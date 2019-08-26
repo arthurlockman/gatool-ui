@@ -1,19 +1,52 @@
 language: node_js
 node_js:
   - node
+
+addons:
+  apt:
+    sources:
+      - google-chrome
+    packages:
+      - google-chrome-stable
+
 cache:
   directories:
     - node_modules
+
 install:
   - npm i -g @angular/cli
   - npm i
-deploy_beta:
-  - provider: script
-    script: ng build -c beta && s3-deploy './dist/gatool-ui/*' --cwd './dist/gatool-ui' --region us-east-1 --bucket beta.gatool.org --distId E2G6T2LTLBO3Q
-    on:
-      branch: beta
-deploy_prod:
-  - provider: script
-    script: ng build -c production && npm run deploy-production
-    on:
-      branch: master
+  - pip install --user awscli
+
+jobs:
+  include:
+    - stage: deploy beta
+      if: branch = beta
+      script: ng build -c beta
+      deploy:
+        provider: s3
+        access_key_id: $AWS_ACCESS_KEY_ID
+        secret_access_key: $AWS_SECRET_ACCESS_KEY
+        bucket: "beta.gatool.org"
+        skip_cleanup: true
+        region: us-east-1
+        local_dir: dist/gatool-ui
+        on:
+          branch: beta
+      after_deploy:
+        - aws cloudfront create-invalidation --distribution-id $BETA_DIST_ID --paths "/*"
+    - stage: deploy production
+      if: branch = master
+      script: ng build -c production
+      deploy:
+        provider: s3
+        access_key_id: $AWS_ACCESS_KEY_ID
+        secret_access_key: $AWS_SECRET_ACCESS_KEY
+        bucket: "gatool.org"
+        skip_cleanup: true
+        region: us-east-1
+        local_dir: dist/gatool-ui
+        on:
+          branch: master
+      after_deploy:
+        - aws cloudfront create-invalidation --distribution-id $PROD_DIST_ID --paths "/*"
