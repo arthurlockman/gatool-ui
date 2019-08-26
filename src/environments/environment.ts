@@ -3,7 +3,9 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  serviceUrl: 'https://www.gatool.org/api/',
+  redirectUri: 'http://localhost:4200/callback'
 };
 
 /*
