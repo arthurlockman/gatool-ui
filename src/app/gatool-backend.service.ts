@@ -1,15 +1,18 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
-import {Observable, throwError} from 'rxjs';
+import {Observable, throwError, of} from 'rxjs';
 import {environment} from '../environments/environment';
-import {catchError} from 'rxjs/operators';
+import {catchError, map} from 'rxjs/operators';
 import {EventList} from './model/event';
 import {AuthService} from './auth.service';
+import { Team } from './model/team';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GaToolBackendService {
+  private teams;
+
   constructor(private http: HttpClient, private auth: AuthService) {
   }
 
@@ -28,6 +31,18 @@ export class GaToolBackendService {
    */
   public getEvents(year: string): Observable<EventList> {
     return this.get(`${year}/events`);
+  }
+
+  /**
+   * Retrieve teams for a particular event and year
+   * @param year The year to fetch teams for
+   * @param event The event to fetch teams for
+   */
+  public getEventTeams(year: string, event: string): Observable<Team[]> {
+    return this.get(`${year}/teams?eventCode=${event}`).pipe(map(evt => {
+      this.teams = (evt as any).teams;
+      return this.teams;
+    }));
   }
 
   /**

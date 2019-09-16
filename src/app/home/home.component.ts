@@ -1,5 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {GaToolBackendService} from '../gatool-backend.service';
+import { EventList } from '../model/event';
+import { Team } from '../model/team';
 
 @Component({
   selector: 'app-home',
@@ -8,14 +10,25 @@ import {GaToolBackendService} from '../gatool-backend.service';
 })
 export class HomeComponent implements OnInit {
 
-  data = '';
+  public events: EventList;
+  public teams: Team[];
 
   constructor(public service: GaToolBackendService) {
   }
 
   ngOnInit() {
+    this.reload();
+  }
+
+  public reload() {
     this.service.getEvents('2019').subscribe(events => {
-      this.data = JSON.stringify(events);
+      this.events = events;
+    });
+  }
+
+  public onChange(eventCode: any) {
+    this.service.getEventTeams('2019', eventCode).subscribe(teams => {
+      this.teams = teams;
     });
   }
 }

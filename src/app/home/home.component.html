@@ -1,2 +1,9 @@
 <h1>Home Component - Displaying 2019 Events</h1>
-<p>{{data}}</p>
+<button (click)="reload()">Reload Data</button>
+<select (change)="onChange($event.target.value)" *ngIf="!!events">
+  <option *ngFor="let event of events.Events" value="{{event.code}}">{{event.name}}</option>
+</select>
+
+<ul *ngIf="!!teams">
+  <li *ngFor="let team of teams">{{team.teamNumber}}</li>
+</ul>

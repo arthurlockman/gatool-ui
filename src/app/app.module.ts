@@ -8,12 +8,14 @@ import {AuthService} from './auth.service';
 import {AUTH0_OPTIONS_TOKEN} from './auth-options';
 import {environment} from '../environments/environment';
 import {HttpClientModule} from '@angular/common/http';
+import { SetupComponent } from './setup/setup.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     CallbackComponent,
-    HomeComponent
+    HomeComponent,
+    SetupComponent
   ],
   imports: [
     BrowserModule,
