@@ -1,4 +1,4 @@
-import {Match} from './match';
+import { Match } from './match';
 
 export class EventSchedule {
   Schedule: Match[];
@@ -34,7 +34,7 @@ export class FRCEvent {
   stateprov: string;
   country: string;
   website: string;
-  webcasts: string[];
+  webcasts: Webcast[];
   timezone: string;
   dateStart: string;
   dateEnd: string;
@@ -42,4 +42,10 @@ export class FRCEvent {
 
 export class EventResponse {
   Events: FRCEvent[];
+}
+
+export class Webcast {
+  channel: string;
+  date: string;
+  type: string;
 }
