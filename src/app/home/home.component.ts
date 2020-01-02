@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {GaToolBackendService} from '../gatool-backend.service';
-import { EventList } from '../model/FRCEvent';
+import {FRCEvent} from '../model/FRCEvent';
 import { Team } from '../model/team';
 
 @Component({
@@ -10,7 +10,7 @@ import { Team } from '../model/team';
 })
 export class HomeComponent implements OnInit {
 
-  public events: EventList;
+  public events: FRCEvent[];
   public teams: Team[];
 
   constructor(public service: GaToolBackendService) {
