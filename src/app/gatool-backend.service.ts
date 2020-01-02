@@ -3,15 +3,15 @@ import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {Observable, throwError, of} from 'rxjs';
 import {environment} from '../environments/environment';
 import {catchError, map} from 'rxjs/operators';
-import {EventList} from './model/event';
+import {FRCEvent, EventResponse} from './model/FRCEvent';
 import {AuthService} from './auth.service';
-import { Team } from './model/team';
+import {Team, TeamResponse} from './model/team';
+import {Award, AwardResponse} from './model/award';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GaToolBackendService {
-  private teams;
 
   constructor(private http: HttpClient, private auth: AuthService) {
   }
@@ -29,8 +29,10 @@ export class GaToolBackendService {
    * Get a list of events for a particular year.
    * @param year The year to fetch events for.
    */
-  public getEvents(year: string): Observable<EventList> {
-    return this.get(`${year}/events`);
+  public getEvents(year: string): Observable<FRCEvent[]> {
+    return this.get(`${year}/events`).pipe(map(evt => {
+      return (evt as EventResponse).Events;
+    }));
   }
 
   /**
@@ -40,8 +42,18 @@ export class GaToolBackendService {
    */
   public getEventTeams(year: string, event: string): Observable<Team[]> {
     return this.get(`${year}/teams?eventCode=${event}`).pipe(map(evt => {
-      this.teams = (evt as any).teams;
-      return this.teams;
+      return (evt as TeamResponse).teams;
+    }));
+  }
+
+  /**
+   * Retrieve team awards for a particular year
+   * @param year The year to fetch awards for
+   * @param teamNumber The team to fetch awards for
+   */
+  public getTeamAwards(year: string, teamNumber: number): Observable<Award[]> {
+    return this.get(`${year}/awards/${teamNumber}`).pipe(map(evt => {
+      return (evt as AwardResponse).Awards;
     }));
   }
 

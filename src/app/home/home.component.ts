@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {GaToolBackendService} from '../gatool-backend.service';
-import { EventList } from '../model/event';
+import { EventList } from '../model/FRCEvent';
 import { Team } from '../model/team';
 
 @Component({

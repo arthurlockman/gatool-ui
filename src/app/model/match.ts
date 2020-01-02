@@ -1,5 +1,5 @@
 import {Team} from './team';
-import {EventType} from './event';
+import {EventType} from './FRCEvent';
 
 export class Match {
   description: string;

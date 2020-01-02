@@ -22,7 +22,7 @@ export class TeamAvatar {
   encodedAvatar: string;
 }
 
-export class Event {
+export class FRCEvent {
   code: string;
   divisionCode: string;
   name: string;
@@ -40,6 +40,6 @@ export class Event {
   dateEnd: string;
 }
 
-export class EventList {
-  Events: Event[];
+export class EventResponse {
+  Events: FRCEvent[];
 }
