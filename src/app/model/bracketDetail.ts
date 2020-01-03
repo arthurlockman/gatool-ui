@@ -1,3 +1,5 @@
+// This class supports the playoff bracket.
+
 export class BracketDetail {
     description: string;
     redAlliance: number[];

@@ -1,5 +1,8 @@
 import { Match } from './match';
 
+// These classes support calls to the events API. Responses
+// contain arrays of matches as well as event details.
+
 export class EventSchedule {
   Schedule: Match[];
 }
@@ -9,19 +12,9 @@ export class EventType {
   type: string;
 }
 
-export class EventAvatars {
-  teams: TeamAvatar[];
-  teamCountTotal: number;
-  teamCountPage: number;
-  pageCurrent: number;
-  pageTotal: number;
+export class EventResponse {
+  Events: FRCEvent[];
 }
-
-export class TeamAvatar {
-  teamNumber: number;
-  encodedAvatar: string;
-}
-
 export class FRCEvent {
   code: string;
   divisionCode: string;
@@ -38,10 +31,6 @@ export class FRCEvent {
   timezone: string;
   dateStart: string;
   dateEnd: string;
-}
-
-export class EventResponse {
-  Events: FRCEvent[];
 }
 
 export class Webcast {

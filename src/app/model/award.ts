@@ -1,3 +1,7 @@
+// These classes support calls to awards APIs. Awards are
+// used during the regular season, and AllTeamAwards are
+// used during FIRST Champs events.
+
 export class AwardResponse {
   Awards: Award[];
 }

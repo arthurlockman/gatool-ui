@@ -1,6 +1,8 @@
 import {Team} from './team';
 import {EventType} from './FRCEvent';
 
+// These classes support calls to multiple APIs that return Match data.
+
 export class Match {
   description: string;
   tournamentLevel: string;
@@ -20,11 +22,4 @@ export class Match {
 export class MatchWithEventDetails {
   event: EventType;
   match: Match;
-}
-
-export class MatchWithHighScoreDetails {
-  event: EventType;
-  match: Match;
-  // Either 'red' or 'blue'
-  highScoreAlliance: string;
 }

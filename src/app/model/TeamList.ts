@@ -1,3 +1,7 @@
+// These classes support calls to the teams API, which
+// reports on which teams are registered for a specific
+// event or season.
+
 export class TeamList {
     teamList: TeamDetail[];
 }

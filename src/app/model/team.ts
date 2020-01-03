@@ -1,3 +1,5 @@
+// These classes support calls to the Schedule APIs.
+
 export class TeamResponse {
   teams: Team[];
 }
@@ -9,6 +11,10 @@ export class Team {
   dq: boolean;
   teamName: string;
 }
+
+// This class supports the locally stored team record. It contains both
+// FIRST-supplied and calculated data about the team, and it is used
+// throughtout the application.
 
 export class TeamData {
   nameShort: string;

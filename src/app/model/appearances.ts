@@ -1,5 +1,14 @@
 import { Webcast } from './FRCEvent';
 
+// These classes are used to support FIRST Champs statistics. We provide
+// additional team lifetime stats to GAs during FIRST Champs. These
+// include champs appearances, notable  awards during the regular
+// season, and so on.
+//
+// These structures are different because they support calls to
+// the Blue Alliance APIs, whcih have a different schema than
+// the FIRST APIs.
+
 export class AppearancesResponse {
     Appearances: Appearance[];
 }

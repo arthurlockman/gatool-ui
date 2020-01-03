@@ -1,3 +1,5 @@
+// These classes support calls to the Alliances API.
+
 export class AlliancesResponse {
     Alliances: Alliance[];
 }

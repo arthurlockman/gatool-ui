@@ -1,6 +1,10 @@
 import { EventType } from './FRCEvent';
 import { Match } from './match';
 
+// These classes support calls to the high scores API. We report
+// on event and global high scores, which we use to populate
+// the stats component.
+
 export class HighScoresResponse {
     HighScores: HighScore[];
 }
@@ -10,11 +14,12 @@ export class HighScore {
     year: string;
     type: string;
     level: string;
-    matchData: MatchData;
+    matchData: MatchWithHighScoreDetails;
 }
 
-export class MatchData {
+export class MatchWithHighScoreDetails {
     event: EventType;
-    highScoreAlliance: string;
     match: Match;
-}
+    // Either 'red' or 'blue'
+    highScoreAlliance: string;
+  }

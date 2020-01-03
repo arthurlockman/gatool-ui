@@ -1,3 +1,7 @@
+// These classes support calls to the rankings API. The response
+// is an array of Ranks, which we use to populate TeamData and
+// to draw the rankings component.
+
 export class RankingsResponse {
     Rankings: Rank[];
 }
