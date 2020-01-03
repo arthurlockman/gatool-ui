@@ -4,6 +4,10 @@ export class AppearancesResponse {
     Appearances: Appearance[];
 }
 
+export class EventAppearancesResponse {
+    EventAppearances: EventAppearance[];
+}
+
 export class Appearance {
     address: string;
     city: string;
@@ -42,4 +46,17 @@ export class District {
     display_name: string;
     key: string;
     year: number;
+}
+
+export class EventAppearance {
+    champsAppearances: number;
+    champsAppearancesyears: string[];
+    einsteinAppearances: number;
+    einsteinAppearancesyears: string[];
+    districtChampsAppearances: number;
+    districtChampsAppearancesyears: string[];
+    districtEinsteinAppearances: number;
+    districtEinsteinAppearancesyears: string[];
+    FOCAppearances: number;
+    FOCAppearancesyears: string[];
 }
