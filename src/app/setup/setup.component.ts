@@ -11,6 +11,7 @@ import {FRCEvent} from '../model/FRCEvent';
 export class SetupComponent implements OnInit {
   public availableSeasonEvents: FRCEvent[];
   public eventsLoading = false;
+  public teamDataBold = false;
 
   constructor(public service: GaToolBackendService, public stateManager: StateService) { }
 
@@ -19,6 +20,7 @@ export class SetupComponent implements OnInit {
     if (!!selectedSeason) {
       this.seasonSelectionChange(selectedSeason);
     }
+    this.teamDataBold = this.stateManager.getTeamDataBold();
   }
 
   public seasonSelectionChange(newSeason: string) {
@@ -36,5 +38,9 @@ export class SetupComponent implements OnInit {
 
   public eventSelectionChange(eventCode: string) {
     this.stateManager.setSelectedEvent(eventCode);
+  }
+
+  public teamDataBoldSwitchChange() {
+    this.stateManager.setTeamDataBold(this.teamDataBold);
   }
 }

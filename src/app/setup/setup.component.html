@@ -27,10 +27,14 @@
       <div class="card">
         <div class="card-header">
           <h4>
-            More Settings Over Here
+            Display Settings
           </h4>
         </div>
         <div class="card-body">
+          <div class="custom-control custom-switch">
+            <input type="checkbox" class="custom-control-input" id="teamDataBoldSwitch" (change)="teamDataBoldSwitchChange()" [(ngModel)]="teamDataBold">
+            <label class="custom-control-label" for="teamDataBoldSwitch">Should team names be bold?</label>
+          </div>
         </div>
       </div>
     </div>

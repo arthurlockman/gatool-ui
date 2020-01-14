@@ -13,7 +13,7 @@
     </div>
     <div class="card-body">
       <ul *ngIf="!!teams">
-        <li *ngFor="let team of teams">{{team.teamNumber}} - {{team.nameShort}}</li>
+        <app-team-data-row *ngFor="let team of teams" [team]="team"></app-team-data-row>
       </ul>
       <div class="d-flex align-items-center m-2" *ngIf="fetchInProgress">
         <strong>Loading teams...</strong>

@@ -11,6 +11,9 @@ export class StateService {
   // Default values
   static defaultSeason = '2020';
 
+  // Temporary (non-persisted) settings
+  private teamDataBold = false;
+
   constructor() { }
 
   /**
@@ -42,5 +45,13 @@ export class StateService {
    */
   public getSelectedEvent(): string {
     return localStorage.getItem(StateService.eventStorageKey);
+  }
+
+  public setTeamDataBold(bold: boolean): void {
+    this.teamDataBold = bold;
+  }
+
+  public getTeamDataBold(): boolean {
+    return this.teamDataBold;
   }
 }
