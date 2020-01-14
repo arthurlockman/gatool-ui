@@ -1,0 +1,20 @@
+<div class="container pt-4">
+  <div class="card" *ngIf="!(!!selectedSeason && !!selectedEvent)">
+    <div class="card-header">
+      <h1>No Season Selected</h1>
+    </div>
+    <div class="card-body">
+      <h2 style="color: red">Please select a year and season on the setup tab</h2>
+    </div>
+  </div>
+  <div class="card" *ngIf="!!selectedSeason && !!selectedEvent">
+    <div class="card-header">
+      <h1>{{selectedSeason}} - {{selectedEvent}} Schedule</h1>
+    </div>
+    <div class="card-body">
+      <p>
+        Data will go here
+      </p>
+    </div>
+  </div>
+</div>

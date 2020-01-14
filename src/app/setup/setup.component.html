@@ -1,1 +1,38 @@
-<p>setup works!</p>
+<div class="container pt-4">
+  <div class="row">
+    <div class="col-sm-6">
+      <div class="card">
+        <div class="card-header">
+          <h4>
+            Select an Event
+          </h4>
+        </div>
+        <div class="card-body">
+          <select (change)="seasonSelectionChange($event.target.value)" class="form-control form-control-lg" [value]="stateManager.getSelectedSeason()">
+            <option value="2020">2020 Season</option>
+            <option value="2019">2019 Season (past)</option>
+            <option value="2018">2018 Season (past)</option>
+          </select>
+          <select (change)="eventSelectionChange($event.target.value)" *ngIf="!!availableSeasonEvents" class="form-control form-control-lg" [value]="stateManager.getSelectedEvent()">
+            <option *ngFor="let event of availableSeasonEvents" value="{{event.code}}">{{event.dateStart}} - {{event.name}}</option>
+          </select>
+          <div class="d-flex align-items-center m-2" *ngIf="eventsLoading">
+            <strong>Loading events...</strong>
+            <div class="spinner-border ml-auto" role="status" aria-hidden="true"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div class="card">
+        <div class="card-header">
+          <h4>
+            More Settings Over Here
+          </h4>
+        </div>
+        <div class="card-body">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

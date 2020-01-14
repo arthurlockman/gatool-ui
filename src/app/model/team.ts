@@ -9,7 +9,8 @@ export class Team {
   station: string;
   surrogate: boolean;
   dq: boolean;
-  teamName: string;
+  nameShort: string;
+  nameFull: string;
 }
 
 // This class supports the locally stored team record. It contains both

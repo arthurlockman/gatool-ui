@@ -1,0 +1,24 @@
+<div class="container pt-4">
+  <div class="card" *ngIf="!(!!selectedSeason && !!selectedEvent)">
+    <div class="card-header">
+      <h1>No Season Selected</h1>
+    </div>
+    <div class="card-body">
+      <h2 style="color: red">Please select a year and season on the setup tab</h2>
+    </div>
+  </div>
+  <div class="card" *ngIf="!!selectedSeason && !!selectedEvent">
+    <div class="card-header">
+      <h1>{{selectedSeason}} - {{selectedEvent}} Teams</h1>
+    </div>
+    <div class="card-body">
+      <ul *ngIf="!!teams">
+        <li *ngFor="let team of teams">{{team.teamNumber}} - {{team.nameShort}}</li>
+      </ul>
+      <div class="d-flex align-items-center m-2" *ngIf="fetchInProgress">
+        <strong>Loading teams...</strong>
+        <div class="spinner-border ml-auto" role="status" aria-hidden="true"></div>
+      </div>
+    </div>
+  </div>
+</div>

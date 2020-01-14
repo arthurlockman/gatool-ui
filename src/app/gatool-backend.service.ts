@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
-import {Observable, throwError, of} from 'rxjs';
+import {Observable, throwError} from 'rxjs';
 import {environment} from '../environments/environment';
 import {catchError, map} from 'rxjs/operators';
 import {FRCEvent, EventResponse} from './model/FRCEvent';
