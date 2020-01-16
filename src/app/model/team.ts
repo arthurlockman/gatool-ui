@@ -1,7 +1,7 @@
 // These classes support calls to the Schedule APIs.
 
 export class TeamResponse {
-  teams: Team[];
+  teams: TeamData[];
 }
 
 export class Team {
@@ -18,12 +18,20 @@ export class Team {
 // throughtout the application.
 
 export class TeamData {
-  nameShort: string;
+  teamNumber: number;
   nameFull: string;
-  cityState: string;
-  cityStateSort: string;
+  nameShort: string;
+  schoolName: string;
+  city: string;
+  stateProv: string;
+  country: string;
+  website: string;
   rookieYear: number;
   robotName: string;
+  districtCode: string;
+  homeCMP: string;
+  cityState: string;
+  cityStateSort: string;
   organization: string;
   sponsors: string;
   topSponsors: string;

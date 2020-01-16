@@ -1,8 +1,8 @@
-<li>{{team.teamNumber}} - <span [ngStyle]="stateManager.getTeamDataBold() ? {'font-weight': 'bold'} : {}">{{team.nameShort}}</span>
+<li>{{team.teamNumber}} - <span [ngStyle]="stateManager.getTeamDataBold() ? {'font-weight': 'bold'} : {}">{{team.nameShort}}</span><p>{{team.organization}}</p><p>Top Sponsors: {{team.topSponsors}}</p>
   <div *ngIf="!!teamAwards && teamAwards.length > 0">
     <ul>
       <li *ngFor="let award of teamAwards">
-        {{award.awardId}} - {{award.name}}
+        {{award.awardId}} - {{award.name}} – {{award.schoolName}}
       </li>
     </ul>
   </div>

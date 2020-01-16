@@ -5,7 +5,7 @@ import {environment} from '../environments/environment';
 import {catchError, map} from 'rxjs/operators';
 import {FRCEvent, EventResponse} from './model/FRCEvent';
 import {AuthService} from './auth.service';
-import {Team, TeamResponse} from './model/team';
+import {Team, TeamData, TeamResponse} from './model/team';
 import {Award, AwardResponse} from './model/award';
 
 @Injectable({
@@ -40,7 +40,7 @@ export class GaToolBackendService {
    * @param year The year to fetch teams for
    * @param event The event to fetch teams for
    */
-  public getEventTeams(year: string, event: string): Observable<Team[]> {
+  public getEventTeams(year: string, event: string): Observable<TeamData[]> {
     return this.get(`${year}/teams?eventCode=${event}`).pipe(map(evt => {
       return (evt as TeamResponse).teams;
     }));

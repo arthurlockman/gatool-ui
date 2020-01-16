@@ -1,5 +1,5 @@
 import {Component, Input, OnChanges} from '@angular/core';
-import {Team} from '../../model/team';
+import {Team, TeamData} from '../../model/team';
 import {StateService} from '../../state.service';
 import {GaToolBackendService} from '../../gatool-backend.service';
 import {Award} from '../../model/award';
@@ -10,7 +10,7 @@ import {Award} from '../../model/award';
   styleUrls: ['./team-data-row.component.scss']
 })
 export class TeamDataRowComponent implements OnChanges {
-  @Input() team: Team;
+  @Input() team: TeamData;
   public loadingTeamData = false;
   public teamAwards: Award[];
 
