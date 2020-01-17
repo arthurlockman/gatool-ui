@@ -1,3 +1,5 @@
+import { Award } from './award';
+
 // These classes support calls to the Schedule APIs.
 
 export class TeamResponse {
@@ -35,7 +37,7 @@ export class TeamData {
   organization: string;
   sponsors: string;
   topSponsors: string;
-  awards: string;
+  awards: Award[];
   alliance: number;
   allianceName: string;
   allianceChoice: string;
