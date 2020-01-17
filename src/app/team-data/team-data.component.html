@@ -11,14 +11,48 @@
     <div class="card-header">
       <h1>{{selectedSeason}} - {{selectedEvent}} Teams</h1>
     </div>
-    <div class="card-body">
-      <ul *ngIf="!!teams">
-        <app-team-data-row *ngFor="let team of teams" [team]="team"></app-team-data-row>
-      </ul>
-      <div class="d-flex align-items-center m-2" *ngIf="fetchInProgress">
-        <strong>Loading teams...</strong>
-        <div class="spinner-border ml-auto" role="status" aria-hidden="true"></div>
-      </div>
+    <div >
+      <table class="table table-striped table-sm">
+        <thead>
+          <tr>
+            <th>Team #</th>
+            <th>Rank</th>
+            <th>Team Name</th>
+            <th>City</th>
+            <th>Top 5 Sponsors</th>
+            <th>Organization</th>
+            <th>Rookie Year</th>
+            <th>Robot Name</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let team of teams">
+            <td>{{team.teamNumber}}</td>
+            <td>{{team.rank}}</td>
+            <td class="table-success" *ngIf="team.nameShortLocal; else nameShort">{{team.nameShortLocal}}</td>
+            <ng-template #nameShort>
+              <td>{{team.nameShort}}</td>
+            </ng-template>
+            <td class="table-success" *ngIf="team.cityStateLocal; else cityState">{{team.cityStateLocal}}</td>
+            <ng-template #cityState>
+              <td>{{team.cityState}}</td>
+            </ng-template>
+            <td class="table-success" *ngIf="team.topSponsorsLocal; else topSponsors">{{team.topSponsorsLocal}}</td>
+            <ng-template #topSponsors>
+              <td>{{team.topSponsors}}</td>
+            </ng-template>
+            <td class="table-success" *ngIf="team.organizationLocal; else organization">{{team.organizationLocal}}</td>
+            <ng-template #organization>
+              <td>{{team.organization}}</td>
+            </ng-template>
+            <td>{{team.rookieYear}}</td>
+            <td class="table-success" *ngIf="team.robotNameLocal; else robotName">{{team.robotNameLocal}}</td>
+            <ng-template #robotName>
+              <td>{{team.robotName}}</td>
+            </ng-template>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </div>

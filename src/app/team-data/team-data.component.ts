@@ -24,6 +24,8 @@ export class TeamDataComponent implements OnInit {
       this.service.getEventTeams(this.selectedSeason, this.selectedEvent).subscribe(teams => {
         this.fetchInProgress = false;
         this.teams = this.expandSponsors(teams);
+        this.teams = this.getAwards(teams);
+        console.log(teams);
       }, err => {
         console.error(err);
         this.fetchInProgress = false;
@@ -40,6 +42,8 @@ export class TeamDataComponent implements OnInit {
     let organizationArray: string[];
     // We need to split apart the sponsors because FIRST combines the sponsors and the school in nameFull
     for (team of teams) {
+      team.cityState = team.city + ', ' + team.stateProv;
+      team.cityStateSort = team.country + ':' + team.stateProv + ':' + team.city;
       sponsorsRaw = team.nameFull;
       if (team.schoolName) {
         team.organization = team.schoolName;
@@ -95,7 +99,18 @@ export class TeamDataComponent implements OnInit {
         }
         return arr;
       }
-      console.log(team);
+    }
+    return teams;
+  }
+
+  getAwards(teams: TeamData[]) {
+    let team: TeamData;
+    for (team of teams) {
+      this.service.getTeamAwards(this.stateManager.getSelectedSeason(), team.teamNumber).subscribe(awards => {
+        team.awards = awards;
+      }, err => {
+        console.error(err);
+      });
     }
     return teams;
   }
