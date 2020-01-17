@@ -16,7 +16,7 @@
           <select (change)="eventSelectionChange($event.target.value)" *ngIf="!!availableSeasonEvents" class="form-control form-control-lg" [value]="stateManager.getSelectedEvent()">
             <option *ngFor="let event of availableSeasonEvents" value="{{event.code}}">{{event.dateStart}} - {{event.name}}</option>
           </select>
-          <div class="d-flex align-items-center m-2" *ngIf="eventsLoading">
+          <div class="d-flex align-items-center m-2" *ngIf="stateManager.httpOperationsInProgress()">
             <strong>Loading events...</strong>
             <div class="spinner-border ml-auto" role="status" aria-hidden="true"></div>
           </div>

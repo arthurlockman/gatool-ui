@@ -21,6 +21,11 @@
           Team Data
         </a>
       </li>
+      <li class="nav-item">
+        <div class="spinner-grow text-light" role="status" *ngIf="stateService.httpOperationsInProgress()">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </li>
     </ul>
   </div>
 </nav>

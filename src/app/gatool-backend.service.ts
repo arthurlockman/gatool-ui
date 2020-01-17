@@ -7,13 +7,14 @@ import {FRCEvent, EventResponse} from './model/FRCEvent';
 import {AuthService} from './auth.service';
 import {Team, TeamData, TeamResponse} from './model/team';
 import {Award, AwardResponse} from './model/award';
+import {CacheService} from './cache.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GaToolBackendService {
 
-  constructor(private http: HttpClient, private auth: AuthService) {
+  constructor(private http: HttpClient, private auth: AuthService, private cache: CacheService) {
   }
 
   /**
@@ -30,9 +31,10 @@ export class GaToolBackendService {
    * @param year The year to fetch events for.
    */
   public getEvents(year: string): Observable<FRCEvent[]> {
-    return this.get(`${year}/events`).pipe(map(evt => {
+    const route = `${year}/events`;
+    return this.cache.get(route, this.get(route).pipe(map(evt => {
       return (evt as EventResponse).Events;
-    }));
+    })), 86400);
   }
 
   /**
@@ -41,9 +43,10 @@ export class GaToolBackendService {
    * @param event The event to fetch teams for
    */
   public getEventTeams(year: string, event: string): Observable<TeamData[]> {
-    return this.get(`${year}/teams?eventCode=${event}`).pipe(map(evt => {
+    const route = `${year}/teams?eventCode=${event}`;
+    return this.cache.get(route, this.get(route).pipe(map(evt => {
       return (evt as TeamResponse).teams;
-    }));
+    })), 86400);
   }
 
   /**
@@ -52,9 +55,10 @@ export class GaToolBackendService {
    * @param teamNumber The team to fetch awards for
    */
   public getTeamAwards(year: string, teamNumber: number): Observable<Award[]> {
-    return this.get(`${year}/awards/${teamNumber}`).pipe(map(evt => {
+    const route = `${year}/awards/${teamNumber}`;
+    return this.cache.get(route, this.get(route).pipe(map(evt => {
       return (evt as AwardResponse).Awards;
-    }));
+    })), 3600);
   }
 
   /**

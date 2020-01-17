@@ -9,31 +9,38 @@ import { TeamData } from '../model/team';
   styleUrls: ['./team-data.component.scss']
 })
 export class TeamDataComponent implements OnInit {
-  public selectedSeason: string;
-  public selectedEvent: string;
-  public fetchInProgress = false;
-  public teams: TeamData[];
 
   constructor(public service: GaToolBackendService, public stateManager: StateService) { }
+  public selectedSeason: string;
+  public selectedEvent: string;
+  public teams: TeamData[];
+
+  private static trimArray(arr) {
+    let i: number;
+    for (i = 0; i <= arr.length - 1; i++) {
+      arr[i] = arr[i].trim();
+    }
+    return arr;
+  }
 
   ngOnInit() {
     this.selectedSeason = this.stateManager.getSelectedSeason();
     this.selectedEvent = this.stateManager.getSelectedEvent();
+    this.stateManager.startHttpOperation();
     if (!!this.selectedEvent && !!this.selectedSeason) {
-      this.fetchInProgress = true;
       this.service.getEventTeams(this.selectedSeason, this.selectedEvent).subscribe(teams => {
-        this.fetchInProgress = false;
-        this.teams = this.expandSponsors(teams);
-        this.teams = this.getAwards(teams);
-        console.log(teams);
+        this.stateManager.finishHttpOperation();
+        this.teams = teams;
+        this.expandSponsors();
+        this.getAwards();
       }, err => {
+        this.stateManager.finishHttpOperation();
         console.error(err);
-        this.fetchInProgress = false;
       });
     }
   }
 
-  expandSponsors(teams: TeamData[]) {
+  expandSponsors(): void {
     let team: TeamData;
     let sponsorArray: string[];
     let topSponsorsArray: string[];
@@ -41,7 +48,7 @@ export class TeamDataComponent implements OnInit {
     let sponsorsRaw: string;
     let organizationArray: string[];
     // We need to split apart the sponsors because FIRST combines the sponsors and the school in nameFull
-    for (team of teams) {
+    for (team of this.teams) {
       team.cityState = team.city + ', ' + team.stateProv;
       team.cityStateSort = team.country + ':' + team.stateProv + ':' + team.city;
       sponsorsRaw = team.nameFull;
@@ -49,18 +56,18 @@ export class TeamDataComponent implements OnInit {
         team.organization = team.schoolName;
       }
       if (!team.organization) {
-        sponsorArray = trimArray(team.nameFull.split('/'));
+        sponsorArray = TeamDataComponent.trimArray(team.nameFull.split('/'));
       } else {
         if (team.organization === sponsorsRaw) {
           sponsorArray[0] = sponsorsRaw;
         } else {
           sponsorsRaw = sponsorsRaw.slice(0, sponsorsRaw.length - team.organization.length).trim();
           sponsorsRaw = sponsorsRaw.slice(0, sponsorsRaw.length - 1).trim();
-          sponsorArray = trimArray(sponsorsRaw.split('/'));
+          sponsorArray = TeamDataComponent.trimArray(sponsorsRaw.split('/'));
         }
       }
 
-      organizationArray = trimArray(team.nameFull.split('/').pop().split('&'));
+      organizationArray = TeamDataComponent.trimArray(team.nameFull.split('/').pop().split('&'));
 
       if (!sponsorArray && !organizationArray && !team.organization) {
         team.organization = 'No organization in TIMS';
@@ -91,28 +98,20 @@ export class TeamDataComponent implements OnInit {
           team.organization = organizationArray.join(' & ');
         }
       }
-
-      function trimArray(arr) {
-        let i: number;
-        for (i = 0; i <= arr.length - 1; i++) {
-          arr[i] = arr[i].trim();
-        }
-        return arr;
-      }
     }
-    return teams;
   }
 
-  getAwards(teams: TeamData[]) {
-    let team: TeamData;
-    for (team of teams) {
+  getAwards(): void {
+    for (const team of this.teams) {
+      this.stateManager.startHttpOperation();
       this.service.getTeamAwards(this.stateManager.getSelectedSeason(), team.teamNumber).subscribe(awards => {
+        this.stateManager.finishHttpOperation();
         team.awards = awards;
+        this.teams[this.teams.indexOf(team)] = team;
       }, err => {
+        this.stateManager.finishHttpOperation();
         console.error(err);
       });
     }
-    return teams;
   }
-
 }

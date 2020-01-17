@@ -23,6 +23,7 @@
             <th>Organization</th>
             <th>Rookie Year</th>
             <th>Robot Name</th>
+            <th>Awards</th>
           </tr>
         </thead>
         <tbody>
@@ -49,6 +50,16 @@
             <td class="table-success" *ngIf="team.robotNameLocal; else robotName">{{team.robotNameLocal}}</td>
             <ng-template #robotName>
               <td>{{team.robotName}}</td>
+            </ng-template>
+            <td class="table-success" *ngIf="team.awardsLocal; else awards">{{team.awardsLocal}}</td>
+            <ng-template #awards>
+              <td>
+                <ul>
+                  <li *ngFor="let award of team.awards">
+                    {{award.name}}
+                  </li>
+                </ul>
+              </td>
             </ng-template>
           </tr>
         </tbody>

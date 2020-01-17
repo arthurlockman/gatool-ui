@@ -14,6 +14,9 @@ export class StateService {
   // Temporary (non-persisted) settings
   private teamDataBold = false;
 
+  // Number of active operations on the page
+  private operationsInProgress = 0;
+
   constructor() { }
 
   /**
@@ -53,5 +56,17 @@ export class StateService {
 
   public getTeamDataBold(): boolean {
     return this.teamDataBold;
+  }
+
+  public startHttpOperation(): void {
+    this.operationsInProgress++;
+  }
+
+  public finishHttpOperation(): void {
+    if (this.operationsInProgress > 0) { this.operationsInProgress--; }
+  }
+
+  public httpOperationsInProgress(): boolean {
+    return this.operationsInProgress > 0;
   }
 }
