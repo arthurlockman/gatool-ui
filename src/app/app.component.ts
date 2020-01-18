@@ -8,11 +8,12 @@ import {StateService} from './state.service';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  title = 'gatool-ui';
+  public loading = false;
 
   constructor(private auth: AuthService, public stateService: StateService) {
   }
 
   ngOnInit() {
+    this.stateService.httpOperationsInProgress().subscribe(loading => this.loading = loading);
   }
 }

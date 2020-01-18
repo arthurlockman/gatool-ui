@@ -1,6 +1,8 @@
 import {Injectable} from '@angular/core';
-import {Observable, of, Subject, throwError} from 'rxjs';
-import {catchError, tap} from 'rxjs/operators';
+import {from, Observable, of, Subject, throwError} from 'rxjs';
+import {catchError, flatMap, map, tap} from 'rxjs/operators';
+import {StateService} from './state.service';
+import { get, set, keys, del, clear } from 'idb-keyval';
 
 interface CacheContent {
   expiry: number;
@@ -16,9 +18,13 @@ interface CacheContent {
   providedIn: 'root'
 })
 export class CacheService {
-  private cache: Map<string, CacheContent> = new Map<string, CacheContent>();
   private inFlightObservables: Map<string, Subject<any>> = new Map<string, Subject<any>>();
   readonly DEFAULT_MAX_AGE: number = 60; // seconds
+  private offline = false;
+
+  constructor(private stateService: StateService) {
+    this.stateService.getOfflineStatus().subscribe(offline => this.offline = offline);
+  }
 
   /**
    * Gets the value from cache if the key is provided.
@@ -27,33 +33,35 @@ export class CacheService {
    * Subject inFlightObservable and return the source observable.
    */
   get(key: string, fallback?: Observable<any>, maxAge?: number): Observable<any> | Subject<any> {
+    return this.hasValidCachedValue(key).pipe(flatMap(cachedValue => {
+      if (cachedValue != null) {
+        console.log(`%cGetting from cache ${key}`, 'color: green');
+        return of(cachedValue.value);
+      } else if (this.offline) {
+        return throwError(`No cached value found for route ${key}`);
+      }
 
-    if (this.hasValidCachedValue(key)) {
-      console.log(`%cGetting from cache ${key}`, 'color: green');
-      return of(this.cache.get(key).value);
-    }
+      if (!maxAge) {
+        maxAge = this.DEFAULT_MAX_AGE;
+      }
 
-    if (!maxAge) {
-      maxAge = this.DEFAULT_MAX_AGE;
-    }
-
-    if (this.inFlightObservables.has(key)) {
-      return this.inFlightObservables.get(key);
-    } else if (fallback && fallback instanceof Observable) {
-      this.inFlightObservables.set(key, new Subject());
-      console.log(`%c Calling api for ${key}`, 'color: purple');
-      return fallback.pipe(tap((value) => { this.set(key, value, maxAge); }),
-        catchError((e: any) => { // `fallback` are crashed
-          // crashed flight is terrible😰, it's better to clean it up...
-          this.inFlightObservables.delete(key);
-          // and when we have done our job, it's good idea to let the others know this event.
-          // maybe they have their stuffs need to be done too.
-          return throwError(e);
-        }));
-    } else {
-      return throwError('Requested key is not available in Cache');
-    }
-
+      if (this.inFlightObservables.has(key)) {
+        return this.inFlightObservables.get(key);
+      } else if (fallback && fallback instanceof Observable) {
+        this.inFlightObservables.set(key, new Subject());
+        console.log(`%c Calling api for ${key}`, 'color: purple');
+        return fallback.pipe(tap((value) => { this.set(key, value, maxAge); }),
+          catchError((e: any) => { // `fallback` are crashed
+            // crashed flight is terrible it's better to clean it up...
+            this.inFlightObservables.delete(key);
+            // and when we have done our job, it's good idea to let the others know this event.
+            // maybe they have their stuffs need to be done too.
+            return throwError(e);
+          }));
+      } else {
+        return throwError('Requested key is not available in Cache');
+      }
+    }));
   }
 
   /**
@@ -61,15 +69,26 @@ export class CacheService {
    * Notifies all observers of the new value
    */
   set(key: string, value: any, maxAge: number = this.DEFAULT_MAX_AGE): void {
-    this.cache.set(key, { value, expiry: Date.now() + (maxAge * 1000) });
-    this.notifyInFlightObservers(key, value);
+    const content: CacheContent = { value, expiry: Date.now() + (maxAge * 1000) };
+    set(key, content).then(() =>
+      this.notifyInFlightObservers(key, value)
+    ).catch(err => console.error(err));
   }
 
   /**
    * Checks if the a key exists in cache
    */
-  has(key: string): boolean {
-    return this.cache.has(key);
+  has(key: string): Observable<boolean> {
+    return from(keys()).pipe(map(k => {
+      return k.includes(key);
+    }));
+  }
+
+  /**
+   * Clear the cache
+   */
+  clear(): Observable<void> {
+    return from(clear());
   }
 
   /**
@@ -92,15 +111,13 @@ export class CacheService {
   /**
    * Checks if the key exists and   has not expired.
    */
-  private hasValidCachedValue(key: string): boolean {
-    if (this.cache.has(key)) {
-      if (this.cache.get(key).expiry < Date.now()) {
-        this.cache.delete(key);
-        return false;
+  private hasValidCachedValue(key: string): Observable<CacheContent | null> {
+    return from(get<CacheContent>(key)).pipe(flatMap(value => {
+      if (!!value && value.expiry < Date.now() && !this.offline) {
+        return from(del(key)).pipe(map(() => null));
+      } else {
+        return of(value);
       }
-      return true;
-    } else {
-      return false;
-    }
+    }));
   }
 }

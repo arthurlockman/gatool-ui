@@ -16,7 +16,7 @@
           <select (change)="eventSelectionChange($event.target.value)" *ngIf="!!availableSeasonEvents" class="form-control form-control-lg" [value]="stateManager.getSelectedEvent()">
             <option *ngFor="let event of availableSeasonEvents" value="{{event.code}}">{{event.dateStart}} - {{event.name}}</option>
           </select>
-          <div class="d-flex align-items-center m-2" *ngIf="stateManager.httpOperationsInProgress()">
+          <div class="d-flex align-items-center m-2" *ngIf="loading">
             <strong>Loading events...</strong>
             <div class="spinner-border ml-auto" role="status" aria-hidden="true"></div>
           </div>
@@ -32,9 +32,10 @@
         </div>
         <div class="card-body">
           <div class="custom-control custom-switch">
-            <input type="checkbox" class="custom-control-input" id="teamDataBoldSwitch" (change)="teamDataBoldSwitchChange()" [(ngModel)]="teamDataBold">
-            <label class="custom-control-label" for="teamDataBoldSwitch">Should team names be bold?</label>
+            <input type="checkbox" class="custom-control-input" id="offlineModeSwitch" (change)="offlineModeSwitchChange()" [(ngModel)]="offlineMode">
+            <label class="custom-control-label" for="offlineModeSwitch">Offline mode</label>
           </div>
+          <button class="btn btn-lg btn-block btn-danger" (click)="clearCache()">Clear Cache</button>
         </div>
       </div>
     </div>

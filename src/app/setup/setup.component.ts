@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { GaToolBackendService } from '../gatool-backend.service';
 import {StateService} from '../state.service';
 import {FRCEvent} from '../model/FRCEvent';
+import {CacheService} from '../cache.service';
 
 @Component({
   selector: 'app-setup',
@@ -10,16 +11,19 @@ import {FRCEvent} from '../model/FRCEvent';
 })
 export class SetupComponent implements OnInit {
   public availableSeasonEvents: FRCEvent[];
-  public teamDataBold = false;
+  public offlineMode = false;
+  public loading = false;
 
-  constructor(public service: GaToolBackendService, public stateManager: StateService) { }
+  constructor(public service: GaToolBackendService, public stateManager: StateService,
+              private cacheService: CacheService) { }
 
   ngOnInit() {
+    this.stateManager.httpOperationsInProgress().subscribe(loading => this.loading = loading);
     const selectedSeason = this.stateManager.getSelectedSeason();
     if (!!selectedSeason) {
       this.seasonSelectionChange(selectedSeason);
     }
-    this.teamDataBold = this.stateManager.getTeamDataBold();
+    this.stateManager.getOfflineStatus().subscribe(offline => this.offlineMode = offline);
   }
 
   public seasonSelectionChange(newSeason: string) {
@@ -39,7 +43,19 @@ export class SetupComponent implements OnInit {
     this.stateManager.setSelectedEvent(eventCode);
   }
 
-  public teamDataBoldSwitchChange() {
-    this.stateManager.setTeamDataBold(this.teamDataBold);
+  public offlineModeSwitchChange() {
+    this.stateManager.setOfflineStatus(this.offlineMode);
+  }
+
+  public clearCache() {
+    const r = window.confirm('Are you sure you want to clear your cache');
+    if (r === true) {
+      this.stateManager.startHttpOperation();
+      this.cacheService.clear().subscribe(() => {
+        this.stateManager.finishHttpOperation();
+      }, () => {
+        this.stateManager.finishHttpOperation();
+      });
+    }
   }
 }

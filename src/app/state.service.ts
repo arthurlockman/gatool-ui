@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
+import {Observable, ReplaySubject, Subject} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -7,17 +8,22 @@ export class StateService {
   // Local storage keys
   static seasonStorageKey = 'selectedSeason';
   static eventStorageKey = 'selectedEventCode';
+  static offlineModeStorageKey = 'offlineModeEnabled';
 
   // Default values
   static defaultSeason = '2020';
 
-  // Temporary (non-persisted) settings
-  private teamDataBold = false;
-
   // Number of active operations on the page
   private operationsInProgress = 0;
+  private operationIsInProgress = new ReplaySubject<boolean>(1);
 
-  constructor() { }
+  // Are we in offline mode?
+  private offlineMode = new ReplaySubject<boolean>(1);
+
+  constructor() {
+    this.operationIsInProgress.next(false);
+    this.offlineMode.next(localStorage.getItem(StateService.offlineModeStorageKey) === 'true');
+  }
 
   /**
    * Set the currently selected season
@@ -50,23 +56,26 @@ export class StateService {
     return localStorage.getItem(StateService.eventStorageKey);
   }
 
-  public setTeamDataBold(bold: boolean): void {
-    this.teamDataBold = bold;
-  }
-
-  public getTeamDataBold(): boolean {
-    return this.teamDataBold;
-  }
-
   public startHttpOperation(): void {
     this.operationsInProgress++;
+    this.operationIsInProgress.next(this.operationsInProgress > 0);
   }
 
   public finishHttpOperation(): void {
     if (this.operationsInProgress > 0) { this.operationsInProgress--; }
+    this.operationIsInProgress.next(this.operationsInProgress > 0);
   }
 
-  public httpOperationsInProgress(): boolean {
-    return this.operationsInProgress > 0;
+  public httpOperationsInProgress(): Observable<boolean> {
+    return this.operationIsInProgress;
+  }
+
+  public getOfflineStatus(): Observable<boolean> {
+    return this.offlineMode;
+  }
+
+  public setOfflineStatus(offline: boolean): void {
+    this.offlineMode.next(offline);
+    localStorage.setItem(StateService.offlineModeStorageKey, `${offline}`);
   }
 }
