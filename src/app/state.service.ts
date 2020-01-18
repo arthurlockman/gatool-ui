@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Observable, ReplaySubject, Subject} from 'rxjs';
+import {fromEvent, Observable, ReplaySubject} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -19,10 +19,30 @@ export class StateService {
 
   // Are we in offline mode?
   private offlineMode = new ReplaySubject<boolean>(1);
+  private networkStatus = new ReplaySubject<boolean>(1);
+
+  // Automated offline mode handling
+  private offlineEvent: Observable<Event>;
+  private onlineEvent: Observable<Event>;
+  private forcedOffline = false;
 
   constructor() {
     this.operationIsInProgress.next(false);
     this.offlineMode.next(localStorage.getItem(StateService.offlineModeStorageKey) === 'true');
+
+    // Subscribe to automatic window offline/online events
+    this.offlineEvent = fromEvent(window, 'offline');
+    this.onlineEvent = fromEvent(window, 'online');
+    this.offlineEvent.subscribe(() => {
+      this.networkStatus.next(false);
+      this.setOfflineStatus(true, true);
+    });
+    this.onlineEvent.subscribe(() => {
+      this.networkStatus.next(true);
+      if (this.forcedOffline) {
+        this.setOfflineStatus(false, false);
+      }
+    });
   }
 
   /**
@@ -74,8 +94,13 @@ export class StateService {
     return this.offlineMode;
   }
 
-  public setOfflineStatus(offline: boolean): void {
+  public getNetworkStatus(): Observable<boolean> {
+    return this.networkStatus;
+  }
+
+  public setOfflineStatus(offline: boolean, forced: boolean = false): void {
     this.offlineMode.next(offline);
+    this.forcedOffline = forced;
     localStorage.setItem(StateService.offlineModeStorageKey, `${offline}`);
   }
 }

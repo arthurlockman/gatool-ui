@@ -1,4 +1,7 @@
 <div class="container pt-4">
+  <div class="alert alert-danger" *ngIf="errorMessage !== ''">
+    {{errorMessage}}
+  </div>
   <div class="row">
     <div class="col-sm-6">
       <div class="card">
@@ -27,15 +30,16 @@
       <div class="card">
         <div class="card-header">
           <h4>
-            Display Settings
+            Offline Mode and Caching
           </h4>
         </div>
         <div class="card-body">
           <div class="custom-control custom-switch">
-            <input type="checkbox" class="custom-control-input" id="offlineModeSwitch" (change)="offlineModeSwitchChange()" [(ngModel)]="offlineMode">
-            <label class="custom-control-label" for="offlineModeSwitch">Offline mode</label>
+            <input type="checkbox" class="custom-control-input" id="offlineModeSwitch" (change)="offlineModeSwitchChange()" [(ngModel)]="offlineMode" [disabled]="!networkOnline">
+            <label class="custom-control-label" for="offlineModeSwitch">Enable offline mode</label>
           </div>
-          <button class="btn btn-lg btn-block btn-danger" (click)="clearCache()">Clear Cache</button>
+          <br/>
+          <button class="btn btn-block btn-danger" (click)="clearCache()">Clear Cache</button>
         </div>
       </div>
     </div>

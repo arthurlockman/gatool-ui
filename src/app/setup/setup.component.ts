@@ -12,7 +12,9 @@ import {CacheService} from '../cache.service';
 export class SetupComponent implements OnInit {
   public availableSeasonEvents: FRCEvent[];
   public offlineMode = false;
+  public networkOnline = true;
   public loading = false;
+  public errorMessage = '';
 
   constructor(public service: GaToolBackendService, public stateManager: StateService,
               private cacheService: CacheService) { }
@@ -24,6 +26,7 @@ export class SetupComponent implements OnInit {
       this.seasonSelectionChange(selectedSeason);
     }
     this.stateManager.getOfflineStatus().subscribe(offline => this.offlineMode = offline);
+    this.stateManager.getNetworkStatus().subscribe(networkOnline => this.networkOnline = networkOnline);
   }
 
   public seasonSelectionChange(newSeason: string) {
@@ -33,8 +36,10 @@ export class SetupComponent implements OnInit {
     this.service.getEvents(newSeason).subscribe(events => {
       this.availableSeasonEvents = events;
       this.stateManager.finishHttpOperation();
+      this.errorMessage = '';
     }, err => {
       console.error(err);
+      this.errorMessage = err;
       this.stateManager.finishHttpOperation();
     });
   }
