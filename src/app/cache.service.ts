@@ -32,9 +32,9 @@ export class CacheService {
    * in flight, if so return the subject. If not create a new
    * Subject inFlightObservable and return the source observable.
    */
-  get(key: string, fallback?: Observable<any>, maxAge?: number): Observable<any> | Subject<any> {
+  get(key: string, fallback?: Observable<any>, maxAge?: number, forceReload: boolean = false): Observable<any> | Subject<any> {
     return this.hasValidCachedValue(key).pipe(flatMap(cachedValue => {
-      if (cachedValue != null) {
+      if (cachedValue != null && !forceReload) {
         console.log(`%cGetting from cache ${key}`, 'color: green');
         return of(cachedValue.value);
       } else if (this.offline) {

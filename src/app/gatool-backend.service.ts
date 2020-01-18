@@ -29,36 +29,39 @@ export class GaToolBackendService {
   /**
    * Get a list of events for a particular year.
    * @param year The year to fetch events for.
+   * @param forceReload Force a cache skip and re-load
    */
-  public getEvents(year: string): Observable<FRCEvent[]> {
+  public getEvents(year: string, forceReload: boolean = false): Observable<FRCEvent[]> {
     const route = `${year}/events`;
     return this.cache.get(route, this.get(route).pipe(map(evt => {
       return (evt as EventResponse).Events;
-    })), 86400);
+    })), 86400, forceReload);
   }
 
   /**
    * Retrieve teams for a particular event and year
    * @param year The year to fetch teams for
    * @param event The event to fetch teams for
+   * @param forceReload Force a cache skip and re-load
    */
-  public getEventTeams(year: string, event: string): Observable<TeamData[]> {
+  public getEventTeams(year: string, event: string, forceReload: boolean = false): Observable<TeamData[]> {
     const route = `${year}/teams?eventCode=${event}`;
     return this.cache.get(route, this.get(route).pipe(map(evt => {
       return (evt as TeamResponse).teams;
-    })), 86400);
+    })), 86400, forceReload);
   }
 
   /**
    * Retrieve team awards for a particular year
    * @param year The year to fetch awards for
    * @param teamNumber The team to fetch awards for
+   * @param forceReload Force a cache skip and re-load
    */
-  public getTeamAwards(year: string, teamNumber: number): Observable<Award[]> {
+  public getTeamAwards(year: string, teamNumber: number, forceReload: boolean = false): Observable<Award[]> {
     const route = `${year}/awards/${teamNumber}`;
     return this.cache.get(route, this.get(route).pipe(map(evt => {
       return (evt as AwardResponse).Awards;
-    })), 3600);
+    })), 3600, forceReload);
   }
 
   /**
