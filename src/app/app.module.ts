@@ -11,7 +11,6 @@ import { HttpClientModule } from '@angular/common/http';
 import { SetupComponent } from './setup/setup.component';
 import { TeamDataComponent } from './team-data/team-data.component';
 import { MatchScheduleComponent } from './match-schedule/match-schedule.component';
-import { TeamDataRowComponent } from './team-data/team-data-row/team-data-row.component';
 import {FormsModule} from '@angular/forms';
 
 @NgModule({
@@ -20,8 +19,7 @@ import {FormsModule} from '@angular/forms';
     CallbackComponent,
     SetupComponent,
     TeamDataComponent,
-    MatchScheduleComponent,
-    TeamDataRowComponent
+    MatchScheduleComponent
   ],
   imports: [
     BrowserModule,
