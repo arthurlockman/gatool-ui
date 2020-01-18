@@ -57,6 +57,7 @@ export class GaToolBackendService {
   public getTeamAwards(year: string, teamNumber: number): Observable<Award[]> {
     const route = `${year}/awards/${teamNumber}`;
     return this.cache.get(route, this.get(route).pipe(map(evt => {
+      
       return (evt as AwardResponse).Awards;
     })), 3600);
   }

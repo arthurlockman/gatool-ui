@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { GaToolBackendService } from '../gatool-backend.service';
 import { StateService } from '../state.service';
 import { TeamData } from '../model/team';
+import { Award } from '../model/award';
 
 @Component({
   selector: 'app-team-data',
@@ -102,10 +103,15 @@ export class TeamDataComponent implements OnInit {
   }
 
   getAwards(): void {
+    let award: Award;
     for (const team of this.teams) {
       this.stateManager.startHttpOperation();
       this.service.getTeamAwards(this.stateManager.getSelectedSeason(), team.teamNumber).subscribe(awards => {
         this.stateManager.finishHttpOperation();
+        for (award of awards) {
+          award.season = this.stateManager.getSelectedSeason();
+        }
+        // TODO inject year and event name into individual award.
         team.awards = awards;
         this.teams[this.teams.indexOf(team)] = team;
       }, err => {

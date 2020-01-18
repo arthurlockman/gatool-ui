@@ -18,6 +18,8 @@ export class Award {
   schoolName: string;
   fullTeamName: string;
   person: string;
+  season: string;
+  eventName: string;
 }
 
 export class AllTeamAwards {
