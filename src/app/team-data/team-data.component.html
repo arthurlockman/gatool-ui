@@ -7,6 +7,9 @@
       <h2 style="color: red">Please select a year and season on the setup tab</h2>
     </div>
   </div>
+  <div class="alert alert-danger" *ngIf="errorMessage !== ''">
+    {{errorMessage}}
+  </div>
   <div class="card" *ngIf="!!selectedSeason && !!selectedEvent">
     <div class="card-header">
       <h1>{{selectedSeason}} - {{selectedEvent}} Teams</h1>

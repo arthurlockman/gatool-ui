@@ -14,6 +14,7 @@ export class TeamDataComponent implements OnInit {
   public selectedSeason: string;
   public selectedEvent: string;
   public teams: TeamData[];
+  public errorMessage = '';
 
   private static trimArray(arr) {
     let i: number;
@@ -33,9 +34,11 @@ export class TeamDataComponent implements OnInit {
         this.teams = teams;
         this.expandSponsors();
         this.getAwards();
+        this.errorMessage = '';
       }, err => {
         this.stateManager.finishHttpOperation();
         console.error(err);
+        this.errorMessage = err;
       });
     }
   }
@@ -108,9 +111,11 @@ export class TeamDataComponent implements OnInit {
         this.stateManager.finishHttpOperation();
         team.awards = awards;
         this.teams[this.teams.indexOf(team)] = team;
+        this.errorMessage = '';
       }, err => {
         this.stateManager.finishHttpOperation();
         console.error(err);
+        this.errorMessage = err;
       });
     }
   }
