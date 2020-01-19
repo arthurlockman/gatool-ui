@@ -17,7 +17,7 @@
             <option value="2018">2018 Season (past)</option>
           </select>
           <select (change)="eventSelectionChange($event.target.value)" *ngIf="!!availableSeasonEvents" class="form-control form-control-lg" [value]="stateManager.getSelectedEvent()">
-            <option *ngFor="let event of availableSeasonEvents" value="{{event.code}}">{{event.dateStart}} - {{event.name}}</option>
+            <option *ngFor="let event of availableSeasonEvents" value="{{event.code}}">{{event.name}}</option>
           </select>
           <div class="d-flex align-items-center m-2" *ngIf="loading">
             <strong>Loading events...</strong>
