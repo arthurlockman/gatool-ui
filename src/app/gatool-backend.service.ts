@@ -1,13 +1,15 @@
-import {Injectable} from '@angular/core';
-import {HttpClient, HttpErrorResponse} from '@angular/common/http';
-import {Observable, throwError} from 'rxjs';
-import {environment} from '../environments/environment';
-import {catchError, map} from 'rxjs/operators';
-import {FRCEvent, EventResponse} from './model/FRCEvent';
-import {AuthService} from './auth.service';
-import {Team, TeamData, TeamResponse} from './model/team';
-import {Award, AwardResponse} from './model/award';
-import {CacheService} from './cache.service';
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { environment } from '../environments/environment';
+import { catchError, map } from 'rxjs/operators';
+import { FRCEvent, EventResponse } from './model/FRCEvent';
+import { AuthService } from './auth.service';
+import { Team, TeamData, TeamResponse } from './model/team';
+import { Award, AwardResponse } from './model/award';
+import { CacheService } from './cache.service';
+import { Match } from './model/match';
+import { ScheduleResponse } from './model/schedule';
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +25,7 @@ export class GaToolBackendService {
    */
   private static handleError(error: HttpErrorResponse): Observable<any> {
     console.error(error);
-    return throwError({error});
+    return throwError({ error });
   }
 
   /**
@@ -52,6 +54,20 @@ export class GaToolBackendService {
   }
 
   /**
+   * Retrieve the schedule for a specific event and year.
+   * @param year The year to fetch match data for
+   * @param event The event to fetch match data for
+   * @param level The tournament level to fetch. Allowable values: qual, playoff
+   * @param forceReload Force a cache skip and re-load
+   */
+  public getSchedule(year: string, event: string, level: string, forceReload: boolean = false): Observable<Match[]> {
+    const route = `${year}/schedule/${event}/${level}?returnschedule=true`;
+    return this.cache.get(route, this.get(route).pipe(map(evt => {
+      return (evt as ScheduleResponse).Schedule;
+    })), 86400, forceReload);
+  }
+
+  /**
    * Retrieve team awards for a particular year
    * @param year The year to fetch awards for
    * @param teamNumber The team to fetch awards for
@@ -60,7 +76,6 @@ export class GaToolBackendService {
   public getTeamAwards(year: string, teamNumber: number, forceReload: boolean = false): Observable<Award[]> {
     const route = `${year}/awards/${teamNumber}`;
     return this.cache.get(route, this.get(route).pipe(map(evt => {
-      
       return (evt as AwardResponse).Awards;
     })), 3600, forceReload);
   }

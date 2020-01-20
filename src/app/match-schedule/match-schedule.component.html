@@ -12,9 +12,45 @@
       <h1>{{selectedSeason}} - {{selectedEvent}} Schedule</h1>
     </div>
     <div class="card-body">
-      <p>
-        Data will go here
-      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Description</th>
+            <th>Match #</th>
+            <th>Score</th>
+            <th>Station 1</th>
+            <th>Station 2</th>
+            <th>Station 3</th>
+          </tr>
+          <tr *ngFor="let match of qualSchedule">
+            <td>{{match.startTime}}</td>
+            <td>{{match.description}}</td>
+            <td>{{match.matchNumber}}</td>
+            <td><span class='redScore'>{{match.scoreRedFinal}}</span><br>
+              <span class='blueScore'>{{match.scoreBlueFinal}}</span></td>
+            <td><span class='redScore'>{{match.teams[0].teamNumber}}</span><br>
+              <span class='blueScore'>{{match.teams[3].teamNumber}}</span></td>
+            <td><span class='redScore'>{{match.teams[1].teamNumber}}</span><br>
+              <span class='blueScore'>{{match.teams[4].teamNumber}}</span></td>
+              <td><span class='redScore'>{{match.teams[2].teamNumber}}</span><br>
+                <span class='blueScore'>{{match.teams[5].teamNumber}}</span></td>
+          </tr>
+          <tr *ngFor="let match of playoffSchedule">
+            <td>{{match.startTime}}</td>
+            <td>{{match.description}}</td>
+            <td>{{match.matchNumber}}</td>
+            <td><span class='redScore'>{{match.scoreRedFinal}}</span><br>
+              <span class='blueScore'>{{match.scoreBlueFinal}}</span></td>
+            <td><span class='redScore'>{{match.teams[0].teamNumber}}</span><br>
+              <span class='blueScore'>{{match.teams[3].teamNumber}}</span></td>
+            <td><span class='redScore'>{{match.teams[1].teamNumber}}</span><br>
+              <span class='blueScore'>{{match.teams[4].teamNumber}}</span></td>
+              <td><span class='redScore'>{{match.teams[2].teamNumber}}</span><br>
+                <span class='blueScore'>{{match.teams[5].teamNumber}}</span></td>
+          </tr>
+        </thead>
+      </table>
     </div>
   </div>
 </div>

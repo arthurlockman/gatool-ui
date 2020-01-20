@@ -1,5 +1,6 @@
 import {Injectable} from '@angular/core';
 import {fromEvent, Observable, ReplaySubject} from 'rxjs';
+import { TeamData } from './model/team';
 
 @Injectable({
   providedIn: 'root'
@@ -25,6 +26,8 @@ export class StateService {
   private offlineEvent: Observable<Event>;
   private onlineEvent: Observable<Event>;
   private forcedOffline = false;
+
+  private teamList: Observable<TeamData[]>;
 
   constructor() {
     this.operationIsInProgress.next(false);
