@@ -12,6 +12,7 @@ import { SetupComponent } from './setup/setup.component';
 import { TeamDataComponent } from './team-data/team-data.component';
 import { MatchScheduleComponent } from './match-schedule/match-schedule.component';
 import {FormsModule} from '@angular/forms';
+import { MomentModule } from 'ngx-moment';
 
 @NgModule({
   declarations: [
@@ -26,7 +27,13 @@ import {FormsModule} from '@angular/forms';
     AppRoutingModule,
     HttpClientModule,
     FontAwesomeModule,
-    FormsModule
+    FormsModule,
+    MomentModule,
+    MomentModule.forRoot({
+      relativeTimeThresholdOptions: {
+        'm': 59
+      }
+    })
   ],
   providers: [
     AuthService,

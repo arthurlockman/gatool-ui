@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { GaToolBackendService } from '../gatool-backend.service';
 import { StateService } from '../state.service';
 import { Match } from '../model/match';
+import {MomentModule} from 'ngx-moment';
 
 @Component({
   selector: 'app-match-schedule',
