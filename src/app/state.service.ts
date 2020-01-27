@@ -1,6 +1,7 @@
-import {Injectable} from '@angular/core';
-import {fromEvent, Observable, ReplaySubject} from 'rxjs';
+import { Injectable } from '@angular/core';
+import { fromEvent, Observable, ReplaySubject } from 'rxjs';
 import { TeamData } from './model/team';
+import { FRCEvent } from './model/FRCEvent';
 
 @Injectable({
   providedIn: 'root'
@@ -9,6 +10,7 @@ export class StateService {
   // Local storage keys
   static seasonStorageKey = 'selectedSeason';
   static eventStorageKey = 'selectedEventCode';
+  static eventDetailsStorageKey = 'selectedEventDetails';
   static offlineModeStorageKey = 'offlineModeEnabled';
 
   // Default values
@@ -47,6 +49,23 @@ export class StateService {
       }
     });
   }
+
+  /**
+   * Set the details for the currently selected event
+   * @param eventDetails The object containing the details of the currently selected event
+   */
+  public setEventDetails(eventDetails: FRCEvent): void {
+    localStorage.setItem(StateService.eventDetailsStorageKey, JSON.stringify(eventDetails));
+  }
+
+  /**
+   * Get the details for the currently selected event. Returns the null if no selection is made.
+   */
+  public getEventDetails(): FRCEvent {
+    const value = JSON.parse(localStorage.getItem(StateService.eventDetailsStorageKey));
+    return value === null ? null : value;
+  }
+
 
   /**
    * Set the currently selected season

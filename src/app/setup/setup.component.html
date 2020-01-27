@@ -24,6 +24,11 @@
             <div class="spinner-border ml-auto" role="status" aria-hidden="true"></div>
           </div>
         </div>
+        <div *ngIf="eventDetails" class="card-body">
+          <div class="h2">{{eventDetails.name}}</div>
+          <div *ngIf="eventDetails.districtCode">District Code: {{eventDetails.districtCode}}</div>
+        <div><span class="bold">Event Location:</span> {{eventDetails.venue}} in {{eventDetails.city}}, {{eventDetails.stateprov}} {{eventDetails.country}}</div>
+        </div>
       </div>
     </div>
     <div class="col-sm-6">

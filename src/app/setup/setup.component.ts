@@ -15,11 +15,13 @@ export class SetupComponent implements OnInit {
   public networkOnline = true;
   public loading = false;
   public errorMessage = '';
+  public eventDetails: FRCEvent;
 
   constructor(public service: GaToolBackendService, public stateManager: StateService,
     private cacheService: CacheService) { }
 
   ngOnInit() {
+    this.eventDetails = this.stateManager.getEventDetails();
     this.stateManager.httpOperationsInProgress().subscribe(loading => this.loading = loading);
     const selectedSeason = this.stateManager.getSelectedSeason();
     if (!!selectedSeason) {
@@ -77,7 +79,9 @@ export class SetupComponent implements OnInit {
 
 
   public eventSelectionChange(eventCode: string) {
+    this.eventDetails = this.availableSeasonEvents.find(o => o.code === eventCode);
     this.stateManager.setSelectedEvent(eventCode);
+    this.stateManager.setEventDetails(this.eventDetails);
   }
 
   public offlineModeSwitchChange() {
