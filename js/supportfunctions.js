@@ -582,7 +582,7 @@ function saveEnvironment() {
                     req.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("token"));
                     req.addEventListener('load', function () {
                         dialogRef.close();
-                        if (req.status === 200) {
+                        if (req.status === 204) {
                             BootstrapDialog.show({
                                 message: "Environment saved to gatool Cloud.",
                                 buttons: [{
