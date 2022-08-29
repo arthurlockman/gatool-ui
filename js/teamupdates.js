@@ -4,7 +4,7 @@ function getTeamUpdates(teamNumber, singleton) {
     "use strict";
     $('#teamDataTabPicker').addClass('alert-danger');
     var req = new XMLHttpRequest();
-    req.open('GET', apiURL + 'team/' + teamNumber + '/updates');
+    req.open('GET', apiURLV3 + 'team/' + teamNumber + '/updates');
     req.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("token"));
     req.addEventListener('load', function () {
         if (req.status !== 204) {
@@ -101,7 +101,7 @@ function sendTeamUpdates(teamNumber, singleton) {
     teamUpdates.sayNumber = teamData.sayNumber;
     teamUpdates.lastUpdate = moment().format();
     teamUpdates.source = parseJwt(localStorage.getItem("token")).email;
-    req.open('PUT', apiURL + 'team/' + teamNumber + '/updates');
+    req.open('PUT', apiURLV3 + 'team/' + teamNumber + '/updates');
     req.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("token"));
     req.addEventListener('load', function () {
         teamUpdateCalls--;

@@ -88,9 +88,9 @@ var matchTimer = setInterval(function () {
     timer()
 }, 1000);
 
-//The apiURL determines the endpoint for API calls. 
+//The apiURL determines the endpoint for API calls.
 var apiURL = "https://www.gatool.org/api/";
-var apiURLV3 = "https://www.gatool.org/api/v3/";
+var apiURLV3 = "https://api.gatool.org/v3/";
 
 //Now that we have the variables all set up and all of the necessary JS and CSS are loaded, we can run the app.
 var webAuth = new auth0.WebAuth({
@@ -738,7 +738,7 @@ function prepareAllianceSelection() {
             <div id="allianceSelectionFilterInput" class="form-group col-sm-6"><input type="text" inputmode="tel" pattern="[0-9]*" class="form-control" id="allianceSelectionFilter" placeholder="Type a number to filter the teams" onfocus="deactivateKeys();" onblur="activateKeys();"></div>
             <div id="allianceUndoButton" class="col-sm-6"><a href="#" class="btn btn-warning undoButton">Undo Alliance Selection Choice<span id="undoAlliance"></span></a></div>
         </div>
-    </div>  
+    </div>
     <table>
     <tr>
         <td>

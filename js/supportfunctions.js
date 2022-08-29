@@ -422,7 +422,7 @@ function loadEnvironment() {
                 action: function (dialogRef) {
 
                     var req = new XMLHttpRequest();
-                    req.open('GET', apiURL + 'user/preferences');
+                    req.open('GET', apiURLV3 + 'user/preferences');
                     req.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("token"));
                     req.addEventListener('load', function () {
                         dialogRef.close();
@@ -537,7 +537,7 @@ function saveEnvironment() {
                         if (localStorageKeys[i].startsWith("teamData")) {
                             //if (Number(localStorageKeys[i].slice(8)>9000)) {
                             environment.localStorage[localStorageKeys[i]] = JSON.stringify(decompressLocalStorage(localStorageKeys[i]));
-                            //}                  
+                            //}
                         } else {
                             environment.localStorage[localStorageKeys[i]] = localStorage[localStorageKeys[i]];
                         }
@@ -577,7 +577,7 @@ function saveEnvironment() {
                     environment.allianceSelectionReady = allianceSelectionReady;
 
                     var req = new XMLHttpRequest();
-                    req.open('PUT', apiURL + 'user/preferences');
+                    req.open('PUT', apiURLV3 + 'user/preferences');
                     req.setRequestHeader("Content-type", "application/json");
                     req.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("token"));
                     req.addEventListener('load', function () {
@@ -733,7 +733,7 @@ function exportXLSX() {
 
     data = [];
     data2 = [];
-    //Add the Schedule to the worksheet   
+    //Add the Schedule to the worksheet
     if (localStorage.qualsList !== '{"Schedule":[]}') {
         data = JSON.parse(localStorage.qualsList).Schedule;
         if (localStorage.playoffList !== '{"Schedule":[]}') {
@@ -767,7 +767,7 @@ function exportXLSX() {
 
 }
 
-// The following section creates merged Word docs. 
+// The following section creates merged Word docs.
 // It is used in conjunction with the team list to create team info sheets.
 
 function loadFile(url, callback) {
