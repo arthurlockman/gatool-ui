@@ -39,7 +39,7 @@ function getHighScores() {
     "use strict";
     var req = new XMLHttpRequest();
     var eventNames = JSON.parse(localStorage.events);
-    req.open('GET', apiURL + localStorage.currentYear + '/highscores');
+    req.open('GET', apiURLV3 + localStorage.currentYear + '/highscores');
     req.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("token"));
     req.addEventListener('load', function () {
         if (req.status === 200) {
@@ -78,7 +78,7 @@ function getHighScores() {
         }
     });
     var req2 = new XMLHttpRequest();
-    req2.open('GET', apiURL + localStorage.currentYear + '/highscores/' + localStorage.currentEvent);
+    req2.open('GET', apiURLV3 + localStorage.currentYear + '/highscores/' + localStorage.currentEvent);
     req2.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("token"));
     req2.addEventListener('load', function () {
         if (req2.status === 200) {
@@ -208,7 +208,7 @@ function getTeamRanks() {
                     $("#teamTableRank" + data.Rankings[i].teamNumber).attr("class", teamTableRankHighlight(data.Rankings[i].rank));
                     ranksList += updateRanksTableRow(team, data.Rankings[i].teamNumber);
                     compressLocalStorage("teamData" + data.Rankings[i].teamNumber, team);
-                   
+
                     //Count how many teams have not played all of their matches
                     if (data.Rankings[i].matchesPlayed < matchCount) {
                         teamAllianceReady += 1;
@@ -226,7 +226,7 @@ function getTeamRanks() {
                 $('#teamRanksPicker').removeClass('alert-danger');
                 $('#teamRanksPicker').addClass('alert-success');
                 lastRanksUpdate = req.getResponseHeader("Last-Modified");
-                
+
                 teamCountTotal = data.Rankings.length;
                 if (localStorage.playoffCountOverride === "true") {
                     allianceCount = parseInt(localStorage.playoffCountOverrideValue);
@@ -542,15 +542,15 @@ function getTeamAppearance(teamNumber) {
             for (var i = 0; i < appearances.length; i++) {
                 //check for district code
                 //DISTRICT_CMP = 2
-                //DISTRICT_CMP_DIVISION = 5   
-                // Ontario (>=2019), Michigan (>=2017), Texas (>=2022), New England (>=2022), 
-                // Indiana (>=2022) check for Einstein appearances 
+                //DISTRICT_CMP_DIVISION = 5
+                // Ontario (>=2019), Michigan (>=2017), Texas (>=2022), New England (>=2022),
+                // Indiana (>=2022) check for Einstein appearances
                 //appearances.district.abbreviation = "ont"
                 //appearances.district.abbreviation = "fim"
                 // >=2017 check for Division appearance then Champs appearances
                 //test for champs prior to 2001
                 if (appearances[i].district !== null) {
-                    if (((appearances[i].year >= 2019) && (appearances[i].district.abbreviation === "ont")) || 
+                    if (((appearances[i].year >= 2019) && (appearances[i].district.abbreviation === "ont")) ||
                     ((appearances[i].year >= 2017) && (appearances[i].district.abbreviation === "fim")) ||
                     ((appearances[i].year >= 2022) && (appearances[i].district.abbreviation === "ne")) ||
                     ((appearances[i].year >= 2022) && (appearances[i].district.abbreviation === "in")) ||
