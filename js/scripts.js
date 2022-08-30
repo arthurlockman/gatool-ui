@@ -89,7 +89,6 @@ var matchTimer = setInterval(function () {
 }, 1000);
 
 //The apiURL determines the endpoint for API calls.
-var apiURL = "https://www.gatool.org/api/";
 var apiURLV3 = "https://api.gatool.org/v3/";
 
 //Now that we have the variables all set up and all of the necessary JS and CSS are loaded, we can run the app.
@@ -1083,8 +1082,8 @@ function loadEventsList() {
     var req = new XMLHttpRequest();
     var endpoint = "/events";
     if (localStorage.offseason === "true") {
-        endpoint = "/offseasoneventsv2";
-        URL = apiURL;
+        endpoint = "/offseason/events";
+        URL = apiURLV3;
     }
     req.open('GET', `${URL}${localStorage.currentYear}${endpoint}`);
     req.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("token"));
@@ -1739,12 +1738,12 @@ function getTeamList(year) {
     var req = new XMLHttpRequest();
     var endpoint = "/teams?eventCode=";
     if (localStorage.offseason === "true") {
-        endpoint = "/offseasonteamsv2/";
+        endpoint = "/offseason/teams/";
     }
     if (localStorage.offseason === "true") {
-        req.open('GET', apiURL + year + endpoint + localStorage.currentEvent + "/1");
+        req.open('GET', apiURLV3 + year + endpoint + localStorage.currentEvent + "/1");
     } else {
-        req.open('GET', apiURL + year + endpoint + localStorage.currentEvent);
+        req.open('GET', apiURLV3 + year + endpoint + localStorage.currentEvent);
     }
 
     req.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("token"));
@@ -1865,7 +1864,7 @@ function getTeamList(year) {
                         for (var i = 0; i < districtTeams.length; i++) {
                             teamDataLoadPromises.push(new Promise((resolve, reject) => {
                                 var req = new XMLHttpRequest();
-                                req.open('GET', apiURL + localStorage.currentYear + '/teams?teamNumber=' + districtTeams[i].teamNumber);
+                                req.open('GET', apiURLV3 + localStorage.currentYear + '/teams?teamNumber=' + districtTeams[i].teamNumber);
                                 req.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("token"));
                                 req.addEventListener('load', function () {
                                     if (req.responseText.substring(0, 5) !== '"Team') {
@@ -2035,7 +2034,7 @@ function getAllianceList() {
     "use strict";
     $("#allianceUpdateContainer").html("Loading Alliance data...");
     var req2 = new XMLHttpRequest();
-    req2.open('GET', apiURL + localStorage.currentYear + '/alliances/' + localStorage.currentEvent);
+    req2.open('GET', apiURLV3 + localStorage.currentYear + '/alliances/' + localStorage.currentEvent);
     req2.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("token"));
     req2.addEventListener('load', function () {
         if (req2.status === 200) {
@@ -3093,7 +3092,7 @@ function getTeamData(teamList, year) {
         teamDataLoadPromises.push(new Promise((resolve, reject) => {
             var req = new XMLHttpRequest();
             req.teamNumber = teamList[i].teamNumber;
-            req.open('GET', apiURL + year + '/teams?teamNumber=' + teamList[i].teamNumber);
+            req.open('GET', apiURLV3 + year + '/teams?teamNumber=' + teamList[i].teamNumber);
             req.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("token"));
             req.addEventListener('load', function () {
                 //console.log(req.responseText);
@@ -3185,7 +3184,7 @@ function playoffScoreDetails(matchNumber1, matchNumber2, tournamentLevel) {
     "use strict";
     var Detail = {};
     var req = new XMLHttpRequest();
-    req.open('GET', apiURL + localStorage.currentYear + '/scores/' + localStorage.currentEvent + "/" + tournamentLevel + "/" + matchNumber1 + "/" + matchNumber2 + "/");
+    req.open('GET', apiURLV3 + localStorage.currentYear + '/scores/' + localStorage.currentEvent + "/" + tournamentLevel + "/" + matchNumber1 + "/" + matchNumber2 + "/");
     req.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("token"));
     req.addEventListener('load', function () {
         if (req.status === 200) {
@@ -3236,7 +3235,7 @@ function playoffScoreDetails(matchNumber1, matchNumber2, tournamentLevel) {
 function scoreDetails(matchNumber, tournamentLevel) {
     "use strict";
     var req = new XMLHttpRequest();
-    req.open('GET', apiURL + localStorage.currentYear + '/scores/' + localStorage.currentEvent + "/" + tournamentLevel + "/" + matchNumber + "/" + matchNumber + "/");
+    req.open('GET', apiURLV3 + localStorage.currentYear + '/scores/' + localStorage.currentEvent + "/" + tournamentLevel + "/" + matchNumber + "/" + matchNumber + "/");
     req.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("token"));
     req.addEventListener('load', function () {
         if (req.status === 200) {

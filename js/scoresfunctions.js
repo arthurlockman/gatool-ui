@@ -310,7 +310,7 @@ function getTeamRanks() {
 function getAllTeamAwards(teamNumber) {
     "use strict";
     var req = new XMLHttpRequest();
-    req.open('GET', apiURL + "team/" + teamNumber + "/awards");
+    req.open('GET', apiURLV3 + "team/" + teamNumber + "/awards");
     req.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("token"));
     req.addEventListener('load', function () {
         if (req.status === 200) {
@@ -522,7 +522,7 @@ function getTeamAppearances(teamList) {
 function getTeamAppearance(teamNumber) {
     "use strict";
     var req = new XMLHttpRequest();
-    req.open('GET', apiURL + "team/" + teamNumber + "/appearances");
+    req.open('GET', apiURLV3 + "team/" + teamNumber + "/appearances");
     req.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("token"));
     req.addEventListener('load', function () {
         if (req.status === 200) {
