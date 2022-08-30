@@ -1924,9 +1924,6 @@ function getTeamList(year) {
                             }
                             localStorage.teamList = JSON.stringify(eventTeamList);
                             getTeamAwardsAsync(eventTeamList, year);
-                            //if (Number(localStorage.currentYear) >= 2018) {
-                            //    getAvatars()
-                            //}
                             getHybridSchedule();
                             displayAwardsTeams(eventTeamList.slice());
                             updateTeamTable();
@@ -1944,9 +1941,6 @@ function getTeamList(year) {
                         });
                 } else {
                     getTeamAwardsAsync(eventTeamList, year);
-                    //if (Number(localStorage.currentYear) >= 2018) {
-                    //    getAvatars()
-                    //}
                     getHybridSchedule();
                     displayAwardsTeams(eventTeamList.slice());
                     lastSchedulePage = !0
@@ -1957,39 +1951,6 @@ function getTeamList(year) {
             $("#teamUpdateContainer").html(moment().format("dddd, MMMM Do YYYY, " + timeFormats[localStorage.timeFormat]))
             getTeamAppearances(eventTeamList);
         }
-    });
-    req.send()
-}
-
-function getAvatars() {
-    "use strict";
-    var req = new XMLHttpRequest();
-    req.open('GET', apiURL + localStorage.currentYear + '/avatars/' + localStorage.currentEvent);
-    req.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("token"));
-    req.addEventListener('load', function () {
-        if (req.status === 200) {
-            var data = JSON.parse(req.responseText);
-            var teamData = {};
-            for (var i = 0; i < data.teams.length; i++) {
-                if (typeof localStorage["teamData" + data.teams[i].teamNumber] !== "undefined") {
-                    teamData = decompressLocalStorage("teamData" + data.teams[i].teamNumber);
-                    if (data.teams[i].encodedAvatar !== null) {
-                        teamData.avatar = data.teams[i].encodedAvatar;
-                        $("#avatar" + data.teams[i].teamNumber).html('<img src="https://www.gatool.org/' + data.teams[i].encodedAvatar + '">&nbsp;')
-                    } else {
-                        teamData.avatar = "null";
-                        $("#avatar" + data.teams[i].teamNumber).html("")
-                    }
-                    compressLocalStorage("teamData" + data.teams[i].teamNumber, teamData)
-                }
-            }
-        }
-        if (req.status >= 400) {
-            console.log(req.responseText);
-        }
-    });
-    req.addEventListener('error', function (errorText) {
-        console.log(errorText);
     });
     req.send()
 }
@@ -3438,7 +3399,7 @@ function updateTeamTableRow(teamData) {
     if ((teamInfo.avatar !== "null") && (Number(localStorage.currentYear) >= 2018 && (typeof teamInfo !== "undefined"))) {
         avatar = '<img src="https://www.gatool.org/' + teamInfo.avatar + '">&nbsp;'
     }
-    avatar = `<img src="https://www.gatool.org/api/${localStorage.currentYear}/avatars/team/${teamData.teamNumber}/avatar.png" onerror="this.style.display='none'">&nbsp;`;
+    avatar = `<img src="https://api.gatool.org/v3/${localStorage.currentYear}/avatars/team/${teamData.teamNumber}/avatar.png" onerror="this.style.display='none'">&nbsp;`;
     if (teamInfo.nameShortLocal === "") {
         returnData += '<td id="teamTableName' + teamData.teamNumber + '">' + '<span id="avatar' + teamData.teamNumber + '">' + avatar + '</span><span class="teamTableName">' + teamInfo.nameShort + '</span></td>'
     } else {
