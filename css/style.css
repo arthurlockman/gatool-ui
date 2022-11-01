@@ -240,6 +240,11 @@ ul.tab li a:focus,
 
 .gatool-button-row {}
 
+.offseasonWarn {
+	font-weight: bold;
+	color: red;
+}
+
 .gatool-button {
 	font-size: 20px;
 	font-weight: bold;

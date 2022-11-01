@@ -3115,6 +3115,14 @@ function getTeamData(teamList, year) {
                     eventTeamList.push(data.teams[0]);
                     resolve({ teamNumber: req.teamNumber, year: year - 1, retry: true })
                 }
+                if (req.status === 400) {
+                    var data = emptyTeamsResponse;
+                    var teamData = data.teams[0];
+                    teamData.teamNumber = req.teamNumber;
+                    fixSponsors(teamData);
+                    eventTeamList.push(data.teams[0]);
+                    resolve({ teamNumber: req.teamNumber, year: year - 1, retry: false })
+                }
 
             });
             req.addEventListener('error', function (errorText) {
@@ -4174,104 +4182,129 @@ function handleQualsFiles(e) {
             var teamList = [];
             var teamToInsert = {};
             var matchNumber = 0;
-            localStorage.eventName = worksheet1["B3"].v;
-            localStorage.eventCode = worksheet1["B3"].v;
+            var errorMatches = [];
+            var scheduleKeys = [];
+            var errorMessage = "";
             for (var i = 0; i < schedule.length; i++) {
-                if (schedule[i]["Red 1"]) {
-                    matchNumber++;
-                    var tempRow = {
-                        "description": schedule[i].Description,
-                        "tournamentLevel": "Qualification",
-                        "matchNumber": matchNumber,
-                        "startTime": schedule[i].Time,
-                        "actualStartTime": "",
-                        "postResultTime": "",
-                        "scoreRedFinal": "",
-                        "scoreRedFoul": "",
-                        "scoreRedAuto": "",
-                        "scoreBlueFinal": "",
-                        "scoreBlueFoul": "",
-                        "scoreBlueAuto": "",
-                        "teams": [{
-                            "teamNumber": removeSurrogate(schedule[i]["Red 1"]),
-                            "station": "Red1",
-                            "surrogate": (schedule[i]["Red 1"].includes("*")) ? !0 : !1,
-                            "dq": !1
-                        }, {
-                            "teamNumber": removeSurrogate(schedule[i]["Red 2"]),
-                            "station": "Red2",
-                            "surrogate": (schedule[i]["Red 2"].includes("*")) ? !0 : !1,
-                            "dq": !1
-                        }, {
-                            "teamNumber": removeSurrogate(schedule[i]["Red 3"]),
-                            "station": "Red3",
-                            "surrogate": (schedule[i]["Red 3"].includes("*")) ? !0 : !1,
-                            "dq": !1
-                        }, {
-                            "teamNumber": removeSurrogate(schedule[i]["Blue 1"]),
-                            "station": "Blue1",
-                            "surrogate": (schedule[i]["Blue 1"].includes("*")) ? !0 : !1,
-                            "dq": !1
-                        }, {
-                            "teamNumber": removeSurrogate(schedule[i]["Blue 2"]),
-                            "station": "Blue2",
-                            "surrogate": (schedule[i]["Blue 2"].includes("*")) ? !0 : !1,
-                            "dq": !1
-                        }, {
-                            "teamNumber": removeSurrogate(schedule[i]["Blue 3"]),
-                            "station": "Blue3",
-                            "surrogate": (schedule[i]["Blue 3"].includes("*")) ? !0 : !1,
-                            "dq": !1
-                        }]
-                    };
-                    if (teamListArray.indexOf(schedule[i]["Red 1"]) === -1) {
-                        teamListArray.push(schedule[i]["Red 1"])
+                scheduleKeys = Object.keys(schedule[i]);
+                for (var j = 0; j < scheduleKeys.length;j++) {
+                    schedule[i][scheduleKeys[j]] = schedule[i][scheduleKeys[j]].toString();
+                }
+                if (scheduleKeys.length < 8) {
+                    if (schedule[i]["Description"].includes("Qual")) {
+                        errorMatches.push(schedule[i]);
                     }
-                    if (teamListArray.indexOf(schedule[i]["Red 2"]) === -1) {
-                        teamListArray.push(schedule[i]["Red 2"])
-                    }
-                    if (teamListArray.indexOf(schedule[i]["Red 3"]) === -1) {
-                        teamListArray.push(schedule[i]["Red 3"])
-                    }
-                    if (teamListArray.indexOf(schedule[i]["Blue 1"]) === -1) {
-                        teamListArray.push(schedule[i]["Blue 1"])
-                    }
-                    if (teamListArray.indexOf(schedule[i]["Blue 2"]) === -1) {
-                        teamListArray.push(schedule[i]["Blue 2"])
-                    }
-                    if (teamListArray.indexOf(schedule[i]["Blue 3"]) === -1) {
-                        teamListArray.push(schedule[i]["Blue 3"])
-                    }
-
-                    innerSchedule.push(tempRow)
                 }
             }
-            formattedSchedule.Schedule = innerSchedule;
-            teamListArray.sort(function (a, b) {
-                return Number(a) - Number(b)
-            });
-            for (i = 0; i < teamListArray.length; i++) {
-                teamToInsert = { "teamNumber": teamListArray[i] };
-                teamList.push(teamToInsert)
+            if (errorMatches.length > 0) {
+                errorMessage = "</br>Your Quals Schedule has missing data from the following match" + ((errorMatches.length > 1) ? "es:" : ":") + "</br>";
+                for (var i = 0; i < errorMatches.length; i++) {
+                    errorMessage += errorMatches[i]["Description"] + "</br>"
+                }
+                errorMessage += "Please adjust the match details and reload.</br>"
+                $("#QualsFilesWarning").html(errorMessage);
+            } else {
+                localStorage.eventName = worksheet1["B3"].v;
+                localStorage.eventCode = worksheet1["B3"].v;
+                for (var i = 0; i < schedule.length; i++) {
+                    if (schedule[i]["Red 1"]) {
+                        matchNumber++;
+                        var tempRow = {
+                            "description": schedule[i].Description,
+                            "tournamentLevel": "Qualification",
+                            "matchNumber": matchNumber,
+                            "startTime": schedule[i].Time,
+                            "actualStartTime": "",
+                            "postResultTime": "",
+                            "scoreRedFinal": "",
+                            "scoreRedFoul": "",
+                            "scoreRedAuto": "",
+                            "scoreBlueFinal": "",
+                            "scoreBlueFoul": "",
+                            "scoreBlueAuto": "",
+                            "teams": [{
+                                "teamNumber": removeSurrogate(schedule[i]["Red 1"]),
+                                "station": "Red1",
+                                "surrogate": (schedule[i]["Red 1"].toString().includes("*")) ? !0 : !1,
+                                "dq": !1
+                            }, {
+                                "teamNumber": removeSurrogate(schedule[i]["Red 2"]),
+                                "station": "Red2",
+                                "surrogate": (schedule[i]["Red 2"].toString().includes("*")) ? !0 : !1,
+                                "dq": !1
+                            }, {
+                                "teamNumber": removeSurrogate(schedule[i]["Red 3"]),
+                                "station": "Red3",
+                                "surrogate": (schedule[i]["Red 3"].toString().includes("*")) ? !0 : !1,
+                                "dq": !1
+                            }, {
+                                "teamNumber": removeSurrogate(schedule[i]["Blue 1"]),
+                                "station": "Blue1",
+                                "surrogate": (schedule[i]["Blue 1"].toString().includes("*")) ? !0 : !1,
+                                "dq": !1
+                            }, {
+                                "teamNumber": removeSurrogate(schedule[i]["Blue 2"]),
+                                "station": "Blue2",
+                                "surrogate": (schedule[i]["Blue 2"].toString().includes("*")) ? !0 : !1,
+                                "dq": !1
+                            }, {
+                                "teamNumber": removeSurrogate(schedule[i]["Blue 3"]),
+                                "station": "Blue3",
+                                "surrogate": (schedule[i]["Blue 3"].toString().includes("*")) ? !0 : !1,
+                                "dq": !1
+                            }]
+                        };
+                        if (teamListArray.indexOf(schedule[i]["Red 1"]) === -1) {
+                            teamListArray.push(schedule[i]["Red 1"])
+                        }
+                        if (teamListArray.indexOf(schedule[i]["Red 2"]) === -1) {
+                            teamListArray.push(schedule[i]["Red 2"])
+                        }
+                        if (teamListArray.indexOf(schedule[i]["Red 3"]) === -1) {
+                            teamListArray.push(schedule[i]["Red 3"])
+                        }
+                        if (teamListArray.indexOf(schedule[i]["Blue 1"]) === -1) {
+                            teamListArray.push(schedule[i]["Blue 1"])
+                        }
+                        if (teamListArray.indexOf(schedule[i]["Blue 2"]) === -1) {
+                            teamListArray.push(schedule[i]["Blue 2"])
+                        }
+                        if (teamListArray.indexOf(schedule[i]["Blue 3"]) === -1) {
+                            teamListArray.push(schedule[i]["Blue 3"])
+                        }
+
+                        innerSchedule.push(tempRow)
+                    }
+                }
+                formattedSchedule.Schedule = innerSchedule;
+                teamListArray.sort(function (a, b) {
+                    return Number(a) - Number(b)
+                });
+                for (i = 0; i < teamListArray.length; i++) {
+                    teamToInsert = { "teamNumber": teamListArray[i] };
+                    teamList.push(teamToInsert)
+                }
+                $("#eventTeamCount").html(teamList.length);
+                $('#teamsListEventName').html(localStorage.eventName);
+                $('#eventName').html(localStorage.eventName);
+                $('#eventNameAwards').html(localStorage.eventName);
+                $('#eventCodeContainer').html(localStorage.eventCode);
+                $('#districtCodeContainer').html("Offseason Event");
+                $('#eventLocationContainer').html("Offseason Event");
+                teamCountTotal = teamList.length;
+                $('#teamsTableEventName').html(localStorage.eventName);
+                $("#teamsTable tbody").empty();
+                getTeamData(teamList, localStorage.currentYear);
+                localStorage.qualsList = JSON.stringify(formattedSchedule);
+                lastSchedulePage = true;
+                getHybridSchedule();
+                updateTeamTable();
+                displayAwardsTeams(teamList.slice());
             }
-            $("#eventTeamCount").html(teamList.length);
-            $('#teamsListEventName').html(localStorage.eventName);
-            $('#eventName').html(localStorage.eventName);
-            $('#eventNameAwards').html(localStorage.eventName);
-            $('#eventCodeContainer').html(localStorage.eventCode);
-            $('#districtCodeContainer').html("Offseason Event");
-            $('#eventLocationContainer').html("Offseason Event");
-            teamCountTotal = teamList.length;
-            $('#teamsTableEventName').html(localStorage.eventName);
-            $("#teamsTable tbody").empty();
-            getTeamData(teamList, localStorage.currentYear);
-            localStorage.qualsList = JSON.stringify(formattedSchedule);
-            lastSchedulePage = true;
-            getHybridSchedule();
+
             $("#QualsFiles").hide();
             $("#QualsFilesReset").show();
-            updateTeamTable();
-            displayAwardsTeams(teamList.slice());
+
         };
         reader.readAsArrayBuffer(f);
     }
@@ -4301,7 +4334,12 @@ function handlePlayoffFiles(e) {
             var innerSchedule = [];
             var tempRow = {};
             var matchNumber = 0;
+            var scheduleKeys = [];
             for (var i = 0; i < schedule.length; i++) {
+                scheduleKeys = Object.keys(schedule[i]);
+                for (var j = 0; j < scheduleKeys.length;j++) {
+                    schedule[i][scheduleKeys[j]] = schedule[i][scheduleKeys[j]].toString();
+                }
                 if (schedule[i]["Red 1"]) {
                     matchNumber++;
                     tempRow = {
@@ -4357,6 +4395,8 @@ function handlePlayoffFiles(e) {
             localStorage.playoffList = JSON.stringify(formattedSchedule);
             lastSchedulePage = true;
             getHybridSchedule();
+
+
             $("#PlayoffFiles").hide();
             $("#PlayoffFilesReset").show()
         };
@@ -4442,6 +4482,7 @@ function handleQualsFilesReset() {
     document.getElementById("QualsFiles").addEventListener('change', handleQualsFiles, !1);
     $("#QualsFiles").show();
     $("#QualsFilesReset").hide();
+    $("#QualsFilesWarning").html("");
     localStorage.qualsList = '{"Schedule":[]}';
     getOffseasonSchedule()
 }
