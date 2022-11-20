@@ -13,6 +13,7 @@ import AwardsPage from './pages/AwardsPage';
 import StatsPage from './pages/StatsPage';
 import CheatsheetPage from './pages/CheatsheetPage';
 import EmceePage from './pages/EmceePage';
+import HelpPage from './pages/HelpPage';
 
 function LayoutsWithNavbar() {
   return (
@@ -40,6 +41,7 @@ function App() {
             <Route path='/stats' element={<StatsPage />} />
             <Route path='/cheatsheet' element={<CheatsheetPage />} />
             <Route path='/emcee' element={<EmceePage />} />
+            <Route path='/help' element={<HelpPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

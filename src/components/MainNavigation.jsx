@@ -2,11 +2,11 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import AuthWidget from './AuthWidget';
 import { NavLink, Link } from 'react-router-dom';
-import { Calendar3, CardList, Eye, Flag, Gear, Gift, HandThumbsUp, List, Megaphone, SortNumericDown, Speedometer, Trophy } from 'react-bootstrap-icons';
+import { Calendar3, CardList, Eye, Flag, Gear, Gift, HandThumbsUp, List, Megaphone, Question, QuestionOctagon, SortNumericDown, Speedometer, Trophy } from 'react-bootstrap-icons';
 
 const activeStyle = {
   backgroundColor: "#ccc",
-  boxShadow: "inset 0px 0px 5px 2px #FF0000"
+  boxShadow: "inset 0px 0px 5px 2px #3d85c6"
 }
 
 const inactiveStyle = {
@@ -30,6 +30,7 @@ function MainNavigation() {
         <Nav.Link as={NavLink} style={({ isActive }) => isActive ? activeStyle : inactiveStyle} to="/stats"><Flag /><div className='d-none d-xl-block'>Stats</div></Nav.Link>
         <Nav.Link as={NavLink} style={({ isActive }) => isActive ? activeStyle : inactiveStyle} to="/cheatsheet"><Eye /><div className='d-none d-xl-block'>Cheat Sheet</div></Nav.Link>
         <Nav.Link as={NavLink} style={({ isActive }) => isActive ? activeStyle : inactiveStyle} to="/emcee"><Gift /><div className='d-none d-xl-block'>Emcee #s</div></Nav.Link>
+        <Nav.Link as={NavLink} style={({ isActive }) => isActive ? activeStyle : inactiveStyle} to="/help"><QuestionOctagon  /><div className='d-none d-xl-block'>Help</div></Nav.Link>
       </Nav>
       <AuthWidget />
     </Navbar>
