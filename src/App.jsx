@@ -8,6 +8,11 @@ import TeamDataPage from './pages/TeamDataPage';
 import RanksPage from './pages/RanksPage';
 import AnnouncePage from './pages/AnnouncePage';
 import PlayByPlayPage from './pages/PlayByPlayPage';
+import AllianceSelectionPage from './pages/AllianceSelectionPage';
+import AwardsPage from './pages/AwardsPage';
+import StatsPage from './pages/StatsPage';
+import CheatsheetPage from './pages/CheatsheetPage';
+import EmceePage from './pages/EmceePage';
 
 function LayoutsWithNavbar() {
   return (
@@ -30,11 +35,11 @@ function App() {
             <Route path='/ranks' element={<RanksPage />} />
             <Route path='/announce' element={<AnnouncePage />} />
             <Route path='/playbyplay' element={<PlayByPlayPage />} />
-            <Route path='/allianceselection' element={<RanksPage />} />
-            <Route path='/awards' element={<RanksPage />} />
-            <Route path='/stats' element={<RanksPage />} />
-            <Route path='/cheatsheet' element={<RanksPage />} />
-            <Route path='/emcee' element={<RanksPage />} />
+            <Route path='/allianceselection' element={<AllianceSelectionPage />} />
+            <Route path='/awards' element={<AwardsPage />} />
+            <Route path='/stats' element={<StatsPage />} />
+            <Route path='/cheatsheet' element={<CheatsheetPage />} />
+            <Route path='/emcee' element={<EmceePage />} />
           </Route>
         </Routes>
       </BrowserRouter>

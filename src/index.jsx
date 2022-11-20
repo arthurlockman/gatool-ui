@@ -5,6 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { Auth0Provider } from "@auth0/auth0-react";
+import { AuthClientContextProvider } from './clients/AuthClient';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -14,9 +15,11 @@ root.render(
       clientId="afsE1dlAGS609U32NjmvNMaYSQmtO3NT"
       redirectUri={window.location.origin}
     >
-      <App />
+      <AuthClientContextProvider>
+        <App />
+      </AuthClientContextProvider>
     </Auth0Provider>
-  </React.StrictMode>
+  </React.StrictMode >
 );
 
 // If you want to start measuring performance in your app, pass a function
