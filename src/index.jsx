@@ -5,7 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { Auth0Provider } from "@auth0/auth0-react";
-import { AuthClientContextProvider } from './clients/AuthClient';
+import { AuthClientContextProvider } from './contextProviders/AuthClientContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

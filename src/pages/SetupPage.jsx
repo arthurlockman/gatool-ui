@@ -1,29 +1,64 @@
 import { useEffect, useState } from "react";
-import { UseAuthClient } from "../clients/AuthClient";
+import { Blocks } from "react-loader-spinner";
+import Select from "react-select";
+import { UseAuthClient } from "../contextProviders/AuthClientContext";
+
+const supportedYears = [
+    { label: '2022', value: '2022' },
+    { label: '2021', value: '2021' },
+    { label: '2020', value: '2020' },
+    { label: '2019', value: '2019' }
+];
 
 function SetupPage() {
     // This is a demo on how to get data from the API. UseAuthClient()
     // provides us with an authenticated client that we can use to get data.
     var httpClient = UseAuthClient();
+
     // UseState can store data that persists across re-renders
-    var [data, setData] = useState('');
+    var [events, setEvents] = useState([]);
+    const [selectedEvent, setSelectedEvent] = useState(null);
+    const [selectedYear, setSelectedYear] = useState(supportedYears[0]);
+    const [loading, setLoading] = useState(false);
+
     useEffect(() => {
         async function getData() {
+            setLoading(true);
+            setSelectedEvent(null);
+            setEvents([]);
             // Get the data inside the UseEffect
-            const val = await httpClient.get('2022/events')
-            const json = await val.json()
+            const val = await httpClient.get(`${selectedYear.value}/events`);
+            const json = await val.json();
+            setLoading(false);
             // Store the data in the UseEffect
-            setData(JSON.stringify(json))
+            setEvents(json.Events.map((e) => {
+                return {
+                    value: e,
+                    label: e.name
+                };
+            }));
         }
         getData()
-    }, [httpClient])
+    }, [httpClient, selectedYear])
 
     return (
-        <>
-            <div>This is the setup page</div>
-            {/* Display the data we got */}
-            {data}
-        </>
+        <div className="d-flex">
+            <div className="d-flex p-2 flex-grow-1">
+                <Select options={supportedYears} defaultValue={selectedYear} onChange={setSelectedYear} />
+                <Select options={events} placeholder="Select an event" defaultValue={selectedEvent} onChange={setSelectedEvent} />
+                <Blocks
+                    visible={loading}
+                    height="38"
+                    width="38"
+                    ariaLabel="blocks-loading"
+                    wrapperStyle={{}}
+                    wrapperClass="blocks-wrapper"
+                />
+            </div>
+            <div className="d-flex p-2 flex-grow-1">
+                some more content
+            </div>
+        </div>
     )
 }
 

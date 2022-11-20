@@ -14,6 +14,7 @@ import StatsPage from './pages/StatsPage';
 import CheatsheetPage from './pages/CheatsheetPage';
 import EmceePage from './pages/EmceePage';
 import HelpPage from './pages/HelpPage';
+import { ModalFooter } from 'react-bootstrap';
 
 function LayoutsWithNavbar() {
   return (
