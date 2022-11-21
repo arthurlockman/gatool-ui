@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Offline, Online } from "react-detect-offline";
 import { Blocks } from "react-loader-spinner";
 import Select from "react-select";
 import { UseAuthClient } from "../contextProviders/AuthClientContext";
@@ -10,36 +11,40 @@ const supportedYears = [
     { label: '2019', value: '2019' }
 ];
 
-function SetupPage() {
+function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear }) {
     // This is a demo on how to get data from the API. UseAuthClient()
     // provides us with an authenticated client that we can use to get data.
     var httpClient = UseAuthClient();
 
     // UseState can store data that persists across re-renders
     var [events, setEvents] = useState([]);
-    const [selectedEvent, setSelectedEvent] = useState(null);
-    const [selectedYear, setSelectedYear] = useState(supportedYears[0]);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         async function getData() {
-            setLoading(true);
-            setSelectedEvent(null);
-            setEvents([]);
-            // Get the data inside the UseEffect
-            const val = await httpClient.get(`${selectedYear.value}/events`);
-            const json = await val.json();
-            setLoading(false);
-            // Store the data in the UseEffect
-            setEvents(json.Events.map((e) => {
-                return {
-                    value: e,
-                    label: e.name
-                };
-            }));
+            try {
+                setLoading(true);
+                setSelectedEvent(null);
+                setEvents([]);
+                // Get the data inside the UseEffect
+                const val = await httpClient.get(`${selectedYear.value}/events`);
+                const json = await val.json();
+                setLoading(false);
+                // Store the data in the UseEffect
+                setEvents(json.Events.map((e) => {
+                    return {
+                        value: e,
+                        label: e.name
+                    };
+                }));
+            } catch (e) {
+                console.error(e)
+            }
         }
-        getData()
-    }, [httpClient, selectedYear])
+        if (httpClient && selectedYear && setSelectedEvent) {
+            getData()
+        }
+    }, [httpClient, selectedYear, setSelectedEvent])
 
     return (
         <div className="d-flex">
@@ -58,6 +63,10 @@ function SetupPage() {
             <div className="d-flex p-2 flex-grow-1">
                 some more content
             </div>
+            <Offline><span style={{
+                color: 'red',
+                fontSize: '100pt'
+            }}>You're offline, dummy!</span></Offline>
         </div>
     )
 }

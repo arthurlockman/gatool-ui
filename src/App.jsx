@@ -14,7 +14,7 @@ import StatsPage from './pages/StatsPage';
 import CheatsheetPage from './pages/CheatsheetPage';
 import EmceePage from './pages/EmceePage';
 import HelpPage from './pages/HelpPage';
-import { ModalFooter } from 'react-bootstrap';
+import { useState } from 'react';
 
 function LayoutsWithNavbar() {
   return (
@@ -26,13 +26,16 @@ function LayoutsWithNavbar() {
 }
 
 function App() {
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [selectedYear, setSelectedYear] = useState(null);
+
   return (
     <div className="App">
       <BrowserRouter>
         <Routes>
           <Route path ="/" element={<LayoutsWithNavbar />}>
-            <Route path="/" element={<SetupPage />} />
-            <Route path="/schedule" element={<SchedulePage />} />
+            <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} />} />
+            <Route path="/schedule" element={<SchedulePage selectedEvent={selectedEvent} selectedYear={selectedYear} />} />
             <Route path="/teamdata" element={<TeamDataPage />} />
             <Route path='/ranks' element={<RanksPage />} />
             <Route path='/announce' element={<AnnouncePage />} />
