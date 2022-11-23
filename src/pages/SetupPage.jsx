@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Offline, Online } from "react-detect-offline";
+import { Offline } from "react-detect-offline";
 import { Blocks } from "react-loader-spinner";
 import Select from "react-select";
 import { UseAuthClient } from "../contextProviders/AuthClientContext";
