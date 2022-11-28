@@ -4,16 +4,21 @@ import { createContext, useContext, useMemo } from "react"
 const apiBaseUrl = "https://api.gatool.org/v3/";
 
 class AuthClient {
+    operationsInProgress = 0;
+
     constructor(tokenGetter) {
         this.tokenGetter = tokenGetter
     }
 
     async get(path) {
+        this.operationsInProgress += 1;
         var token = await this.getToken();
         return fetch(`${apiBaseUrl}${path}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
+        }).finally(() => {
+            this.operationsInProgress -= 1;
         });
     }
 

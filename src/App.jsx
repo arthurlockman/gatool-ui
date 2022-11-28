@@ -17,10 +17,10 @@ import HelpPage from './pages/HelpPage';
 import { useEffect, useState } from 'react';
 import { UseAuthClient } from './contextProviders/AuthClientContext';
 
-function LayoutsWithNavbar({scheduleTabState}) {
+function LayoutsWithNavbar({scheduleTabReady, teamDataTabReady}) {
   return (
     <>
-      <MainNavigation scheduleTabState={scheduleTabState} />
+      <MainNavigation scheduleTabReady={scheduleTabReady} teamDataTabReady={teamDataTabReady} />
       <Outlet />
     </>
   );
@@ -36,7 +36,8 @@ function App() {
   const [teamList, setTeamList] = useState(null);
 
   // Tab state trackers - false indicates loading, true indicates good to go
-  const [scheduleTabState, setScheduleTabState] = useState(false)
+  const [scheduleTabReady, setScheduleTabReady] = useState(false)
+  const [teamDataTabReady, setTeamDataTabReady] = useState(false)
 
   // Retrieve event list when year selection changes
   useEffect(() => {
@@ -64,7 +65,7 @@ function App() {
   // Retrieve schedule when event selection changes
   useEffect(() => {
     async function getSchedule() {
-      setScheduleTabState(false);
+      setScheduleTabReady(false);
       setQualSchedule(null);
       setPlayoffSchedule(null);
       var result = await httpClient.get(`${selectedYear.value}/schedule/hybrid/${selectedEvent.value.code}/qual`);
@@ -73,16 +74,18 @@ function App() {
       result = await httpClient.get(`${selectedYear.value}/schedule/hybrid/${selectedEvent.value.code}/playoff`);
       var playoffschedule = await result.json();
       setPlayoffSchedule(playoffschedule);
-      setScheduleTabState(true);
+      setScheduleTabReady(true);
       //schedule = qualSchedule;
       //schedule.concat(playoffSchedule);
     }
 
     async function getTeamList() {
       setTeamList(null);
+      setTeamDataTabReady(false);
       var result = await httpClient.get(`${selectedYear.value}/teams?eventCode=${selectedEvent.value.code}`);
       var teams = await result.json();
       setTeamList(teams);
+      setTeamDataTabReady(true);
     }
 
     if (httpClient && selectedEvent && selectedYear) {
@@ -95,7 +98,7 @@ function App() {
     <div className="App">
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<LayoutsWithNavbar scheduleTabState={scheduleTabState} />}>
+          <Route path="/" element={<LayoutsWithNavbar scheduleTabReady={scheduleTabReady} teamDataTabReady={teamDataTabReady} />}>
             <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} />} />
             <Route path="/schedule" element={<SchedulePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} />} />
             <Route path="/teamdata" element={<TeamDataPage selectedEvent={selectedEvent} teamList={teamList}/>} />

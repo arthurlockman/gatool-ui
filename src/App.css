@@ -52,11 +52,3 @@
     transform: rotate(360deg);
   }
 }
-
-.tab-loading {
-  color: red
-}
-
-.tab-loaded {
-  color: green
-}

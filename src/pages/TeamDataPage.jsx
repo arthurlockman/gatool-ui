@@ -5,7 +5,7 @@ function TeamDataPage({selectedEvent, teamList}) {
     }
 
     return (
-        <>{teamList.teams.map((team) => {return fixTeamName(team.nameFull)})}</>
+        <>{teamList && teamList.teams && teamList.teams.map((team) => {return fixTeamName(team.nameFull)})}</>
 
     )
 }

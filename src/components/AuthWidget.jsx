@@ -1,21 +1,17 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import LoginButton from "./LoginButton";
 import { Blocks } from "react-loader-spinner";
+import { UseAuthClient } from "../contextProviders/AuthClientContext";
 
 const AuthWidget = () => {
   const { user, isAuthenticated, isLoading } = useAuth0();
+  const httpClient = UseAuthClient();
+  const [showSpinner, setShowSpinner] = useState(false);
 
-  if (isLoading) {
-    return <div><Blocks
-      visible={true}
-      height="38"
-      width=""
-      ariaLabel="blocks-loading"
-      wrapperStyle={{}}
-      wrapperClass="blocks-wrapper"
-    /></div>;
-  }
+  useEffect(() => {
+    setShowSpinner(httpClient.operationsInProgress || isLoading);
+  }, [httpClient.operationsInProgress, isLoading])
 
   return (
     isAuthenticated ? (
@@ -23,16 +19,26 @@ const AuthWidget = () => {
         <div className='d-block d-xl-none' style={{
           marginRight: "5px"
         }}>
-          <img src={user.picture} alt={user.name} height="31px" style={{
+          {showSpinner ? <Blocks
+            visible={true}
+            height="38"
+            width=""
+            ariaLabel="blocks-loading"
+          /> : <img src={user.picture} alt={user.name} height="31px" style={{
             borderRadius: "6px"
-          }} />
+          }} />}
         </div>
         <div className='d-none d-xl-block' style={{
           marginRight: "10px"
         }}>
-          <img src={user.picture} alt={user.name} height="45px" style={{
+          {showSpinner ? <Blocks
+            visible={true}
+            height="45"
+            width=""
+            ariaLabel="blocks-loading"
+          /> : <img src={user.picture} alt={user.name} height="45px" style={{
             borderRadius: "6px"
-          }} />
+          }} />}
         </div>
       </span>
     ) : (
