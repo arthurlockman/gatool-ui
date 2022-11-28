@@ -1,7 +1,12 @@
 
-function TeamDataPage() {
+function TeamDataPage({selectedEvent, teamList}) {
+    function fixTeamName(teamName) {
+        return `aefaefaef ${teamName}`;
+    }
+
     return (
-        <div>This is the team data page</div>
+        <>{teamList.teams.map((team) => {return fixTeamName(team.nameFull)})}</>
+
     )
 }
 

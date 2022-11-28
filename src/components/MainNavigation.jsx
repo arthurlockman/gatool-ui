@@ -13,14 +13,14 @@ const inactiveStyle = {
   textDecoration: "none"
 }
 
-function MainNavigation() {
+function MainNavigation({scheduleTabState}) {
   return (
     <Navbar bg="light" sticky='top' style={{
       color: "black"
     }}>
       <Nav className="me-auto">
         <Nav.Link as={NavLink} style={({ isActive }) => isActive ? activeStyle : inactiveStyle} to="/"><Gear /><div className='d-none d-xl-block'>Setup</div></Nav.Link>
-        <Nav.Link as={NavLink} style={({ isActive }) => isActive ? activeStyle : inactiveStyle} to="/schedule"><Calendar3 /><div className='d-none d-xl-block'>Schedule</div></Nav.Link>
+        <Nav.Link as={NavLink} style={({ isActive }) => isActive ? activeStyle : inactiveStyle} to="/schedule" className={scheduleTabState ? 'tab-loaded' : 'tab-loading'}><Calendar3 /><div className='d-none d-xl-block'>Schedule</div></Nav.Link>
         <Nav.Link as={NavLink} style={({ isActive }) => isActive ? activeStyle : inactiveStyle} to="/teamdata"><CardList /><div className='d-none d-xl-block'>Team Data</div></Nav.Link>
         <Nav.Link as={NavLink} style={({ isActive }) => isActive ? activeStyle : inactiveStyle} to="/ranks"><SortNumericDown /><div className='d-none d-xl-block'>Ranks</div></Nav.Link>
         <Nav.Link as={NavLink} style={({ isActive }) => isActive ? activeStyle : inactiveStyle} to="/announce"><Megaphone /><div className='d-none d-xl-block'>Announce</div></Nav.Link>
