@@ -1,8 +1,8 @@
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import AuthWidget from './AuthWidget';
-import { NavLink, Link } from 'react-router-dom';
-import { Calendar3, CardList, Eye, Flag, Gear, Gift, HandThumbsUp, List, Megaphone, Question, QuestionOctagon, SortNumericDown, Speedometer, Trophy } from 'react-bootstrap-icons';
+import { NavLink } from 'react-router-dom';
+import { Calendar3, CardList, Eye, Flag, Gear, Gift, HandThumbsUp, Megaphone, QuestionOctagon, SortNumericDown, Speedometer, Trophy } from 'react-bootstrap-icons';
 
 const activeStyle = {
   backgroundColor: "#ccc",

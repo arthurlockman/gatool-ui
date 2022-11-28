@@ -1,5 +1,5 @@
 import { Offline } from "react-detect-offline";
-import { Blocks } from "react-loader-spinner";
+// import { Blocks } from "react-loader-spinner";
 import Select from "react-select";
 
 const supportedYears = [

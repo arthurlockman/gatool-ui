@@ -14,7 +14,7 @@ import StatsPage from './pages/StatsPage';
 import CheatsheetPage from './pages/CheatsheetPage';
 import EmceePage from './pages/EmceePage';
 import HelpPage from './pages/HelpPage';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { UseAuthClient } from './contextProviders/AuthClientContext';
 
 function LayoutsWithNavbar({scheduleTabState}) {
