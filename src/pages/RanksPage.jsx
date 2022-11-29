@@ -1,8 +1,8 @@
 import { Alert, Container, Table } from "react-bootstrap";
 
-function RanksPage({selectedEvent, teamList, rankings}) {
+function RanksPage({ selectedEvent, teamList, rankings }) {
     return (
-        <Container>
+        <Container fluid>
             {!selectedEvent && !teamList && <div>
                 <Alert variant="warning" >You need to select an event before you can see anything here.</Alert>
             </div>}
@@ -29,19 +29,18 @@ function RanksPage({selectedEvent, teamList, rankings}) {
                     </thead>
                     <tbody>
                         {rankings && rankings.Rankings && rankings.Rankings.map((rankRow) => {
-                            return <>
-                                <tr key={"rankings"+rankRow.teamNumber}>
-                                    <td>{rankRow.teamNumber}</td>
-                                    <td>{rankRow.rank}</td>
-                                    <td>todo: lookup teamName</td>
-                                    <td>{rankRow.sortOrder1}</td>
-                                    <td>{rankRow.wins}</td>
-                                    <td>{rankRow.losses}</td>
-                                    <td>{rankRow.ties}</td>
-                                    <td>{rankRow.qualAverage}</td>
-                                    <td>{rankRow.dq}</td>
-                                    <td>{rankRow.matchesPlayed}</td>
-                                </tr></>
+                            return <tr key={"rankings" + rankRow.teamNumber}>
+                                <td>{rankRow.teamNumber}</td>
+                                <td>{rankRow.rank}</td>
+                                <td>todo: lookup teamName</td>
+                                <td>{rankRow.sortOrder1}</td>
+                                <td>{rankRow.wins}</td>
+                                <td>{rankRow.losses}</td>
+                                <td>{rankRow.ties}</td>
+                                <td>{rankRow.qualAverage}</td>
+                                <td>{rankRow.dq}</td>
+                                <td>{rankRow.matchesPlayed}</td>
+                            </tr>
                         })}
                     </tbody>
                 </Table>

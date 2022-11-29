@@ -27,7 +27,8 @@ function LayoutsWithNavbar({scheduleTabReady, teamDataTabReady, ranksTabReady}) 
 }
 
 function App() {
-  const httpClient = UseAuthClient();
+  // eslint-disable-next-line no-unused-vars
+  const [httpClient] = UseAuthClient();
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [selectedYear, setSelectedYear] = useState(null);
   const [events, setEvents] = useState([]);
@@ -116,7 +117,7 @@ function App() {
     <div className="App">
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<LayoutsWithNavbar scheduleTabReady={scheduleTabReady} teamDataTabReady={teamDataTabReady} eventListready={eventListReady} />}>
+          <Route path="/" element={<LayoutsWithNavbar scheduleTabReady={scheduleTabReady} teamDataTabReady={teamDataTabReady} eventListready={eventListReady} ranksTabReady={ranksTabReady} />}>
             <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} eventListReady={eventListReady}/>} />
             <Route path="/schedule" element={<SchedulePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} />} />
             <Route path="/teamdata" element={<TeamDataPage selectedEvent={selectedEvent} teamList={teamList} rankings={rankings}/>} />

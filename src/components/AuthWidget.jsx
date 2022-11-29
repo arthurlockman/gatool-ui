@@ -6,12 +6,12 @@ import { UseAuthClient } from "../contextProviders/AuthClientContext";
 
 const AuthWidget = () => {
   const { user, isAuthenticated, isLoading } = useAuth0();
-  const httpClient = UseAuthClient();
+  const [, operationsInProgress] = UseAuthClient();
   const [showSpinner, setShowSpinner] = useState(false);
 
   useEffect(() => {
-    setShowSpinner(httpClient.operationsInProgress || isLoading);
-  }, [httpClient.operationsInProgress, isLoading])
+    setShowSpinner(operationsInProgress || isLoading);
+  }, [operationsInProgress, isLoading])
 
   return (
     isAuthenticated ? (

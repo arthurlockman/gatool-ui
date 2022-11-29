@@ -1,13 +1,12 @@
 import { Alert, Container, Table } from "react-bootstrap";
-import moment from 'moment';
 
 function TeamDataPage({ selectedEvent, teamList }) {
-    function fixTeamName(teamName) {
-        return `aefaefaef ${teamName}`;
-    }
+    // function fixTeamName(teamName) {
+    //     return `aefaefaef ${teamName}`;
+    // }
 
     return (
-        <Container>
+        <Container fluid>
             {!selectedEvent && !teamList && <div>
                 <Alert variant="warning" >You need to select an event before you can see anything here.</Alert>
             </div>}
@@ -29,18 +28,17 @@ function TeamDataPage({ selectedEvent, teamList }) {
                     </thead>
                     <tbody>
                         {teamList && teamList.teams && teamList.teams.map((team) => {
-                            return <>
-                                <tr key={"teamData"+team.teamNumber}>
-                                    <td>{team.teamNumber}</td>
-                                    <td>Rank</td>
-                                    <td>{team.nameShort}</td>
-                                    <td>{team.city}</td>
-                                    <td>Top Sponsors</td>
-                                    <td>{team.schoolName}</td>
-                                    <td>{team.rookieYear}</td>
-                                    <td>{team.robotName}</td>
-                                    <td>Additional Notes</td>
-                                </tr></>
+                            return <tr key={"teamData" + team.teamNumber}>
+                                <td>{team.teamNumber}</td>
+                                <td>Rank</td>
+                                <td>{team.nameShort}</td>
+                                <td>{team.city}</td>
+                                <td>Top Sponsors</td>
+                                <td>{team.schoolName}</td>
+                                <td>{team.rookieYear}</td>
+                                <td>{team.robotName}</td>
+                                <td>Additional Notes</td>
+                            </tr>
                         })}
                     </tbody>
                 </Table>
