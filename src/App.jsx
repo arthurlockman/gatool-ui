@@ -17,10 +17,10 @@ import HelpPage from './pages/HelpPage';
 import { useEffect, useState } from 'react';
 import { UseAuthClient } from './contextProviders/AuthClientContext';
 
-function LayoutsWithNavbar({scheduleTabReady, teamDataTabReady}) {
+function LayoutsWithNavbar({scheduleTabReady, teamDataTabReady, ranksTabReady}) {
   return (
     <>
-      <MainNavigation scheduleTabReady={scheduleTabReady} teamDataTabReady={teamDataTabReady} />
+      <MainNavigation scheduleTabReady={scheduleTabReady} teamDataTabReady={teamDataTabReady} ranksTabReady={ranksTabReady}/>
       <Outlet />
     </>
   );
@@ -34,10 +34,15 @@ function App() {
   const [playoffSchedule, setPlayoffSchedule] = useState(null);
   const [qualSchedule, setQualSchedule] = useState(null);
   const [teamList, setTeamList] = useState(null);
+  const [rankings, setRankings] = useState(null);
 
   // Tab state trackers - false indicates loading, true indicates good to go
   const [scheduleTabReady, setScheduleTabReady] = useState(false)
   const [teamDataTabReady, setTeamDataTabReady] = useState(false)
+  const [ranksTabReady, setRanksTabReady] = useState(false)
+
+  // Data ready trackers for use in pages
+  const [eventListReady, setEventListReady] = useState(false)
 
   // Retrieve event list when year selection changes
   useEffect(() => {
@@ -46,6 +51,7 @@ function App() {
         setSelectedEvent(null);
         const val = await httpClient.get(`${selectedYear.value}/events`);
         const json = await val.json();
+        setEventListReady(true);
         setEvents(json.Events.map((e) => {
           return {
             value: e,
@@ -58,6 +64,7 @@ function App() {
 
     }
     if (httpClient && selectedYear) {
+      setEventListReady(false)
       getData()
     }
   }, [selectedYear, httpClient])
@@ -66,8 +73,11 @@ function App() {
   useEffect(() => {
     async function getSchedule() {
       setScheduleTabReady(false);
+      setTeamDataTabReady(false);
+      setRanksTabReady(false);
       setQualSchedule(null);
       setPlayoffSchedule(null);
+      setTeamList(null);
       var result = await httpClient.get(`${selectedYear.value}/schedule/hybrid/${selectedEvent.value.code}/qual`);
       var qualschedule = await result.json();
       setQualSchedule(qualschedule);
@@ -75,8 +85,6 @@ function App() {
       var playoffschedule = await result.json();
       setPlayoffSchedule(playoffschedule);
       setScheduleTabReady(true);
-      //schedule = qualSchedule;
-      //schedule.concat(playoffSchedule);
     }
 
     async function getTeamList() {
@@ -88,9 +96,19 @@ function App() {
       setTeamDataTabReady(true);
     }
 
+    async function getRanks() {
+      setRankings(null);
+      setRanksTabReady(false);
+      var result = await httpClient.get(`${selectedYear.value}/rankings/${selectedEvent.value.code}`);
+      var ranks = await result.json();
+      setRankings(ranks);
+      setRanksTabReady(true);
+    }
+
     if (httpClient && selectedEvent && selectedYear) {
       getSchedule();
       getTeamList();
+      getRanks();
     }
   }, [httpClient, selectedEvent, selectedYear])
 
@@ -98,11 +116,11 @@ function App() {
     <div className="App">
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<LayoutsWithNavbar scheduleTabReady={scheduleTabReady} teamDataTabReady={teamDataTabReady} />}>
-            <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} />} />
+          <Route path="/" element={<LayoutsWithNavbar scheduleTabReady={scheduleTabReady} teamDataTabReady={teamDataTabReady} eventListready={eventListReady} />}>
+            <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} eventListReady={eventListReady}/>} />
             <Route path="/schedule" element={<SchedulePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} />} />
-            <Route path="/teamdata" element={<TeamDataPage selectedEvent={selectedEvent} teamList={teamList}/>} />
-            <Route path='/ranks' element={<RanksPage />} />
+            <Route path="/teamdata" element={<TeamDataPage selectedEvent={selectedEvent} teamList={teamList} rankings={rankings}/>} />
+            <Route path='/ranks' element={<RanksPage selectedEvent={selectedEvent} teamList={teamList} rankings={rankings}/>} />
             <Route path='/announce' element={<AnnouncePage />} />
             <Route path='/playbyplay' element={<PlayByPlayPage />} />
             <Route path='/allianceselection' element={<AllianceSelectionPage />} />

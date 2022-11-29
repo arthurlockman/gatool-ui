@@ -33,7 +33,7 @@ const tabInactiveNotready = {
   textDecoration: "none"
 }
 
-function MainNavigation({scheduleTabReady, teamDataTabReady}) {
+function MainNavigation({scheduleTabReady, teamDataTabReady, ranksTabReady}) {
   function getTabStyle(active, state) {
     if (state === null) { // tab has no ready state
       if (active) return tabActive;
@@ -54,7 +54,7 @@ function MainNavigation({scheduleTabReady, teamDataTabReady}) {
         <Nav.Link as={NavLink} style={({ isActive }) => getTabStyle(isActive, null)} to="/"><Gear /><div className='d-none d-xl-block'>Setup</div></Nav.Link>
         <Nav.Link as={NavLink} style={({ isActive }) => getTabStyle(isActive, scheduleTabReady)} to="/schedule"><Calendar3 /><div className='d-none d-xl-block'>Schedule</div></Nav.Link>
         <Nav.Link as={NavLink} style={({ isActive }) => getTabStyle(isActive, teamDataTabReady)} to="/teamdata"><CardList /><div className='d-none d-xl-block'>Team Data</div></Nav.Link>
-        <Nav.Link as={NavLink} style={({ isActive }) => getTabStyle(isActive, null)} to="/ranks"><SortNumericDown /><div className='d-none d-xl-block'>Ranks</div></Nav.Link>
+        <Nav.Link as={NavLink} style={({ isActive }) => getTabStyle(isActive, ranksTabReady)} to="/ranks"><SortNumericDown /><div className='d-none d-xl-block'>Ranks</div></Nav.Link>
         <Nav.Link as={NavLink} style={({ isActive }) => getTabStyle(isActive, null)} to="/announce"><Megaphone /><div className='d-none d-xl-block'>Announce</div></Nav.Link>
         <Nav.Link as={NavLink} style={({ isActive }) => getTabStyle(isActive, null)} to="/playbyplay"><Speedometer /><div className='d-none d-xl-block'>Play-by-Play</div></Nav.Link>
         <Nav.Link as={NavLink} style={({ isActive }) => getTabStyle(isActive, null)} to="/allianceselection"><HandThumbsUp /><div className='d-none d-xl-block'>Alliance Selection</div></Nav.Link>
