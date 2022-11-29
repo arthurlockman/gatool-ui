@@ -18,18 +18,20 @@ import { useEffect, useState } from 'react';
 import { UseAuthClient } from './contextProviders/AuthClientContext';
 import { useAuth0 } from '@auth0/auth0-react';
 import AnonymousUserPage from './pages/AnonymousUserPage';
+import { Blocks } from 'react-loader-spinner';
+import { Container } from 'react-bootstrap';
 
-function LayoutsWithNavbar({scheduleTabReady, teamDataTabReady, ranksTabReady}) {
+function LayoutsWithNavbar({ scheduleTabReady, teamDataTabReady, ranksTabReady }) {
   return (
     <>
-      <MainNavigation scheduleTabReady={scheduleTabReady} teamDataTabReady={teamDataTabReady} ranksTabReady={ranksTabReady}/>
+      <MainNavigation scheduleTabReady={scheduleTabReady} teamDataTabReady={teamDataTabReady} ranksTabReady={ranksTabReady} />
       <Outlet />
     </>
   );
 }
 
 function App() {
-  const { isAuthenticated } = useAuth0();
+  const { isAuthenticated, isLoading } = useAuth0();
   // eslint-disable-next-line no-unused-vars
   const [httpClient] = UseAuthClient();
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -118,24 +120,29 @@ function App() {
 
   return (
     <div className="App">
-      {isAuthenticated ? <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<LayoutsWithNavbar scheduleTabReady={scheduleTabReady} teamDataTabReady={teamDataTabReady} eventListready={eventListReady} ranksTabReady={ranksTabReady} />}>
-            <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} eventListReady={eventListReady}/>} />
-            <Route path="/schedule" element={<SchedulePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} />} />
-            <Route path="/teamdata" element={<TeamDataPage selectedEvent={selectedEvent} teamList={teamList} rankings={rankings}/>} />
-            <Route path='/ranks' element={<RanksPage selectedEvent={selectedEvent} teamList={teamList} rankings={rankings}/>} />
-            <Route path='/announce' element={<AnnouncePage />} />
-            <Route path='/playbyplay' element={<PlayByPlayPage />} />
-            <Route path='/allianceselection' element={<AllianceSelectionPage />} />
-            <Route path='/awards' element={<AwardsPage />} />
-            <Route path='/stats' element={<StatsPage />} />
-            <Route path='/cheatsheet' element={<CheatsheetPage />} />
-            <Route path='/emcee' element={<EmceePage />} />
-            <Route path='/help' element={<HelpPage />} />
-          </Route>
-        </Routes>
-      </BrowserRouter> : <AnonymousUserPage />}
+        {isLoading ? <div className="vertical-center">
+          <Container>
+            <Blocks visible height="200" width="" ariaLabel="blocks-loading" />
+          </Container>
+        </div> :
+          isAuthenticated ? <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<LayoutsWithNavbar scheduleTabReady={scheduleTabReady} teamDataTabReady={teamDataTabReady} eventListready={eventListReady} ranksTabReady={ranksTabReady} />}>
+                <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} eventListReady={eventListReady} />} />
+                <Route path="/schedule" element={<SchedulePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} />} />
+                <Route path="/teamdata" element={<TeamDataPage selectedEvent={selectedEvent} teamList={teamList} rankings={rankings} />} />
+                <Route path='/ranks' element={<RanksPage selectedEvent={selectedEvent} teamList={teamList} rankings={rankings} />} />
+                <Route path='/announce' element={<AnnouncePage />} />
+                <Route path='/playbyplay' element={<PlayByPlayPage />} />
+                <Route path='/allianceselection' element={<AllianceSelectionPage />} />
+                <Route path='/awards' element={<AwardsPage />} />
+                <Route path='/stats' element={<StatsPage />} />
+                <Route path='/cheatsheet' element={<CheatsheetPage />} />
+                <Route path='/emcee' element={<EmceePage />} />
+                <Route path='/help' element={<HelpPage />} />
+              </Route>
+            </Routes>
+          </BrowserRouter> : <AnonymousUserPage />}
     </div>
   );
 }
