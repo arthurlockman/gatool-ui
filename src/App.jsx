@@ -16,6 +16,8 @@ import EmceePage from './pages/EmceePage';
 import HelpPage from './pages/HelpPage';
 import { useEffect, useState } from 'react';
 import { UseAuthClient } from './contextProviders/AuthClientContext';
+import { useAuth0 } from '@auth0/auth0-react';
+import AnonymousUserPage from './pages/AnonymousUserPage';
 
 function LayoutsWithNavbar({scheduleTabReady, teamDataTabReady, ranksTabReady}) {
   return (
@@ -27,6 +29,7 @@ function LayoutsWithNavbar({scheduleTabReady, teamDataTabReady, ranksTabReady}) 
 }
 
 function App() {
+  const { isAuthenticated } = useAuth0();
   // eslint-disable-next-line no-unused-vars
   const [httpClient] = UseAuthClient();
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -115,7 +118,7 @@ function App() {
 
   return (
     <div className="App">
-      <BrowserRouter>
+      {isAuthenticated ? <BrowserRouter>
         <Routes>
           <Route path="/" element={<LayoutsWithNavbar scheduleTabReady={scheduleTabReady} teamDataTabReady={teamDataTabReady} eventListready={eventListReady} ranksTabReady={ranksTabReady} />}>
             <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} eventListReady={eventListReady}/>} />
@@ -132,7 +135,7 @@ function App() {
             <Route path='/help' element={<HelpPage />} />
           </Route>
         </Routes>
-      </BrowserRouter>
+      </BrowserRouter> : <AnonymousUserPage />}
     </div>
   );
 }
