@@ -50,6 +50,10 @@ function App() {
   // Data ready trackers for use in pages
   const [eventListReady, setEventListReady] = useState(false)
 
+  // Controllers for table sort order at render time
+  const [teamSort, setTeamSort] = useState("")
+  const [rankSort, setRankSort] = useState("")
+
   // Retrieve event list when year selection changes
   useEffect(() => {
     async function getData() {
@@ -120,29 +124,29 @@ function App() {
 
   return (
     <div className="App">
-        {isLoading ? <div className="vertical-center">
-          <Container>
-            <Blocks visible height="200" width="" ariaLabel="blocks-loading" />
-          </Container>
-        </div> :
-          isAuthenticated ? <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<LayoutsWithNavbar scheduleTabReady={scheduleTabReady} teamDataTabReady={teamDataTabReady} eventListready={eventListReady} ranksTabReady={ranksTabReady} />}>
-                <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} eventListReady={eventListReady} />} />
-                <Route path="/schedule" element={<SchedulePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} />} />
-                <Route path="/teamdata" element={<TeamDataPage selectedEvent={selectedEvent} teamList={teamList} rankings={rankings} />} />
-                <Route path='/ranks' element={<RanksPage selectedEvent={selectedEvent} teamList={teamList} rankings={rankings} />} />
-                <Route path='/announce' element={<AnnouncePage />} />
-                <Route path='/playbyplay' element={<PlayByPlayPage />} />
-                <Route path='/allianceselection' element={<AllianceSelectionPage />} />
-                <Route path='/awards' element={<AwardsPage />} />
-                <Route path='/stats' element={<StatsPage />} />
-                <Route path='/cheatsheet' element={<CheatsheetPage />} />
-                <Route path='/emcee' element={<EmceePage />} />
-                <Route path='/help' element={<HelpPage />} />
-              </Route>
-            </Routes>
-          </BrowserRouter> : <AnonymousUserPage />}
+      {isLoading ? <div className="vertical-center">
+        <Container>
+          <Blocks visible height="200" width="" ariaLabel="blocks-loading" />
+        </Container>
+      </div> :
+        isAuthenticated ? <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<LayoutsWithNavbar scheduleTabReady={scheduleTabReady} teamDataTabReady={teamDataTabReady} eventListready={eventListReady} ranksTabReady={ranksTabReady} />}>
+              <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} eventListReady={eventListReady} />} />
+              <Route path="/schedule" element={<SchedulePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} />} />
+              <Route path="/teamdata" element={<TeamDataPage selectedEvent={selectedEvent} teamList={teamList} rankings={rankings} teamSort={teamSort} setTeamSort={setTeamSort}/>} />
+              <Route path='/ranks' element={<RanksPage selectedEvent={selectedEvent} teamList={teamList} rankings={rankings} rankSort={rankSort} setRankSort={setRankSort}/>} />
+              <Route path='/announce' element={<AnnouncePage />} />
+              <Route path='/playbyplay' element={<PlayByPlayPage />} />
+              <Route path='/allianceselection' element={<AllianceSelectionPage />} />
+              <Route path='/awards' element={<AwardsPage />} />
+              <Route path='/stats' element={<StatsPage />} />
+              <Route path='/cheatsheet' element={<CheatsheetPage />} />
+              <Route path='/emcee' element={<EmceePage />} />
+              <Route path='/help' element={<HelpPage />} />
+            </Route>
+          </Routes>
+        </BrowserRouter> : <AnonymousUserPage />}
     </div>
   );
 }

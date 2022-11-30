@@ -3,7 +3,7 @@ import moment from 'moment';
 
 function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule }) {
     return (
-        <Container>
+        <Container fluid>
             {!selectedEvent && !qualSchedule && <div>
                 <Alert variant="warning" >You need to select an event before you can see anything here.</Alert>
             </div>}
