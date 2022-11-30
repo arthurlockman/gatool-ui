@@ -1,11 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+
 import './index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'react-toastify/dist/ReactToastify.css';
+
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { Auth0Provider } from "@auth0/auth0-react";
 import { AuthClientContextProvider } from './contextProviders/AuthClientContext';
+import { ToastContainer } from 'react-toastify';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -19,6 +23,15 @@ root.render(
         <App />
       </AuthClientContextProvider>
     </Auth0Provider>
+    <ToastContainer
+      position='bottom-right'
+      autoClose={5000}
+      closeOnClick
+      pauseOnHover
+      pauseOnFocusLoss={true}
+      draggable
+      theme="colored"
+    />
   </React.StrictMode >
 );
 

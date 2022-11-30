@@ -4,14 +4,14 @@ import orderBy from "lodash/orderBy";
 import { SortAlphaDown, SortAlphaUp, SortNumericDown, SortNumericUp } from 'react-bootstrap-icons';
 
 function TeamDataPage({ selectedEvent, teamList, rankings, teamSort, setTeamSort}) {
-    
+
     function getTeamRank(teamNumber) {
-        var team = find(rankings.Rankings,{"teamNumber": teamNumber} );
-        return team.rank;
+        var team = find(rankings?.Rankings,{"teamNumber": teamNumber} );
+        return team?.rank;
 
     }
 
-    var teamListExtended = teamList.teams.map((teamRow) => {
+    var teamListExtended = teamList?.teams?.map((teamRow) => {
         teamRow.rank = getTeamRank(teamRow.teamNumber);
         teamRow.citySort = teamRow.country+teamRow.stateProv+teamRow.city;
         return teamRow;
@@ -47,14 +47,14 @@ function TeamDataPage({ selectedEvent, teamList, rankings, teamSort, setTeamSort
                     <tbody>
                         {teamList && teamList.teams && teamListExtended.map((team) => {
                             return <tr key={"teamData" + team.teamNumber}>
-                                <td>{team.teamNumber}</td>
-                                <td>{team.rank}</td>
-                                <td>{team.nameShort}</td>
-                                <td>{team.city}, {team.stateProv} {(team.country !== "USA") ? " "+team.country : ""}</td>
+                                <td>{team?.teamNumber}</td>
+                                <td>{team?.rank}</td>
+                                <td>{team?.nameShort}</td>
+                                <td>{team?.city}, {team?.stateProv} {(team?.country !== "USA") ? " "+team?.country : ""}</td>
                                 <td>Top Sponsors</td>
-                                <td>{team.schoolName}</td>
-                                <td>{team.rookieYear}</td>
-                                <td>{team.robotName}</td>
+                                <td>{team?.schoolName}</td>
+                                <td>{team?.rookieYear}</td>
+                                <td>{team?.robotName}</td>
                                 <td>Additional Notes</td>
                             </tr>
                         })}

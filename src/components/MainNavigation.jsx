@@ -3,6 +3,7 @@ import Navbar from 'react-bootstrap/Navbar';
 import AuthWidget from './AuthWidget';
 import { NavLink } from 'react-router-dom';
 import { Calendar3, CardList, Eye, Flag, Gear, Gift, HandThumbsUp, Megaphone, QuestionOctagon, SortNumericDown, Speedometer, Trophy } from 'react-bootstrap-icons';
+import { TabStates } from '../App';
 
 const tabActive = {
   backgroundColor: "#ccc",
@@ -19,12 +20,22 @@ const tabActiveReady = {
   boxShadow: "inset 0px 0px 5px 2px #3d85c6"
 }
 
+const tabActiveStale = {
+  backgroundColor: "rgba(255, 153, 51, 1.0)",
+  boxShadow: "inset 0px 0px 5px 2px #3d85c6"
+}
+
 const tabInactive = {
   textDecoration: "none"
 }
 
 const tabInactiveReady = {
   backgroundColor: "rgba(144, 238, 144, 0.5)",
+  textDecoration: "none"
+}
+
+const tabInactiveStale = {
+  backgroundColor: "rgba(255, 153, 51, 0.5)",
   textDecoration: "none"
 }
 
@@ -38,12 +49,15 @@ function MainNavigation({scheduleTabReady, teamDataTabReady, ranksTabReady}) {
     if (state === null) { // tab has no ready state
       if (active) return tabActive;
       else return tabInactive;
-    } else if (state) { // tab is ready
+    } else if (state === TabStates.Ready) { // tab is ready
       if (active) return tabActiveReady;
       else return tabInactiveReady;
-    } else if (!state) { // tab is not ready
+    } else if (state === TabStates.NotReady) { // tab is not ready
       if (active) return tabActiveNotready;
       else return tabInactiveNotready;
+    } else if (state === TabStates.Stale) { // tab may contain stale data
+      if (active) return tabActiveStale;
+      else return tabInactiveStale;
     }
   }
   return (

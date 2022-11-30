@@ -1,17 +1,17 @@
 import { Alert, Container, Table } from "react-bootstrap";
 import find from "lodash/find";
 import orderBy from "lodash/orderBy";
-import { SortAlphaDown, SortAlphaUp, SortNumericDown, SortNumericUp } from 'react-bootstrap-icons';
+import { SortNumericDown, SortNumericUp } from 'react-bootstrap-icons';
 
 function RanksPage({ selectedEvent, teamList, rankings, rankSort, setRankSort }) {
-    
+
     function getTeamName(teamNumber) {
         var team = find(teamList.teams,{"teamNumber": teamNumber} );
         return team.nameShort;
 
     }
 
-    var rankingsList = rankings.Rankings;
+    var rankingsList = rankings?.Rankings;
 
     if (rankSort.charAt(0)==="-") {
         rankingsList = orderBy(rankingsList,rankSort.slice(1), 'desc');

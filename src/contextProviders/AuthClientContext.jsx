@@ -1,5 +1,6 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { createContext, useContext, useMemo, useState } from "react"
+import { toast } from 'react-toastify';
 
 const apiBaseUrl = "https://api.gatool.org/v3/";
 
@@ -15,13 +16,17 @@ class AuthClient {
     async get(path) {
         this.operationStart();
         var token = await this.getToken();
-        return fetch(`${apiBaseUrl}${path}`, {
+        var response = await fetch(`${apiBaseUrl}${path}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
         }).finally(() => {
             this.operationDone();
         });
+        if (response.ok) return response;
+        const errorText = `Received a ${response.status} error from backend: "${response.statusText}"`;
+        toast.error(errorText);
+        throw new Error(errorText);
     }
 
     operationStart() {

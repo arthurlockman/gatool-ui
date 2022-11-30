@@ -10,12 +10,12 @@ const supportedYears = [
     { label: '2019', value: '2019' }
 ];
 
-function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, eventListReady }) {
+function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList }) {
     return (
         <div className="d-flex">
             <div className="d-flex p-2 flex-grow-1">
-                <Select options={supportedYears} defaultValue={selectedYear} onChange={setSelectedYear} />
-                <Select options={eventList} placeholder={eventListReady ? "Select an event" : "Loading event list"} defaultValue={selectedEvent} onChange={setSelectedEvent} />
+                <Select options={supportedYears} value={selectedYear} onChange={setSelectedYear} />
+                <Select options={eventList} placeholder={eventList?.length > 0 ? "Select an event" : "Loading event list"} value={selectedEvent} onChange={setSelectedEvent} />
                 {/* <Blocks
                     visible={loading}
                     height="38"
