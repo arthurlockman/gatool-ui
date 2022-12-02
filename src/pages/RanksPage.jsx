@@ -1,7 +1,7 @@
 import { Alert, Container, Table } from "react-bootstrap";
 import find from "lodash/find";
 import orderBy from "lodash/orderBy";
-import { SortNumericDown, SortNumericUp } from 'react-bootstrap-icons';
+import { SortNumericDown, SortNumericUp, SortAlphaDown, SortAlphaUp } from 'react-bootstrap-icons';
 
 function RanksPage({ selectedEvent, teamList, rankings, rankSort, setRankSort }) {
 
@@ -11,7 +11,11 @@ function RanksPage({ selectedEvent, teamList, rankings, rankSort, setRankSort })
 
     }
 
-    var rankingsList = rankings?.Rankings;
+    var rankingsList = rankings?.Rankings?.map((teamRow) => {
+        teamRow.teamName = getTeamName(teamRow.teamNumber);
+        return teamRow;
+    });
+
 
     if (rankSort.charAt(0)==="-") {
         rankingsList = orderBy(rankingsList,rankSort.slice(1), 'desc');
@@ -35,7 +39,7 @@ function RanksPage({ selectedEvent, teamList, rankings, rankSort, setRankSort })
                         <tr>
                             <th className="col1" onClick={() => (rankSort === "teamNumber") ? setRankSort("-teamNumber") : setRankSort("teamNumber")}><b>Team #{rankSort==="teamNumber" ? <SortNumericUp /> : ""}{rankSort==="-teamNumber" ? <SortNumericDown /> : ""}</b></th>
                             <th className="col1" onClick={() => (rankSort === "rank") ? setRankSort("-rank") : setRankSort("rank")}><b>Rank{rankSort==="rank" ? <SortNumericUp /> : ""}{rankSort==="-rank" ? <SortNumericDown /> : ""}</b></th>
-                            <th className="col2"><b>Team Name</b></th>
+                            <th className="col2" onClick={() => (rankSort === "teamName") ? setRankSort("-teamName") : setRankSort("teamName")}><b>Team Name{rankSort==="teamName" ? <SortAlphaUp /> : ""}{rankSort==="-teamName" ? <SortAlphaDown /> : ""}</b></th>
                             <th className="col1" onClick={() => (rankSort === "sortOrder1") ? setRankSort("-sortOrder1") : setRankSort("sortOrder1")}><b>RP Avg.{rankSort==="sortOrder1" ? <SortNumericUp /> : ""}{rankSort==="-sortOrder1" ? <SortNumericDown /> : ""}</b></th>
                             <th className="col1" onClick={() => (rankSort === "wins") ? setRankSort("-wins") : setRankSort("wins")}><b>Wins{rankSort==="wins" ? <SortNumericUp /> : ""}{rankSort==="-wins" ? <SortNumericDown /> : ""}</b></th>
                             <th className="col1" onClick={() => (rankSort === "losses") ? setRankSort("-losses") : setRankSort("losses")}><b>Losses{rankSort==="losses" ? <SortNumericUp /> : ""}{rankSort==="-losses" ? <SortNumericDown /> : ""}</b></th>
@@ -50,7 +54,7 @@ function RanksPage({ selectedEvent, teamList, rankings, rankSort, setRankSort })
                             return <tr key={"rankings" + rankRow.teamNumber}>
                                 <td>{rankRow.teamNumber}</td>
                                 <td>{rankRow.rank}</td>
-                                <td>{getTeamName(rankRow.teamNumber)}</td>
+                                <td>{rankRow.teamName}</td>
                                 <td>{rankRow.sortOrder1}</td>
                                 <td>{rankRow.wins}</td>
                                 <td>{rankRow.losses}</td>

@@ -1,19 +1,23 @@
 import { Alert, Container, Table } from "react-bootstrap";
 import find from "lodash/find";
-import orderBy from "lodash/orderBy";
 import { SortAlphaDown, SortAlphaUp, SortNumericDown, SortNumericUp } from 'react-bootstrap-icons';
+import { merge, orderBy } from "lodash";
 
-function TeamDataPage({ selectedEvent, teamList, rankings, teamSort, setTeamSort}) {
+function TeamDataPage({ selectedEvent, teamList, rankings, teamSort, setTeamSort, communityUpdates}) {
 
     function getTeamRank(teamNumber) {
         var team = find(rankings?.Rankings,{"teamNumber": teamNumber} );
         return team?.rank;
+    }
 
+    function getTeamSponsors (sponsors) {
+        return sponsors;
     }
 
     var teamListExtended = teamList?.teams?.map((teamRow) => {
         teamRow.rank = getTeamRank(teamRow.teamNumber);
         teamRow.citySort = teamRow.country+teamRow.stateProv+teamRow.city;
+        teamRow = merge(teamRow,find(communityUpdates,{"teamNumber": teamRow.teamNumber}))
         return teamRow;
     })
 
@@ -49,13 +53,13 @@ function TeamDataPage({ selectedEvent, teamList, rankings, teamSort, setTeamSort
                             return <tr key={"teamData" + team.teamNumber}>
                                 <td>{team?.teamNumber}</td>
                                 <td>{team?.rank}</td>
-                                <td>{team?.nameShort}</td>
+                                <td>{team?.updates.nameShortLocal ? team.updates.nameShortLocal : team?.nameShort}</td>
                                 <td>{team?.city}, {team?.stateProv} {(team?.country !== "USA") ? " "+team?.country : ""}</td>
-                                <td>Top Sponsors</td>
+                                <td>{team?.updates.topSponsorsLocal ? team.updates.topSponsorsLocal :getTeamSponsors(team.nameFull)}</td>
                                 <td>{team?.schoolName}</td>
                                 <td>{team?.rookieYear}</td>
-                                <td>{team?.robotName}</td>
-                                <td>Additional Notes</td>
+                                <td>{team?.updates.robotNameLocal}</td>
+                                <td dangerouslySetInnerHTML={{__html:team?.updates.teamNotes}}></td>
                             </tr>
                         })}
                     </tbody>
