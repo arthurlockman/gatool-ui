@@ -48,8 +48,8 @@ function App() {
   const [playoffSchedule, setPlayoffSchedule] = usePersistentState("cache:playoffSchedule", null);
   const [qualSchedule, setQualSchedule] = usePersistentState("cache:qualSchedule", null);
   const [teamList, setTeamList] = usePersistentState("cache:teamList", null);
-  const [rankings, setRankings] = usePersistentState("cache:rankings",null);
-  const [communityUpdates, setCommunityUpdates] = usePersistentState("cache:communityUpdates",null);
+  const [rankings, setRankings] = usePersistentState("cache:rankings", null);
+  const [communityUpdates, setCommunityUpdates] = usePersistentState("cache:communityUpdates", null);
 
   // Tab state trackers
   const [scheduleTabReady, setScheduleTabReady] = useState(TabStates.NotReady)
@@ -59,6 +59,18 @@ function App() {
   // Controllers for table sort order at render time
   const [teamSort, setTeamSort] = useState("")
   const [rankSort, setRankSort] = useState("")
+
+  function getAllianceCount() {
+    var allianceCount = 8;
+    return allianceCount;
+  }
+
+  function trimArray(arr) {
+    for (var i = 0; i <= arr.length - 1; i++) {
+      arr[i] = arr[i].trim();
+    }
+    return arr;
+  }
 
   // Retrieve event list when year selection changes
   useEffect(() => {
@@ -85,7 +97,7 @@ function App() {
     if (httpClient && selectedYear) {
       getEvents()
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedYear, httpClient, setSelectedEvent, setEvents])
 
   useEffect(() => {
@@ -98,7 +110,7 @@ function App() {
       setTeamDataTabReady(TabStates.NotReady);
       setRanksTabReady(TabStates.NotReady);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedEvent])
 
   // Retrieve schedule when event selection changes
@@ -120,6 +132,76 @@ function App() {
       setTeamDataTabReady(TabStates.NotReady);
       var result = await httpClient.get(`${selectedYear.value}/teams?eventCode=${selectedEvent.value.code}`);
       var teams = await result.json();
+
+      // Fix the sponsors now that teams are loaded
+
+      // prepare to separate and combine sponsors and organization name
+      var teamListSponsorsFixed = teams?.teams?.map((teamRow) => {
+        var sponsors = {
+          organization: "",
+          sponsors: "",
+          topSponsors: "",
+          sponsorsRaw: teamRow.nameFull,
+          sponsorArray: [],
+          topSponsorsArray: [],
+          organizationArray: [],
+          lastSponsor: ""
+        };
+
+        if (teamRow.schoolName) {
+          sponsors.organization = teamRow.schoolName;
+          if (sponsors.organization === sponsors.sponsorsRaw) {
+            sponsors.sponsorArray[0] = sponsors.sponsorsRaw
+          } else {
+            sponsors.sponsorArray = trimArray(sponsors.sponsorsRaw.split("/"));
+            sponsors.sponsorArray.push(sponsors.sponsorArray.pop().split("&")[0]);
+          }
+        } else {
+          sponsors.sponsorArray = trimArray(teamRow.nameFull.split("/"))
+        }
+
+        sponsors.organizationArray = trimArray(teamRow.nameFull.split("/").pop().split("&"));
+
+        if (!sponsors.sponsorArray && !sponsors.organizationArray && !sponsors.organization) {
+          sponsors.organization = "No organization in TIMS";
+          sponsors.sponsors = "No sponsors in TIMS";
+          sponsors.topSponsorsArray[0] = sponsors.sponsors
+        }
+
+        if (sponsors.sponsorArray.length === 1) {
+          sponsors.sponsors = sponsors.sponsorArray[0];
+          sponsors.topSponsors = sponsors.sponsors
+        } else {
+          if (sponsors.organizationArray.length > 1 && !sponsors.organization) {
+            sponsors.sponsorArray.pop();
+            sponsors.sponsorArray.push(sponsors.organizationArray.slice(0).shift())
+          }
+          sponsors.topSponsorsArray = sponsors.sponsorArray.slice(0, 5);
+          sponsors.lastSponsor = sponsors.sponsorArray.pop();
+          sponsors.sponsors = sponsors.sponsorArray.join(", ");
+          sponsors.sponsors += " & " + sponsors.lastSponsor;
+          sponsors.lastSponsor = sponsors.topSponsorsArray.pop();
+          sponsors.topSponsors = sponsors.topSponsorsArray.join(", ");
+          sponsors.topSponsors += " & " + sponsors.lastSponsor;
+        }
+
+        if (sponsors.organizationArray.length === 1 && !sponsors.organization) {
+          sponsors.organization = sponsors.organizationArray[0]
+        } else {
+          if (!sponsors.organization) {
+            sponsors.organizationArray.shift();
+            sponsors.organization = sponsors.organizationArray.join(" & ")
+          }
+        }
+
+        teamRow.sponsors = sponsors.sponsors;
+        teamRow.topSponsors = sponsors.topSponsors;
+        teamRow.organization = sponsors.organization;
+        return teamRow;
+      })
+
+      teams.teams = teamListSponsorsFixed
+
       setTeamList(teams);
       setTeamDataTabReady(TabStates.Ready);
     }
@@ -150,7 +232,7 @@ function App() {
       getCommunityUpdates();
       getRanks();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [httpClient, selectedEvent])
 
   return (
@@ -165,8 +247,8 @@ function App() {
             <Route path="/" element={<LayoutsWithNavbar scheduleTabReady={scheduleTabReady} teamDataTabReady={teamDataTabReady} ranksTabReady={ranksTabReady} />}>
               <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} />} />
               <Route path="/schedule" element={<SchedulePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} />} />
-              <Route path="/teamdata" element={<TeamDataPage selectedEvent={selectedEvent} teamList={teamList} rankings={rankings} teamSort={teamSort} setTeamSort={setTeamSort} communityUpdates={communityUpdates}/>} />
-              <Route path='/ranks' element={<RanksPage selectedEvent={selectedEvent} teamList={teamList} rankings={rankings} rankSort={rankSort} setRankSort={setRankSort} communityUpdates={communityUpdates}/>} />
+              <Route path="/teamdata" element={<TeamDataPage selectedEvent={selectedEvent} teamList={teamList} rankings={rankings} teamSort={teamSort} setTeamSort={setTeamSort} communityUpdates={communityUpdates} allianceCount={getAllianceCount()}/>} />
+              <Route path='/ranks' element={<RanksPage selectedEvent={selectedEvent} teamList={teamList} rankings={rankings} rankSort={rankSort} setRankSort={setRankSort} communityUpdates={communityUpdates} allianceCount={getAllianceCount()} />} />
               <Route path='/announce' element={<AnnouncePage />} />
               <Route path='/playbyplay' element={<PlayByPlayPage />} />
               <Route path='/allianceselection' element={<AllianceSelectionPage />} />
