@@ -1076,16 +1076,14 @@ function handleOffseasonEventSelection() {
 function loadEventsList() {
     "use strict";
     var e = document.getElementById('yearPicker');
-    var URL = apiURLV3;
     localStorage.currentYear = e.options[e.selectedIndex].value;
     $("#eventUpdateContainer").html("Loading event list...");
     var req = new XMLHttpRequest();
     var endpoint = "/events";
     if (localStorage.offseason === "true") {
         endpoint = "/offseason/events";
-        URL = apiURLV3;
     }
-    req.open('GET', `${URL}${localStorage.currentYear}${endpoint}`);
+    req.open('GET', `${apiURLV3}${localStorage.currentYear}${endpoint}`);
     req.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("token"));
     req.addEventListener('load', function () {
         if (req.status === 200) {
