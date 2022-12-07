@@ -14,7 +14,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
     return (
         <div className="d-flex">
             <div className="d-flex p-2 flex-grow-1">
-                <Select options={supportedYears} value={selectedYear} onChange={setSelectedYear} />
+                <Select options={supportedYears} value={selectedYear ? selectedYear : supportedYears[0]} onChange={setSelectedYear} />
                 <Select options={eventList} placeholder={eventList?.length > 0 ? "Select an event" : "Loading event list"} value={selectedEvent} onChange={setSelectedEvent} />
                 {/* <Blocks
                     visible={loading}

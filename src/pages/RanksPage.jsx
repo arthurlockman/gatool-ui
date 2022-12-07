@@ -7,8 +7,8 @@ import { SortNumericDown, SortNumericUp, SortAlphaDown, SortAlphaUp } from 'reac
 function RanksPage({ selectedEvent, teamList, rankings, rankSort, setRankSort, allianceCount }) {
 
     function getTeamName(teamNumber) {
-        var team = find(teamList.teams, { "teamNumber": teamNumber });
-        return team.nameShort;
+        var team = find(teamList?.teams, { "teamNumber": teamNumber });
+        return team?.nameShortLocal ? team?.nameShortLocal : team?.nameShort;
 
     }
 
@@ -47,6 +47,9 @@ function RanksPage({ selectedEvent, teamList, rankings, rankSort, setRankSort, a
             {!selectedEvent && !teamList && <div>
                 <Alert variant="warning" >You need to select an event before you can see anything here.</Alert>
             </div>}
+            {selectedEvent && !teamList && <div>
+                <Alert variant="warning" >Loading team data for {selectedEvent.label}</Alert>
+            </div>}
             {selectedEvent && teamList && !rankings && <div>
                 <Alert variant="warning" >Your event is not reporting rankings yet.</Alert>
             </div>
@@ -73,7 +76,7 @@ function RanksPage({ selectedEvent, teamList, rankings, rankSort, setRankSort, a
                             return <tr key={"rankings" + rankRow.teamNumber}>
                                 <td>{rankRow.teamNumber}</td>
                                 <td style={rankHighlight(rankRow.rank)}>{rankRow.rank}</td>
-                                <td>{rankRow.teamName}</td>
+                                <td dangerouslySetInnerHTML={{__html : rankRow.teamName}}></td>
                                 <td>{rankRow.sortOrder1}</td>
                                 <td>{rankRow.wins}</td>
                                 <td>{rankRow.losses}</td>

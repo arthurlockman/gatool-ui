@@ -1,5 +1,6 @@
 import './App.css';
 import MainNavigation from './components/MainNavigation';
+import BottomNavigation from './components/BottomNavigation'
 import { Outlet, Route, Routes } from 'react-router';
 import { BrowserRouter } from 'react-router-dom';
 import SetupPage from './pages/SetupPage';
@@ -34,6 +35,7 @@ function LayoutsWithNavbar({ scheduleTabReady, teamDataTabReady, ranksTabReady }
     <>
       <MainNavigation scheduleTabReady={scheduleTabReady} teamDataTabReady={teamDataTabReady} ranksTabReady={ranksTabReady} />
       <Outlet />
+      <BottomNavigation />
     </>
   );
 }
@@ -247,7 +249,7 @@ function App() {
             <Route path="/" element={<LayoutsWithNavbar scheduleTabReady={scheduleTabReady} teamDataTabReady={teamDataTabReady} ranksTabReady={ranksTabReady} />}>
               <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} />} />
               <Route path="/schedule" element={<SchedulePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} />} />
-              <Route path="/teamdata" element={<TeamDataPage selectedEvent={selectedEvent} teamList={teamList} rankings={rankings} teamSort={teamSort} setTeamSort={setTeamSort} communityUpdates={communityUpdates} allianceCount={getAllianceCount()}/>} />
+              <Route path="/teamdata" element={<TeamDataPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} teamSort={teamSort} setTeamSort={setTeamSort} communityUpdates={communityUpdates} allianceCount={getAllianceCount()} />} />
               <Route path='/ranks' element={<RanksPage selectedEvent={selectedEvent} teamList={teamList} rankings={rankings} rankSort={rankSort} setRankSort={setRankSort} communityUpdates={communityUpdates} allianceCount={getAllianceCount()} />} />
               <Route path='/announce' element={<AnnouncePage />} />
               <Route path='/playbyplay' element={<PlayByPlayPage />} />

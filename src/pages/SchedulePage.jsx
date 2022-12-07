@@ -7,6 +7,9 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule }) {
             {!selectedEvent && !qualSchedule && <div>
                 <Alert variant="warning" >You need to select an event before you can see anything here.</Alert>
             </div>}
+            {selectedEvent && !qualSchedule && <div>
+                <Alert variant="warning" >Loading schedule for {selectedEvent.label}</Alert>
+            </div>}
             {selectedEvent && qualSchedule &&
                 <div>
                     <p>{selectedEvent.label}</p>
