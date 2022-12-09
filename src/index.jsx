@@ -10,28 +10,31 @@ import reportWebVitals from './reportWebVitals';
 import { Auth0Provider } from "@auth0/auth0-react";
 import { AuthClientContextProvider } from './contextProviders/AuthClientContext';
 import { ToastContainer } from 'react-toastify';
+import { OnlineStatusProvider } from './contextProviders/OnlineContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <Auth0Provider
-      domain="gatool.auth0.com"
-      clientId="afsE1dlAGS609U32NjmvNMaYSQmtO3NT"
-      redirectUri={window.location.origin}
-    >
-      <AuthClientContextProvider>
-        <App />
-      </AuthClientContextProvider>
-    </Auth0Provider>
-    <ToastContainer
-      position='bottom-right'
-      autoClose={5000}
-      closeOnClick
-      pauseOnHover
-      pauseOnFocusLoss={true}
-      draggable
-      theme="colored"
-    />
+    <OnlineStatusProvider>
+      <Auth0Provider
+        domain="gatool.auth0.com"
+        clientId="afsE1dlAGS609U32NjmvNMaYSQmtO3NT"
+        redirectUri={window.location.origin}
+      >
+        <AuthClientContextProvider>
+          <App />
+        </AuthClientContextProvider>
+      </Auth0Provider>
+      <ToastContainer
+        position='bottom-right'
+        autoClose={5000}
+        closeOnClick
+        pauseOnHover
+        pauseOnFocusLoss={true}
+        draggable
+        theme="colored"
+      />
+    </OnlineStatusProvider>
   </React.StrictMode >
 );
 

@@ -42,6 +42,7 @@ function LayoutsWithNavbar({ scheduleTabReady, teamDataTabReady, ranksTabReady }
 
 function App() {
   const { isAuthenticated, isLoading } = useAuth0();
+
   // eslint-disable-next-line no-unused-vars
   const [httpClient] = UseAuthClient();
   const [selectedEvent, setSelectedEvent] = usePersistentState("setting:selectedEvent", null);

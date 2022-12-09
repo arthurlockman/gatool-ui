@@ -2,8 +2,9 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import AuthWidget from './AuthWidget';
 import { NavLink } from 'react-router-dom';
-import { Calendar3, CardList, Eye, Flag, Gear, Gift, HandThumbsUp, Megaphone, QuestionOctagon, SortNumericDown, Speedometer, Trophy } from 'react-bootstrap-icons';
+import { Calendar3, CardList, Eye, Flag, Gear, Gift, HandThumbsUp, Megaphone, QuestionOctagon, SortNumericDown, Speedometer, Trophy, WifiOff } from 'react-bootstrap-icons';
 import { TabStates } from '../App';
+import { useOnlineStatus } from '../contextProviders/OnlineContext';
 
 const tabActive = {
   backgroundColor: "#ccc",
@@ -60,6 +61,9 @@ function MainNavigation({scheduleTabReady, teamDataTabReady, ranksTabReady}) {
       else return tabInactiveStale;
     }
   }
+
+  const isOnline = useOnlineStatus();
+
   return (
     <Navbar bg="light" sticky='top' style={{
       color: "black"
@@ -78,6 +82,13 @@ function MainNavigation({scheduleTabReady, teamDataTabReady, ranksTabReady}) {
         <Nav.Link as={NavLink} style={({ isActive }) => getTabStyle(isActive, null)} to="/emcee"><Gift /><div className='d-none d-xl-block'>Emcee #s</div></Nav.Link>
         <Nav.Link as={NavLink} style={({ isActive }) => getTabStyle(isActive, null)} to="/help"><QuestionOctagon  /><div className='d-none d-xl-block'>Help</div></Nav.Link>
       </Nav>
+      {!isOnline &&
+        <WifiOff style={{
+          color: 'red',
+          marginRight: '5px',
+          height: "31px",
+          width: "31px"
+        }}/>}
       <AuthWidget />
     </Navbar>
   );

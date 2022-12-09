@@ -1,12 +1,14 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import { createContext, useContext, useMemo, useState } from "react"
+import { createContext, useContext, useEffect, useMemo, useState } from "react"
 import { toast } from 'react-toastify';
+import { useOnlineStatus } from "./OnlineContext";
 
 const apiBaseUrl = "https://api.gatool.org/v3/";
 
 class AuthClient {
     setOperationsInProgress = null;
     operationsInProgress = 0;
+    online = true;
 
     constructor(tokenGetter, setOperationsInProgress) {
         this.setOperationsInProgress = setOperationsInProgress
@@ -14,6 +16,10 @@ class AuthClient {
     }
 
     async get(path) {
+        if (!this.online) {
+            throw new Error('You are offline.')
+        }
+
         this.operationStart();
         var token = await this.getToken();
         var response = await fetch(`${apiBaseUrl}${path}`, {
@@ -27,6 +33,10 @@ class AuthClient {
         const errorText = `Received a ${response.status} error from backend: "${response.statusText}"`;
         toast.error(errorText);
         throw new Error(errorText);
+    }
+
+    setOnlineStatus(online) {
+        this.online = online
     }
 
     operationStart() {
@@ -61,6 +71,11 @@ function AuthClientContextProvider({ children }) {
     const client = useMemo(() => {
         return new AuthClient(getAccessTokenSilently, setOperationsInProgress);
     }, [getAccessTokenSilently, setOperationsInProgress])
+
+    const isOnline = useOnlineStatus();
+    useEffect(() => {
+        client.setOnlineStatus(isOnline)
+    }, [isOnline, client])
     return <AuthClientContext.Provider value={[client, operationsInProgress]}>{children}</AuthClientContext.Provider>
 }
 
