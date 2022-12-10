@@ -254,7 +254,7 @@ function App() {
               <Route path='/ranks' element={<RanksPage selectedEvent={selectedEvent} teamList={teamList} rankings={rankings} rankSort={rankSort} setRankSort={setRankSort} communityUpdates={communityUpdates} allianceCount={getAllianceCount()} />} />
               <Route path='/announce' element={<AnnouncePage />} />
               <Route path='/playbyplay' element={<PlayByPlayPage />} />
-              <Route path='/allianceselection' element={<AllianceSelectionPage />} />
+              <Route path='/allianceselection' element={<AllianceSelectionPage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} />} />
               <Route path='/awards' element={<AwardsPage />} />
               <Route path='/stats' element={<StatsPage />} />
               <Route path='/cheatsheet' element={<CheatsheetPage />} />

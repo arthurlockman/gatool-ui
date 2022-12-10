@@ -1,7 +1,11 @@
+import Bracket from "../components/Bracket";
+import { find } from "lodash";
 
-function AllianceSelectionPage() {
+function AllianceSelectionPage({ selectedEvent, playoffSchedule}) {
     return (
-        <div>This is the AllianceSelectionPage page</div>
+        <div>
+            <Bracket selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} />
+        </div>
     )
 }
 
