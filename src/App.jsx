@@ -75,6 +75,113 @@ function App() {
     return arr;
   }
 
+  //functions to retrieve API data
+  // This function retrieves a schedule from FIRST. It attempts to get both the Qual and Playoff Schedule and sets the global variables 
+  async function getSchedule() {
+    setScheduleTabReady(TabStates.NotReady);
+    var result = await httpClient.get(`${selectedYear.value}/schedule/hybrid/${selectedEvent.value.code}/qual`);
+    var qualschedule = await result.json();
+    setQualSchedule(qualschedule);
+    result = await httpClient.get(`${selectedYear.value}/schedule/hybrid/${selectedEvent.value.code}/playoff`);
+    var playoffschedule = await result.json();
+    setPlayoffSchedule(playoffschedule);
+    setScheduleTabReady(TabStates.Ready);
+  }
+
+  async function getTeamList() {
+    setTeamDataTabReady(TabStates.NotReady);
+    var result = await httpClient.get(`${selectedYear.value}/teams?eventCode=${selectedEvent.value.code}`);
+    var teams = await result.json();
+
+    // Fix the sponsors now that teams are loaded
+
+    // prepare to separate and combine sponsors and organization name
+    var teamListSponsorsFixed = teams?.teams?.map((teamRow) => {
+      var sponsors = {
+        organization: "",
+        sponsors: "",
+        topSponsors: "",
+        sponsorsRaw: teamRow.nameFull,
+        sponsorArray: [],
+        topSponsorsArray: [],
+        organizationArray: [],
+        lastSponsor: ""
+      };
+
+      if (teamRow.schoolName) {
+        sponsors.organization = teamRow.schoolName;
+        if (sponsors.organization === sponsors.sponsorsRaw) {
+          sponsors.sponsorArray[0] = sponsors.sponsorsRaw
+        } else {
+          sponsors.sponsorArray = trimArray(sponsors.sponsorsRaw.split("/"));
+          sponsors.sponsorArray.push(sponsors.sponsorArray.pop().split("&")[0]);
+        }
+      } else {
+        sponsors.sponsorArray = trimArray(teamRow.nameFull.split("/"))
+      }
+
+      sponsors.organizationArray = trimArray(teamRow.nameFull.split("/").pop().split("&"));
+
+      if (!sponsors.sponsorArray && !sponsors.organizationArray && !sponsors.organization) {
+        sponsors.organization = "No organization in TIMS";
+        sponsors.sponsors = "No sponsors in TIMS";
+        sponsors.topSponsorsArray[0] = sponsors.sponsors
+      }
+
+      if (sponsors.sponsorArray.length === 1) {
+        sponsors.sponsors = sponsors.sponsorArray[0];
+        sponsors.topSponsors = sponsors.sponsors
+      } else {
+        if (sponsors.organizationArray.length > 1 && !sponsors.organization) {
+          sponsors.sponsorArray.pop();
+          sponsors.sponsorArray.push(sponsors.organizationArray.slice(0).shift())
+        }
+        sponsors.topSponsorsArray = sponsors.sponsorArray.slice(0, 5);
+        sponsors.lastSponsor = sponsors.sponsorArray.pop();
+        sponsors.sponsors = sponsors.sponsorArray.join(", ");
+        sponsors.sponsors += " & " + sponsors.lastSponsor;
+        sponsors.lastSponsor = sponsors.topSponsorsArray.pop();
+        sponsors.topSponsors = sponsors.topSponsorsArray.join(", ");
+        sponsors.topSponsors += " & " + sponsors.lastSponsor;
+      }
+
+      if (sponsors.organizationArray.length === 1 && !sponsors.organization) {
+        sponsors.organization = sponsors.organizationArray[0]
+      } else {
+        if (!sponsors.organization) {
+          sponsors.organizationArray.shift();
+          sponsors.organization = sponsors.organizationArray.join(" & ")
+        }
+      }
+
+      teamRow.sponsors = sponsors.sponsors;
+      teamRow.topSponsors = sponsors.topSponsors;
+      teamRow.organization = sponsors.organization;
+      return teamRow;
+    })
+
+    teams.teams = teamListSponsorsFixed
+
+    setTeamList(teams);
+    setTeamDataTabReady(TabStates.Ready);
+  }
+
+  async function getCommunityUpdates() {
+    setTeamDataTabReady(TabStates.NotReady);
+    var result = await httpClient.get(`${selectedYear.value}/communityUpdates/${selectedEvent.value.code}`);
+    var teams = await result.json();
+    setCommunityUpdates(teams);
+    setTeamDataTabReady(TabStates.Ready);
+  }
+
+  async function getRanks() {
+    setRanksTabReady(TabStates.NotReady);
+    var result = await httpClient.get(`${selectedYear.value}/rankings/${selectedEvent.value.code}`);
+    var ranks = await result.json();
+    setRankings(ranks);
+    setRanksTabReady(TabStates.Ready);
+  }
+
   // Retrieve event list when year selection changes
   useEffect(() => {
     async function getEvents() {
@@ -118,112 +225,6 @@ function App() {
 
   // Retrieve schedule when event selection changes
   useEffect(() => {
-    async function getSchedule() {
-      setScheduleTabReady(TabStates.NotReady);
-      setTeamDataTabReady(TabStates.NotReady);
-      setRanksTabReady(TabStates.NotReady);
-      var result = await httpClient.get(`${selectedYear.value}/schedule/hybrid/${selectedEvent.value.code}/qual`);
-      var qualschedule = await result.json();
-      setQualSchedule(qualschedule);
-      result = await httpClient.get(`${selectedYear.value}/schedule/hybrid/${selectedEvent.value.code}/playoff`);
-      var playoffschedule = await result.json();
-      setPlayoffSchedule(playoffschedule);
-      setScheduleTabReady(TabStates.Ready);
-    }
-
-    async function getTeamList() {
-      setTeamDataTabReady(TabStates.NotReady);
-      var result = await httpClient.get(`${selectedYear.value}/teams?eventCode=${selectedEvent.value.code}`);
-      var teams = await result.json();
-
-      // Fix the sponsors now that teams are loaded
-
-      // prepare to separate and combine sponsors and organization name
-      var teamListSponsorsFixed = teams?.teams?.map((teamRow) => {
-        var sponsors = {
-          organization: "",
-          sponsors: "",
-          topSponsors: "",
-          sponsorsRaw: teamRow.nameFull,
-          sponsorArray: [],
-          topSponsorsArray: [],
-          organizationArray: [],
-          lastSponsor: ""
-        };
-
-        if (teamRow.schoolName) {
-          sponsors.organization = teamRow.schoolName;
-          if (sponsors.organization === sponsors.sponsorsRaw) {
-            sponsors.sponsorArray[0] = sponsors.sponsorsRaw
-          } else {
-            sponsors.sponsorArray = trimArray(sponsors.sponsorsRaw.split("/"));
-            sponsors.sponsorArray.push(sponsors.sponsorArray.pop().split("&")[0]);
-          }
-        } else {
-          sponsors.sponsorArray = trimArray(teamRow.nameFull.split("/"))
-        }
-
-        sponsors.organizationArray = trimArray(teamRow.nameFull.split("/").pop().split("&"));
-
-        if (!sponsors.sponsorArray && !sponsors.organizationArray && !sponsors.organization) {
-          sponsors.organization = "No organization in TIMS";
-          sponsors.sponsors = "No sponsors in TIMS";
-          sponsors.topSponsorsArray[0] = sponsors.sponsors
-        }
-
-        if (sponsors.sponsorArray.length === 1) {
-          sponsors.sponsors = sponsors.sponsorArray[0];
-          sponsors.topSponsors = sponsors.sponsors
-        } else {
-          if (sponsors.organizationArray.length > 1 && !sponsors.organization) {
-            sponsors.sponsorArray.pop();
-            sponsors.sponsorArray.push(sponsors.organizationArray.slice(0).shift())
-          }
-          sponsors.topSponsorsArray = sponsors.sponsorArray.slice(0, 5);
-          sponsors.lastSponsor = sponsors.sponsorArray.pop();
-          sponsors.sponsors = sponsors.sponsorArray.join(", ");
-          sponsors.sponsors += " & " + sponsors.lastSponsor;
-          sponsors.lastSponsor = sponsors.topSponsorsArray.pop();
-          sponsors.topSponsors = sponsors.topSponsorsArray.join(", ");
-          sponsors.topSponsors += " & " + sponsors.lastSponsor;
-        }
-
-        if (sponsors.organizationArray.length === 1 && !sponsors.organization) {
-          sponsors.organization = sponsors.organizationArray[0]
-        } else {
-          if (!sponsors.organization) {
-            sponsors.organizationArray.shift();
-            sponsors.organization = sponsors.organizationArray.join(" & ")
-          }
-        }
-
-        teamRow.sponsors = sponsors.sponsors;
-        teamRow.topSponsors = sponsors.topSponsors;
-        teamRow.organization = sponsors.organization;
-        return teamRow;
-      })
-
-      teams.teams = teamListSponsorsFixed
-
-      setTeamList(teams);
-      setTeamDataTabReady(TabStates.Ready);
-    }
-
-    async function getCommunityUpdates() {
-      setTeamDataTabReady(TabStates.NotReady);
-      var result = await httpClient.get(`${selectedYear.value}/communityUpdates/${selectedEvent.value.code}`);
-      var teams = await result.json();
-      setCommunityUpdates(teams);
-      setTeamDataTabReady(TabStates.Ready);
-    }
-
-    async function getRanks() {
-      setRanksTabReady(TabStates.NotReady);
-      var result = await httpClient.get(`${selectedYear.value}/rankings/${selectedEvent.value.code}`);
-      var ranks = await result.json();
-      setRankings(ranks);
-      setRanksTabReady(TabStates.Ready);
-    }
 
     if (httpClient && selectedEvent && selectedYear) {
       setQualSchedule(null);
