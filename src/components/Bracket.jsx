@@ -6,7 +6,7 @@ function Bracket({ selectedEvent, playoffSchedule }) {
 	const black = "900";
 	const bold = "700";
 	const semibold = "600";
-	const normal = "400";
+	// const normal = "400";
 
 	function allianceNumbers(matchNumber, allianceColor) {
 		var alliance = "TBD";
@@ -53,15 +53,15 @@ function Bracket({ selectedEvent, playoffSchedule }) {
 					<rect x="109" y="89" fill="#DBDAD9" width="75" height="684" />
 					<rect x="302" y="89" fill="#DBDAD9" width="75" height="684" />
 					<rect x="490" y="89" fill="#DBDAD9" width="75" height="684" />
-					<polyline fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" points="242.02,175.06 430.85,175.06 
+					<polyline fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" points="242.02,175.06 430.85,175.06
 		430.85,328.12 242.62,328.12 	"/>
-					<polyline fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" points="186.26,136.56 242.54,136.56 
+					<polyline fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" points="186.26,136.56 242.54,136.56
 		242.54,213.56 199.05,213.56 	"/>
-					<polyline fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" points="186.26,291.56 242.54,291.56 
+					<polyline fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" points="186.26,291.56 242.54,291.56
 		242.54,368.56 199.05,368.56 	"/>
-					<polyline fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" points="431,254 1006,254 1006,504.12 
+					<polyline fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" points="431,254 1006,254 1006,504.12
 		816.83,504.12 816.83,574.12 630,574.12 	"/>
-					<polyline fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" points="388.1,721.12 436.71,721.12 
+					<polyline fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" points="388.1,721.12 436.71,721.12
 		436.71,647.99 629.72,647.99 629.72,508.99 436.71,508.99 436.71,567.12 364.94,567.12 	"/>
 					<line fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" x1="1024" y1="421" x2="1006" y2="421" />
 					<line fill="none" stroke="#8E8E8E" stroke-width="2" stroke-miterlimit="10" x1="70" y1="419" x2="971" y2="419" />

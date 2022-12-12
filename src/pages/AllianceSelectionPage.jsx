@@ -1,6 +1,5 @@
-import { Alert, Container, Table } from "react-bootstrap";
+import { Alert, Container } from "react-bootstrap";
 import Bracket from "../components/Bracket";
-import { find } from "lodash";
 
 function AllianceSelectionPage({ selectedEvent, playoffSchedule }) {
     return (
@@ -11,7 +10,7 @@ function AllianceSelectionPage({ selectedEvent, playoffSchedule }) {
             {selectedEvent && !playoffSchedule && <div>
                 <Alert variant="warning" >Waiting for Playoff Schedule</Alert>
             </div>}
-            {selectedEvent && playoffSchedule && 
+            {selectedEvent && playoffSchedule &&
                 <Bracket selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} />}
                 </Container>
 
