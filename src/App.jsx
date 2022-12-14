@@ -52,6 +52,7 @@ function App() {
   const [qualSchedule, setQualSchedule] = usePersistentState("cache:qualSchedule", null);
   const [teamList, setTeamList] = usePersistentState("cache:teamList", null);
   const [rankings, setRankings] = usePersistentState("cache:rankings", null);
+  const [alliances, setAlliances] = usePersistentState("cache:alliances", null);
   const [communityUpdates, setCommunityUpdates] = usePersistentState("cache:communityUpdates", null);
 
   // Tab state trackers
@@ -76,6 +77,7 @@ function App() {
   }
 
   //functions to retrieve API data
+
   // This function retrieves a schedule from FIRST. It attempts to get both the Qual and Playoff Schedule and sets the global variables 
   async function getSchedule() {
     setScheduleTabReady(TabStates.NotReady);
@@ -85,9 +87,13 @@ function App() {
     result = await httpClient.get(`${selectedYear.value}/schedule/hybrid/${selectedEvent.value.code}/playoff`);
     var playoffschedule = await result.json();
     setPlayoffSchedule(playoffschedule);
+    if (playoffschedule?.Schedule.length > 0) {
+      getAlliances();
+    }
     setScheduleTabReady(TabStates.Ready);
   }
 
+  // This function retrieves a a list of teams for a specific event from FIRST. It parses the list and modifies some of the data to produce more readable content.
   async function getTeamList() {
     setTeamDataTabReady(TabStates.NotReady);
     var result = await httpClient.get(`${selectedYear.value}/teams?eventCode=${selectedEvent.value.code}`);
@@ -166,6 +172,7 @@ function App() {
     setTeamDataTabReady(TabStates.Ready);
   }
 
+  // This function retrieves communnity updates for a specified event from gatool Cloud. 
   async function getCommunityUpdates() {
     setTeamDataTabReady(TabStates.NotReady);
     var result = await httpClient.get(`${selectedYear.value}/communityUpdates/${selectedEvent.value.code}`);
@@ -174,12 +181,30 @@ function App() {
     setTeamDataTabReady(TabStates.Ready);
   }
 
+
+  // This function retrieves the ranking data for a specified event from FIRST. 
   async function getRanks() {
     setRanksTabReady(TabStates.NotReady);
     var result = await httpClient.get(`${selectedYear.value}/rankings/${selectedEvent.value.code}`);
     var ranks = await result.json();
     setRankings(ranks);
     setRanksTabReady(TabStates.Ready);
+  }
+
+  // This function retrieves the Playoff Alliance data for a specified event from FIRST. 
+  async function getAlliances() {
+    var result = await httpClient.get(`${selectedYear.value}/alliances/${selectedEvent.value.code}`);
+    var alliances = await result.json();
+    var allianceLookup = {};
+    alliances.Alliances.forEach(alliance => {
+      allianceLookup[`${alliance.captain}`] = { role: `Captain`, alliance: `Alliance ${alliance.number}` };
+      allianceLookup[`${alliance.round1}`] = { role: `Round 1 Selection`, alliance: `Alliance ${alliance.number}` };
+      allianceLookup[`${alliance.round2}`] = { role: `Round 2 Selection`, alliance: `Alliance ${alliance.number}` };
+      if (alliance.round3) { allianceLookup[`${alliance.round3}`] = { role: `Round 3 Selection`, alliance: `Alliance ${alliance.number}` }; }
+      if (alliance.backup) { allianceLookup[`${alliance.backup}`] = { role: `Backup for ${alliance.backupReplaced}`, alliance: `Alliance ${alliance.number}` }; }
+    })
+    alliances.Lookup = allianceLookup;
+    setAlliances(alliances);
   }
 
   // Retrieve event list when year selection changes
@@ -210,6 +235,7 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedYear, httpClient, setSelectedEvent, setEvents])
 
+  // Reset the event data when the selectedEvent changes 
   useEffect(() => {
     if (!selectedEvent) {
       setPlayoffSchedule(null);
@@ -223,7 +249,7 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedEvent])
 
-  // Retrieve schedule when event selection changes
+  // Retrieve schedule, team list, community updates, andrankings when event selection changes
   useEffect(() => {
 
     if (httpClient && selectedEvent && selectedYear) {
@@ -255,7 +281,7 @@ function App() {
               <Route path='/ranks' element={<RanksPage selectedEvent={selectedEvent} teamList={teamList} rankings={rankings} rankSort={rankSort} setRankSort={setRankSort} communityUpdates={communityUpdates} allianceCount={getAllianceCount()} />} />
               <Route path='/announce' element={<AnnouncePage />} />
               <Route path='/playbyplay' element={<PlayByPlayPage />} />
-              <Route path='/allianceselection' element={<AllianceSelectionPage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} />} />
+              <Route path='/allianceselection' element={<AllianceSelectionPage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} alliances={alliances} />} />
               <Route path='/awards' element={<AwardsPage />} />
               <Route path='/stats' element={<StatsPage />} />
               <Route path='/cheatsheet' element={<CheatsheetPage />} />

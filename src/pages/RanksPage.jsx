@@ -48,7 +48,7 @@ function RanksPage({ selectedEvent, teamList, rankings, rankSort, setRankSort, a
                 <Alert variant="warning" >You need to select an event before you can see anything here.</Alert>
             </div>}
             {selectedEvent && !teamList && <div>
-                <Alert variant="warning" >Loading team data for {selectedEvent.label}</Alert>
+                <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..."/></div><div>Awaiting team data for {selectedEvent.label}</div></Alert>
             </div>}
             {selectedEvent && teamList && !rankings && <div>
                 <Alert variant="warning" >Your event is not reporting rankings yet.</Alert>
