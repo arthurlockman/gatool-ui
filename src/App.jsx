@@ -30,6 +30,16 @@ export const TabStates = {
   Ready: 'ready'
 };
 
+// Tiebreakers
+const playoffTiebreakers = {
+  "2022": ["foulPoints", "endgamePoints", "autoCargoTotal+autoTaxiPoints"],
+  "2021": ["foulPoints", "autoPoints", "endgamePoints", "controlPanelPoints+teleopCellPoints"],
+  "2020": ["foulPoints", "autoPoints", "endgamePoints", "controlPanelPoints+teleopCellPoints"],
+  "2019": ["foulPoints", "cargoPoints", "hatchPanelPoints", "habClimbPoints", "sandStormBonusPoints"],
+  "2018": ["foulPoints", "endgamePoints", "autoPoints", "autoOwnershipPoints+teleopOwnershipPoints", "vaultPoints"]
+};
+
+
 function LayoutsWithNavbar({ scheduleTabReady, teamDataTabReady, ranksTabReady }) {
   return (
     <>
@@ -80,16 +90,94 @@ function App() {
 
   // This function retrieves a schedule from FIRST. It attempts to get both the Qual and Playoff Schedule and sets the global variables 
   async function getSchedule() {
+
+    // returns the winner of the match
+    function winner(match) {
+      var winner = { winner: "", tieWinner: "", level: 0 }
+      if (match?.scoreRedFinal || match?.scoreBlueFinal) {
+        if (match?.scoreRedFinal < match?.scoreBlueFinal) {
+          winner.winner = "blue";
+        } else if (match?.scoreRedFinal > match?.scoreBlueFinal) {
+          winner.winner = "red";
+        } else if (match?.scoreRedFinal === match?.scoreBlueFinal) {
+          winner.winner = "tie";
+        }
+      } else {
+        winner.winner = "TBD";
+      }
+
+      return winner;
+    }
+
     setScheduleTabReady(TabStates.NotReady);
     var result = await httpClient.get(`${selectedYear.value}/schedule/hybrid/${selectedEvent.value.code}/qual`);
     var qualschedule = await result.json();
+    // adds the winner to the schedule.
+    var matches = qualschedule.Schedule.map((match) => {
+      match.winner = winner(match);
+      return match;
+    });
+    qualschedule.Schedule = matches;
     setQualSchedule(qualschedule);
+
+    //get the playoff schedule
+    matches = [];
+    result = {};
     result = await httpClient.get(`${selectedYear.value}/schedule/hybrid/${selectedEvent.value.code}/playoff`);
     var playoffschedule = await result.json();
-    setPlayoffSchedule(playoffschedule);
     if (playoffschedule?.Schedule.length > 0) {
+      // adds the winner to the schedule.
+      matches = playoffschedule.Schedule.map((match) => {
+        match.winner = winner(match);
+        return match;
+      });
+      playoffschedule.Schedule = matches;
+
+      // determine the tiebreaker
+      var lastMatchNumber = playoffschedule.Schedule[_.findLastIndex(playoffschedule.Schedule, function (match) {
+        return (match.scoreRedFinal !== null) || (match.scoreBlueFinal !== null)
+      })].matchNumber;
+
+      result = await httpClient.get(`${selectedYear.value}/scores/${selectedEvent.value.code}/playoff/1/${lastMatchNumber}`);
+      var scores = await result.json();
+
+      _.forEach(scores.MatchScores, ((score) => {
+        if (score.alliances[0].totalPoints === score.alliances[1].totalPoints) {
+          var tiebreaker = {
+            level: 0,
+            red: 0,
+            blue: 0,
+            winner: "TBD"
+          }
+          for (var i = 0; i < playoffTiebreakers[selectedYear.value].length; i++) {
+            tiebreaker.level = i + 1;
+            var criterion = playoffTiebreakers[selectedYear.value][i].split("+");
+            for (var a = 0; a < criterion.length; a++) {
+              tiebreaker.red += Number(score.alliances[1][criterion[a]]);
+              tiebreaker.blue += Number(score.alliances[0][criterion[a]]);
+            }
+            if (tiebreaker.red > tiebreaker.blue) {
+              tiebreaker.winner = "red";
+              break;
+            } else if (tiebreaker.red < tiebreaker.blue) {
+              tiebreaker.winner = "blue";
+              break;
+            }
+          }
+          playoffschedule.Schedule[_.findIndex(playoffschedule.Schedule, { "matchNumber": score.matchNumber })].winner.tieWinner = tiebreaker.winner;
+          playoffschedule.Schedule[_.findIndex(playoffschedule.Schedule, { "matchNumber": score.matchNumber })].winner.level = tiebreaker.level;
+
+        }
+
+
+      }))
+
+
+
       getAlliances();
     }
+
+    setPlayoffSchedule(playoffschedule);
     setScheduleTabReady(TabStates.Ready);
   }
 
@@ -180,7 +268,6 @@ function App() {
     setCommunityUpdates(teams);
     setTeamDataTabReady(TabStates.Ready);
   }
-
 
   // This function retrieves the ranking data for a specified event from FIRST. 
   async function getRanks() {
