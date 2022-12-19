@@ -23,6 +23,7 @@ import { Blocks } from 'react-loader-spinner';
 import { Container } from 'react-bootstrap';
 import { usePersistentState } from './hooks/UsePersistentState';
 import _ from 'lodash';
+import moment from 'moment';
 
 export const TabStates = {
   NotReady: 'notready',
@@ -32,12 +33,16 @@ export const TabStates = {
 
 // Tiebreakers
 const playoffTiebreakers = {
+  "2033": ["foulPoints"], // Update after rules release
   "2022": ["foulPoints", "endgamePoints", "autoCargoTotal+autoTaxiPoints"],
   "2021": ["foulPoints", "autoPoints", "endgamePoints", "controlPanelPoints+teleopCellPoints"],
   "2020": ["foulPoints", "autoPoints", "endgamePoints", "controlPanelPoints+teleopCellPoints"],
   "2019": ["foulPoints", "cargoPoints", "hatchPanelPoints", "habClimbPoints", "sandStormBonusPoints"],
   "2018": ["foulPoints", "endgamePoints", "autoPoints", "autoOwnershipPoints+teleopOwnershipPoints", "vaultPoints"]
 };
+
+const paleYellow = "#fdfaed";
+const paleBlue = "#effdff";
 
 
 function LayoutsWithNavbar({ scheduleTabReady, teamDataTabReady, ranksTabReady }) {
@@ -64,6 +69,8 @@ function App() {
   const [rankings, setRankings] = usePersistentState("cache:rankings", null);
   const [alliances, setAlliances] = usePersistentState("cache:alliances", null);
   const [communityUpdates, setCommunityUpdates] = usePersistentState("cache:communityUpdates", null);
+  const [eventFilters, setEventFilters] = usePersistentState("cache:eventFilters",null);
+  const [timeFilter, setTimeFilter] = usePersistentState("cache:timeFilter",null);
 
   // Tab state trackers
   const [scheduleTabReady, setScheduleTabReady] = useState(TabStates.NotReady)
@@ -300,13 +307,90 @@ function App() {
       try {
         const val = await httpClient.get(`${selectedYear.value}/events`);
         const json = await val.json();
+        var timeNow = moment();
+
         const events = json.Events.map((e) => {
+          var color = "";
+          var optionPrefix = "";
+          var optionPostfix = "";
+          var filters = [];
+          var eventTime = moment(e.dateEnd);
+          e.name = e.name.trim();
+          e.name = _.replace(e.name, `- FIRST Robotics Competition -`, `-`);
+          if (e.type === "OffSeasonWithAzureSync") {
+            color = paleBlue;
+            optionPrefix = "•• ";
+            optionPostfix = " ••";
+            filters.push("offseason");
+          }
+          if (e.type === "OffSeason") {
+            color = paleYellow;
+            optionPrefix = "•• ";
+            optionPostfix = " ••";
+            filters.push("offseason");
+          }
+          if (e.type.startsWith("Regional")) {
+            filters.push("regional");
+          } else if (e.type.startsWith("Champion")) {
+            filters.push("champs");
+          } else if (e.type.startsWith("District")) {
+            filters.push("district");
+            filters.push(e.districtCode);
+          }
+          if (timeNow.diff(eventTime) < 0) {
+            filters.push("future")
+          } else {
+            filters.push("past")
+          }
+          filters.push("week" + e.weekNumber);
+
           return {
             value: e,
-            label: e.name
+            label: `${optionPrefix}${e.name}${optionPostfix}`,
+            color: color,
+            filters: filters
           };
         });
-        setEvents(events);
+
+        //filter the array
+        var filters = eventFilters.map((e)=> {return e.value});
+        if (timeFilter.value === "past" || timeFilter.value === "future") {
+          filters.push(timeFilter.value);
+        }
+        var filteredEvents = events;
+        //reduce the list by time, then additively include other filters
+        if (_.indexOf(filters, "past") >= 0) {
+          filteredEvents = _.filter(events, function (o) { return (_.indexOf(o.filters, "past") >= 0) });
+        } else if (_.indexOf(filters, "future") >= 0) {
+          filteredEvents = _.filter(events, function (o) { return (_.indexOf(o.filters, "future") >= 0) });
+        }
+        var filterTemp = [];
+        if (filters.length>0) {
+          filters.forEach( (filter) => {
+            if (filter !== "past" && filter !== "future") {
+              filterTemp = filterTemp.concat(_.filter(filteredEvents, function (o) { return (_.indexOf(o.filters, filter) >= 0) }));
+            }
+          })
+
+          //remove duplicates
+          filterTemp = filterTemp.filter((item, index) => {
+            return (filterTemp.indexOf(item) === index)
+          })
+        } else filterTemp = filteredEvents;
+        
+
+        //sort the list alphabetically
+        filterTemp.sort(function (a, b) {
+          if (a.value.name < b.value.name) {
+            return -1
+          }
+          if (a.value.name > b.value.name) {
+            return 1
+          }
+          return 0
+        });
+
+        setEvents(filterTemp);
         if (!_.some(events, selectedEvent)) {
           setSelectedEvent(null);
         }
@@ -320,7 +404,7 @@ function App() {
       getEvents()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedYear, httpClient, setSelectedEvent, setEvents])
+  }, [selectedYear, httpClient, setSelectedEvent, setEvents, eventFilters, timeFilter])
 
   // Reset the event data when the selectedEvent changes 
   useEffect(() => {
@@ -362,7 +446,7 @@ function App() {
         isAuthenticated ? <BrowserRouter>
           <Routes>
             <Route path="/" element={<LayoutsWithNavbar scheduleTabReady={scheduleTabReady} teamDataTabReady={teamDataTabReady} ranksTabReady={ranksTabReady} />}>
-              <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} />} />
+              <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} eventFilters={eventFilters} setEventFilters={setEventFilters} timeFilter={timeFilter} setTimeFilter={setTimeFilter}/>} />
               <Route path="/schedule" element={<SchedulePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} />} />
               <Route path="/teamdata" element={<TeamDataPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} teamSort={teamSort} setTeamSort={setTeamSort} communityUpdates={communityUpdates} allianceCount={getAllianceCount()} />} />
               <Route path='/ranks' element={<RanksPage selectedEvent={selectedEvent} teamList={teamList} rankings={rankings} rankSort={rankSort} setRankSort={setRankSort} communityUpdates={communityUpdates} allianceCount={getAllianceCount()} />} />
