@@ -55,8 +55,10 @@ function RanksPage({ selectedEvent, teamList, rankings, rankSort, setRankSort, a
             </div>
             }
             {selectedEvent && teamList && rankings && <div>
-                <p>{selectedEvent.label}</p>
+                <h4>{selectedEvent.label}</h4>
+                <p>This table lists the teams in rank order for this competition. This table updates during the competition, and freezes once Playoff Matches begin.</p>
                 <Table responsive striped bordered size="sm">
+                
                     <thead className="thead-default">
                         <tr>
                             <th xs={1} onClick={() => (rankSort === "teamNumber") ? setRankSort("-teamNumber") : setRankSort("teamNumber")}><b>Team #{rankSort === "teamNumber" ? <SortNumericUp /> : ""}{rankSort === "-teamNumber" ? <SortNumericDown /> : ""}</b></th>

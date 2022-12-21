@@ -69,8 +69,16 @@ function App() {
   const [rankings, setRankings] = usePersistentState("cache:rankings", null);
   const [alliances, setAlliances] = usePersistentState("cache:alliances", null);
   const [communityUpdates, setCommunityUpdates] = usePersistentState("cache:communityUpdates", null);
-  const [eventFilters, setEventFilters] = usePersistentState("cache:eventFilters",null);
-  const [timeFilter, setTimeFilter] = usePersistentState("cache:timeFilter",null);
+  const [eventFilters, setEventFilters] = usePersistentState("cache:eventFilters", []);
+  const [timeFilter, setTimeFilter] = usePersistentState("cache:timeFilter", null);
+  const [timeFormat, setTimeFormat] = usePersistentState("cache:timeFormat",{ label: "12hr", value:"h:mm:ss a"});
+  const [showSponsors, setShowSponsors] = usePersistentState("cache:showSponsors",null);
+  const [showAwards, setShowAwards] = usePersistentState("cache:showAwards",null);
+  const [showNotes, setShowNotes] = usePersistentState("cache:showNotes",null);
+  const [showMottoes, setShowMottoes] = usePersistentState("cache:showMottoes",null);
+  const [showChampsStats, setShowChampsStats] = usePersistentState("cache:showChampsStats",null);
+  const [swapScreen, setSwapScreen] = usePersistentState("cache:swapScreen",false);
+  const [autoAdvance, setAutoAdvance] = usePersistentState("cache:autoAdvance",false);
 
   // Tab state trackers
   const [scheduleTabReady, setScheduleTabReady] = useState(TabStates.NotReady)
@@ -117,7 +125,7 @@ function App() {
     }
 
     setScheduleTabReady(TabStates.NotReady);
-    var result = await httpClient.get(`${selectedYear.value}/schedule/hybrid/${selectedEvent.value.code}/qual`);
+    var result = await httpClient.get(`${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/qual`);
     var qualschedule = await result.json();
     // adds the winner to the schedule.
     var matches = qualschedule.Schedule.map((match) => {
@@ -125,13 +133,16 @@ function App() {
       return match;
     });
     qualschedule.Schedule = matches;
+
+    qualschedule.lastUpdate = moment();
     setQualSchedule(qualschedule);
 
     //get the playoff schedule
     matches = [];
     result = {};
-    result = await httpClient.get(`${selectedYear.value}/schedule/hybrid/${selectedEvent.value.code}/playoff`);
+    result = await httpClient.get(`${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/playoff`);
     var playoffschedule = await result.json();
+
     if (playoffschedule?.Schedule.length > 0) {
       // adds the winner to the schedule.
       matches = playoffschedule.Schedule.map((match) => {
@@ -145,7 +156,7 @@ function App() {
         return (match.scoreRedFinal !== null) || (match.scoreBlueFinal !== null)
       })].matchNumber;
 
-      result = await httpClient.get(`${selectedYear.value}/scores/${selectedEvent.value.code}/playoff/1/${lastMatchNumber}`);
+      result = await httpClient.get(`${selectedYear?.value}/scores/${selectedEvent?.value.code}/playoff/1/${lastMatchNumber}`);
       var scores = await result.json();
 
       _.forEach(scores.MatchScores, ((score) => {
@@ -156,9 +167,9 @@ function App() {
             blue: 0,
             winner: "TBD"
           }
-          for (var i = 0; i < playoffTiebreakers[selectedYear.value].length; i++) {
+          for (var i = 0; i < playoffTiebreakers[selectedYear?.value].length; i++) {
             tiebreaker.level = i + 1;
-            var criterion = playoffTiebreakers[selectedYear.value][i].split("+");
+            var criterion = playoffTiebreakers[selectedYear?.value][i].split("+");
             for (var a = 0; a < criterion.length; a++) {
               tiebreaker.red += Number(score.alliances[1][criterion[a]]);
               tiebreaker.blue += Number(score.alliances[0][criterion[a]]);
@@ -184,6 +195,7 @@ function App() {
       getAlliances();
     }
 
+    playoffschedule.lastUpdate = moment();
     setPlayoffSchedule(playoffschedule);
     setScheduleTabReady(TabStates.Ready);
   }
@@ -191,7 +203,7 @@ function App() {
   // This function retrieves a a list of teams for a specific event from FIRST. It parses the list and modifies some of the data to produce more readable content.
   async function getTeamList() {
     setTeamDataTabReady(TabStates.NotReady);
-    var result = await httpClient.get(`${selectedYear.value}/teams?eventCode=${selectedEvent.value.code}`);
+    var result = await httpClient.get(`${selectedYear?.value}/teams?eventCode=${selectedEvent?.value.code}`);
     var teams = await result.json();
 
     // Fix the sponsors now that teams are loaded
@@ -263,6 +275,7 @@ function App() {
 
     teams.teams = teamListSponsorsFixed
 
+    teams.lastUpdate = moment();
     setTeamList(teams);
     setTeamDataTabReady(TabStates.Ready);
   }
@@ -270,8 +283,10 @@ function App() {
   // This function retrieves communnity updates for a specified event from gatool Cloud. 
   async function getCommunityUpdates() {
     setTeamDataTabReady(TabStates.NotReady);
-    var result = await httpClient.get(`${selectedYear.value}/communityUpdates/${selectedEvent.value.code}`);
+    var result = await httpClient.get(`${selectedYear?.value}/communityUpdates/${selectedEvent?.value.code}`);
     var teams = await result.json();
+
+    teams.lastUpdate = moment();
     setCommunityUpdates(teams);
     setTeamDataTabReady(TabStates.Ready);
   }
@@ -279,15 +294,17 @@ function App() {
   // This function retrieves the ranking data for a specified event from FIRST. 
   async function getRanks() {
     setRanksTabReady(TabStates.NotReady);
-    var result = await httpClient.get(`${selectedYear.value}/rankings/${selectedEvent.value.code}`);
+    var result = await httpClient.get(`${selectedYear?.value}/rankings/${selectedEvent?.value.code}`);
     var ranks = await result.json();
+
+    ranks.lastUpdate = moment();
     setRankings(ranks);
     setRanksTabReady(TabStates.Ready);
   }
 
   // This function retrieves the Playoff Alliance data for a specified event from FIRST. 
   async function getAlliances() {
-    var result = await httpClient.get(`${selectedYear.value}/alliances/${selectedEvent.value.code}`);
+    var result = await httpClient.get(`${selectedYear?.value}/alliances/${selectedEvent?.value.code}`);
     var alliances = await result.json();
     var allianceLookup = {};
     alliances.Alliances.forEach(alliance => {
@@ -298,6 +315,8 @@ function App() {
       if (alliance.backup) { allianceLookup[`${alliance.backup}`] = { role: `Backup for ${alliance.backupReplaced}`, alliance: `Alliance ${alliance.number}` }; }
     })
     alliances.Lookup = allianceLookup;
+
+    alliances.lastUpdate = moment();
     setAlliances(alliances);
   }
 
@@ -305,11 +324,11 @@ function App() {
   useEffect(() => {
     async function getEvents() {
       try {
-        const val = await httpClient.get(`${selectedYear.value}/events`);
+        const val = await httpClient.get(`${selectedYear?.value}/events`);
         const json = await val.json();
         var timeNow = moment();
 
-        const events = json.Events.map((e) => {
+        const events = json?.Events.map((e) => {
           var color = "";
           var optionPrefix = "";
           var optionPostfix = "";
@@ -352,45 +371,7 @@ function App() {
           };
         });
 
-        //filter the array
-        var filters = eventFilters.map((e)=> {return e.value});
-        if (timeFilter.value === "past" || timeFilter.value === "future") {
-          filters.push(timeFilter.value);
-        }
-        var filteredEvents = events;
-        //reduce the list by time, then additively include other filters
-        if (_.indexOf(filters, "past") >= 0) {
-          filteredEvents = _.filter(events, function (o) { return (_.indexOf(o.filters, "past") >= 0) });
-        } else if (_.indexOf(filters, "future") >= 0) {
-          filteredEvents = _.filter(events, function (o) { return (_.indexOf(o.filters, "future") >= 0) });
-        }
-        var filterTemp = [];
-        if (filters.length>0) {
-          filters.forEach( (filter) => {
-            if (filter !== "past" && filter !== "future") {
-              filterTemp = filterTemp.concat(_.filter(filteredEvents, function (o) { return (_.indexOf(o.filters, filter) >= 0) }));
-            }
-          })
-
-          //remove duplicates
-          filterTemp = filterTemp.filter((item, index) => {
-            return (filterTemp.indexOf(item) === index)
-          })
-        } else filterTemp = filteredEvents;
-        
-
-        //sort the list alphabetically
-        filterTemp.sort(function (a, b) {
-          if (a.value.name < b.value.name) {
-            return -1
-          }
-          if (a.value.name > b.value.name) {
-            return 1
-          }
-          return 0
-        });
-
-        setEvents(filterTemp);
+        setEvents(events);
         if (!_.some(events, selectedEvent)) {
           setSelectedEvent(null);
         }
@@ -404,7 +385,7 @@ function App() {
       getEvents()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedYear, httpClient, setSelectedEvent, setEvents, eventFilters, timeFilter])
+  }, [selectedYear, httpClient, setSelectedEvent, setEvents])
 
   // Reset the event data when the selectedEvent changes 
   useEffect(() => {
@@ -446,7 +427,7 @@ function App() {
         isAuthenticated ? <BrowserRouter>
           <Routes>
             <Route path="/" element={<LayoutsWithNavbar scheduleTabReady={scheduleTabReady} teamDataTabReady={teamDataTabReady} ranksTabReady={ranksTabReady} />}>
-              <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} eventFilters={eventFilters} setEventFilters={setEventFilters} timeFilter={timeFilter} setTimeFilter={setTimeFilter}/>} />
+              <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} teamList={teamList} eventFilters={eventFilters} setEventFilters={setEventFilters} timeFilter={timeFilter} setTimeFilter={setTimeFilter} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} rankings={rankings} timeFormat={timeFormat} setTimeFormat={setTimeFormat} showSponsors={showSponsors} setShowSponsors={setShowSponsors} showAwards={showAwards} setShowAwards={setShowAwards} showNotes={showNotes} setShowNotes={setShowNotes} showMottoes={showMottoes} setShowMottoes={setShowMottoes} showChampsStats={showChampsStats} setShowChampsStats={setShowChampsStats} swapScreen={swapScreen} setSwapScreen={setSwapScreen} autoAdvance={autoAdvance} setAutoAdvance={setAutoAdvance}/>} />
               <Route path="/schedule" element={<SchedulePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} />} />
               <Route path="/teamdata" element={<TeamDataPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} teamSort={teamSort} setTeamSort={setTeamSort} communityUpdates={communityUpdates} allianceCount={getAllianceCount()} />} />
               <Route path='/ranks' element={<RanksPage selectedEvent={selectedEvent} teamList={teamList} rankings={rankings} rankSort={rankSort} setRankSort={setRankSort} communityUpdates={communityUpdates} allianceCount={getAllianceCount()} />} />

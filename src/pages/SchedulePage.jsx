@@ -12,7 +12,7 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule }) {
             </div>}
             {selectedEvent && qualSchedule &&
                 <div>
-                    <p>{selectedEvent.label}</p>
+                    <h4>{selectedEvent.label}</h4>
                     <Table responsive striped bordered size="sm">
                         <thead className="thead-default">
                             <tr>

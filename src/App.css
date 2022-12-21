@@ -49,6 +49,27 @@
   text-align: left;
 }
 
+.setupPageMenus {
+  background-color: rgb(227, 247, 255);
+  padding: 10px;
+  border-color: blue;
+  border-style: solid;
+  margin-bottom: 5px;
+}
+.setupPageFilters {
+  background-color: rgb(231, 255, 227);
+  padding: 10px;
+  border-color: rgb(107, 221, 0);
+  border-style: solid;
+  margin-bottom: 10px;
+}
+
+.switchLabel {
+  display: table-cell;
+  height: 25px;
+  vertical-align: middle;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

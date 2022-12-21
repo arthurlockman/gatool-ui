@@ -1,5 +1,9 @@
 import Select from "react-select";
-import { Row, Col, Container } from 'react-bootstrap';
+import { Row, Col, Container, Alert } from 'react-bootstrap';
+import moment from "moment/moment";
+import LogoutButton from "../components/LogoutButton";
+import _ from "lodash";
+import Switch from "react-switch";
 
 const supportedYears = [
     { label: '2023', value: '2023' },
@@ -32,35 +36,126 @@ const filterTime = [
     { value: "future", label: "Future Events" }
 ]
 
-function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, eventFilters, setEventFilters, timeFilter, setTimeFilter }) {
+const timeFormatMenu = [
+    { label: "12hr", value: "h:mm:ss a" },
+    { label: "24hr", value: "HH:mm:ss" },
+]
+
+function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance }) {
+
+    function filterEvents(events) {
+        //filter the array
+        var filters = eventFilters?.map((e) => { return e?.value });
+        if (timeFilter?.value === "past" || timeFilter?.value === "future") {
+            filters.push(timeFilter.value);
+        }
+        var filteredEvents = events;
+        //reduce the list by time, then additively include other filters
+        if (_.indexOf(filters, "past") >= 0) {
+            filteredEvents = _.filter(events, function (o) { return (_.indexOf(o.filters, "past") >= 0) });
+        } else if (_.indexOf(filters, "future") >= 0) {
+            filteredEvents = _.filter(events, function (o) { return (_.indexOf(o.filters, "future") >= 0) });
+        }
+        var filterTemp = [];
+        if (filters.length > 0) {
+            filters.forEach((filter) => {
+                if (filter !== "past" && filter !== "future") {
+                    filterTemp = filterTemp.concat(_.filter(filteredEvents, function (o) { return (_.indexOf(o.filters, filter) >= 0) }));
+                }
+            })
+
+            //remove duplicates
+            filterTemp = filterTemp.filter((item, index) => {
+                return (filterTemp.indexOf(item) === index)
+            })
+        } else filterTemp = filteredEvents;
+
+
+        //sort the list alphabetically
+        filterTemp.sort(function (a, b) {
+            if (a.value.name < b.value.name) {
+                return -1
+            }
+            if (a.value.name > b.value.name) {
+                return 1
+            }
+            return 0
+        });
+        return filterTemp
+    }
+
+
     return (
         <Container fluid>
-            <Row>
-                <Col sm={4}>Choose a year...<br /><Select options={supportedYears} value={selectedYear ? selectedYear : supportedYears[0]} onChange={setSelectedYear} />
+            <Row className="setupPageMenus">
+                <Col sm={4}><b>Choose a year...</b><br /><Select options={supportedYears} value={selectedYear ? selectedYear : supportedYears[0]} onChange={setSelectedYear} />
                 </Col>
-                <Col sm={8}>
-                    ...then choose an event.<br /><Select options={eventList} placeholder={eventList?.length > 0 ? "Select an event" : "Loading event list"} value={selectedEvent} onChange={setSelectedEvent}
-                        styles={{
-                            option: (styles, { data }) => {
-                                return {
-                                    ...styles,
-                                    backgroundColor: data.color,
-                                    color: "black"
-                                };
-                            },
-                        }} /></Col>
+                <Col sm={8}><b>...then choose an event.</b><br /><Select options={filterEvents(eventList)} placeholder={eventList?.length > 0 ? "Select an event" : "Loading event list"} value={selectedEvent} onChange={setSelectedEvent}
+                    styles={{
+                        option: (styles, { data }) => {
+                            return {
+                                ...styles,
+                                backgroundColor: data.color,
+                                color: "black"
+                            };
+                        },
+                    }} /></Col>
             </Row>
-            <Row>
-                <Col sm={4}>Filter your event list here...<br />
+            <Row className="setupPageFilters">
+                <Col sm={4}><b>Filter your event list here...</b><br />
                     <Select options={filterTime} value={timeFilter ? timeFilter : filterTime[0]} onChange={setTimeFilter} />
                 </Col>
                 <Col sm={8}><br />
                     <Select isMulti options={filtersMenu} value={eventFilters} onChange={setEventFilters} />
                 </Col>
             </Row>
-            <div className="d-flex p-2 flex-grow-1">
-                some more content
-            </div>
+            {!selectedEvent && <div>
+                <Alert variant="warning" >You need to select an event before you can see anything here.</Alert>
+            </div>}
+            {selectedEvent && <div>
+                <h4>{selectedEvent.label}</h4>
+                <Row className="leftTable">
+                    <Col sm={4}>
+                        <p><b>Event Code: </b>{selectedEvent?.value.code}</p>
+                        {!selectedEvent?.value.type.includes("OffSeason") && <p><b>Event Week: </b>{selectedEvent?.value.weekNumber}</p>}
+                        {selectedEvent?.value.type === "Regional" && <p><b>Regional Event</b></p>}
+                        {selectedEvent?.value.type === "OffSeasonWithAzureSync" && <p><b>FMS Registered Offseason Event</b></p>}
+                        {!selectedEvent?.value.type === "OffSeason" && <p><b>Offseason Event not registered with FMS</b></p>}
+                        {selectedEvent?.value.districtCode && <p><b>District Code: </b>{selectedEvent?.value.districtCode}</p>}
+                        {selectedEvent?.value.type === "ChampionshipDivision" && <p><b>Championship Division</b></p>}
+                        {selectedEvent?.value.type === "ChampionshipSubdivision" && <p><b>Championship Subdivision</b></p>}
+                        {selectedEvent?.value.type === "Championship" && <p><b>FIRST Championship</b></p>}
+                        {selectedEvent?.value.type === "DistrictChampionship" && <p><b>District Championship</b></p>}
+                        {selectedEvent?.value.city && <p><b>Event Location: </b><br />{selectedEvent?.value.venue} in {selectedEvent?.value.city}, {selectedEvent?.value.stateprov} {selectedEvent?.value.country}</p>}
+                        {teamList?.teams.length > 0 && <p><b>Number of Competing teams: </b>{teamList?.teams.length}</p>}
+                        {selectedEvent?.value.dateStart && <p><b>Event Start: </b>{moment(selectedEvent.value.dateStart, 'YYYY-MM-DDTHH:mm:ss').format('ddd, MMM Do YYYY')}</p>}
+                        {selectedEvent?.value.dateEnd && <p><b>Event End: </b>{moment(selectedEvent.value.dateEnd, 'YYYY-MM-DDTHH:mm:ss').format('ddd, MMM Do YYYY')}</p>}
+                    </Col>
+                    <Col sm={4}>
+                        {selectedEvent?.value.allianceCount === "SixAlliance" && <p><b>Playoff Type: </b>Round Robin</p>}
+                        {selectedEvent?.value.allianceCount === "EightAlliance" && <p><b>Playoff Type: </b>8 Alliance Playoffs</p>}
+                        {selectedEvent?.value.allianceCount === "FourAlliance" && <p><b>Playoff Type: </b>4 Alliance Playoff</p>}
+                        {qualSchedule?.lastUpdate && <p><b>Quals Schedule last updated: </b><br />{moment(qualSchedule?.lastUpdate).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
+                        {playoffSchedule?.lastUpdate && <p><b>Playoff Schedule last updated: </b><br />{moment(playoffSchedule?.lastUpdate).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
+                        {teamList?.lastUpdate && <p><b>Team List last updated: </b><br />{moment(teamList?.lastUpdate).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
+                        {rankings?.lastUpdate && <p><b>Rankings last updated: </b><br />{moment(rankings?.lastUpdate).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
+                    </Col>
+                    <Col sm={4}>
+                    <p><label><span className="switchLabel"><Switch checked={showSponsors} onChange={setShowSponsors} />  </span><span className="switchLabel"><b>Show Sponsors on Announce </b></span></label></p>
+                        <p><label><span className="switchLabel"><Switch checked={showAwards} onChange={setShowAwards} />  </span><span className="switchLabel"><b>Show Awards on Announce</b></span></label></p>
+                        <p><label><span className="switchLabel"><Switch checked={showNotes} onChange={setShowNotes} />  </span><span className="switchLabel"><b>Show Notes on Announce & Play-By-Play</b></span></label></p>
+                        <p><label><span className="switchLabel"><Switch checked={showMottoes} onChange={setShowMottoes} />  </span><span className="switchLabel"><b>Show Mottoes on Announce & Play-By-Play</b></span></label></p>
+                        <p><label><span className="switchLabel"><Switch checked={showChampsStats} onChange={setShowChampsStats} />  </span><span className="switchLabel"><b>Show Champs Statistics on Announce</b></span></label></p>
+                        <p><label><span className="switchLabel"><Switch checked={swapScreen} onChange={setSwapScreen} />  </span><span className="switchLabel"><b>Swap Play-By-Play Screen Orientation</b></span></label></p>
+                        <p><label><span className="switchLabel"><Switch checked={autoAdvance} onChange={setAutoAdvance} />  </span><span className="switchLabel"><b>Automatically advance to the next match when loading</b></span></label></p>
+                        
+                        <p><label><b>Set your time format</b><Select options={timeFormatMenu} value={timeFormat} onChange={setTimeFormat} /></label></p>
+                        <p><LogoutButton /></p>
+                    </Col>
+                </Row>
+
+            </div>}
+
         </Container>
     )
 }
