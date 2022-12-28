@@ -24,6 +24,7 @@ import { Container } from 'react-bootstrap';
 import { usePersistentState } from './hooks/UsePersistentState';
 import _ from 'lodash';
 import moment from 'moment';
+import Developer from './pages/Developer';
 
 export const TabStates = {
   NotReady: 'notready',
@@ -72,14 +73,14 @@ function App() {
   const [eventFilters, setEventFilters] = usePersistentState("cache:eventFilters", []);
   const [timeFilter, setTimeFilter] = usePersistentState("cache:timeFilter", null);
   const [timeFormat, setTimeFormat] = usePersistentState("cache:timeFormat",{ label: "12hr", value:"h:mm:ss a"});
-  const [showSponsors, setShowSponsors] = usePersistentState("cache:showSponsors",!0);
-  const [showAwards, setShowAwards] = usePersistentState("cache:showAwards",!0);
-  const [showNotes, setShowNotes] = usePersistentState("cache:showNotes",!0);
-  const [showMottoes, setShowMottoes] = usePersistentState("cache:showMottoes",!0);
-  const [showChampsStats, setShowChampsStats] = usePersistentState("cache:showChampsStats",!0);
-  const [swapScreen, setSwapScreen] = usePersistentState("cache:swapScreen",false);
-  const [autoAdvance, setAutoAdvance] = usePersistentState("cache:autoAdvance",false);
-  const [currentMatch,setCurrentMatch] = usePersistentState("cache:currentMatch",1);
+  const [showSponsors, setShowSponsors] = usePersistentState("cache:showSponsors", null);
+  const [showAwards, setShowAwards] = usePersistentState("cache:showAwards",null);
+  const [showNotes, setShowNotes] = usePersistentState("cache:showNotes",null);
+  const [showMottoes, setShowMottoes] = usePersistentState("cache:showMottoes",null);
+  const [showChampsStats, setShowChampsStats] = usePersistentState("cache:showChampsStats",null);
+  const [swapScreen, setSwapScreen] = usePersistentState("cache:swapScreen",null);
+  const [autoAdvance, setAutoAdvance] = usePersistentState("cache:autoAdvance",null);
+  const [currentMatch,setCurrentMatch] = usePersistentState("cache:currentMatch",null);
 
   // Tab state trackers
   const [scheduleTabReady, setScheduleTabReady] = useState(TabStates.NotReady)
@@ -104,7 +105,7 @@ function App() {
 
   //functions to retrieve API data
 
-  // This function retrieves a schedule from FIRST. It attempts to get both the Qual and Playoff Schedule and sets the global variables 
+  // This function retrieves a schedule from FIRST. It attempts to get both the Qual and Playoff Schedule and sets the global variables
   async function getSchedule() {
 
     // returns the winner of the match
@@ -281,7 +282,7 @@ function App() {
     setTeamDataTabReady(TabStates.Ready);
   }
 
-  // This function retrieves communnity updates for a specified event from gatool Cloud. 
+  // This function retrieves communnity updates for a specified event from gatool Cloud.
   async function getCommunityUpdates() {
     setTeamDataTabReady(TabStates.NotReady);
     var result = await httpClient.get(`${selectedYear?.value}/communityUpdates/${selectedEvent?.value.code}`);
@@ -292,7 +293,7 @@ function App() {
     setTeamDataTabReady(TabStates.Ready);
   }
 
-  // This function retrieves the ranking data for a specified event from FIRST. 
+  // This function retrieves the ranking data for a specified event from FIRST.
   async function getRanks() {
     setRanksTabReady(TabStates.NotReady);
     var result = await httpClient.get(`${selectedYear?.value}/rankings/${selectedEvent?.value.code}`);
@@ -303,7 +304,7 @@ function App() {
     setRanksTabReady(TabStates.Ready);
   }
 
-  // This function retrieves the Playoff Alliance data for a specified event from FIRST. 
+  // This function retrieves the Playoff Alliance data for a specified event from FIRST.
   async function getAlliances() {
     var result = await httpClient.get(`${selectedYear?.value}/alliances/${selectedEvent?.value.code}`);
     var alliances = await result.json();
@@ -388,7 +389,7 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedYear, httpClient, setSelectedEvent, setEvents])
 
-  // Reset the event data when the selectedEvent changes 
+  // Reset the event data when the selectedEvent changes
   useEffect(() => {
     if (!selectedEvent) {
       setPlayoffSchedule(null);
@@ -445,6 +446,7 @@ function App() {
               <Route path='/cheatsheet' element={<CheatsheetPage />} />
               <Route path='/emcee' element={<EmceePage />} />
               <Route path='/help' element={<HelpPage />} />
+              <Route path='/dev' element={<Developer />} />
             </Route>
           </Routes>
         </BrowserRouter> : <AnonymousUserPage />}
