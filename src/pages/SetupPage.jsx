@@ -1,5 +1,5 @@
 import Select from "react-select";
-import { Row, Col, Container, Alert } from 'react-bootstrap';
+import { Row, Col, Container, Alert, Button } from 'react-bootstrap';
 import moment from "moment/moment";
 import LogoutButton from "../components/LogoutButton";
 import _ from "lodash";
@@ -41,7 +41,7 @@ const timeFormatMenu = [
     { label: "24hr", value: "HH:mm:ss" },
 ]
 
-function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance }) {
+function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, getSchedule}) {
 
     function filterEvents(events) {
         //filter the array
@@ -153,6 +153,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                         <p><LogoutButton /></p>
                     </Col>
                 </Row>
+                <Row><Button size="large" onClick={getSchedule} variant="success">Tap to refresh Schedule. <br />Use after Alliance Selection to load Playoffs.</Button></Row>
 
             </div>}
 

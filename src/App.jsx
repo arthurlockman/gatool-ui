@@ -72,13 +72,14 @@ function App() {
   const [eventFilters, setEventFilters] = usePersistentState("cache:eventFilters", []);
   const [timeFilter, setTimeFilter] = usePersistentState("cache:timeFilter", null);
   const [timeFormat, setTimeFormat] = usePersistentState("cache:timeFormat",{ label: "12hr", value:"h:mm:ss a"});
-  const [showSponsors, setShowSponsors] = usePersistentState("cache:showSponsors",null);
-  const [showAwards, setShowAwards] = usePersistentState("cache:showAwards",null);
-  const [showNotes, setShowNotes] = usePersistentState("cache:showNotes",null);
-  const [showMottoes, setShowMottoes] = usePersistentState("cache:showMottoes",null);
-  const [showChampsStats, setShowChampsStats] = usePersistentState("cache:showChampsStats",null);
+  const [showSponsors, setShowSponsors] = usePersistentState("cache:showSponsors",!0);
+  const [showAwards, setShowAwards] = usePersistentState("cache:showAwards",!0);
+  const [showNotes, setShowNotes] = usePersistentState("cache:showNotes",!0);
+  const [showMottoes, setShowMottoes] = usePersistentState("cache:showMottoes",!0);
+  const [showChampsStats, setShowChampsStats] = usePersistentState("cache:showChampsStats",!0);
   const [swapScreen, setSwapScreen] = usePersistentState("cache:swapScreen",false);
   const [autoAdvance, setAutoAdvance] = usePersistentState("cache:autoAdvance",false);
+  const [currentMatch,setCurrentMatch] = usePersistentState("cache:currentMatch",1);
 
   // Tab state trackers
   const [scheduleTabReady, setScheduleTabReady] = useState(TabStates.NotReady)
@@ -427,11 +428,16 @@ function App() {
         isAuthenticated ? <BrowserRouter>
           <Routes>
             <Route path="/" element={<LayoutsWithNavbar scheduleTabReady={scheduleTabReady} teamDataTabReady={teamDataTabReady} ranksTabReady={ranksTabReady} />}>
-              <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} teamList={teamList} eventFilters={eventFilters} setEventFilters={setEventFilters} timeFilter={timeFilter} setTimeFilter={setTimeFilter} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} rankings={rankings} timeFormat={timeFormat} setTimeFormat={setTimeFormat} showSponsors={showSponsors} setShowSponsors={setShowSponsors} showAwards={showAwards} setShowAwards={setShowAwards} showNotes={showNotes} setShowNotes={setShowNotes} showMottoes={showMottoes} setShowMottoes={setShowMottoes} showChampsStats={showChampsStats} setShowChampsStats={setShowChampsStats} swapScreen={swapScreen} setSwapScreen={setSwapScreen} autoAdvance={autoAdvance} setAutoAdvance={setAutoAdvance}/>} />
+
+              <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} teamList={teamList} eventFilters={eventFilters} setEventFilters={setEventFilters} timeFilter={timeFilter} setTimeFilter={setTimeFilter} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} rankings={rankings} timeFormat={timeFormat} setTimeFormat={setTimeFormat} showSponsors={showSponsors} setShowSponsors={setShowSponsors} showAwards={showAwards} setShowAwards={setShowAwards} showNotes={showNotes} setShowNotes={setShowNotes} showMottoes={showMottoes} setShowMottoes={setShowMottoes} showChampsStats={showChampsStats} setShowChampsStats={setShowChampsStats} swapScreen={swapScreen} setSwapScreen={setSwapScreen} autoAdvance={autoAdvance} setAutoAdvance={setAutoAdvance} getSchedule={getSchedule}/>} />
+
               <Route path="/schedule" element={<SchedulePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} />} />
+
               <Route path="/teamdata" element={<TeamDataPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} teamSort={teamSort} setTeamSort={setTeamSort} communityUpdates={communityUpdates} allianceCount={getAllianceCount()} />} />
+
               <Route path='/ranks' element={<RanksPage selectedEvent={selectedEvent} teamList={teamList} rankings={rankings} rankSort={rankSort} setRankSort={setRankSort} communityUpdates={communityUpdates} allianceCount={getAllianceCount()} />} />
-              <Route path='/announce' element={<AnnouncePage />} />
+
+              <Route path='/announce' element={<AnnouncePage teamList={teamList} rankings={rankings} communityUpdates={communityUpdates} currentMatch={currentMatch} setCurrentMatch={setCurrentMatch}/>} />
               <Route path='/playbyplay' element={<PlayByPlayPage />} />
               <Route path='/allianceselection' element={<AllianceSelectionPage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} alliances={alliances} />} />
               <Route path='/awards' element={<AwardsPage />} />

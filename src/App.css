@@ -70,6 +70,129 @@
   vertical-align: middle;
 }
 
+.redAlliance {
+	border: 2px solid #ccc;
+	background-color: #F7B3B4
+}
+
+.blueAlliance {
+	border: 2px solid #ccc;
+	background-color: #98B4F4
+}
+
+.redAllianceTeam {
+	color: #FF0000
+}
+
+.blueAllianceTeam {
+	color: #0000FF
+}
+
+.redAlliancePlayByPlay {
+	border: 1px solid #ccc;
+	align-content: center;
+	text-align: center;
+	background-color: red;
+	font-size: x-large;
+	font-weight: bold;
+	color: white
+}
+
+.blueAlliance {
+	border: 2px solid #ccc;
+	background-color: #98B4F4
+}
+
+.blueAllianceTeam {
+	color: #0000FF
+}
+
+.announceTeamNumber {
+	font-size: x-large;
+	color: black
+}
+
+.announceOrganization {
+	font-size: 20px;
+	font-weight: bold
+}
+
+.awards {
+	font-style: italic;
+	line-height: 1
+}
+
+.awardHilight {
+	font-weight: bold;
+	color: green
+}
+
+.gatool-announce {
+	border: 1px solid #ccc;
+  text-align: left;
+  align-items: center;
+}
+
+.ranking {
+	align-content: center;
+	vertical-align: middle;
+	text-align: center;
+	font-size: xx-large;
+	color: black
+}
+
+.rank1 {
+	text-align: center;
+	color: white;
+	background-color: orange
+}
+
+.rank2 {
+	text-align: center;
+	color: white;
+	background-color: green
+}
+
+.rank9 {
+	text-align: center;
+	color: black;
+	background-color: yellow
+}
+
+.rank0 {
+	text-align: center;
+	color: black
+}
+
+.teamName {
+	font-size: x-large;
+	color: black
+}
+
+.champs {
+	color: blue
+}
+
+.HOFred {
+	font-style: italic;
+	font-weight: bold;
+	color: blue;
+	line-height: 1
+}
+
+.HOFblue {
+	font-style: italic;
+	font-weight: bold;
+	color: red;
+	line-height: 1
+}
+
+.robotName {
+	font-style: italic;
+	font-weight: bold;
+	color: #FF4000
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
