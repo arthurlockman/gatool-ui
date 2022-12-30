@@ -256,7 +256,8 @@ ul.tab li a:focus,
 
 .gatool-announce {
 	border: 1px solid #ccc;
-	background-color: white
+	background-color: white;
+	align-content: center;
 }
 
 .gatool-sponsors {
