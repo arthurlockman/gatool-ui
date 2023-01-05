@@ -25,6 +25,7 @@ import { usePersistentState } from './hooks/UsePersistentState';
 import _ from 'lodash';
 import moment from 'moment';
 import Developer from './pages/Developer';
+import { useOnlineStatus } from './contextProviders/OnlineContext';
 
 export const TabStates = {
   NotReady: 'notready',
@@ -90,6 +91,13 @@ function App() {
   // Controllers for table sort order at render time
   const [teamSort, setTeamSort] = useState("")
   const [rankSort, setRankSort] = useState("")
+
+  const isOnline = useOnlineStatus()
+
+  // Handle if users are offline. If they're offline but have an event and year selected, let them in.
+  const canAccessApp = () => {
+    return isOnline ? isAuthenticated : selectedEvent && selectedYear
+  }
 
   function getAllianceCount() {
     var allianceCount = 8;
@@ -426,7 +434,7 @@ function App() {
           <Blocks visible height="200" width="" ariaLabel="blocks-loading" />
         </Container>
       </div> :
-        isAuthenticated ? <BrowserRouter>
+        canAccessApp() ? <BrowserRouter>
           <Routes>
             <Route path="/" element={<LayoutsWithNavbar scheduleTabReady={scheduleTabReady} teamDataTabReady={teamDataTabReady} ranksTabReady={ranksTabReady} />}>
 

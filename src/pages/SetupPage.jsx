@@ -4,6 +4,9 @@ import moment from "moment/moment";
 import LogoutButton from "../components/LogoutButton";
 import _ from "lodash";
 import Switch from "react-switch";
+import { useOnlineStatus } from "../contextProviders/OnlineContext";
+
+import { ArrowClockwise } from 'react-bootstrap-icons';
 
 const supportedYears = [
     { label: '2023', value: '2023' },
@@ -41,7 +44,8 @@ const timeFormatMenu = [
     { label: "24hr", value: "HH:mm:ss" },
 ]
 
-function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, getSchedule}) {
+function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, getSchedule }) {
+    const isOnline = useOnlineStatus()
 
     function filterEvents(events) {
         //filter the array
@@ -87,8 +91,11 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
 
     return (
         <Container fluid>
+            {!isOnline && <Row>
+                <Alert variant="danger"><b>You're offline. Only cached data is available. Some options may be unavailable. <br/>Reconnect to the internet to choose a different event.</b></Alert>
+            </Row>}
             <Row className="setupPageMenus">
-                <Col sm={4}><b>Choose a year...</b><br /><Select options={supportedYears} value={selectedYear ? selectedYear : supportedYears[0]} onChange={setSelectedYear} />
+                <Col sm={4}><b>Choose a year...</b><br /><Select options={supportedYears} value={selectedYear ? selectedYear : supportedYears[0]} onChange={setSelectedYear} isDisabled={!isOnline} />
                 </Col>
                 <Col sm={8}><b>...then choose an event.</b><br /><Select options={filterEvents(eventList)} placeholder={eventList?.length > 0 ? "Select an event" : "Loading event list"} value={selectedEvent} onChange={setSelectedEvent}
                     styles={{
@@ -99,20 +106,22 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                 color: "black"
                             };
                         },
-                    }} /></Col>
+                    }} isDisabled={!isOnline} /></Col>
             </Row>
             <Row className="setupPageFilters">
                 <Col sm={4}><b>Filter your event list here...</b><br />
-                    <Select options={filterTime} value={timeFilter ? timeFilter : filterTime[0]} onChange={setTimeFilter} />
+                    <Select options={filterTime} value={timeFilter ? timeFilter : filterTime[0]} onChange={setTimeFilter} isDisabled={!isOnline} />
                 </Col>
                 <Col sm={8}><br />
-                    <Select isMulti options={filtersMenu} value={eventFilters} onChange={setEventFilters} />
+                    <Select isMulti options={filtersMenu} value={eventFilters} onChange={setEventFilters} isDisabled={!isOnline} />
                 </Col>
             </Row>
             {!selectedEvent && <div>
                 <Alert variant="warning" >You need to select an event before you can see anything here.</Alert>
             </div>}
             {selectedEvent && <div>
+                <Row><Button size="large" onClick={getSchedule} variant="outline-success" disabled={!isOnline}><b><ArrowClockwise /> Tap to refresh Schedule.</b> <br />Use after Alliance Selection to load Playoffs.</Button></Row>
+                <br/>
                 <h4>{selectedEvent.label}</h4>
                 <Row className="leftTable">
                     <Col sm={4}>
@@ -141,20 +150,17 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                         {rankings?.lastUpdate && <p><b>Rankings last updated: </b><br />{moment(rankings?.lastUpdate).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
                     </Col>
                     <Col sm={4}>
-                    <p><label><span className="switchLabel"><Switch checked={showSponsors} onChange={setShowSponsors} />  </span><span className="switchLabel"><b>Show Sponsors on Announce </b></span></label></p>
+                        <p><label><span className="switchLabel"><Switch checked={showSponsors} onChange={setShowSponsors} />  </span><span className="switchLabel"><b>Show Sponsors on Announce </b></span></label></p>
                         <p><label><span className="switchLabel"><Switch checked={showAwards} onChange={setShowAwards} />  </span><span className="switchLabel"><b>Show Awards on Announce</b></span></label></p>
                         <p><label><span className="switchLabel"><Switch checked={showNotes} onChange={setShowNotes} />  </span><span className="switchLabel"><b>Show Notes on Announce & Play-By-Play</b></span></label></p>
                         <p><label><span className="switchLabel"><Switch checked={showMottoes} onChange={setShowMottoes} />  </span><span className="switchLabel"><b>Show Mottoes on Announce & Play-By-Play</b></span></label></p>
                         <p><label><span className="switchLabel"><Switch checked={showChampsStats} onChange={setShowChampsStats} />  </span><span className="switchLabel"><b>Show Champs Statistics on Announce</b></span></label></p>
                         <p><label><span className="switchLabel"><Switch checked={swapScreen} onChange={setSwapScreen} />  </span><span className="switchLabel"><b>Swap Play-By-Play Screen Orientation</b></span></label></p>
                         <p><label><span className="switchLabel"><Switch checked={autoAdvance} onChange={setAutoAdvance} />  </span><span className="switchLabel"><b>Automatically advance to the next match when loading</b></span></label></p>
-                        
                         <p><label><b>Set your time format</b><Select options={timeFormatMenu} value={timeFormat} onChange={setTimeFormat} /></label></p>
-                        <p><LogoutButton /></p>
+                        <p><LogoutButton disabled={!isOnline}/></p>
                     </Col>
                 </Row>
-                <Row><Button size="large" onClick={getSchedule} variant="success">Tap to refresh Schedule. <br />Use after Alliance Selection to load Playoffs.</Button></Row>
-
             </div>}
 
         </Container>
