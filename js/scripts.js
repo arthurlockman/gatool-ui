@@ -2990,6 +2990,7 @@ function getTeamAwards(teamNumber, year) {
     var eventNames = [];
     var data = {};
     eventNames[String(year)] = JSON.parse(localStorage.events);
+    eventNames["2022"] = events2022;
     eventNames["2021"] = events2021;
     eventNames["2020"] = events2020;
     eventNames["2019"] = events2019;
@@ -3402,7 +3403,7 @@ function updateTeamTableRow(teamData) {
     returnData += '" id="teamTableNumber' + teamData.teamNumber + '" onclick="updateTeamInfo(' + teamData.teamNumber + ')"><span class="teamDataNumber">' + teamData.teamNumber + '</span><br><span id="lastVisit' + teamData.teamNumber + '" teamNumber = "' + teamData.teamNumber + '"  lastvisit = "' + teamInfo.lastVisit + '">' + lastVisit + '</span></td>';
     returnData += '<td id="teamTableRank' + teamData.teamNumber + '" class="rank0"></td>';
     if ((teamInfo.avatar !== "null") && (Number(localStorage.currentYear) >= 2018 && (typeof teamInfo !== "undefined"))) {
-        avatar = '<img src="https://www.gatool.org/' + teamInfo.avatar + '">&nbsp;'
+        avatar = '<img src="https://api.gatool.org/' + teamInfo.avatar + '">&nbsp;'
     }
     avatar = `<img src="https://api.gatool.org/v3/${localStorage.currentYear}/avatars/team/${teamData.teamNumber}/avatar.png" onerror="this.style.display='none'">&nbsp;`;
     if (teamInfo.nameShortLocal === "") {

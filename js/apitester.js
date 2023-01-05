@@ -22,7 +22,7 @@ function getScoutingDataNew() {
 	$("#year").html(year);
 	
 	//get quals schedule
-	fetch("https://www.gatool.org/api/" + year + "/schedule/" + eventCode + "/qual?returnschedule=true", options)
+	fetch("https://api.gatool.org/api/" + year + "/schedule/" + eventCode + "/qual?returnschedule=true", options)
 		.then(response => response.json())
 		.then(data => {
 			schedule = data.Schedule;
@@ -34,7 +34,7 @@ function getScoutingDataNew() {
 					}
 				}
 				// now get the score details for the matches
-				fetch("https://www.gatool.org/api/" + year + '/scores/' + eventCode + "/qual/1/" + lastMatch + "/", options)
+				fetch("https://api.gatool.org/api/" + year + '/scores/' + eventCode + "/qual/1/" + lastMatch + "/", options)
 					.then(scores => scores.json())
 					.then(scoreData => {
 						for (score of scoreData.MatchScores) {
@@ -42,7 +42,7 @@ function getScoutingDataNew() {
 						}
 					}).then(
 						//get the playoff schedule
-						fetch("https://www.gatool.org/api/" + year + "/schedule/" + eventCode + "/playoff?returnschedule=true", options)
+						fetch("https://api.gatool.org/api/" + year + "/schedule/" + eventCode + "/playoff?returnschedule=true", options)
 							.then(response => response.json())
 							.then(data => {
 								playoffSchedule = data.Schedule;
@@ -53,7 +53,7 @@ function getScoutingDataNew() {
 											lastMatch = match.matchNumber;
 										}
 									}
-									fetch("https://www.gatool.org/api/" + year + '/scores/' + eventCode + "/playoff/1/" + lastMatch + "/", options)
+									fetch("https://api.gatool.org/api/" + year + '/scores/' + eventCode + "/playoff/1/" + lastMatch + "/", options)
 										.then(scores => scores.json())
 										.then(scoreData => {
 											for (const [index, score] of scoreData.MatchScores.entries()) {
