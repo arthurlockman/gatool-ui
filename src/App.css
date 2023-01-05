@@ -138,7 +138,8 @@
 	vertical-align: middle;
 	text-align: center;
 	font-size: xx-large;
-	color: black
+	color: black;
+	padding: 0;
 }
 
 .rank1 {
@@ -173,14 +174,14 @@
 	color: blue
 }
 
-.HOFred {
+.HOFRed {
 	font-style: italic;
 	font-weight: bold;
 	color: blue;
 	line-height: 1
 }
 
-.HOFblue {
+.HOFBlue {
 	font-style: italic;
 	font-weight: bold;
 	color: red;

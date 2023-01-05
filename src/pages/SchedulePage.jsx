@@ -26,7 +26,7 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule }) {
                             </tr>
                         </thead>
                         <tbody>
-                            {qualSchedule && qualSchedule?.Schedule?.map((match) => {
+                            {qualSchedule && qualSchedule?.schedule?.map((match) => {
                                 let redStyle = "red";
                                 let blueStyle = "blue";
                                 if (Number(match.scoreRedFinal) > Number(match.scoreBlueFinal)) {
@@ -47,10 +47,10 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule }) {
                                 )
                             })
                             }
-                            {(playoffSchedule && playoffSchedule.Schedule?.length > 0) ? playoffSchedule.Schedule.map((match) => {
+                            {(playoffSchedule && playoffSchedule.schedule?.length > 0) ? playoffSchedule.schedule.map((match) => {
                                 let redStyle = "red";
                                 let blueStyle = "blue";
-                                let qualMatchCount = qualSchedule.Schedule.length;
+                                let qualMatchCount = qualSchedule.schedule.length;
                                 if (Number(match.scoreRedFinal) > Number(match.scoreBlueFinal)) {
                                     redStyle += " bold"
                                 } else if (Number(match.scoreBlueFinal) > Number(match.scoreRedFinal)) {

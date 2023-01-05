@@ -10,7 +10,7 @@ function AllianceSelectionPage({ selectedEvent, playoffSchedule, alliances }) {
             {selectedEvent && !playoffSchedule && <div>
                 <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..."/></div><div>Waiting for Playoff Schedule</div></Alert>
             </div>}
-            {selectedEvent && playoffSchedule && 
+            {selectedEvent && playoffSchedule && alliances &&
                 <Bracket selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} alliances={alliances}/>}
                 </Container>
 

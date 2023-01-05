@@ -6,7 +6,7 @@ const LogoutButton = ({disabled = false}) => {
   const { logout } = useAuth0();
 
   return (
-    <Button block size="md" variant="outline-danger" onClick={() => logout({ returnTo: window.location.origin })} disabled={disabled}>
+    <Button size="md" variant="outline-danger" onClick={() => logout({ returnTo: window.location.origin })} disabled={disabled}>
       Log Out
     </Button>
   );

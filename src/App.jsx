@@ -25,8 +25,8 @@ import { usePersistentState } from './hooks/UsePersistentState';
 import _ from 'lodash';
 import moment from 'moment';
 import Developer from './pages/Developer';
+import { originalAndSustaining, eventNames, specialAwards, champs, allianceShortNames, hallOfFame } from './components/Constants';
 import { useOnlineStatus } from './contextProviders/OnlineContext';
-
 export const TabStates = {
   NotReady: 'notready',
   Stale: 'stale',
@@ -45,7 +45,6 @@ const playoffTiebreakers = {
 
 const paleYellow = "#fdfaed";
 const paleBlue = "#effdff";
-
 
 function LayoutsWithNavbar({ scheduleTabReady, teamDataTabReady, ranksTabReady }) {
   return (
@@ -73,15 +72,15 @@ function App() {
   const [communityUpdates, setCommunityUpdates] = usePersistentState("cache:communityUpdates", null);
   const [eventFilters, setEventFilters] = usePersistentState("cache:eventFilters", []);
   const [timeFilter, setTimeFilter] = usePersistentState("cache:timeFilter", null);
-  const [timeFormat, setTimeFormat] = usePersistentState("cache:timeFormat",{ label: "12hr", value:"h:mm:ss a"});
+  const [timeFormat, setTimeFormat] = usePersistentState("cache:timeFormat", { label: "12hr", value: "h:mm:ss a" });
   const [showSponsors, setShowSponsors] = usePersistentState("cache:showSponsors", null);
-  const [showAwards, setShowAwards] = usePersistentState("cache:showAwards",null);
-  const [showNotes, setShowNotes] = usePersistentState("cache:showNotes",null);
-  const [showMottoes, setShowMottoes] = usePersistentState("cache:showMottoes",null);
-  const [showChampsStats, setShowChampsStats] = usePersistentState("cache:showChampsStats",null);
-  const [swapScreen, setSwapScreen] = usePersistentState("cache:swapScreen",null);
-  const [autoAdvance, setAutoAdvance] = usePersistentState("cache:autoAdvance",null);
-  const [currentMatch,setCurrentMatch] = usePersistentState("cache:currentMatch",null);
+  const [showAwards, setShowAwards] = usePersistentState("cache:showAwards", null);
+  const [showNotes, setShowNotes] = usePersistentState("cache:showNotes", null);
+  const [showMottoes, setShowMottoes] = usePersistentState("cache:showMottoes", null);
+  const [showChampsStats, setShowChampsStats] = usePersistentState("cache:showChampsStats", null);
+  const [swapScreen, setSwapScreen] = usePersistentState("cache:swapScreen", null);
+  const [autoAdvance, setAutoAdvance] = usePersistentState("cache:autoAdvance", null);
+  const [currentMatch, setCurrentMatch] = usePersistentState("cache:currentMatch", null);
 
   // Tab state trackers
   const [scheduleTabReady, setScheduleTabReady] = useState(TabStates.NotReady)
@@ -138,11 +137,15 @@ function App() {
     var result = await httpClient.get(`${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/qual`);
     var qualschedule = await result.json();
     // adds the winner to the schedule.
-    var matches = qualschedule.Schedule.map((match) => {
+    if (typeof qualschedule.Schedule !== "undefined") {
+      qualschedule.schedule = qualschedule.Schedule;
+      delete qualschedule.Schedule;
+    }
+    var matches = qualschedule?.schedule.map((match) => {
       match.winner = winner(match);
       return match;
     });
-    qualschedule.Schedule = matches;
+    qualschedule.schedule = matches;
 
     qualschedule.lastUpdate = moment();
     setQualSchedule(qualschedule);
@@ -152,17 +155,20 @@ function App() {
     result = {};
     result = await httpClient.get(`${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/playoff`);
     var playoffschedule = await result.json();
+    if (typeof playoffschedule.Schedule !== "undefined") {
+      playoffschedule.schedule = playoffschedule.Schedule;
+    }
 
-    if (playoffschedule?.Schedule.length > 0) {
+    if (playoffschedule?.schedule.length > 0) {
       // adds the winner to the schedule.
-      matches = playoffschedule.Schedule.map((match) => {
+      matches = playoffschedule.schedule.map((match) => {
         match.winner = winner(match);
         return match;
       });
-      playoffschedule.Schedule = matches;
+      playoffschedule.schedule = matches;
 
       // determine the tiebreaker
-      var lastMatchNumber = playoffschedule.Schedule[_.findLastIndex(playoffschedule.Schedule, function (match) {
+      var lastMatchNumber = playoffschedule.schedule[_.findLastIndex(playoffschedule.schedule, function (match) {
         return (match.scoreRedFinal !== null) || (match.scoreBlueFinal !== null)
       })].matchNumber;
 
@@ -192,16 +198,11 @@ function App() {
               break;
             }
           }
-          playoffschedule.Schedule[_.findIndex(playoffschedule.Schedule, { "matchNumber": score.matchNumber })].winner.tieWinner = tiebreaker.winner;
-          playoffschedule.Schedule[_.findIndex(playoffschedule.Schedule, { "matchNumber": score.matchNumber })].winner.level = tiebreaker.level;
+          playoffschedule.schedule[_.findIndex(playoffschedule.schedule, { "matchNumber": score.matchNumber })].winner.tieWinner = tiebreaker.winner;
+          playoffschedule.schedule[_.findIndex(playoffschedule.schedule, { "matchNumber": score.matchNumber })].winner.level = tiebreaker.level;
 
         }
-
-
       }))
-
-
-
       getAlliances();
     }
 
@@ -212,9 +213,20 @@ function App() {
 
   // This function retrieves a a list of teams for a specific event from FIRST. It parses the list and modifies some of the data to produce more readable content.
   async function getTeamList() {
+    function awardsHilight(awardName) {
+      if (awardName === "District Chairman's Award" || awardName === "District Event Winner" || awardName === "District Event Finalist" || awardName === "Regional Engineering Inspiration Award" || awardName === "District Engineering Inspiration Award" || awardName === "Engineering Inspiration Award" || awardName === "District Championship Finalist" || awardName === "District Championship Winner" || awardName === "Regional Winners" || awardName === "Regional Finalists" || awardName === "Regional Chairman's Award" || awardName === "FIRST Dean's List Finalist Award" || awardName === "Championship Subdivision Winner" || awardName === "Championship Subdivision Finalist" || awardName === "Championship Division Winner" || awardName === "Championship Division Finalist" || awardName === "Championship Winner" || awardName === "Championship Finalist" || awardName === "Chairman's Award" || awardName === "Chairman's Award Finalist" || awardName === "FIRST Dean's List Award" || awardName === "Woodie Flowers Award" || awardName === "Innovation Challenge Winner" || awardName === "Innovation Challenge Finalist") {
+        return true;
+      } else {
+        return false;
+      }
+    }
+
     setTeamDataTabReady(TabStates.NotReady);
     var result = await httpClient.get(`${selectedYear?.value}/teams?eventCode=${selectedEvent?.value.code}`);
     var teams = await result.json();
+    if (typeof teams.Teams !== "undefined") {
+      teams.teams = teams.Teams;
+    }
 
     // Fix the sponsors now that teams are loaded
 
@@ -283,11 +295,82 @@ function App() {
       return teamRow;
     })
 
-    teams.teams = teamListSponsorsFixed
+    teams.teams = teamListSponsorsFixed;
 
-    teams.lastUpdate = moment();
-    setTeamList(teams);
-    setTeamDataTabReady(TabStates.Ready);
+    //fetch awards for the current teams
+
+    var newTeams = teams.teams.map(async team => {
+      var request = await httpClient.get(`${selectedYear?.value}/team/${team?.teamNumber}/awards`);
+      var awards = await request.json();
+      team.awards = awards;
+      return team;
+    });
+
+    setTeamDataTabReady(TabStates.NotReady);
+
+    Promise.all(newTeams).then(function (values) {
+
+      // Parse awards to ensure we highlight them properly and remove extraneous text i.e. FIRST CHampionship from name
+      var formattedAwards = values.map(team => {
+        // Add in special awards not reported by FIRST APIs (from 2021 season)
+        for (var index = 0; index < 3; index++) {
+          let items = specialAwards.filter(item => item.Year === (parseInt(selectedYear?.value) - index));
+          if (items.length > 0) {
+            let teamAwards = items[0].awards.filter(item => item.teamNumber === team.teamNumber);
+            if (teamAwards.length > 0) {
+              team.awards[`${selectedYear?.value - index}`].Awards = _.concat(team.awards[`${selectedYear?.value - index}`].Awards, teamAwards);
+            }
+          }
+        }
+        var awardYears = Object.keys(team?.awards);
+        var eventnames = _.clone(eventNames);
+        var halloffame = _.clone(hallOfFame);
+        events.forEach(event => {
+          eventNames[selectedYear.value][event.value.code] = event.value.name;
+        });
+        awardYears?.forEach(year => {
+          if (team?.awards[`${year}`] !== null) {
+            team.awards[`${year}`].Awards = team?.awards[`${year}`]?.Awards.map(award => {
+              award.highlight = awardsHilight(award.name);
+              award.eventName = eventnames[`${year}`][award.eventCode];
+              award.year = year
+              return award;
+            })
+          } else {
+            team.awards[`${year}`] = { "Awards": [] }
+          }
+        })
+        team.hallOfFame = [];
+        _.filter(halloffame, { "Chairmans": team.teamNumber }).forEach((award) => {
+          team.hallOfFame.push({ "year": award.Year, "challenge": award.Challenge, "type": "chairmans" })
+        });
+        _.filter(halloffame, { "Winner1": team.teamNumber }).forEach((award) => {
+          team.hallOfFame.push({ "year": award.Year, "challenge": award.Challenge, "type": "winner" })
+        });
+        _.filter(halloffame, { "Winner2": team.teamNumber }).forEach((award) => {
+          team.hallOfFame.push({ "year": award.Year, "challenge": award.Challenge, "type": "winner" })
+        });
+        _.filter(halloffame, { "Winner3": team.teamNumber }).forEach((award) => {
+          team.hallOfFame.push({ "year": award.Year, "challenge": award.Challenge, "type": "winner" })
+        });
+        _.filter(halloffame, { "Winner4": team.teamNumber }).forEach((award) => {
+          team.hallOfFame.push({ "year": award.Year, "challenge": award.Challenge, "type": "winner" })
+        });
+        _.filter(halloffame, { "Winner5": team.teamNumber }).forEach((award) => {
+          team.hallOfFame.push({ "year": award.Year, "challenge": award.Challenge, "type": "winner" })
+        });
+
+        return team;
+
+      })
+      teams.teams = formattedAwards;
+
+      teams.lastUpdate = moment();
+      setTeamList(teams);
+      setTeamDataTabReady(TabStates.Ready);
+    })
+
+
   }
 
   // This function retrieves communnity updates for a specified event from gatool Cloud.
@@ -306,6 +389,11 @@ function App() {
     setRanksTabReady(TabStates.NotReady);
     var result = await httpClient.get(`${selectedYear?.value}/rankings/${selectedEvent?.value.code}`);
     var ranks = await result.json();
+    if (typeof ranks.Rankings === "undefined") {
+      ranks.ranks = ranks.rankings;
+    } else {
+      ranks.ranks = ranks.Rankings;
+    }
 
     ranks.lastUpdate = moment();
     setRankings(ranks);
@@ -316,8 +404,11 @@ function App() {
   async function getAlliances() {
     var result = await httpClient.get(`${selectedYear?.value}/alliances/${selectedEvent?.value.code}`);
     var alliances = await result.json();
+    if (typeof alliances.Alliances !== "undefined") {
+      alliances.alliances = alliances.Alliances;
+    }
     var allianceLookup = {};
-    alliances.Alliances.forEach(alliance => {
+    alliances.alliances.forEach(alliance => {
       allianceLookup[`${alliance.captain}`] = { role: `Captain`, alliance: `Alliance ${alliance.number}` };
       allianceLookup[`${alliance.round1}`] = { role: `Round 1 Selection`, alliance: `Alliance ${alliance.number}` };
       allianceLookup[`${alliance.round2}`] = { role: `Round 2 Selection`, alliance: `Alliance ${alliance.number}` };
@@ -336,9 +427,13 @@ function App() {
       try {
         const val = await httpClient.get(`${selectedYear?.value}/events`);
         const json = await val.json();
+        if (typeof json.Events !== "undefined") {
+          json.events = json.Events;
+          delete json.Events;
+        }
         var timeNow = moment();
 
-        const events = json?.Events.map((e) => {
+        const events = json?.events.map((e) => {
           var color = "";
           var optionPrefix = "";
           var optionPostfix = "";
@@ -411,7 +506,7 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedEvent])
 
-  // Retrieve schedule, team list, community updates, andrankings when event selection changes
+  // Retrieve schedule, team list, community updates, and rankings when event selection changes
   useEffect(() => {
 
     if (httpClient && selectedEvent && selectedYear) {
@@ -419,6 +514,7 @@ function App() {
       setPlayoffSchedule(null);
       setTeamList(null);
       setRankings(null);
+      setCurrentMatch(1);
       getSchedule();
       getTeamList();
       getCommunityUpdates();
@@ -438,7 +534,7 @@ function App() {
           <Routes>
             <Route path="/" element={<LayoutsWithNavbar scheduleTabReady={scheduleTabReady} teamDataTabReady={teamDataTabReady} ranksTabReady={ranksTabReady} />}>
 
-              <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} teamList={teamList} eventFilters={eventFilters} setEventFilters={setEventFilters} timeFilter={timeFilter} setTimeFilter={setTimeFilter} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} rankings={rankings} timeFormat={timeFormat} setTimeFormat={setTimeFormat} showSponsors={showSponsors} setShowSponsors={setShowSponsors} showAwards={showAwards} setShowAwards={setShowAwards} showNotes={showNotes} setShowNotes={setShowNotes} showMottoes={showMottoes} setShowMottoes={setShowMottoes} showChampsStats={showChampsStats} setShowChampsStats={setShowChampsStats} swapScreen={swapScreen} setSwapScreen={setSwapScreen} autoAdvance={autoAdvance} setAutoAdvance={setAutoAdvance} getSchedule={getSchedule}/>} />
+              <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} teamList={teamList} eventFilters={eventFilters} setEventFilters={setEventFilters} timeFilter={timeFilter} setTimeFilter={setTimeFilter} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} rankings={rankings} timeFormat={timeFormat} setTimeFormat={setTimeFormat} showSponsors={showSponsors} setShowSponsors={setShowSponsors} showAwards={showAwards} setShowAwards={setShowAwards} showNotes={showNotes} setShowNotes={setShowNotes} showMottoes={showMottoes} setShowMottoes={setShowMottoes} showChampsStats={showChampsStats} setShowChampsStats={setShowChampsStats} swapScreen={swapScreen} setSwapScreen={setSwapScreen} autoAdvance={autoAdvance} setAutoAdvance={setAutoAdvance} getSchedule={getSchedule} />} />
 
               <Route path="/schedule" element={<SchedulePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} />} />
 
@@ -446,7 +542,7 @@ function App() {
 
               <Route path='/ranks' element={<RanksPage selectedEvent={selectedEvent} teamList={teamList} rankings={rankings} rankSort={rankSort} setRankSort={setRankSort} communityUpdates={communityUpdates} allianceCount={getAllianceCount()} />} />
 
-              <Route path='/announce' element={<AnnouncePage teamList={teamList} rankings={rankings} communityUpdates={communityUpdates} currentMatch={currentMatch} setCurrentMatch={setCurrentMatch}/>} />
+              <Route path='/announce' element={<AnnouncePage selectedEvent={selectedEvent} teamList={teamList} rankings={rankings} communityUpdates={communityUpdates} currentMatch={currentMatch} setCurrentMatch={setCurrentMatch} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} />} />
               <Route path='/playbyplay' element={<PlayByPlayPage />} />
               <Route path='/allianceselection' element={<AllianceSelectionPage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} alliances={alliances} />} />
               <Route path='/awards' element={<AwardsPage />} />

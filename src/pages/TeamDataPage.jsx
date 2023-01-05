@@ -1,31 +1,13 @@
 import { Alert, Container, Table } from "react-bootstrap";
-import find from "lodash/find";
 import { SortAlphaDown, SortAlphaUp, SortNumericDown, SortNumericUp } from 'react-bootstrap-icons';
-import { merge, orderBy } from "lodash";
+import { merge, orderBy, find } from "lodash";
+import { rankHighlight } from "../components/HelperFunctions";
 
 function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSort, setTeamSort, communityUpdates, allianceCount }) {
 
     function getTeamRank(teamNumber) {
-        var team = find(rankings?.Rankings, { "teamNumber": teamNumber });
+        var team = find(rankings?.ranks, { "teamNumber": teamNumber });
         return team?.rank;
-    }
-
-    function rankHighlight(rank) {
-        var style = { color: "black", backgroundColor: "white" };
-        if ((rank <= allianceCount) && (rank > 1)) {
-            style.color = "white";
-            style.backgroundColor = "green"
-        } else if ((rank < (allianceCount + 3)) && (rank > allianceCount)) {
-            style.color = "black";
-            style.backgroundColor = "yellow"
-        } else if (rank === 1) {
-            style.color = "white";
-            style.backgroundColor = "orange"
-        } else {
-            style.color = "";
-            style.backgroundColor = ""
-        }
-        return style;
     }
 
     function updateHighlight(update) {
@@ -86,7 +68,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
 
                             return <tr key={"teamData" + team?.teamNumber}>
                                 <td>{team?.teamNumber}</td>
-                                <td style={rankHighlight(team?.rank ? team?.rank : 100)}>{team?.rank}</td>
+                                <td style={rankHighlight(team?.rank ? team?.rank : 100,allianceCount)}>{team?.rank}</td>
                                 <td dangerouslySetInnerHTML={{ __html: teamNameWithAvatar }} style={updateHighlight(team?.nameShortLocal)}></td>
                                 <td style={updateHighlight(team?.cityStateLocal)}>{team?.cityStateLocal ? team?.cityStateLocal : cityState} </td>
                                 <td style={updateHighlight(team?.topSponsorsLocal)}>{team?.topSponsorsLocal ? team?.topSponsorsLocal : team?.topSponsors}</td>

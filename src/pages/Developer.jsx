@@ -22,7 +22,7 @@ function Developer() {
 
     return (
         <>
-            {user.email.endsWith("rthr.me") || user.email.endsWith("jameslockman.com") ? <>
+            {user.email.endsWith("rthr.me") || user.email.endsWith("adobe.com") ? <>
                 <Form.Control as="textarea" rows={3} value={token} />
                 <Button onClick={() => {
                     navigator.clipboard.writeText(token)

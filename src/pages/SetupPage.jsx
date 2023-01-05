@@ -139,6 +139,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                         {teamList?.teams.length > 0 && <p><b>Number of Competing teams: </b>{teamList?.teams.length}</p>}
                         {selectedEvent?.value.dateStart && <p><b>Event Start: </b>{moment(selectedEvent.value.dateStart, 'YYYY-MM-DDTHH:mm:ss').format('ddd, MMM Do YYYY')}</p>}
                         {selectedEvent?.value.dateEnd && <p><b>Event End: </b>{moment(selectedEvent.value.dateEnd, 'YYYY-MM-DDTHH:mm:ss').format('ddd, MMM Do YYYY')}</p>}
+                        <img style={{ width: 140, height: 140 }} src="/images/charged-up-gs-update.svg" alt="FIRST Energize Charged Up Logo" />
                     </Col>
                     <Col sm={4}>
                         {selectedEvent?.value.allianceCount === "SixAlliance" && <p><b>Playoff Type: </b>Round Robin</p>}
@@ -150,17 +151,34 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                         {rankings?.lastUpdate && <p><b>Rankings last updated: </b><br />{moment(rankings?.lastUpdate).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
                     </Col>
                     <Col sm={4}>
-                        <p><label><span className="switchLabel"><Switch checked={showSponsors} onChange={setShowSponsors} />  </span><span className="switchLabel"><b>Show Sponsors on Announce </b></span></label></p>
-                        <p><label><span className="switchLabel"><Switch checked={showAwards} onChange={setShowAwards} />  </span><span className="switchLabel"><b>Show Awards on Announce</b></span></label></p>
-                        <p><label><span className="switchLabel"><Switch checked={showNotes} onChange={setShowNotes} />  </span><span className="switchLabel"><b>Show Notes on Announce & Play-By-Play</b></span></label></p>
-                        <p><label><span className="switchLabel"><Switch checked={showMottoes} onChange={setShowMottoes} />  </span><span className="switchLabel"><b>Show Mottoes on Announce & Play-By-Play</b></span></label></p>
-                        <p><label><span className="switchLabel"><Switch checked={showChampsStats} onChange={setShowChampsStats} />  </span><span className="switchLabel"><b>Show Champs Statistics on Announce</b></span></label></p>
-                        <p><label><span className="switchLabel"><Switch checked={swapScreen} onChange={setSwapScreen} />  </span><span className="switchLabel"><b>Swap Play-By-Play Screen Orientation</b></span></label></p>
-                        <p><label><span className="switchLabel"><Switch checked={autoAdvance} onChange={setAutoAdvance} />  </span><span className="switchLabel"><b>Automatically advance to the next match when loading</b></span></label></p>
-                        <p><label><b>Set your time format</b><Select options={timeFormatMenu} value={timeFormat} onChange={setTimeFormat} /></label></p>
-                        <p><LogoutButton disabled={!isOnline}/></p>
+                        <Row>
+                            <Col width={"50px"}><Switch checked={showSponsors === null ? true : showSponsors} onChange={setShowSponsors} />
+                            </Col>
+                            <Col sm={10}><label><span className="switchLabel"><b>Show Sponsors on Announce </b></span></label>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col sm={2}><Switch checked={showAwards === null ? true : showAwards} onChange={setShowAwards} />
+                            </Col>
+                            <Col sm={10}><label><span className="switchLabel"><b>Show Awards on Announce</b></span></label>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col sm={2}><Switch checked={showNotes === null ? true : showNotes} onChange={setShowNotes} />
+                            </Col>
+                            <Col sm={10}><label><span className="switchLabel"><b>Show Notes on Announce & Play-By-Play</b></span></label>
+                            </Col>
+                        </Row>
+                        <Switch checked={showMottoes === null ? true : showMottoes} onChange={setShowMottoes} /><label><span className="switchLabel">  <b>Show Mottoes on Announce & Play-By-Play</b></span></label><br />
+                        <Switch checked={showChampsStats === null ? false : showChampsStats} onChange={setShowChampsStats} /><label><span className="switchLabel">  <b>Show Champs Statistics on Announce</b></span></label><br />
+                        <Switch checked={swapScreen === null ? false : swapScreen} onChange={setSwapScreen} /><label><span className="switchLabel">  <b>Swap Play-By-Play Screen Orientation</b></span></label><br />
+                        <Switch checked={autoAdvance === null ? false : autoAdvance} onChange={setAutoAdvance} /><label><span className="switchLabel">  <b>Automatically advance to the next match when loading</b></span></label><br />
+
+                        <Row><label><b>Set your time format</b><Select options={timeFormatMenu} value={timeFormat} onChange={setTimeFormat} /></label></Row>
+                        <Row><LogoutButton disabled={!isOnline}/></Row>
                     </Col>
                 </Row>
+
             </div>}
 
         </Container>

@@ -30,7 +30,7 @@ function RanksPage({ selectedEvent, teamList, rankings, rankSort, setRankSort, a
         return style;
     }
 
-    var rankingsList = rankings?.Rankings?.map((teamRow) => {
+    var rankingsList = rankings?.ranks?.map((teamRow) => {
         teamRow.teamName = getTeamName(teamRow.teamNumber);
         return teamRow;
     });
@@ -74,7 +74,7 @@ function RanksPage({ selectedEvent, teamList, rankings, rankSort, setRankSort, a
                         </tr>
                     </thead>
                     <tbody>
-                        {rankings && rankings.Rankings && rankingsList.map((rankRow) => {
+                        {rankings && rankings.ranks && rankingsList.map((rankRow) => {
                             return <tr key={"rankings" + rankRow.teamNumber}>
                                 <td>{rankRow.teamNumber}</td>
                                 <td style={rankHighlight(rankRow.rank)}>{rankRow.rank}</td>

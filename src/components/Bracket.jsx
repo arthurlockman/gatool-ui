@@ -11,7 +11,7 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 	const semibold = "600";
 	//const normal = "400";
 
-	var matches = playoffSchedule.Schedule;
+	var matches = playoffSchedule.schedule;
 
 	//returns the three members of an alliance based on the match data.
 	function allianceNumbers(matchNumber, allianceColor) {
@@ -22,12 +22,12 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 		if (matches[matchNumber]?.teams[0]?.teamNumber) {
 			allianceName = alliances?.Lookup[`${matches[matchNumber]?.teams[0]?.teamNumber}`]?.alliance;
 			allianceNumber = Number(allianceName?.substring(allianceName.length - 1)) - 1;
-			allianceMembers = compact([alliances.Alliances[allianceNumber]?.captain, alliances.Alliances[allianceNumber]?.round1, alliances.Alliances[allianceNumber]?.round2, alliances.Alliances[allianceNumber]?.round3, alliances.Alliances[allianceNumber]?.backup]);
+			allianceMembers = compact([alliances?.alliances[allianceNumber]?.captain, alliances?.alliances[allianceNumber]?.round1, alliances?.alliances[allianceNumber]?.round2, alliances?.alliances[allianceNumber]?.round3, alliances?.alliances[allianceNumber]?.backup]);
 			alliance = allianceMembers.join("  ");
 			if (allianceColor === "blue") {
 				allianceName = alliances?.Lookup[`${matches[matchNumber]?.teams[3]?.teamNumber}`]?.alliance;
 				allianceNumber = Number(allianceName?.substring(allianceName.length - 1)) - 1;
-				allianceMembers = compact([alliances.Alliances[allianceNumber]?.captain, alliances.Alliances[allianceNumber]?.round1, alliances.Alliances[allianceNumber]?.round2, alliances.Alliances[allianceNumber]?.round3, alliances.Alliances[allianceNumber]?.backup]);
+				allianceMembers = compact([alliances?.alliances[allianceNumber]?.captain, alliances?.alliances[allianceNumber]?.round1, alliances?.alliances[allianceNumber]?.round2, alliances?.alliances[allianceNumber]?.round3, alliances?.alliances[allianceNumber]?.backup]);
 				alliance = allianceMembers.join("  ");
 			}
 		}
