@@ -93,7 +93,7 @@ var apiURLV3 = "https://api.gatool.org/v3/";
 
 //Now that we have the variables all set up and all of the necessary JS and CSS are loaded, we can run the app.
 var webAuth = new auth0.WebAuth({
-    domain: 'gatool.auth0.com',
+    domain: 'auth.gatool.org',
     clientID: 'afsE1dlAGS609U32NjmvNMaYSQmtO3NT',
     responseType: 'token id_token',
     audience: 'https://gatool.auth0.com/userinfo',
