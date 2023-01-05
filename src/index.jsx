@@ -17,7 +17,7 @@ root.render(
   <React.StrictMode>
     <OnlineStatusProvider>
       <Auth0Provider
-        domain="gatool.auth0.com"
+        domain="auth.gatool.org"
         clientId="afsE1dlAGS609U32NjmvNMaYSQmtO3NT"
         redirectUri={window.location.origin}
       >
