@@ -25,7 +25,7 @@ import { usePersistentState } from './hooks/UsePersistentState';
 import _ from 'lodash';
 import moment from 'moment';
 import Developer from './pages/Developer';
-import { originalAndSustaining, eventNames, specialAwards, champs, allianceShortNames, hallOfFame } from './components/Constants';
+import { eventNames, specialAwards, hallOfFame } from './components/Constants';
 import { useOnlineStatus } from './contextProviders/OnlineContext';
 export const TabStates = {
   NotReady: 'notready',
@@ -314,7 +314,8 @@ function App() {
       var formattedAwards = values.map(team => {
         // Add in special awards not reported by FIRST APIs (from 2021 season)
         for (var index = 0; index < 3; index++) {
-          let items = specialAwards.filter(item => item.Year === (parseInt(selectedYear?.value) - index));
+          const targetYear = (parseInt(selectedYear?.value) - index)
+          let items = specialAwards.filter(item => item.Year === targetYear);
           if (items.length > 0) {
             let teamAwards = items[0].awards.filter(item => item.teamNumber === team.teamNumber);
             if (teamAwards.length > 0) {
