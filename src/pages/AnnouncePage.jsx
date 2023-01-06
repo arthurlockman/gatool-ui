@@ -43,7 +43,7 @@ function AnnouncePage({ selectedEvent, teamList, rankings, communityUpdates, cur
             setCurrentMatch(currentMatch - 1);
         }
     }
-    
+
 
     return (
         <Container fluid >
@@ -59,10 +59,7 @@ function AnnouncePage({ selectedEvent, teamList, rankings, communityUpdates, cur
                     <Col><h4>{matchDetails.description}</h4></Col>
                     <Col><Button onClick={nextMatch}>Next Match</Button></Col>
                 </Row>
-                {displayOrder.forEach((station)=>{
-                    <Announce station={station} team={teamDetails[station]} inPlayoffs={inPlayoffs}/>
-                })}
-                
+                {displayOrder.map((station)=> <Announce station={station} team={teamDetails[station]} inPlayoffs={inPlayoffs}/>)}
             </Container>
             }
 
