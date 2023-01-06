@@ -32,15 +32,15 @@ function Announce({ station, team, inPlayoffs }) {
                 <p className={"sponsors"} id="red1Sponsors">{team?.updates?.topSponsorsLocal ? team?.updates?.topSponsorsLocal : team?.topSponsors}</p>
                 <p className={`HOF${allianceColor}`}>
                     {team?.hallOfFame.map((award)=>{
-                        return <span className={`HOF${allianceColor}`}>{award.year} {award.type==="chairmans" ? "Chairman's Award" : "Winner"} {award.challenge}<br /></span>
+                        return <span key={award.year+award.type+award.challenge} className={`HOF${allianceColor}`}>{award.year} {award.type==="chairmans" ? "Chairman's Award" : "Winner"} {award.challenge}<br /></span>
                     })}
                     </p>
                 <p id="red1Awards" className={"awards"}>
                         {awards.map((award) => {
                             return <span key={award.year+award.eventName+award.name+award.person+team.teamNumber} className={award.highlight ? "awardHilight" : ""}>{award.year} {award.eventName} : {award.name}{award.person ? ` : ${award.person}` : ""}<br /></span>
                         })}
-                    
-                    
+
+
                 </p>
                 <p id="red1Notes" className={"notes"}></p>
             </Col>

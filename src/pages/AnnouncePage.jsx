@@ -59,7 +59,7 @@ function AnnouncePage({ selectedEvent, teamList, rankings, communityUpdates, cur
                     <Col><h4>{matchDetails.description}</h4></Col>
                     <Col><Button onClick={nextMatch}>Next Match</Button></Col>
                 </Row>
-                {displayOrder.map((station)=> <Announce station={station} team={teamDetails[station]} inPlayoffs={inPlayoffs}/>)}
+                {displayOrder.map((station)=> <Announce station={station} team={teamDetails[station]} inPlayoffs={inPlayoffs} key={station} />)}
             </Container>
             }
 
