@@ -47,15 +47,15 @@ function RanksPage({ selectedEvent, teamList, rankings, rankSort, setRankSort, a
             {!selectedEvent && !teamList && <div>
                 <Alert variant="warning" >You need to select an event before you can see anything here.</Alert>
             </div>}
-            {selectedEvent && !teamList && <div>
+            {selectedEvent && teamList?.teams.length===0 && <div>
                 <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..."/></div><div>Awaiting team data for {selectedEvent.label}</div></Alert>
             </div>}
-            {selectedEvent && teamList && !rankings && <div>
-                <Alert variant="warning" >Your event is not reporting rankings yet.</Alert>
+            {selectedEvent && teamList?.teams.length>0 && rankings?.ranks.length===0 && <div>
+                <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..."/></div><div>Your event is not reporting rankings yet.</div></Alert>
             </div>
             }
-            {selectedEvent && teamList && rankings && <div>
-                <h4>{selectedEvent.label}</h4>
+            {selectedEvent && teamList?.teams.length>0 && rankings?.ranks.length>0  && <div>
+                <h4>{selectedEvent?.label}</h4>
                 <p>This table lists the teams in rank order for this competition. This table updates during the competition, and freezes once Playoff Matches begin.</p>
                 <Table responsive striped bordered size="sm">
                 

@@ -92,7 +92,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
     return (
         <Container fluid>
             {!isOnline && <Row>
-                <Alert variant="danger"><b>You're offline. Only cached data is available. Some options may be unavailable. <br/>Reconnect to the internet to choose a different event.</b></Alert>
+                <Alert variant="danger"><b>You're offline. Only cached data is available. Some options may be unavailable. <br />Reconnect to the internet to choose a different event.</b></Alert>
             </Row>}
             <Row className="setupPageMenus">
                 <Col sm={4}><b>Choose a year...</b><br /><Select options={supportedYears} value={selectedYear ? selectedYear : supportedYears[0]} onChange={setSelectedYear} isDisabled={!isOnline} />
@@ -121,7 +121,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
             </div>}
             {selectedEvent && <div>
                 <Row><Button size="large" onClick={getSchedule} variant="outline-success" disabled={!isOnline}><b><ArrowClockwise /> Tap to refresh Schedule.</b> <br />Use after Alliance Selection to load Playoffs.</Button></Row>
-                <br/>
+                <br />
                 <h4>{selectedEvent.label}</h4>
                 <Row className="leftTable">
                     <Col sm={4}>
@@ -175,7 +175,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                         <Switch checked={autoAdvance === null ? false : autoAdvance} onChange={setAutoAdvance} /><label><span className="switchLabel">  <b>Automatically advance to the next match when loading</b></span></label><br />
 
                         <Row><label><b>Set your time format</b><Select options={timeFormatMenu} value={timeFormat} onChange={setTimeFormat} /></label></Row>
-                        <Row><LogoutButton disabled={!isOnline}/></Row>
+                        <Row><LogoutButton disabled={!isOnline} /></Row>
                     </Col>
                 </Row>
 

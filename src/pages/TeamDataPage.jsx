@@ -39,11 +39,11 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
             {!selectedEvent && !teamList && <div>
                 <Alert variant="warning" >You need to select an event before you can see anything here.</Alert>
             </div>}
-            {selectedEvent && !teamList && <div>
-                <Alert variant="warning" >Loading team data for {selectedEvent.label}</Alert>
+            {selectedEvent && teamList?.teams.length===0 && <div>
+                <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..."/></div><div>Awaiting team data for {selectedEvent.label}</div></Alert>
             </div>}
-            {selectedEvent && teamList && <div>
-                <h4>{selectedEvent.label}</h4>
+            {selectedEvent && teamList?.teams.length>0 && <div>
+                <h4>{selectedEvent?.label}</h4>
                 <p>This table is editable and sortable. Tap on a team number to change data for a specific team. Edits you make are local to this browser, and they will persist here if you do not clear your browser cache. You can save your changes to the gatool Cloud on the team details page or on the Setup Screen. Cells highlighted in green have been modified, either by you or by other gatool users.</p>
                 <Table responsive striped bordered size="sm">
                     <thead className="thead-default">

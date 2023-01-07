@@ -18,7 +18,7 @@ function Announce({ station, team, inPlayoffs }) {
                 <span className={"announceTeamNumber"} ><b>{team.teamNumber}</b></span><br />
                 {team?.updates?.sayNumber && <span >{team.updates.sayNumber}<br /></span>}
                 <span >{team?.rookieYear}</span>
-                <p id="red1Alliance" className={"announceAlliance"}>Playoff Alliance Name</p>
+                {inPlayoffs && <p id="red1Alliance" className={"announceAlliance"}>{team.alliance}<br />{team.allianceRole}</p>}
             </Col>
             <Col xs={2}>
                 <span className={"teamName"}>{team?.updates?.nameShortLocal ? team?.updates?.nameShortLocal : team?.nameShort}</span><br />
