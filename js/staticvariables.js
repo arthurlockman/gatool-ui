@@ -62,7 +62,10 @@ var oneDayEvent = false;
 tablist.tabs=["setupTabPicker","scheduleTabPicker","teamDataTabPicker","teamRanksPicker","announceTabPicker","playByPlayTabPicker","allianceSelectionTabPicker","awardsTabPicker","statsTabPicker","cheatsheetTabPicker","davidPriceTabPicker"];
 tablist.clicks=["setup","schedule","teamdata","teamRanks","announce","playbyplay","allianceselection","awards","stats","cheatsheet","davidPrice"];
 tablist.index=0;
+
+// Update after rules release
 var playoffTiebreakers = {};
+playoffTiebreakers["2023"] = ["foulPoints", "chargeStationPoints", "autoPoints"]; 
 playoffTiebreakers["2022"] = ["foulPoints","endgamePoints","autoCargoTotal+autoTaxiPoints"];
 playoffTiebreakers["2021"] = ["foulPoints","autoPoints","endgamePoints","controlPanelPoints+teleopCellPoints"];
 playoffTiebreakers["2020"] = ["foulPoints","autoPoints","endgamePoints","controlPanelPoints+teleopCellPoints"];
