@@ -25,8 +25,9 @@ import { usePersistentState } from './hooks/UsePersistentState';
 import _ from 'lodash';
 import moment from 'moment';
 import Developer from './pages/Developer';
-import { eventNames, specialAwards, hallOfFame } from './components/Constants';
+import { eventNames, specialAwards, hallOfFame, champs, champDivisions, champSubdivisions, miChamps, miDivisions } from './components/Constants';
 import { useOnlineStatus } from './contextProviders/OnlineContext';
+
 export const TabStates = {
   NotReady: 'notready',
   Stale: 'stale',
@@ -34,8 +35,14 @@ export const TabStates = {
 };
 
 // Tiebreakers
+// Order Sort
+// Criteria 2023 need to revisit once we see the data
+// 1st Cumulative TECH FOUL points due to opponent rule violations
+// 2nd ALLIANCE CHARGE STATION points 
+// 3rd ALLIANCE AUTO points
+// 4th MATCH is replayed
 const playoffTiebreakers = {
-  "2033": ["foulPoints"], // Update after rules release
+  "2033": ["foulPoints", "chargeStationPoints", "autoPoints"], // Update after rules release
   "2022": ["foulPoints", "endgamePoints", "autoCargoTotal+autoTaxiPoints"],
   "2021": ["foulPoints", "autoPoints", "endgamePoints", "controlPanelPoints+teleopCellPoints"],
   "2020": ["foulPoints", "autoPoints", "endgamePoints", "controlPanelPoints+teleopCellPoints"],
@@ -55,6 +62,11 @@ function LayoutsWithNavbar({ scheduleTabReady, teamDataTabReady, ranksTabReady }
     </>
   );
 }
+const champsEvents = _.clone(champs);
+const divisions = _.clone(champDivisions);
+const subdivisions = _.clone(champSubdivisions);
+const michamps = _.clone(miChamps);
+const midivisions = _.clone(miDivisions);
 
 function App() {
   const { isAuthenticated, isLoading } = useAuth0();
@@ -81,6 +93,7 @@ function App() {
   const [swapScreen, setSwapScreen] = usePersistentState("cache:swapScreen", null);
   const [autoAdvance, setAutoAdvance] = usePersistentState("cache:autoAdvance", null);
   const [currentMatch, setCurrentMatch] = usePersistentState("cache:currentMatch", null);
+  const [awardsMenu, setAwardsMenu] = usePersistentState("cache:awardsMenu", null);
 
   // Tab state trackers
   const [scheduleTabReady, setScheduleTabReady] = useState(TabStates.NotReady)
@@ -298,7 +311,6 @@ function App() {
     teams.teams = teamListSponsorsFixed;
 
     //fetch awards for the current teams
-
     var newTeams = teams.teams.map(async team => {
       var request = await httpClient.get(`${selectedYear?.value}/team/${team?.teamNumber}/awards`);
       var awards = await request.json();
@@ -326,6 +338,7 @@ function App() {
         var awardYears = Object.keys(team?.awards);
         var eventnames = _.clone(eventNames);
         var halloffame = _.clone(hallOfFame);
+
         events.forEach(event => {
           eventNames[selectedYear.value][event.value.code] = event.value.name;
         });
@@ -369,7 +382,105 @@ function App() {
       teams.lastUpdate = moment();
       setTeamList(teams);
       setTeamDataTabReady(TabStates.Ready);
+      var champsTeams = [];
+      if (selectedEvent?.value?.champLevel !== "") {
+        setTeamDataTabReady(TabStates.NotReady);
+        champsTeams = teams.teams.map(async team => {
+          var champsRequest = await httpClient.get(`/team/${team?.teamNumber}/appearances`);
+          var appearances = await champsRequest.json();
+          var result = {};
+          result.teamNumber = team?.teamNumber;
+          result.champsAppearances = 0;
+          result.champsAppearancesYears = [];
+          result.einsteinAppearances = 0;
+          result.einsteinAppearancesYears = [];
+
+          result.districtChampsAppearances = 0;
+          result.districtChampsAppearancesYears = [];
+          result.districtEinsteinAppearances = 0;
+          result.districtEinsteinAppearancesYears = [];
+          result.FOCAppearances = 0;
+          result.FOCAppearancesYears = [];
+
+          appearances.forEach((appearance) => {
+            //check for district code
+            //DISTRICT_CMP = 2
+            //DISTRICT_CMP_DIVISION = 5
+            // Ontario (>=2019), Michigan (>=2017), Texas (>=2022), New England (>=2022),
+            // Indiana (>=2022) check for Einstein appearances
+            //appearances.district.abbreviation = "ont"
+            //appearances.district.abbreviation = "fim"
+            // >=2017 check for Division appearance then Champs appearances
+            //test for champs prior to 2001
+            if (appearance.district !== null) {
+              if (((appearance.year >= 2019) && (appearance.district.abbreviation === "ont")) ||
+                ((appearance.year >= 2017) && (appearance.district.abbreviation === "fim")) ||
+                ((appearance.year >= 2022) && (appearance.district.abbreviation === "ne")) ||
+                ((appearance.year >= 2022) && (appearance.district.abbreviation === "in")) ||
+                ((appearance.year >= 2022) && (appearance.district.abbreviation === "tx"))) {
+                if (appearance.event_type === 5) {
+                  result.districtChampsAppearances += 1;
+                  result.districtChampsAppearancesYears.push(appearance.year);
+                }
+                if (appearance.event_type === 2) {
+                  result.districtEinsteinAppearances += 1;
+                  result.districtEinsteinAppearancesYears.push(appearance.year);
+                }
+              } else {
+                if (appearance.event_type === 2) {
+                  result.districtChampsAppearances += 1;
+                  result.districtChampsAppearancesYears.push(appearance.year);
+                }
+
+              }
+            }
+
+
+            //check for champs Division code
+            //CMP_DIVISION = 3
+            //CMP_FINALS = 4
+            //FOC = 6
+            // >=2001 check for Division appearance then Champs appearances
+            if (appearance.event_type === 6) {
+              result.FOCAppearances += 1;
+              result.FOCAppearancesYears.push(appearance.year);
+            }
+            //test for champs prior to 2001
+            if (appearance.year < 2001) {
+              if (appearance.event_type === 4) {
+                result.champsAppearances += 1;
+                result.champsAppearancesYears.push(appearance.year);
+              }
+            } else {
+              if (appearance.event_type === 3) {
+                result.champsAppearances += 1;
+                result.champsAppearancesYears.push(appearance.year);
+              }
+              // TO FIX: mapping out this year's Einstein appearances.
+              // if (appearance.event_type === 4 && appearance.year < Number(localStorage.currentYear) && inSubdivision()) {
+              if (appearance.event_type === 4) {
+                result.einsteinAppearances += 1;
+                result.einsteinAppearancesYears.push(appearance.year);
+              }
+
+            }
+          })
+
+          team.champsAppearances = result;
+          return team;
+        });
+
+        Promise.all(champsTeams).then(function (values) {
+          teams.lastUpdate = moment();
+          teams.teams = values;
+          setTeamList(teams);
+          setTeamDataTabReady(TabStates.Ready);
+        })
+      }
+
     })
+
+
 
 
   }
@@ -422,6 +533,7 @@ function App() {
     setAlliances(alliances);
   }
 
+
   // Retrieve event list when year selection changes
   useEffect(() => {
     async function getEvents() {
@@ -468,6 +580,12 @@ function App() {
             filters.push("past")
           }
           filters.push("week" + e.weekNumber);
+          e.champLevel = "";
+          if (champsEvents.indexOf(e?.code) >= 0) { e.champLevel = "CHAMPS" } else
+            if (divisions.indexOf(e?.code) >= 0) { e.champLevel = "CMPDIV" } else
+              if (subdivisions.indexOf(e?.code) >= 0) { e.champLevel = "CMPSUB" } else
+                if (michamps.indexOf(e?.code) >= 0) { e.champLevel = "DISTCHAMPS" } else
+                  if (midivisions.indexOf(e?.code) >= 0) { e.champLevel = "DISTDIV" }
 
           return {
             value: e,
@@ -535,7 +653,7 @@ function App() {
           <Routes>
             <Route path="/" element={<LayoutsWithNavbar scheduleTabReady={scheduleTabReady} teamDataTabReady={teamDataTabReady} ranksTabReady={ranksTabReady} />}>
 
-              <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} teamList={teamList} eventFilters={eventFilters} setEventFilters={setEventFilters} timeFilter={timeFilter} setTimeFilter={setTimeFilter} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} rankings={rankings} timeFormat={timeFormat} setTimeFormat={setTimeFormat} showSponsors={showSponsors} setShowSponsors={setShowSponsors} showAwards={showAwards} setShowAwards={setShowAwards} showNotes={showNotes} setShowNotes={setShowNotes} showMottoes={showMottoes} setShowMottoes={setShowMottoes} showChampsStats={showChampsStats} setShowChampsStats={setShowChampsStats} swapScreen={swapScreen} setSwapScreen={setSwapScreen} autoAdvance={autoAdvance} setAutoAdvance={setAutoAdvance} getSchedule={getSchedule} />} />
+              <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} teamList={teamList} eventFilters={eventFilters} setEventFilters={setEventFilters} timeFilter={timeFilter} setTimeFilter={setTimeFilter} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} rankings={rankings} timeFormat={timeFormat} setTimeFormat={setTimeFormat} showSponsors={showSponsors} setShowSponsors={setShowSponsors} showAwards={showAwards} setShowAwards={setShowAwards} showNotes={showNotes} setShowNotes={setShowNotes} showMottoes={showMottoes} setShowMottoes={setShowMottoes} showChampsStats={showChampsStats} setShowChampsStats={setShowChampsStats} swapScreen={swapScreen} setSwapScreen={setSwapScreen} autoAdvance={autoAdvance} setAutoAdvance={setAutoAdvance} getSchedule={getSchedule} awardsMenu={awardsMenu} setAwardsMenu={setAwardsMenu} />} />
 
               <Route path="/schedule" element={<SchedulePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} />} />
 
@@ -543,9 +661,9 @@ function App() {
 
               <Route path='/ranks' element={<RanksPage selectedEvent={selectedEvent} teamList={teamList} rankings={rankings} rankSort={rankSort} setRankSort={setRankSort} communityUpdates={communityUpdates} allianceCount={getAllianceCount()} />} />
 
-              <Route path='/announce' element={<AnnouncePage selectedEvent={selectedEvent} teamList={teamList} rankings={rankings} communityUpdates={communityUpdates} currentMatch={currentMatch} setCurrentMatch={setCurrentMatch} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} alliances={alliances} getSchedule={getSchedule} getRanks={getRanks} />} />
+              <Route path='/announce' element={<AnnouncePage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} communityUpdates={communityUpdates} currentMatch={currentMatch} setCurrentMatch={setCurrentMatch} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} alliances={alliances} getSchedule={getSchedule} getRanks={getRanks} awardsMenu={awardsMenu} />} />
 
-              <Route path='/playbyplay' element={<PlayByPlayPage />} />
+              <Route path='/playbyplay' element={<PlayByPlayPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} communityUpdates={communityUpdates} currentMatch={currentMatch} setCurrentMatch={setCurrentMatch} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} alliances={alliances} getSchedule={getSchedule} getRanks={getRanks} awardsMenu={awardsMenu} />} />
 
               <Route path='/allianceselection' element={<AllianceSelectionPage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} alliances={alliances} />} />
               <Route path='/awards' element={<AwardsPage />} />

@@ -23,7 +23,7 @@ function Developer() {
     return (
         <>
             {user.email.endsWith("rthr.me") || user.email.endsWith("adobe.com") ? <>
-                <Form.Control as="textarea" rows={3} value={token} />
+                <Form.Control as="textarea" rows={3} value={token ? token : ""} readOnly />
                 <Button onClick={() => {
                     navigator.clipboard.writeText(token)
                 }} >Copy to Clipboard</Button>

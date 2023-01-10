@@ -1,7 +1,10 @@
+import {Container} from  "react-bootstrap";
 
 function CheatsheetPage() {
     return (
-        <div>This is the CheatsheetPage page</div>
+        <Container fluid>
+        <a href="/cheatsheet/charged-up-cheat-sheet.pdf" download><img src="cheatsheet/charged-up-cheat-sheet.svg" width="100%" alt="Cheatsheet"></img></a>
+        </Container>
     )
 }
 

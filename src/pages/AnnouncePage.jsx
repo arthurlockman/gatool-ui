@@ -4,11 +4,10 @@ import { Alert, Container, Row, Col, Button } from "react-bootstrap";
 import React from "react";
 import _ from "lodash";
 import { rankHighlight } from "../components/HelperFunctions";
-import { getSelectionRange } from "@testing-library/user-event/dist/utils";
 
 const paleGreen = "rgba(144, 238, 144, 0.5)"
 
-function AnnouncePage({ selectedEvent, teamList, rankings, communityUpdates, currentMatch, setCurrentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, getSchedule, getRanks }) {
+function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, setCurrentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, getSchedule, getRanks, awardsMenu }) {
     function updateTeamDetails(station, matchDetails) {
         var team = matchDetails?.teams[_.findIndex(matchDetails?.teams, { "station": station })];
         team = _.merge(team,
@@ -88,10 +87,15 @@ function AnnouncePage({ selectedEvent, teamList, rankings, communityUpdates, cur
                             };
                         },
                     }} /></Col>
-                    <Col><h4>{matchDetails?.description}</h4></Col>
                     <Col><Button onClick={nextMatch}>Next Match</Button></Col>
                 </Row>
-                {displayOrder.map((station) => <Announce station={station} team={teamDetails[station]} inPlayoffs={inPlayoffs} key={station} />)}
+                <table><tbody>
+                    {displayOrder.map((station) => <Announce station={station} team={teamDetails[station]} inPlayoffs={inPlayoffs} key={station} awardsMenu={awardsMenu} selectedYear={selectedYear} selectedEvent={selectedEvent}/>)}
+                </tbody></table>
+                <Row><Col><Button onClick={previousMatch}>Previous Match</Button></Col>
+                    <Col><h4>{matchDetails?.description}</h4></Col>
+                    <Col><Button onClick={nextMatch}>Next Match</Button></Col></Row>
+                <Row> <br /><br /></Row>
             </Container>
             }
 

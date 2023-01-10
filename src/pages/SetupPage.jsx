@@ -44,7 +44,13 @@ const timeFormatMenu = [
     { label: "24hr", value: "HH:mm:ss" },
 ]
 
-function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, getSchedule }) {
+const awardsMenuOptions = [
+    { label: "3 (current and two prior seasons)", value: "3" },
+    { label: "2 (current and prior season)", value: "2" },
+    { label: "1 (current season only", value: "1" },
+]
+
+function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, getSchedule, awardsMenu, setAwardsMenu }) {
     const isOnline = useOnlineStatus()
 
     function filterEvents(events) {
@@ -173,7 +179,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                         <Switch checked={showChampsStats === null ? false : showChampsStats} onChange={setShowChampsStats} /><label><span className="switchLabel">  <b>Show Champs Statistics on Announce</b></span></label><br />
                         <Switch checked={swapScreen === null ? false : swapScreen} onChange={setSwapScreen} /><label><span className="switchLabel">  <b>Swap Play-By-Play Screen Orientation</b></span></label><br />
                         <Switch checked={autoAdvance === null ? false : autoAdvance} onChange={setAutoAdvance} /><label><span className="switchLabel">  <b>Automatically advance to the next match when loading</b></span></label><br />
-
+                        <Row><label><b>For how many years should we display awards on the Announce Screen?</b><Select options={awardsMenuOptions} value={awardsMenu} onChange={setAwardsMenu} /></label></Row>
                         <Row><label><b>Set your time format</b><Select options={timeFormatMenu} value={timeFormat} onChange={setTimeFormat} /></label></Row>
                         <Row><LogoutButton disabled={!isOnline} /></Row>
                     </Col>
