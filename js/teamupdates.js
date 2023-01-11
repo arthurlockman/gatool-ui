@@ -8,6 +8,7 @@ function getTeamUpdates(teamNumber, singleton) {
     req.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("token"));
     req.addEventListener('load', function () {
         if (req.status !== 204) {
+            if (req.status !== 404){
             var teamUpdates = JSON.parse(req.responseText);
             var teamData = decompressLocalStorage("teamData" + teamNumber);
             teamData.nameShortLocal = teamUpdates.nameShortLocal;
@@ -25,7 +26,26 @@ function getTeamUpdates(teamNumber, singleton) {
             teamData.sayNumber = teamUpdates.sayNumber || "";
             teamData.lastUpdate = (teamUpdates.lastUpdate || "No recent update");
             //teamData.source = teamUpdates.source;
+            compressLocalStorage("teamData" + teamNumber, teamData);}
+            if (req.status === 404) {
+                var teamData = decompressLocalStorage("teamData" + teamNumber);
+            teamData.nameShortLocal = "";
+            teamData.cityStateLocal = "";
+            teamData.topSponsorsLocal = "";
+            teamData.sponsorsLocal = "";
+            teamData.organizationLocal = "";
+            teamData.robotNameLocal = "";
+            teamData.awardsLocal = "";
+            teamData.teamMottoLocal = "";
+            teamData.teamNotesLocal = "";
+            teamData.teamYearsNoCompeteLocal = "";
+            teamData.showRobotName = "";
+            teamData.teamNotes = "";
+            teamData.sayNumber = "";
+            teamData.lastUpdate = "No recent update";
+            //teamData.source = teamUpdates.source;
             compressLocalStorage("teamData" + teamNumber, teamData);
+            }
         }
         teamUpdateCalls--;
         if ((teamAwardCalls === 0) && (teamUpdateCalls === 0) && (lastSchedulePage)) {
