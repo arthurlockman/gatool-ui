@@ -20,13 +20,13 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
 
     return (
         <><tr key={station} className={`gatool-announce ${_.toLower(allianceColor)}Alliance`} >
-            <td xs={1} >
+            <td className={'col1'} >
                 <span className={"announceTeamNumber"} ><b>{team.teamNumber}</b></span><br />
                 {team?.updates?.sayNumber && <span >{team.updates?.sayNumber}<br /></span>}
                 <span >{team?.rookieYear} ({years}{yearsDisplay} season)</span>
                 {inPlayoffs && <p className={"announceAlliance"}>{team.alliance}<br />{team.allianceRole}</p>}
             </td>
-            <td xs={2}>
+            <td className={'col2'}>
                 <span className={"teamName"}>{team?.updates?.nameShortLocal ? team?.updates?.nameShortLocal : team?.nameShort}</span><br />
                 <span>{team?.updates?.cityStateLocal ? team?.updates?.CityStateLocal : team?.city + ", " + team?.stateProv}</span><br />
                 {team?.updates?.robotNameLocal && <span className={"robotName"}>{team?.updates?.robotNameLocal}<br /></span>}
@@ -53,7 +53,7 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
                         <br /></span>}
                 </span>}
             </td>
-            <td xs={7}>
+            <td className={'col7'}>
                 <p className={"announceOrganization"}>{team?.updates?.organizationLocal ? team?.updates?.organizationLocal : team?.schoolName}</p>
                 <p className={"sponsors"} >{team?.updates?.topSponsorsLocal ? team?.updates?.topSponsorsLocal : team?.topSponsors}</p>
                 <p className={`HOF${allianceColor}`}>
@@ -75,7 +75,7 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
                 </p>}
                 <p className={"notes"} dangerouslySetInnerHTML={{ __html: team?.updates?.teamNotes }} />
             </td>
-            <td xs={1} className={"ranking"} style={team?.rankStyle}>
+            <td className={"col1 ranking"} style={team?.rankStyle}>
                 {team?.rank ? team?.rank : ""}
             </td>
         </tr>

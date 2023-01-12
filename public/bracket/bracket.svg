@@ -97,8 +97,8 @@
 		<line fill="none" stroke="#FFFFFF" stroke-miterlimit="10" x1="802.7" y1="574.75" x2="644" y2="574.75"/>
 		<rect x="644" y="538.54" width="22.43" height="72.46"/>
 		<text transform="matrix(0 -1.0059 1 0 659.7773 602.333)" fill="#FFFFFF" font-family="'MyriadPro-Bold'" font-size="12.076px">MATCH 12</text>
-		<text transform="matrix(0.9941 0 0 1 685.248 553.1807)"><tspan x="0" y="0" fill="#FFFFFF" font-family="'MyriadPro-Bold'" font-size="12.1471px">Winner of M10</tspan><tspan x="-13.42" y="14.58" fill="#FFFFFF" font-family="'MyriadPro-Bold'" font-size="12.1471px">22222 22222 22222</tspan></text>
-		<text transform="matrix(0.9941 0 0 1 688.5996 589.6221)"><tspan x="0" y="0" fill="#FFFFFF" font-family="'MyriadPro-Bold'" font-size="12.1471px">Winner of M9</tspan><tspan x="-16.79" y="14.58" fill="#FFFFFF" font-family="'MyriadPro-Bold'" font-size="12.1471px">22222 22222 22222</tspan></text>
+		<text transform="matrix(0.9941 0 0 1 685.248 553.1807)"><tspan x="0" y="0" fill="#FFFFFF" font-family="'MyriadPro-Bold'" font-size="12.1471px">Winner of M9</tspan><tspan x="-13.42" y="14.58" fill="#FFFFFF" font-family="'MyriadPro-Bold'" font-size="12.1471px">22222 22222 22222</tspan></text>
+		<text transform="matrix(0.9941 0 0 1 688.5996 589.6221)"><tspan x="0" y="0" fill="#FFFFFF" font-family="'MyriadPro-Bold'" font-size="12.1471px">Winner of M10</tspan><tspan x="-16.79" y="14.58" fill="#FFFFFF" font-family="'MyriadPro-Bold'" font-size="12.1471px">22222 22222 22222</tspan></text>
 		<circle id="match12BueDot" fill="#FFCA10" cx="814" cy="556" r="8"/>
 		<circle id="match12RedDot" fill="#FFCA10" cx="814" cy="593" r="8"/>
 		

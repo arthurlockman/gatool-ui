@@ -4,6 +4,7 @@ import { Alert, Container, Row, Col, Button } from "react-bootstrap";
 import React from "react";
 import _ from "lodash";
 import { rankHighlight } from "../components/HelperFunctions";
+import { CaretLeftFill, CaretRightFill } from "react-bootstrap-icons";
 
 const paleGreen = "rgba(144, 238, 144, 0.5)"
 
@@ -33,7 +34,11 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
 
     const matchDetails = schedule[currentMatch - 1];
     const matchMenu = schedule.map((match, index) => {
-        return { "value": index + 1, "label": match.description, "color": match.scoreRedFinal ? paleGreen : "" }
+        var tag = `${match.description} of ${qualSchedule.schedule.length}`;
+        if (match.tournamentLevel === "Playoff") {
+            tag = match.description;
+        }
+        return { "value": index + 1, "label": tag, "color": match.scoreRedFinal ? paleGreen : "" }
     })
 
     var displayOrder = ["Red1", "Red2", "Red3", "Blue1", "Blue2", "Blue3"];
@@ -77,7 +82,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
             </div>}
             {selectedEvent && teamList && schedule.length > 0 && <Container fluid>
                 <Row>
-                    <Col><Button onClick={previousMatch}>Previous Match</Button></Col>
+                    <Col><Button size="large" variant="outline-success" onClick={previousMatch}><CaretLeftFill /> Previous Match</Button></Col>
                     <Col><Select options={matchMenu} value={currentMatch ? matchMenu[currentMatch - 1] : matchMenu[0]} onChange={setMatchFromMenu} styles={{
                         option: (styles, { data }) => {
                             return {
@@ -87,14 +92,15 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
                             };
                         },
                     }} /></Col>
-                    <Col><Button onClick={nextMatch}>Next Match</Button></Col>
+                    <Col><Button size="large" variant="outline-success" onClick={nextMatch}>Next Match <CaretRightFill /></Button></Col>
                 </Row>
-                <table><tbody>
-                    {displayOrder.map((station) => <Announce station={station} team={teamDetails[station]} inPlayoffs={inPlayoffs} key={station} awardsMenu={awardsMenu} selectedYear={selectedYear} selectedEvent={selectedEvent}/>)}
-                </tbody></table>
-                <Row><Col><Button onClick={previousMatch}>Previous Match</Button></Col>
+                <table>
+                    <tbody>
+                        {displayOrder.map((station) => <Announce station={station} team={teamDetails[station]} inPlayoffs={inPlayoffs} key={station} awardsMenu={awardsMenu} selectedYear={selectedYear} selectedEvent={selectedEvent} />)}
+                    </tbody></table>
+                <Row><Col><Button onClick={previousMatch}><CaretLeftFill /> Previous Match</Button></Col>
                     <Col><h4>{matchDetails?.description}</h4></Col>
-                    <Col><Button onClick={nextMatch}>Next Match</Button></Col></Row>
+                    <Col><Button onClick={nextMatch}>Next Match <CaretRightFill /></Button></Col></Row>
                 <Row> <br /><br /></Row>
             </Container>
             }

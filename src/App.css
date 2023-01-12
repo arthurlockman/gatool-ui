@@ -1,73 +1,84 @@
 .App {
-  text-align: center;
+	text-align: center;
 }
 
 .App-logo {
-  height: 40vmin;
-  pointer-events: none;
+	height: 40vmin;
+	pointer-events: none;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+	.App-logo {
+		animation: App-logo-spin infinite 20s linear;
+	}
 }
 
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+	background-color: #282c34;
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	font-size: calc(10px + 2vmin);
+	color: white;
 }
 
 .App-link {
-  color: #61dafb;
+	color: #61dafb;
+}
+
+body {
+	font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+	line-height: normal;
+}
+
+th,
+td {
+	padding: 10px;
 }
 
 .red {
-  color: red;
+	color: red;
 }
 
 .blue {
-  color: blue;
+	color: blue;
 }
 
 .bold {
-  font-weight: bold;
+	font-weight: bold;
 }
 
 .centerTable {
-  vertical-align: middle;
+	vertical-align: middle;
 }
 
 .leftTable {
-  vertical-align: middle;
-  text-align: left;
+	vertical-align: middle;
+	text-align: left;
 }
 
 .setupPageMenus {
-  background-color: rgb(227, 247, 255);
-  padding: 10px;
-  border-color: blue;
-  border-style: solid;
-  margin-bottom: 5px;
+	background-color: rgb(227, 247, 255);
+	padding: 10px;
+	border-color: blue;
+	border-style: solid;
+	margin-bottom: 5px;
 }
+
 .setupPageFilters {
-  background-color: rgb(231, 255, 227);
-  padding: 10px;
-  border-color: rgb(107, 221, 0);
-  border-style: solid;
-  margin-bottom: 10px;
+	background-color: rgb(231, 255, 227);
+	padding: 10px;
+	border-color: rgb(107, 221, 0);
+	border-style: solid;
+	margin-bottom: 10px;
 }
 
 .switchLabel {
-  display: table-cell;
-  height: 25px;
-  vertical-align: middle;
+	display: table-cell;
+	height: 25px;
+	vertical-align: middle;
 }
 
 .redAlliance {
@@ -129,8 +140,8 @@
 
 .gatool-announce {
 	border: 1px solid #ccc;
-  text-align: left;
-  align-items: center;
+	text-align: left;
+	align-items: center;
 }
 
 .ranking {
@@ -195,18 +206,42 @@
 }
 
 @keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+	from {
+		transform: rotate(0deg);
+	}
+
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+/* Column definitions for tables */
+.col1 {
+	width: 8.333%
+}
+
+.col2 {
+	width: 16.667%
+}
+
+.col4 {
+	width: 33.333%
+}
+
+.col5 {
+	width: 41.667%
+}
+
+.col7 {
+	width: 58.333%
 }
 
 .vertical-center {
-  min-height: 100%;  /* Fallback for browsers do NOT support vh unit */
-  min-height: 100vh; /* These two lines are counted as one :-)       */
+	min-height: 100%;
+	/* Fallback for browsers do NOT support vh unit */
+	min-height: 100vh;
+	/* These two lines are counted as one :-)       */
 
-  display: flex;
-  align-items: center;
+	display: flex;
+	align-items: center;
 }

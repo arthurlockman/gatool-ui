@@ -339,9 +339,9 @@ function App() {
         var eventnames = _.clone(eventNames);
         var halloffame = _.clone(hallOfFame);
 
-        events.forEach(event => {
-          eventNames[selectedYear.value][event.value.code] = event.value.name;
-        });
+        events.forEach((event) => {
+          eventNames[selectedYear?.value][event?.value?.code] = event?.value?.name;
+        })
         awardYears?.forEach(year => {
           if (team?.awards[`${year}`] !== null) {
             team.awards[`${year}`].Awards = team?.awards[`${year}`]?.Awards.map(award => {
