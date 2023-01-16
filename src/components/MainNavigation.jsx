@@ -80,7 +80,7 @@ function MainNavigation({scheduleTabReady, teamDataTabReady, ranksTabReady}) {
         <Nav.Link as={NavLink} style={({ isActive }) => getTabStyle(isActive, null)} to="/stats"><Flag /><div className='d-none d-lg-block'>Stats</div></Nav.Link>
         <Nav.Link as={NavLink} style={({ isActive }) => getTabStyle(isActive, null)} to="/cheatsheet"><Eye /><div className='d-none d-lg-block'>Cheat Sheet</div></Nav.Link>
         <Nav.Link as={NavLink} style={({ isActive }) => getTabStyle(isActive, null)} to="/emcee"><Gift /><div className='d-none d-lg-block'>Emcee #s</div></Nav.Link>
-        <Nav.Link as={NavLink} style={({ isActive }) => getTabStyle(isActive, null)} to="/help"><QuestionOctagon  /><div className='d-none d-lg-block'>Help</div></Nav.Link>
+        <Nav.Link as={NavLink} className='d-none d-lg-block' style={({ isActive }) => getTabStyle(isActive, null)} to="/help"><QuestionOctagon  /><div className='d-none d-lg-block'>Help</div></Nav.Link>
       </Nav>
       {!isOnline &&
         <WifiOff style={{

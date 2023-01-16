@@ -81,6 +81,13 @@ td {
 	vertical-align: middle;
 }
 
+.gatool-button {
+	font-size: 20px;
+	font-weight: bold;
+	padding: 0px;
+	margin: 0px
+}
+
 .redAlliance {
 	border: 2px solid #ccc;
 	background-color: #F7B3B4
@@ -99,6 +106,10 @@ td {
 	color: #0000FF
 }
 
+.gatool-playbyplay {
+	border: 1px solid #ccc;
+}
+
 .redAlliancePlayByPlay {
 	border: 1px solid #ccc;
 	align-content: center;
@@ -108,6 +119,98 @@ td {
 	font-weight: bold;
 	color: white
 }
+
+.redAlliancePlayByPlay {
+	border: 1px solid #ccc;
+	align-content: center;
+	text-align: center;
+	background-color: red;
+	font-size: x-large;
+	font-weight: bold;
+	color: white
+}
+
+.blueAlliancePlayByPlay {
+	border: 1px solid #ccc;
+	align-content: center;
+	text-align: center;
+	background-color: blue;
+	font-size: x-large;
+	font-weight: bold;
+	color: white
+}
+
+.playByPlayTable{
+	display: table;
+}
+
+.playByPlayTableRow{
+	vertical-align: middle;
+	text-align: center;
+	display: table-cell;
+}
+
+.playByPlayTeamName {
+	font-size: 36px;
+	margin: 0px
+}
+
+.playByPlayTeamNameStats {
+	font-size: 24px;
+	margin: 0px
+}
+
+.playByPlayWinLossTie {
+	font-size: large;
+	font-style: italic;
+	align-content: center;
+	text-align: center
+}
+
+
+.playByPlayRobotName {
+	font-style: italic;
+	color: #F9FE00;
+	margin: 5px 0px 5px;
+	line-height: 100%
+}
+
+.playByPlayteamNumber {
+	font-size: 40px;
+	margin: 0px
+}
+
+.playByPlaysayNumber {
+	font-size: medium;
+	line-height: 100%;
+	margin-bottom: 10px
+}
+
+.playByPlayOrganization {
+	font-size: medium;
+	font-style: italic;
+	line-height: 100%;
+	margin: 0px
+}
+
+.playByPlayCity {
+	font-size: medium;
+	line-height: 100%;
+	padding-top: 15px;
+	margin: 0px
+}
+
+.playByPlayAlliance {
+	font-size: 20px;
+	line-height: 100%;
+	margin-top: 5px
+}
+
+.playByPlayChampsAlliance {
+	margin: 0px;
+	line-height: 100%
+}
+
 
 .blueAlliance {
 	border: 2px solid #ccc;
@@ -245,3 +348,12 @@ td {
 	display: flex;
 	align-items: center;
 }
+
+.wltTable {
+	border-width: thin;
+	background-color: rgba(255, 255, 255, 0.20);
+	text-align: center;
+	align-content: center;
+	margin: auto;
+}
+

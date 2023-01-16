@@ -1,7 +1,7 @@
 
 import _ from "lodash";
 
-function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selectedEvent }) {
+function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selectedEvent, showNotes, showAwards,showSponsors, showMottoes, showChampsStats }) {
     var allianceColor = station.slice(0, -1);
     var awardsYears = Object.keys(team?.awards)
     var awards = [];

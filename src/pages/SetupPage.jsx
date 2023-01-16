@@ -28,7 +28,7 @@ const filtersMenu = [
     { value: "PCH", label: "Peachtree" },
     { value: "PNW", label: "Pacific Northwest" },
     { value: "FIT", label: "FIRST in Texas" },
-    { value: "regionals", label: "Regional Events" },
+    { value: "regional", label: "Regional Events" },
     { value: "champs", label: "FIRST Championships" },
     { value: "offseason", label: "Offseason Events" }
 ];
@@ -36,7 +36,16 @@ const filtersMenu = [
 const filterTime = [
     { value: "all", label: "All Events" },
     { value: "past", label: "Past Events" },
-    { value: "future", label: "Future Events" }
+    { value: "future", label: "Future Events" },
+    { value: "week0", label: "Week 0"},
+    { value: "week1", label: "Week 1"},
+    { value: "week2", label: "Week 2"},
+    { value: "week3", label: "Week 3"},
+    { value: "week4", label: "Week 4"},
+    { value: "week5", label: "Week 5"},
+    { value: "week6", label: "Week 6"},
+    { value: "week7", label: "Week 7"},
+    { value: "week8", label: "Week 8"},
 ]
 
 const timeFormatMenu = [
@@ -50,28 +59,22 @@ const awardsMenuOptions = [
     { label: "1 (current season only", value: "1" },
 ]
 
-function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, getSchedule, awardsMenu, setAwardsMenu }) {
+function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats }) {
     const isOnline = useOnlineStatus()
 
     function filterEvents(events) {
         //filter the array
         var filters = eventFilters?.map((e) => { return e?.value });
-        if (timeFilter?.value === "past" || timeFilter?.value === "future") {
-            filters.push(timeFilter.value);
-        }
+       
         var filteredEvents = events;
         //reduce the list by time, then additively include other filters
-        if (_.indexOf(filters, "past") >= 0) {
-            filteredEvents = _.filter(events, function (o) { return (_.indexOf(o.filters, "past") >= 0) });
-        } else if (_.indexOf(filters, "future") >= 0) {
-            filteredEvents = _.filter(events, function (o) { return (_.indexOf(o.filters, "future") >= 0) });
-        }
+        if (timeFilter.value !== "all") {
+            filteredEvents = _.filter(events, function (o) { return (_.indexOf(o.filters, timeFilter.value) >= 0) });
+        } 
         var filterTemp = [];
         if (filters.length > 0) {
             filters.forEach((filter) => {
-                if (filter !== "past" && filter !== "future") {
                     filterTemp = filterTemp.concat(_.filter(filteredEvents, function (o) { return (_.indexOf(o.filters, filter) >= 0) }));
-                }
             })
 
             //remove duplicates
@@ -115,11 +118,11 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                     }} isDisabled={!isOnline} /></Col>
             </Row>
             <Row className="setupPageFilters">
-                <Col sm={4}><b>Filter your event list here...</b><br />
+                <Col sm={4}><b>Filter by event timeframe here...</b><br />
                     <Select options={filterTime} value={timeFilter ? timeFilter : filterTime[0]} onChange={setTimeFilter} isDisabled={!isOnline} />
                 </Col>
-                <Col sm={8}><br />
-                    <Select isMulti options={filtersMenu} value={eventFilters} onChange={setEventFilters} isDisabled={!isOnline} />
+                <Col sm={8}><b>Filter by event type or District here...</b><br />
+                    <Select isMulti options={filtersMenu} value={eventFilters} onChange={setEventFilters} isDisabled={!isOnline}/>
                 </Col>
             </Row>
             {!selectedEvent && <div>
@@ -177,6 +180,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                         </Row>
                         <Switch checked={showMottoes === null ? true : showMottoes} onChange={setShowMottoes} /><label><span className="switchLabel">  <b>Show Mottoes on Announce & Play-By-Play</b></span></label><br />
                         <Switch checked={showChampsStats === null ? false : showChampsStats} onChange={setShowChampsStats} /><label><span className="switchLabel">  <b>Show Champs Statistics on Announce</b></span></label><br />
+                        <Switch checked={showQualsStats === null ? false : showQualsStats} onChange={setShowQualsStats} /><label><span className="switchLabel">  <b>Show Quals Statistics on Announce during Playoffs</b></span></label><br />
                         <Switch checked={swapScreen === null ? false : swapScreen} onChange={setSwapScreen} /><label><span className="switchLabel">  <b>Swap Play-By-Play Screen Orientation</b></span></label><br />
                         <Switch checked={autoAdvance === null ? false : autoAdvance} onChange={setAutoAdvance} /><label><span className="switchLabel">  <b>Automatically advance to the next match when loading</b></span></label><br />
                         <Row><label><b>For how many years should we display awards on the Announce Screen?</b><Select options={awardsMenuOptions} value={awardsMenu} onChange={setAwardsMenu} /></label></Row>

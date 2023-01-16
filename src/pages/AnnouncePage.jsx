@@ -8,7 +8,7 @@ import { CaretLeftFill, CaretRightFill } from "react-bootstrap-icons";
 
 const paleGreen = "rgba(144, 238, 144, 0.5)"
 
-function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, setCurrentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, getSchedule, getRanks, awardsMenu }) {
+function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, setCurrentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, getSchedule, getRanks, awardsMenu, showNotes, showAwards,showSponsors, showMottoes, showChampsStats}) {
     function updateTeamDetails(station, matchDetails) {
         var team = matchDetails?.teams[_.findIndex(matchDetails?.teams, { "station": station })];
         team = _.merge(team,
@@ -96,7 +96,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
                 </Row>
                 <table>
                     <tbody>
-                        {displayOrder.map((station) => <Announce station={station} team={teamDetails[station]} inPlayoffs={inPlayoffs} key={station} awardsMenu={awardsMenu} selectedYear={selectedYear} selectedEvent={selectedEvent} />)}
+                        {displayOrder.map((station) => <Announce station={station} team={teamDetails[station]} inPlayoffs={inPlayoffs} key={station} awardsMenu={awardsMenu} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showAwards={showAwards} showSponsors={showSponsors} showMottoes={showMottoes} showChampsStats={showChampsStats}/>)}
                     </tbody></table>
                 <Row><Col><Button onClick={previousMatch}><CaretLeftFill /> Previous Match</Button></Col>
                     <Col><h4>{matchDetails?.description}</h4></Col>
