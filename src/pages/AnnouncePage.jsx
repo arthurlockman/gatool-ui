@@ -77,10 +77,11 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
             {!selectedEvent && !teamList && <div>
                 <Alert variant="warning" >You need to select an event before you can see anything here.</Alert>
             </div>}
-            {selectedEvent && teamList && schedule.length === 0 && <div>
+            {selectedEvent && teamList && (!schedule || schedule?.length === 0) && <div>
                 <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div>Awaiting schedule data for {selectedEvent.label}</Alert>
             </div>}
-            {selectedEvent && teamList && schedule.length > 0 && <Container fluid>
+            {selectedEvent && teamList?.teams.length>0 && schedule?.length > 0 && 
+            <Container fluid>
                 <Row>
                     <Col><Button size="large" variant="outline-success" onClick={previousMatch}><CaretLeftFill /> Previous Match</Button></Col>
                     <Col><Select options={matchMenu} value={currentMatch ? matchMenu[currentMatch - 1] : matchMenu[0]} onChange={setMatchFromMenu} styles={{

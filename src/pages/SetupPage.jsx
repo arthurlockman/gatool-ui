@@ -68,8 +68,8 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
        
         var filteredEvents = events;
         //reduce the list by time, then additively include other filters
-        if (timeFilter.value !== "all") {
-            filteredEvents = _.filter(events, function (o) { return (_.indexOf(o.filters, timeFilter.value) >= 0) });
+        if (timeFilter && (timeFilter?.value !== "all")) {
+            filteredEvents = _.filter(events, function (o) { return (_.indexOf(o?.filters, timeFilter.value) >= 0) });
         } 
         var filterTemp = [];
         if (filters.length > 0) {
@@ -97,16 +97,22 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
         return filterTemp
     }
 
-
+    if (!selectedYear) {
+        setSelectedYear(supportedYears[0]);
+    }
     return (
         <Container fluid>
             {!isOnline && <Row>
                 <Alert variant="danger"><b>You're offline. Only cached data is available. Some options may be unavailable. <br />Reconnect to the internet to choose a different event.</b></Alert>
             </Row>}
+            {!selectedYear && <Row>
+                <Alert variant="danger"><b>Awaiting event list</b></Alert>
+            </Row>}
             <Row className="setupPageMenus">
                 <Col sm={4}><b>Choose a year...</b><br /><Select options={supportedYears} value={selectedYear ? selectedYear : supportedYears[0]} onChange={setSelectedYear} isDisabled={!isOnline} />
                 </Col>
-                <Col sm={8}><b>...then choose an event.</b><br /><Select options={filterEvents(eventList)} placeholder={eventList?.length > 0 ? "Select an event" : "Loading event list"} value={selectedEvent} onChange={setSelectedEvent}
+                <Col sm={8}>
+                    {eventList && <span><b>...then choose an event.</b><br /><Select options={filterEvents(eventList)} placeholder={eventList?.length > 0 ? "Select an event" : "Loading event list"} value={selectedEvent} onChange={setSelectedEvent}
                     styles={{
                         option: (styles, { data }) => {
                             return {
@@ -115,16 +121,17 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                 color: "black"
                             };
                         },
-                    }} isDisabled={!isOnline} /></Col>
+                    }} isDisabled={!isOnline} /></span>}
+                    </Col>
             </Row>
-            <Row className="setupPageFilters">
+            {eventList && <Row className="setupPageFilters">
                 <Col sm={4}><b>Filter by event timeframe here...</b><br />
                     <Select options={filterTime} value={timeFilter ? timeFilter : filterTime[0]} onChange={setTimeFilter} isDisabled={!isOnline} />
                 </Col>
                 <Col sm={8}><b>Filter by event type or District here...</b><br />
                     <Select isMulti options={filtersMenu} value={eventFilters} onChange={setEventFilters} isDisabled={!isOnline}/>
                 </Col>
-            </Row>
+            </Row>}
             {!selectedEvent && <div>
                 <Alert variant="warning" >You need to select an event before you can see anything here.</Alert>
             </div>}

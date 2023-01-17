@@ -108,6 +108,8 @@ td {
 
 .gatool-playbyplay {
 	border: 1px solid #ccc;
+	text-align: left;
+	align-items: center;
 }
 
 .redAlliancePlayByPlay {
