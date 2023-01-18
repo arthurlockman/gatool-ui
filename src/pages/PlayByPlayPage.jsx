@@ -136,14 +136,18 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
             {!selectedEvent && !teamList && <div>
                 <Alert variant="warning" >You need to select an event before you can see anything here.</Alert>
             </div>}
+            {selectedEvent && !teamList && <div>
+                <Alert variant="warning" ><Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div>Awaiting team data for {selectedEvent.label}</Alert></Alert>
+            </div>}
             {selectedEvent && teamList && (!schedule || schedule?.length === 0) && <div>
                 <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div>Awaiting schedule data for {selectedEvent.label}</Alert>
             </div>}
             {selectedEvent && teamList?.teams.length > 0 && schedule?.length > 0 &&
-                <div className={"container container-fluid"} style={{ display: "block" }}>
+
+                <Container fluid>
                     <Row>
-                        <Col ><Button size="large" variant="outline-success" onClick={previousMatch}><CaretLeftFill /><span className="d-none d-lg-block"> Previous Match</span></Button></Col>
-                        <Col ><Select options={matchMenu} value={currentMatch ? matchMenu[currentMatch - 1] : matchMenu[0]} onChange={setMatchFromMenu} styles={{
+                        <Col ><Button size="large" variant="outline-success" className={"buttonNoWrap"} onClick={previousMatch}><CaretLeftFill /> Previous Match</Button></Col>
+                        <Col ><b>{selectedEvent.label.replace("FIRST Championship - ","").replace("FIRST In Texas District Championship - ","").replace("FIRST Ontario Provincial Championship - ","").replace("New England FIRST District Championship - ","")}</b><br /><Select options={matchMenu} value={currentMatch ? matchMenu[currentMatch - 1] : matchMenu[0]} onChange={setMatchFromMenu} styles={{
                             option: (styles, { data }) => {
                                 return {
                                     ...styles,
@@ -152,36 +156,36 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
                                 };
                             },
                         }} /></Col>
-                        <Col ><Button size="large" variant="outline-success" onClick={nextMatch}><span className="d-none d-lg-block">Next Match </span><CaretRightFill /></Button></Col>
+                        <Col ><Button size="large" variant="outline-success" className={"buttonNoWrap"} onClick={nextMatch}>Next Match <CaretRightFill /></Button></Col>
                     </Row>
-                    <div id="playByPlayDisplay" className={"gatool-playbyplay"} style={{ display: "block" }}>
-                        <table >
-                            <tbody>
+
+                    <table >
+                        <tbody>
+                            <tr className={"gatool-playbyplay"}>
+                                <PlayByPlay station={displayOrder[0]} team={teamDetails[displayOrder[0]]} inPlayoffs={inPlayoffs} key={displayOrder[0]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} />
+                                <PlayByPlay station={displayOrder[1]} team={teamDetails[displayOrder[1]]} inPlayoffs={inPlayoffs} key={displayOrder[1]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} />
+                            </tr>
+                            <tr className={"gatool-playbyplay"}>
+                                <PlayByPlay station={displayOrder[2]} team={teamDetails[displayOrder[2]]} inPlayoffs={inPlayoffs} key={displayOrder[2]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} />
+                                <PlayByPlay station={displayOrder[3]} team={teamDetails[displayOrder[3]]} inPlayoffs={inPlayoffs} key={displayOrder[3]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} />
+                            </tr>
+                            <tr className={"gatool-playbyplay"}>
+                                <PlayByPlay station={displayOrder[4]} team={teamDetails[displayOrder[4]]} inPlayoffs={inPlayoffs} key={displayOrder[4]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} />
+                                <PlayByPlay station={displayOrder[5]} team={teamDetails[displayOrder[5]]} inPlayoffs={inPlayoffs} key={displayOrder[5]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} />
+                            </tr>
+                            {inPlayoffs && (!_.isEmpty(teamDetails["Red4"]) || !_.isEmpty(teamDetails["Blue4"])) &&
                                 <tr className={"gatool-playbyplay"}>
-                                    <PlayByPlay station={displayOrder[0]} team={teamDetails[displayOrder[0]]} inPlayoffs={inPlayoffs} key={displayOrder[0]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} />
-                                    <PlayByPlay station={displayOrder[1]} team={teamDetails[displayOrder[1]]} inPlayoffs={inPlayoffs} key={displayOrder[1]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} />
-                                </tr>
-                                <tr className={"gatool-playbyplay"}>
-                                    <PlayByPlay station={displayOrder[2]} team={teamDetails[displayOrder[2]]} inPlayoffs={inPlayoffs} key={displayOrder[2]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} />
-                                    <PlayByPlay station={displayOrder[3]} team={teamDetails[displayOrder[3]]} inPlayoffs={inPlayoffs} key={displayOrder[3]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} />
-                                </tr>
-                                <tr className={"gatool-playbyplay"}>
-                                    <PlayByPlay station={displayOrder[4]} team={teamDetails[displayOrder[4]]} inPlayoffs={inPlayoffs} key={displayOrder[4]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} />
-                                    <PlayByPlay station={displayOrder[5]} team={teamDetails[displayOrder[5]]} inPlayoffs={inPlayoffs} key={displayOrder[5]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} />
-                                </tr>
-                                {inPlayoffs && (!_.isEmpty(teamDetails["Red4"]) || !_.isEmpty(teamDetails["Blue4"])) &&
-                                    <tr className={"gatool-playbyplay"}>
-                                        <PlayByPlay station={displayOrder[6]} team={teamDetails[displayOrder[6]]} inPlayoffs={inPlayoffs} key={displayOrder[6]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} />
-                                        <PlayByPlay station={displayOrder[7]} team={teamDetails[displayOrder[7]]} inPlayoffs={inPlayoffs} key={displayOrder[7]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} />
-                                    </tr>}
-                            </tbody>
-                        </table>
-                        <Row><Col><Button onClick={previousMatch}><CaretLeftFill /> Previous Match</Button></Col>
-                            <Col><h4>{matchDetails?.description}</h4></Col>
-                            <Col><Button onClick={nextMatch}>Next Match <CaretRightFill /></Button></Col></Row>
-                        <Row> <br /><br /></Row>
-                    </div>
-                </div>}
+                                    <PlayByPlay station={displayOrder[6]} team={teamDetails[displayOrder[6]]} inPlayoffs={inPlayoffs} key={displayOrder[6]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} />
+                                    <PlayByPlay station={displayOrder[7]} team={teamDetails[displayOrder[7]]} inPlayoffs={inPlayoffs} key={displayOrder[7]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} />
+                                </tr>}
+                        </tbody>
+                    </table>
+                    <Row><Col><Button variant="outline-success" className={"buttonNoWrap"} onClick={previousMatch}><CaretLeftFill /> Previous Match</Button></Col>
+                        <Col><h4>{matchDetails?.description}</h4></Col>
+                        <Col><Button variant="outline-success" className={"buttonNoWrap"} onClick={nextMatch}>Next Match  <CaretRightFill /></Button></Col></Row>
+                    <Row> <br /><br /></Row>
+
+                </Container>}
         </Container>
     )
 }

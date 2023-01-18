@@ -7,10 +7,10 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule }) {
             {!selectedEvent && !qualSchedule && <div>
                 <Alert variant="warning" >You need to select an event before you can see anything here.</Alert>
             </div>}
-            {selectedEvent && qualSchedule?.schedule.length===0 && <div>
-                <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..."/></div><div>Awaiting schedule for {selectedEvent.label}</div></Alert>
+            {selectedEvent && qualSchedule?.schedule.length === 0 && <div>
+                <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div><div>Awaiting schedule for {selectedEvent.label}</div></Alert>
             </div>}
-            {selectedEvent && qualSchedule?.schedule.length>0 &&
+            {selectedEvent && qualSchedule?.schedule.length > 0 &&
                 <div>
                     <h4>{selectedEvent.label}</h4>
                     <Table responsive striped bordered size="sm">
@@ -35,7 +35,7 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule }) {
                                     blueStyle += " bold"
                                 }
 
-                                return (<tr key={"qualSchedule"+match.matchNumber} className="centerTable">
+                                return (<tr key={"qualSchedule" + match.matchNumber} className="centerTable">
                                     <td>{match.actualStartTime ? "Actual:" : "Scheduled:"}<br /> {match.actualStartTime ? moment(match.actualStartTime).format('dd hh:mm A') : moment(match.StartTime).format('dd hh:mm A')}</td>
                                     <td>{match.description}</td>
                                     <td>{match.matchNumber}</td>
@@ -57,7 +57,7 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule }) {
                                     blueStyle += " bold"
                                 }
 
-                                return (<tr key={"playoffSchedule"+match.matchNumber} className="centerTable">
+                                return (<tr key={"playoffSchedule" + match.matchNumber} className="centerTable">
                                     <td>{match.actualStartTime ? "Actual:" : "Scheduled:"}<br /> {match.actualStartTime ? moment(match.actualStartTime).format('dd hh:mm A') : moment(match.StartTime).format('dd hh:mm A')}</td>
                                     <td>{match.description}</td>
                                     <td>{match.matchNumber + qualMatchCount}</td>
@@ -68,7 +68,7 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule }) {
                                 </tr>
                                 )
                             })
-                            : <tr><td colSpan={7}>No playoff schedule available yet.</td></tr>}
+                                : <tr><td colSpan={7}>No playoff schedule available yet.</td></tr>}
                         </tbody>
                     </Table>
                 </div>}
