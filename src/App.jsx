@@ -672,7 +672,7 @@ function App() {
               <Route path='/playbyplay' element={<PlayByPlayPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} communityUpdates={communityUpdates} currentMatch={currentMatch} setCurrentMatch={setCurrentMatch} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} alliances={alliances} getSchedule={getSchedule} getRanks={getRanks} awardsMenu={awardsMenu} showMottoes={showMottoes} showNotes={showNotes} showQualsStats={showQualsStats}/>} />
 
               <Route path='/allianceselection' element={<AllianceSelectionPage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} alliances={alliances} />} />
-              <Route path='/awards' element={<AwardsPage selectedEvent={selectedEvent} teamList={teamList}/>} />
+              <Route path='/awards' element={<AwardsPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} communityUpdates={communityUpdates}/>} />
               <Route path='/stats' element={<StatsPage />} />
               <Route path='/cheatsheet' element={<CheatsheetPage />} />
               <Route path='/emcee' element={<EmceePage />} />

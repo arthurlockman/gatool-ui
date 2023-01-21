@@ -142,11 +142,11 @@ td {
 	color: white
 }
 
-.playByPlayTable{
+.playByPlayTable {
 	display: table;
 }
 
-.playByPlayTableRow{
+.playByPlayTableRow {
 	vertical-align: middle;
 	text-align: center;
 	display: table-cell;
@@ -365,6 +365,10 @@ td {
 	margin: auto;
 }
 
-.buttonNoWrap{
-white-space:nowrap;
+.buttonNoWrap {
+	white-space: nowrap;
+}
+
+.awardsButton {
+	padding: 5px;
 }

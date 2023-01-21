@@ -1,7 +1,7 @@
 
 import _ from "lodash";
 
-function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selectedEvent, showNotes, showAwards,showSponsors, showMottoes, showChampsStats }) {
+function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selectedEvent, showNotes, showAwards, showSponsors, showMottoes, showChampsStats }) {
     var allianceColor = station.slice(0, -1);
     var awardsYears = Object.keys(team?.awards)
     var awards = [];
@@ -17,13 +17,15 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
     if (years.toString().endsWith("1")) { yearsDisplay = "st" }
     if (years.toString().endsWith("2")) { yearsDisplay = "nd" }
     if (years.toString().endsWith("3")) { yearsDisplay = "rd" }
+    if (years.toString() === "11" || years.toString() === "12" || years.toString() === "13") { yearsDisplay = "th" }
+    if (years.toString() === "1") { yearsDisplay = "Rookie" };
 
     return (
         <><tr key={station} className={`gatool-announce ${_.toLower(allianceColor)}Alliance`} >
             <td className={'col1'} >
                 <span className={"announceTeamNumber"} ><b>{team.teamNumber}</b></span><br />
                 {team?.updates?.sayNumber && <span >{team.updates?.sayNumber}<br /></span>}
-                <span >{team?.rookieYear} ({years}{yearsDisplay} season)</span>
+                <span >{team?.rookieYear} ({years === 1 ? "" : years}{yearsDisplay} season)</span>
                 {inPlayoffs && <p className={"announceAlliance"}>{team.alliance}<br />{team.allianceRole}</p>}
             </td>
             <td className={'col2'}>
