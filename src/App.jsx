@@ -153,6 +153,7 @@ function App() {
     }
 
     setScheduleTabReady(TabStates.NotReady);
+    setAllianceSelectionReady(TabStates.NotReady);
     var result = await httpClient.get(`${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/qual`);
     var qualschedule = await result.json();
     // adds the winner to the schedule.

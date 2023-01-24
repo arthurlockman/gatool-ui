@@ -1,6 +1,6 @@
 import _ from "lodash";
 
-function StatsMatch({highScores={highScores}, matchType={matchType}, matchName={matchName}}) {
+function StatsMatch({highScores, matchType, matchName}) {
     return (
     <>
     {!_.isEmpty(_.filter(highScores, { "scoreType": matchType })) && <td >{matchName}<br />
