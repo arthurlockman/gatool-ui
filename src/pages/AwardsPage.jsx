@@ -1,5 +1,6 @@
 import { Alert, Container, Button, Row, Col, Modal } from "react-bootstrap";
 import { useState } from 'react';
+import { Trophy } from "react-bootstrap-icons";
 import _ from "lodash";
 
 
@@ -72,21 +73,21 @@ function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates })
                         </Col>)
                     })}
                     </Row>
-                    {awardTeam && <Modal size={"lg"} centered={true} show={show} onHide={handleClose}>
+                    {awardTeam && <Modal centered={true} show={show} onHide={handleClose}>
                         <Modal.Header closeButton>
                             <Modal.Title className={"success"}>Awards Announcement</Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
-                            <h2>Team {awardTeam?.teamNumber} {awardTeam?.updates?.nameShortLocal ? awardTeam.updates.nameShortLocal : awardTeam?.nameShort}</h2>
-                            <h2> is from </h2>
-                            <h2>{awardTeam?.updates?.organizationLocal ? awardTeam?.updates?.organizationLocal : awardTeam?.organization}</h2>
-                            <h2>in {awardTeam?.updates?.cityStateLocal ? awardTeam?.updates?.cityStateLocal : `${awardTeam?.city}, ${awardTeam?.stateProv}`}{awardTeam?.country !== "USA" ? awardTeam?.country : ""}</h2>
-                            <br />
-                            <h2>Founded in {awardTeam?.rookieYear}, this is their {awardTeam?.yearsDisplay} season competing with FIRST.</h2>
+                            <span className={"allianceAnnounceDialog"}>Team {awardTeam?.teamNumber} {awardTeam?.updates?.nameShortLocal ? awardTeam.updates.nameShortLocal : awardTeam?.nameShort}<br />
+                                is from<br />
+                                {awardTeam?.updates?.organizationLocal ? awardTeam?.updates?.organizationLocal : awardTeam?.organization}<br />
+                                in {awardTeam?.updates?.cityStateLocal ? awardTeam?.updates?.cityStateLocal : `${awardTeam?.city}, ${awardTeam?.stateProv}`}{awardTeam?.country !== "USA" ? `, ${awardTeam?.country}` : ""}<br />
+                                <br />
+                                Founded in {awardTeam?.rookieYear}, this is their {awardTeam?.yearsDisplay} season competing with <i><b>FIRST</b></i>. </span>
                         </Modal.Body>
                         <Modal.Footer>
                             <Button variant="success" onClick={handleClose}>
-                                Congratulations!
+                                <Trophy /> Congratulations!
                             </Button>
                         </Modal.Footer>
                     </Modal>}

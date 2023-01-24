@@ -1,10 +1,10 @@
-import Select from "react-select";
-import { Alert, Container, Row, Col, Button } from "react-bootstrap";
+import { Alert, Container } from "react-bootstrap";
 import React from "react";
 import _ from "lodash";
 import { rankHighlight } from "../components/HelperFunctions";
-import { CaretLeftFill, CaretRightFill } from "react-bootstrap-icons";
 import PlayByPlay from "../components/PlayByPlay";
+import BottomButtons from "../components/BottomButtons";
+import TopButtons from "../components/TopButtons";
 
 const paleGreen = "rgba(144, 238, 144, 0.5)"
 var displayOrder = ["Blue1", "Red3", "Blue2", "Red2", "Blue3", "Red1", "Blue4", "Red4"];
@@ -143,22 +143,8 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
                 <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div>Awaiting schedule data for {selectedEvent.label}</Alert>
             </div>}
             {selectedEvent && teamList?.teams.length > 0 && schedule?.length > 0 &&
-
                 <Container fluid>
-                    <Row>
-                        <Col ><Button size="large" variant="outline-success" className={"buttonNoWrap"} onClick={previousMatch}><CaretLeftFill /> Previous Match</Button></Col>
-                        <Col ><b>{selectedEvent.label.replace("FIRST Championship - ","").replace("FIRST In Texas District Championship - ","").replace("FIRST Ontario Provincial Championship - ","").replace("New England FIRST District Championship - ","")}</b><br /><Select options={matchMenu} value={currentMatch ? matchMenu[currentMatch - 1] : matchMenu[0]} onChange={setMatchFromMenu} styles={{
-                            option: (styles, { data }) => {
-                                return {
-                                    ...styles,
-                                    backgroundColor: data.color,
-                                    color: "black"
-                                };
-                            },
-                        }} /></Col>
-                        <Col ><Button size="large" variant="outline-success" className={"buttonNoWrap"} onClick={nextMatch}>Next Match <CaretRightFill /></Button></Col>
-                    </Row>
-
+                    <TopButtons previousMatch={previousMatch} nextMatch={nextMatch} currentMatch={currentMatch} matchMenu={matchMenu} setMatchFromMenu={setMatchFromMenu} selectedEvent={selectedEvent} />
                     <table >
                         <tbody>
                             <tr className={"gatool-playbyplay"}>
@@ -180,11 +166,7 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
                                 </tr>}
                         </tbody>
                     </table>
-                    <Row><Col><Button variant="outline-success" className={"buttonNoWrap"} onClick={previousMatch}><CaretLeftFill /> Previous Match</Button></Col>
-                        <Col><h4>{matchDetails?.description}</h4></Col>
-                        <Col><Button variant="outline-success" className={"buttonNoWrap"} onClick={nextMatch}>Next Match  <CaretRightFill /></Button></Col></Row>
-                    <Row> <br /><br /></Row>
-
+                    <BottomButtons previousMatch={previousMatch} nextMatch={nextMatch} matchDetails={matchDetails} />
                 </Container>}
         </Container>
     )

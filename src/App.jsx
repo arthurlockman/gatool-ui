@@ -54,10 +54,10 @@ const playoffTiebreakers = {
 const paleYellow = "#fdfaed";
 const paleBlue = "#effdff";
 
-function LayoutsWithNavbar({ scheduleTabReady, teamDataTabReady, ranksTabReady }) {
+function LayoutsWithNavbar({ scheduleTabReady, teamDataTabReady, ranksTabReady, statsTabReady, allianceSelectionReady }) {
   return (
     <>
-      <MainNavigation scheduleTabReady={scheduleTabReady} teamDataTabReady={teamDataTabReady} ranksTabReady={ranksTabReady} />
+      <MainNavigation scheduleTabReady={scheduleTabReady} teamDataTabReady={teamDataTabReady} ranksTabReady={ranksTabReady} statsTabReady={statsTabReady} allianceSelectionReady={allianceSelectionReady} />
       <Outlet />
       <BottomNavigation />
     </>
@@ -96,11 +96,15 @@ function App() {
   const [currentMatch, setCurrentMatch] = usePersistentState("cache:currentMatch", null);
   const [awardsMenu, setAwardsMenu] = usePersistentState("cache:awardsMenu", null);
   const [showQualsStats, setShowQualsStats] = usePersistentState("cache:showQualsStats", null);
+  const [worldStats, setWorldStats] = usePersistentState("cache:stats", null);
+
 
   // Tab state trackers
   const [scheduleTabReady, setScheduleTabReady] = useState(TabStates.NotReady)
   const [teamDataTabReady, setTeamDataTabReady] = useState(TabStates.NotReady)
   const [ranksTabReady, setRanksTabReady] = useState(TabStates.NotReady)
+  const [statsTabReady, setStatsTabReady] = useState(TabStates.NotReady)
+  const [allianceSelectionReady, setAllianceSelectionReady] = useState(TabStates.NotReady)
 
   // Controllers for table sort order at render time
   const [teamSort, setTeamSort] = useState("")
@@ -511,6 +515,19 @@ function App() {
     setRanksTabReady(TabStates.Ready);
   }
 
+  // This function retrieves the ranking data for a specified event from FIRST.
+  async function getWorldStats() {
+    setStatsTabReady(TabStates.NotReady);
+    var result = await httpClient.get(`${selectedYear?.value}/highscores`);
+    var highscores = await result.json();
+    var scores = {};
+    scores.year = selectedYear?.value;
+    scores.lastUpdate = moment();
+    scores.highscores = highscores;
+    setWorldStats(scores);
+    setStatsTabReady(TabStates.Ready);
+  }
+
   // This function retrieves the Playoff Alliance data for a specified event from FIRST.
   async function getAlliances() {
     var result = await httpClient.get(`${selectedYear?.value}/alliances/${selectedEvent?.value.code}`);
@@ -631,7 +648,7 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedEvent])
 
-  // Retrieve schedule, team list, community updates, and rankings when event selection changes
+  // Retrieve schedule, team list, community updates, high scores and rankings when event selection changes
   useEffect(() => {
 
     if (httpClient && selectedEvent && selectedYear) {
@@ -644,6 +661,7 @@ function App() {
       getTeamList();
       getCommunityUpdates();
       getRanks();
+      getWorldStats();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [httpClient, selectedEvent])
@@ -657,9 +675,9 @@ function App() {
       </div> :
         canAccessApp() ? <BrowserRouter>
           <Routes>
-            <Route path="/" element={<LayoutsWithNavbar scheduleTabReady={scheduleTabReady} teamDataTabReady={teamDataTabReady} ranksTabReady={ranksTabReady} />}>
+            <Route path="/" element={<LayoutsWithNavbar scheduleTabReady={scheduleTabReady} teamDataTabReady={teamDataTabReady} ranksTabReady={ranksTabReady} statsTabReady={statsTabReady} allianceSelectionReady={allianceSelectionReady} />}>
 
-              <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} teamList={teamList} eventFilters={eventFilters} setEventFilters={setEventFilters} timeFilter={timeFilter} setTimeFilter={setTimeFilter} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} rankings={rankings} timeFormat={timeFormat} setTimeFormat={setTimeFormat} showSponsors={showSponsors} setShowSponsors={setShowSponsors} showAwards={showAwards} setShowAwards={setShowAwards} showNotes={showNotes} setShowNotes={setShowNotes} showMottoes={showMottoes} setShowMottoes={setShowMottoes} showChampsStats={showChampsStats} setShowChampsStats={setShowChampsStats} swapScreen={swapScreen} setSwapScreen={setSwapScreen} autoAdvance={autoAdvance} setAutoAdvance={setAutoAdvance} getSchedule={getSchedule} awardsMenu={awardsMenu} setAwardsMenu={setAwardsMenu} showQualsStats={showQualsStats} setShowQualsStats={setShowQualsStats}/>} />
+              <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} teamList={teamList} eventFilters={eventFilters} setEventFilters={setEventFilters} timeFilter={timeFilter} setTimeFilter={setTimeFilter} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} rankings={rankings} timeFormat={timeFormat} setTimeFormat={setTimeFormat} showSponsors={showSponsors} setShowSponsors={setShowSponsors} showAwards={showAwards} setShowAwards={setShowAwards} showNotes={showNotes} setShowNotes={setShowNotes} showMottoes={showMottoes} setShowMottoes={setShowMottoes} showChampsStats={showChampsStats} setShowChampsStats={setShowChampsStats} swapScreen={swapScreen} setSwapScreen={setSwapScreen} autoAdvance={autoAdvance} setAutoAdvance={setAutoAdvance} getSchedule={getSchedule} awardsMenu={awardsMenu} setAwardsMenu={setAwardsMenu} showQualsStats={showQualsStats} setShowQualsStats={setShowQualsStats} />} />
 
               <Route path="/schedule" element={<SchedulePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} />} />
 
@@ -669,11 +687,11 @@ function App() {
 
               <Route path='/announce' element={<AnnouncePage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} communityUpdates={communityUpdates} currentMatch={currentMatch} setCurrentMatch={setCurrentMatch} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} alliances={alliances} getSchedule={getSchedule} getRanks={getRanks} awardsMenu={awardsMenu} showNotes={showNotes} showAwards={showAwards} showSponsors={showSponsors} showMottoes={showMottoes} showChampsStats={showChampsStats} />} />
 
-              <Route path='/playbyplay' element={<PlayByPlayPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} communityUpdates={communityUpdates} currentMatch={currentMatch} setCurrentMatch={setCurrentMatch} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} alliances={alliances} getSchedule={getSchedule} getRanks={getRanks} awardsMenu={awardsMenu} showMottoes={showMottoes} showNotes={showNotes} showQualsStats={showQualsStats}/>} />
+              <Route path='/playbyplay' element={<PlayByPlayPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} communityUpdates={communityUpdates} currentMatch={currentMatch} setCurrentMatch={setCurrentMatch} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} alliances={alliances} getSchedule={getSchedule} getRanks={getRanks} awardsMenu={awardsMenu} showMottoes={showMottoes} showNotes={showNotes} showQualsStats={showQualsStats} />} />
 
               <Route path='/allianceselection' element={<AllianceSelectionPage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} alliances={alliances} />} />
-              <Route path='/awards' element={<AwardsPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} communityUpdates={communityUpdates}/>} />
-              <Route path='/stats' element={<StatsPage />} />
+              <Route path='/awards' element={<AwardsPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} communityUpdates={communityUpdates} />} />
+              <Route path='/stats' element={<StatsPage worldStats={worldStats} selectedEvent={selectedEvent} eventNames={eventNames}/>} />
               <Route path='/cheatsheet' element={<CheatsheetPage />} />
               <Route path='/emcee' element={<EmceePage />} />
               <Route path='/help' element={<HelpPage />} />
