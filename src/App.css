@@ -405,9 +405,17 @@ td {
 	border-color: #dca7a7;
 	color: #a94442;
 	background-color: #f2dede;
+	border: 3px solid;
+	border-collapse: collapse;
+	margin-bottom: 10px;
 }
 
-.alert-info {
+.gatool-eventHighScores {
+	font-size: 14px;
+	font-weight: bold;
+	text-align: center;
+	padding: 0px;
+	margin: 0px;
 	background-image: -webkit-linear-gradient(top, #d9edf7 0, #b9def0 100%);
 	background-image: -o-linear-gradient(top, #d9edf7 0, #b9def0 100%);
 	background-image: -webkit-gradient(linear, left top, left bottom, from(#d9edf7), to(#b9def0));
@@ -417,4 +425,7 @@ td {
 	border-color: #9acfea;
 	color: #31708f;
 	background-color: #d9edf7;
+	border: 3px solid;
+	border-collapse: collapse;
+	margin-bottom: 10px;
 }

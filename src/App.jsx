@@ -97,7 +97,7 @@ function App() {
   const [awardsMenu, setAwardsMenu] = usePersistentState("cache:awardsMenu", null);
   const [showQualsStats, setShowQualsStats] = usePersistentState("cache:showQualsStats", null);
   const [worldStats, setWorldStats] = usePersistentState("cache:stats", null);
-
+  const [eventHighScores, setEventHighScores] = usePersistentState("cache:eventHighScores", null);
 
   // Tab state trackers
   const [scheduleTabReady, setScheduleTabReady] = useState(TabStates.NotReady)
@@ -133,6 +133,7 @@ function App() {
 
   // This function retrieves a schedule from FIRST. It attempts to get both the Qual and Playoff Schedule and sets the global variables
   async function getSchedule() {
+    var highScores = [];
 
     // returns the winner of the match
     function winner(match) {
@@ -152,8 +153,72 @@ function App() {
       return winner;
     }
 
+    //checks to see if the match is a high score
+    function isHighScore(match) {
+      var tempMatch = {};
+      if (!_.isNull(match.scoreRedFinal)) {
+        tempMatch.eventName = selectedEvent.label;
+        tempMatch.matchName = match?.description;
+        if (match?.scoreRedFinal > match?.scoreBlueFinal) {
+          tempMatch.alliance = "Red";
+          tempMatch.allianceMembers = _.filter(match?.teams, function (o) { return _.startsWith(o.station, tempMatch.alliance) }).map((team) => { return team.teamNumber }).join(" ");
+          tempMatch.score = match[`score${tempMatch.alliance}Final`]
+        } else if (match?.scoreRedFinal < match?.scoreBlueFinal) {
+          tempMatch.alliance = "Blue";
+          tempMatch.allianceMembers = _.filter(match?.teams, function (o) { return _.startsWith(o.station, tempMatch.alliance) }).map((team) => { return team.teamNumber }).join(" ");
+          tempMatch.score = match[`score${tempMatch.alliance}Final`]
+        } else {
+          tempMatch.alliance = "Tie";
+          tempMatch.allianceMembers = match?.teams.map((team) => { return team.teamNumber }).join(" ");
+          tempMatch.score = match.scoreRedFinal
+        }
+
+        if (match.level === "Qualification") {
+          tempMatch.matchLevel = "qual";
+        } else if (match.level === "Playoff") {
+          tempMatch.matchLevel = "playoff";
+        }
+
+        if (match.scoreRedFoul === match.scoreBlueFoul) {
+          if (match.scoreRedFoul > 0) {
+            tempMatch.scoreType = "offsetting" + tempMatch.matchLevel;
+          } else if (match.scoreRedFoul === 0) {
+            tempMatch.scoreType = "penaltyFree" + tempMatch.matchLevel;
+          }
+        } else {
+          tempMatch.scoreType = "overall" + tempMatch.matchLevel;
+        }
+        // test to see if the match is penalty free and a high score
+        if (tempMatch.scoreType.includes("penaltyFree")) {
+          if (_.isEmpty(highScores[`penaltyFree${tempMatch.matchLevel}`])) {
+            highScores[`penaltyFree${tempMatch.matchLevel}`] = tempMatch;
+          } else if (highScores[`penaltyFree${tempMatch.matchLevel}`].score < tempMatch.score) {
+            highScores[`penaltyFree${tempMatch.matchLevel}`] = tempMatch;
+          }
+        }
+
+        //test to see if the match has offsetting penalties and is a high score
+        if (tempMatch.scoreType.includes("offsetting")) {
+          if (_.isEmpty(highScores[`offsetting${tempMatch.matchLevel}`])) {
+            highScores[`offsetting${tempMatch.matchLevel}`] = tempMatch;
+          } else if (highScores[`offsetting${tempMatch.matchLevel}`].score < tempMatch.score) {
+            highScores[`offsetting${tempMatch.matchLevel}`] = tempMatch;
+          }
+        }
+
+        //now test against overall high score
+        if (_.isEmpty(highScores[`overall${tempMatch.matchLevel}`])) {
+          highScores[`overall${tempMatch.matchLevel}`] = tempMatch;
+        } else if (highScores[`overall${tempMatch.matchLevel}`].score < tempMatch.score) {
+          highScores[`overall${tempMatch.matchLevel}`] = tempMatch;
+        }
+
+      }
+    }
+
     setScheduleTabReady(TabStates.NotReady);
     setAllianceSelectionReady(TabStates.NotReady);
+
     var result = await httpClient.get(`${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/qual`);
     var qualschedule = await result.json();
     // adds the winner to the schedule.
@@ -165,7 +230,11 @@ function App() {
       match.winner = winner(match);
       return match;
     });
+
     qualschedule.schedule = matches;
+    matches.forEach((match) => {
+      isHighScore(match);
+    })
 
     qualschedule.lastUpdate = moment();
     setQualSchedule(qualschedule);
@@ -187,6 +256,9 @@ function App() {
         return match;
       });
       playoffschedule.schedule = matches;
+      matches.forEach((match) => {
+        isHighScore(match);
+      })
 
       // determine the tiebreaker
       var lastMatchNumber = playoffschedule.schedule[_.findLastIndex(playoffschedule.schedule, function (match) {
@@ -227,6 +299,7 @@ function App() {
       getAlliances();
     }
 
+    setEventHighScores(highScores);
     playoffschedule.lastUpdate = moment();
     setPlayoffSchedule(playoffschedule);
     setScheduleTabReady(TabStates.Ready);
@@ -522,9 +595,24 @@ function App() {
     var result = await httpClient.get(`${selectedYear?.value}/highscores`);
     var highscores = await result.json();
     var scores = {};
+    var reducedScores = {};
+
     scores.year = selectedYear?.value;
     scores.lastUpdate = moment();
-    scores.highscores = highscores;
+    
+
+    highscores.forEach((score) => {
+      var details = {};
+      details.eventName = eventNames[worldStats?.year][score?.matchData?.event?.eventCode];
+      details.alliance = _.upperFirst(score?.matchData?.highScoreAlliance);
+      details.scoreType = score?.type + score?.level;
+      details.matchName = score?.matchData?.match?.description;
+      details.allianceMembers = _.filter(score?.matchData?.match?.teams, function (o) { return _.startsWith(o.station, details.alliance) }).map((team) => { return team.teamNumber }).join(" ")
+      details.score = score?.matchData?.match[`score${details.alliance}Final`];
+      reducedScores[details.scoreType] = details;
+    })
+    scores.highscores = reducedScores;
+
     setWorldStats(scores);
     setStatsTabReady(TabStates.Ready);
   }
@@ -642,6 +730,7 @@ function App() {
       setQualSchedule(null);
       setTeamList(null);
       setRankings(null);
+      setEventHighScores(null);
       setScheduleTabReady(TabStates.NotReady);
       setTeamDataTabReady(TabStates.NotReady);
       setRanksTabReady(TabStates.NotReady);
@@ -657,6 +746,7 @@ function App() {
       setPlayoffSchedule(null);
       setTeamList(null);
       setRankings(null);
+      setEventHighScores(null);
       setCurrentMatch(1);
       getSchedule();
       getTeamList();
@@ -692,7 +782,7 @@ function App() {
 
               <Route path='/allianceselection' element={<AllianceSelectionPage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} alliances={alliances} />} />
               <Route path='/awards' element={<AwardsPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} communityUpdates={communityUpdates} />} />
-              <Route path='/stats' element={<StatsPage worldStats={worldStats} selectedEvent={selectedEvent} eventNames={eventNames}/>} />
+              <Route path='/stats' element={<StatsPage worldStats={worldStats} selectedEvent={selectedEvent} eventHighScores={eventHighScores} />} />
               <Route path='/cheatsheet' element={<CheatsheetPage />} />
               <Route path='/emcee' element={<EmceePage />} />
               <Route path='/help' element={<HelpPage />} />
