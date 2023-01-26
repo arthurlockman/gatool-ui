@@ -302,7 +302,16 @@ function App() {
     setEventHighScores(highScores);
     playoffschedule.lastUpdate = moment();
     setPlayoffSchedule(playoffschedule);
-    setScheduleTabReady(TabStates.Ready);
+    if (qualSchedule?.schedule?.length === 0) {
+      setScheduleTabReady(TabStates.Stale);
+    } else if (qualSchedule?.schedule?.length > 0) {
+      setScheduleTabReady(TabStates.Ready);
+    } else if ((_.indexOf(champsEvents, selectedEvent?.value?.code) >= 0) && (playoffSchedule.schedule.length > 0)) {
+      setScheduleTabReady(TabStates.Ready);
+    } else {
+      setScheduleTabReady(TabStates.NotReady);
+    }
+
   }
 
   // This function retrieves a a list of teams for a specific event from FIRST. It parses the list and modifies some of the data to produce more readable content.
@@ -463,7 +472,14 @@ function App() {
 
       teams.lastUpdate = moment();
       setTeamList(teams);
-      setTeamDataTabReady(TabStates.Ready);
+      if (teams?.teams?.length === 0) {
+        setTeamDataTabReady(TabStates.Stale);
+      } else if (teams?.teams?.length > 0) {
+        setTeamDataTabReady(TabStates.Ready);
+      } else {
+        setTeamDataTabReady(TabStates.NotReady);
+      }
+      
       var champsTeams = [];
       if (selectedEvent?.value?.champLevel !== "") {
         setTeamDataTabReady(TabStates.NotReady);
@@ -586,7 +602,14 @@ function App() {
 
     ranks.lastUpdate = moment();
     setRankings(ranks);
-    setRanksTabReady(TabStates.Ready);
+    if (ranks?.ranks?.length === 0) {
+      setRanksTabReady(TabStates.Stale);
+    } else if (ranks?.ranks?.length > 0) {
+      setRanksTabReady(TabStates.Ready);
+    } else {
+      setRanksTabReady(TabStates.NotReady);
+    }
+    
   }
 
   // This function retrieves the ranking data for a specified event from FIRST.
@@ -599,7 +622,7 @@ function App() {
 
     scores.year = selectedYear?.value;
     scores.lastUpdate = moment();
-    
+
 
     highscores.forEach((score) => {
       var details = {};
@@ -614,7 +637,12 @@ function App() {
     scores.highscores = reducedScores;
 
     setWorldStats(scores);
-    setStatsTabReady(TabStates.Ready);
+    if (!_.isEmpty(scores?.highscores)) {
+      setStatsTabReady(TabStates.Ready);
+    } else {
+      setStatsTabReady(TabStates.NotReady);
+    }
+    
   }
 
   // This function retrieves the Playoff Alliance data for a specified event from FIRST.
@@ -778,7 +806,7 @@ function App() {
 
               <Route path='/announce' element={<AnnouncePage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} communityUpdates={communityUpdates} currentMatch={currentMatch} setCurrentMatch={setCurrentMatch} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} alliances={alliances} getSchedule={getSchedule} getRanks={getRanks} awardsMenu={awardsMenu} showNotes={showNotes} showAwards={showAwards} showSponsors={showSponsors} showMottoes={showMottoes} showChampsStats={showChampsStats} />} />
 
-              <Route path='/playbyplay' element={<PlayByPlayPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} communityUpdates={communityUpdates} currentMatch={currentMatch} setCurrentMatch={setCurrentMatch} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} alliances={alliances} getSchedule={getSchedule} getRanks={getRanks} awardsMenu={awardsMenu} showMottoes={showMottoes} showNotes={showNotes} showQualsStats={showQualsStats} />} />
+              <Route path='/playbyplay' element={<PlayByPlayPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} communityUpdates={communityUpdates} currentMatch={currentMatch} setCurrentMatch={setCurrentMatch} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} alliances={alliances} getSchedule={getSchedule} getRanks={getRanks} awardsMenu={awardsMenu} showMottoes={showMottoes} showNotes={showNotes} showQualsStats={showQualsStats} swapScreen={swapScreen} />} />
 
               <Route path='/allianceselection' element={<AllianceSelectionPage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} alliances={alliances} />} />
               <Route path='/awards' element={<AwardsPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} communityUpdates={communityUpdates} />} />

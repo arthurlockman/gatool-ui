@@ -7,9 +7,11 @@ import BottomButtons from "../components/BottomButtons";
 import TopButtons from "../components/TopButtons";
 
 const paleGreen = "rgba(144, 238, 144, 0.5)"
-var displayOrder = ["Blue1", "Red3", "Blue2", "Red2", "Blue3", "Red1", "Blue4", "Red4"];
 
-function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, setCurrentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, getSchedule, getRanks, showNotes, showMottoes, showQualsStats }) {
+
+function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, setCurrentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, getSchedule, getRanks, showNotes, showMottoes, showQualsStats, swapScreen }) {
+    var displayOrder = ["Blue1", "Red3", "Blue2", "Red2", "Blue3", "Red1", "Blue4", "Red4"];
+    if (swapScreen===true) {displayOrder = ["Red3", "Blue1", "Red2", "Blue2", "Red1", "Blue3", "Red4", "Blue4"]}
 
     function updateTeamDetails(station, matchDetails) {
         var team = {}
