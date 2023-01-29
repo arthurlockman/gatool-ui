@@ -113,10 +113,10 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
 
     return (
         <Container fluid >
-            {!selectedEvent && !teamList && <div>
+            {!selectedEvent &&  <div>
                 <Alert variant="warning" >You need to select an event before you can see anything here.</Alert>
             </div>}
-            {selectedEvent && !teamList && <div>
+            {selectedEvent && (!teamList || teamList?.teams.length === 0) && <div>
                 <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div>Awaiting team data for {selectedEvent.label}</Alert>
             </div>}
             {selectedEvent && teamList && (!schedule || schedule?.length === 0) && <div>

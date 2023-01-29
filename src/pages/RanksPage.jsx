@@ -75,7 +75,7 @@ function RanksPage({ selectedEvent, teamList, rankings, rankSort, setRankSort, a
                         </tr>
                     </thead>
                     <tbody>
-                        {rankings && rankings.ranks && rankingsList.map((rankRow) => {
+                        {rankings && rankings?.ranks && rankingsList.map((rankRow) => {
                             return <tr key={"rankings" + rankRow.teamNumber}>
                                 <td>{rankRow.teamNumber}</td>
                                 <td style={rankHighlight(rankRow.rank)}>{rankRow.rank}</td>

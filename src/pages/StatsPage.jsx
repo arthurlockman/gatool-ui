@@ -13,7 +13,7 @@ function StatsPage({ worldStats, selectedEvent, eventHighScores }) {
             {selectedEvent && !worldStats && <div>
                 <Alert variant="warning" ><Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div>Awaiting stats data for {selectedEvent.label}</Alert></Alert>
             </div>}
-            {selectedEvent && worldStats && eventHighScores &&
+            {selectedEvent && worldStats && 
                 <Container fluid>
                     <Row>
                         <Col xs={"12"} sm={"6"}>

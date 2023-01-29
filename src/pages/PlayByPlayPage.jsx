@@ -100,7 +100,7 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
         if (match.tournamentLevel === "Playoff") {
             tag = match.description;
         }
-        return { "value": index + 1, "label": tag, "color": match.scoreRedFinal ? paleGreen : "" }
+        return { "value": index + 1, "label": tag, "color": match?.scoreRedFinal ? paleGreen : "" }
     })
 
     var teamDetails = [];
@@ -135,11 +135,11 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
     return (
 
         <Container fluid>
-            {!selectedEvent && !teamList && <div>
+            {!selectedEvent &&  <div>
                 <Alert variant="warning" >You need to select an event before you can see anything here.</Alert>
             </div>}
-            {selectedEvent && !teamList && <div>
-                <Alert variant="warning" ><Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div>Awaiting team data for {selectedEvent.label}</Alert></Alert>
+            {selectedEvent && (!teamList || teamList?.teams.length === 0) && <div>
+                <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div>Awaiting team data for {selectedEvent.label}</Alert>
             </div>}
             {selectedEvent && teamList && (!schedule || schedule?.length === 0) && <div>
                 <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div>Awaiting schedule data for {selectedEvent.label}</Alert>

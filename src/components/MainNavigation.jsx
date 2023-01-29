@@ -45,7 +45,7 @@ const tabInactiveNotready = {
   textDecoration: "none"
 }
 
-function MainNavigation({scheduleTabReady, teamDataTabReady, ranksTabReady, statsTabReady, allianceSelectionReady}) {
+function MainNavigation({ scheduleTabReady, teamDataTabReady, ranksTabReady, statsTabReady, allianceSelectionReady, playoffs }) {
   function getTabStyle(active, state) {
     if (state === null) { // tab has no ready state
       if (active) return tabActive;
@@ -75,12 +75,12 @@ function MainNavigation({scheduleTabReady, teamDataTabReady, ranksTabReady, stat
         <Nav.Link as={NavLink} style={({ isActive }) => getTabStyle(isActive, ranksTabReady)} to="/ranks"><SortNumericDown /><div className='d-none d-lg-block'>Ranks</div></Nav.Link>
         <Nav.Link as={NavLink} style={({ isActive }) => getTabStyle(isActive, scheduleTabReady)} to="/announce"><Megaphone /><div className='d-none d-lg-block'>Announce</div></Nav.Link>
         <Nav.Link as={NavLink} style={({ isActive }) => getTabStyle(isActive, scheduleTabReady)} to="/playbyplay"><Speedometer /><div className='d-none d-lg-block'>Play-by-Play</div></Nav.Link>
-        <Nav.Link as={NavLink} style={({ isActive }) => getTabStyle(isActive, allianceSelectionReady)} to="/allianceselection"><HandThumbsUp /><div className='d-none d-lg-block'>Alliance Selection</div></Nav.Link>
+        <Nav.Link as={NavLink} style={({ isActive }) => getTabStyle(isActive, allianceSelectionReady)} to="/allianceselection"><HandThumbsUp /><div className='d-none d-lg-block'>{playoffs ? "Playoffs" : "Alliance Selection"}</div></Nav.Link>
         <Nav.Link as={NavLink} style={({ isActive }) => getTabStyle(isActive, teamDataTabReady)} to="/awards"><Trophy /><div className='d-none d-lg-block'>Awards</div></Nav.Link>
         <Nav.Link as={NavLink} style={({ isActive }) => getTabStyle(isActive, statsTabReady)} to="/stats"><Flag /><div className='d-none d-lg-block'>Stats</div></Nav.Link>
         <Nav.Link as={NavLink} style={({ isActive }) => getTabStyle(isActive, null)} to="/cheatsheet"><Eye /><div className='d-none d-lg-block'>Cheat Sheet</div></Nav.Link>
         <Nav.Link as={NavLink} style={({ isActive }) => getTabStyle(isActive, null)} to="/emcee"><Gift /><div className='d-none d-lg-block'>Emcee #s</div></Nav.Link>
-        <Nav.Link as={NavLink} className='d-none d-lg-block' style={({ isActive }) => getTabStyle(isActive, null)} to="/help"><QuestionOctagon  /><div className='d-none d-lg-block'>Help</div></Nav.Link>
+        <Nav.Link as={NavLink} className='d-none d-lg-block' style={({ isActive }) => getTabStyle(isActive, null)} to="/help"><QuestionOctagon /><div className='d-none d-lg-block'>Help</div></Nav.Link>
       </Nav>
       {!isOnline &&
         <WifiOff style={{
@@ -88,7 +88,7 @@ function MainNavigation({scheduleTabReady, teamDataTabReady, ranksTabReady, stat
           marginRight: '5px',
           height: "31px",
           width: "31px"
-        }}/>}
+        }} />}
       <AuthWidget />
     </Navbar>
   );

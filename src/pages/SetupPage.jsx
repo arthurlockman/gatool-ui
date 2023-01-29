@@ -48,6 +48,14 @@ const filterTime = [
     { value: "week8", label: "Week 8" },
 ]
 
+const teamReducer = [
+    {value:0,label:0},
+    {value: 1,label: 1},
+    {value: 2,label: 2},
+    {value: 3,label: 3},
+    {value: 4,label: 4}
+]
+
 const timeFormatMenu = [
     { label: "12hr", value: "h:mm:ss a" },
     { label: "24hr", value: "HH:mm:ss" },
@@ -59,7 +67,7 @@ const awardsMenuOptions = [
     { label: "1 (current season only", value: "1" },
 ]
 
-function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats }) {
+function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, teamReduction, setTeamReduction }) {
     const isOnline = useOnlineStatus()
 
     function filterEvents(events) {
@@ -155,6 +163,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                         {teamList?.teams.length > 0 && <p><b>Number of Competing teams: </b>{teamList?.teams.length}</p>}
                         {selectedEvent?.value.dateStart && <p><b>Event Start: </b>{moment(selectedEvent.value.dateStart, 'YYYY-MM-DDTHH:mm:ss').format('ddd, MMM Do YYYY')}</p>}
                         {selectedEvent?.value.dateEnd && <p><b>Event End: </b>{moment(selectedEvent.value.dateEnd, 'YYYY-MM-DDTHH:mm:ss').format('ddd, MMM Do YYYY')}</p>}
+                        <Alert variant={"danger"}><b>ADVANCED:</b> If your event includes non-competing teams in the team list, indicate the number of non-competing teams here. <Select options={teamReducer} value={teamReduction ? teamReduction : teamReducer[0]} onChange={setTeamReduction} isDisabled={!teamList?.teamCountTotal} /></Alert>
                         <img style={{ width: 140, height: 140 }} src="/images/charged-up-gs-update.svg" alt="FIRST Energize Charged Up Logo" />
                     </Col>
                     <Col sm={4}>

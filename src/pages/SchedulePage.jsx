@@ -4,10 +4,10 @@ import moment from 'moment';
 function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule }) {
     return (
         <Container fluid>
-            {!selectedEvent && !qualSchedule && <div>
+            {!selectedEvent && <div>
                 <Alert variant="warning" >You need to select an event before you can see anything here.</Alert>
             </div>}
-            {selectedEvent && qualSchedule?.schedule.length === 0 && <div>
+            {selectedEvent && (!qualSchedule || qualSchedule?.schedule.length === 0) && <div>
                 <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div><div>Awaiting schedule for {selectedEvent.label}</div></Alert>
             </div>}
             {selectedEvent && qualSchedule?.schedule.length > 0 &&

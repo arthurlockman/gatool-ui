@@ -24,15 +24,15 @@ function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates })
     var rows = sortedTeams?.length;
     if (sortedTeams?.length > 0) {
         sortedTeams?.forEach((team, index) => {
-            if (index <= 1 * rows / 6) {
+            if (index <= 1 * rows / 6 -1) {
                 columns[0].push(team);
-            } else if (index <= 2 * rows / 6) {
+            } else if (index <= 2 * rows / 6 -1) {
                 columns[1].push(team);
-            } else if (index <= 3 * rows / 6) {
+            } else if (index <= 3 * rows / 6 -1) {
                 columns[2].push(team);
-            } else if (index <= 4 * rows / 6) {
+            } else if (index <= 4 * rows / 6 -1) {
                 columns[3].push(team);
-            } else if (index <= 5 * rows / 6) {
+            } else if (index <= 5 * rows / 6 -1) {
                 columns[4].push(team);
             } else {
                 columns[5].push(team);
