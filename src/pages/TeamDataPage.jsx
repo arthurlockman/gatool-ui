@@ -68,7 +68,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
 
                             return <tr key={"teamData" + team?.teamNumber}>
                                 <td>{team?.teamNumber}</td>
-                                <td style={rankHighlight(team?.rank ? team?.rank : 100,allianceCount)}>{team?.rank}</td>
+                                <td style={rankHighlight(team?.rank ? team?.rank : 100,allianceCount.count)}>{team?.rank}</td>
                                 <td dangerouslySetInnerHTML={{ __html: teamNameWithAvatar }} style={updateHighlight(team?.nameShortLocal)}></td>
                                 <td style={updateHighlight(team?.cityStateLocal)}>{team?.cityStateLocal ? team?.cityStateLocal : cityState} </td>
                                 <td style={updateHighlight(team?.topSponsorsLocal)}>{team?.topSponsorsLocal ? team?.topSponsorsLocal : team?.topSponsors}</td>
