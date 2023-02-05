@@ -5,6 +5,7 @@ import _ from "lodash";
 
 
 function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates }) {
+    const originalAndSustaining = ["20", "45", "126", "148", "151", "157", "190", "191", "250"];
 
     var columns = [[], [], [], [], [], []];
     var sortedTeams = _.orderBy(teamList?.teams, "teamNumber", "asc");
@@ -79,7 +80,7 @@ function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates })
                         </Modal.Header>
                         <Modal.Body>
                             <span className={"allianceAnnounceDialog"}>Team {awardTeam?.teamNumber} {awardTeam?.updates?.nameShortLocal ? awardTeam.updates.nameShortLocal : awardTeam?.nameShort}<br />
-                                is from<br />
+                                is {originalAndSustaining.includes(String(awardTeam?.teamNumber))?"an Original and Sustaining Team " : ""}from<br />
                                 {awardTeam?.updates?.organizationLocal ? awardTeam?.updates?.organizationLocal : awardTeam?.organization}<br />
                                 in {awardTeam?.updates?.cityStateLocal ? awardTeam?.updates?.cityStateLocal : `${awardTeam?.city}, ${awardTeam?.stateProv}`}{awardTeam?.country !== "USA" ? `, ${awardTeam?.country}` : ""}<br />
                                 <br />

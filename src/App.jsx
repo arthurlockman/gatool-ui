@@ -104,6 +104,7 @@ function App() {
   const [playoffs, setPlayoffs] = usePersistentState("cache:playoffs", null);
   const [playoffCountOverride, setPlayoffCountOverride] = usePersistentState("cache:playoffCountOverride", null);
   const [allianceCount, setAllianceCount] = usePersistentState("cache:allianceCount", null);
+  const [allianceSelectionArrays, setAllianceSelectionArrays] = usePersistentState("cache:allianceSelectionArrays",{});
 
   // Tab state trackers
   const [scheduleTabReady, setScheduleTabReady] = useState(TabStates.NotReady)
@@ -817,6 +818,7 @@ function App() {
       setAllianceCount(null);
       setTeamReduction(null);
       setPlayoffCountOverride(null);
+      setAllianceSelectionArrays({});
       setScheduleTabReady(TabStates.NotReady);
       setTeamDataTabReady(TabStates.NotReady);
       setRanksTabReady(TabStates.NotReady);
@@ -838,6 +840,7 @@ function App() {
       setAllianceCount(null);
       setTeamReduction(null);
       setPlayoffCountOverride(null);
+      setAllianceSelectionArrays({});
       setCurrentMatch(1);
       getSchedule();
       getTeamList();
