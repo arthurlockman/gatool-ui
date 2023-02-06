@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Container, Modal } from "react-bootstrap";
+import { Button, Container, Form, InputGroup, Modal } from "react-bootstrap";
 import _ from "lodash";
 import { HandThumbsDownFill, HandThumbsUpFill, TrophyFill } from "react-bootstrap-icons";
 import { usePersistentState } from "../hooks/UsePersistentState";
@@ -10,6 +10,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
     const [show, setShow] = useState(false);
     const [allianceTeam, setAllianceTeam] = useState(false);
     const [allianceMode, setAllianceMode] = useState(null);
+    const [teamFilter, setTeamFilter] = useState("");
 
     const allianceSelectionOrderBase = [
         { "number": 1, "round": 1 },
@@ -119,6 +120,21 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         asArrays.nextChoice = undo.nextChoice;
         asArrays.rankedTeams = undo.rankedTeams;
         setAllianceSelectionArrays(asArrays);
+    }
+
+    const filterTeams = (e) => {
+        if (_.isNaN(e.currentTarget.valueAsNumber)) {
+            setTeamFilter("");
+        } else {
+            setTeamFilter(String(e.currentTarget.valueAsNumber));
+        }
+    }
+
+    const handleFilterSelect = (e) => {
+        var team = _.filter(asArrays.availableTeams, {"teamNumber":e.currentTarget[0].valueAsNumber})[0];
+        setTeamFilter("");
+        handleAccept(team,"accept",e);
+
     }
 
     var availColumns = [[], [], [], [], []];
@@ -277,8 +293,16 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
             <Container fluid>
                 {selectedEvent && rankings && teamList && allianceCount &&
                     <div>
-                        {(asArrays.undo.length > 0) && <Button onClick={handleUndo} active >Undo Choice</Button>}
-                        {(asArrays.undo.length === 0) && <Button onClick={handleUndo} disabled >Undo Choice</Button>}
+                        <Form onSubmit={handleFilterSelect}>
+                            <InputGroup className="mb-3" >
+                            <InputGroup.Text>Filter the teams</InputGroup.Text>
+                            <Form.Control type="number" placeholder="Enter a number" aria-label="Team Number" onChange={filterTeams}/>
+                            <Button variant="primary" type="submit">Select this team</Button>
+
+                            {(asArrays.undo.length > 0) && <Button onClick={handleUndo} active >Undo Choice</Button>}
+                            {(asArrays.undo.length === 0) && <Button onClick={handleUndo} disabled >Undo Choice</Button>}
+                        </InputGroup>
+                        </Form>
                         <table>
                             <tbody>
                                 <tr>
@@ -293,7 +317,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                         return (<td key={index}>
                                                             {column.map((team) => {
                                                                 var declined = asArrays.declined.includes(team?.teamNumber);
-                                                                return (<div key={"availableButton" + team.teamNumber} className={declined ? "allianceDecline" : "allianceTeam"} onClick={(e) => handleShow(team, declined ? "declined" : "show", e)}><b>{team.teamNumber}</b></div>)
+                                                                return ((String(team.teamNumber).startsWith(teamFilter) || teamFilter==="") && <div key={"availableButton" + team.teamNumber} className={declined ? "allianceDecline" : "allianceTeam"} onClick={(e) => handleShow(team, declined ? "declined" : "show", e)}><b>{team.teamNumber}</b></div>)
                                                             })}
                                                         </td>)
                                                     })}
