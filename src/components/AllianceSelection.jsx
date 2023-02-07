@@ -47,6 +47,11 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         }
     })
 
+    var inChamps = false;
+    if (selectedEvent.champLevel === "CHAMPS" || selectedEvent.champLevel === "CMPDIV" || selectedEvent.champLevel === "CMPSUB") {
+        inChamps = true;
+    }
+
     var allianceDisplayOrder = [];
     if (allianceCount?.count <= 4) {
         allianceDisplayOrder = [[1, 4], [2, 3]]
@@ -123,18 +128,29 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
     }
 
     const filterTeams = (e) => {
-        if (_.isNaN(e.currentTarget.valueAsNumber)) {
+        e.preventDefault();
+        if (e.currentTarget.valueAsNumber === "") {
             setTeamFilter("");
         } else {
-            setTeamFilter(String(e.currentTarget.valueAsNumber));
+            setTeamFilter(e.currentTarget.value);
         }
     }
 
     const handleFilterSelect = (e) => {
-        var team = _.filter(asArrays.availableTeams, {"teamNumber":e.currentTarget[0].valueAsNumber})[0];
+        e.preventDefault();
+        var team = _.filter(asArrays.availableTeams, { 'teamNumber': Number(e.currentTarget[0].value) })[0];
+        document.getElementById("filterControl").value = "";
         setTeamFilter("");
-        handleAccept(team,"accept",e);
+        setAllianceTeam(team);
+        setAllianceMode("show");
+        setShow(true);
 
+    }
+
+    const handleReset = () => {
+        document.getElementById("filterControl").value = "";
+        setTeamFilter("");
+        setAllianceSelectionArrays({});
     }
 
     var availColumns = [[], [], [], [], []];
@@ -252,7 +268,11 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                 }
             ];
             asArrays.rankedTeams = _.orderBy(sortedTeams, ["rank", "asc"]);
-            asArrays.availableTeams = _.orderBy(asArrays.rankedTeams.slice(1), ["teamNumber", "asc"]);
+            asArrays.availableTeams = _.orderBy(sortedTeams, ["teamNumber", "asc"]);
+            //asArrays.availableTeams = _.cloneDeep(asArrays.rankedTeams);
+            //asArrays.availableTeams.shift();
+            //asArrays.availableTeams = _.orderBy(asArrays.availableTeams, ["teamNumber", "asc"]);
+            //asArrays.availableTeams.splice(_.findIndex(asArrays.rankedTeams, { "rank": 1 }), 1);
             asArrays.nextChoice = 0;
             asArrays.undo = [];
             asArrays.declined = [];
@@ -266,7 +286,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
 
         // set up the available teams block
         var rows = asArrays.availableTeams?.length;
-        if (asArrays.availableTeams?.length > 0) {
+        if (rows > 0) {
             asArrays.availableTeams?.forEach((team, index) => {
                 if (index <= 1 * rows / 5 - 1) {
                     availColumns[0].push(team);
@@ -291,17 +311,18 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
     return (
         <>
             <Container fluid>
-                {selectedEvent && rankings && teamList && allianceCount &&
+                {selectedEvent && rankings?.ranks?.length > 0 && teamList?.teams?.length>0 && allianceCount &&
                     <div>
                         <Form onSubmit={handleFilterSelect}>
                             <InputGroup className="mb-3" >
-                            <InputGroup.Text>Filter the teams</InputGroup.Text>
-                            <Form.Control type="number" placeholder="Enter a number" aria-label="Team Number" onChange={filterTeams}/>
-                            <Button variant="primary" type="submit">Select this team</Button>
-
-                            {(asArrays.undo.length > 0) && <Button onClick={handleUndo} active >Undo Choice</Button>}
-                            {(asArrays.undo.length === 0) && <Button onClick={handleUndo} disabled >Undo Choice</Button>}
-                        </InputGroup>
+                                <InputGroup.Text>Filter the teams</InputGroup.Text>
+                                <Form.Control id={"filterControl"} type="number" placeholder="Enter a number" aria-label="Team Number" onChange={filterTeams} />
+                                {(_.filter(asArrays.availableTeams, { 'teamNumber': Number(teamFilter) }).length === 1) && <Button variant="primary" type="submit">Select this team</Button>}
+                                <span>    </span>
+                                {(asArrays.undo.length > 0) && <Button size="sm" onClick={handleUndo} active >Undo Previous Choice</Button>}
+                                {(asArrays.undo.length === 0) && <Button size="sm" onClick={handleUndo} disabled >Undo Previous Choice</Button>}
+                                <span>    </span><Button size="sm" variant="warning" onClick={handleReset} active>Restart Alliance Selection</Button>
+                            </InputGroup>
                         </Form>
                         <table>
                             <tbody>
@@ -314,10 +335,18 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                 </tr>
                                                 <tr>
                                                     {availColumns.map((column, index) => {
-                                                        return (<td key={index}>
+                                                        return (<td key={`availableTableColumn${index}`}>
                                                             {column.map((team) => {
                                                                 var declined = asArrays.declined.includes(team?.teamNumber);
-                                                                return ((String(team.teamNumber).startsWith(teamFilter) || teamFilter==="") && <div key={"availableButton" + team.teamNumber} className={declined ? "allianceDecline" : "allianceTeam"} onClick={(e) => handleShow(team, declined ? "declined" : "show", e)}><b>{team.teamNumber}</b></div>)
+                                                                return (
+                                                                    <>
+                                                                        {(asArrays.nextChoice < allianceSelectionOrder.length && team.rank != 1) &&
+                                                                            (String(team.teamNumber).startsWith(teamFilter) || teamFilter === "") && <div key={"availableButton" + team.teamNumber} className={declined ? "allianceDecline" : "allianceTeam"} onClick={(e) => handleShow(team, declined ? "declined" : "show", e)}><b>{team.teamNumber}</b></div>}
+
+                                                                        {(asArrays.nextChoice >= allianceSelectionOrder.length || team.rank === 1) &&
+                                                                            (String(team.teamNumber).startsWith(teamFilter) || teamFilter === "") && <div key={"availableButtonDisabled" + team.teamNumber} className={declined ? "allianceDecline" : "allianceTeam"} ><b>{team.teamNumber}</b></div>}
+                                                                    </>
+                                                                )
                                                             })}
                                                         </td>)
                                                     })}
@@ -326,7 +355,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                         </table>
                                     </td>
                                     <td  >
-                                        <table id="backupTeamsTable" className={"backupAlliancesTable"}>
+                                        <table className={"backupAlliancesTable"}>
                                             <tbody>
                                                 <tr>
                                                     <td>
@@ -337,7 +366,13 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                     <td>
                                                         {backupTeams.map((team) => {
                                                             var declined = asArrays.declined.includes(team.teamNumber);
-                                                            return (<div key={"availableButton" + team.teamNumber} className={declined ? "allianceDecline" : "allianceTeam"} onClick={(e) => handleShow(team, declined ? "declined" : "show", e)}><b>{team.teamNumber}</b></div>)
+                                                            return (
+                                                                <>{(asArrays.nextChoice < allianceSelectionOrder.length) &&
+                                                                    <div key={"backupButton" + team.teamNumber} className={declined ? "allianceDecline" : "allianceTeam"} onClick={(e) => handleShow(team, declined ? "declined" : "show", e)}><b>{team.teamNumber}</b></div>}
+                                                                    {(asArrays.nextChoice >= allianceSelectionOrder.length) &&
+                                                                        <div key={"backupButtonDisabled" + team.teamNumber} className={declined ? "allianceDecline" : "allianceTeam"} ><b>{team.teamNumber}</b></div>}
+                                                                </>
+                                                            )
                                                         })}
                                                     </td>
                                                 </tr>
@@ -355,26 +390,28 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                                 var alliance = _.filter(alliances, { "number": allianceNumber })
                                                                 var allianceName = alliance[0].name;
                                                                 var captain = alliance[0]?.captain;
-                                                                captain.declined = asArrays?.declined.includes(captain?.teamNumber);
+                                                                if (captain) {captain.declined = asArrays?.declined?.includes(captain?.teamNumber);}
                                                                 var round1 = alliance[0]?.round1;
-                                                                if (round1) { round1.declined = asArrays?.declined.includes(round1?.teamNumber); }
+                                                                if (round1) { round1.declined = asArrays?.declined?.includes(round1?.teamNumber); }
                                                                 var round2 = alliance[0]?.round2;
-                                                                if (round2) { round2.declined = asArrays?.declined.includes(round2?.teamNumber); }
+                                                                if (round2) { round2.declined = asArrays?.declined?.includes(round2?.teamNumber); }
                                                                 var round3 = alliance[0]?.round3;
-                                                                if (round3) { round3.declined = asArrays?.declined.includes(round3?.teamNumber); }
+                                                                if (round3) { round3.declined = asArrays?.declined?.includes(round3?.teamNumber); }
                                                                 return (
                                                                     (allianceNumber <= allianceCount.count) ? <td className={allianceSelectionOrder[asArrays.nextChoice]?.number === allianceNumber ? "dropzone" : ""} key={`AllianceTable${allianceName}`}>
                                                                         <div><b>{allianceName}</b></div>
 
-                                                                        {(allianceNumber > asArrays.nextChoice + 1) && <div className={"alliancedrop allianceCaptain"} >Captain<div className={captain?.declined ? "allianceDecline" : "allianceTeam"} onClick={(e) => handleShow(captain, allianceNumber === 1 ? "a1captain" : captain.declined ? "declined" : "show", e)}>{captain?.teamNumber ? captain?.teamNumber : ""}</div></div>}
+                                                                        {(allianceNumber === asArrays.nextChoice + 1) && <div className={"alliancedrop allianceCaptain"} >Captain<div key={`${allianceName}captainAvailable`} className={captain?.declined ? "allianceDecline" : "allianceTeam"} onClick={(e) => handleShow(captain, allianceNumber === 1 ? "a1captain" : allianceNumber > 1 ? "captain" : captain.declined ? "declined" : "show", e)}>{captain?.teamNumber ? captain?.teamNumber : ""}</div></div>}
 
-                                                                        {(allianceNumber <= asArrays.nextChoice + 1) && <div className={"alliancedrop allianceCaptain"} >Captain<div className={captain?.declined ? "allianceDecline" : "allianceTeam"} >{captain?.teamNumber ? captain?.teamNumber : ""}</div></div>}
+                                                                        {(allianceNumber > asArrays.nextChoice + 1) && <div className={"alliancedrop allianceCaptain"} >Captain<div key={`${allianceName}captainAvailable`} className={captain?.declined ? "allianceDecline" : "allianceTeam"} onClick={(e) => handleShow(captain, captain.declined ? "declined" : "show", e)}>{captain?.teamNumber ? captain?.teamNumber : ""}</div></div>}
 
-                                                                        <div className={(allianceSelectionOrder[asArrays.nextChoice]?.number === allianceNumber) && (allianceSelectionOrder[asArrays.nextChoice]?.round === 1) ? "alliancedrop nextAllianceChoice" : "alliancedrop"}>1st choice{round1?.teamNumber ? <div className={round1?.declined ? "allianceDecline" : "allianceTeam"}>{round1?.teamNumber}</div> : ""}</div>
+                                                                        {(allianceNumber < asArrays.nextChoice + 1) && <div className={"alliancedrop allianceCaptain"} >Captain<div key={`${allianceName}captainunavailable`} className={captain?.declined ? "allianceDecline" : "allianceTeam"} >{captain?.teamNumber ? captain?.teamNumber : ""}</div></div>}
 
-                                                                        <div className={(allianceSelectionOrder[asArrays.nextChoice]?.number === allianceNumber) && (allianceSelectionOrder[asArrays.nextChoice]?.round === 2) ? "alliancedrop nextAllianceChoice" : "alliancedrop"}>2nd choice{round2?.teamNumber ? <div className={"allianceTeam"}>{round2?.teamNumber}</div> : ""}</div>
+                                                                        <div className={(allianceSelectionOrder[asArrays.nextChoice]?.number === allianceNumber) && (allianceSelectionOrder[asArrays.nextChoice]?.round === 1) ? "alliancedrop nextAllianceChoice" : "alliancedrop"}>1st choice{round1?.teamNumber ? <div key={`${allianceName}round1`} className={round1?.declined ? "allianceDecline" : "allianceTeam"}>{round1?.teamNumber}</div> : ""}</div>
 
-                                                                        <div className={(allianceSelectionOrder[asArrays.nextChoice]?.number === allianceNumber) && (allianceSelectionOrder[asArrays.nextChoice]?.round === 3) ? "alliancedrop nextAllianceChoice" : "alliancedrop"}>3rd choice{round3?.teamNumber ? <div className={"allianceTeam"}>{round3?.teamNumber}</div> : ""}</div>
+                                                                        <div className={(allianceSelectionOrder[asArrays.nextChoice]?.number === allianceNumber) && (allianceSelectionOrder[asArrays.nextChoice]?.round === 2) ? "alliancedrop nextAllianceChoice" : "alliancedrop"}>2nd choice{round2?.teamNumber ? <div key={`${allianceName}round2`} className={"allianceTeam"}>{round2?.teamNumber}</div> : ""}</div>
+
+                                                                        {inChamps && <div className={(allianceSelectionOrder[asArrays.nextChoice]?.number === allianceNumber) && (allianceSelectionOrder[asArrays.nextChoice]?.round === 3) ? "alliancedrop nextAllianceChoice" : "alliancedrop"}>3rd choice{round3?.teamNumber ? <div key={`${allianceName}round3`} className={"allianceTeam"}>{round3?.teamNumber}</div> : ""}</div>}
                                                                     </td> : <td></td>
                                                                 )
                                                             })}
@@ -393,22 +430,26 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                     </Modal.Header>
                     <Modal.Body>
                         {allianceMode === "show" && <span className={"allianceAnnounceDialog"}>Team {allianceTeam?.teamNumber} {allianceTeam?.updates?.nameShortLocal ? allianceTeam.updates.nameShortLocal : allianceTeam?.nameShort}<br />
-                            is {originalAndSustaining.indexOf(String(allianceTeam?.teamNumber)) ? "an Original and Sustaining Team " : ""}from<br />
+                            is {(originalAndSustaining.indexOf(String(allianceTeam?.teamNumber))>=0) ? "an Original and Sustaining Team " : ""}from<br />
                             {allianceTeam?.updates?.organizationLocal ? allianceTeam?.updates?.organizationLocal : allianceTeam?.organization}<br />
                             in {allianceTeam?.updates?.cityStateLocal ? allianceTeam?.updates?.cityStateLocal : `${allianceTeam?.city}, ${allianceTeam?.stateProv}`}{allianceTeam?.country !== "USA" ? `, ${allianceTeam?.country}` : ""}<br /></span>}
                         {allianceMode === "accept" && <span className={"allianceAnnounceDialog"}>Team {allianceTeam?.teamNumber} {allianceTeam?.updates?.nameShortLocal ? allianceTeam.updates.nameShortLocal : allianceTeam?.nameShort}<br />
-                            has been asked to join Alliance {allianceSelectionOrder[asArrays.nextChoice].number}.<br />Do they accept?</span>}
+                            has been asked to join Alliance {allianceSelectionOrder[asArrays.nextChoice]?.number}.<br />Do they accept?</span>}
                         {allianceMode === "decline" && <span className={"allianceAnnounceDialog"}>Team {allianceTeam?.teamNumber} {allianceTeam?.updates?.nameShortLocal ? allianceTeam?.updates?.nameShortLocal : allianceTeam?.nameShort}<br />
-                            has declined the offer from Alliance {allianceSelectionOrder[asArrays.nextChoice].number}.<br />They will become inelegible to be selected by another team or to continue as a backup team in the playoffs. Do they decline?</span>}
+                            has declined the offer from Alliance {allianceSelectionOrder[asArrays.nextChoice]?.number}.<br />They will become inelegible to be selected by another team or to continue as a backup team in the playoffs. Do they decline?</span>}
                         {allianceMode === "declined" && <span className={"allianceAnnounceDialog"}>Team {allianceTeam?.teamNumber} {allianceTeam?.updates?.nameShortLocal ? allianceTeam.updates.nameShortLocal : allianceTeam?.nameShort}<br />
                             has previously declined an offer. They are inelegible to be selected by another alliance.</span>}
                         {allianceMode === "a1captain" && <span className={"allianceAnnounceDialog"}>Team {allianceTeam?.teamNumber} {allianceTeam?.updates?.nameShortLocal ? allianceTeam.updates.nameShortLocal : allianceTeam?.nameShort}<br />
                             is our top seeded Alliance. They are inelegible to be selected by another alliance.</span>}
+                        {allianceMode === "captain" && <span className={"allianceAnnounceDialog"}>Team {allianceTeam?.teamNumber} {allianceTeam?.updates?.nameShortLocal ? allianceTeam.updates.nameShortLocal : allianceTeam?.nameShort}<br />
+                            is an Alliance Captain. They are inelegible to be selected by another alliance.</span>}
+
                     </Modal.Body>
                     <Modal.Footer>
                         <Button variant="primary" size="sm" onClick={handleClose}>
                             {allianceMode === "show" && <span> <TrophyFill /> Alliance Announce</span>}
                             {allianceMode === "a1captain" && <span> <TrophyFill /> Top Seeded Alliance</span>}
+                            {allianceMode === "captain" && <span> <TrophyFill /> Alliance Captain</span>}
                             {allianceMode === "declined" && <span> <TrophyFill /> Sorry</span>}
                             {(allianceMode === "decline" || allianceMode === "accept") && <span><TrophyFill /> Oops, they reconsidered.</span>}
                         </Button>

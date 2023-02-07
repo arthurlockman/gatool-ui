@@ -245,7 +245,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                         <Switch checked={autoAdvance === null ? false : autoAdvance} onChange={setAutoAdvance} disabled />
                                     </td>
                                     <td>
-                                        <b>Automatically advance to the next match when loading</b>
+                                        <b>Future Feature: Automatically advance to the next match when loading</b>
                                     </td>
                                 </tr>
                                 <tr>
