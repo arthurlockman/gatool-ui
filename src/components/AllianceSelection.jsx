@@ -340,7 +340,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                                 var declined = asArrays.declined.includes(team?.teamNumber);
                                                                 return (
                                                                     <>
-                                                                        {(asArrays.nextChoice < allianceSelectionOrder.length && team.rank != 1) &&
+                                                                        {(asArrays.nextChoice < allianceSelectionOrder.length && team.rank !== 1) &&
                                                                             (String(team.teamNumber).startsWith(teamFilter) || teamFilter === "") && <div key={"availableButton" + team.teamNumber} className={declined ? "allianceDecline" : "allianceTeam"} onClick={(e) => handleShow(team, declined ? "declined" : "show", e)}><b>{team.teamNumber}</b></div>}
 
                                                                         {(asArrays.nextChoice >= allianceSelectionOrder.length || team.rank === 1) &&
