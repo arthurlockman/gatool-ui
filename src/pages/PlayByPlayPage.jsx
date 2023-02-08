@@ -9,7 +9,7 @@ import TopButtons from "../components/TopButtons";
 const paleGreen = "rgba(144, 238, 144, 0.5)"
 
 
-function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, setCurrentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, getSchedule, getRanks, showNotes, showMottoes, showQualsStats, swapScreen }) {
+function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, setCurrentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, getSchedule, getRanks, showNotes, showMottoes, showQualsStats, swapScreen, timeFormat }) {
     var displayOrder = ["Blue1", "Red3", "Blue2", "Red2", "Blue3", "Red1", "Blue4", "Red4"];
     if (swapScreen===true) {displayOrder = ["Red3", "Blue1", "Red2", "Blue2", "Red1", "Blue3", "Red4", "Blue4"]}
 
@@ -146,7 +146,7 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
             </div>}
             {selectedEvent && teamList?.teams.length > 0 && schedule?.length > 0 &&
                 <Container fluid>
-                    <TopButtons previousMatch={previousMatch} nextMatch={nextMatch} currentMatch={currentMatch} matchMenu={matchMenu} setMatchFromMenu={setMatchFromMenu} selectedEvent={selectedEvent} />
+                    <TopButtons previousMatch={previousMatch} nextMatch={nextMatch} currentMatch={currentMatch} matchMenu={matchMenu} setMatchFromMenu={setMatchFromMenu} selectedEvent={selectedEvent} matchDetails={matchDetails} timeFormat={timeFormat}/>
                     <table >
                         <tbody>
                             <tr className={"gatool-playbyplay"}>

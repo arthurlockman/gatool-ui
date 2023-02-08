@@ -26,7 +26,7 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
             <td className={'col1'} >
                 <span className={"announceTeamNumber"} ><b>{team.teamNumber}</b></span><br />
                 {team?.updates?.sayNumber && <span >{team.updates?.sayNumber}<br /></span>}
-                <span >{team?.rookieYear} ({years === 1 ? "" : years}{yearsDisplay} season)</span>
+                <span >{team?.rookieYear}<br />({years === 1 ? "" : years}{yearsDisplay} season)</span>
                 {inPlayoffs && <p className={"announceAlliance"}>{team.alliance}<br />{team.allianceRole}</p>}
             </td>
             <td className={'col2'}>

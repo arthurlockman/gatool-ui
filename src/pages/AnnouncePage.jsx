@@ -6,9 +6,10 @@ import { rankHighlight } from "../components/HelperFunctions";
 import BottomButtons from "../components/BottomButtons";
 import TopButtons from "../components/TopButtons";
 
+
 const paleGreen = "rgba(144, 238, 144, 0.5)"
 
-function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, setCurrentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, getSchedule, getRanks, awardsMenu, showNotes, showAwards, showSponsors, showMottoes, showChampsStats }) {
+function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, setCurrentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, getSchedule, getRanks, awardsMenu, showNotes, showAwards, showSponsors, showMottoes, showChampsStats, timeFormat }) {
 
     function updateTeamDetails(station, matchDetails) {
         var team = {}
@@ -124,7 +125,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
             </div>}
             {selectedEvent && teamList?.teams.length > 0 && schedule?.length > 0 &&
                 <Container fluid>
-                    <TopButtons previousMatch={previousMatch} nextMatch={nextMatch} currentMatch={currentMatch} matchMenu={matchMenu} setMatchFromMenu={setMatchFromMenu} selectedEvent={selectedEvent} />
+                    <TopButtons previousMatch={previousMatch} nextMatch={nextMatch} currentMatch={currentMatch} matchMenu={matchMenu} setMatchFromMenu={setMatchFromMenu} selectedEvent={selectedEvent} matchDetails={matchDetails} timeFormat={timeFormat}/>
                     <table>
                         <tbody>
                             {displayOrder.map((station) => {
