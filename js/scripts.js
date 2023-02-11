@@ -487,7 +487,7 @@ window.onload = function () {
     });
 
     //Add the image to the cheat sheet. We do this late so that other items will load first.
-    $('#cheatSheetImage').html('<a href="/images/charged-up-cheat-sheet.pdf" download><img src="images/charged-up-cheat-sheet.svg" width="100%" alt="Cheatsheet"></a>');
+    $('#cheatSheetImage').html('<a href="/images/charged-up-cheat-sheet.pdf" download><img src="/images/Charged-Up-Cheat-Sheet.png" width="100%" alt="Cheatsheet"></a>');
     $('#allianceSelectionTable').hide();
     $('#allianceUndoButton').hide();
 
