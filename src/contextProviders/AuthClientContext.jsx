@@ -35,6 +35,28 @@ class AuthClient {
         throw new Error(errorText);
     }
 
+    async post(path, body) {
+        if (!this.online) {
+            throw new Error('You are offline.')
+        }
+
+        this.operationStart();
+        var token = await this.getToken();
+        var response = await fetch(`${apiBaseUrl}${path}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            method: 'POST',
+            body: JSON.stringify(body)
+        }).finally(() => {
+            this.operationDone();
+        });
+        if (response.ok) return response;
+        const errorText = `Received a ${response.status} error from backend: "${response.statusText}"`;
+        toast.error(errorText);
+        throw new Error(errorText);
+    }
+
     setOnlineStatus(online) {
         this.online = online
     }
