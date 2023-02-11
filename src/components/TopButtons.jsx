@@ -8,7 +8,7 @@ function TopButtons({previousMatch, nextMatch, currentMatch, matchMenu, setMatch
         <>
             <Row style={{ "paddingTop": "10px", "paddingBottom": "10px" }}>
                         <Col xs={"3"} ><Button size="large" variant="outline-success" className={"gatool-button buttonNoWrap"} onClick={previousMatch}><span className={"d-none d-lg-block"}><CaretLeftFill /> Previous Match</span><span className={"d-block d-lg-none"}><CaretLeftFill /> <CaretLeftFill /></span></Button></Col>
-                        <Col xs={"2"}><MatchClock matchDetails={matchDetails} timeFormat={timeFormat}/></Col>
+                        <MatchClock matchDetails={matchDetails} timeFormat={timeFormat}/>
                         <Col xs={"4"}><b>{selectedEvent?.label.replace("FIRST Championship - ", "").replace("FIRST In Texas District Championship - ", "").replace("FIRST Ontario Provincial Championship - ", "").replace("New England FIRST District Championship - ", "")}</b><br /><Select options={matchMenu} value={currentMatch ? matchMenu[currentMatch - 1] : matchMenu[0]} onChange={setMatchFromMenu} styles={{
                             option: (styles, { data }) => {
                                 return {

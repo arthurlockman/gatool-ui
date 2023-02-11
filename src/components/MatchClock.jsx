@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import moment from 'moment/moment';
+import { Col } from 'react-bootstrap';
 
 const MatchClock = ({ matchDetails, timeFormat }) => {
     const [currentTime, setCurrentTime] = useState(moment());
@@ -39,11 +40,11 @@ const MatchClock = ({ matchDetails, timeFormat }) => {
 
     }
     return (
-        <div className={matchDelay}>
+        <Col xs={"2"} className={matchDelay}>
             <div><b>{moment(currentTime).format(timeFormat.value)}</b></div>
             {matchDetails?.actualStartTime && <div>Actual match time:<br />{moment(matchDetails?.actualStartTime).format("MMM Do, " + timeFormat.value)}</div>}
             {!matchDetails?.actualStartTime && <div>Scheduled match time:<br />{moment(matchDetails?.startTime).format("MMM Do, " + timeFormat.value)}</div>}
-        </div>
+        </Col>
     );
 };
 
