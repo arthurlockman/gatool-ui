@@ -35,7 +35,7 @@ class AuthClient {
         throw new Error(errorText);
     }
 
-    async post(path, body) {
+    async put(path, body) {
         if (!this.online) {
             throw new Error('You are offline.')
         }
@@ -44,9 +44,10 @@ class AuthClient {
         var token = await this.getToken();
         var response = await fetch(`${apiBaseUrl}${path}`, {
             headers: {
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
             },
-            method: 'POST',
+            method: 'PUT',
             body: JSON.stringify(body)
         }).finally(() => {
             this.operationDone();
