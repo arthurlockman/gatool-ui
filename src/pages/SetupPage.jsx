@@ -174,7 +174,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                         <Alert variant={"danger"}><b>ADVANCED EVENT SETTINGS:</b><br />If your event includes non-competing teams in the team list, indicate the number of non-competing teams here. THIS IS A RARE CONDITION <Select options={teamReducer} value={teamReduction ? teamReduction : teamReducer[0]} onChange={setTeamReduction} isDisabled={!teamList?.teamCountTotal} /><br />
                             If your event requires a reduced Alliance Count, you can override the Alliance Count here. THIS SHOULD ONLY APPLY TO EVENTS WITH LESS THAN 24 TEAMS. <Select options={playoffOverrideMenu} value={playoffCountOverride ? playoffCountOverride : (allianceCount?.menu ? allianceCount.menu : playoffOverrideMenu[0])} onChange={setPlayoffCountOverride} />
                         </Alert>
-                        <img style={{ width: 140, height: 140 }} src="/images/charged-up-gs-update.svg" alt="FIRST Energize Charged Up Logo" />
+                        <img style={{ width: 180 }} src="/images/CHARGED_UP_Logo_Horiz_RGB_FullColor.png" alt="FIRST Energize Charged Up Logo" />
                     </Col>
                     <Col sm={4}>
                         {selectedEvent?.value.allianceCount === "SixAlliance" && <p><b>Playoff Type: </b>Round Robin</p>}

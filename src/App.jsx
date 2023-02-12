@@ -106,6 +106,7 @@ function App() {
   const [playoffCountOverride, setPlayoffCountOverride] = usePersistentState("cache:playoffCountOverride", null);
   const [allianceCount, setAllianceCount] = usePersistentState("cache:allianceCount", null);
   const [lastVisit, setLastVisit] = usePersistentState("cache:lastVisit", {});
+  const [localUpdates, setLocalUpdates] = usePersistentState("cache:localUpdates", []);
 
   // Tab state trackers
   const [scheduleTabReady, setScheduleTabReady] = useState(TabStates.NotReady)
@@ -642,7 +643,11 @@ function App() {
 
     highscores.forEach((score) => {
       var details = {};
-      details.eventName = eventNames[worldStats?.year][score?.matchData?.event?.eventCode];
+      if (worldStats) {
+        details.eventName = eventNames[worldStats?.year][score?.matchData?.event?.eventCode]
+      } else {
+        details.eventName = score?.matchData?.event?.eventCode;
+      }
       details.alliance = _.upperFirst(score?.matchData?.highScoreAlliance);
       details.scoreType = score?.type + score?.level;
       details.matchName = score?.matchData?.match?.description;
@@ -685,6 +690,13 @@ function App() {
       setPlayoffs(true);
     }
   }
+
+  // This function writes updated team data back to gatool Cloud.
+  async function putTeamData(teamNumber, data) {
+    var result = await httpClient.put(`team/${teamNumber}/updates`, data);
+    return result.ok;
+  }
+
 
   //update the Alliance Count when conditions change
   useEffect(() => {
@@ -865,7 +877,7 @@ function App() {
 
               <Route path="/schedule" element={<SchedulePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} />} />
 
-              <Route path="/teamdata" element={<TeamDataPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} teamSort={teamSort} setTeamSort={setTeamSort} communityUpdates={communityUpdates} allianceCount={allianceCount} lastVisit={lastVisit} setLastVisit={setLastVisit}/>} />
+              <Route path="/teamdata" element={<TeamDataPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} teamSort={teamSort} setTeamSort={setTeamSort} communityUpdates={communityUpdates} setCommunityUpdates={setCommunityUpdates} allianceCount={allianceCount} lastVisit={lastVisit} setLastVisit={setLastVisit} putTeamData={putTeamData} localUpdates={localUpdates} setLocalUpdates={setLocalUpdates} />} />
 
               <Route path='/ranks' element={<RanksPage selectedEvent={selectedEvent} teamList={teamList} rankings={rankings} rankSort={rankSort} setRankSort={setRankSort} communityUpdates={communityUpdates} allianceCount={allianceCount} />} />
 

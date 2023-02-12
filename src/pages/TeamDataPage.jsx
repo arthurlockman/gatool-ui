@@ -4,8 +4,10 @@ import { merge, orderBy, find } from "lodash";
 import { rankHighlight } from "../components/HelperFunctions";
 import { useEffect, useState } from "react";
 import moment from "moment";
+import _ from "lodash";
+import { toast } from "react-toastify";
 
-function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSort, setTeamSort, communityUpdates, allianceCount, lastVisit, setLastVisit }) {
+function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSort, setTeamSort, communityUpdates, setCommunityUpdates, allianceCount, lastVisit, setLastVisit, putTeamData, localUpdates, setLocalUpdates }) {
     const [currentTime, setCurrentTime] = useState(moment());
 
     useEffect(() => {
@@ -14,6 +16,25 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         }, 1000);
         return () => clearInterval(interval);
     }, []);
+
+    //display the delay on the Announce Screen if we have a schedule
+
+    function updateClass(updateTime) {
+        var timeDifference = 0;
+        var updateDelay = "";
+        timeDifference = moment(currentTime).diff(updateTime, "hours");
+        if (timeDifference < 24) {
+            updateDelay = "alert-success";
+        } else if ((timeDifference >= 24) && (timeDifference < 72)) {
+            updateDelay = "alert-warning";
+        } else if (timeDifference >= 72) {
+            updateDelay = "alert-danger";
+        }
+        return updateDelay
+    }
+
+
+
 
     const [show, setShow] = useState(false);
     const [updateTeam, setUpdateTeam] = useState({});
@@ -24,15 +45,42 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         setShow(false);
     }
 
-    const handleSubmit = (update, e) => {
+    const handleSubmit = (mode, e) => {
         var visits = lastVisit;
         visits[`${updateTeam.teamNumber}`] = moment();
-        if (update === "update") {
-            console.log(formValue)
+        var communityUpdatesTemp = _.cloneDeep(communityUpdates);
+        var update = _.filter(communityUpdatesTemp, { "teamNumber": updateTeam.teamNumber })[0];
+        var keys = Object.keys(formValue);
+        keys.forEach((key) => {
+            if (formValue[key] !== "") {
+                update.updates[key] = formValue[key];
+            } else if (update.updates[key] !== "") {
+                update.updates[key] = formValue[key];
+            }
+        })
+        update.updates.lastUpdate = moment().format();
+        communityUpdatesTemp[_.findIndex(communityUpdatesTemp, { "teamNumber": updateTeam.teamNumber })] = update;
+        setCommunityUpdates(communityUpdatesTemp);
+
+        var localUpdatesTemp = _.cloneDeep(localUpdates)
+        if (mode === "update") {
             //to do: actually update the team info locally and to the Cloud
+            var response = putTeamData(updateTeam.teamNumber, update.updates);
+            if (!response) {
+                localUpdatesTemp.push(updateTeam.teamNumber);
+                setLocalUpdates(localUpdatesTemp);
+                var errorText = `Your update for team ${updateTeam.teamNumber} was not successful. We have saved the change locally, and you can send it later from here or the Settings page.`;
+                toast.error(errorText);
+                throw new Error(errorText);
+            } else {
+                toast.success(`Your update for team ${updateTeam.teamNumber} was successful. Thank you for helping keep the team data current.`)
+            }
         } else {
-            //to do: actually update the team info locally
+            localUpdatesTemp.push(updateTeam.teamNumber);
+            toast.success(`We have stored your update for team ${updateTeam.teamNumber}. Remember that this update is only visible to you until you save it to gatool Cloud.`)
+            setLocalUpdates(localUpdatesTemp);
         }
+
         setLastVisit(visits);
 
 
@@ -127,7 +175,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                             var cityState = `${team?.city}, ${team?.stateProv} ${(team?.country !== "USA") ? " " + team?.country : ""}`;
                             var avatar = `<img src='https://api.gatool.org/v3/${selectedYear.value}/avatars/team/${team?.teamNumber}/avatar.png' onerror="this.style.display='none'">&nbsp`;
                             var teamNameWithAvatar = team?.nameShortLocal ? team?.nameShortLocal : team?.nameShort;
-                            teamNameWithAvatar = avatar + teamNameWithAvatar;
+                            teamNameWithAvatar = avatar + "<br />" + teamNameWithAvatar;
 
                             return <tr key={`teamDataRow${team?.teamNumber}`}>
                                 <td className={`teamNumberButton ${lastVisit[`${team?.teamNumber}`] ? "teamTableButtonHighlight" : ""}`} onClick={(e) => handleShow(team, e)} key={"teamData" + team?.teamNumber}><span className={"teamDataNumber"}>{team?.teamNumber}</span><br />{lastVisit[`${team?.teamNumber}`] ? moment(lastVisit[`${team?.teamNumber}`]).fromNow() : "No recent visit."}</td>
@@ -153,7 +201,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                     <p>Use this form to update team information for <b>Team {updateTeam.teamNumber}.</b> Editable fields are shown below. Your changes will be stored locally on your machine and should not be erased if you close your browser.</p>
                     <p>Tap on each item to update its value. Tap <b>DONE</b> when you're finished editing, or browse to another tab to cancel editing. Items <span className={"teamTableHighlight"}><b>highlighted in green</b></span> have local changes. Motto and Notes do not exist in TIMS, so they are always local. To reset any value to the TIMS value, simply delete it here and tap DONE.</p>
                     <p>You can load changes to Team Data from gatool Cloud, or you can sync your local values with gatool Cloud using the buttons at the bottom of this screen.</p>
-                    <p>Last updated in gatool Cloud: No recent update</p>
+                    <div className={updateClass(updateTeam?.lastUpdate)}><p>Last updated in gatool Cloud: {moment(updateTeam?.lastUpdate).fromNow()}</p></div>
                     <Form>
                         <Form.Group controlId="teamName">
                             <Form.Label className={"formLabel"}><b>Team Name ({updateTeam.nameShort ? updateTeam.nameShort : "No team name"} in TIMS)</b></Form.Label>
@@ -170,7 +218,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                         <Form.Group controlId="robotName">
                             <InputGroup>
                                 <Form.Label className={"formLabel"}><b>Robot Name ({updateTeam.robotName ? updateTeam.robotName : "No robot name"}) in TIMS</b> </Form.Label>
-                                <Form.Text ><Form.Check className={"robotNameCheckbox"} type="switch" id="showRobotName" label="Show robot name" defaultChecked={updateTeam?.showRobotName ? updateTeam?.showRobotName : true} onChange={(e) => updateForm("showRobotName", e.target.checked)}/></Form.Text>
+                                <Form.Text ><Form.Check className={"robotNameCheckbox"} type="switch" id="showRobotName" label="Show robot name" defaultChecked={updateTeam?.showRobotName ? updateTeam?.showRobotName : true} onChange={(e) => updateForm("showRobotName", e.target.checked)} /></Form.Text>
                             </InputGroup>
                             <Form.Control className={updateTeam.robotNameLocal ? "formHighlight" : formValue.robotNameLocal ? "formHighlight" : ""} type="text" placeholder={updateTeam.robotName} defaultValue={updateTeam.robotNameLocal ? updateTeam.robotNameLocal : updateTeam.robotName} onChange={(e) => updateForm("robotNameLocal", e.target.value)} />
                         </Form.Group>
@@ -184,7 +232,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                         </Form.Group>
                         <Form.Group controlId="teamYearsNoCompete">
                             <Form.Label className={"formLabel"}><b>Number of seasons NOT competing with FIRST (will be used in calculating Nth season)</b></Form.Label>
-                            <Form.Control className={updateTeam.teamYearsNoCompeteLocal ? "formHighlight" : formValue.teamYearsNoCompeteLocal ? "formHighlight" : ""} type="text" placeholder={"Enter the count of years rather than the actual years: i.e. 5, not 2004-2007"} defaultValue={updateTeam.teamYearsNoCompeteLocal} onChange={(e) => updateForm("teamYearsNoCompeteLocal", e.target.value)} />
+                            <Form.Control className={updateTeam.teamYearsNoCompeteLocal ? "formHighlight" : formValue.teamYearsNoCompeteLocal ? "formHighlight" : ""} type="number" placeholder={"Enter the count of years rather than the actual years: i.e. 5, not 2004-2007"} defaultValue={updateTeam.teamYearsNoCompeteLocal} onChange={(e) => updateForm("teamYearsNoCompeteLocal", e.target.value)} />
                         </Form.Group>
                         <Form.Group controlId="teamNotesLocal">
                             <Form.Label className={"formLabel"}><b>Team Notes for Announce Screen (These notes are local notes and do not come from <i>FIRST</i>)</b></Form.Label>
@@ -203,9 +251,6 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                             <Form.Control className={updateTeam.sponsorsLocal ? "formHighlight" : formValue.sponsorsLocal ? "formHighlight" : ""} type="text" placeholder={updateTeam?.sponsors} defaultValue={updateTeam.sponsorsLocal ? updateTeam.sponsorsLocal : updateTeam?.sponsors} onChange={(e) => updateForm("sponsorsLocal", e.target.value)} />
                         </Form.Group>
                     </Form>
-
-
-
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="warning" size="sm" onClick={(e) => { clearVisits(true, e) }}>Reset visit times</Button><Button variant="primary" size="sm" onClick={(e) => { handleSubmit("save", e) }}>Submit changes but only keep them locally</Button>
