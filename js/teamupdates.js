@@ -120,6 +120,7 @@ function sendTeamUpdates(teamNumber, singleton) {
     teamUpdates.source = parseJwt(localStorage.getItem("token")).email;
     req.open('PUT', apiURLV3 + 'team/' + teamNumber + '/updates');
     req.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("token"));
+    req.setRequestHeader("Content-Type", "application/json")
     req.addEventListener('load', function () {
         teamUpdateCalls--;
         if ((teamAwardCalls === 0) && (teamUpdateCalls === 0) && (lastSchedulePage)) {
