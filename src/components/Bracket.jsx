@@ -1,4 +1,4 @@
-import { compact } from "lodash";
+import _ from "lodash";
 function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 	//Ball colors
 	const GOLD = "#FFCA10";
@@ -19,15 +19,15 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 		var allianceName = "";
 		var allianceMembers = [];
 		var allianceNumber = 0;
-		if (matches[matchNumber]?.teams[0]?.teamNumber) {
-			allianceName = alliances?.Lookup[`${matches[matchNumber]?.teams[0]?.teamNumber}`]?.alliance;
+		if (matches[_.findIndex(matches,{"matchNumber":matchNumber})]?.teams[0]?.teamNumber) {
+			allianceName = alliances?.Lookup[`${matches[_.findIndex(matches,{"matchNumber":matchNumber})]?.teams[0]?.teamNumber}`]?.alliance;
 			allianceNumber = Number(allianceName?.substring(allianceName.length - 1)) - 1;
-			allianceMembers = compact([alliances?.alliances[allianceNumber]?.captain, alliances?.alliances[allianceNumber]?.round1, alliances?.alliances[allianceNumber]?.round2, alliances?.alliances[allianceNumber]?.round3, alliances?.alliances[allianceNumber]?.backup]);
+			allianceMembers = _.compact([alliances?.alliances[allianceNumber]?.captain, alliances?.alliances[allianceNumber]?.round1, alliances?.alliances[allianceNumber]?.round2, alliances?.alliances[allianceNumber]?.round3, alliances?.alliances[allianceNumber]?.backup]);
 			alliance = allianceMembers.join("  ");
 			if (allianceColor === "blue") {
-				allianceName = alliances?.Lookup[`${matches[matchNumber]?.teams[3]?.teamNumber}`]?.alliance;
+				allianceName = alliances?.Lookup[`${matches[_.findIndex(matches,{"matchNumber":matchNumber})]?.teams[3]?.teamNumber}`]?.alliance;
 				allianceNumber = Number(allianceName?.substring(allianceName.length - 1)) - 1;
-				allianceMembers = compact([alliances?.alliances[allianceNumber]?.captain, alliances?.alliances[allianceNumber]?.round1, alliances?.alliances[allianceNumber]?.round2, alliances?.alliances[allianceNumber]?.round3, alliances?.alliances[allianceNumber]?.backup]);
+				allianceMembers = _.compact([alliances?.alliances[allianceNumber]?.captain, alliances?.alliances[allianceNumber]?.round1, alliances?.alliances[allianceNumber]?.round2, alliances?.alliances[allianceNumber]?.round3, alliances?.alliances[allianceNumber]?.backup]);
 				alliance = allianceMembers.join("  ");
 			}
 		}
@@ -38,15 +38,15 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 	// returns the name of the alliance
 	function allianceName(matchNumber, allianceColor) {
 		var allianceName = "";
-		if (matches[matchNumber]?.teams[0]?.teamNumber) {
-			allianceName = alliances?.Lookup[`${matches[matchNumber]?.teams[0]?.teamNumber}`]?.alliance;
-			if (matches[matchNumber]?.winner.tieWinner === "red") {
-				allianceName += ` (L${matches[matchNumber]?.winner.level})`;
+		if (matches[_.findIndex(matches,{"matchNumber":matchNumber})]?.teams[0]?.teamNumber) {
+			allianceName = alliances?.Lookup[`${matches[_.findIndex(matches,{"matchNumber":matchNumber})]?.teams[0]?.teamNumber}`]?.alliance;
+			if (matches[_.findIndex(matches,{"matchNumber":matchNumber})]?.winner.tieWinner === "red") {
+				allianceName += ` (L${matches[_.findIndex(matches,{"matchNumber":matchNumber})]?.winner.level})`;
 			}
 			if (allianceColor === "blue") {
-				allianceName = alliances?.Lookup[`${matches[matchNumber]?.teams[3]?.teamNumber}`]?.alliance
-				if (matches[matchNumber]?.winner.tieWinner === "blue") {
-					allianceName += ` (L${matches[matchNumber]?.winner.level} WIN)`;
+				allianceName = alliances?.Lookup[`${matches[_.findIndex(matches,{"matchNumber":matchNumber})]?.teams[3]?.teamNumber}`]?.alliance
+				if (matches[_.findIndex(matches,{"matchNumber":matchNumber})]?.winner.tieWinner === "blue") {
+					allianceName += ` (L${matches[_.findIndex(matches,{"matchNumber":matchNumber})]?.winner.level} WIN)`;
 				}
 			}
 		}

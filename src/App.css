@@ -484,3 +484,27 @@ td {
 .robotNameCheckbox {
 	vertical-align: middle !important;
 }
+
+.davidPrice {
+	font-size: 500px;
+	text-align: center;
+	font-family: "alternate-gothic-no-1-d", sans-serif;
+	line-height: 85%
+}
+
+.davidPriceWarning {
+		background-color: #fcf8e3;
+		border-color: #faebcc;
+}
+
+.davidPriceSuccess {
+		background-color: #dff0d8;
+		border-color: #d6e9c6;
+}
+
+.davidPriceDetail {
+	font-size: 100px;
+	text-align: center;
+	font-family: "alternate-gothic-no-1-d", sans-serif;
+	line-height: 100%
+}

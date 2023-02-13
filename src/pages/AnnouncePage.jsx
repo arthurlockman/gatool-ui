@@ -65,10 +65,10 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
 
     var schedule = qualSchedule?.schedule || [];
     var inPlayoffs = false;
-    if (playoffSchedule?.schedule.length > 0) {
+    if (playoffSchedule?.schedule?.length > 0) {
         schedule = _.concat(qualSchedule?.schedule, playoffSchedule?.schedule);
     }
-    if (currentMatch > qualSchedule?.schedule.length) {
+    if (currentMatch > qualSchedule?.schedule?.length) {
         inPlayoffs = true;
     }
 
