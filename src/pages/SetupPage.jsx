@@ -118,13 +118,14 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
         var localUpdatesTemp = _.cloneDeep(localUpdates);
         var success = [];
         localUpdatesTemp.forEach((update) => {
-            var result = putTeamData(update.teamNumber, update.update)
+            var result = putTeamData(update.teamNumber, update.update);
+            var errorText = "";
             if (!result) {
-                var errorText = `Your update for team ${update.teamNumber} was not successful. We have preserved the change locally, and you can send it later from here.`;
+                errorText = `Your update for team ${update.teamNumber} was not successful. We have preserved the change locally, and you can send it later from here.`;
                 toast.error(errorText);
                 throw new Error(errorText);
             } else {
-                var errorText = `Your update for team ${update.teamNumber} was successful.`;
+                errorText = `Your update for team ${update.teamNumber} was successful.`;
                 success.push(update);
                 toast.success(errorText);
             }
