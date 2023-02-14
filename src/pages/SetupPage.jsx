@@ -5,6 +5,7 @@ import LogoutButton from "../components/LogoutButton";
 import _ from "lodash";
 import Switch from "react-switch";
 import { useOnlineStatus } from "../contextProviders/OnlineContext";
+import { toast } from "react-toastify";
 
 import { ArrowClockwise } from 'react-bootstrap-icons';
 
@@ -75,7 +76,7 @@ const awardsMenuOptions = [
     { label: "1 (current season only", value: "1" },
 ]
 
-function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount }) {
+function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData }) {
     const isOnline = useOnlineStatus()
 
     function filterEvents(events) {
@@ -113,9 +114,31 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
         return filterTemp
     }
 
+    function uploadLocalUpdates() {
+        var localUpdatesTemp = _.cloneDeep(localUpdates);
+        var success = [];
+        localUpdatesTemp.forEach((update) => {
+            var result = putTeamData(update.teamNumber, update.update)
+            if (!result) {
+                var errorText = `Your update for team ${update.teamNumber} was not successful. We have preserved the change locally, and you can send it later from here.`;
+                toast.error(errorText);
+                throw new Error(errorText);
+            } else {
+                var errorText = `Your update for team ${update.teamNumber} was successful.`;
+                success.push(update);
+                toast.success(errorText);
+            }
+        })
+        success.forEach((item) => {
+            localUpdatesTemp.splice(_.findIndex(localUpdatesTemp, { "teamNumber": item.teamNumber }), 1)
+        })
+        setLocalUpdates(localUpdatesTemp);
+    }
+
     if (!selectedYear) {
         setSelectedYear(supportedYears[0]);
     }
+
     return (
         <Container fluid>
             {!isOnline && <Row>
@@ -184,6 +207,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                         {playoffSchedule?.lastUpdate && <p><b>Playoff Schedule last updated: </b><br />{moment(playoffSchedule?.lastUpdate).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
                         {teamList?.lastUpdate && <p><b>Team List last updated: </b><br />{moment(teamList?.lastUpdate).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
                         {rankings?.lastUpdate && <p><b>Rankings last updated: </b><br />{moment(rankings?.lastUpdate).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
+                        {localUpdates.length > 0 && <Alert><p><b>You have updates that can be uploaded to gatool Cloud.</b></p><Button disabled={!isOnline} onClick={uploadLocalUpdates}>Upload to gatool Cloud now</Button></Alert>}
                     </Col>
                     <Col sm={4}>
                         <table>

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import moment from "moment";
 import _ from "lodash";
 import { toast } from "react-toastify";
+import { useOnlineStatus } from "../contextProviders/OnlineContext";
 
 function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSort, setTeamSort, communityUpdates, setCommunityUpdates, allianceCount, lastVisit, setLastVisit, putTeamData, localUpdates, setLocalUpdates }) {
     const [currentTime, setCurrentTime] = useState(moment());
@@ -67,7 +68,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
             //to do: actually update the team info locally and to the Cloud
             var response = putTeamData(updateTeam.teamNumber, update.updates);
             if (!response) {
-                localUpdatesTemp.push(updateTeam.teamNumber);
+                localUpdatesTemp.push({ "teamNumber": updateTeam.teamNumber, "update": update.updates });
                 setLocalUpdates(localUpdatesTemp);
                 var errorText = `Your update for team ${updateTeam.teamNumber} was not successful. We have saved the change locally, and you can send it later from here or the Settings page.`;
                 toast.error(errorText);
@@ -76,7 +77,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                 toast.success(`Your update for team ${updateTeam.teamNumber} was successful. Thank you for helping keep the team data current.`)
             }
         } else {
-            localUpdatesTemp.push(updateTeam.teamNumber);
+            localUpdatesTemp.push({ "teamNumber": updateTeam.teamNumber, "update": update.updates });
             toast.success(`We have stored your update for team ${updateTeam.teamNumber}. Remember that this update is only visible to you until you save it to gatool Cloud.`)
             setLocalUpdates(localUpdatesTemp);
         }
@@ -141,6 +142,8 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
     } else {
         teamListExtended = orderBy(teamListExtended, teamSort, 'asc');
     }
+
+    const isOnline = useOnlineStatus();
 
     return (
         <Container fluid>
@@ -254,10 +257,9 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="warning" size="sm" onClick={(e) => { clearVisits(true, e) }}>Reset visit times</Button><Button variant="primary" size="sm" onClick={(e) => { handleSubmit("save", e) }}>Submit changes but only keep them locally</Button>
-                    <Button variant="success" size="sm" onClick={(e) => { handleSubmit("update", e) }}>Submit changes and upload to gatool Cloud</Button>
+                    <Button variant="success" size="sm" disabled={!isOnline} onClick={(e) => { handleSubmit("update", e) }}>Submit changes and upload to gatool Cloud</Button>
                 </Modal.Footer>
             </Modal>}
-
         </Container>
     )
 }
