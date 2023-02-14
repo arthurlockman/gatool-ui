@@ -519,3 +519,8 @@ td {
 	font-family: "alternate-gothic-no-1-d", sans-serif;
 	line-height: 100%
 }
+
+.playoffDetails {
+	font-size:x-large;
+	font-weight: 900;
+}

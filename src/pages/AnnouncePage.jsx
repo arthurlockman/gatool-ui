@@ -138,7 +138,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
                             )}
                         </tbody>
                     </table>
-                    <BottomButtons previousMatch={previousMatch} nextMatch={nextMatch} matchDetails={matchDetails} />
+                    <BottomButtons previousMatch={previousMatch} nextMatch={nextMatch} matchDetails={matchDetails} playoffSchedule={playoffSchedule}/>
                 </Container>
             }
 
