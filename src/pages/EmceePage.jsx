@@ -45,11 +45,6 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
         return allianceName;
     }
 
-    function priorMatchWinner(matchNumber) {
-         return matches[_.findIndex(matches, {"matchNumber":matchNumber-1})]?.winner;
-    }
-
-
     if (playoffSchedule?.schedule?.length > 0) {
         schedule = _.concat(qualSchedule?.schedule, playoffSchedule?.schedule);
     }
