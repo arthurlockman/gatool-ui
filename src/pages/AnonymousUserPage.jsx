@@ -7,7 +7,7 @@ function AnonymousUserPage() {
         <div className="vertical-center">
             <Container>
                 <Image src="/images/apple-touch-icon-152x152.png" />
-                <h1>Welcome to GATool!</h1>
+                <h1>Welcome to gatool!</h1>
                 <p>gatool is a tool to provide <i><b>FIRST®</b></i> Game Announcers with up to date information while announcing events
                     during the <i><b>FIRST</b></i> Robotics season. As a web-based tool, it uses up-to-date information about the event to
                     provide a comprehensive set of useful data to Game Announcers. It is designed to work on desktops,

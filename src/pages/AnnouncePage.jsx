@@ -126,7 +126,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
             {selectedEvent && teamList?.teams.length > 0 && schedule?.length > 0 &&
                 <Container fluid>
                     <TopButtons previousMatch={previousMatch} nextMatch={nextMatch} currentMatch={currentMatch} matchMenu={matchMenu} setMatchFromMenu={setMatchFromMenu} selectedEvent={selectedEvent} matchDetails={matchDetails} timeFormat={timeFormat}/>
-                    <table>
+                    <table className={"table table-responsive"}>
                         <tbody>
                             {displayOrder.map((station) => {
                                 if (!_.isEmpty(teamDetails[station])) {
