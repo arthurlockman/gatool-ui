@@ -23,32 +23,9 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
     ]
     var schedule = qualSchedule?.schedule || [];
     var inPlayoffs = false;
-    var inFinals = false;
     var playoffMatchNumber = -1;
     var scores = [];
     var matches = playoffSchedule?.schedule;
-
-    //returns the three members of an alliance based on the match data.
-    function allianceNumbers(matchNumber, allianceColor) {
-        var alliance = "TBD";
-        var allianceName = "";
-        var allianceMembers = [];
-        var allianceNumber = 0;
-        if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[0]?.teamNumber) {
-            allianceName = alliances?.Lookup[`${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[0]?.teamNumber}`]?.alliance;
-            allianceNumber = Number(allianceName?.substring(allianceName.length - 1)) - 1;
-            allianceMembers = _.compact([alliances?.alliances[allianceNumber]?.captain, alliances?.alliances[allianceNumber]?.round1, alliances?.alliances[allianceNumber]?.round2, alliances?.alliances[allianceNumber]?.round3, alliances?.alliances[allianceNumber]?.backup]);
-            alliance = allianceMembers.join("  ");
-            if (allianceColor === "blue") {
-                allianceName = alliances?.Lookup[`${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[3]?.teamNumber}`]?.alliance;
-                allianceNumber = Number(allianceName?.substring(allianceName.length - 1)) - 1;
-                allianceMembers = _.compact([alliances?.alliances[allianceNumber]?.captain, alliances?.alliances[allianceNumber]?.round1, alliances?.alliances[allianceNumber]?.round2, alliances?.alliances[allianceNumber]?.round3, alliances?.alliances[allianceNumber]?.backup]);
-                alliance = allianceMembers.join("  ");
-            }
-        }
-        //todo: layer in fourth member for new playoff modes
-        return alliance;
-    }
 
     // returns the name of the alliance
     function allianceName(matchNumber, allianceColor) {
@@ -68,15 +45,17 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
         return allianceName;
     }
 
+    function priorMatchWinner(matchNumber) {
+         return matches[_.findIndex(matches, {"matchNumber":matchNumber-1})]?.winner;
+    }
+
+
     if (playoffSchedule?.schedule?.length > 0) {
         schedule = _.concat(qualSchedule?.schedule, playoffSchedule?.schedule);
     }
     if (currentMatch > qualSchedule?.schedule?.length) {
         inPlayoffs = true;
         playoffMatchNumber = currentMatch - qualSchedule?.schedule?.length;
-    }
-    if (currentMatch > qualSchedule?.length + 13) {
-        inFinals = true;
     }
 
     _.forEach(schedule, (match) => {
@@ -108,23 +87,26 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
             {selectedEvent && (schedule?.length > 0) && inPlayoffs &&
                 <Container fluid>
                     <Row>
-                        <Col xs={2} className={"davidPriceDetail redAllianceTeam"}>
+                        {(playoffMatchNumber<=13) && <Col xs={2} className={"davidPriceDetail redAllianceTeam"}>
                         {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.red.from ? _.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.red.from : ""}
-                        </Col>
-                        <Col xs={4} className={`redAllianceTeam`}>
+                        </Col>}
+                        <Col xs={(playoffMatchNumber>13) ? 6 : 4} className={`redAllianceTeam`}>
                             <div className={"davidPrice"}>{allianceName(schedule[currentMatch - 1].matchNumber, "red").replace("Alliance ", "")}</div>
                         </Col>
-                        <Col xs={4} className={`blueAllianceTeam`}>
+                        <Col xs={(playoffMatchNumber>13) ? 6 : 4} className={`blueAllianceTeam`}>
                             <div className={"davidPrice"}>{allianceName(schedule[currentMatch - 1].matchNumber, "blue").replace("Alliance ", "")}</div>
                         </Col>
-                        <Col xs={2} className={"davidPriceDetail blueAllianceTeam"}>
+                        {(playoffMatchNumber<=13) && <Col xs={2} className={"davidPriceDetail blueAllianceTeam"}>
                         {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.blue.from ? _.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.blue.from : ""}
-                        </Col>
+                        </Col>}
                     </Row>
                     <Row>
                         <Col xs={12} className={"davidPriceDetail"}>
-                            Winner <ArrowRight /> M{_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.winnerTo}<br />
-                            Loser {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.loserTo ? <><ArrowRight /> M{_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.loserTo} </> : " eliminated"}
+                            {(playoffMatchNumber<=13) && <>Winner <ArrowRight /> {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.winnerTo<=13 ? `M${_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.winnerTo}`:"Finals"}<br />
+                            Loser {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.loserTo ? <><ArrowRight /> M{_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.loserTo} </> : " eliminated"} </>}
+                            {(playoffMatchNumber===14) && <>FINALS MATCH 1</>}
+                            {(playoffMatchNumber===15) && <span className={`${matches[_.findIndex(matches, {"matchNumber":playoffMatchNumber-1})]?.winner.winner}AllianceTeam`}>FINALS MATCH 2<br />ADVANTAGE {_.matches[_.findIndex(matches, {"matchNumber":playoffMatchNumber-1})]?.winner.tieWinner ? `${_.upperCase(matches[_.findIndex(matches, {"matchNumber":playoffMatchNumber-1})]?.winner.tieWinner)} (L${matches[_.findIndex(matches, {"matchNumber":playoffMatchNumber-1})]?.winner.level})`:_.upperCase(matches[_.findIndex(matches, {"matchNumber":playoffMatchNumber-1})]?.winner.winner)}</span>}
+                            {(playoffMatchNumber===16) && <span className={"tieAllianceTeam"}>FINALS TIEBREAKER</span>}
                         </Col>
                     </Row>
 
