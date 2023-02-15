@@ -98,7 +98,7 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
                     <Row>
                         <Col xs={12} className={"davidPriceDetail"}>
                             {(playoffMatchNumber<=13) && <>Winner <ArrowRight /> {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.winnerTo<=13 ? `M${_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.winnerTo}`:"Finals"}<br />
-                            Loser {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.loserTo ? <><ArrowRight /> M{_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.loserTo} </> : " eliminated"} </>}
+                            Losing Alliance {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.loserTo ? <><ArrowRight /> M{_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.loserTo} </> : " eliminated"} </>}
                             {(playoffMatchNumber===14) && <>FINALS MATCH 1</>}
                             {(playoffMatchNumber===15) && <span className={`${matches[_.findIndex(matches, {"matchNumber":playoffMatchNumber-1})]?.winner.winner}AllianceTeam`}>FINALS MATCH 2<br />ADVANTAGE {_.matches[_.findIndex(matches, {"matchNumber":playoffMatchNumber-1})]?.winner.tieWinner ? `${_.upperCase(matches[_.findIndex(matches, {"matchNumber":playoffMatchNumber-1})]?.winner.tieWinner)} (L${matches[_.findIndex(matches, {"matchNumber":playoffMatchNumber-1})]?.winner.level})`:_.upperCase(matches[_.findIndex(matches, {"matchNumber":playoffMatchNumber-1})]?.winner.winner)}</span>}
                             {(playoffMatchNumber===16) && <span className={"tieAllianceTeam"}>FINALS TIEBREAKER</span>}
