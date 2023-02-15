@@ -3,7 +3,7 @@ import { CaretLeftFill, CaretRightFill, ArrowRight } from "react-bootstrap-icons
 import _ from "lodash";
 
 
-function BottomButtons({ previousMatch, nextMatch, matchDetails, playoffSchedule}) {
+function BottomButtons({ previousMatch, nextMatch, matchDetails, playoffSchedule, eventHighScores}) {
     const matchClasses = [
         { "matchNumber": 1, "red": { "class": "success", "from": null }, "blue": { "class": "success", "from": null }, "winnerTo": 7, "loserTo": 5 },
         { "matchNumber": 2, "red": { "class": "success", "from": null }, "blue": { "class": "success", "from": null }, "winnerTo": 7, "loserTo": 5 },
@@ -24,20 +24,24 @@ function BottomButtons({ previousMatch, nextMatch, matchDetails, playoffSchedule
     return (
         <>
             <Row style={{ "paddingTop": "10px" }}>
-                <Col xs={"3"}>
+                <Col xs={"2"} lg={"3"}>
                     <Button size="large" variant="outline-success" className={"gatool-button buttonNoWrap"} onClick={previousMatch}><span className={"d-none d-lg-block"}><CaretLeftFill /> Previous Match</span><span className={"d-block d-lg-none"}><CaretLeftFill /> <CaretLeftFill /></span></Button>
                 </Col>
-                {matchDetails.tournamentLevel === "Playoff" && <Col xs={"6"} className={"playoffDetails"}>
+                {matchDetails?.tournamentLevel === "Playoff" && <Col xs={"8"} lg={"6"} className={"playoffDetails"}>
                     {(matchDetails.matchNumber <= 13) && <>Winner <ArrowRight /> {_.filter(matchClasses, { "matchNumber": matchDetails.matchNumber })[0]?.winnerTo <= 13 ? `Match ${_.filter(matchClasses, { "matchNumber": matchDetails.matchNumber })[0]?.winnerTo}` : "Finals"}<br />
                         Loser {_.filter(matchClasses, { "matchNumber": matchDetails.matchNumber })[0]?.loserTo ? <><ArrowRight /> Match {_.filter(matchClasses, { "matchNumber": matchDetails.matchNumber })[0]?.loserTo} </> : " eliminated"} </>}
                     {(matchDetails.matchNumber === 14) && <>FINALS MATCH 1</>}
                     {(matchDetails.matchNumber === 15) && <span className={`${matches[_.findIndex(matches, { "matchNumber": matchDetails.matchNumber - 1 })]?.winner.winner}AllianceTeam`}>FINALS MATCH 2<br />ADVANTAGE {_.matches[_.findIndex(matches, { "matchNumber": matchDetails.matchNumber - 1 })]?.winner.tieWinner ? `${_.upperCase(matches[_.findIndex(matches, { "matchNumber": matchDetails.matchNumber - 1 })]?.winner.tieWinner)} (L${matches[_.findIndex(matches, { "matchNumber": matchDetails.matchNumber - 1 })]?.winner.level})` : _.upperCase(matches[_.findIndex(matches, { "matchNumber": matchDetails.matchNumber - 1 })]?.winner.winner)}</span>}
                     {(matchDetails.matchNumber === 16) && <span className={"tieAllianceTeam"}>FINALS TIEBREAKER</span>}
-
-
                 </Col>}
-                {matchDetails.tournamentLevel !== "Playoff" && <Col xs={"6"}><h4>{matchDetails?.description}</h4></Col>}
-                <Col xs={"3"}>
+
+                {matchDetails?.tournamentLevel !== "Playoff" && eventHighScores?.overallqual?.score && <Col xs={"8"} lg={"6"}><p><b>Event High Score: {eventHighScores?.overallqual?.score}<br />
+                in Match {eventHighScores?.overallqual?.matchName}<br />
+                {eventHighScores?.overallqual?.alliance} Alliance ({eventHighScores?.overallqual?.allianceMembers})</b></p></Col>}
+
+                {matchDetails?.tournamentLevel !== "Playoff" && !eventHighScores?.overallqual?.score && <Col xs={"8"} lg={"6"}><h4>{matchDetails.description}</h4></Col>}
+
+                <Col xs={"2"} lg={"3"}>
                     <Button size="large" variant="outline-success" className={"gatool-button buttonNoWrap"} onClick={nextMatch}><span className={"d-none d-lg-block"}>Next Match <CaretRightFill /></span><span className={"d-block d-lg-none"}><CaretRightFill /> <CaretRightFill /></span></Button>
                 </Col>
             </Row>

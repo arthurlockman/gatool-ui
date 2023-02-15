@@ -128,16 +128,6 @@ td {
 	color: white
 }
 
-.redAlliancePlayByPlay {
-	border: 1px solid #ccc;
-	align-content: center;
-	text-align: center;
-	background-color: red;
-	font-size: x-large;
-	font-weight: bold;
-	color: white
-}
-
 .blueAlliancePlayByPlay {
 	border: 1px solid #ccc;
 	align-content: center;
@@ -145,7 +135,7 @@ td {
 	background-color: blue;
 	font-size: x-large;
 	font-weight: bold;
-	color: white
+	color: white;
 }
 
 .playByPlayTable {

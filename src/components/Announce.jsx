@@ -34,7 +34,7 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
                 <span>{team?.updates?.cityStateLocal ? team?.updates?.CityStateLocal : team?.city + ", " + team?.stateProv}</span><br />
                 {team?.updates?.robotNameLocal && <span className={"robotName"}>{team?.updates?.robotNameLocal}<br /></span>}
                 {team?.updates?.teamMottoLocal && <span className={"mottoes"}>{team?.updates?.teamMottoLocal}<br /></span>}
-                {(selectedEvent?.value?.champLevel === "CHAMPS" || selectedEvent?.value?.champLevel === "CMPDIV" || selectedEvent?.value?.champLevel === "CMPSUB") && <span className={"champs"}>
+                {(selectedEvent?.value?.champLevel === "CHAMPS" || selectedEvent?.value?.champLevel === "CMPDIV" || selectedEvent?.value?.champLevel === "CMPSUB") && showChampsStats && <span className={"champs"}>
                     {team?.champsAppearances?.champsAppearances > 0 && <span><b>{team?.champsAppearances?.champsAppearances} Champs Appearance{team?.champsAppearances?.champsAppearances > 1 ? "s" : ""}</b><br /></span>}
                     {team?.champsAppearances?.champsAppearances > 0 && <span>
                         {team?.champsAppearances?.champsAppearancesYears?.join(", ")}
@@ -45,7 +45,7 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
                         <br /></span>}
                     {team?.champsAppearances?.FOCAppearances > 0 && <span><b>Festival of Champions Team</b><br />{team?.champsAppearances?.FOCAppearancesYears?.join(", ")}</span>}
                 </span>}
-                {(selectedEvent?.value?.champLevel === "DISTCHAMPS" || selectedEvent?.value?.champLevel === "DISTDIV") && <span className={"champs"}>
+                {(selectedEvent?.value?.champLevel === "DISTCHAMPS" || selectedEvent?.value?.champLevel === "DISTDIV") && showChampsStats && <span className={"champs"}>
                     {team?.champsAppearances?.districtChampsAppearances > 0 && <span><b>{team?.champsAppearances?.districtChampsAppearances} District Champs Appearance{team?.champsAppearances?.districtChampsAppearances > 1 ? "s" : ""}</b><br /></span>}
                     {team?.champsAppearances?.districtChampsAppearances > 0 && <span>
                         {team?.champsAppearances?.districtChampsAppearancesYears?.join(", ")}

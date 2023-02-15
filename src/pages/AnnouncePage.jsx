@@ -9,7 +9,7 @@ import TopButtons from "../components/TopButtons";
 
 const paleGreen = "rgba(144, 238, 144, 0.5)"
 
-function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, setCurrentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, getSchedule, getRanks, awardsMenu, showNotes, showAwards, showSponsors, showMottoes, showChampsStats, timeFormat }) {
+function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, setCurrentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, getSchedule, getRanks, awardsMenu, showNotes, showAwards, showSponsors, showMottoes, showChampsStats, timeFormat, eventHighScores}) {
 
     function updateTeamDetails(station, matchDetails) {
         var team = {}
@@ -138,7 +138,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
                             )}
                         </tbody>
                     </table>
-                    <BottomButtons previousMatch={previousMatch} nextMatch={nextMatch} matchDetails={matchDetails} playoffSchedule={playoffSchedule}/>
+                    <BottomButtons previousMatch={previousMatch} nextMatch={nextMatch} matchDetails={matchDetails} playoffSchedule={playoffSchedule}  eventHighScores={eventHighScores}/>
                 </Container>
             }
 

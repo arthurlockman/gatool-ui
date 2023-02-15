@@ -40,7 +40,7 @@ const MatchClock = ({ matchDetails, timeFormat }) => {
 
     }
     return (
-        <Col xs={"2"} className={matchDelay}>
+        <Col xs={"3"} lg={"2"} className={matchDelay}>
             <div><b>{moment(currentTime).format(timeFormat.value)}</b></div>
             {matchDetails?.actualStartTime && <div>Actual match time:<br />{moment(matchDetails?.actualStartTime).format("MMM Do, " + timeFormat.value)}</div>}
             {!matchDetails?.actualStartTime && <div>Scheduled match time:<br />{moment(matchDetails?.startTime).format("MMM Do, " + timeFormat.value)}</div>}
