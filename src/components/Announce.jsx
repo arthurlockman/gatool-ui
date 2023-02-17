@@ -25,7 +25,7 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
         <><tr key={station} className={`gatool-announce ${_.toLower(allianceColor)}Alliance`} >
             <td className={'col1'} >
                 <span className={"announceTeamNumber"} ><b>{team.teamNumber}</b></span><br />
-                {team?.updates?.sayNumber && <span >{team.updates?.sayNumber}<br /></span>}
+                {team?.updates?.sayNumber && <span className={"playByPlaysayNumber"}>{team.updates?.sayNumber}<br /></span>}
                 <span >{team?.rookieYear}<br />({years === 1 ? "" : years}{yearsDisplay} season)</span>
                 {inPlayoffs && <p className={"announceAlliance"}>{team.alliance}<br />{team.allianceRole}</p>}
             </td>

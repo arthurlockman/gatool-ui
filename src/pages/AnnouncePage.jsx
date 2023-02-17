@@ -9,7 +9,7 @@ import TopButtons from "../components/TopButtons";
 
 const paleGreen = "rgba(144, 238, 144, 0.5)"
 
-function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, setCurrentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, getSchedule, getRanks, awardsMenu, showNotes, showAwards, showSponsors, showMottoes, showChampsStats, timeFormat, eventHighScores}) {
+function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, setCurrentMatch, playoffSchedule, setPlayoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, getSchedule, getRanks, awardsMenu, showNotes, showAwards, showSponsors, showMottoes, showChampsStats, timeFormat, eventHighScores, backupTeam, setBackupTeam}) {
 
     function updateTeamDetails(station, matchDetails) {
         var team = {}
@@ -27,14 +27,14 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
             team.allianceRole = alliances?.Lookup[`${team?.teamNumber}`]?.role || null;
         }
 
-        if (station.slice(-1) === "4") {
+        if (station?.slice(-1) === "4") {
             if (inPlayoffs) {
 
-                var playoffTeams = matchDetails.teams.map((team) => {
-                    return { "teamNumber": team.teamNumber, "alliance": team.alliance }
+                var playoffTeams = matchDetails?.teams.map((team) => {
+                    return { "teamNumber": team?.teamNumber, "alliance": team?.alliance }
                 });
                 var allianceTeams = _.filter(playoffTeams, { "alliance": allianceNumber }).map((o) => { return o.teamNumber });
-                var allianceMembers = _.filter(alliances.alliances, { "number": Number(allianceNumber.slice(-1)) })[0];
+                var allianceMembers = _.filter(alliances?.alliances, { "number": Number(allianceNumber.slice(-1)) })[0];
                 var allianceArray = [];
                 allianceArray.push(allianceMembers.captain);
                 allianceArray.push(allianceMembers.round1);
@@ -78,7 +78,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
         if (match.tournamentLevel === "Playoff") {
             tag = match.description;
         }
-        return { "value": index + 1, "label": tag, "color": match.scoreRedFinal ? paleGreen : "" }
+        return { "value": index + 1, "label": tag, "color": !_.isNull(match.scoreRedFinal) ? paleGreen : "" }
     })
 
     var displayOrder = ["Red1", "Red2", "Red3", "Red4", "Blue1", "Blue2", "Blue3", "Blue4"];
@@ -125,7 +125,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
             </div>}
             {selectedEvent && teamList?.teams.length > 0 && schedule?.length > 0 &&
                 <Container fluid>
-                    <TopButtons previousMatch={previousMatch} nextMatch={nextMatch} currentMatch={currentMatch} matchMenu={matchMenu} setMatchFromMenu={setMatchFromMenu} selectedEvent={selectedEvent} matchDetails={matchDetails} timeFormat={timeFormat}/>
+                    <TopButtons previousMatch={previousMatch} nextMatch={nextMatch} currentMatch={currentMatch} matchMenu={matchMenu} setMatchFromMenu={setMatchFromMenu} selectedEvent={selectedEvent} matchDetails={matchDetails} timeFormat={timeFormat} inPlayoffs={inPlayoffs} alliances={alliances} setAlliances={setAlliances} rankings={rankings} backupTeam={backupTeam} setBackupTeam={setBackupTeam} playoffSchedule={playoffSchedule} setPlayoffSchedule={setPlayoffSchedule} teamList={teamList} communityUpdates={communityUpdates}/>
                     <table className={"table table-responsive"}>
                         <tbody>
                             {displayOrder.map((station) => {

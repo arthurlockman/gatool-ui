@@ -9,7 +9,7 @@ import TopButtons from "../components/TopButtons";
 const paleGreen = "rgba(144, 238, 144, 0.5)"
 
 
-function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, setCurrentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, getSchedule, getRanks, showNotes, showMottoes, showQualsStats, swapScreen, timeFormat, eventHighScores}) {
+function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, setCurrentMatch, playoffSchedule, setPlayoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, getSchedule, getRanks, showNotes, showMottoes, showQualsStats, swapScreen, timeFormat, eventHighScores, backupTeam, setBackupTeam}) {
     var displayOrder = ["Blue1", "Red3", "Blue2", "Red2", "Blue3", "Red1", "Blue4", "Red4"];
     if (swapScreen===true) {displayOrder = ["Red3", "Blue1", "Red2", "Blue2", "Red1", "Blue3", "Red4", "Blue4"]}
 
@@ -32,20 +32,20 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
         if (station.slice(-1) === "4") {
             if (inPlayoffs) {
 
-                var playoffTeams = matchDetails.teams.map((team) => {
-                    return { "teamNumber": team.teamNumber, "alliance": team.alliance }
+                var playoffTeams = matchDetails?.teams.map((team) => {
+                    return { "teamNumber": team?.teamNumber, "alliance": team.alliance }
                 });
                 var allianceTeams = _.filter(playoffTeams, { "alliance": allianceNumber }).map((o) => { return o.teamNumber });
-                var allianceMembers = _.filter(alliances.alliances, { "number": Number(allianceNumber.slice(-1)) })[0];
+                var allianceMembers = _.filter(alliances.alliances, { "number": Number(allianceNumber?.slice(-1)) })[0];
                 var allianceArray = [];
-                allianceArray.push(allianceMembers.captain);
-                allianceArray.push(allianceMembers.round1);
-                allianceArray.push(allianceMembers.round2);
+                allianceArray.push(allianceMembers?.captain);
+                allianceArray.push(allianceMembers?.round1);
+                allianceArray.push(allianceMembers?.round2);
                 if (allianceMembers.round3) {
-                    allianceArray.push(allianceMembers.round3);
+                    allianceArray.push(allianceMembers?.round3);
                 }
-                if (allianceMembers.backup) {
-                    allianceArray.push(allianceMembers.backup);
+                if (allianceMembers?.backup) {
+                    allianceArray.push(allianceMembers?.backup);
                 }
 
                 var remainingTeam = _.difference(allianceArray, allianceTeams);
@@ -94,13 +94,13 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
     }
     )
 
-    const matchDetails = schedule[currentMatch - 1];
+    var matchDetails = schedule[currentMatch - 1];
     const matchMenu = schedule.map((match, index) => {
         var tag = `${match.description} of ${qualSchedule.schedule.length}`;
         if (match.tournamentLevel === "Playoff") {
             tag = match.description;
         }
-        return { "value": index + 1, "label": tag, "color": match?.scoreRedFinal ? paleGreen : "" }
+        return { "value": index + 1, "label": tag, "color": !_.isNull(match.scoreRedFinal) ? paleGreen : "" }
     })
 
     var teamDetails = [];
@@ -146,7 +146,7 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
             </div>}
             {selectedEvent && teamList?.teams.length > 0 && schedule?.length > 0 &&
                 <Container fluid>
-                    <TopButtons previousMatch={previousMatch} nextMatch={nextMatch} currentMatch={currentMatch} matchMenu={matchMenu} setMatchFromMenu={setMatchFromMenu} selectedEvent={selectedEvent} matchDetails={matchDetails} timeFormat={timeFormat}/>
+                    <TopButtons previousMatch={previousMatch} nextMatch={nextMatch} currentMatch={currentMatch} matchMenu={matchMenu} setMatchFromMenu={setMatchFromMenu} selectedEvent={selectedEvent} matchDetails={matchDetails} timeFormat={timeFormat} inPlayoffs={inPlayoffs} alliances={alliances} setAlliances={setAlliances} rankings={rankings} backupTeam={backupTeam} setBackupTeam={setBackupTeam} playoffSchedule={playoffSchedule} setPlayoffSchedule={setPlayoffSchedule} teamList={teamList} communityUpdates={communityUpdates}/>
                     <table >
                         <tbody>
                             <tr className={"gatool-playbyplay"}>

@@ -20,6 +20,10 @@ function BottomButtons({ previousMatch, nextMatch, matchDetails, playoffSchedule
         { "matchNumber": 13, "red": { "class": "davidPriceWarning", "from": "Lost M11" }, "blue": { "class": "davidPriceWarning", "from": "Won M12" }, "winnerTo": 14, "loserTo": null }
     ]
     var matches=playoffSchedule?.schedule;
+    var eventHighScore = eventHighScores?.overallqual;
+    if (eventHighScores?.overallqual?.score < eventHighScores?.overallplayoff?.score) {
+        eventHighScore = eventHighScores?.overallplayoff;
+    }
 
     return (
         <>
@@ -27,7 +31,7 @@ function BottomButtons({ previousMatch, nextMatch, matchDetails, playoffSchedule
                 <Col xs={"2"} lg={"3"}>
                     <Button size="large" variant="outline-success" className={"gatool-button buttonNoWrap"} onClick={previousMatch}><span className={"d-none d-lg-block"}><CaretLeftFill /> Previous Match</span><span className={"d-block d-lg-none"}><CaretLeftFill /> <CaretLeftFill /></span></Button>
                 </Col>
-                {matchDetails?.tournamentLevel === "Playoff" && <Col xs={"8"} lg={"6"} className={"playoffDetails"}>
+                {matchDetails?.tournamentLevel === "Playoff" && <Col xs={"5"} lg={"4"} className={"playoffDetails"}>
                     {(matchDetails.matchNumber <= 13) && <>Winner <ArrowRight /> {_.filter(matchClasses, { "matchNumber": matchDetails.matchNumber })[0]?.winnerTo <= 13 ? `Match ${_.filter(matchClasses, { "matchNumber": matchDetails.matchNumber })[0]?.winnerTo}` : "Finals"}<br />
                     Losing Alliance {_.filter(matchClasses, { "matchNumber": matchDetails.matchNumber })[0]?.loserTo ? <><ArrowRight /> Match {_.filter(matchClasses, { "matchNumber": matchDetails.matchNumber })[0]?.loserTo} </> : " eliminated"} </>}
                     {(matchDetails.matchNumber === 14) && <>FINALS MATCH 1</>}
@@ -35,11 +39,15 @@ function BottomButtons({ previousMatch, nextMatch, matchDetails, playoffSchedule
                     {(matchDetails.matchNumber === 16) && <span className={"tieAllianceTeam"}>FINALS TIEBREAKER</span>}
                 </Col>}
 
-                {matchDetails?.tournamentLevel !== "Playoff" && eventHighScores?.overallqual?.score && <Col xs={"8"} lg={"6"}><p><b>Event High Score: {eventHighScores?.overallqual?.score}<br />
-                in Match {eventHighScores?.overallqual?.matchName}<br />
-                {eventHighScores?.overallqual?.alliance} Alliance ({eventHighScores?.overallqual?.allianceMembers})</b></p></Col>}
+                {matchDetails?.tournamentLevel !== "Playoff" && eventHighScore?.score && <Col xs={"8"} lg={"6"}><p><b>Event High Score: {eventHighScore?.score}<br />
+                in {eventHighScore?.matchName}<br />
+                {eventHighScore?.alliance} Alliance ({eventHighScore?.allianceMembers})</b></p></Col>}
 
-                {matchDetails?.tournamentLevel !== "Playoff" && !eventHighScores?.overallqual?.score && <Col xs={"8"} lg={"6"}><h4>{matchDetails.description}</h4></Col>}
+                {matchDetails?.tournamentLevel === "Playoff" && eventHighScore?.score && <Col xs={"3"} lg={"2"}><p><b>Event High Score: {eventHighScore?.score}<br />
+                in {eventHighScore?.matchName}<br />
+                {eventHighScore?.alliance} Alliance ({eventHighScore?.allianceMembers})</b></p></Col>}
+
+                {matchDetails?.tournamentLevel !== "Playoff" && !eventHighScore && <Col xs={"8"} lg={"6"}><h4>{matchDetails.description}</h4></Col>}
 
                 <Col xs={"2"} lg={"3"}>
                     <Button size="large" variant="outline-success" className={"gatool-button buttonNoWrap"} onClick={nextMatch}><span className={"d-none d-lg-block"}>Next Match <CaretRightFill /></span><span className={"d-block d-lg-none"}><CaretRightFill /> <CaretRightFill /></span></Button>

@@ -180,8 +180,9 @@ td {
 
 .playByPlaysayNumber {
 	font-size: medium;
-	line-height: 100%;
-	margin-bottom: 10px
+	line-height: 110%;
+	margin-bottom: 10px;
+	margin-top: 10px;
 }
 
 .playByPlayOrganization {
@@ -429,30 +430,32 @@ td {
 }
 
 .alert-warning {
-    color: #8a6d3b;
-    background-color: #fcf8e3;
-    border-color: #faebcc;
+	color: #8a6d3b;
+	background-color: #fcf8e3;
+	border-color: #faebcc;
 }
 
 .alert-danger {
-    color: #a94442;
-    background-color: #f2dede;
-    border-color: #ebccd1;
+	color: #a94442;
+	background-color: #f2dede;
+	border-color: #ebccd1;
 }
 
 .alert-success {
-    color: #3c763d;
-    background-color: #dff0d8;
-    border-color: #d6e9c6;
+	color: #3c763d;
+	background-color: #dff0d8;
+	border-color: #d6e9c6;
 }
 
 .teamNumberButton {
 	background-color: #ccc;
 }
+
 .teamNumberButton:hover {
-	background-color:#aaa;
+	background-color: #aaa;
 	cursor: pointer;
 }
+
 .teamTable {
 	line-height: 1.3;
 }
@@ -463,7 +466,7 @@ td {
 
 .teamTableButtonHighlight {
 	background-color: rgb(48, 171, 0) !important;
-	color:white !important; 
+	color: white !important;
 }
 
 .teamDataNumber {
@@ -473,7 +476,7 @@ td {
 
 .formHighlight {
 	outline: green;
-    outline-style: solid;
+	outline-style: solid;
 	background: #f2fff1;
 
 }
@@ -494,13 +497,13 @@ td {
 }
 
 .davidPriceWarning {
-		background-color: #fcf8e3;
-		border-color: #faebcc;
+	background-color: #fcf8e3;
+	border-color: #faebcc;
 }
 
 .davidPriceSuccess {
-		background-color: #dff0d8;
-		border-color: #d6e9c6;
+	background-color: #dff0d8;
+	border-color: #d6e9c6;
 }
 
 .davidPriceDetail {
@@ -511,6 +514,43 @@ td {
 }
 
 .playoffDetails {
-	font-size:x-large;
+	font-size: x-large;
 	font-weight: 900;
+}
+
+.RedReplace {
+	margin: 5px;
+	color: white;
+	background-color: red;
+	font-weight: bolder;
+}
+
+.BlueReplace {
+	margin: 5px;
+	color: white;
+	background-color: blue;
+	font-weight: bolder;
+}
+
+.promoteBackup {
+	border-radius: 5px;
+	font-size: 16px;
+	font-stretch: condensed;
+	font-weight: bold;
+	padding: 5px;
+	margin: 0px;
+	background-color: darkorchid;
+	color: white;
+	vertical-align: middle;
+	align-content: center;
+}
+
+.promoteBackup:hover {
+	background-color: rgb(81, 25, 133);
+}
+
+.backupDialog {
+	font-size: 30px;
+	align-content: center;
+	text-align: center
 }
