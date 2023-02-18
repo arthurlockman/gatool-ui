@@ -45,7 +45,7 @@ export const TabStates = {
 // 3rd ALLIANCE AUTO points
 // 4th MATCH is replayed
 const playoffTiebreakers = {
-  "2033": ["foulPoints", "chargeStationPoints", "autoPoints"], // Update after rules release
+  "2023": ["foulPoints", "totalChargeStationPoints", "autoPoints"], // Update after rules release
   "2022": ["foulPoints", "endgamePoints", "autoCargoTotal+autoTaxiPoints"],
   "2021": ["foulPoints", "autoPoints", "endgamePoints", "controlPanelPoints+teleopCellPoints"],
   "2020": ["foulPoints", "autoPoints", "endgamePoints", "controlPanelPoints+teleopCellPoints"],
