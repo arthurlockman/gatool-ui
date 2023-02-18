@@ -180,7 +180,7 @@ function App() {
           tempMatch.score = match.scoreRedFinal
         }
 
-        if (match.level === "Qualification") {
+        if (match.tournamentLevel === "Qualification" || match.level==="Qualification") {
           tempMatch.matchLevel = "qual";
         } else if (match.level === "Playoff") {
           tempMatch.matchLevel = "playoff";
@@ -277,7 +277,7 @@ function App() {
       // determine the tiebreaker
       var lastMatchNumber = playoffschedule.schedule[_.findLastIndex(playoffschedule.schedule, function (match) {
         return (match.scoreRedFinal !== null) || (match.scoreBlueFinal !== null)
-      })].matchNumber;
+      })]?.matchNumber;
 
       result = await httpClient.get(`${selectedYear?.value}/scores/${selectedEvent?.value.code}/playoff/1/${lastMatchNumber}`);
       var scores = await result.json();
