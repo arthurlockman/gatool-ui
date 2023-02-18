@@ -41,7 +41,7 @@ export const TabStates = {
 // Order Sort
 // Criteria 2023 need to revisit once we see the data
 // 1st Cumulative TECH FOUL points due to opponent rule violations
-// 2nd ALLIANCE CHARGE STATION points 
+// 2nd ALLIANCE CHARGE STATION points
 // 3rd ALLIANCE AUTO points
 // 4th MATCH is replayed
 const playoffTiebreakers = {
