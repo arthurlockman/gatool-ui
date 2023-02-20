@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 27.2.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="bracket" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 1280 810" style="enable-background:new 0 0 1280 810;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#FFFFFF;}
+	.st1{fill:#DBDAD9;}
+	.st2{fill:none;stroke:#000000;stroke-width:2;stroke-miterlimit:10;}
+	.st3{fill:none;stroke:#8E8E8E;stroke-width:2;stroke-miterlimit:10;}
+	.st4{font-family:'MyriadPro-Bold';}
+	.st5{font-size:26px;}
+	.st6{font-size:16px;}
+	.st7{font-family:'MyriadPro-Black';}
+	.st8{font-size:38px;}
+	.st9{fill:#C1C1C1;stroke:#000000;stroke-width:2;stroke-miterlimit:10;}
+	.st10{fill:#FF0000;}
+	.st11{fill:#0000FF;}
+	.st12{fill:none;stroke:#FFFFFF;stroke-miterlimit:10;}
+	.st13{font-size:12.076px;}
+	.st14{font-size:12.1471px;}
+	.st15{fill:#474E5D;}
+	.st16{fill:#606776;}
+	.st17{fill:#2E3544;}
+	.st18{fill:#FFCA10;}
+	.st19{fill:#FEE79B;}
+	.st20{fill:#FFA200;}
+	.st21{fill:#09BA48;}
+	.st22{font-family:'MyriadPro-Semibold';}
+	.st23{font-size:14px;}
+	.st24{font-size:15px;}
+</style>
+<font horiz-adv-x="1000">
+<!-- Copyright 1992, 1994, 1997, 2000, 2004 Adobe Systems Incorporated. All rights reserved. Myriad is either a registered trademark or a trademark of Adobe Systems Incorporated in the United States and/or other countries. -->
+<font-face font-family="MyriadPro-Semibold" units-per-em="1000" underline-position="-100" underline-thickness="50"/>
+<missing-glyph horiz-adv-x="500" d="M0,0l500,0l0,700l-500,0M250,395l-170,255l340,0M280,350l170,255l0,-510M80,50l170,255l170,-255M50,605l170,-255l-170,-255z"/>
+<glyph unicode="9" horiz-adv-x="536" d="M93,-9C111,-10 139,-10 167,-7C254,-1 332,29 389,82C456,146 502,245 502,384C502,542 421,661 270,661C131,661 35,553 35,429C35,309 119,227 232,227C295,227 341,248 374,285l2,-1C364,223 335,174 293,140C257,111 209,94 161,90C131,87 112,86 93,88M264,570C344,570 377,494 376,406C376,389 373,379 369,371C350,340 314,317 264,317C196,317 158,369 157,436C157,515 202,570 264,570z"/>
+</font>
+
+	<font horiz-adv-x="1000">
+<!-- Copyright 1992, 1994, 1997, 2000, 2004 Adobe Systems Incorporated. All rights reserved. Myriad is either a registered trademark or a trademark of Adobe Systems Incorporated in the United States and/or other countries. -->
+<font-face font-family="MyriadPro-Bold" units-per-em="1000" underline-position="-100" underline-thickness="50"/>
+<missing-glyph horiz-adv-x="500" d="M0,0l500,0l0,700l-500,0M250,395l-170,255l340,0M280,350l170,255l0,-510M80,50l170,255l170,-255M50,605l170,-255l-170,-255z"/>
+<glyph unicode="A" horiz-adv-x="656" d="M416,173l52,-173l164,0l-209,674l-200,0l-206,-674l158,0l48,173M245,287l40,143C296,469 306,520 316,560l2,0C328,520 340,470 352,430l42,-143z"/>
+<glyph unicode="B" horiz-adv-x="604" d="M66,3C100,-2 156,-7 231,-7C365,-7 447,15 496,54C538,88 566,136 566,197C566,284 509,342 432,363l0,2C508,393 543,449 543,509C543,570 509,616 462,641C413,670 356,679 263,679C187,679 106,673 66,665M217,564C230,566 249,568 282,568C351,568 390,541 390,490C390,440 347,407 267,407l-50,0M217,298l52,0C345,298 406,271 406,203C406,132 345,106 276,106C250,106 232,106 217,108z"/>
+<glyph unicode="C" horiz-adv-x="595" d="M538,138C508,126 457,116 411,116C275,116 195,201 195,336C195,486 289,559 410,559C464,559 507,547 538,534l31,121C542,669 482,685 403,685C199,685 35,557 35,327C35,135 155,-10 388,-10C470,-10 533,5 561,19z"/>
+<glyph unicode="D" horiz-adv-x="696" d="M66,3C104,-2 160,-7 239,-7C371,-7 479,21 550,80C615,135 662,224 662,353C662,472 618,555 548,607C483,656 400,679 272,679C195,679 122,674 66,665M219,556C232,559 254,562 288,562C419,562 501,488 500,348C500,187 410,111 272,112C253,112 232,112 219,115z"/>
+<glyph unicode="E" horiz-adv-x="534" d="M467,409l-248,0l0,140l263,0l0,125l-416,0l0,-674l430,0l0,125l-277,0l0,160l248,0z"/>
+<glyph unicode="F" horiz-adv-x="527" d="M66,0l153,0l0,271l242,0l0,124l-242,0l0,154l259,0l0,125l-412,0z"/>
+<glyph unicode="H" horiz-adv-x="689" d="M66,674l0,-674l153,0l0,282l251,0l0,-282l152,0l0,674l-152,0l0,-259l-251,0l0,259z"/>
+<glyph unicode="I" horiz-adv-x="285" d="M66,674l0,-674l153,0l0,674z"/>
+<glyph unicode="K" horiz-adv-x="614" d="M66,0l151,0l0,220l58,71l165,-291l178,0l-235,387l223,287l-187,0l-153,-224C251,426 235,402 220,376l-3,0l0,298l-151,0z"/>
+<glyph unicode="L" horiz-adv-x="511" d="M66,0l421,0l0,128l-268,0l0,546l-153,0z"/>
+<glyph unicode="M" horiz-adv-x="846" d="M646,0l149,0l-37,674l-199,0l-72,-224C465,375 442,286 423,208l-3,0C405,287 384,371 363,449l-66,225l-203,0l-43,-674l141,0l12,256C209,340 212,444 216,535l2,0C234,447 257,351 279,272l72,-261l119,0l82,263C578,353 606,449 627,535l3,0C630,437 633,339 636,258z"/>
+<glyph unicode="N" horiz-adv-x="690" d="M206,0l0,203C206,313 204,408 200,497l3,1C236,419 280,332 320,260l144,-260l160,0l0,674l-140,0l0,-197C484,376 487,285 497,196l-3,0C464,272 424,356 384,427l-140,247l-178,0l0,-674z"/>
+<glyph unicode="O" horiz-adv-x="717" d="M363,685C164,685 35,534 35,332C35,140 152,-11 352,-11C549,-11 683,123 683,344C683,530 570,685 363,685M359,564C464,564 522,460 522,339C522,208 463,110 360,110C258,110 196,203 196,335C196,466 256,564 359,564z"/>
+<glyph unicode="P" horiz-adv-x="581" d="M66,0l151,0l0,241C231,239 249,238 269,238C359,238 436,260 488,309C528,347 550,403 550,469C550,535 521,591 478,625C433,661 366,679 272,679C179,679 113,673 66,665M217,558C228,561 249,564 280,564C356,564 399,527 399,465C399,396 349,355 268,355C246,355 230,356 217,359z"/>
+<glyph unicode="R" horiz-adv-x="593" d="M66,0l151,0l0,265l46,0C325,264 354,241 372,157C392,74 408,19 419,0l156,0C562,26 541,114 520,190C503,252 477,297 430,316l0,3C488,340 549,399 549,485C549,547 527,594 487,626C439,664 369,679 269,679C188,679 115,673 66,665M217,561C228,563 249,566 286,566C356,565 398,534 398,472C398,413 353,375 277,375l-60,0z"/>
+<glyph unicode="S" horiz-adv-x="540" d="M40,31C78,10 154,-10 231,-10C416,-10 503,86 503,199C503,294 447,356 328,400C241,433 203,452 203,495C203,530 235,560 301,560C367,560 415,541 442,528l34,123C436,669 380,685 304,685C145,685 49,597 49,482C49,384 122,322 234,283C315,254 347,230 347,188C347,144 310,115 240,115C175,115 112,136 71,157z"/>
+<glyph unicode="T" horiz-adv-x="548" d="M196,0l153,0l0,546l184,0l0,128l-518,0l0,-128l181,0z"/>
+<glyph unicode="U" horiz-adv-x="682" d="M65,674l0,-376C65,83 165,-11 335,-11C511,-11 616,88 616,296l0,378l-152,0l0,-388C464,167 420,111 340,111C262,111 218,170 218,286l0,388z"/>
+<glyph unicode="W" horiz-adv-x="888" d="M342,0l64,290C422,358 433,422 445,498l2,0C455,421 466,358 479,290l57,-290l165,0l174,674l-155,0l-55,-276C651,318 636,239 626,164l-2,0C614,239 603,311 588,390l-54,284l-162,0l-57,-276C298,315 282,234 271,161l-2,0C258,229 244,316 229,396l-51,278l-163,0l160,-674z"/>
+<glyph unicode="a" horiz-adv-x="528" d="M476,0C471,27 469,72 469,119l0,170C469,404 417,500 254,500C165,500 98,476 64,457l28,-98C124,379 177,396 227,396C302,396 316,359 316,333l0,-7C143,327 29,266 29,139C29,61 88,-11 187,-11C245,-11 295,10 327,49l3,0l9,-49M321,178C321,169 320,160 318,152C308,121 277,96 239,96C205,96 179,115 179,154C179,213 241,232 321,231z"/>
+<glyph unicode="c" horiz-adv-x="451" d="M410,124C387,115 359,109 323,109C249,109 189,156 189,246C188,326 240,383 320,383C360,383 387,376 405,368l24,113C397,493 353,500 313,500C131,500 33,383 33,240C33,86 134,-10 292,-10C350,-10 401,0 428,12z"/>
+<glyph unicode="e" horiz-adv-x="528" d="M493,196C495,207 498,230 498,256C498,377 438,500 280,500C110,500 33,363 33,239C33,86 128,-10 294,-10C360,-10 421,0 471,20l-20,103C410,110 368,103 316,103C245,103 183,133 178,196M177,300C181,341 207,399 271,399C341,399 357,337 357,300z"/>
+<glyph unicode="8" horiz-adv-x="555" d="M273,-11C424,-11 523,68 523,186C523,270 467,324 404,348l0,3C468,383 498,438 498,494C498,573 435,661 283,661C153,661 54,588 54,478C54,421 85,368 148,336l0,-3C77,302 32,248 32,170C32,82 108,-11 273,-11M279,94C222,94 186,138 187,185C187,232 216,268 266,282C326,266 368,232 368,175C368,129 333,94 279,94M276,558C332,558 355,518 355,478C355,437 324,405 289,395C237,411 197,439 197,483C197,524 224,558 276,558z"/>
+<glyph unicode="f" horiz-adv-x="341" d="M231,0l0,377l97,0l0,112l-98,0l0,25C230,562 251,601 301,601C321,601 337,598 350,594l6,117C335,717 309,721 275,721C231,721 178,708 140,672C96,632 78,567 78,508l0,-19l-64,0l0,-112l64,0l0,-377z"/>
+<glyph unicode="5" horiz-adv-x="555" d="M476,650l-358,0l-43,-341C102,313 127,315 163,315C293,315 346,274 346,207C346,138 279,108 216,108C157,108 98,126 69,140l-27,-114C78,7 144,-11 223,-11C398,-11 502,96 502,217C502,293 472,347 423,380C377,413 314,427 252,427C236,427 224,427 210,425l14,100l252,0z"/>
+<glyph unicode="4" horiz-adv-x="555" d="M455,0l0,155l78,0l0,114l-78,0l0,381l-186,0l-246,-396l0,-99l288,0l0,-155M165,269l0,2l87,142C274,454 291,492 312,534l4,0C313,492 311,452 311,413l0,-144z"/>
+<glyph unicode="i" horiz-adv-x="274" d="M213,0l0,489l-152,0l0,-489M137,702C88,702 56,669 57,625C56,583 88,549 136,549C186,549 218,583 218,625C217,669 186,702 137,702z"/>
+<glyph unicode="l" horiz-adv-x="275" d="M61,0l152,0l0,710l-152,0z"/>
+<glyph unicode="n" horiz-adv-x="586" d="M61,0l152,0l0,282C213,296 215,311 219,320C229,348 254,377 296,377C351,377 373,334 373,271l0,-271l152,0l0,290C525,434 450,500 350,500C269,500 219,453 199,422l-3,0l-7,67l-132,0C59,446 61,394 61,333z"/>
+<glyph unicode="9" horiz-adv-x="555" d="M90,-9C107,-10 133,-11 159,-9C260,-5 345,26 407,82C478,147 521,246 521,381C521,533 442,661 275,661C132,661 30,554 30,427C30,301 123,224 233,224C292,224 334,241 363,271l3,-1C354,221 326,179 284,150C249,126 202,113 156,110C126,108 109,108 90,110M271,550C340,550 366,482 366,413C366,394 363,384 358,375C344,352 315,332 274,332C212,332 182,380 182,436C181,504 219,550 271,550z"/>
+<glyph unicode="o" horiz-adv-x="577" d="M294,500C137,500 33,399 33,241C33,83 143,-11 286,-11C417,-11 544,71 544,250C544,397 444,500 294,500M290,392C359,392 387,318 387,245C387,157 349,98 290,98C225,98 190,161 190,245C190,317 217,392 290,392z"/>
+<glyph unicode="1" horiz-adv-x="555" d="M236,0l147,0l0,650l-126,0l-172,-80l25,-114l124,59l2,0z"/>
+<glyph unicode="r" horiz-adv-x="380" d="M61,0l152,0l0,248C213,260 214,272 216,282C226,329 264,359 320,359C337,359 350,357 361,355l0,143C350,500 343,500 329,500C282,500 222,470 197,399l-4,0l-5,90l-131,0C59,447 61,400 61,328z"/>
+<glyph unicode="s" horiz-adv-x="434" d="M33,24C70,4 127,-10 191,-10C331,-10 403,57 403,148C402,220 363,267 270,299C210,320 191,332 191,355C191,380 212,395 249,395C291,395 333,379 355,367l27,105C352,487 301,500 244,500C123,500 45,431 45,340C44,282 83,227 184,193C241,174 256,162 256,137C256,112 237,96 191,96C146,96 88,116 60,133z"/>
+<glyph unicode="7" horiz-adv-x="555" d="M49,650l0,-125l298,0l0,-2l-268,-523l161,0l268,554l0,96z"/>
+<glyph unicode="6" horiz-adv-x="555" d="M457,659C442,660 424,660 396,658C294,653 210,621 145,562C75,497 30,395 30,273C30,118 115,-11 288,-11C429,-11 528,95 528,224C528,359 436,436 327,436C266,436 221,417 189,384l-3,0C203,460 263,529 398,540C422,542 440,543 457,542M286,101C217,101 184,163 181,232C181,250 183,262 187,270C202,303 236,328 277,328C342,328 374,276 374,216C374,150 340,101 286,101z"/>
+<glyph unicode=" " horiz-adv-x="202"/>
+<glyph unicode="3" horiz-adv-x="555" d="M38,35C76,11 147,-11 231,-11C396,-11 497,73 497,188C497,273 434,332 356,346l0,2C436,376 475,430 475,499C475,588 398,661 259,661C175,661 97,637 58,612l31,-110C116,518 172,541 225,541C289,541 321,512 321,473C321,418 256,399 205,398l-59,0l0,-109l62,0C275,289 339,260 339,196C339,147 299,109 220,109C158,109 96,135 69,149z"/>
+<glyph unicode="2" horiz-adv-x="555" d="M503,0l0,125l-245,0l0,2l60,50C412,261 491,348 491,457C491,575 410,661 263,661C175,661 99,631 50,594l43,-109C127,511 176,539 232,539C307,539 339,497 339,444C337,368 268,295 126,168l-84,-76l0,-92z"/>
+<glyph unicode="0" horiz-adv-x="555" d="M280,661C112,661 32,512 32,324C33,140 107,-11 275,-11C441,-11 522,127 522,328C522,506 454,661 280,661M278,546C339,546 370,470 370,326C370,178 338,104 279,104C220,104 184,175 185,324C184,475 222,546 278,546z"/>
+</font>
+
+	<font horiz-adv-x="1000">
+<!-- Copyright 1992, 1994, 1997, 2000, 2004 Adobe Systems Incorporated. All rights reserved. Myriad is either a registered trademark or a trademark of Adobe Systems Incorporated in the United States and/or other countries. -->
+<font-face font-family="MyriadPro-Black" units-per-em="1000" underline-position="-100" underline-thickness="50"/>
+<missing-glyph horiz-adv-x="500" d="M0,0l500,0l0,700l-500,0M250,395l-170,255l340,0M280,350l170,255l0,-510M80,50l170,255l170,-255M50,605l170,-255l-170,-255z"/>
+<glyph unicode="A" horiz-adv-x="675" d="M413,156l43,-156l195,0l-201,674l-240,0l-196,-674l187,0l38,156M263,290l29,120C302,448 312,504 322,544l2,0C334,504 347,449 357,411l31,-121z"/>
+<glyph unicode="B" horiz-adv-x="631" d="M62,4C99,-2 158,-7 240,-7C384,-7 468,15 519,53C564,87 594,137 594,200C594,280 545,341 462,364l0,2C541,396 572,451 572,508C572,573 533,622 481,646C428,673 371,679 275,679C192,679 103,672 62,665M241,546C253,548 270,550 300,550C361,550 391,525 391,485C391,442 354,415 277,415l-36,0M241,287l43,0C352,287 404,265 404,208C404,149 353,125 293,125C270,125 254,125 241,127z"/>
+<glyph unicode="C" horiz-adv-x="602" d="M542,159C514,148 465,139 421,139C297,139 224,215 224,338C224,476 314,537 418,537C472,537 513,525 543,513l35,142C550,670 487,685 409,685C208,685 34,564 34,326C34,147 145,-10 397,-10C478,-10 541,5 567,17z"/>
+<glyph unicode="E" horiz-adv-x="552" d="M485,418l-242,0l0,109l257,0l0,147l-438,0l0,-674l452,0l0,148l-271,0l0,124l242,0z"/>
+<glyph unicode="F" horiz-adv-x="545" d="M62,0l181,0l0,256l237,0l0,146l-237,0l0,125l252,0l0,147l-433,0z"/>
+<glyph unicode="K" horiz-adv-x="646" d="M62,0l179,0l0,204l54,69l142,-273l209,0l-222,387l214,287l-222,0l-129,-212C272,438 257,413 243,388l-2,0l0,286l-179,0z"/>
+<glyph unicode="L" horiz-adv-x="528" d="M62,0l440,0l0,151l-259,0l0,523l-181,0z"/>
+<glyph unicode="O" horiz-adv-x="730" d="M369,685C163,685 34,529 34,333C34,146 149,-11 358,-11C566,-11 696,127 696,344C696,524 586,685 369,685M366,542C453,542 505,454 505,338C505,217 454,132 367,132C280,132 225,210 225,336C225,460 280,542 366,542z"/>
+<glyph unicode="P" horiz-adv-x="602" d="M62,0l179,0l0,229C252,228 268,227 285,227C376,227 455,248 510,297C552,335 575,395 575,463C575,532 544,592 498,626C451,662 382,679 285,679C182,679 111,673 62,665M241,539C250,541 268,543 295,543C363,543 397,509 397,459C397,401 353,365 282,365C263,365 251,366 241,367z"/>
+<glyph unicode="R" horiz-adv-x="617" d="M62,0l179,0l0,253l29,0C326,253 351,236 369,155C389,72 406,20 416,0l185,0C588,26 566,124 545,193C528,251 504,294 459,313l0,4C512,336 575,396 575,480C575,546 551,594 508,627C457,665 383,679 280,679C190,679 113,673 62,665M241,542C250,544 268,546 302,546C362,545 395,517 395,466C395,416 356,382 288,382l-47,0z"/>
+<glyph unicode="T" horiz-adv-x="570" d="M193,0l181,0l0,523l175,0l0,151l-528,0l0,-151l172,0z"/>
+<glyph unicode="Y" horiz-adv-x="629" d="M400,0l0,279l221,395l-203,0l-56,-152C346,476 332,439 319,398l-2,0C302,441 290,475 271,522l-57,152l-207,0l213,-402l0,-272z"/>
+<glyph unicode="a" horiz-adv-x="548" d="M501,0C495,25 493,71 493,120l0,166C493,409 434,503 265,503C163,503 93,475 61,459l32,-115C125,363 180,381 232,381C297,381 312,359 312,339l0,-4C145,334 27,276 27,144C27,62 89,-11 189,-11C242,-11 291,4 326,43l3,0l10,-43M318,185C318,176 318,167 316,159C308,132 280,114 254,114C224,114 203,130 203,161C203,204 245,225 318,225z"/>
+<glyph unicode="b" horiz-adv-x="610" d="M204,0l7,63l2,0C246,8 301,-11 353,-11C467,-11 579,78 579,256C581,407 495,503 378,503C315,503 266,479 238,442l-2,0l0,268l-180,0l0,-554C56,95 54,32 52,0M236,280C236,288 237,296 238,304C244,339 274,365 309,365C369,365 396,315 396,248C396,170 362,130 309,130C273,130 245,158 238,189C237,196 236,205 236,214z"/>
+<glyph unicode="{" horiz-adv-x="328" d="M31,244C99,240 105,204 105,178C105,154 102,128 100,101C98,75 96,48 96,24C96,-75 157,-112 250,-112l42,0l0,97l-18,0C233,-15 221,11 221,51C221,65 223,81 225,100C227,119 229,141 229,167C230,248 198,275 138,287l0,2C198,301 230,328 229,408C229,433 227,455 225,474C223,493 221,509 221,524C221,564 235,589 274,589l18,0l0,97l-41,0C154,686 96,645 96,550C96,526 98,499 100,473C102,447 105,420 105,397C105,370 99,335 31,331z"/>
+<glyph unicode="}" horiz-adv-x="328" d="M296,331C229,335 223,370 223,397C223,420 225,447 228,473C230,499 232,526 232,550C232,645 174,686 77,686l-41,0l0,-97l18,0C93,588 107,564 107,524C107,509 105,493 103,474C101,455 99,433 99,408C97,328 129,301 190,289l0,-2C129,275 97,248 99,167C99,141 101,119 103,100C105,81 107,65 107,51C107,11 95,-14 53,-15l-17,0l0,-97l42,0C171,-112 232,-75 232,24C232,48 230,75 228,101C225,128 223,154 223,178C223,204 229,240 296,244z"/>
+<glyph unicode="c" horiz-adv-x="452" d="M413,142C391,133 365,130 334,130C271,130 215,168 215,248C215,320 262,366 330,366C366,366 390,360 407,353l26,133C398,498 355,503 319,503C127,503 31,382 31,242C31,85 134,-10 297,-10C352,-10 403,-3 433,10z"/>
+<glyph unicode="d" horiz-adv-x="610" d="M374,710l0,-254l-2,0C350,487 305,503 251,503C135,503 30,408 31,243C31,88 126,-11 240,-11C297,-11 356,11 389,67l2,0l7,-67l160,0C556,33 554,95 554,156l0,554M374,224C374,213 373,201 371,191C365,158 337,132 301,132C251,132 214,172 214,247C214,312 241,366 301,366C339,366 366,337 373,303C374,295 374,287 374,280z"/>
+<glyph unicode="e" horiz-adv-x="539" d="M506,183C509,195 513,221 513,251C513,386 445,503 286,503C105,503 31,356 31,241C31,85 129,-10 302,-10C363,-10 427,-3 486,21l-23,120C419,127 375,122 328,122C265,122 208,144 202,183M200,305C203,336 224,385 277,385C334,385 347,333 347,305z"/>
+<glyph unicode="l" horiz-adv-x="292" d="M56,0l180,0l0,710l-180,0z"/>
+<glyph unicode="n" horiz-adv-x="599" d="M56,0l180,0l0,279C236,292 237,306 241,315C249,334 265,358 300,358C343,358 363,325 363,268l0,-268l180,0l0,290C543,425 481,503 366,503C284,503 237,455 219,429l-4,0l-8,63l-155,0C54,447 56,390 56,325z"/>
+<glyph unicode="9" horiz-adv-x="573" d="M87,-8C103,-9 128,-11 151,-10C266,-8 358,22 425,82C499,149 540,247 540,379C540,524 463,661 281,661C133,661 26,555 26,426C26,293 126,222 233,222C289,222 327,235 353,259l3,-2C345,220 318,184 275,160C242,141 196,130 151,129C121,128 107,128 87,130M277,531C337,531 356,470 355,419C355,399 354,388 349,379C338,362 317,347 282,347C228,347 205,392 205,437C204,494 236,531 277,531z"/>
+<glyph unicode="." horiz-adv-x="283" d="M152,-11C213,-11 255,33 255,94C254,157 212,199 152,199C92,199 49,156 49,94C49,33 91,-11 152,-11z"/>
+<glyph unicode="?" horiz-adv-x="463" d="M293,230l1,15C294,288 309,324 342,359C376,396 428,445 428,526C428,611 364,685 225,685C145,685 85,664 47,644l38,-129C112,533 151,544 184,544C228,542 247,523 247,496C247,467 220,437 193,405C151,355 135,306 136,256l1,-26M211,-11C273,-11 314,33 314,92C313,153 272,196 211,196C151,195 109,153 109,92C109,33 150,-11 211,-11z"/>
+<glyph unicode="s" horiz-adv-x="451" d="M30,24C69,4 130,-10 198,-10C350,-10 423,60 423,154C422,225 385,275 288,307C230,326 214,336 214,352C214,372 232,380 263,380C303,380 349,364 372,353l29,122C369,490 315,503 254,503C125,503 42,432 42,334C41,277 78,218 186,184C239,167 250,159 250,141C250,123 235,114 197,114C152,114 88,134 60,151z"/>
+<glyph unicode=" " horiz-adv-x="198"/>
+<glyph unicode="t" horiz-adv-x="383" d="M77,592l0,-100l-61,0l0,-132l61,0l0,-172C77,113 93,64 123,34C149,8 193,-10 246,-10C292,-10 332,-4 353,3l0,137C343,138 329,136 310,136C267,136 253,160 253,219l0,141l102,0l0,132l-102,0l0,140z"/>
+<glyph unicode="v" horiz-adv-x="551" d="M8,492l175,-492l181,0l179,492l-189,0l-49,-209C295,242 289,207 283,167l-3,0C274,206 267,244 257,283l-53,209z"/>
+</font>
+
+	<g id="background">
+	<g>
+		<rect x="1" class="st0" width="1279" height="810"/>
+	</g>
+	<rect x="1091" y="89" class="st1" width="75" height="684"/>
+	<rect x="862" y="89" class="st1" width="75" height="684"/>
+	<rect x="677" y="89" class="st1" width="75" height="684"/>
+	<rect x="109" y="89" class="st1" width="75" height="684"/>
+	<rect x="302" y="89" class="st1" width="75" height="684"/>
+	<rect x="490" y="89" class="st1" width="75" height="684"/>
+	<polyline class="st2" points="242,175.1 430.8,175.1 430.8,328.1 242.6,328.1 	"/>
+	<polyline class="st2" points="186.3,136.6 242.5,136.6 242.5,213.6 199.1,213.6 	"/>
+	<polyline class="st2" points="186.3,291.6 242.5,291.6 242.5,368.6 199.1,368.6 	"/>
+	<polyline class="st2" points="431,254 1006,254 1006,504.1 816.8,504.1 816.8,574.1 630,574.1 	"/>
+	<polyline class="st2" points="388.1,721.1 436.7,721.1 436.7,648 629.7,648 629.7,509 436.7,509 436.7,567.1 364.9,567.1 	"/>
+	<line class="st2" x1="1024" y1="421" x2="1006" y2="421"/>
+	<line class="st3" x1="70" y1="419" x2="971" y2="419"/>
+	<text transform="matrix(0 -1 1 0 49.7114 348.6689)" class="st4 st5">UPPER BRACKET</text>
+	<text transform="matrix(0 -1 1 0 49.7114 673.2046)" class="st4 st5">LOWER BRACKET</text>
+	<text transform="matrix(1 0 0 1 116.6694 84.2646)" class="st4 st6">ROUND 1</text>
+	<text transform="matrix(1 0 0 1 306.6694 84.2646)" class="st4 st6">ROUND 2</text>
+	<text transform="matrix(1 0 0 1 494.6694 84.2646)" class="st4 st6">ROUND 3</text>
+	<text transform="matrix(1 0 0 1 682.6694 84.2646)" class="st4 st6">ROUND 4</text>
+	<text transform="matrix(1 0 0 1 869.6694 84.2646)" class="st4 st6">ROUND 5</text>
+	<text transform="matrix(1 0 0 1 1106.0776 84.2646)" class="st4 st6">FINALS</text>
+	<text id="playoffBracketTitle" transform="matrix(1 0 0 1 277.9612 47.6909)" class="st7 st8">PLAYOFF BRACKET {selectedEvent?.label}</text>
+</g>
+<g id="finals">
+	<path id="finalsBackground" class="st9" d="M1254.5,511.6H1024c-5.5,0-10-4.5-10-10V343.4c0-5.5,4.5-10,10-10h230.5
+		c5.5,0,10,4.5,10,10v158.1C1264.5,507.1,1260,511.6,1254.5,511.6z"/>
+	<g id="finalsContainer">
+		<polygon class="st10" points="1164.7,389.6 1048.4,389.6 1048.4,353.5 1164.7,353.5 1177.6,371.6 		"/>
+		<polygon class="st11" points="1164.7,426 1048.4,426 1048.4,390 1164.7,390 1177.6,408 		"/>
+		<line class="st12" x1="1164.7" y1="389.7" x2="1026" y2="389.7"/>
+		<rect x="1026" y="353.5" width="22.4" height="72.5"/>
+		<text transform="matrix(0 -1.0059 1 0 1041.7773 418.6328)" class="st0 st4 st13">BEST 2 of 3</text>
+		<text transform="matrix(0.9941 0 0 1 1067.248 368.1807)"><tspan x="0" y="0" class="st0 st4 st14">Winner of M11</tspan><tspan x="-13.4" y="14.6" class="st0 st4 st14">22222 22222 22222</tspan></text>
+		<text transform="matrix(0.9941 0 0 1 1067.248 404.6221)"><tspan x="0" y="0" class="st0 st4 st14">Winner of M13</tspan><tspan x="-13.4" y="14.6" class="st0 st4 st14">22222 22222 22222</tspan></text>
+	</g>
+	<g id="trophy">
+		<rect x="1204.4" y="414.2" class="st15" width="26.5" height="1.7"/>
+		<rect x="1207.7" y="414.2" class="st16" width="1.7" height="1.7"/>
+		<rect x="1225.9" y="414.2" class="st17" width="5" height="1.7"/>
+		<rect x="1206" y="404.2" class="st15" width="23.2" height="9.9"/>
+		<rect x="1209.3" y="404.2" class="st16" width="1.7" height="9.9"/>
+		<rect x="1224.2" y="404.2" class="st17" width="5" height="9.9"/>
+		<path class="st18" d="M1219.3,390.2c0,6.1,3.9,11.3,9.3,13.3l0.6,0.8H1206l0.6-0.8c5.5-1.9,9.4-7.1,9.4-13.3H1219.3z"/>
+		<path class="st19" d="M1216.8,390.2h-0.4c0,6.1-2.9,11.3-7,13.3l-0.4,0.8h2.9l0.3-0.8C1214.8,401.5,1216.8,396.3,1216.8,390.2z"/>
+		<path class="st20" d="M1228.6,403.4c-5.4-1.9-9.3-7.1-9.3-13.3h-0.8c0,6.1,1.9,11.3,4.7,13.3l0.3,0.8h5.8L1228.6,403.4z"/>
+		<path class="st18" d="M1194.4,366.1c0,11.9,10.4,21.5,23.2,21.5c12.8,0,23.2-9.6,23.2-21.5H1194.4z M1217.6,385.2
+			c-10.5,0-19.2-7.2-20.5-16.6h41.1C1236.8,378,1228.1,385.2,1217.6,385.2z"/>
+		<path class="st18" d="M1232.5,362.8h-29.8c0,15.6,6.7,28.2,14.9,28.2S1232.5,378.4,1232.5,362.8z"/>
+		<path class="st20" d="M1225.1,362.8c0,15.6-3.3,28.2-7.5,28.2c8.2,0,14.9-12.6,14.9-28.2H1225.1z"/>
+		<path class="st19" d="M1208.6,362.8h-2.2c0,15.6,5,28.2,11.2,28.2C1212.6,391,1208.6,378.4,1208.6,362.8z"/>
+	</g>
+	<circle id="winnerMatch3Dot" class="st21" cx="1139.5" cy="451" r="8"/>
+	<circle id="winnerMatch2Dot" class="st11" cx="1110.2" cy="451" r="8"/>
+	<circle id="winnerMatch1Dot" class="st10" cx="1081" cy="451" r="8"/>
+	<text id="finalsM1Scores" transform="matrix(1 0 0 1 1069.5928 477.5537)"><tspan x="0" y="0" class="st10 st22 st23">999</tspan><tspan x="-0.8" y="14" class="st11 st7 st23">999</tspan></text>
+	<text id="finalsM2Scores" transform="matrix(1 0 0 1 1098.0654 477.5537)"><tspan x="0" y="0" class="st10 st7 st23">999</tspan><tspan x="0.8" y="14" class="st11 st22 st23">999</tspan></text>
+	<text id="finalsM3Scores" transform="matrix(1 0 0 1 1128.0928 477.5537)"><tspan x="0" y="0" class="st10 st22 st23">999</tspan><tspan x="-0.8" y="14" class="st11 st7 st23">999</tspan></text>
+	<circle id="winnerMatch4Dot" class="st21" cx="1168.7" cy="451" r="8"/>
+	<text id="finalsM4Scores" transform="matrix(1 0 0 1 1157.3428 477.5537)"><tspan x="0" y="0" class="st10 st22 st23">999</tspan><tspan x="-0.8" y="14" class="st11 st7 st23">999</tspan></text>
+	<circle id="winnerMatch5Dot" class="st21" cx="1197.9" cy="451" r="8"/>
+	<text id="finalsM5Scores" transform="matrix(1 0 0 1 1186.6687 477.5537)"><tspan x="0" y="0" class="st10 st22 st23">999</tspan><tspan x="-0.8" y="14" class="st11 st7 st23">999</tspan></text>
+</g>
+<g id="match13">
+	<g>
+		<polygon class="st10" points="984.7,504.6 848.4,504.6 848.4,468.5 984.7,468.5 997.6,486.6 		"/>
+		<polygon class="st11" points="984.7,541 848.4,541 848.4,505 984.7,505 997.6,523 		"/>
+		<line class="st12" x1="984.7" y1="504.7" x2="826" y2="504.7"/>
+		<rect x="826" y="468.5" width="22.4" height="72.5"/>
+		<text transform="matrix(0 -1.0059 1 0 841.7773 532.333)" class="st0 st4 st13">MATCH 13</text>
+		<text transform="matrix(0.9941 0 0 1 872.1514 483.1807)"><tspan x="0" y="0" class="st0 st4 st14">Loser of M11</tspan><tspan x="-18.3" y="14.6" class="st0 st4 st14">22222 22222 22222</tspan></text>
+		<text transform="matrix(0.9941 0 0 1 867.248 519.6221)"><tspan x="0" y="0" class="st0 st4 st14">Winner of M12</tspan><tspan x="-13.4" y="14.6" class="st0 st4 st14">22222 22222 22222</tspan></text>
+		<circle id="match13BlueDot_00000183246667418592597280000016511939998315598008_" class="st18" cx="993" cy="483" r="8"/>
+		<circle id="match13BlueDot" class="st18" cx="993" cy="520" r="8"/>
+		<text id="M13BlueScore" transform="matrix(1 0 0 1 959.3965 525.6279)" class="st0 st4 st24">999</text>
+		<text id="M13RedScore" transform="matrix(1 0 0 1 959.3965 489.6279)" class="st0 st4 st24">999</text>
+	</g>
+</g>
+<g id="match12">
+	<g>
+		<polygon class="st10" points="802.7,574.6 666.4,574.6 666.4,538.5 802.7,538.5 815.6,556.6 		"/>
+		<polygon class="st11" points="802.7,611 666.4,611 666.4,575 802.7,575 815.6,593 		"/>
+		<line class="st12" x1="802.7" y1="574.7" x2="644" y2="574.7"/>
+		<rect x="644" y="538.5" width="22.4" height="72.5"/>
+		<text transform="matrix(0 -1.0059 1 0 659.7773 602.333)" class="st0 st4 st13">MATCH 12</text>
+		<text transform="matrix(0.9941 0 0 1 685.248 553.1807)"><tspan x="0" y="0" class="st0 st4 st14">Winner of M10</tspan><tspan x="-13.4" y="14.6" class="st0 st4 st14">22222 22222 22222</tspan></text>
+		<text transform="matrix(0.9941 0 0 1 688.5996 589.6221)"><tspan x="0" y="0" class="st0 st4 st14">Winner of M9</tspan><tspan x="-16.8" y="14.6" class="st0 st4 st14">22222 22222 22222</tspan></text>
+		<circle id="match12RedDot" class="st18" cx="814" cy="556" r="8"/>
+		<circle id="match12BlueDot" class="st18" cx="814" cy="593" r="8"/>
+		<text id="M12BlueScore" transform="matrix(1 0 0 1 779.3965 595.6279)" class="st0 st4 st24">999</text>
+		<text id="M12RedScore" transform="matrix(1 0 0 1 779.3965 559.6279)" class="st0 st4 st24">999</text>
+	</g>
+</g>
+<g id="match11">
+	<g>
+		<polygon class="st10" points="802.7,254.6 666.4,254.6 666.4,218.5 802.7,218.5 815.6,236.6 		"/>
+		<polygon class="st11" points="802.7,291 666.4,291 666.4,255 802.7,255 815.6,273 		"/>
+		<line class="st12" x1="802.7" y1="254.7" x2="644" y2="254.7"/>
+		<rect x="644" y="218.5" width="22.4" height="72.5"/>
+		<text transform="matrix(0 -1.0059 1 0 659.7764 282.332)" class="st0 st4 st13">MATCH 11</text>
+		<text transform="matrix(0.9941 0 0 1 695.3613 233.1807)"><tspan x="0" y="0" class="st0 st4 st14">Winner M7</tspan><tspan x="-23.6" y="14.6" class="st0 st4 st14">22222 22222 22222</tspan></text>
+		<text transform="matrix(0.9941 0 0 1 688.5996 269.6221)"><tspan x="0" y="0" class="st0 st4 st14">Winner of M8</tspan><tspan x="-16.8" y="14.6" class="st0 st4 st14">22222 22222 22222</tspan></text>
+		<circle id="match11RedDot" class="st18" cx="814" cy="236" r="8"/>
+		<circle id="match11BlueDot" class="st18" cx="814" cy="273" r="8"/>
+		<text id="M11BlueScore" transform="matrix(1 0 0 1 779.3965 277.6279)" class="st0 st4 st24">999</text>
+		<text id="M11RedScore" transform="matrix(1 0 0 1 779.3965 241.6279)" class="st0 st4 st24">999</text>
+	</g>
+</g>
+<g id="match10">
+	<g>
+		<polygon class="st10" points="611.7,508.6 475.4,508.6 475.4,472.5 611.7,472.5 624.6,490.6 		"/>
+		<polygon class="st11" points="611.7,545 475.4,545 475.4,509 611.7,509 624.6,527 		"/>
+		<line class="st12" x1="611.7" y1="508.7" x2="453" y2="508.7"/>
+		<rect x="453" y="472.5" width="22.4" height="72.5"/>
+		<text transform="matrix(0 -1.0059 1 0 468.7769 536.333)" class="st0 st4 st13">MATCH 10</text>
+		<text transform="matrix(0.9941 0 0 1 502.502 487.1807)"><tspan x="0" y="0" class="st0 st4 st14">Loser of M8</tspan><tspan x="-21.7" y="14.6" class="st0 st4 st14">22222 22222 22222</tspan></text>
+		<text transform="matrix(0.9941 0 0 1 497.5991 523.6221)"><tspan x="0" y="0" class="st0 st4 st14">Winner of M5</tspan><tspan x="-16.8" y="14.6" class="st0 st4 st14">22222 22222 22222</tspan></text>
+		<circle id="match10RedDot" class="st18" cx="623" cy="490" r="8"/>
+		<circle id="match10BlueDot" class="st18" cx="623" cy="527" r="8"/>
+		<text id="M10BlueScore" transform="matrix(1 0 0 1 587.3965 532.6279)" class="st0 st4 st24">999</text>
+		<text id="M10RedScore" transform="matrix(1 0 0 1 587.3965 496.6279)" class="st0 st4 st24">999</text>
+	</g>
+</g>
+<g id="match9">
+	<g>
+		<polygon class="st10" points="611.7,647.6 475.4,647.6 475.4,611.5 611.7,611.5 624.6,629.6 		"/>
+		<polygon class="st11" points="611.7,684 475.4,684 475.4,648 611.7,648 624.6,666 		"/>
+		<line class="st12" x1="611.7" y1="647.7" x2="453" y2="647.7"/>
+		<rect x="453" y="611.5" width="22.4" height="72.5"/>
+		<text transform="matrix(0 -1.0059 1 0 468.7773 671.9619)" class="st0 st4 st13">MATCH 9</text>
+		<text transform="matrix(0.9941 0 0 1 502.502 626.1807)"><tspan x="0" y="0" class="st0 st4 st14">Loser of M7</tspan><tspan x="-21.7" y="14.6" class="st0 st4 st14">22222 22222 22222</tspan></text>
+		<text transform="matrix(0.9941 0 0 1 497.5991 662.6221)"><tspan x="0" y="0" class="st0 st4 st14">Winner of M6</tspan><tspan x="-16.8" y="14.6" class="st0 st4 st14">22222 22222 22222</tspan></text>
+		<circle id="match9RedDot" class="st18" cx="623" cy="629" r="8"/>
+		<circle id="match9BlueDot" class="st18" cx="623" cy="666" r="8"/>
+		<text id="M9BlueScore" transform="matrix(1 0 0 1 587.3965 669.6279)" class="st0 st4 st24">999</text>
+		<text id="M9RedScore" transform="matrix(1 0 0 1 587.3965 633.6279)" class="st0 st4 st24">999</text>
+	</g>
+</g>
+<g id="match8">
+	<g>
+		<polygon class="st10" points="412.7,328.6 276.4,328.6 276.4,292.5 412.7,292.5 425.6,310.6 		"/>
+		<polygon class="st11" points="412.7,365 276.4,365 276.4,329 412.7,329 425.6,347 		"/>
+		<line class="st12" x1="412.7" y1="328.7" x2="254" y2="328.7"/>
+		<rect x="254" y="292.5" width="22.4" height="72.5"/>
+		<text transform="matrix(0 -1.0059 1 0 269.7769 352.9624)" class="st0 st4 st13">MATCH 8</text>
+		<text transform="matrix(0.9941 0 0 1 298.5991 307.1807)"><tspan x="0" y="0" class="st0 st4 st14">Winner of M3</tspan><tspan x="-16.8" y="14.6" class="st0 st4 st14">22222 22222 22222</tspan></text>
+		<text transform="matrix(0.9941 0 0 1 298.5991 343.6221)"><tspan x="0" y="0" class="st0 st4 st14">Winner of M4</tspan><tspan x="-16.8" y="14.6" class="st0 st4 st14">22222 22222 22222</tspan></text>
+		<circle id="matchRedDot" class="st18" cx="426" cy="309" r="8"/>
+		<circle id="match8BlueDot" class="st18" cx="426" cy="346" r="8"/>
+		<text id="M8BlueScore" transform="matrix(1 0 0 1 390.3965 352.6279)" class="st0 st4 st24">999</text>
+		<text id="M8RedScore" transform="matrix(1 0 0 1 390.3965 316.6279)" class="st0 st4 st24">999</text>
+	</g>
+</g>
+<g id="match7">
+	<g>
+		<polygon class="st10" points="412.7,174.6 276.4,174.6 276.4,138.5 412.7,138.5 425.6,156.6 		"/>
+		<polygon class="st11" points="412.7,211 276.4,211 276.4,175 412.7,175 425.6,193 		"/>
+		<line class="st12" x1="412.7" y1="174.7" x2="254" y2="174.7"/>
+		<rect x="254" y="138.5" width="22.4" height="72.5"/>
+		<text transform="matrix(0 -1.0059 1 0 269.7769 198.9624)" class="st0 st4 st13">MATCH 7</text>
+		<text transform="matrix(0.9941 0 0 1 298.5991 153.1807)"><tspan x="0" y="0" class="st0 st4 st14">Winner of M1</tspan><tspan x="-16.8" y="14.6" class="st0 st4 st14">22222 22222 22222</tspan></text>
+		<text transform="matrix(0.9941 0 0 1 298.5991 189.6221)"><tspan x="0" y="0" class="st0 st4 st14">Winner of M2</tspan><tspan x="-16.8" y="14.6" class="st0 st4 st14">22222 22222 22222</tspan></text>
+		<circle id="match7RedDot" class="st18" cx="426" cy="156" r="8"/>
+		<circle id="match7BlueDot" class="st18" cx="426" cy="193" r="8"/>
+		<text id="M7BlueScore" transform="matrix(1 0 0 1 390.3965 196.6279)" class="st0 st4 st24">999</text>
+		<text id="M7RedScore" transform="matrix(1 0 0 1 390.3965 160.6279)" class="st0 st4 st24">999</text>
+	</g>
+</g>
+<g id="match6">
+	<g>
+		<polygon class="st10" points="412.7,721.6 276.4,721.6 276.4,685.5 412.7,685.5 425.6,703.6 		"/>
+		<polygon class="st11" points="412.7,758 276.4,758 276.4,722 412.7,722 425.6,740 		"/>
+		<line class="st12" x1="412.7" y1="721.7" x2="254" y2="721.7"/>
+		<rect x="254" y="685.5" width="22.4" height="72.5"/>
+		<text transform="matrix(0 -1.0059 1 0 269.7773 745.9619)" class="st0 st4 st13">MATCH 6</text>
+		<text transform="matrix(0.9941 0 0 1 303.502 700.1807)"><tspan x="0" y="0" class="st0 st4 st14">Loser of M3</tspan><tspan x="-21.7" y="14.6" class="st0 st4 st14">22222 22222 22222</tspan></text>
+		<text transform="matrix(0.9941 0 0 1 303.502 736.6221)"><tspan x="0" y="0" class="st0 st4 st14">Loser of M4</tspan><tspan x="-21.7" y="14.6" class="st0 st4 st14">22222 22222 22222</tspan></text>
+		<circle id="match6RedDot" class="st18" cx="426" cy="702" r="8"/>
+		<circle id="match6BlueDot" class="st18" cx="426" cy="739" r="8"/>
+		<text id="M6BlueScore" transform="matrix(1 0 0 1 390.3965 743.6279)" class="st0 st4 st24">999</text>
+		<text id="M6RedScore" transform="matrix(1 0 0 1 390.3965 707.6279)" class="st0 st4 st24">999</text>
+	</g>
+</g>
+<g id="match5">
+	<g>
+		<polygon class="st10" points="412.7,567.6 276.4,567.6 276.4,531.5 412.7,531.5 425.6,549.6 		"/>
+		<polygon class="st11" points="412.7,604 276.4,604 276.4,568 412.7,568 425.6,586 		"/>
+		<line class="st12" x1="412.7" y1="567.7" x2="254" y2="567.7"/>
+		<rect x="254" y="531.5" width="22.4" height="72.5"/>
+		<text transform="matrix(0 -1.0059 1 0 269.7773 591.9619)" class="st0 st4 st13">MATCH 5</text>
+		<text transform="matrix(0.9941 0 0 1 303.502 546.1807)"><tspan x="0" y="0" class="st0 st4 st14">Loser of M1</tspan><tspan x="-21.7" y="14.6" class="st0 st4 st14">22222 22222 22222</tspan></text>
+		<text transform="matrix(0.9941 0 0 1 303.502 582.6221)"><tspan x="0" y="0" class="st0 st4 st14">Loser of M2</tspan><tspan x="-21.7" y="14.6" class="st0 st4 st14">22222 22222 22222</tspan></text>
+		<circle id="match5RedDot" class="st18" cx="426" cy="549" r="8"/>
+		<circle id="match5BlueDot" class="st18" cx="426" cy="586" r="8"/>
+		<text id="M5BlueScore" transform="matrix(1 0 0 1 390.3965 589.6279)" class="st0 st4 st24">999</text>
+		<text id="M5RedScore" transform="matrix(1 0 0 1 390.3965 553.6279)" class="st0 st4 st24">999</text>
+	</g>
+</g>
+<g id="match4">
+	<g>
+		<polygon class="st10" points="223.7,367.6 87.4,367.6 87.4,331.5 223.7,331.5 236.6,349.6 		"/>
+		<polygon class="st11" points="223.7,404 87.4,404 87.4,368 223.7,368 236.6,386 		"/>
+		<line class="st12" x1="223.7" y1="367.7" x2="65" y2="367.7"/>
+		<rect x="65" y="331.5" width="22.4" height="72.5"/>
+		<text transform="matrix(0 -1.0059 1 0 80.7769 391.9619)" class="st0 st4 st13">MATCH 4</text>
+		<text transform="matrix(0.9941 0 0 1 119.4712 346.1807)"><tspan x="0" y="0" class="st0 st4 st14">Alliance 3</tspan><tspan x="-26.7" y="14.6" class="st0 st4 st14">22222 22222 22222</tspan></text>
+		<text transform="matrix(0.9941 0 0 1 119.4712 382.6221)"><tspan x="0" y="0" class="st0 st4 st14">Alliance 6</tspan><tspan x="-26.7" y="14.6" class="st0 st4 st14">22222 22222 22222</tspan></text>
+		<circle id="match4RedDot" class="st18" cx="237" cy="350" r="8"/>
+		<circle id="match4BlueDot" class="st18" cx="237" cy="387" r="8"/>
+		<text id="M4BlueScore" transform="matrix(1 0 0 1 202.3965 391.6279)" class="st0 st4 st24">999</text>
+		<text id="M4RedScore" transform="matrix(1 0 0 1 202.3965 355.6279)" class="st0 st4 st24">999</text>
+	</g>
+</g>
+<g id="match3">
+	<g>
+		<polygon class="st10" points="223.7,290.6 87.4,290.6 87.4,254.5 223.7,254.5 236.6,272.6 		"/>
+		<polygon class="st11" points="223.7,327 87.4,327 87.4,291 223.7,291 236.6,309 		"/>
+		<line class="st12" x1="223.7" y1="290.7" x2="65" y2="290.7"/>
+		<rect x="65" y="254.5" width="22.4" height="72.5"/>
+		<text transform="matrix(0 -1.0059 1 0 80.7769 314.9624)" class="st0 st4 st13">MATCH 3</text>
+		<text transform="matrix(0.9941 0 0 1 119.4712 269.1807)"><tspan x="0" y="0" class="st0 st4 st14">Alliance 2</tspan><tspan x="-26.7" y="14.6" class="st0 st4 st14">22222 22222 22222</tspan></text>
+		<text transform="matrix(0.9941 0 0 1 119.4712 305.6221)"><tspan x="0" y="0" class="st0 st4 st14">Alliance 7</tspan><tspan x="-26.7" y="14.6" class="st0 st4 st14">22222 22222 22222</tspan></text>
+		<circle id="match3RedDot" class="st18" cx="237" cy="272" r="8"/>
+		<circle id="match3BlueDot" class="st18" cx="237" cy="309" r="8"/>
+		<text id="M3BlueScore" transform="matrix(1 0 0 1 202.3965 314.6279)" class="st0 st4 st24">999</text>
+		<text id="M3RedScore" transform="matrix(1 0 0 1 202.3965 278.6279)" class="st0 st4 st24">999</text>
+	</g>
+</g>
+<g id="match2">
+	<g>
+		<polygon class="st10" points="223.7,213.6 87.4,213.6 87.4,177.5 223.7,177.5 236.6,195.6 		"/>
+		<polygon class="st11" points="223.7,250 87.4,250 87.4,214 223.7,214 236.6,232 		"/>
+		<line class="st12" x1="223.7" y1="213.7" x2="65" y2="213.7"/>
+		<rect x="65" y="177.5" width="22.4" height="72.5"/>
+		<text transform="matrix(0 -1.0059 1 0 80.7769 237.9624)" class="st0 st4 st13">MATCH 2</text>
+		<text transform="matrix(0.9941 0 0 1 119.4712 192.1807)"><tspan x="0" y="0" class="st0 st4 st14">Alliance 4</tspan><tspan x="-26.7" y="14.6" class="st0 st4 st14">22222 22222 22222</tspan></text>
+		<text transform="matrix(0.9941 0 0 1 119.4712 228.6221)"><tspan x="0" y="0" class="st0 st4 st14">Alliance 5</tspan><tspan x="-26.7" y="14.6" class="st0 st4 st14">22222 22222 22222</tspan></text>
+		<circle id="match2RedDot" class="st18" cx="237" cy="195" r="8"/>
+		<circle id="match2BlueDot" class="st18" cx="237" cy="232" r="8"/>
+		<text id="M2BlueScore" transform="matrix(1 0 0 1 202.3965 236.6279)" class="st0 st4 st24">999</text>
+		<text id="M2RedScore" transform="matrix(1 0 0 1 202.3965 200.6279)" class="st0 st4 st24">999</text>
+	</g>
+</g>
+<g id="match1">
+	<g>
+		<polygon class="st10" points="223.7,136.6 87.4,136.6 87.4,100.5 223.7,100.5 236.6,118.6 		"/>
+		<polygon class="st11" points="223.7,173 87.4,173 87.4,137 223.7,137 236.6,155 		"/>
+		<line class="st12" x1="223.7" y1="136.7" x2="65" y2="136.7"/>
+		<rect x="65" y="100.5" width="22.4" height="72.5"/>
+		<text transform="matrix(0 -1.0059 1 0 80.7769 160.9624)" class="st0 st4 st13">MATCH 1</text>
+		<text transform="matrix(0.9941 0 0 1 119.4712 115.1807)"><tspan x="0" y="0" class="st0 st4 st14">Alliance 1</tspan><tspan x="-26.7" y="14.6" class="st0 st4 st14">22222 22222 22222</tspan></text>
+		<text transform="matrix(0.9941 0 0 1 119.4712 151.6221)"><tspan x="0" y="0" class="st0 st4 st14">Alliance 8</tspan><tspan x="-26.7" y="14.6" class="st0 st4 st14">22222 22222 22222</tspan></text>
+		<circle id="match1RedDot" class="st18" cx="237" cy="118" r="8"/>
+		<circle id="match1BlueDot" class="st18" cx="237" cy="155" r="8"/>
+		<text id="M1BlueScore" transform="matrix(1 0 0 1 202.3965 159.6279)" class="st0 st4 st24">999</text>
+		<text id="M1RedScore" transform="matrix(1 0 0 1 202.3965 123.6279)" class="st0 st4 st24">999</text>
+	</g>
+</g>
+</svg>

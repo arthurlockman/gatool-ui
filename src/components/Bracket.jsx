@@ -19,15 +19,19 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 		var allianceName = "";
 		var allianceMembers = [];
 		var allianceNumber = 0;
-		if (matches[_.findIndex(matches,{"matchNumber":matchNumber})]?.teams[0]?.teamNumber) {
-			allianceName = alliances?.Lookup[`${matches[_.findIndex(matches,{"matchNumber":matchNumber})]?.teams[0]?.teamNumber}`]?.alliance;
-			allianceNumber = Number(allianceName?.substring(allianceName.length - 1)) - 1;
-			allianceMembers = _.compact([alliances?.alliances[allianceNumber]?.captain, alliances?.alliances[allianceNumber]?.round1, alliances?.alliances[allianceNumber]?.round2, alliances?.alliances[allianceNumber]?.round3, alliances?.alliances[allianceNumber]?.backup]);
+		var targetAlliance = {};
+		var match = matches[_.findIndex(matches, { "matchNumber": matchNumber })];
+		if (match?.teams[0]?.teamNumber) {
+			targetAlliance = alliances?.Lookup[`${match?.teams[0]?.teamNumber}`];
+			allianceName = targetAlliance?.alliance;
+			allianceNumber = targetAlliance?.number;
+			allianceMembers = _.compact([targetAlliance?.captain, targetAlliance?.round1, targetAlliance?.round2, targetAlliance?.round3, targetAlliance?.backup]);
 			alliance = allianceMembers.join("  ");
 			if (allianceColor === "blue") {
-				allianceName = alliances?.Lookup[`${matches[_.findIndex(matches,{"matchNumber":matchNumber})]?.teams[3]?.teamNumber}`]?.alliance;
-				allianceNumber = Number(allianceName?.substring(allianceName.length - 1)) - 1;
-				allianceMembers = _.compact([alliances?.alliances[allianceNumber]?.captain, alliances?.alliances[allianceNumber]?.round1, alliances?.alliances[allianceNumber]?.round2, alliances?.alliances[allianceNumber]?.round3, alliances?.alliances[allianceNumber]?.backup]);
+				targetAlliance = alliances?.Lookup[`${match?.teams[3]?.teamNumber}`]
+				allianceName = targetAlliance?.alliance;
+				allianceNumber = targetAlliance?.number;
+				allianceMembers = _.compact([targetAlliance?.captain, targetAlliance?.round1, targetAlliance?.round2, targetAlliance?.round3, targetAlliance?.backup]);
 				alliance = allianceMembers.join("  ");
 			}
 		}
@@ -38,21 +42,26 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 	// returns the name of the alliance
 	function allianceName(matchNumber, allianceColor) {
 		var allianceName = "";
-		if (matches[_.findIndex(matches,{"matchNumber":matchNumber})]?.teams[0]?.teamNumber) {
-			allianceName = alliances?.Lookup[`${matches[_.findIndex(matches,{"matchNumber":matchNumber})]?.teams[0]?.teamNumber}`]?.alliance;
-			if (matches[_.findIndex(matches,{"matchNumber":matchNumber})]?.winner.tieWinner === "red") {
-				allianceName += ` (L${matches[_.findIndex(matches,{"matchNumber":matchNumber})]?.winner.level})`;
+		if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[0]?.teamNumber) {
+			allianceName = alliances?.Lookup[`${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[0]?.teamNumber}`]?.alliance;
+			if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner.tieWinner === "red") {
+				allianceName += ` (L${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner.level})`;
 			}
 			if (allianceColor === "blue") {
-				allianceName = alliances?.Lookup[`${matches[_.findIndex(matches,{"matchNumber":matchNumber})]?.teams[3]?.teamNumber}`]?.alliance
-				if (matches[_.findIndex(matches,{"matchNumber":matchNumber})]?.winner.tieWinner === "blue") {
-					allianceName += ` (L${matches[_.findIndex(matches,{"matchNumber":matchNumber})]?.winner.level} WIN)`;
+				allianceName = alliances?.Lookup[`${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[3]?.teamNumber}`]?.alliance
+				if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner.tieWinner === "blue") {
+					allianceName += ` (L${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner.level} WIN)`;
 				}
 			}
 		}
 		return allianceName;
 	}
-
+	var overtimeOffset = 0;
+	if (matches[17]?.postResultTime) {
+		overtimeOffset = -20;
+	} else if (matches[16]?.postResultTime) {
+		overtimeOffset = -40;
+	}
 
 	return (
 		<div>
@@ -91,23 +100,22 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 					<text transform="matrix(1 0 0 1 869.6694 84.2646)" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="16px">ROUND 5</text>
 					<text transform="matrix(1 0 0 1 1106.0776 84.2646)" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="16px">FINALS</text>
 					<text id="playoffBracket" transform="matrix(1 0 0 1 620 47.6909)" dominantBaseline="middle" textAnchor="middle" fontFamily={selectedEvent?.label.length > 50 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={black} fontStyle={"normal"} fontSize="38px">{selectedEvent?.label}</text>
-					<path id="finalsBackground" fill="#C1C1C1" stroke="#000000" strokeWidth="2" strokeMiterlimit="10" d="M1254.49,486.55H1024
-		c-5.5,0-10-4.5-10-10v-111.1c0-5.5,4.5-10,10-10h230.49c5.5,0,10,4.5,10,10v111.1C1264.49,482.05,1259.99,486.55,1254.49,486.55z"
-					/>
 				</g>
 				<g id="finals">
 					<g id="finalsContainer">
-						<polygon fill={RED} points="1157.7,422.56 1041.43,422.56 1041.43,386.54 1157.7,386.54 1170.64,404.55 		" />
-						<polygon fill={BLUE} points="1157.7,459 1041.43,459 1041.43,422.99 1157.7,422.99 1170.64,440.99 		" />
-						<line fill="none" stroke="#FFFFFF" strokeMiterlimit="10" x1="1157.7" y1="422.75" x2="1019" y2="422.75" />
-						<rect x="1019" y="386.54" width="22.43" height="72.46" />
-						<text transform="matrix(0 -1.0059 1 0 1034.7773 451.6328)" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">BEST 2 of 3</text>
-						<text transform="matrix(0.9941 0 0 1 1099.6 401.1807)" textAnchor="middle">
-							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(13, "red") ? allianceName(13, "red") : "Winner of M11"}</tspan>
-							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(13, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(13, "red")}</tspan></text>
-						<text transform="matrix(0.9941 0 0 1 1099.6 437.6221)" textAnchor="middle">
-							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(13, "blue") ? allianceName(13, "blue") : "Winner of M13"}</tspan>
-							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(13, "blue").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(13, "blue")}</tspan></text>
+					<path id="finalsBackground" fill="#C1C1C1" stroke="#000000" strokeWidth="2" strokeMiterlimit="10" d="M1254.5,511.6H1024c-5.5,0-10-4.5-10-10V343.4c0-5.5,4.5-10,10-10h230.5
+		c5.5,0,10,4.5,10,10v158.1C1264.5,507.1,1260,511.6,1254.5,511.6z"/>
+						<polygon fill={RED} points="1164.7,389.6 1048.4,389.6 1048.4,353.5 1164.7,353.5 1177.6,371.6" />
+						<polygon fill={BLUE} points="1164.7,426 1048.4,426 1048.4,390 1164.7,390 1177.6,408" />
+						<line fill="none" stroke="#FFFFFF" strokeMiterlimit="10" x1="1164.7" y1="389.7" x2="1026" y2="389.7" />
+						<rect x="1026" y="353.5" width="22.4" height="72.5"/>
+						<text transform="matrix(0 -1.0059 1 0 1041.7773 418.6328)" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">BEST 2 of 3</text>
+						<text transform="matrix(0.9941 0 0 1 1106 367)" textAnchor="middle">
+							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(14, "red") ? allianceName(14, "red") : "Winner of M11"}</tspan>
+							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(14, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(14, "red")}</tspan></text>
+						<text transform="matrix(0.9941 0 0 1 1106 404)" textAnchor="middle">
+							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(14, "blue") ? allianceName(14, "blue") : "Winner of M13"}</tspan>
+							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(14, "blue").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(14, "blue")}</tspan></text>
 					</g>
 					<g id="trophy">
 						<rect x="1204.36" y="414.19" fill="#474E5D" width="26.51" height="1.66" />
@@ -128,11 +136,13 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 						<path fill="#FFA200" d="M1225.08,362.82c0,15.56-3.34,28.17-7.46,28.17c8.24,0,14.91-12.61,14.91-28.17H1225.08z" />
 						<path fill="#FEE79B" d="M1208.61,362.82h-2.18c0,15.56,5.01,28.17,11.19,28.17C1212.64,390.99,1208.61,378.38,1208.61,362.82z" />
 					</g>
-					<circle id="winnerMatch3Dot" fill={(matches[15]?.winner.winner === "red") ? RED : ((matches[15]?.winner.winner === "blue") ? BLUE : "none")} cx="1246" cy="429" r="8" />
-					<circle id="winnerMatch2Dot" fill={(matches[14]?.winner.winner === "red") ? RED : ((matches[14]?.winner.winner === "blue") ? BLUE : "none")} cx="1217" cy="429" r="8" />
-					<circle id="winnerMatch1Dot" fill={(matches[13]?.winner.winner === "red") ? RED : ((matches[13]?.winner.winner === "blue") ? BLUE : "none")} cx="1188" cy="429" r="8" />
+					
+					
+					
+					
+					<circle id="winnerMatch1Dot" fill={(matches[13]?.winner.winner === "red") ? RED : (matches[13]?.winner.winner === "blue") ? BLUE : (matches[13]?.winner.winner === "tie") ? GREEN : "none"} cx="1080" cy="451" r="8" />
 					<text id="finalsM1Scores"
-						transform="matrix(1 0 0 1 1187.8 455.5537)">
+						transform="matrix(1 0 0 1 1080 477.5537)">
 						<tspan x="0" y="0" fill={RED} fontFamily="'myriad-pro'"
 							fontWeight={(matches[13]?.winner.winner === "red") ? black : semibold}
 							fontStyle={"normal"}
@@ -140,8 +150,11 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 						<tspan x="0" y="14" fill={BLUE} fontFamily="'myriad-pro'"
 							fontWeight={(matches[13]?.winner.winner === "blue") ? black : semibold}
 							fontStyle={"normal"}
-							fontSize="14px" textAnchor="middle">{matches[13]?.scoreBlueFinal}</tspan></text>
-					<text id="finalsM2Scores" transform="matrix(1 0 0 1 1216.8 455.5537)">
+							fontSize="14px" textAnchor="middle">{matches[13]?.scoreBlueFinal}</tspan>
+					</text>
+
+					<circle id="winnerMatch2Dot" fill={(matches[14]?.winner.winner === "red") ? RED : (matches[14]?.winner.winner === "blue") ? BLUE : (matches[14]?.winner.winner === "tie") ? GREEN : "none"} cx="1110" cy="451" r="8" />
+					<text id="finalsM2Scores" transform="matrix(1 0 0 1 1110 477.5537)">
 						<tspan x="0" y="0"
 							fill={RED}
 							fontFamily="'myriad-pro'"
@@ -154,8 +167,10 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 							fontStyle={"normal"}
 							fontSize="14px" textAnchor="middle">{matches[14]?.scoreBlueFinal}</tspan>
 					</text>
+
+					<circle id="winnerMatch3Dot" fill={(matches[15]?.winner.winner === "red") ? RED : (matches[15]?.winner.winner === "blue") ? BLUE : (matches[15]?.winner.winner === "tie") ? GREEN : "none"} cx="1140" cy="451" r="8" />
 					<text id="finalsM3Scores"
-						transform="matrix(1 0 0 1 1245.8 455.5537)">
+						transform="matrix(1 0 0 1 1140 477.5537)">
 						<tspan x="0" y="0"
 							fill={RED}
 							fontFamily="'myriad-pro'"
@@ -168,7 +183,41 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 							fontStyle={"normal"}
 							fontSize="14px" textAnchor="middle">{matches[15]?.scoreBlueFinal}</tspan>
 					</text>
+
+					<circle id="winnerMatch4Dot" fill={(matches[16]?.winner.winner === "red") ? RED : (matches[16]?.winner.winner === "blue") ? BLUE : (matches[16]?.winner.winner === "tie") ? GREEN : "none"} cx="1170" cy="451" r="8" />
+					<text id="finalsM4Scores"
+						transform="matrix(1 0 0 1 1170 477.5537)">
+						<tspan x="0" y="0"
+							fill={RED}
+							fontFamily="'myriad-pro'"
+							fontWeight={(matches[16]?.winner.winner === "red") ? black : semibold}
+							fontStyle={"normal"}
+							fontSize="14px" textAnchor="middle">{matches[16]?.scoreRedFinal}</tspan>
+						<tspan x="0" y="14" fill={BLUE}
+							fontFamily="'myriad-pro'"
+							fontWeight={(matches[16]?.winner.winner === "blue") ? black : semibold}
+							fontStyle={"normal"}
+							fontSize="14px" textAnchor="middle">{matches[16]?.scoreBlueFinal}</tspan>
+					</text>
+
+					<circle id="winnerMatch5Dot" fill={(matches[17]?.winner.winner === "red") ? RED : (matches[17]?.winner.winner === "blue") ? BLUE : (matches[17]?.winner.winner === "tie") ? GREEN : "none"} cx="1200" cy="451" r="8" />
+					<text id="finalsM5Scores"
+						transform="matrix(1 0 0 1 1200 477.5537)">
+						<tspan x="0" y="0"
+							fill={RED}
+							fontFamily="'myriad-pro'"
+							fontWeight={(matches[17]?.winner.winner === "red") ? black : semibold}
+							fontStyle={"normal"}
+							fontSize="14px" textAnchor="middle">{matches[17]?.scoreRedFinal}</tspan>
+						<tspan x="0" y="14" fill={BLUE}
+							fontFamily="'myriad-pro'"
+							fontWeight={(matches[17]?.winner.winner === "blue") ? black : semibold}
+							fontStyle={"normal"}
+							fontSize="14px" textAnchor="middle">{matches[17]?.scoreBlueFinal}</tspan>
+					</text>
 				</g>
+				
+
 				<g id="match13">
 					<g>
 						<polygon fill={RED} points="984.7,504.56 848.43,504.56 848.43,468.54 984.7,468.54 997.64,486.55 		" stroke={(matches[12]?.winner.winner === "red" || matches[12]?.winner.tieWinner === "red") ? GOLD : "none"} strokeWidth="5" />
@@ -177,11 +226,11 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 						<rect x="826" y="468.54" width="22.43" height="72.46" />
 						<text transform="matrix(0 -1.0059 1 0 841.7773 532.333)" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">MATCH 13</text>
 						<text transform="matrix(0.9941 0 0 1 906.5 483.1807)" textAnchor="middle">
-							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(12, "red") ? allianceName(12, "red") : "Losing Alliance of M11"}</tspan>
-							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(12, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(12, "red")}</tspan></text>
+							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(13, "red") ? allianceName(13, "red") : "Losing Alliance of M11"}</tspan>
+							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(13, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(13, "red")}</tspan></text>
 						<text transform="matrix(0.9941 0 0 1 906.5 519.6221)" textAnchor="middle">
-							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(12, "blue") ? allianceName(12, "blue") : "Winner of M12"}</tspan>
-							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(12, "blue").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(12, "blue")}</tspan></text>
+							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(13, "blue") ? allianceName(13, "blue") : "Winner of M12"}</tspan>
+							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(13, "blue").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(13, "blue")}</tspan></text>
 						<circle id="match13RedDot" fill={(matches[12]?.winner.winner === "red") ? GOLD : ((matches[12]?.winner.winner === "tie") ? GREEN : "none")} cx="993" cy="483" r="8" />
 						<circle id="match13BlueDot" fill={(matches[12]?.winner.winner === "blue") ? GOLD : ((matches[12]?.winner.winner === "tie") ? GREEN : "none")} cx="993" cy="520" r="8" />
 
@@ -198,11 +247,11 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 						<rect x="644" y="538.54" width="22.43" height="72.46" />
 						<text transform="matrix(0 -1.0059 1 0 659.7773 602.333)" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">MATCH 12</text>
 						<text transform="matrix(0.9941 0 0 1 725 553.1807)" textAnchor="middle">
-							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(11, "red") ? allianceName(11, "red") : "Winner of M10"}</tspan>
-							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(11, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(11, "red")}</tspan></text>
+							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(12, "red") ? allianceName(12, "red") : "Winner of M10"}</tspan>
+							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(12, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(12, "red")}</tspan></text>
 						<text transform="matrix(0.9941 0 0 1 725 589.6221)" textAnchor="middle">
-							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(11, "blue") ? allianceName(11, "blue") : "Winner of M9"}</tspan>
-							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(11, "blue").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(11, "blue")}</tspan></text>
+							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(12, "blue") ? allianceName(12, "blue") : "Winner of M9"}</tspan>
+							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(12, "blue").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(12, "blue")}</tspan></text>
 						<circle id="match12RedDot" fill={(matches[11]?.winner.winner === "red") ? GOLD : ((matches[11]?.winner.winner === "tie") ? GREEN : "none")} cx="814" cy="556" r="8" />
 						<circle id="match12BlueDot" fill={(matches[11]?.winner.winner === "blue") ? GOLD : ((matches[11]?.winner.winner === "tie") ? GREEN : "none")} cx="814" cy="593" r="8" />
 
@@ -219,11 +268,11 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 						<rect x="644" y="218.54" width="22.43" height="72.46" />
 						<text transform="matrix(0 -1.0059 1 0 659.7764 282.332)" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">MATCH 11</text>
 						<text transform="matrix(0.9941 0 0 1 725 233.1807)" textAnchor="middle">
-							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(10, "red") ? allianceName(10, "red") : "Winner of M7"}</tspan>
-							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(10, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(10, "red")}</tspan></text>
+							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(11, "red") ? allianceName(11, "red") : "Winner of M7"}</tspan>
+							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(11, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(11, "red")}</tspan></text>
 						<text transform="matrix(0.9941 0 0 1 725 269.6221)" textAnchor="middle">
-							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(10, "blue") ? allianceName(10, "blue") : "Winner of M8"}</tspan>
-							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(10, "blue").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(10, "blue")}</tspan></text>
+							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(11, "blue") ? allianceName(11, "blue") : "Winner of M8"}</tspan>
+							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(11, "blue").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(11, "blue")}</tspan></text>
 						<circle id="match11RedDot" fill={(matches[10]?.winner.winner === "red") ? GOLD : ((matches[10]?.winner.winner === "tie") ? GREEN : "none")} cx="814" cy="236" r="8" />
 						<circle id="match11BlueDot" fill={(matches[10]?.winner.winner === "blue") ? GOLD : ((matches[10]?.winner.winner === "tie") ? GREEN : "none")} cx="814" cy="273" r="8" />
 
@@ -240,11 +289,11 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 						<rect x="453" y="472.54" width="22.43" height="72.46" />
 						<text transform="matrix(0 -1.0059 1 0 468.7769 536.333)" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">MATCH 10</text>
 						<text transform="matrix(0.9941 0 0 1 533 487.1807)" textAnchor="middle">
-							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(9, "red") ? allianceName(9, "red") : "Losing Alliance of M8"}</tspan>
-							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(9, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(9, "red")}</tspan></text>
+							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(10, "red") ? allianceName(10, "red") : "Losing Alliance of M8"}</tspan>
+							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(10, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(10, "red")}</tspan></text>
 						<text transform="matrix(0.9941 0 0 1 533 523.6221)" textAnchor="middle">
-							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(9, "blue") ? allianceName(9, "blue") : "Winner of M5"}</tspan>
-							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(9, "blue").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(9, "blue")}</tspan></text>
+							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(10, "blue") ? allianceName(10, "blue") : "Winner of M5"}</tspan>
+							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(10, "blue").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(10, "blue")}</tspan></text>
 						<circle id="match10RedDot" fill={(matches[9]?.winner.winner === "red") ? GOLD : ((matches[9]?.winner.winner === "tie") ? GREEN : "none")} cx="623" cy="490" r="8" />
 						<circle id="match10BlueDot" fill={(matches[9]?.winner.winner === "blue") ? GOLD : ((matches[9]?.winner.winner === "tie") ? GREEN : "none")} cx="623" cy="527" r="8" />
 
@@ -261,11 +310,11 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 						<rect x="453" y="611.54" width="22.43" height="72.46" />
 						<text transform="matrix(0 -1.0059 1 0 468.7773 671.9619)" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">MATCH 9</text>
 						<text transform="matrix(0.9941 0 0 1 533 626.1807)" textAnchor="middle">
-							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(8, "red") ? allianceName(8, "red") : "Losing Alliance of M7"}</tspan>
-							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(8, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(8, "red")}</tspan></text>
+							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(9, "red") ? allianceName(9, "red") : "Losing Alliance of M7"}</tspan>
+							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(9, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(9, "red")}</tspan></text>
 						<text transform="matrix(0.9941 0 0 1 533 662.6221)" textAnchor="middle">
-							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(8, "blue") ? allianceName(8, "blue") : "Winner of M6"}</tspan>
-							<tspan x="-0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(8, "blue").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(8, "blue")}</tspan></text>
+							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(9, "blue") ? allianceName(9, "blue") : "Winner of M6"}</tspan>
+							<tspan x="-0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(9, "blue").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(9, "blue")}</tspan></text>
 						<circle id="match9RedDot" fill={(matches[8]?.winner.winner === "red") ? GOLD : ((matches[8]?.winner.winner === "tie") ? GREEN : "none")} cx="623" cy="629" r="8" />
 						<circle id="match9BlueDot" fill={(matches[8]?.winner.winner === "blue") ? GOLD : ((matches[8]?.winner.winner === "tie") ? GREEN : "none")} cx="623" cy="666" r="8" />
 
@@ -282,11 +331,11 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 						<rect x="254" y="292.54" width="22.43" height="72.46" />
 						<text transform="matrix(0 -1.0059 1 0 269.7769 352.9624)" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">MATCH 8</text>
 						<text transform="matrix(0.9941 0 0 1 334.6 307.1807)" textAnchor="middle">
-							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(7, "red") ? allianceName(7, "red") : "Winner of M3"}</tspan>
-							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(7, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(7, "red")}</tspan></text>
+							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(8, "red") ? allianceName(8, "red") : "Winner of M3"}</tspan>
+							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(8, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(8, "red")}</tspan></text>
 						<text transform="matrix(0.9941 0 0 1 334.6 343.6221)" textAnchor="middle">
-							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(7, "blue") ? allianceName(7, "blue") : "Winner of M4"}</tspan>
-							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(7, "blue").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(7, "blue")}</tspan></text>
+							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(8, "blue") ? allianceName(8, "blue") : "Winner of M4"}</tspan>
+							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(8, "blue").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(8, "blue")}</tspan></text>
 						<circle id="match8RedDot" fill={(matches[7]?.winner.winner === "red") ? GOLD : ((matches[7]?.winner.winner === "tie") ? GREEN : "none")} cx="426" cy="309" r="8" />
 						<circle id="match8BlueDot" fill={(matches[7]?.winner.winner === "blue") ? GOLD : ((matches[7]?.winner.winner === "tie") ? GREEN : "none")} cx="426" cy="346" r="8" />
 
@@ -303,11 +352,11 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 						<rect x="254" y="138.54" width="22.43" height="72.46" />
 						<text transform="matrix(0 -1.0059 1 0 269.7769 198.9624)" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">MATCH 7</text>
 						<text transform="matrix(0.9941 0 0 1 334.6 153.1807)" textAnchor="middle">
-							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(6, "red") ? allianceName(6, "red") : "Winner of M1"}</tspan>
-							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(6, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(6, "red")}</tspan></text>
+							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(7, "red") ? allianceName(7, "red") : "Winner of M1"}</tspan>
+							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(7, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(7, "red")}</tspan></text>
 						<text transform="matrix(0.9941 0 0 1 334.6 189.6221)" textAnchor="middle">
-							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(6, "blue") ? allianceName(6, "blue") : "Winner of M2"}</tspan>
-							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(6, "blue").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(6, "blue")}</tspan></text>
+							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(7, "blue") ? allianceName(7, "blue") : "Winner of M2"}</tspan>
+							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(7, "blue").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(7, "blue")}</tspan></text>
 						<circle id="match7RedDot" fill={(matches[6]?.winner.winner === "red") ? GOLD : ((matches[6]?.winner.winner === "tie") ? GREEN : "none")} cx="426" cy="156" r="8" />
 						<circle id="match7BlueDot" fill={(matches[6]?.winner.winner === "blue") ? GOLD : ((matches[6]?.winner.winner === "tie") ? GREEN : "none")} cx="426" cy="193" r="8" />
 
@@ -324,11 +373,11 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 						<rect x="254" y="685.54" width="22.43" height="72.46" />
 						<text transform="matrix(0 -1.0059 1 0 269.7773 745.9619)" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">MATCH 6</text>
 						<text transform="matrix(0.9941 0 0 1 334.6 700.1807)" textAnchor="middle">
-							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(5, "red") ? allianceName(5, "red") : "Losing Alliance of M3"}</tspan>
-							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(5, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(5, "red")}</tspan></text>
+							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(6, "red") ? allianceName(6, "red") : "Losing Alliance of M3"}</tspan>
+							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(6, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(6, "red")}</tspan></text>
 						<text transform="matrix(0.9941 0 0 1 334.6 736.6221)" textAnchor="middle">
-							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(5, "blue") ? allianceName(5, "blue") : "Losing Alliance of M4"}</tspan>
-							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(5, "blue").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(5, "blue")}</tspan></text>
+							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(6, "blue") ? allianceName(6, "blue") : "Losing Alliance of M4"}</tspan>
+							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(6, "blue").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(6, "blue")}</tspan></text>
 						<circle id="match6RedDot" fill={(matches[5]?.winner.winner === "red") ? GOLD : ((matches[5]?.winner.winner === "tie") ? GREEN : "none")} cx="426" cy="702" r="8" />
 						<circle id="match6BlueDot" fill={(matches[5]?.winner.winner === "blue") ? GOLD : ((matches[5]?.winner.winner === "tie") ? GREEN : "none")} cx="426" cy="739" r="8" />
 
@@ -345,11 +394,11 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 						<rect x="254" y="531.54" width="22.43" height="72.46" />
 						<text transform="matrix(0 -1.0059 1 0 269.7773 591.9619)" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">MATCH 5</text>
 						<text transform="matrix(0.9941 0 0 1 334.6 546.1807)" textAnchor="middle">
-							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px" textAnchor="middle">{allianceName(4, "red") ? allianceName(4, "red") : "Losing Alliance of M1"}</tspan>
-							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(4, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(4, "red")}</tspan></text>
+							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px" textAnchor="middle">{allianceName(5, "red") ? allianceName(5, "red") : "Losing Alliance of M1"}</tspan>
+							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(5, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(5, "red")}</tspan></text>
 						<text transform="matrix(0.9941 0 0 1 334.6 582.6221)" textAnchor="middle">
-							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(4, "blue") ? allianceName(4, "blue") : "Winner of M2"}</tspan>
-							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(4, "blue").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(4, "blue")}</tspan></text>
+							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(5, "blue") ? allianceName(5, "blue") : "Winner of M2"}</tspan>
+							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(5, "blue").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(5, "blue")}</tspan></text>
 						<circle id="match5RedDot" fill={(matches[4]?.winner.winner === "red") ? GOLD : ((matches[4]?.winner.winner === "tie") ? GREEN : "none")} cx="426" cy="549" r="8" />
 						<circle id="match5BlueDot" fill={(matches[4]?.winner.winner === "blue") ? GOLD : ((matches[4]?.winner.winner === "tie") ? GREEN : "none")} cx="426" cy="586" r="8" />
 
@@ -366,11 +415,11 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 						<rect x="65" y="331.54" width="22.43" height="72.46" />
 						<text transform="matrix(0 -1.0059 1 0 80.7769 391.9619)" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">MATCH 4</text>
 						<text transform="matrix(0.9941 0 0 1 145.6 346.1807)" textAnchor="middle">
-							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(3, "red") ? allianceName(3, "red") : "Alliance 3"}</tspan>
-							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(3, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(3, "red")}</tspan></text>
+							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(4, "red") ? allianceName(4, "red") : "Alliance 3"}</tspan>
+							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(4, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(4, "red")}</tspan></text>
 						<text transform="matrix(0.9941 0 0 1 145.6 382.6221)" textAnchor="middle">
-							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(3, "blue") ? allianceName(3, "blue") : "Alliance 6"}</tspan>
-							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(3, "blue").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(3, "blue")}</tspan></text>
+							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(4, "blue") ? allianceName(4, "blue") : "Alliance 6"}</tspan>
+							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(4, "blue").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(4, "blue")}</tspan></text>
 						<circle id="match4RedDot" fill={(matches[3]?.winner.winner === "red") ? GOLD : ((matches[3]?.winner.winner === "tie") ? GREEN : "none")} cx="237" cy="350" r="8" />
 						<circle id="match4BlueDot" fill={(matches[3]?.winner.winner === "blue") ? GOLD : ((matches[3]?.winner.winner === "tie") ? GREEN : "none")} cx="237" cy="387" r="8" />
 
@@ -387,11 +436,11 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 						<rect x="65" y="254.54" width="22.43" height="72.46" />
 						<text transform="matrix(0 -1.0059 1 0 80.7769 314.9624)" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">MATCH 3</text>
 						<text transform="matrix(0.9941 0 0 1 145.6 269.1807)" textAnchor="middle">
-							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(2, "red") ? allianceName(2, "red") : "Alliance 2"}</tspan>
-							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(2, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(2, "red")}</tspan></text>
+							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(3, "red") ? allianceName(3, "red") : "Alliance 2"}</tspan>
+							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(3, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(3, "red")}</tspan></text>
 						<text transform="matrix(0.9941 0 0 1 145.6 305.6221)" textAnchor="middle">
-							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(2, "blue") ? allianceName(2, "blue") : "Alliance 7"}</tspan>
-							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(2, "blue").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(2, "blue")}</tspan></text>
+							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(3, "blue") ? allianceName(3, "blue") : "Alliance 7"}</tspan>
+							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(3, "blue").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(3, "blue")}</tspan></text>
 						<circle id="match3RedDot" fill={(matches[2]?.winner.winner === "red") ? GOLD : ((matches[2]?.winner.winner === "tie") ? GREEN : "none")} cx="237" cy="272" r="8" />
 						<circle id="match3BlueDot" fill={(matches[2]?.winner.winner === "blue") ? GOLD : ((matches[2]?.winner.winner === "tie") ? GREEN : "none")} cx="237" cy="309" r="8" />
 
@@ -408,9 +457,9 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 						<rect x="65" y="177.54" width="22.43" height="72.46" />
 						<text transform="matrix(0 -1.0059 1 0 80.7769 237.9624)" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">MATCH 2</text>
 						<text transform="matrix(0.9941 0 0 1 145.6 192.1807)" textAnchor="middle">
-							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(1, "red") ? allianceName(1, "red") : "Alliance 4"}</tspan><tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(1, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(1, "red")}</tspan></text>
+							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(2, "red") ? allianceName(2, "red") : "Alliance 4"}</tspan><tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(2, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(2, "red")}</tspan></text>
 						<text transform="matrix(0.9941 0 0 1 145.6 228.6221)" textAnchor="middle">
-							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(1, "blue") ? allianceName(1, "blue") : "Alliance 5"}</tspan><tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(1, "blue").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(1, "blue")}</tspan></text>
+							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(2, "blue") ? allianceName(2, "blue") : "Alliance 5"}</tspan><tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(2, "blue").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(2, "blue")}</tspan></text>
 						<circle id="match2RedDot" fill={(matches[1]?.winner.winner === "red") ? GOLD : ((matches[1]?.winner.winner === "tie") ? GREEN : "none")} cx="237" cy="195" r="8" />
 						<circle id="match2BlueDot" fill={(matches[1]?.winner.winner === "blue") ? GOLD : ((matches[1]?.winner.winner === "tie") ? GREEN : "none")} cx="237" cy="232" r="8" />
 
@@ -427,11 +476,11 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 						<rect x="65" y="100.54" width="22.43" height="72.46" />
 						<text transform="matrix(0 -1.0059 1 0 80.7769 160.9624)" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">MATCH 1</text>
 						<text transform="matrix(0.9941 0 0 1 145.6 115.1807)" textAnchor="middle">
-							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(0, "red") ? allianceName(0, "red") : "Alliance 1"}</tspan>
-							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(0, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(0, "red")}</tspan></text>
+							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(1, "red") ? allianceName(1, "red") : "Alliance 1"}</tspan>
+							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(1, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(1, "red")}</tspan></text>
 						<text transform="matrix(0.9941 0 0 1 145.6 150.6221)" textAnchor="middle">
-							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(0, "blue") ? allianceName(0, "blue") : "Alliance 8"}</tspan>
-							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(0, "blue").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(0, "blue")}</tspan>
+							<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(1, "blue") ? allianceName(1, "blue") : "Alliance 8"}</tspan>
+							<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(1, "blue").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(1, "blue")}</tspan>
 						</text>
 						<circle id="match1RedDot" fill={(matches[0]?.winner.winner === "red") ? GOLD : ((matches[0]?.winner.winner === "tie") ? GREEN : "none")} cx="237" cy="118" r="8" />
 						<circle id="match1BlueDot" fill={(matches[0]?.winner.winner === "blue") ? GOLD : ((matches[0]?.winner.winner === "tie") ? GREEN : "none")} cx="237" cy="155" r="8" />
