@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Button, Container, Form, InputGroup, Modal } from "react-bootstrap";
 import _ from "lodash";
 import { HandThumbsDownFill, HandThumbsUpFill, TrophyFill } from "react-bootstrap-icons";
-import { usePersistentState } from "../hooks/UsePersistentState";
 
 function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays}) {
 
