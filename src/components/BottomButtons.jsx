@@ -36,16 +36,16 @@ function BottomButtons({ previousMatch, nextMatch, matchDetails, playoffSchedule
                     Losing Alliance {_.filter(matchClasses, { "matchNumber": matchDetails.matchNumber })[0]?.loserTo ? <><ArrowRight /> Match {_.filter(matchClasses, { "matchNumber": matchDetails.matchNumber })[0]?.loserTo} </> : " eliminated"} </>}
                     {(matchDetails.matchNumber === 14) && <>FINALS MATCH 1</>}
                     {(matchDetails.matchNumber === 15) && <span className={`${matches[_.findIndex(matches, { "matchNumber": matchDetails.matchNumber - 1 })]?.winner.winner}AllianceTeam`}>FINALS MATCH 2<br />ADVANTAGE {_.matches[_.findIndex(matches, { "matchNumber": matchDetails.matchNumber - 1 })]?.winner.tieWinner ? `${_.upperCase(matches[_.findIndex(matches, { "matchNumber": matchDetails.matchNumber - 1 })]?.winner.tieWinner)} (L${matches[_.findIndex(matches, { "matchNumber": matchDetails.matchNumber - 1 })]?.winner.level})` : _.upperCase(matches[_.findIndex(matches, { "matchNumber": matchDetails.matchNumber - 1 })]?.winner.winner)}</span>}
-                    {(matchDetails.matchNumber === 16) && <span className={"tieAllianceTeam"}>FINALS TIEBREAKER</span>}
+                    {(matchDetails.matchNumber >= 16 ) && <span className={"tieAllianceTeam"}>{_.upperCase(matchDetails.description)}</span>}
                 </Col>}
 
                 {matchDetails?.tournamentLevel !== "Playoff" && eventHighScore?.score && <Col xs={"8"} lg={"6"}><p><b>Event High Score: {eventHighScore?.score}<br />
                 in {eventHighScore?.matchName}<br />
-                {eventHighScore?.alliance} Alliance ({eventHighScore?.allianceMembers})</b></p></Col>}
+                ({eventHighScore?.allianceMembers})</b></p></Col>}
 
                 {matchDetails?.tournamentLevel === "Playoff" && eventHighScore?.score && <Col xs={"3"} lg={"2"}><p><b>Event High Score: {eventHighScore?.score}<br />
                 in {eventHighScore?.matchName}<br />
-                {eventHighScore?.alliance} Alliance ({eventHighScore?.allianceMembers})</b></p></Col>}
+                ({eventHighScore?.allianceMembers})</b></p></Col>}
 
                 {matchDetails?.tournamentLevel !== "Playoff" && !eventHighScore && <Col xs={"8"} lg={"6"}><h4>{matchDetails.description}</h4></Col>}
 

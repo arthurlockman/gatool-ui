@@ -16,21 +16,15 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 	//returns the three members of an alliance based on the match data.
 	function allianceNumbers(matchNumber, allianceColor) {
 		var alliance = "TBD";
-		var allianceName = "";
 		var allianceMembers = [];
-		var allianceNumber = 0;
 		var targetAlliance = {};
 		var match = matches[_.findIndex(matches, { "matchNumber": matchNumber })];
 		if (match?.teams[0]?.teamNumber) {
 			targetAlliance = alliances?.Lookup[`${match?.teams[0]?.teamNumber}`];
-			allianceName = targetAlliance?.alliance;
-			allianceNumber = targetAlliance?.number;
 			allianceMembers = _.compact([targetAlliance?.captain, targetAlliance?.round1, targetAlliance?.round2, targetAlliance?.round3, targetAlliance?.backup]);
 			alliance = allianceMembers.join("  ");
 			if (allianceColor === "blue") {
 				targetAlliance = alliances?.Lookup[`${match?.teams[3]?.teamNumber}`]
-				allianceName = targetAlliance?.alliance;
-				allianceNumber = targetAlliance?.number;
 				allianceMembers = _.compact([targetAlliance?.captain, targetAlliance?.round1, targetAlliance?.round2, targetAlliance?.round3, targetAlliance?.backup]);
 				alliance = allianceMembers.join("  ");
 			}
@@ -58,9 +52,9 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 	}
 	var overtimeOffset = 0;
 	if (matches[17]?.postResultTime) {
-		overtimeOffset = -20;
+		overtimeOffset = 30;
 	} else if (matches[16]?.postResultTime) {
-		overtimeOffset = -40;
+		overtimeOffset = 15;
 	}
 
 	return (
@@ -137,12 +131,8 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 						<path fill="#FEE79B" d="M1208.61,362.82h-2.18c0,15.56,5.01,28.17,11.19,28.17C1212.64,390.99,1208.61,378.38,1208.61,362.82z" />
 					</g>
 					
-					
-					
-					
-					<circle id="winnerMatch1Dot" fill={(matches[13]?.winner.winner === "red") ? RED : (matches[13]?.winner.winner === "blue") ? BLUE : (matches[13]?.winner.winner === "tie") ? GREEN : "none"} cx="1080" cy="451" r="8" />
-					<text id="finalsM1Scores"
-						transform="matrix(1 0 0 1 1080 477.5537)">
+					<circle id="winnerMatch1Dot" fill={(matches[13]?.winner.winner === "red") ? RED : (matches[13]?.winner.winner === "blue") ? BLUE : (matches[13]?.winner.winner === "tie") ? GREEN : "none"} cx={`${1110-overtimeOffset}`} cy="451" r="8" />
+					<text id="finalsM1Scores" transform={`matrix(1 0 0 1 ${1110-overtimeOffset} 477.5537)`}>
 						<tspan x="0" y="0" fill={RED} fontFamily="'myriad-pro'"
 							fontWeight={(matches[13]?.winner.winner === "red") ? black : semibold}
 							fontStyle={"normal"}
@@ -153,8 +143,8 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 							fontSize="14px" textAnchor="middle">{matches[13]?.scoreBlueFinal}</tspan>
 					</text>
 
-					<circle id="winnerMatch2Dot" fill={(matches[14]?.winner.winner === "red") ? RED : (matches[14]?.winner.winner === "blue") ? BLUE : (matches[14]?.winner.winner === "tie") ? GREEN : "none"} cx="1110" cy="451" r="8" />
-					<text id="finalsM2Scores" transform="matrix(1 0 0 1 1110 477.5537)">
+					<circle id="winnerMatch2Dot" fill={(matches[14]?.winner.winner === "red") ? RED : (matches[14]?.winner.winner === "blue") ? BLUE : (matches[14]?.winner.winner === "tie") ? GREEN : "none"} cx={`${1140-overtimeOffset}`}cy="451" r="8" />
+					<text id="finalsM2Scores" transform={`matrix(1 0 0 1 ${1140-overtimeOffset} 477.5537)`}>
 						<tspan x="0" y="0"
 							fill={RED}
 							fontFamily="'myriad-pro'"
@@ -168,9 +158,9 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 							fontSize="14px" textAnchor="middle">{matches[14]?.scoreBlueFinal}</tspan>
 					</text>
 
-					<circle id="winnerMatch3Dot" fill={(matches[15]?.winner.winner === "red") ? RED : (matches[15]?.winner.winner === "blue") ? BLUE : (matches[15]?.winner.winner === "tie") ? GREEN : "none"} cx="1140" cy="451" r="8" />
+					<circle id="winnerMatch3Dot" fill={(matches[15]?.winner.winner === "red") ? RED : (matches[15]?.winner.winner === "blue") ? BLUE : (matches[15]?.winner.winner === "tie") ? GREEN : "none"} cx={`${1170-overtimeOffset}`}cy="451" r="8" />
 					<text id="finalsM3Scores"
-						transform="matrix(1 0 0 1 1140 477.5537)">
+						transform={`matrix(1 0 0 1 ${1170-overtimeOffset} 477.5537)`}>
 						<tspan x="0" y="0"
 							fill={RED}
 							fontFamily="'myriad-pro'"
@@ -184,9 +174,9 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 							fontSize="14px" textAnchor="middle">{matches[15]?.scoreBlueFinal}</tspan>
 					</text>
 
-					<circle id="winnerMatch4Dot" fill={(matches[16]?.winner.winner === "red") ? RED : (matches[16]?.winner.winner === "blue") ? BLUE : (matches[16]?.winner.winner === "tie") ? GREEN : "none"} cx="1170" cy="451" r="8" />
+					<circle id="winnerMatch4Dot" fill={(matches[16]?.winner.winner === "red") ? RED : (matches[16]?.winner.winner === "blue") ? BLUE : (matches[16]?.winner.winner === "tie") ? GREEN : "none"} cx={`${1170+overtimeOffset}`}cy="451" r="8" />
 					<text id="finalsM4Scores"
-						transform="matrix(1 0 0 1 1170 477.5537)">
+						transform={`matrix(1 0 0 1 ${1170+overtimeOffset} 477.5537)`}>
 						<tspan x="0" y="0"
 							fill={RED}
 							fontFamily="'myriad-pro'"
