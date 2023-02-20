@@ -108,6 +108,7 @@ function App() {
   const [allianceCount, setAllianceCount] = usePersistentState("cache:allianceCount", null);
   const [lastVisit, setLastVisit] = usePersistentState("cache:lastVisit", {});
   const [localUpdates, setLocalUpdates] = usePersistentState("cache:localUpdates", []);
+  const [allianceSelectionArrays, setAllianceSelectionArrays] = usePersistentState("cache:allianceSelectionArrays", {});
 
   const [backupTeam, setBackupTeam] = useState(null);
 
@@ -836,6 +837,7 @@ function App() {
       setAllianceCount(null);
       setTeamReduction(null);
       setPlayoffCountOverride(null);
+      setAllianceSelectionArrays({});
       setScheduleTabReady(TabStates.NotReady);
       setTeamDataTabReady(TabStates.NotReady);
       setRanksTabReady(TabStates.NotReady);
@@ -857,6 +859,7 @@ function App() {
       setAllianceCount(null);
       setTeamReduction(null);
       setPlayoffCountOverride(null);
+      setAllianceSelectionArrays({});
       setCurrentMatch(1);
       getSchedule();
       getTeamList();
@@ -890,7 +893,7 @@ function App() {
 
               <Route path='/playbyplay' element={<PlayByPlayPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} communityUpdates={communityUpdates} currentMatch={currentMatch} setCurrentMatch={setCurrentMatch} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} setPlayoffSchedule={setPlayoffSchedule} alliances={alliances} setAlliances={setAlliances} getSchedule={getSchedule} getRanks={getRanks} awardsMenu={awardsMenu} showMottoes={showMottoes} showNotes={showNotes} showQualsStats={showQualsStats} swapScreen={swapScreen} timeFormat={timeFormat} eventHighScores={eventHighScores} backupTeam={backupTeam} setBackupTeam={setBackupTeam} />} />
 
-              <Route path='/allianceselection' element={<AllianceSelectionPage selectedYear={selectedYear} selectedEvent={selectedEvent} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} alliances={alliances} rankings={rankings} timeFormat={timeFormat} getRanks={getRanks} allianceSelection={allianceSelection} playoffs={playoffs} teamList={teamList} allianceCount={allianceCount} communityUpdates={communityUpdates} />} />
+              <Route path='/allianceselection' element={<AllianceSelectionPage selectedYear={selectedYear} selectedEvent={selectedEvent} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} alliances={alliances} rankings={rankings} timeFormat={timeFormat} getRanks={getRanks} allianceSelection={allianceSelection} playoffs={playoffs} teamList={teamList} allianceCount={allianceCount} communityUpdates={communityUpdates} allianceSelectionArrays={allianceSelectionArrays} setAllianceSelectionArrays={setAllianceSelectionArrays}/>} />
 
               <Route path='/awards' element={<AwardsPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} communityUpdates={communityUpdates} />} />
 

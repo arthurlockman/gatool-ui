@@ -5,7 +5,7 @@ import AllianceSelection from "../components/AllianceSelection";
 
 import './AllianceSelectionPage.css';
 
-function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, playoffSchedule, alliances, rankings, timeFormat, getRanks, allianceSelection, playoffs, teamList, allianceCount, communityUpdates }) {
+function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, playoffSchedule, alliances, rankings, timeFormat, getRanks, allianceSelection, playoffs, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays }) {
     
 
     var ranksLastUpdateDisplay = "No rankings reporting yet."
@@ -29,8 +29,8 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
                     {!allianceSelection && <Alert variant="danger" ><div onClick={getRanks}><b>Do not proceed with Alliance Selection until you confirm that the rank order below agrees with the rank order in FMS. Tap this alert to see if we can get a more current schedule and rankings.</b></div></Alert>}
                     {allianceSelection && <Alert variant="success" ><div onClick={getRanks}><b>We believe your event is ready for Alliance Selection, but you must confirm that the rank order below agrees with the rank order in FMS before proceeding with Alliance Selection.</b> If you see a discrepancy, tap this alert to see if we can get a more current rankings.</div></Alert>}
                 </div>}
-                {selectedEvent && qualSchedule?.schedule?.length > 0 && !playoffs && 
-                    <div><AllianceSelection selectedYear={selectedYear} selectedEvent={selectedEvent} rankings={rankings} teamList={teamList} allianceCount={allianceCount} communityUpdates={communityUpdates} />
+                {selectedEvent && qualSchedule?.schedule?.length > 0 && !playoffs && allianceSelection &&
+                    <div><AllianceSelection selectedYear={selectedYear} selectedEvent={selectedEvent} rankings={rankings} teamList={teamList} allianceCount={allianceCount} communityUpdates={communityUpdates} allianceSelectionArrays={allianceSelectionArrays} setAllianceSelectionArrays={setAllianceSelectionArrays}/>
                     </div>}
             </Container>
             {selectedEvent && playoffs &&

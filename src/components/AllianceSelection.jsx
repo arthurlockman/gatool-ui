@@ -4,8 +4,7 @@ import _ from "lodash";
 import { HandThumbsDownFill, HandThumbsUpFill, TrophyFill } from "react-bootstrap-icons";
 import { usePersistentState } from "../hooks/UsePersistentState";
 
-function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, allianceCount, communityUpdates }) {
-    const [allianceSelectionArrays, setAllianceSelectionArrays] = usePersistentState("cache:allianceSelectionArrays", {});
+function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays}) {
 
     const [show, setShow] = useState(false);
     const [allianceTeam, setAllianceTeam] = useState(false);
@@ -359,7 +358,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                             <tbody>
                                                 <tr>
                                                     <td>
-                                                        <p><strong>Backup Alliances</strong><br />(Initially rank {allianceCount.count + 1} to {allianceCount.count + 8} top to bottom)</p>
+                                                        <p><strong>Backup Alliances</strong><br />(Teams here are initially ranked {allianceCount.count + 1} to {allianceCount.count + 8} top to bottom. As Alliance Selection progresses, teams will rise up into this section as teams are selected.)</p>
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -429,7 +428,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                         <Modal.Title >{allianceMode === "decline" ? "Team declines the offer" : allianceMode === "accept" ? "Are you sure they want to accept?" : allianceMode === "a1captaion" ? "Top Seeded Alliance" : "Alliance Choice"}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        {allianceMode === "show" && <span className={"allianceAnnounceDialog"}>Team {allianceTeam?.teamNumber} {allianceTeam?.updates?.nameShortLocal ? allianceTeam.updates.nameShortLocal : allianceTeam?.nameShort}<br />
+                        {(allianceMode === "show" || allianceMode === "a1captain") && <span className={"allianceAnnounceDialog"}>Team {allianceTeam?.teamNumber} {allianceTeam?.updates?.nameShortLocal ? allianceTeam.updates.nameShortLocal : allianceTeam?.nameShort}<br />
                             is {(originalAndSustaining.indexOf(String(allianceTeam?.teamNumber))>=0) ? "an Original and Sustaining Team " : ""}from<br />
                             {allianceTeam?.updates?.organizationLocal ? allianceTeam?.updates?.organizationLocal : allianceTeam?.organization}<br />
                             in {allianceTeam?.updates?.cityStateLocal ? allianceTeam?.updates?.cityStateLocal : `${allianceTeam?.city}, ${allianceTeam?.stateProv}`}{allianceTeam?.country !== "USA" ? `, ${allianceTeam?.country}` : ""}<br /></span>}
@@ -439,8 +438,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                             has declined the offer from Alliance {allianceSelectionOrder[asArrays.nextChoice]?.number}.<br />They will become inelegible to be selected by another team or to continue as a backup team in the playoffs. Do they decline?</span>}
                         {allianceMode === "declined" && <span className={"allianceAnnounceDialog"}>Team {allianceTeam?.teamNumber} {allianceTeam?.updates?.nameShortLocal ? allianceTeam.updates.nameShortLocal : allianceTeam?.nameShort}<br />
                             has previously declined an offer. They are inelegible to be selected by another alliance.</span>}
-                        {allianceMode === "a1captain" && <span className={"allianceAnnounceDialog"}>Team {allianceTeam?.teamNumber} {allianceTeam?.updates?.nameShortLocal ? allianceTeam.updates.nameShortLocal : allianceTeam?.nameShort}<br />
-                            is our top seeded Alliance. They are inelegible to be selected by another alliance.</span>}
+                        {allianceMode === "a1captain" && <span className={"allianceAnnounceDialog"}><br />Team {allianceTeam?.teamNumber} is our top seeded Alliance. They are inelegible to be selected by another alliance.</span>}
                         {allianceMode === "captain" && <span className={"allianceAnnounceDialog"}>Team {allianceTeam?.teamNumber} {allianceTeam?.updates?.nameShortLocal ? allianceTeam.updates.nameShortLocal : allianceTeam?.nameShort}<br />
                             is an Alliance Captain. They are inelegible to be selected by another alliance.</span>}
 
