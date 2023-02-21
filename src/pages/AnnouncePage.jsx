@@ -9,7 +9,7 @@ import TopButtons from "../components/TopButtons";
 
 const paleGreen = "rgba(144, 238, 144, 0.5)"
 
-function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, setCurrentMatch, playoffSchedule, setPlayoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, getSchedule, getRanks, awardsMenu, showNotes, showAwards, showSponsors, showMottoes, showChampsStats, timeFormat, eventHighScores, backupTeam, setBackupTeam}) {
+function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, setCurrentMatch, playoffSchedule, setPlayoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, getSchedule, getRanks, awardsMenu, showNotes, showAwards, showSponsors, showMottoes, showChampsStats, timeFormat, eventHighScores, backupTeam, setBackupTeam, getWorldStats}) {
 
     function updateTeamDetails(station, matchDetails) {
         var team = {}
@@ -95,6 +95,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
             setCurrentMatch(currentMatch + 1);
             getSchedule();
             getRanks();
+            getWorldStats();
         }
     }
     function previousMatch() {
@@ -102,6 +103,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
             setCurrentMatch(currentMatch - 1);
             getSchedule();
             getRanks();
+            getWorldStats();
         }
     }
 
@@ -109,6 +111,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
         setCurrentMatch(e.value);
         getSchedule();
         getRanks();
+        getWorldStats();
     }
 
 

@@ -66,11 +66,14 @@ function LayoutsWithNavbar({ scheduleTabReady, teamDataTabReady, ranksTabReady, 
   );
 }
 
-const champsEvents = _.clone(champs);
-const divisions = _.clone(champDivisions);
-const subdivisions = _.clone(champSubdivisions);
-const michamps = _.clone(miChamps);
-const midivisions = _.clone(miDivisions);
+const champsEvents = _.cloneDeep(champs);
+const divisions = _.cloneDeep(champDivisions);
+const subdivisions = _.cloneDeep(champSubdivisions);
+const michamps = _.cloneDeep(miChamps);
+const midivisions = _.cloneDeep(miDivisions);
+
+var eventnames = _.cloneDeep(eventNames);
+var halloffame = _.cloneDeep(hallOfFame);
 
 function App() {
   const { isAuthenticated, isLoading } = useAuth0();
@@ -442,11 +445,10 @@ function App() {
           }
         }
         var awardYears = Object.keys(team?.awards);
-        var eventnames = _.clone(eventNames);
-        var halloffame = _.clone(hallOfFame);
+        
 
         events.forEach((event) => {
-          eventNames[selectedYear?.value][event?.value?.code] = event?.value?.name;
+          eventnames[selectedYear?.value][event?.value?.code] = event?.value?.name;
         })
         awardYears?.forEach(year => {
           if (team?.awards[`${year}`] !== null) {
@@ -650,11 +652,12 @@ function App() {
 
     highscores.forEach((score) => {
       var details = {};
-      if (worldStats) {
-        details.eventName = eventNames[worldStats?.year][score?.matchData?.event?.eventCode]
-      } else {
-        details.eventName = score?.matchData?.event?.eventCode;
-      }
+      details.eventName = eventnames[worldStats?.year][score?.matchData?.event?.eventCode] || score?.matchData?.event?.eventCode;
+      //if (worldStats) {
+      //  details.eventName = eventnames[worldStats?.year][score?.matchData?.event?.eventCode]
+      //} else {
+      //  details.eventName = score?.matchData?.event?.eventCode;
+      //}
       details.alliance = _.upperFirst(score?.matchData?.highScoreAlliance);
       details.scoreType = score?.type + score?.level;
       details.matchName = score?.matchData?.match?.description;
@@ -889,9 +892,9 @@ function App() {
 
               <Route path='/ranks' element={<RanksPage selectedEvent={selectedEvent} teamList={teamList} rankings={rankings} rankSort={rankSort} setRankSort={setRankSort} communityUpdates={communityUpdates} allianceCount={allianceCount} />} />
 
-              <Route path='/announce' element={<AnnouncePage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} communityUpdates={communityUpdates} currentMatch={currentMatch} setCurrentMatch={setCurrentMatch} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} setPlayoffSchedule={setPlayoffSchedule} alliances={alliances} setAlliances={setAlliances} getSchedule={getSchedule} getRanks={getRanks} awardsMenu={awardsMenu} showNotes={showNotes} showAwards={showAwards} showSponsors={showSponsors} showMottoes={showMottoes} showChampsStats={showChampsStats} timeFormat={timeFormat} eventHighScores={eventHighScores} backupTeam={backupTeam} setBackupTeam={setBackupTeam} />} />
+              <Route path='/announce' element={<AnnouncePage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} communityUpdates={communityUpdates} currentMatch={currentMatch} setCurrentMatch={setCurrentMatch} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} setPlayoffSchedule={setPlayoffSchedule} alliances={alliances} setAlliances={setAlliances} getSchedule={getSchedule} getRanks={getRanks} awardsMenu={awardsMenu} showNotes={showNotes} showAwards={showAwards} showSponsors={showSponsors} showMottoes={showMottoes} showChampsStats={showChampsStats} timeFormat={timeFormat} eventHighScores={eventHighScores} backupTeam={backupTeam} setBackupTeam={setBackupTeam} getWorldStats={getWorldStats}/>} />
 
-              <Route path='/playbyplay' element={<PlayByPlayPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} communityUpdates={communityUpdates} currentMatch={currentMatch} setCurrentMatch={setCurrentMatch} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} setPlayoffSchedule={setPlayoffSchedule} alliances={alliances} setAlliances={setAlliances} getSchedule={getSchedule} getRanks={getRanks} awardsMenu={awardsMenu} showMottoes={showMottoes} showNotes={showNotes} showQualsStats={showQualsStats} swapScreen={swapScreen} timeFormat={timeFormat} eventHighScores={eventHighScores} backupTeam={backupTeam} setBackupTeam={setBackupTeam} />} />
+              <Route path='/playbyplay' element={<PlayByPlayPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} communityUpdates={communityUpdates} currentMatch={currentMatch} setCurrentMatch={setCurrentMatch} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} setPlayoffSchedule={setPlayoffSchedule} alliances={alliances} setAlliances={setAlliances} getSchedule={getSchedule} getRanks={getRanks} awardsMenu={awardsMenu} showMottoes={showMottoes} showNotes={showNotes} showQualsStats={showQualsStats} swapScreen={swapScreen} timeFormat={timeFormat} eventHighScores={eventHighScores} backupTeam={backupTeam} setBackupTeam={setBackupTeam} getWorldStats={getWorldStats}/>} />
 
               <Route path='/allianceselection' element={<AllianceSelectionPage selectedYear={selectedYear} selectedEvent={selectedEvent} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} alliances={alliances} rankings={rankings} timeFormat={timeFormat} getRanks={getRanks} allianceSelection={allianceSelection} playoffs={playoffs} teamList={teamList} allianceCount={allianceCount} communityUpdates={communityUpdates} allianceSelectionArrays={allianceSelectionArrays} setAllianceSelectionArrays={setAllianceSelectionArrays}/>} />
 

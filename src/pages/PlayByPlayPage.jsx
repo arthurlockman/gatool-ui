@@ -9,7 +9,7 @@ import TopButtons from "../components/TopButtons";
 const paleGreen = "rgba(144, 238, 144, 0.5)"
 
 
-function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, setCurrentMatch, playoffSchedule, setPlayoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, getSchedule, getRanks, showNotes, showMottoes, showQualsStats, swapScreen, timeFormat, eventHighScores, backupTeam, setBackupTeam}) {
+function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, setCurrentMatch, playoffSchedule, setPlayoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, getSchedule, getRanks, showNotes, showMottoes, showQualsStats, swapScreen, timeFormat, eventHighScores, backupTeam, setBackupTeam, getWorldStats}) {
     var displayOrder = ["Blue1", "Red3", "Blue2", "Red2", "Blue3", "Red1", "Blue4", "Red4"];
     if (swapScreen===true) {displayOrder = ["Red3", "Blue1", "Red2", "Blue2", "Red1", "Blue3", "Red4", "Blue4"]}
 
@@ -116,6 +116,7 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
             setCurrentMatch(currentMatch + 1);
             getSchedule();
             getRanks();
+            getWorldStats();
         }
     }
     function previousMatch() {
@@ -123,6 +124,7 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
             setCurrentMatch(currentMatch - 1);
             getSchedule();
             getRanks();
+            getWorldStats();
         }
     }
 
@@ -130,6 +132,7 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
         setCurrentMatch(e.value);
         getSchedule();
         getRanks();
+        getWorldStats();
     }
 
     return (
