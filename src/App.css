@@ -554,3 +554,8 @@ td {
 	align-content: center;
 	text-align: center
 }
+
+.navBarText {
+	font-size: 12px;
+	white-space: nowrap;
+}

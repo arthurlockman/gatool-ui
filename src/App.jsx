@@ -652,7 +652,12 @@ function App() {
 
     highscores.forEach((score) => {
       var details = {};
-      details.eventName = eventnames[worldStats?.year][score?.matchData?.event?.eventCode] || score?.matchData?.event?.eventCode;
+      if (!_.isEmpty(eventnames[worldStats?.year])) {
+        details.eventName = eventnames[worldStats?.year][score?.matchData?.event?.eventCode] || score?.matchData?.event?.eventCode;
+      } else {
+        details.eventName = score?.matchData?.event?.eventCode;
+      }
+      
       //if (worldStats) {
       //  details.eventName = eventnames[worldStats?.year][score?.matchData?.event?.eventCode]
       //} else {
