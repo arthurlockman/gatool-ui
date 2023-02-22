@@ -14,7 +14,8 @@
 
 .alliancesTeamsTable {
 	text-align: center;
-	background: rgba(157, 203, 250, 1.00)
+	background: rgba(157, 203, 250, 1.00);
+	white-space: nowrap;
 }
 
 .dropzone {

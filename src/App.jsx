@@ -727,12 +727,12 @@ function App() {
     var allianceMultiplier = 2;
     if (selectedEvent?.value?.champLevel === "CHAMPS" || selectedEvent?.value?.champLevel === "CMPDIV" || selectedEvent?.value?.champLevel === "CMPSUB") {
       allianceMultiplier = 3;
-  }
+    }
 
     allianceCountTemp.allianceSelectionLength = allianceMultiplier * allianceCountTemp.count - 1;
     allianceCountTemp.menu = { "value": allianceCountTemp.count, "label": allianceCountTemp.count }
     setAllianceCount(allianceCountTemp);
-  }, [playoffCountOverride, teamList, setAllianceCount])
+  }, [playoffCountOverride, teamList, setAllianceCount, selectedEvent])
 
   // Retrieve event list when year selection changes
   useEffect(() => {

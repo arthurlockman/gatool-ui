@@ -328,10 +328,10 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                     <td>
                                         <table className="availableTeams">
                                             <tbody>
-                                                <tr>
-                                                    <td colSpan={"5"}><strong>Teams for Alliance Selection</strong></td>
+                                                <tr key={"titleRow"}>
+                                                    <td colSpan={"5"} key={"Title"} ><strong>Teams for Alliance Selection</strong></td>
                                                 </tr>
-                                                <tr>
+                                                <tr key={"AvailableTeams"}>
                                                     {availColumns.map((column, index) => {
                                                         return (<td key={`availableTableColumn${index}`}>
                                                             {column.map((team) => {
@@ -422,7 +422,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                 </tr>
                             </tbody></table></div>
                 }
-                {allianceTeam && <Modal centered={true} show={show} size="lg" onHide={handleClose}>
+                {allianceTeam && <Modal centered={true} show={show} onHide={handleClose}>
                     <Modal.Header className={allianceMode === "decline" ? "allianceDecline" : "allianceChoice"} closeVariant={"white"} closeButton>
                         <Modal.Title >{allianceMode === "decline" ? "Team declines the offer" : allianceMode === "accept" ? "Are you sure they want to accept?" : allianceMode === "a1captaion" ? "Top Seeded Alliance" : "Alliance Choice"}</Modal.Title>
                     </Modal.Header>
