@@ -39,13 +39,14 @@ export const TabStates = {
 
 // Tiebreakers
 // Order Sort
-// Criteria 2023 need to revisit once we see the data
+// Criteria 2023 has been updated.
 // 1st Cumulative TECH FOUL points due to opponent rule violations
 // 2nd ALLIANCE CHARGE STATION points
 // 3rd ALLIANCE AUTO points
 // 4th MATCH is replayed
 const playoffTiebreakers = {
-  "2023": ["foulPoints", "totalChargeStationPoints", "autoPoints"], // Update after rules release
+  "2024": ["foulPoints", "autoPoints"],// Update after rules release
+  "2023": ["foulPoints", "totalChargeStationPoints", "autoPoints"],
   "2022": ["foulPoints", "endgamePoints", "autoCargoTotal+autoTaxiPoints"],
   "2021": ["foulPoints", "autoPoints", "endgamePoints", "controlPanelPoints+teleopCellPoints"],
   "2020": ["foulPoints", "autoPoints", "endgamePoints", "controlPanelPoints+teleopCellPoints"],
@@ -445,7 +446,7 @@ function App() {
           }
         }
         var awardYears = Object.keys(team?.awards);
-        
+
 
         events.forEach((event) => {
           eventnames[selectedYear?.value][event?.value?.code] = event?.value?.name;
@@ -657,7 +658,7 @@ function App() {
       } else {
         details.eventName = score?.matchData?.event?.eventCode;
       }
-      
+
       //if (worldStats) {
       //  details.eventName = eventnames[worldStats?.year][score?.matchData?.event?.eventCode]
       //} else {
@@ -692,10 +693,10 @@ function App() {
     var allianceLookup = {};
     alliances.alliances.forEach(alliance => {
       allianceLookup[`${alliance.captain}`] = { role: `Captain`, alliance: `Alliance ${alliance.number}`, number: alliance.number, captain: alliance.captain, round1: alliance.round1, round2: alliance.round2, round3: alliance.round3, backup: alliance.backup, backupReplaced: alliance.backupReplaced };
-      allianceLookup[`${alliance.round1}`] = { role: `Round 1 Selection`, alliance: `Alliance ${alliance.number}`, number: alliance.number, captain: alliance.captain, round1: alliance.round1, round2: alliance.round2, round3: alliance.round3, backup: alliance.backup, backupReplaced: alliance.backupReplaced  };
-      allianceLookup[`${alliance.round2}`] = { role: `Round 2 Selection`, alliance: `Alliance ${alliance.number}`, number: alliance.number, captain: alliance.captain, round1: alliance.round1, round2: alliance.round2, round3: alliance.round3, backup: alliance.backup, backupReplaced: alliance.backupReplaced  };
-      if (alliance.round3) { allianceLookup[`${alliance.round3}`] = { role: `Round 3 Selection`, alliance: `Alliance ${alliance.number}`, number: alliance.number, captain: alliance.captain, round1: alliance.round1, round2: alliance.round2, round3: alliance.round3, backup: alliance.backup, backupReplaced: alliance.backupReplaced  }; }
-      if (alliance.backup) { allianceLookup[`${alliance.backup}`] = { role: `Backup for ${alliance.backupReplaced}`, alliance: `Alliance ${alliance.number}`, number: alliance.number, captain: alliance.captain, round1: alliance.round1, round2: alliance.round2, round3: alliance.round3, backup: alliance.backup, backupReplaced: alliance.backupReplaced  }; }
+      allianceLookup[`${alliance.round1}`] = { role: `Round 1 Selection`, alliance: `Alliance ${alliance.number}`, number: alliance.number, captain: alliance.captain, round1: alliance.round1, round2: alliance.round2, round3: alliance.round3, backup: alliance.backup, backupReplaced: alliance.backupReplaced };
+      allianceLookup[`${alliance.round2}`] = { role: `Round 2 Selection`, alliance: `Alliance ${alliance.number}`, number: alliance.number, captain: alliance.captain, round1: alliance.round1, round2: alliance.round2, round3: alliance.round3, backup: alliance.backup, backupReplaced: alliance.backupReplaced };
+      if (alliance.round3) { allianceLookup[`${alliance.round3}`] = { role: `Round 3 Selection`, alliance: `Alliance ${alliance.number}`, number: alliance.number, captain: alliance.captain, round1: alliance.round1, round2: alliance.round2, round3: alliance.round3, backup: alliance.backup, backupReplaced: alliance.backupReplaced }; }
+      if (alliance.backup) { allianceLookup[`${alliance.backup}`] = { role: `Backup for ${alliance.backupReplaced}`, alliance: `Alliance ${alliance.number}`, number: alliance.number, captain: alliance.captain, round1: alliance.round1, round2: alliance.round2, round3: alliance.round3, backup: alliance.backup, backupReplaced: alliance.backupReplaced }; }
     })
     alliances.Lookup = allianceLookup;
 
@@ -723,7 +724,12 @@ function App() {
     } else {
       allianceCountTemp.count = 8;
     }
-    allianceCountTemp.allianceSelectionLength = 2 * allianceCountTemp.count - 1;
+    var allianceMultiplier = 2;
+    if (selectedEvent?.value?.champLevel === "CHAMPS" || selectedEvent?.value?.champLevel === "CMPDIV" || selectedEvent?.value?.champLevel === "CMPSUB") {
+      allianceMultiplier = 3;
+  }
+
+    allianceCountTemp.allianceSelectionLength = allianceMultiplier * allianceCountTemp.count - 1;
     allianceCountTemp.menu = { "value": allianceCountTemp.count, "label": allianceCountTemp.count }
     setAllianceCount(allianceCountTemp);
   }, [playoffCountOverride, teamList, setAllianceCount])
@@ -897,11 +903,11 @@ function App() {
 
               <Route path='/ranks' element={<RanksPage selectedEvent={selectedEvent} teamList={teamList} rankings={rankings} rankSort={rankSort} setRankSort={setRankSort} communityUpdates={communityUpdates} allianceCount={allianceCount} />} />
 
-              <Route path='/announce' element={<AnnouncePage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} communityUpdates={communityUpdates} currentMatch={currentMatch} setCurrentMatch={setCurrentMatch} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} setPlayoffSchedule={setPlayoffSchedule} alliances={alliances} setAlliances={setAlliances} getSchedule={getSchedule} getRanks={getRanks} awardsMenu={awardsMenu} showNotes={showNotes} showAwards={showAwards} showSponsors={showSponsors} showMottoes={showMottoes} showChampsStats={showChampsStats} timeFormat={timeFormat} eventHighScores={eventHighScores} backupTeam={backupTeam} setBackupTeam={setBackupTeam} getWorldStats={getWorldStats}/>} />
+              <Route path='/announce' element={<AnnouncePage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} communityUpdates={communityUpdates} currentMatch={currentMatch} setCurrentMatch={setCurrentMatch} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} setPlayoffSchedule={setPlayoffSchedule} alliances={alliances} setAlliances={setAlliances} getSchedule={getSchedule} getRanks={getRanks} awardsMenu={awardsMenu} showNotes={showNotes} showAwards={showAwards} showSponsors={showSponsors} showMottoes={showMottoes} showChampsStats={showChampsStats} timeFormat={timeFormat} eventHighScores={eventHighScores} backupTeam={backupTeam} setBackupTeam={setBackupTeam} getWorldStats={getWorldStats} />} />
 
-              <Route path='/playbyplay' element={<PlayByPlayPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} communityUpdates={communityUpdates} currentMatch={currentMatch} setCurrentMatch={setCurrentMatch} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} setPlayoffSchedule={setPlayoffSchedule} alliances={alliances} setAlliances={setAlliances} getSchedule={getSchedule} getRanks={getRanks} awardsMenu={awardsMenu} showMottoes={showMottoes} showNotes={showNotes} showQualsStats={showQualsStats} swapScreen={swapScreen} timeFormat={timeFormat} eventHighScores={eventHighScores} backupTeam={backupTeam} setBackupTeam={setBackupTeam} getWorldStats={getWorldStats}/>} />
+              <Route path='/playbyplay' element={<PlayByPlayPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} communityUpdates={communityUpdates} currentMatch={currentMatch} setCurrentMatch={setCurrentMatch} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} setPlayoffSchedule={setPlayoffSchedule} alliances={alliances} setAlliances={setAlliances} getSchedule={getSchedule} getRanks={getRanks} awardsMenu={awardsMenu} showMottoes={showMottoes} showNotes={showNotes} showQualsStats={showQualsStats} swapScreen={swapScreen} timeFormat={timeFormat} eventHighScores={eventHighScores} backupTeam={backupTeam} setBackupTeam={setBackupTeam} getWorldStats={getWorldStats} />} />
 
-              <Route path='/allianceselection' element={<AllianceSelectionPage selectedYear={selectedYear} selectedEvent={selectedEvent} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} alliances={alliances} rankings={rankings} timeFormat={timeFormat} getRanks={getRanks} allianceSelection={allianceSelection} playoffs={playoffs} teamList={teamList} allianceCount={allianceCount} communityUpdates={communityUpdates} allianceSelectionArrays={allianceSelectionArrays} setAllianceSelectionArrays={setAllianceSelectionArrays}/>} />
+              <Route path='/allianceselection' element={<AllianceSelectionPage selectedYear={selectedYear} selectedEvent={selectedEvent} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} alliances={alliances} rankings={rankings} timeFormat={timeFormat} getRanks={getRanks} allianceSelection={allianceSelection} playoffs={playoffs} teamList={teamList} allianceCount={allianceCount} communityUpdates={communityUpdates} allianceSelectionArrays={allianceSelectionArrays} setAllianceSelectionArrays={setAllianceSelectionArrays} />} />
 
               <Route path='/awards' element={<AwardsPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} communityUpdates={communityUpdates} />} />
 

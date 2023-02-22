@@ -3,7 +3,7 @@ import { Button, Container, Form, InputGroup, Modal } from "react-bootstrap";
 import _ from "lodash";
 import { HandThumbsDownFill, HandThumbsUpFill, TrophyFill } from "react-bootstrap-icons";
 
-function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays}) {
+function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays }) {
 
     const [show, setShow] = useState(false);
     const [allianceTeam, setAllianceTeam] = useState(false);
@@ -46,7 +46,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
     })
 
     var inChamps = false;
-    if (selectedEvent.champLevel === "CHAMPS" || selectedEvent.champLevel === "CMPDIV" || selectedEvent.champLevel === "CMPSUB") {
+    if (selectedEvent?.value?.champLevel === "CHAMPS" || selectedEvent?.value?.champLevel === "CMPDIV" || selectedEvent?.value?.champLevel === "CMPSUB") {
         inChamps = true;
     }
 
@@ -309,7 +309,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
     return (
         <>
             <Container fluid>
-                {selectedEvent && rankings?.ranks?.length > 0 && teamList?.teams?.length>0 && allianceCount &&
+                {selectedEvent && rankings?.ranks?.length > 0 && teamList?.teams?.length > 0 && allianceCount &&
                     <div>
                         <Form onSubmit={handleFilterSelect}>
                             <InputGroup className="mb-3" >
@@ -388,7 +388,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                                 var alliance = _.filter(alliances, { "number": allianceNumber })
                                                                 var allianceName = alliance[0].name;
                                                                 var captain = alliance[0]?.captain;
-                                                                if (captain) {captain.declined = asArrays?.declined?.includes(captain?.teamNumber);}
+                                                                if (captain) { captain.declined = asArrays?.declined?.includes(captain?.teamNumber); }
                                                                 var round1 = alliance[0]?.round1;
                                                                 if (round1) { round1.declined = asArrays?.declined?.includes(round1?.teamNumber); }
                                                                 var round2 = alliance[0]?.round2;
@@ -428,7 +428,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                     </Modal.Header>
                     <Modal.Body>
                         {(allianceMode === "show" || allianceMode === "a1captain") && <span className={"allianceAnnounceDialog"}>Team {allianceTeam?.teamNumber} {allianceTeam?.updates?.nameShortLocal ? allianceTeam.updates.nameShortLocal : allianceTeam?.nameShort}<br />
-                            is {(originalAndSustaining.indexOf(String(allianceTeam?.teamNumber))>=0) ? "an Original and Sustaining Team " : ""}from<br />
+                            is {(originalAndSustaining.indexOf(String(allianceTeam?.teamNumber)) >= 0) ? "an Original and Sustaining Team " : ""}from<br />
                             {allianceTeam?.updates?.organizationLocal ? allianceTeam?.updates?.organizationLocal : allianceTeam?.organization}<br />
                             in {allianceTeam?.updates?.cityStateLocal ? allianceTeam?.updates?.cityStateLocal : `${allianceTeam?.city}, ${allianceTeam?.stateProv}`}{allianceTeam?.country !== "USA" ? `, ${allianceTeam?.country}` : ""}<br /></span>}
                         {allianceMode === "accept" && <span className={"allianceAnnounceDialog"}>Team {allianceTeam?.teamNumber} {allianceTeam?.updates?.nameShortLocal ? allianceTeam.updates.nameShortLocal : allianceTeam?.nameShort}<br />
