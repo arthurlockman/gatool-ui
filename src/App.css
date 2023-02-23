@@ -559,3 +559,13 @@ td {
 	font-size: 12px;
 	white-space: nowrap;
 }
+
+.hiddenInput {
+	width: 0px;
+	height: 0px;
+	overflow: hidden
+}
+
+.topBorderLine {
+	border-top: 2px darkblue solid ;
+}

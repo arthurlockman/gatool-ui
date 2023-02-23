@@ -1,4 +1,4 @@
-import { Alert, Button, Container, Form, InputGroup, Modal, Table } from "react-bootstrap";
+import { Alert, Button, Col, Container, Form, InputGroup, Modal, Row, Table } from "react-bootstrap";
 import { SortAlphaDown, SortAlphaUp, SortNumericDown, SortNumericUp } from 'react-bootstrap-icons';
 import { merge, orderBy, find } from "lodash";
 import { rankHighlight } from "../components/HelperFunctions";
@@ -7,8 +7,13 @@ import moment from "moment";
 import _ from "lodash";
 import { toast } from "react-toastify";
 import { useOnlineStatus } from "../contextProviders/OnlineContext";
+import { utils, write, writeFile } from "xlsx";
+import Docxtemplater from "docxtemplater";
+import PizZip from "pizzip";
+import PizZipUtils from "pizzip/utils/index.js";
+import { saveAs } from "file-saver";
 
-function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSort, setTeamSort, communityUpdates, setCommunityUpdates, allianceCount, lastVisit, setLastVisit, putTeamData, localUpdates, setLocalUpdates }) {
+function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSort, setTeamSort, communityUpdates, setCommunityUpdates, allianceCount, lastVisit, setLastVisit, putTeamData, localUpdates, setLocalUpdates, qualSchedule, playoffSchedule }) {
     const [currentTime, setCurrentTime] = useState(moment());
 
     useEffect(() => {
@@ -38,12 +43,19 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
 
 
     const [show, setShow] = useState(false);
+    const [showDownload, setShowDownload] = useState(false);
     const [updateTeam, setUpdateTeam] = useState({});
     const [formValue, setFormValue] = useState({});
+    const [gaName, setGaName] = useState("");
 
     const handleClose = () => {
         setUpdateTeam(null);
         setShow(false);
+    }
+
+    const handleCloseDownload = () => {
+        setShowDownload(false);
+        setGaName("");
     }
 
     const handleSubmit = (mode, e) => {
@@ -113,6 +125,10 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         setFormValue(update);
     }
 
+    const updateGaForm = (value) => {
+        setGaName(value);
+    }
+
 
     function getTeamRank(teamNumber) {
         var team = find(rankings?.ranks, { "teamNumber": teamNumber });
@@ -145,6 +161,156 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
 
     const isOnline = useOnlineStatus();
 
+    // The following section emits an Excel doc with two sheets:
+    //   Team Table contains details about the teams at the event, including community updates;
+    //   Schedule contains the schedule details at the time of export.
+    function exportXLSX() {
+        var data = [];
+        var data2 = [];
+        var record = {};
+        var keys = [];
+        var workbook = utils.book_new();
+        var awards = [];
+        var awardsKeys = [];
+
+        //Add the team table to the worksheet
+        data = teamListExtended.map((item) => {
+            record = _.cloneDeep(item);
+            awards = record.awards || {};
+            record.awards = [];
+            delete record.hallOfFame;
+            awardsKeys = Object.keys(awards)
+            awardsKeys.forEach((key) => {
+                awards[key].Awards.forEach((award) => {
+                    record.awards.push(`${award.year} ${award.eventName}: ${award.name}${award.person ? `: ${award.person}` : ""}`)
+                })
+            })
+            record.awardList = _.join(record.awards, "; ");
+            delete record.awards;
+            delete record.source;
+            return (record);
+        })
+
+        var ws = utils.json_to_sheet(data, { cellHTML: "true" });
+        utils.book_append_sheet(workbook, ws, "Team Table");
+
+        //Add the Schedule to the worksheet
+        var schedule = qualSchedule?.schedule || [];
+        if (playoffSchedule?.schedule?.length > 0) {
+            schedule = _.concat(qualSchedule?.schedule, playoffSchedule?.schedule);
+        }
+
+        schedule.forEach((match) => {
+            record = {};
+            keys = Object.keys(match);
+            keys.forEach((key) => {
+                if (key === "teams") {
+                    match.teams.forEach((team) => {
+                        record[team.station] = team.teamNumber
+                    })
+                } else if (key === "winner") {
+                    record.winner = match.winner.winner;
+                    record.tieWinner = match.winner.tieWinner;
+                    record.tieBreakerLevel = match.winner.level;
+                } else {
+                    record[key] = match[key];
+                }
+            })
+            data2.push(record);
+        })
+
+        ws = utils.json_to_sheet(data2, { cellHTML: "true" });
+        utils.book_append_sheet(workbook, ws, "Schedule");
+
+        write(workbook, { bookType: "xlsx", bookSST: true, type: 'base64' });
+        writeFile(workbook, "gatoolExport_" + selectedYear.value + selectedEvent.label + moment().format('MMDDYYYY_HHmmss') + ".xlsx");
+
+    }
+
+    function downloadTeamInfoSheets() {
+        setShowDownload(true);
+    }
+
+    function handleSubmitDownload(e) {
+        //toDo make this work.
+        setShowDownload(false);
+        console.log(e);
+        generateDocx(gaName);
+        setGaName("");
+    }
+
+    function clickRestoreBackup() {
+        //todo: fill in this gap
+    }
+
+    // The following section creates merged Word docs.
+    // It is used in conjunction with the team list to create team info sheets.
+    function loadFile(url, callback) {
+        PizZipUtils.getBinaryContent(url, callback);
+    }
+    function generateDocx(gameAnnouncer) {
+        loadFile(
+            "images/gatool_team_information_sheets_merge.docx",
+            function (error, content) {
+                if (error) {
+                    throw error;
+                }
+                var zip = new PizZip(content);
+                var doc = new Docxtemplater(zip, {
+                    paragraphLoop: true,
+                    linebreaks: true,
+                });
+
+                var data = [];
+                var record = {};
+
+                //Create record list from all of the team data
+
+                data = teamListExtended.map((team, index) => {
+                    record = {};
+                    record.tn = team.teamNumber;
+                    record.year = selectedYear.value;
+                    record.nameShort = team.nameShortLocal || team.nameShort;
+                    record.organization = team.organizationLocal || team.organization;
+                    record.robotName = team.robotNameLocal || team.robotName;
+                    record.cityState = team.cityStateLocal || team.cityState;
+                    record.cityState = team.cityStateLocal || `${team.city}, ${team.stateProv}${team.country !== "USA" ? `, ${team.country}` : ""}`;
+                    record.topSponsors = team.topSponsorsLocal || team.topSponsors;
+                    record.teamYearsNoCompete = team.teamYearsNoCompeteLocal || "";
+                    record.teamMotto = team.teamMottoLocal || "";
+                    record.rookieYear = team.rookieYear || "";
+                    record.eventName = selectedEvent.label;
+                    record.sayNumber = team.sayNumber || "";
+                    record.gaName = gameAnnouncer || false;
+                    if (index < teamListExtended.length - 1) {
+                        record.lastTeam = false;
+                    } else {
+                        record.lastTeam = true;
+                    }
+                    return (record);
+                })
+
+
+                // Render the document (Replace {first_name} by John, {last_name} by Doe, ...)
+                doc.render({
+                    teams: data
+                });
+
+                var out = doc.getZip().generate({
+                    type: "blob",
+                    mimeType:
+                        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    // compression: DEFLATE adds a compression step.
+                    // For a 50MB output document, expect 500ms additional CPU time
+                    compression: "DEFLATE",
+                });
+                // Output the document using Data-URI
+                saveAs(out, selectedEvent.label + " " + selectedYear.value + " Team Info Sheets.docx");
+            }
+        );
+    }
+
+
     return (
         <Container fluid>
             {!selectedEvent && !teamList && <div>
@@ -156,9 +322,25 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
             {selectedEvent && teamList?.teams.length === 0 && <div>
                 <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div><div>Awaiting team data for {selectedEvent.label}</div></Alert>
             </div>}
-            {selectedEvent && teamList?.teams.length > 0 && <div>
+            {selectedEvent && teamList?.teams.length > 0 && <><div>
                 <h4>{selectedEvent?.label}</h4>
-                <p>This table is editable and sortable. Tap on a team number to change data for a specific team. Edits you make are local to this browser, and they will persist here if you do not clear your browser cache. You can save your changes to the gatool Cloud on the team details page or on the Setup Screen. Cells <span className={"teamTableHighlight"}>highlighted in green</span> have been modified, either by you or by other gatool users.</p>
+                <p className={"leftTable"}>This table is editable and sortable. Tap on a team number to change data for a specific team. Edits you make are local to this browser, and they will persist here if you do not clear your browser cache. You can save your changes to the gatool Cloud on the team details page or on the Setup Screen. Cells <span className={"teamTableHighlight"}>highlighted in green</span> have been modified, either by you or by other gatool users.</p>
+                <Table responsive className={"leftTable topBorderLine"}>
+                    <Row >
+                        <Col sm>
+                            <p><span style={{ cursor: "pointer", color: "darkblue" }} onClick={exportXLSX}><b><img style={{ float: "left" }} width="30" src="images/excelicon.png" alt="Excel Logo" /> Tap to download this table as Excel</b></span></p>
+                            <p>You can use this as a backup of your team data in conjunction with the Restore Backup button on the right. You can also merge this with Word to create team data sheets you can hand out at an event. <i>Note: this will save to Files on iOS 13+</i></p>
+                        </Col>
+                        <Col sm>
+                            <p><span style={{ cursor: "pointer", color: "darkblue" }} onClick={downloadTeamInfoSheets}><img style={{ float: "left" }} width="30" src="images/wordicon.png" alt="Word Logo" /> <b>Tap here to download a merged document (docx).</b></span></p>
+                            <p>This merged doc contains all of the information in your Teams List, merged onto a template you can print and distribute to teams. <i>Note: this will save to Files on iOS 13+</i></p>
+                        </Col>
+                        <Col>
+                            <p><span style={{ cursor: "pointer", color: "darkblue" }} onClick={clickRestoreBackup}><input type="file" id="BackupFiles" className={"hiddenInput"} /><b><img style={{ float: "left" }} width="30" src="images/excelicon.png" alt="Excel Logo" /> NOT WORKING YET: Tap to restore team data from Excel</b></span></p>
+                            <p>You can export your teams data to Excel using the button on the left, and then restore it from backup here. This is handy in low or no network situations, where you may be unable to update changes to gatool Cloud. <i>Note: Be careful if you modify the Excel file and then import it here.</i></p>
+                        </Col>
+                    </Row>
+                </Table>
                 <Table responsive striped bordered size="sm" className={"teamTable"}>
                     <thead className="thead-default">
                         <tr>
@@ -195,7 +377,22 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                     </tbody>
                 </Table>
                 <Button variant="success" size="sm" onClick={(e) => { clearVisits(false, e) }}>Reset visit times. Use at the start of each day.</Button><br /><br /><br />
-            </div>}
+            </div></>}
+            <Modal centered={true} show={showDownload} onHide={handleCloseDownload}>
+                <Modal.Header className={"success"} closeButton>
+                    <Modal.Title >Download Team Info Sheets</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>You are about to download a Word Docx which contains all of the team data we know about the teams. If you have loaded team data from gatool cloud, or if you have made local changes, those changes will be reflected on the sheets. <br /> If you would like us to personalize the sheets with your name as the Game Announcer, please enter it below:</p>
+                    <Form>
+                        <Form.Control type="text" onChange={(e) => updateGaForm(e.target.value)} />
+                    </Form>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="success" size="sm" onClick={handleSubmitDownload}>Download Info Sheets</Button>
+                </Modal.Footer>
+            </Modal>
+
             {updateTeam && <Modal centered={true} fullscreen={true} show={show} size="lg" onHide={handleClose}>
                 <Modal.Header className={"success"} closeButton>
                     <Modal.Title >Editing Team {updateTeam.teamNumber}'s Details</Modal.Title>

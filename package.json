@@ -8,9 +8,12 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "bootstrap": "^5.2.2",
+    "docxtemplater": "^3.34.1",
+    "file-saver": "^2.0.5",
     "localforage": "^1.10.0",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
+    "pizzip": "^3.1.4",
     "react": "^18.2.0",
     "react-bootstrap": "^2.6.0",
     "react-bootstrap-icons": "^1.9.1",
@@ -21,7 +24,8 @@
     "react-select": "^5.6.1",
     "react-switch": "^7.0.0",
     "react-toastify": "^9.1.1",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.19.2/xlsx-0.19.2.tgz"
   },
   "scripts": {
     "start": "react-scripts --openssl-legacy-provider start",
