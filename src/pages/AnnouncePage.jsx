@@ -9,7 +9,7 @@ import TopButtons from "../components/TopButtons";
 
 const paleGreen = "rgba(144, 238, 144, 0.5)"
 
-function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, setCurrentMatch, playoffSchedule, setPlayoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, getSchedule, getRanks, awardsMenu, showNotes, showAwards, showSponsors, showMottoes, showChampsStats, timeFormat, eventHighScores, backupTeam, setBackupTeam, getWorldStats}) {
+function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, setCurrentMatch, playoffSchedule, setPlayoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, getSchedule, getRanks, awardsMenu, showNotes, showAwards, showSponsors, showMottoes, showChampsStats, timeFormat, eventHighScores, backupTeam, setBackupTeam, getWorldStats, nextMatch, previousMatch, setMatchFromMenu, enableScope, disableScope}) {
 
     function updateTeamDetails(station, matchDetails) {
         var team = {}
@@ -90,29 +90,8 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
         })
     }
 
-    function nextMatch() {
-        if (currentMatch < schedule.length) {
-            setCurrentMatch(currentMatch + 1);
-            getSchedule();
-            getRanks();
-            getWorldStats();
-        }
-    }
-    function previousMatch() {
-        if (currentMatch > 1) {
-            setCurrentMatch(currentMatch - 1);
-            getSchedule();
-            getRanks();
-            getWorldStats();
-        }
-    }
 
-    function setMatchFromMenu(e) {
-        setCurrentMatch(e.value);
-        getSchedule();
-        getRanks();
-        getWorldStats();
-    }
+    
 
 
     return (
@@ -128,7 +107,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
             </div>}
             {selectedEvent && teamList?.teams.length > 0 && schedule?.length > 0 &&
                 <Container fluid>
-                    <TopButtons previousMatch={previousMatch} nextMatch={nextMatch} currentMatch={currentMatch} matchMenu={matchMenu} setMatchFromMenu={setMatchFromMenu} selectedEvent={selectedEvent} matchDetails={matchDetails} timeFormat={timeFormat} inPlayoffs={inPlayoffs} alliances={alliances} setAlliances={setAlliances} rankings={rankings} backupTeam={backupTeam} setBackupTeam={setBackupTeam} />
+                    <TopButtons previousMatch={previousMatch} nextMatch={nextMatch} currentMatch={currentMatch} matchMenu={matchMenu} setMatchFromMenu={setMatchFromMenu} selectedEvent={selectedEvent} matchDetails={matchDetails} timeFormat={timeFormat} inPlayoffs={inPlayoffs} alliances={alliances} setAlliances={setAlliances} rankings={rankings} backupTeam={backupTeam} setBackupTeam={setBackupTeam} enableScope={enableScope} disableScope={disableScope}/>
                     <table className={"table table-responsive"}>
                         <tbody>
                             {displayOrder.map((station) => {

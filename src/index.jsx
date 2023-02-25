@@ -16,7 +16,7 @@ import { HotkeysProvider } from 'react-hotkeys-hook'
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <HotkeysProvider>
+    <HotkeysProvider initialScopes={['navActive']}>
       <OnlineStatusProvider>
         <Auth0Provider
           domain="auth.gatool.org"

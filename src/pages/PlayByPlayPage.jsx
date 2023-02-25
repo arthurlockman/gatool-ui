@@ -9,7 +9,7 @@ import TopButtons from "../components/TopButtons";
 const paleGreen = "rgba(144, 238, 144, 0.5)"
 
 
-function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, setCurrentMatch, playoffSchedule, setPlayoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, getSchedule, getRanks, showNotes, showMottoes, showQualsStats, swapScreen, timeFormat, eventHighScores, backupTeam, setBackupTeam, getWorldStats}) {
+function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, setCurrentMatch, playoffSchedule, setPlayoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, getSchedule, getRanks, showNotes, showMottoes, showQualsStats, swapScreen, timeFormat, eventHighScores, backupTeam, setBackupTeam, getWorldStats, nextMatch, previousMatch, setMatchFromMenu, enableScope, disableScope}) {
     var displayOrder = ["Blue1", "Red3", "Blue2", "Red2", "Blue3", "Red1", "Blue4", "Red4"];
     if (swapScreen===true) {displayOrder = ["Red3", "Blue1", "Red2", "Blue2", "Red1", "Blue3", "Red4", "Blue4"]}
 
@@ -111,30 +111,6 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
         })
     }
 
-    function nextMatch() {
-        if (currentMatch < schedule.length) {
-            setCurrentMatch(currentMatch + 1);
-            getSchedule();
-            getRanks();
-            getWorldStats();
-        }
-    }
-    function previousMatch() {
-        if (currentMatch > 1) {
-            setCurrentMatch(currentMatch - 1);
-            getSchedule();
-            getRanks();
-            getWorldStats();
-        }
-    }
-
-    function setMatchFromMenu(e) {
-        setCurrentMatch(e.value);
-        getSchedule();
-        getRanks();
-        getWorldStats();
-    }
-
     return (
 
         <Container fluid>
@@ -149,7 +125,7 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
             </div>}
             {selectedEvent && teamList?.teams.length > 0 && schedule?.length > 0 &&
                 <Container fluid>
-                    <TopButtons previousMatch={previousMatch} nextMatch={nextMatch} currentMatch={currentMatch} matchMenu={matchMenu} setMatchFromMenu={setMatchFromMenu} selectedEvent={selectedEvent} matchDetails={matchDetails} timeFormat={timeFormat} inPlayoffs={inPlayoffs} alliances={alliances} setAlliances={setAlliances} rankings={rankings} backupTeam={backupTeam} setBackupTeam={setBackupTeam} />
+                    <TopButtons previousMatch={previousMatch} nextMatch={nextMatch} currentMatch={currentMatch} matchMenu={matchMenu} setMatchFromMenu={setMatchFromMenu} selectedEvent={selectedEvent} matchDetails={matchDetails} timeFormat={timeFormat} inPlayoffs={inPlayoffs} alliances={alliances} setAlliances={setAlliances} rankings={rankings} backupTeam={backupTeam} setBackupTeam={setBackupTeam} enableScope={enableScope} disableScope={disableScope}/>
                     <table >
                         <tbody>
                             <tr className={"gatool-playbyplay"}>

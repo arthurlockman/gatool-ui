@@ -5,13 +5,16 @@ import Select from "react-select";
 import MatchClock from "../components/MatchClock";
 import _ from "lodash";
 
-function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatchFromMenu, selectedEvent, matchDetails, timeFormat, alliances, setAlliances, rankings, inPlayoffs, backupTeam, setBackupTeam}) {
+
+function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatchFromMenu, selectedEvent, matchDetails, timeFormat, alliances, setAlliances, rankings, inPlayoffs, backupTeam, setBackupTeam, enableScope, disableScope}) {
 
     const [show, setShow] = useState(null);
     const [teamSelected, setTeamSelected] = useState(null);
     const [confirmSelection, setConfirmSelection] = useState(false);
+    
 
     function handleShow() {
+        disableScope("navActive");
         setShow(true);
     }
 
@@ -19,6 +22,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
         setShow(false);
         setTeamSelected(null);
         setConfirmSelection(false);
+        enableScope("navActive");
     }
 
     function teamToReplace(team) {
@@ -52,6 +56,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
         setBackupTeam(null);
         setTeamSelected(null);
         setConfirmSelection(false);
+        enableScope("navActive");
     }
 
     var allianceMembers = Object.keys(alliances?.Lookup);
