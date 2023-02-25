@@ -5,40 +5,40 @@ import Select from "react-select";
 import MatchClock from "../components/MatchClock";
 import _ from "lodash";
 
-function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatchFromMenu, selectedEvent, matchDetails, timeFormat, alliances, setAlliances, rankings, inPlayoffs, backupTeam, setBackupTeam}) {
+function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatchFromMenu, selectedEvent, matchDetails, timeFormat, alliances, setAlliances, rankings, inPlayoffs, backupTeam, setBackupTeam }) {
 
     const [show, setShow] = useState(null);
     const [teamSelected, setTeamSelected] = useState(null);
     const [confirmSelection, setConfirmSelection] = useState(false);
 
-    function handleShow() {
+    const handleShow = () => {
         setShow(true);
     }
 
-    function handleClose() {
+    const handleClose = () => {
         setShow(false);
         setTeamSelected(null);
         setConfirmSelection(false);
     }
 
-    function teamToReplace(team) {
+    const teamToReplace = (/** @type {object} */ team) => {
         setTeamSelected(team);
         setConfirmSelection(false);
     }
 
-    function handleBackupSelect(team) {
+    const handleBackupSelect = (/** @type {object} */ team) => {
         setBackupTeam({ "backup": team.value, "replacing": teamSelected.teamNumber });
         setConfirmSelection(true);
     }
 
-    function handleBackupConfirm() {
+    const handleBackupConfirm = () => {
         //do the temporary work on the Allianes and team list
 
         //patch alliance
         var alliancesTemp = _.cloneDeep(alliances);
         var allianceToPatch = alliancesTemp?.Lookup[`${backupTeam?.replacing}`];
-        alliancesTemp.alliances[_.findIndex(alliancesTemp?.alliances,{"name":allianceToPatch?.alliance})].backup=backupTeam?.backup?.teamNumber;
-        alliancesTemp.alliances[_.findIndex(alliancesTemp?.alliances,{"name":allianceToPatch?.alliance})].backupReplaced=backupTeam?.replacing;
+        alliancesTemp.alliances[_.findIndex(alliancesTemp?.alliances, { "name": allianceToPatch?.alliance })].backup = backupTeam?.backup?.teamNumber;
+        alliancesTemp.alliances[_.findIndex(alliancesTemp?.alliances, { "name": allianceToPatch?.alliance })].backupReplaced = backupTeam?.replacing;
         setAlliances(alliancesTemp);
 
         // patch schedule
@@ -74,7 +74,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
                         };
                     },
                 }} /></Col>
-                {inPlayoffs && <Col className="promoteBackup" xs={1} onClick={handleShow}>+<ArrowUpSquareFill/>+<br />backup</Col>}
+                {inPlayoffs && <Col className="promoteBackup" xs={1} onClick={handleShow}>+<ArrowUpSquareFill />+<br />backup</Col>}
                 <Col xs={"2"} lg={"3"}><Button size="lg" variant="outline-success" className={"gatool-button buttonNoWrap"} onClick={nextMatch}><span className={"d-none d-lg-block"}>Next Match <CaretRightFill /></span><span className={"d-block d-lg-none"}><CaretRightFill /> <CaretRightFill /></span></Button></Col>
                 <Modal centered={true} show={show} onHide={handleClose}>
                     <Modal.Header className={"promoteBackup"} closeButton closeVariant="white">
@@ -91,11 +91,11 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
                                     })}
                                 </Row></>}
 
-                                {teamSelected && !confirmSelection && <><Row><Col>Select a team from the backup teams to replace team {teamSelected?.teamNumber} with team </Col></Row>
+                            {teamSelected && !confirmSelection && <><Row><Col>Select a team from the backup teams to replace team {teamSelected?.teamNumber} with team </Col></Row>
                                 <Row> <Col><Select options={availableTeams} onChange={handleBackupSelect} /></Col>
                                 </Row></>}
 
-                                {teamSelected && confirmSelection && <><Row><Col>Are you sure you want to replace team {teamSelected?.teamNumber} with {backupTeam?.backup?.teamNumber}?</Col></Row>
+                            {teamSelected && confirmSelection && <><Row><Col>Are you sure you want to replace team {teamSelected?.teamNumber} with {backupTeam?.backup?.teamNumber}?</Col></Row>
                                 <Row> <Col><Button onClick={handleBackupConfirm}>Yes</Button></Col>
                                 </Row></>}
 
