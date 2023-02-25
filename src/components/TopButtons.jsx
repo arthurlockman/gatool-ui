@@ -4,21 +4,25 @@ import { ArrowUpSquareFill, CaretLeftFill, CaretRightFill } from "react-bootstra
 import Select from "react-select";
 import MatchClock from "../components/MatchClock";
 import _ from "lodash";
+import { useHotkeysContext } from "react-hotkeys-hook";
 
 function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatchFromMenu, selectedEvent, matchDetails, timeFormat, alliances, setAlliances, rankings, inPlayoffs, backupTeam, setBackupTeam }) {
 
     const [show, setShow] = useState(null);
     const [teamSelected, setTeamSelected] = useState(null);
     const [confirmSelection, setConfirmSelection] = useState(false);
+    const { disableScope, enableScope } = useHotkeysContext()
 
     const handleShow = () => {
         setShow(true);
+        disableScope('matchNavigation')
     }
 
     const handleClose = () => {
         setShow(false);
         setTeamSelected(null);
         setConfirmSelection(false);
+        enableScope('matchNavigation')
     }
 
     const teamToReplace = (/** @type {object} */ team) => {

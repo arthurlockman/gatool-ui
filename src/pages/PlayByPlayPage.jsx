@@ -5,13 +5,14 @@ import { rankHighlight } from "../components/HelperFunctions";
 import PlayByPlay from "../components/PlayByPlay";
 import BottomButtons from "../components/BottomButtons";
 import TopButtons from "../components/TopButtons";
+import { useHotkeys } from "react-hotkeys-hook";
 
 const paleGreen = "rgba(144, 238, 144, 0.5)"
 
 
-function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, setCurrentMatch, playoffSchedule, setPlayoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, getSchedule, getRanks, showNotes, showMottoes, showQualsStats, swapScreen, timeFormat, eventHighScores, backupTeam, setBackupTeam, getWorldStats}) {
+function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, setCurrentMatch, playoffSchedule, setPlayoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, getSchedule, getRanks, showNotes, showMottoes, showQualsStats, swapScreen, timeFormat, eventHighScores, backupTeam, setBackupTeam, getWorldStats, nextMatch, previousMatch, setMatchFromMenu }) {
     var displayOrder = ["Blue1", "Red3", "Blue2", "Red2", "Blue3", "Red1", "Blue4", "Red4"];
-    if (swapScreen===true) {displayOrder = ["Red3", "Blue1", "Red2", "Blue2", "Red1", "Blue3", "Red4", "Blue4"]}
+    if (swapScreen === true) { displayOrder = ["Red3", "Blue1", "Red2", "Blue2", "Red1", "Blue3", "Red4", "Blue4"] }
 
     function updateTeamDetails(station, matchDetails) {
         var team = {}
@@ -111,34 +112,13 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
         })
     }
 
-    function nextMatch() {
-        if (currentMatch < schedule.length) {
-            setCurrentMatch(currentMatch + 1);
-            getSchedule();
-            getRanks();
-            getWorldStats();
-        }
-    }
-    function previousMatch() {
-        if (currentMatch > 1) {
-            setCurrentMatch(currentMatch - 1);
-            getSchedule();
-            getRanks();
-            getWorldStats();
-        }
-    }
-
-    function setMatchFromMenu(e) {
-        setCurrentMatch(e.value);
-        getSchedule();
-        getRanks();
-        getWorldStats();
-    }
+    useHotkeys('right', () => nextMatch(), { scopes: 'matchNavigation' });
+    useHotkeys('left', () => previousMatch(), { scopes: 'matchNavigation' });
 
     return (
 
         <Container fluid>
-            {!selectedEvent &&  <div>
+            {!selectedEvent && <div>
                 <Alert variant="warning" >You need to select an event before you can see anything here.</Alert>
             </div>}
             {selectedEvent && (!teamList || teamList?.teams.length === 0) && <div>
@@ -171,7 +151,7 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
                                 </tr>}
                         </tbody>
                     </table>
-                    <BottomButtons previousMatch={previousMatch} nextMatch={nextMatch} matchDetails={matchDetails} playoffSchedule={playoffSchedule}  eventHighScores={eventHighScores}/>
+                    <BottomButtons previousMatch={previousMatch} nextMatch={nextMatch} matchDetails={matchDetails} playoffSchedule={playoffSchedule} eventHighScores={eventHighScores} />
                 </Container>}
         </Container>
     )

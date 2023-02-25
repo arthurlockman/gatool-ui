@@ -5,11 +5,12 @@ import _ from "lodash";
 import { rankHighlight } from "../components/HelperFunctions";
 import BottomButtons from "../components/BottomButtons";
 import TopButtons from "../components/TopButtons";
+import { useHotkeys } from "react-hotkeys-hook";
 
 
 const paleGreen = "rgba(144, 238, 144, 0.5)"
 
-function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, setCurrentMatch, playoffSchedule, setPlayoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, getSchedule, getRanks, awardsMenu, showNotes, showAwards, showSponsors, showMottoes, showChampsStats, timeFormat, eventHighScores, backupTeam, setBackupTeam, getWorldStats}) {
+function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, setCurrentMatch, playoffSchedule, setPlayoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, getSchedule, getRanks, awardsMenu, showNotes, showAwards, showSponsors, showMottoes, showChampsStats, timeFormat, eventHighScores, backupTeam, setBackupTeam, getWorldStats, nextMatch, previousMatch, setMatchFromMenu}) {
 
     function updateTeamDetails(station, matchDetails) {
         var team = {}
@@ -89,31 +90,9 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
             teamDetails[station] = updateTeamDetails(station, matchDetails)
         })
     }
-
-    function nextMatch() {
-        if (currentMatch < schedule.length) {
-            setCurrentMatch(currentMatch + 1);
-            getSchedule();
-            getRanks();
-            getWorldStats();
-        }
-    }
-    function previousMatch() {
-        if (currentMatch > 1) {
-            setCurrentMatch(currentMatch - 1);
-            getSchedule();
-            getRanks();
-            getWorldStats();
-        }
-    }
-
-    function setMatchFromMenu(e) {
-        setCurrentMatch(e.value);
-        getSchedule();
-        getRanks();
-        getWorldStats();
-    }
-
+    
+    useHotkeys('right', () => nextMatch(), { scopes: 'matchNavigation'} )
+    useHotkeys('left', () => previousMatch(), { scopes: 'matchNavigation'} )
 
     return (
         <Container fluid >

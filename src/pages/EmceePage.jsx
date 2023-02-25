@@ -1,11 +1,9 @@
 import { Alert, Col, Container, Row } from "react-bootstrap";
 import _ from "lodash";
 import { ArrowRight } from "react-bootstrap-icons";
+import { useHotkeys } from "react-hotkeys-hook";
 
-
-
-
-function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, currentMatch }) {
+function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, currentMatch, nextMatch, previousMatch }) {
     const matchClasses = [
         { "matchNumber": 1, "red": { "class": "success", "from": null }, "blue": { "class": "success", "from": null }, "winnerTo": 7, "loserTo": 5 },
         { "matchNumber": 2, "red": { "class": "success", "from": null }, "blue": { "class": "success", "from": null }, "winnerTo": 7, "loserTo": 5 },
@@ -68,6 +66,9 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
         })
     })
 
+    useHotkeys('right', () => nextMatch(), { scopes: 'matchNavigation' });
+    useHotkeys('left', () => previousMatch(), { scopes: 'matchNavigation' });
+
     return (
         <Container fluid>
             {!selectedEvent && <div>
@@ -82,26 +83,26 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
             {selectedEvent && (schedule?.length > 0) && inPlayoffs &&
                 <Container fluid>
                     <Row>
-                        {(playoffMatchNumber<=13) && <Col xs={2} className={"davidPriceDetail redAllianceTeam"}>
-                        {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.red.from ? _.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.red.from : ""}
+                        {(playoffMatchNumber <= 13) && <Col xs={2} className={"davidPriceDetail redAllianceTeam"}>
+                            {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.red.from ? _.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.red.from : ""}
                         </Col>}
-                        <Col xs={(playoffMatchNumber>13) ? 6 : 4} className={`redAllianceTeam`}>
+                        <Col xs={(playoffMatchNumber > 13) ? 6 : 4} className={`redAllianceTeam`}>
                             <div className={"davidPrice"}>{allianceName(schedule[currentMatch - 1].matchNumber, "red").replace("Alliance ", "")}</div>
                         </Col>
-                        <Col xs={(playoffMatchNumber>13) ? 6 : 4} className={`blueAllianceTeam`}>
+                        <Col xs={(playoffMatchNumber > 13) ? 6 : 4} className={`blueAllianceTeam`}>
                             <div className={"davidPrice"}>{allianceName(schedule[currentMatch - 1].matchNumber, "blue").replace("Alliance ", "")}</div>
                         </Col>
-                        {(playoffMatchNumber<=13) && <Col xs={2} className={"davidPriceDetail blueAllianceTeam"}>
-                        {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.blue.from ? _.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.blue.from : ""}
+                        {(playoffMatchNumber <= 13) && <Col xs={2} className={"davidPriceDetail blueAllianceTeam"}>
+                            {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.blue.from ? _.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.blue.from : ""}
                         </Col>}
                     </Row>
                     <Row>
                         <Col xs={12} className={"davidPriceDetail"}>
-                            {(playoffMatchNumber<=13) && <>Winner <ArrowRight /> {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.winnerTo<=13 ? `M${_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.winnerTo}`:"Finals"}<br />
-                            Losing Alliance {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.loserTo ? <><ArrowRight /> M{_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.loserTo} </> : " eliminated"} </>}
-                            {(playoffMatchNumber===14) && <>FINALS MATCH 1</>}
-                            {(playoffMatchNumber===15) && <span className={`${matches[_.findIndex(matches, {"matchNumber":playoffMatchNumber-1})]?.winner.winner}AllianceTeam`}>FINALS MATCH 2<br />ADVANTAGE {_.matches[_.findIndex(matches, {"matchNumber":playoffMatchNumber-1})]?.winner.tieWinner ? `${_.upperCase(matches[_.findIndex(matches, {"matchNumber":playoffMatchNumber-1})]?.winner.tieWinner)} (L${matches[_.findIndex(matches, {"matchNumber":playoffMatchNumber-1})]?.winner.level})`:_.upperCase(matches[_.findIndex(matches, {"matchNumber":playoffMatchNumber-1})]?.winner.winner)}</span>}
-                            {(playoffMatchNumber===16) && <span className={"tieAllianceTeam"}>FINALS TIEBREAKER</span>}
+                            {(playoffMatchNumber <= 13) && <>Winner <ArrowRight /> {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.winnerTo <= 13 ? `M${_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.winnerTo}` : "Finals"}<br />
+                                Losing Alliance {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.loserTo ? <><ArrowRight /> M{_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.loserTo} </> : " eliminated"} </>}
+                            {(playoffMatchNumber === 14) && <>FINALS MATCH 1</>}
+                            {(playoffMatchNumber === 15) && <span className={`${matches[_.findIndex(matches, { "matchNumber": playoffMatchNumber - 1 })]?.winner.winner}AllianceTeam`}>FINALS MATCH 2<br />ADVANTAGE {_.matches[_.findIndex(matches, { "matchNumber": playoffMatchNumber - 1 })]?.winner.tieWinner ? `${_.upperCase(matches[_.findIndex(matches, { "matchNumber": playoffMatchNumber - 1 })]?.winner.tieWinner)} (L${matches[_.findIndex(matches, { "matchNumber": playoffMatchNumber - 1 })]?.winner.level})` : _.upperCase(matches[_.findIndex(matches, { "matchNumber": playoffMatchNumber - 1 })]?.winner.winner)}</span>}
+                            {(playoffMatchNumber === 16) && <span className={"tieAllianceTeam"}>FINALS TIEBREAKER</span>}
                         </Col>
                     </Row>
 
