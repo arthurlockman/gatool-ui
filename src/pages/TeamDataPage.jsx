@@ -306,10 +306,12 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         );
     }
 
+    // This function clicks the hidden file upload button
     function clickRestoreBackup() {
         document.getElementById("BackupFiles").click();
     }
 
+    // This function clears the file input by removing and recreating the file input button
     function clearFileInput(id) {
         var oldInput = document.getElementById(id);
         var newInput = document.createElement("input");
@@ -321,6 +323,9 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         oldInput.parentNode.replaceChild(newInput, oldInput)
     }
 
+    // This function reads an uploaded Excel file and updates team data based on the 
+    // Excel file's content. The file must have been previously exported from gatool.
+    // It will only update data that Game Announcers control in the Team Data page.
     function handleRestoreBackup(e) {
         var files = e.target.files;
         var i, f;
@@ -334,35 +339,41 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                 workbook = read(data, { type: 'array' });
                 var worksheet = workbook.Sheets[workbook.SheetNames[0]];
                 var teams = utils.sheet_to_json(worksheet);
-                teams.forEach((team) => {
-                    var update = {}
-                    var keys = Object.keys(team);
-                    update.teamNumber = team.teamNumber;
-                    update.updates = {};
-                    keys.forEach((key) => {
-                        if (key.includes("Local")) {
-                            update.updates[key] = team[key];
+                if (!_.isUndefined(teams[0].teamNumber)) {
+                    teams.forEach((team) => {
+                        var update = {}
+                        var keys = Object.keys(team);
+                        update.teamNumber = team.teamNumber;
+                        update.updates = {};
+                        keys.forEach((key) => {
+                            if (key.includes("Local")) {
+                                update.updates[key] = team[key];
+                                update.updates.lastUpdate = moment().format();
+                            }
+                        })
+                        if (!_.isUndefined(team["showRobotName"])) {
+                            update.updates["showRobotName"] = team["showRobotName"];
                             update.updates.lastUpdate = moment().format();
-                        }
+                        };
+                        if (!_.isUndefined(team["teamNotes"])) {
+                            update.updates["teamNotes"] = team["teamNotes"];
+                            update.updates.lastUpdate = moment().format();
+                        };
+                        if (!_.isUndefined(team["sayNumber"])) {
+                            update.updates["sayNumber"] = team["sayNumber"];
+                            update.updates.lastUpdate = moment().format();
+                        };
+                        communityUpdatesTemp[_.findIndex(communityUpdatesTemp, { "teamNumber": team.teamNumber })] = update;
                     })
-                    if (!_.isUndefined(team["showRobotName"])) {
-                        update.updates["showRobotName"] = team["showRobotName"];
-                        update.updates.lastUpdate = moment().format();
-                    };
-                    if (!_.isUndefined(team["teamNotes"])) {
-                        update.updates["teamNotes"] = team["teamNotes"];
-                        update.updates.lastUpdate = moment().format();
-                    };
-                    if (!_.isUndefined(team["sayNumber"])) {
-                        update.updates["sayNumber"] = team["sayNumber"];
-                        update.updates.lastUpdate = moment().format();
-                    };
-                    communityUpdatesTemp[_.findIndex(communityUpdatesTemp, { "teamNumber": team.teamNumber })] = update;
-                })
-                setCommunityUpdates(communityUpdatesTemp);
-                toast.success(`Your have successfully loaded updates for this event from Excel.`)
-                clearFileInput("BackupFiles");
-                document.getElementById("BackupFiles").addEventListener('change', handleRestoreBackup);
+                    setCommunityUpdates(communityUpdatesTemp);
+                    toast.success(`Your have successfully loaded updates for this event from Excel. Please check each team's details to ensure your changes were recorded properly.`)
+                    clearFileInput("BackupFiles");
+                    document.getElementById("BackupFiles").addEventListener('change', handleRestoreBackup);
+                } else {
+                    toast.error(`Your Excel file is malformed. Please download the Teams Table to Excel, compare your headers, and try again.`);
+                    clearFileInput("BackupFiles");
+                    document.getElementById("BackupFiles").addEventListener('change', handleRestoreBackup);
+                }
 
             };
             reader.readAsArrayBuffer(f);
