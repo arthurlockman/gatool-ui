@@ -1,7 +1,6 @@
 import { Form } from "react-bootstrap"
 
 const FormField = ({ updateTeam, formValue, setFormValue, formDetails }) => {
-    var property = formDetails.property + "Local";
 
     const updateForm = (prop,value) => {
         var update = formValue;

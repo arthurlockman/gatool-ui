@@ -44,8 +44,8 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
 
     const [show, setShow] = useState(false);
     const [showDownload, setShowDownload] = useState(false);
-    const [updateTeam, setUpdateTeam] = useState({});
-    const [formValue, setFormValue] = useState({});
+    const [updateTeam, setUpdateTeam] = useState(null);
+    const [formValue, setFormValue] = useState(null);
     const [gaName, setGaName] = useState("");
 
     const handleClose = () => {
@@ -191,6 +191,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
             return (record);
         })
 
+        // @ts-ignore
         var ws = utils.json_to_sheet(data, { cellHTML: "true" });
         utils.book_append_sheet(workbook, ws, "Team Table");
 
@@ -219,6 +220,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
             data2.push(record);
         })
 
+        // @ts-ignore
         ws = utils.json_to_sheet(data2, { cellHTML: "true" });
         utils.book_append_sheet(workbook, ws, "Schedule");
 
@@ -317,13 +319,14 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         var newInput = document.createElement("input");
         newInput.type = "file";
         newInput.id = oldInput.id;
+        // @ts-ignore
         newInput.name = oldInput.name;
         newInput.className = oldInput.className;
         newInput.style.cssText = oldInput.style.cssText;
         oldInput.parentNode.replaceChild(newInput, oldInput)
     }
 
-    // This function reads an uploaded Excel file and updates team data based on the 
+    // This function reads an uploaded Excel file and updates team data based on the
     // Excel file's content. The file must have been previously exported from gatool.
     // It will only update data that Game Announcers control in the Team Data page.
     function handleRestoreBackup(e) {
@@ -334,6 +337,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
             var reader = new FileReader();
             reader.onload = function (e) {
                 var communityUpdatesTemp = _.cloneDeep(communityUpdates);
+                // @ts-ignore
                 var data = new Uint8Array(e.target.result);
                 var workbook;
                 workbook = read(data, { type: 'array' });

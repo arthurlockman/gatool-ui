@@ -176,7 +176,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                 <Alert variant="warning" >You need to select an event before you can see anything here.</Alert>
             </div>}
             {selectedEvent && <div>
-                <Row><Button size="large" onClick={getSchedule} variant="outline-success" disabled={!isOnline}><b><ArrowClockwise /> Tap to refresh Schedule.</b> <br />Use after Alliance Selection to load Playoffs.</Button></Row>
+                <Row><Button size="lg" onClick={getSchedule} variant="outline-success" disabled={!isOnline}><b><ArrowClockwise /> Tap to refresh Schedule.</b> <br />Use after Alliance Selection to load Playoffs.</Button></Row>
                 <br />
                 <h4>{selectedEvent.label}</h4>
                 <Row className="leftTable">
@@ -185,7 +185,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                         {!selectedEvent?.value.type.includes("OffSeason") && <p><b>Event Week: </b>{selectedEvent?.value.weekNumber}</p>}
                         {selectedEvent?.value.type === "Regional" && <p><b>Regional Event</b></p>}
                         {selectedEvent?.value.type === "OffSeasonWithAzureSync" && <p><b>FMS Registered Offseason Event</b></p>}
-                        {!selectedEvent?.value.type === "OffSeason" && <p><b>Offseason Event not registered with FMS</b></p>}
+                        {!(selectedEvent?.value.type === "OffSeason") && <p><b>Offseason Event not registered with FMS</b></p>}
                         {selectedEvent?.value.districtCode && <p><b>District Code: </b>{selectedEvent?.value.districtCode}</p>}
                         {selectedEvent?.value.type === "ChampionshipDivision" && <p><b>Championship Division</b></p>}
                         {selectedEvent?.value.type === "ChampionshipSubdivision" && <p><b>Championship Subdivision</b></p>}

@@ -29,7 +29,7 @@ function BottomButtons({ previousMatch, nextMatch, matchDetails, playoffSchedule
         <>
             <Row style={{ "paddingTop": "10px" }}>
                 <Col xs={"2"} lg={"3"}>
-                    <Button size="large" variant="outline-success" className={"gatool-button buttonNoWrap"} onClick={previousMatch}><span className={"d-none d-lg-block"}><CaretLeftFill /> Previous Match</span><span className={"d-block d-lg-none"}><CaretLeftFill /> <CaretLeftFill /></span></Button>
+                    <Button size="lg" variant="outline-success" className={"gatool-button buttonNoWrap"} onClick={previousMatch}><span className={"d-none d-lg-block"}><CaretLeftFill /> Previous Match</span><span className={"d-block d-lg-none"}><CaretLeftFill /> <CaretLeftFill /></span></Button>
                 </Col>
                 {matchDetails?.tournamentLevel === "Playoff" && <Col xs={"5"} lg={"4"} className={"playoffDetails"}>
                     {(matchDetails.matchNumber <= 13) && <>Winner <ArrowRight /> {_.filter(matchClasses, { "matchNumber": matchDetails.matchNumber })[0]?.winnerTo <= 13 ? `Match ${_.filter(matchClasses, { "matchNumber": matchDetails.matchNumber })[0]?.winnerTo}` : "Finals"}<br />
@@ -50,7 +50,7 @@ function BottomButtons({ previousMatch, nextMatch, matchDetails, playoffSchedule
                 {matchDetails?.tournamentLevel !== "Playoff" && !eventHighScore && <Col xs={"8"} lg={"6"}><h4>{matchDetails.description}</h4></Col>}
 
                 <Col xs={"2"} lg={"3"}>
-                    <Button size="large" variant="outline-success" className={"gatool-button buttonNoWrap"} onClick={nextMatch}><span className={"d-none d-lg-block"}>Next Match <CaretRightFill /></span><span className={"d-block d-lg-none"}><CaretRightFill /> <CaretRightFill /></span></Button>
+                    <Button size="lg" variant="outline-success" className={"gatool-button buttonNoWrap"} onClick={nextMatch}><span className={"d-none d-lg-block"}>Next Match <CaretRightFill /></span><span className={"d-block d-lg-none"}><CaretRightFill /> <CaretRightFill /></span></Button>
                 </Col>
             </Row>
             <Row> <br /><br /><br /></Row>

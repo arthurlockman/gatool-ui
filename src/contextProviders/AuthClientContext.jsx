@@ -99,6 +99,7 @@ function AuthClientContextProvider({ children }) {
     useEffect(() => {
         client.setOnlineStatus(isOnline)
     }, [isOnline, client])
+    // @ts-ignore
     return <AuthClientContext.Provider value={[client, operationsInProgress]}>{children}</AuthClientContext.Provider>
 }
 

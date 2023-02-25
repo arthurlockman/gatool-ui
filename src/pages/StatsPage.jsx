@@ -13,14 +13,14 @@ function StatsPage({ worldStats, selectedEvent, eventHighScores }) {
             {selectedEvent && !worldStats && <div>
                 <Alert variant="warning" ><Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div>Awaiting stats data for {selectedEvent.label}</Alert></Alert>
             </div>}
-            {selectedEvent && worldStats && 
+            {selectedEvent && worldStats &&
                 <Container fluid>
                     <Row>
                         <Col xs={"12"} sm={"6"}>
                             <table className="table table-condensed gatool-worldHighScores">
                                 <thead>
                                     <tr>
-                                        <td colSpan={"2"}>World High Scores {worldStats?.year}</td>
+                                        <td colSpan={2}>World High Scores {worldStats?.year}</td>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -43,7 +43,7 @@ function StatsPage({ worldStats, selectedEvent, eventHighScores }) {
                             <table className="table table-condensed gatool-eventHighScores">
                                 <thead>
                                     <tr>
-                                        <td colSpan={"2"}>Event High Scores: {selectedEvent.label}</td>
+                                        <td colSpan={2}>Event High Scores: {selectedEvent.label}</td>
                                     </tr>
                                 </thead>
                                 <tbody>

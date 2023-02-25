@@ -42,7 +42,7 @@ function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates })
     }
 
     const [show, setShow] = useState(false);
-    const [awardTeam, setAwardTeam] = useState(false);
+    const [awardTeam, setAwardTeam] = useState(null);
 
     const handleClose = () => {
         setAwardTeam(null);
@@ -70,7 +70,7 @@ function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates })
                     <Row key={selectedEvent.label}>{columns.map((column, index) => {
                         return (<Col xs="2" key={index}>
                             {column.map((team) => {
-                                return (<Row className={"awardsButton"} key={team.teamNumber} ><Button value={JSON.stringify(team)} onClick={handleShow} size="medium" variant="outline-success">{team.teamNumber}</Button></Row>)
+                                return (<Row className={"awardsButton"} key={team.teamNumber} ><Button value={JSON.stringify(team)} onClick={handleShow} size="sm" variant="outline-success">{team.teamNumber}</Button></Row>)
                             })}
                         </Col>)
                     })}

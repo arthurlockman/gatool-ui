@@ -10,6 +10,7 @@ const AuthWidget = () => {
   const [showSpinner, setShowSpinner] = useState(false);
 
   useEffect(() => {
+    // @ts-ignore
     setShowSpinner(operationsInProgress || isLoading);
   }, [operationsInProgress, isLoading])
 

@@ -6,7 +6,7 @@ import { HandThumbsDownFill, HandThumbsUpFill, TrophyFill } from "react-bootstra
 function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays }) {
 
     const [show, setShow] = useState(false);
-    const [allianceTeam, setAllianceTeam] = useState(false);
+    const [allianceTeam, setAllianceTeam] = useState(null);
     const [allianceMode, setAllianceMode] = useState(null);
     const [teamFilter, setTeamFilter] = useState("");
 
@@ -137,6 +137,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
     const handleFilterSelect = (e) => {
         e.preventDefault();
         var team = _.filter(asArrays.availableTeams, { 'teamNumber': Number(e.currentTarget[0].value) })[0];
+        // @ts-ignore
         document.getElementById("filterControl").value = "";
         setTeamFilter("");
         setAllianceTeam(team);
@@ -146,6 +147,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
     }
 
     const handleReset = () => {
+        // @ts-ignore
         document.getElementById("filterControl").value = "";
         setTeamFilter("");
         setAllianceSelectionArrays({});
@@ -153,7 +155,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
 
     var availColumns = [[], [], [], [], []];
     var backupTeams = [];
-    var alliances = {};
+    var alliances = null;
 
 
 
@@ -329,7 +331,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                         <table className="availableTeams">
                                             <tbody>
                                                 <tr key={"titleRow"}>
-                                                    <td colSpan={"5"} key={"Title"} ><strong>Teams for Alliance Selection</strong></td>
+                                                    <td colSpan={5} key={"Title"} ><strong>Teams for Alliance Selection</strong></td>
                                                 </tr>
                                                 <tr key={"AvailableTeams"}>
                                                     {availColumns.map((column, index) => {

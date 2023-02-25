@@ -4,6 +4,7 @@ import { Button } from "react-bootstrap";
 
 const LoginButton = ({ size = "sm", block = false }) => {
   const { loginWithRedirect } = useAuth0();
+  // @ts-ignore
   const loginButton = <Button size={size} onClick={() => loginWithRedirect()}>Log In</Button>;
   return <>
     {block ? <div className="d-grid gap-2">

@@ -128,7 +128,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
             </div>}
             {selectedEvent && teamList?.teams.length > 0 && schedule?.length > 0 &&
                 <Container fluid>
-                    <TopButtons previousMatch={previousMatch} nextMatch={nextMatch} currentMatch={currentMatch} matchMenu={matchMenu} setMatchFromMenu={setMatchFromMenu} selectedEvent={selectedEvent} matchDetails={matchDetails} timeFormat={timeFormat} inPlayoffs={inPlayoffs} alliances={alliances} setAlliances={setAlliances} rankings={rankings} backupTeam={backupTeam} setBackupTeam={setBackupTeam} playoffSchedule={playoffSchedule} setPlayoffSchedule={setPlayoffSchedule} teamList={teamList} communityUpdates={communityUpdates}/>
+                    <TopButtons previousMatch={previousMatch} nextMatch={nextMatch} currentMatch={currentMatch} matchMenu={matchMenu} setMatchFromMenu={setMatchFromMenu} selectedEvent={selectedEvent} matchDetails={matchDetails} timeFormat={timeFormat} inPlayoffs={inPlayoffs} alliances={alliances} setAlliances={setAlliances} rankings={rankings} backupTeam={backupTeam} setBackupTeam={setBackupTeam} />
                     <table className={"table table-responsive"}>
                         <tbody>
                             {displayOrder.map((station) => {
