@@ -4,10 +4,13 @@ on:
   push:
     branches:
       - v2
+      - beta
+      - main
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
-      - v2
+      - main
+      - beta
 
 jobs:
   build_and_deploy_job:
@@ -31,6 +34,7 @@ jobs:
           api_location: "" # Api source code path - optional
           output_location: "build" # Built app content directory - optional
           app_build_command: "npm run build:ci"
+          production_branch: "main"
           ###### End of Repository/Build Configurations ######
 
   close_pull_request_job:
