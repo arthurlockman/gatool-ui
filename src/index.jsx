@@ -16,7 +16,8 @@ import { HotkeysProvider } from 'react-hotkeys-hook'
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <HotkeysProvider>
+  {/* see https://github.com/JohannesKlauss/react-hotkeys-hook/issues/854#issuecomment-1345235881 for why the 'none' scope is needed */}
+    <HotkeysProvider initiallyActiveScopes={['matchNavigation', 'none']}>
       <OnlineStatusProvider>
         <Auth0Provider
           domain="auth.gatool.org"

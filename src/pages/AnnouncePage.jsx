@@ -5,6 +5,7 @@ import _ from "lodash";
 import { rankHighlight } from "../components/HelperFunctions";
 import BottomButtons from "../components/BottomButtons";
 import TopButtons from "../components/TopButtons";
+import { useHotkeys } from "react-hotkeys-hook";
 
 
 const paleGreen = "rgba(144, 238, 144, 0.5)"
@@ -114,6 +115,8 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
         getWorldStats();
     }
 
+    useHotkeys('right', () => nextMatch(), { scopes: 'matchNavigation'} )
+    useHotkeys('left', () => previousMatch(), { scopes: 'matchNavigation'} )
 
     return (
         <Container fluid >
