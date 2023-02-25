@@ -1,0 +1,571 @@
+.App {
+	text-align: center;
+	font-size: 14px;
+}
+
+.App-logo {
+	height: 40vmin;
+	pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.App-logo {
+		animation: App-logo-spin infinite 20s linear;
+	}
+}
+
+.App-header {
+	background-color: #282c34;
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	font-size: calc(10px + 2vmin);
+	color: white;
+}
+
+.App-link {
+	color: #61dafb;
+}
+
+body {
+	font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+	line-height: normal;
+}
+
+th,
+td {
+	padding: 10px;
+}
+
+.red {
+	color: red;
+}
+
+.blue {
+	color: blue;
+}
+
+.bold {
+	font-weight: bold;
+}
+
+.centerTable {
+	vertical-align: middle;
+}
+
+.leftTable {
+	vertical-align: middle;
+	text-align: left;
+}
+
+.setupPageMenus {
+	background-color: rgb(227, 247, 255);
+	padding: 10px;
+	border-color: blue;
+	border-style: solid;
+	margin-bottom: 5px;
+}
+
+.setupPageFilters {
+	background-color: rgb(231, 255, 227);
+	padding: 10px;
+	border-color: rgb(107, 221, 0);
+	border-style: solid;
+	margin-bottom: 10px;
+}
+
+.switchLabel {
+	display: table-cell;
+	height: 25px;
+	vertical-align: middle;
+}
+
+.gatool-button {
+	font-size: 20px;
+	font-weight: bold;
+	padding: 5px;
+	margin: 0px;
+	vertical-align: middle;
+}
+
+.redAlliance {
+	border: 2px solid #ccc;
+	background-color: #F7B3B4
+}
+
+.blueAlliance {
+	border: 2px solid #ccc;
+	background-color: #98B4F4
+}
+
+.redAllianceTeam {
+	color: #FF0000
+}
+
+.blueAllianceTeam {
+	color: #0000FF
+}
+
+.tieAllianceTeam {
+	color: #09BA48
+}
+
+.gatool-playbyplay {
+	border: 1px solid #ccc;
+	text-align: left;
+	align-items: center;
+}
+
+.redAlliancePlayByPlay {
+	border: 1px solid #ccc;
+	align-content: center;
+	text-align: center;
+	background-color: red;
+	font-size: x-large;
+	font-weight: bold;
+	color: white
+}
+
+.blueAlliancePlayByPlay {
+	border: 1px solid #ccc;
+	align-content: center;
+	text-align: center;
+	background-color: blue;
+	font-size: x-large;
+	font-weight: bold;
+	color: white;
+}
+
+.playByPlayTable {
+	display: table;
+}
+
+.playByPlayTableRow {
+	vertical-align: middle;
+	text-align: center;
+	display: table-cell;
+}
+
+.playByPlayTeamName {
+	font-size: 36px;
+	margin: 0px
+}
+
+.playByPlayTeamNameStats {
+	font-size: 24px;
+	margin: 0px
+}
+
+.playByPlayWinLossTie {
+	font-size: large;
+	font-style: italic;
+	align-content: center;
+	text-align: center
+}
+
+
+.playByPlayRobotName {
+	font-style: italic;
+	color: #F9FE00;
+	margin: 5px 0px 5px;
+	line-height: 100%
+}
+
+.playByPlayteamNumber {
+	font-size: 40px;
+	margin: 0px
+}
+
+.playByPlaysayNumber {
+	font-size: medium;
+	line-height: 110%;
+	margin-bottom: 10px;
+	margin-top: 10px;
+}
+
+.playByPlayOrganization {
+	font-size: medium;
+	font-style: italic;
+	line-height: 100%;
+	margin: 0px
+}
+
+.playByPlayCity {
+	font-size: medium;
+	line-height: 100%;
+	padding-top: 15px;
+	margin: 0px
+}
+
+.playByPlayAlliance {
+	font-size: 20px;
+	line-height: 100%;
+	margin-top: 5px
+}
+
+.playByPlayChampsAlliance {
+	margin: 0px;
+	line-height: 100%
+}
+
+
+.blueAlliance {
+	border: 2px solid #ccc;
+	background-color: #98B4F4
+}
+
+.announceTeamNumber {
+	font-size: x-large;
+	color: black
+}
+
+.announceAlliance {
+	font-size: 16px;
+	font-weight: bold
+}
+
+.announceOrganization {
+	font-size: 20px;
+	font-weight: bold;
+	line-height: 100%;
+}
+
+.sponsors {
+	line-height: 1;
+	font-weight: 900
+}
+
+.awards {
+	font-style: italic;
+	line-height: 1
+}
+
+.awardHilight {
+	font-weight: bold;
+	color: green
+}
+
+.gatool-announce {
+	border: 1px solid #ccc;
+	text-align: left;
+	align-items: center;
+	line-height: 110%;
+}
+
+.ranking {
+	align-content: center;
+	vertical-align: middle;
+	text-align: center;
+	font-size: xx-large;
+	color: black;
+	padding: 0;
+}
+
+.rank1 {
+	text-align: center;
+	color: white;
+	background-color: orange
+}
+
+.rank2 {
+	text-align: center;
+	color: white;
+	background-color: green
+}
+
+.rank9 {
+	text-align: center;
+	color: black;
+	background-color: yellow
+}
+
+.rank0 {
+	text-align: center;
+	color: black
+}
+
+.teamName {
+	font-size: x-large;
+	color: black;
+	line-height: 100%;
+}
+
+.champs {
+	color: blue
+}
+
+.HOFRed {
+	font-style: italic;
+	font-weight: bold;
+	color: blue;
+	line-height: 1
+}
+
+.HOFBlue {
+	font-style: italic;
+	font-weight: bold;
+	color: red;
+	line-height: 1
+}
+
+.robotName {
+	font-style: italic;
+	font-weight: bold;
+	color: #FF4000
+}
+
+@keyframes App-logo-spin {
+	from {
+		transform: rotate(0deg);
+	}
+
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+/* Column definitions for tables */
+.col1 {
+	width: 8.333%
+}
+
+.col2 {
+	width: 16.667%
+}
+
+.col4 {
+	width: 33.333%
+}
+
+.col5 {
+	width: 41.667%
+}
+
+.col6 {
+	width: 50%;
+	;
+}
+
+.col7 {
+	width: 58.333%
+}
+
+.vertical-center {
+	min-height: 100%;
+	/* Fallback for browsers do NOT support vh unit */
+	min-height: 100vh;
+	/* These two lines are counted as one :-)       */
+
+	display: flex;
+	align-items: center;
+}
+
+.wltTable {
+	border-width: thin;
+	background-color: rgba(255, 255, 255, 0.20);
+	text-align: center;
+	align-content: center;
+	margin: auto;
+}
+
+.buttonNoWrap {
+	white-space: nowrap;
+}
+
+.awardsButton {
+	padding: 5px;
+}
+
+.allianceAnnounceDialog {
+	font-size: 30px;
+	align-content: center;
+	text-align: center
+}
+
+.gatool-HighScores {
+	font-size: 16px;
+	font-weight: bold
+}
+
+.gatool-worldHighScores {
+	font-size: 14px;
+	font-weight: bold;
+	text-align: center;
+	padding: 0px;
+	margin: 0px;
+	background-image: -webkit-linear-gradient(top, #f2dede 0, #e7c3c3 100%);
+	background-image: -o-linear-gradient(top, #f2dede 0, #e7c3c3 100%);
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#f2dede), to(#e7c3c3));
+	background-image: linear-gradient(to bottom, #f2dede 0, #e7c3c3 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fff2dede', endColorstr='#ffe7c3c3', GradientType=0);
+	background-repeat: repeat-x;
+	border-color: #dca7a7;
+	color: #a94442;
+	background-color: #f2dede;
+	border: 3px solid;
+	border-collapse: collapse;
+	margin-bottom: 10px;
+}
+
+.gatool-eventHighScores {
+	font-size: 14px;
+	font-weight: bold;
+	text-align: center;
+	padding: 0px;
+	margin: 0px;
+	background-image: -webkit-linear-gradient(top, #d9edf7 0, #b9def0 100%);
+	background-image: -o-linear-gradient(top, #d9edf7 0, #b9def0 100%);
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#d9edf7), to(#b9def0));
+	background-image: linear-gradient(to bottom, #d9edf7 0, #b9def0 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffd9edf7', endColorstr='#ffb9def0', GradientType=0);
+	background-repeat: repeat-x;
+	border-color: #9acfea;
+	color: #31708f;
+	background-color: #d9edf7;
+	border: 3px solid;
+	border-collapse: collapse;
+	margin-bottom: 10px;
+}
+
+.alert-warning {
+	color: #8a6d3b;
+	background-color: #fcf8e3;
+	border-color: #faebcc;
+}
+
+.alert-danger {
+	color: #a94442;
+	background-color: #f2dede;
+	border-color: #ebccd1;
+}
+
+.alert-success {
+	color: #3c763d;
+	background-color: #dff0d8;
+	border-color: #d6e9c6;
+}
+
+.teamNumberButton {
+	background-color: #ccc;
+}
+
+.teamNumberButton:hover {
+	background-color: #aaa;
+	cursor: pointer;
+}
+
+.teamTable {
+	line-height: 1.3;
+}
+
+.teamTableHighlight {
+	background-color: rgb(195, 244, 199) !important
+}
+
+.teamTableButtonHighlight {
+	background-color: rgb(48, 171, 0) !important;
+	color: white !important;
+}
+
+.teamDataNumber {
+	font-size: 18px;
+	font-weight: bold;
+}
+
+.formHighlight {
+	outline: green;
+	outline-style: solid;
+	background: #f2fff1;
+
+}
+
+.formLabel {
+	margin-top: 20px;
+}
+
+.robotNameCheckbox {
+	vertical-align: middle !important;
+}
+
+.davidPrice {
+	font-size: 500px;
+	text-align: center;
+	font-family: "alternate-gothic-no-1-d", sans-serif;
+	line-height: 85%
+}
+
+.davidPriceWarning {
+	background-color: #fcf8e3;
+	border-color: #faebcc;
+}
+
+.davidPriceSuccess {
+	background-color: #dff0d8;
+	border-color: #d6e9c6;
+}
+
+.davidPriceDetail {
+	font-size: 100px;
+	text-align: center;
+	font-family: "alternate-gothic-no-1-d", sans-serif;
+	line-height: 100%
+}
+
+.playoffDetails {
+	font-size: x-large;
+	font-weight: 900;
+}
+
+.RedReplace {
+	margin: 5px;
+	color: white;
+	background-color: red;
+	font-weight: bolder;
+}
+
+.BlueReplace {
+	margin: 5px;
+	color: white;
+	background-color: blue;
+	font-weight: bolder;
+}
+
+.promoteBackup {
+	border-radius: 5px;
+	font-size: 16px;
+	font-stretch: condensed;
+	font-weight: bold;
+	padding: 5px;
+	margin: 0px;
+	background-color: darkorchid;
+	color: white;
+	vertical-align: middle;
+	align-content: center;
+}
+
+.promoteBackup:hover {
+	background-color: rgb(81, 25, 133);
+}
+
+.backupDialog {
+	font-size: 30px;
+	align-content: center;
+	text-align: center
+}
+
+.navBarText {
+	font-size: 12px;
+	white-space: nowrap;
+}
+
+.hiddenInput {
+	width: 0px;
+	height: 0px;
+	overflow: hidden
+}
+
+.topBorderLine {
+	border-top: 2px darkblue solid ;
+}

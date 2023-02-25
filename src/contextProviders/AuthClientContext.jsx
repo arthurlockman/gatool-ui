@@ -1,0 +1,106 @@
+import { useAuth0 } from "@auth0/auth0-react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react"
+import { toast } from 'react-toastify';
+import { useOnlineStatus } from "./OnlineContext";
+
+const apiBaseUrl = "https://api.gatool.org/v3/";
+
+class AuthClient {
+    setOperationsInProgress = null;
+    operationsInProgress = 0;
+    online = true;
+
+    constructor(tokenGetter, setOperationsInProgress) {
+        this.setOperationsInProgress = setOperationsInProgress
+        this.tokenGetter = tokenGetter
+    }
+
+    async get(path) {
+        if (!this.online) {
+            throw new Error('You are offline.')
+        }
+
+        this.operationStart();
+        var token = await this.getToken();
+        var response = await fetch(`${apiBaseUrl}${path}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }).finally(() => {
+            this.operationDone();
+        });
+        if (response.ok) return response;
+        const errorText = `Received a ${response.status} error from backend: "${response.statusText}"`;
+        toast.error(errorText);
+        throw new Error(errorText);
+    }
+
+    async put(path, body) {
+        if (!this.online) {
+            throw new Error('You are offline.')
+        }
+
+        this.operationStart();
+        var token = await this.getToken();
+        var response = await fetch(`${apiBaseUrl}${path}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            method: 'PUT',
+            body: JSON.stringify(body)
+        }).finally(() => {
+            this.operationDone();
+        });
+        if (response.ok) return response;
+        const errorText = `Received a ${response.status} error from backend: "${response.statusText}"`;
+        toast.error(errorText);
+        throw new Error(errorText);
+    }
+
+    setOnlineStatus(online) {
+        this.online = online
+    }
+
+    operationStart() {
+        this.operationsInProgress += 1;
+        this.setOperationsInProgress(this.operationsInProgress);
+    }
+
+    operationDone() {
+        this.operationsInProgress -= 1;
+        this.setOperationsInProgress(this.operationsInProgress);
+    }
+
+    async getToken() {
+        var tokenResponse = await this.tokenGetter({
+            audience: 'https://gatool.auth0.com/userinfo',
+            scope: 'openid email profile',
+            detailedResponse: true
+        });
+        return tokenResponse.id_token;
+    }
+}
+
+const AuthClientContext = createContext([new AuthClient(), null]);
+
+function UseAuthClient() {
+    return useContext(AuthClientContext);
+}
+
+function AuthClientContextProvider({ children }) {
+    const { getAccessTokenSilently } = useAuth0();
+    const [operationsInProgress, setOperationsInProgress] = useState(0);
+    const client = useMemo(() => {
+        return new AuthClient(getAccessTokenSilently, setOperationsInProgress);
+    }, [getAccessTokenSilently, setOperationsInProgress])
+
+    const isOnline = useOnlineStatus();
+    useEffect(() => {
+        client.setOnlineStatus(isOnline)
+    }, [isOnline, client])
+    // @ts-ignore
+    return <AuthClientContext.Provider value={[client, operationsInProgress]}>{children}</AuthClientContext.Provider>
+}
+
+export { AuthClient, UseAuthClient, AuthClientContextProvider }
