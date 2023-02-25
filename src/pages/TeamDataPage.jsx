@@ -7,7 +7,7 @@ import moment from "moment";
 import _ from "lodash";
 import { toast } from "react-toastify";
 import { useOnlineStatus } from "../contextProviders/OnlineContext";
-import { utils, write, writeFile } from "xlsx";
+import { utils, read, write, writeFile } from "xlsx";
 import Docxtemplater from "docxtemplater";
 import PizZip from "pizzip";
 import PizZipUtils from "pizzip/utils/index.js";
@@ -239,10 +239,6 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         setGaName("");
     }
 
-    function clickRestoreBackup() {
-        //todo: fill in this gap
-    }
-
     // The following section creates merged Word docs.
     // It is used in conjunction with the team list to create team info sheets.
     function loadFile(url, callback) {
@@ -310,6 +306,69 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         );
     }
 
+    function clickRestoreBackup() {
+        document.getElementById("BackupFiles").click();
+    }
+
+    function clearFileInput(id) {
+        var oldInput = document.getElementById(id);
+        var newInput = document.createElement("input");
+        newInput.type = "file";
+        newInput.id = oldInput.id;
+        newInput.name = oldInput.name;
+        newInput.className = oldInput.className;
+        newInput.style.cssText = oldInput.style.cssText;
+        oldInput.parentNode.replaceChild(newInput, oldInput)
+    }
+
+    function handleRestoreBackup(e) {
+        var files = e.target.files;
+        var i, f;
+        for (i = 0; i !== files.length; ++i) {
+            f = files[i];
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                var communityUpdatesTemp = _.cloneDeep(communityUpdates);
+                var data = new Uint8Array(e.target.result);
+                var workbook;
+                workbook = read(data, { type: 'array' });
+                var worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                var teams = utils.sheet_to_json(worksheet);
+                teams.forEach((team) => {
+                    var update = {}
+                    var keys = Object.keys(team);
+                    update.teamNumber = team.teamNumber;
+                    update.updates = {};
+                    keys.forEach((key) => {
+                        if (key.includes("Local")) {
+                            update.updates[key] = team[key];
+                            update.updates.lastUpdate = moment().format();
+                        }
+                    })
+                    if (!_.isUndefined(team["showRobotName"])) {
+                        update.updates["showRobotName"] = team["showRobotName"];
+                        update.updates.lastUpdate = moment().format();
+                    };
+                    if (!_.isUndefined(team["teamNotes"])) {
+                        update.updates["teamNotes"] = team["teamNotes"];
+                        update.updates.lastUpdate = moment().format();
+                    };
+                    if (!_.isUndefined(team["sayNumber"])) {
+                        update.updates["sayNumber"] = team["sayNumber"];
+                        update.updates.lastUpdate = moment().format();
+                    };
+                    communityUpdatesTemp[_.findIndex(communityUpdatesTemp, { "teamNumber": team.teamNumber })] = update;
+                })
+                setCommunityUpdates(communityUpdatesTemp);
+                toast.success(`Your have successfully loaded updates for this event from Excel.`)
+                clearFileInput("BackupFiles");
+                document.getElementById("BackupFiles").addEventListener('change', handleRestoreBackup);
+
+            };
+            reader.readAsArrayBuffer(f);
+        }
+    }
+
 
     return (
         <Container fluid>
@@ -326,20 +385,33 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                 <h4>{selectedEvent?.label}</h4>
                 <p className={"leftTable"}>This table is editable and sortable. Tap on a team number to change data for a specific team. Edits you make are local to this browser, and they will persist here if you do not clear your browser cache. You can save your changes to the gatool Cloud on the team details page or on the Setup Screen. Cells <span className={"teamTableHighlight"}>highlighted in green</span> have been modified, either by you or by other gatool users.</p>
                 <Table responsive className={"leftTable topBorderLine"}>
-                    <Row >
-                        <Col sm>
-                            <p><span style={{ cursor: "pointer", color: "darkblue" }} onClick={exportXLSX}><b><img style={{ float: "left" }} width="30" src="images/excelicon.png" alt="Excel Logo" /> Tap to download this table as Excel</b></span></p>
-                            <p>You can use this as a backup of your team data in conjunction with the Restore Backup button on the right. You can also merge this with Word to create team data sheets you can hand out at an event. <i>Note: this will save to Files on iOS 13+</i></p>
-                        </Col>
-                        <Col sm>
-                            <p><span style={{ cursor: "pointer", color: "darkblue" }} onClick={downloadTeamInfoSheets}><img style={{ float: "left" }} width="30" src="images/wordicon.png" alt="Word Logo" /> <b>Tap here to download a merged document (docx).</b></span></p>
-                            <p>This merged doc contains all of the information in your Teams List, merged onto a template you can print and distribute to teams. <i>Note: this will save to Files on iOS 13+</i></p>
-                        </Col>
-                        <Col>
-                            <p><span style={{ cursor: "pointer", color: "darkblue" }} onClick={clickRestoreBackup}><input type="file" id="BackupFiles" className={"hiddenInput"} /><b><img style={{ float: "left" }} width="30" src="images/excelicon.png" alt="Excel Logo" /> NOT WORKING YET: Tap to restore team data from Excel</b></span></p>
-                            <p>You can export your teams data to Excel using the button on the left, and then restore it from backup here. This is handy in low or no network situations, where you may be unable to update changes to gatool Cloud. <i>Note: Be careful if you modify the Excel file and then import it here.</i></p>
-                        </Col>
-                    </Row>
+                    <thead>
+                        <tr>
+                            <td>
+                                <span style={{ cursor: "pointer", color: "darkblue" }} onClick={exportXLSX}><b><img style={{ float: "left" }} width="30" src="images/excelicon.png" alt="Excel Logo" /> Tap to download this table as Excel</b></span>
+                            </td>
+                            <td>
+                                <span style={{ cursor: "pointer", color: "darkblue" }} onClick={downloadTeamInfoSheets}><img style={{ float: "left" }} width="30" src="images/wordicon.png" alt="Word Logo" /> <b>Tap here to download a merged document (docx).</b></span>
+                            </td>
+                            <td>
+                                <span style={{ cursor: "pointer", color: "darkblue" }} onClick={clickRestoreBackup}><input type="file" id="BackupFiles" onChange={handleRestoreBackup} className={"hiddenInput"} /><b><img style={{ float: "left" }} width="30" src="images/excelicon.png" alt="Excel Logo" /> Tap to restore team data from Excel</b></span>
+                            </td>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr >
+                            <td>
+                                <p>You can use this as a backup of your team data in conjunction with the Restore Backup button on the right. You can also merge this with Word to create team data sheets you can hand out at an event. <i>Note: this will save to Files on iOS 13+</i></p>
+                            </td>
+                            <td>
+                                <p>This merged doc contains all of the information in your Teams List, merged onto a template you can print and distribute to teams. <i>Note: this will save to Files on iOS 13+</i></p>
+                            </td>
+                            <td>
+                                <p>You can export your teams data to Excel using the button on the left, and then restore it from backup here. This is handy in low or no network situations, where you may be unable to update changes to gatool Cloud. <i>Note: Be careful if you modify the Excel file and then import it here.</i></p>
+                            </td>
+                        </tr>
+                    </tbody>
                 </Table>
                 <Table responsive striped bordered size="sm" className={"teamTable"}>
                     <thead className="thead-default">
