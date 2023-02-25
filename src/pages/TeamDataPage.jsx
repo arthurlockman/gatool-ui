@@ -431,15 +431,15 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                 <Table responsive striped bordered size="sm" className={"teamTable"}>
                     <thead className="thead-default">
                         <tr>
-                            <th sm={1} onClick={() => (teamSort === "teamNumber") ? setTeamSort("-teamNumber") : setTeamSort("teamNumber")}><b>Team #{teamSort === "teamNumber" ? <SortNumericDown /> : ""}{teamSort === "-teamNumber" ? <SortNumericUp /> : ""}</b></th>
-                            <th sm={1} onClick={() => (teamSort === "rank") ? setTeamSort("-rank") : setTeamSort("rank")}> <b>Rank{teamSort === "rank" ? <SortNumericDown /> : ""}{teamSort === "-rank" ? <SortNumericUp /> : ""}</b></th>
-                            <th sm={2} onClick={() => (teamSort === "nameShort") ? setTeamSort("-nameShort") : setTeamSort("nameShort")}><b>Team Name{teamSort === "nameShort" ? <SortAlphaDown /> : ""}{teamSort === "-nameShort" ? <SortAlphaUp /> : ""}</b></th>
-                            <th sm={1} onClick={() => (teamSort === "citySort") ? setTeamSort("-citySort") : setTeamSort("citySort")}><b>City{teamSort === "citySort" ? <SortAlphaDown /> : ""}{teamSort === "-citySort" ? <SortAlphaUp /> : ""}</b></th>
-                            <th sm={2} ><b>Top Sponsors</b></th>
-                            <th sm={1} ><b>Organization</b></th>
-                            <th sm={1} onClick={() => (teamSort === "rookieYear") ? setTeamSort("-rookieYear") : setTeamSort("rookieYear")}><b>Rookie Year{teamSort === "rookieYear" ? <SortNumericDown /> : ""}{teamSort === "-rookieYear" ? <SortNumericUp /> : ""}</b></th>
-                            <th sm={1} ><b>Robot Name</b></th>
-                            <th sm={2} ><b>Additional Notes</b></th>
+                            <th onClick={() => (teamSort === "teamNumber") ? setTeamSort("-teamNumber") : setTeamSort("teamNumber")}><b>Team #{teamSort === "teamNumber" ? <SortNumericDown /> : ""}{teamSort === "-teamNumber" ? <SortNumericUp /> : ""}</b></th>
+                            <th onClick={() => (teamSort === "rank") ? setTeamSort("-rank") : setTeamSort("rank")}> <b>Rank{teamSort === "rank" ? <SortNumericDown /> : ""}{teamSort === "-rank" ? <SortNumericUp /> : ""}</b></th>
+                            <th onClick={() => (teamSort === "nameShort") ? setTeamSort("-nameShort") : setTeamSort("nameShort")}><b>Team Name{teamSort === "nameShort" ? <SortAlphaDown /> : ""}{teamSort === "-nameShort" ? <SortAlphaUp /> : ""}</b></th>
+                            <th onClick={() => (teamSort === "citySort") ? setTeamSort("-citySort") : setTeamSort("citySort")}><b>City{teamSort === "citySort" ? <SortAlphaDown /> : ""}{teamSort === "-citySort" ? <SortAlphaUp /> : ""}</b></th>
+                            <th  ><b>Top Sponsors</b></th>
+                            <th  ><b>Organization</b></th>
+                            <th onClick={() => (teamSort === "rookieYear") ? setTeamSort("-rookieYear") : setTeamSort("rookieYear")}><b>Rookie Year{teamSort === "rookieYear" ? <SortNumericDown /> : ""}{teamSort === "-rookieYear" ? <SortNumericUp /> : ""}</b></th>
+                            <th  ><b>Robot Name</b></th>
+                            <th  ><b>Additional Notes</b></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -466,7 +466,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                 <Button variant="success" size="sm" onClick={(e) => { clearVisits(false, e) }}>Reset visit times. Use at the start of each day.</Button><br /><br /><br />
             </div></>}
             <Modal centered={true} show={showDownload} onHide={handleCloseDownload}>
-                <Modal.Header className={"success"} closeButton>
+                <Modal.Header className={"allianceChoice"} closeVariant={"white"} closeButton>
                     <Modal.Title >Download Team Info Sheets</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
@@ -481,7 +481,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
             </Modal>
 
             {updateTeam && <Modal centered={true} fullscreen={true} show={show} size="lg" onHide={handleClose}>
-                <Modal.Header className={"success"} closeButton>
+                <Modal.Header className={"allianceChoice"} closeVariant={"white"} closeButton>
                     <Modal.Title >Editing Team {updateTeam.teamNumber}'s Details</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
@@ -540,7 +540,9 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="warning" size="sm" onClick={(e) => { clearVisits(true, e) }}>Reset visit times</Button><Button variant="primary" size="sm" onClick={(e) => { handleSubmit("save", e) }}>Submit changes but only keep them locally</Button>
+                    <Button variant="warning" size="sm" onClick={(e) => { clearVisits(true, e) }}>Reset visit times</Button>
+                    <Button size="sm" onClick={handleClose}>Close without saving changes</Button>
+                    <Button variant="primary" size="sm" onClick={(e) => { handleSubmit("save", e) }}>Submit changes but only keep them locally</Button>
                     <Button variant="success" size="sm" disabled={!isOnline} onClick={(e) => { handleSubmit("update", e) }}>Submit changes and upload to gatool Cloud</Button>
                 </Modal.Footer>
             </Modal>}

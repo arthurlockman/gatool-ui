@@ -76,7 +76,7 @@ function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates })
                     })}
                     </Row>
                     {awardTeam && <Modal centered={true} show={show} onHide={handleClose}>
-                        <Modal.Header closeButton>
+                        <Modal.Header className={"allianceChoice"} closeVariant={"white"} closeButton>
                             <Modal.Title className={"success"}>Awards Announcement</Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
