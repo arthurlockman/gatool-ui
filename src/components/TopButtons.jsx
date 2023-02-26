@@ -56,6 +56,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
         setBackupTeam(null);
         setTeamSelected(null);
         setConfirmSelection(false);
+        enableScope('matchNavigation');
     }
 
     var allianceMembers = Object.keys(alliances?.Lookup);

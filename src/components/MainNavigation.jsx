@@ -66,32 +66,33 @@ function MainNavigation({ scheduleTabReady, teamDataTabReady, ranksTabReady, sta
   const isOnline = useOnlineStatus();
 
   return (
-    <Navbar bg="light" sticky='top' style={{
-      color: "black"
-    }}>
+    <><Navbar bg="light" sticky='top' style={{ color: "black" }}>
       <Nav className="me-auto">
-        <Nav.Link as={NavLink} style={({ isActive }) => getTabStyle(isActive, null)} to="/"><Gear /><div className='d-none d-md-block navBarText'>Setup</div></Nav.Link>
-        <Nav.Link as={NavLink} style={({ isActive }) => getTabStyle(isActive, scheduleTabReady)} to="/schedule"><Calendar3 /><div className='d-none d-md-block navBarText'>Schedule</div></Nav.Link>
-        <Nav.Link as={NavLink} style={({ isActive }) => getTabStyle(isActive, teamDataTabReady)} to="/teamdata"><CardList /><div className='d-none d-md-block navBarText'>Teams</div></Nav.Link>
-        <Nav.Link as={NavLink} style={({ isActive }) => getTabStyle(isActive, ranksTabReady)} to="/ranks"><SortNumericDown /><div className='d-none d-md-block navBarText'>Ranks</div></Nav.Link>
-        <Nav.Link as={NavLink} style={({ isActive }) => getTabStyle(isActive, scheduleTabReady)} to="/announce"><Megaphone /><div className='d-none d-md-block navBarText'>Announce</div></Nav.Link>
-        <Nav.Link as={NavLink} style={({ isActive }) => getTabStyle(isActive, scheduleTabReady)} to="/playbyplay"><Speedometer /><div className='d-none d-md-block navBarText'>Play-by-Play</div></Nav.Link>
-        <Nav.Link as={NavLink} style={({ isActive }) => getTabStyle(isActive, allianceSelectionReady)} to="/allianceselection"><HandThumbsUp /><div className='d-none d-md-block navBarText'>{playoffs ? "Playoffs" : "Alliance Selection"}</div></Nav.Link>
-        <Nav.Link as={NavLink} style={({ isActive }) => getTabStyle(isActive, teamDataTabReady)} to="/awards"><Trophy /><div className='d-none d-md-block navBarText'>Awards</div></Nav.Link>
-        <Nav.Link as={NavLink} style={({ isActive }) => getTabStyle(isActive, statsTabReady)} to="/stats"><Flag /><div className='d-none d-md-block navBarText'>Stats</div></Nav.Link>
-        <Nav.Link as={NavLink} style={({ isActive }) => getTabStyle(isActive, null)} to="/cheatsheet"><Eye /><div className='d-none d-md-block navBarText'>Cheat Sheet</div></Nav.Link>
-        <Nav.Link as={NavLink} style={({ isActive }) => getTabStyle(isActive, null)} to="/emcee"><Gift /><div className='d-none d-md-block navBarText'>Emcee #s</div></Nav.Link>
+        <Nav.Link id={"setupPage"} as={NavLink} style={({ isActive }) => getTabStyle(isActive, null)} to="/"><Gear /><div className='d-none d-md-block navBarText'>Setup</div></Nav.Link>
+        <Nav.Link id={"schedulePage"} as={NavLink} style={({ isActive }) => getTabStyle(isActive, scheduleTabReady)} to="/schedule"><Calendar3 /><div className='d-none d-md-block navBarText'>Schedule</div></Nav.Link>
+        <Nav.Link id={"teamsPage"} as={NavLink} style={({ isActive }) => getTabStyle(isActive, teamDataTabReady)} to="/teamdata"><CardList /><div className='d-none d-md-block navBarText'>Teams</div></Nav.Link>
+        <Nav.Link id={"ranksPage"} as={NavLink} style={({ isActive }) => getTabStyle(isActive, ranksTabReady)} to="/ranks"><SortNumericDown /><div className='d-none d-md-block navBarText'>Ranks</div></Nav.Link>
+        <Nav.Link id={"announcePage"} as={NavLink} style={({ isActive }) => getTabStyle(isActive, scheduleTabReady)} to="/announce"><Megaphone /><div className='d-none d-md-block navBarText'>Announce</div></Nav.Link>
+        <Nav.Link id={"playByPlayPage"} as={NavLink} style={({ isActive }) => getTabStyle(isActive, scheduleTabReady)} to="/playbyplay"><Speedometer /><div className='d-none d-md-block navBarText'>Play-by-Play</div></Nav.Link>
+        <Nav.Link id={"allianceSelectionPage"} as={NavLink} style={({ isActive }) => getTabStyle(isActive, allianceSelectionReady)} to="/allianceselection"><HandThumbsUp /><div className='d-none d-md-block navBarText'>{playoffs ? "Playoffs" : "Alliance Selection"}</div></Nav.Link>
+        <Nav.Link id={"awardsPage"} as={NavLink} style={({ isActive }) => getTabStyle(isActive, teamDataTabReady)} to="/awards"><Trophy /><div className='d-none d-md-block navBarText'>Awards</div></Nav.Link>
+        <Nav.Link id={"statsPage"} as={NavLink} style={({ isActive }) => getTabStyle(isActive, statsTabReady)} to="/stats"><Flag /><div className='d-none d-md-block navBarText'>Stats</div></Nav.Link>
+        <Nav.Link id={"cheatSheetPage"} as={NavLink} style={({ isActive }) => getTabStyle(isActive, null)} to="/cheatsheet"><Eye /><div className='d-none d-md-block navBarText'>Cheat Sheet</div></Nav.Link>
+        <Nav.Link id={"emceePage"} as={NavLink} style={({ isActive }) => getTabStyle(isActive, null)} to="/emcee"><Gift /><div className='d-none d-md-block navBarText'>Emcee #s</div></Nav.Link>
         <Nav.Link as={NavLink} className='d-none d-md-block navBarText' style={({ isActive }) => getTabStyle(isActive, null)} to="/help"><QuestionOctagon /><div className='d-none d-md-block navBarText'>Help</div></Nav.Link>
-      </Nav>
-      {!isOnline &&
+      </Nav >
+      {
+        !isOnline &&
         <WifiOff style={{
           color: 'red',
           marginRight: '5px',
           height: "31px",
           width: "31px"
-        }} />}
+        }} />
+      }
       <AuthWidget />
-    </Navbar>
+    </Navbar >
+    </>
   );
 }
 

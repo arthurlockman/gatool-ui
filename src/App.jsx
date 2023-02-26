@@ -54,6 +54,20 @@ const playoffTiebreakers = {
   "2018": ["foulPoints", "endgamePoints", "autoPoints", "autoOwnershipPoints+teleopOwnershipPoints", "vaultPoints"]
 };
 
+const navPages = [
+  "setupPage",
+  "schedulePage",
+  "teamsPage",
+  "ranksPage",
+  "announcePage",
+  "playByPlayPage",
+  "allianceSelectionPage",
+  "awardsPage",
+  "statsPage",
+  "cheatSheetPage",
+  "emceePage"
+]
+
 const paleYellow = "#fdfaed";
 const paleBlue = "#effdff";
 
