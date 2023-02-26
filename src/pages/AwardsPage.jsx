@@ -2,10 +2,14 @@ import { Alert, Container, Button, Row, Col, Modal } from "react-bootstrap";
 import { useState } from 'react';
 import { Trophy } from "react-bootstrap-icons";
 import _ from "lodash";
+import { useHotkeysContext } from "react-hotkeys-hook";
+
 
 
 function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates }) {
     const originalAndSustaining = ["20", "45", "126", "148", "151", "157", "190", "191", "250"];
+
+    const { disableScope, enableScope } = useHotkeysContext();
 
     var columns = [[], [], [], [], [], []];
     var sortedTeams = _.orderBy(teamList?.teams, "teamNumber", "asc");
@@ -47,11 +51,13 @@ function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates })
     const handleClose = () => {
         setAwardTeam(null);
         setShow(false);
+        enableScope('tabNavigation');
     }
     const handleShow = (e) => {
         var team = JSON.parse(e.currentTarget.value);
         setAwardTeam(team);
         setShow(true);
+        disableScope('tabNavigation');
     }
 
     return (

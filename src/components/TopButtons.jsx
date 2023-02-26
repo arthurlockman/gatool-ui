@@ -15,14 +15,16 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
 
     const handleShow = () => {
         setShow(true);
-        disableScope('matchNavigation')
+        disableScope('matchNavigation');
+        disableScope('tabNavigation');
     }
 
     const handleClose = () => {
         setShow(false);
         setTeamSelected(null);
         setConfirmSelection(false);
-        enableScope('matchNavigation')
+        enableScope('matchNavigation');
+        enableScope('tabNavigation');
     }
 
     const teamToReplace = (/** @type {object} */ team) => {
@@ -64,6 +66,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
         setTeamSelected(null);
         setConfirmSelection(false);
         enableScope('matchNavigation');
+        enableScope('tabNavigation');
     }
 
     var allianceMembers = Object.keys(alliances?.Lookup);

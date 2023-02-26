@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Button, Container, Form, InputGroup, Modal } from "react-bootstrap";
 import _ from "lodash";
 import { HandThumbsDownFill, HandThumbsUpFill, TrophyFill } from "react-bootstrap-icons";
+import { useHotkeysContext } from "react-hotkeys-hook";
+
 
 function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays }) {
 
@@ -9,6 +11,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
     const [allianceTeam, setAllianceTeam] = useState(null);
     const [allianceMode, setAllianceMode] = useState(null);
     const [teamFilter, setTeamFilter] = useState("");
+    const { disableScope, enableScope } = useHotkeysContext();
 
     const allianceSelectionOrderBase = [
         { "number": 1, "round": 1 },
@@ -62,12 +65,14 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         setAllianceTeam(null);
         setAllianceMode("");
         setShow(false);
+        enableScope('tabNavigation');
     }
 
     const handleShow = (team, mode, e) => {
         setAllianceTeam(team);
         setAllianceMode(mode || "show");
         setShow(true);
+        disableScope('tabNavigation');
     }
     const handleAccept = (team, mode, e) => {
         if (mode === "accept") {
