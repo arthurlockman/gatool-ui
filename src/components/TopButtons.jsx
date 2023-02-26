@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Row, Col, Button, Modal, Container } from "react-bootstrap";
 import { ArrowUpSquareFill, CaretLeftFill, CaretRightFill } from "react-bootstrap-icons";
 import Select from "react-select";
@@ -35,6 +35,13 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
         setConfirmSelection(true);
     }
 
+    const handleMatchSelection = (newMatch) => {
+        setMatchFromMenu(newMatch)
+        selectRef.current?.blur()
+    }
+
+    const selectRef = useRef(null)
+
     const handleBackupConfirm = () => {
         //do the temporary work on the Allianes and team list
 
@@ -56,6 +63,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
         setBackupTeam(null);
         setTeamSelected(null);
         setConfirmSelection(false);
+        enableScope('matchNavigation');
     }
 
     var allianceMembers = Object.keys(alliances?.Lookup);
@@ -69,15 +77,17 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
             <Row style={{ "paddingTop": "10px", "paddingBottom": "10px" }}>
                 <Col xs={"2"} lg={"3"}><Button size="lg" variant="outline-success" className={"gatool-button buttonNoWrap"} onClick={previousMatch}><span className={"d-none d-lg-block"}><CaretLeftFill /> Previous Match</span><span className={"d-block d-lg-none"}><CaretLeftFill /> <CaretLeftFill /></span></Button></Col>
                 <MatchClock matchDetails={matchDetails} timeFormat={timeFormat} />
-                <Col xs={inPlayoffs ? "4" : "5"} lg={inPlayoffs ? "3" : "4"}><b>{selectedEvent?.label.replace("FIRST Championship - ", "").replace("FIRST In Texas District Championship - ", "").replace("FIRST Ontario Provincial Championship - ", "").replace("New England FIRST District Championship - ", "")}</b><br /><Select options={matchMenu} value={currentMatch ? matchMenu[currentMatch - 1] : matchMenu[0]} onChange={setMatchFromMenu} styles={{
-                    option: (styles, { data }) => {
-                        return {
-                            ...styles,
-                            backgroundColor: data.color,
-                            color: "black"
-                        };
-                    },
-                }} /></Col>
+                <Col xs={inPlayoffs ? "4" : "5"} lg={inPlayoffs ? "3" : "4"}><b>{selectedEvent?.label.replace("FIRST Championship - ", "").replace("FIRST In Texas District Championship - ", "").replace("FIRST Ontario Provincial Championship - ", "").replace("New England FIRST District Championship - ", "")}</b><br />
+                    <Select options={matchMenu} value={currentMatch ? matchMenu[currentMatch - 1] : matchMenu[0]} onChange={handleMatchSelection} styles={{
+                        option: (styles, { data }) => {
+                            return {
+                                ...styles,
+                                backgroundColor: data.color,
+                                color: "black"
+                            };
+                        },
+                    }} ref={selectRef}/>
+                </Col>
                 {inPlayoffs && <Col className="promoteBackup" xs={1} onClick={handleShow}>+<ArrowUpSquareFill />+<br />backup</Col>}
                 <Col xs={"2"} lg={"3"}><Button size="lg" variant="outline-success" className={"gatool-button buttonNoWrap"} onClick={nextMatch}><span className={"d-none d-lg-block"}>Next Match <CaretRightFill /></span><span className={"d-block d-lg-none"}><CaretRightFill /> <CaretRightFill /></span></Button></Col>
                 <Modal centered={true} show={show} onHide={handleClose}>

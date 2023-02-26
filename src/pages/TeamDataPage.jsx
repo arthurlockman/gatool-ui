@@ -40,8 +40,6 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
     }
 
 
-
-
     const [show, setShow] = useState(false);
     const [showDownload, setShowDownload] = useState(false);
     const [updateTeam, setUpdateTeam] = useState(null);
@@ -409,7 +407,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                                 <span style={{ cursor: "pointer", color: "darkblue" }} onClick={downloadTeamInfoSheets}><img style={{ float: "left" }} width="30" src="images/wordicon.png" alt="Word Logo" /> <b>Tap here to download a merged document (docx).</b></span>
                             </td>
                             <td>
-                                <span style={{ cursor: "pointer", color: "darkblue" }} onClick={clickRestoreBackup}><input type="file" id="BackupFiles" onChange={handleRestoreBackup} className={"hiddenInput"} /><b><img style={{ float: "left" }} width="30" src="images/excelicon.png" alt="Excel Logo" /> Tap to restore team data from Excel</b></span>
+                                <span style={{ cursor: "pointer", color: "darkblue" }} onClick={clickRestoreBackup}><input type="file" id="BackupFiles" onChange={handleRestoreBackup} className={"hiddenInput"} /><b><img style={{ float: "left" }} width="30" src="images/excelicon.png" alt="Excel Logo" /> Tap here to restore team data from Excel</b></span>
                             </td>
                         </tr>
                     </thead>
