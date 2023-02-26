@@ -40,8 +40,6 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
     }
 
 
-
-
     const [show, setShow] = useState(false);
     const [showDownload, setShowDownload] = useState(false);
     const [updateTeam, setUpdateTeam] = useState(null);

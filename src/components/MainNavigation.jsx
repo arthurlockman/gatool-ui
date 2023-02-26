@@ -65,6 +65,7 @@ function MainNavigation({ scheduleTabReady, teamDataTabReady, ranksTabReady, sta
 
   const isOnline = useOnlineStatus();
 
+
   return (
     <><Navbar bg="light" sticky='top' style={{ color: "black" }}>
       <Nav className="me-auto">
