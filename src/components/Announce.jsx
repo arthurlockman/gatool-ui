@@ -4,7 +4,7 @@ import _ from "lodash";
 function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selectedEvent, showNotes, showAwards, showSponsors, showMottoes, showChampsStats }) {
     const originalAndSustaining = ["20", "45", "126", "148", "151", "157", "190", "191", "250"];
     var allianceColor = station.slice(0, -1);
-    var awardsYears = Object.keys(team?.awards)
+    var awardsYears = team?.awards ? Object.keys(team.awards) : []
     var awards = [];
     awardsYears.forEach((year) => {
         team?.awards[year]?.Awards.forEach((award) => {
@@ -64,7 +64,7 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
                     {team?.hallOfFame.map((award) => {
                         return <span key={award.year + award.type + award.challenge} className={`HOF${allianceColor}`}>{award.year} {award.type === "chairmans" ? "Chairman's Award" : "Winner"} {award.challenge}<br /></span>
                     })}
-                    
+
                 </p>
                 {awards && <p className={"awards"}>
                     {awards.map((award) => {
