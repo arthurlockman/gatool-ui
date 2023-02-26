@@ -56,17 +56,17 @@ const playoffTiebreakers = {
 };
 
 const navPages = [
-  "",
-  "schedule",
-  "teamdata",
-  "ranks",
-  "announce",
-  "playbyplay",
-  "allianceselection",
-  "awards",
-  "stats",
-  "cheatsheet",
-  "emcee"
+  { "href": "", "id": "setupPage" },
+  { "href": "schedule", "id": "schedulePage" },
+  { "href": "teamdata", "id": "teamsPage" },
+  { "href": "ranks", "id": "ranksPage" },
+  { "href": "announce", "id": "announcePage" },
+  { "href": "playbyplay", "id": "playByPlayPage" },
+  { "href": "allianceselection", "id": "allianceSelectionPage" },
+  { "href": "awards", "id": "awardsPage" },
+  { "href": "stats", "id": "statsPage" },
+  { "href": "cheatsheet", "id": "cheatSheetPage" },
+  { "href": "emcee", "id": "emceePage" }
 ]
 
 const paleYellow = "#fdfaed";
@@ -925,22 +925,24 @@ function App() {
   //const navigate = useNavigate();
   const tabNavRight = () => {
     var location = window.location.href.split("/").pop();
-    var tabNumber = _.indexOf(navPages,location);
-    //if (location === "") {tabNumber = 0}
-    //navigate(navPages[tabNumber+1]);
-    console.log("right " + tabNumber)
+    var tabNumber = _.findIndex(navPages, { "href": location });
+    if (tabNumber < navPages.length - 1) { tabNumber += 1 }
+    document.getElementById(navPages[tabNumber].id).click();
   }
 
   const tabNavLeft = () => {
     var location = window.location.href.split("/").pop();
-    var tabNumber = _.indexOf(navPages,location);
-    //if (location === "") {tabNumber = 0}
-    //navigate(navPages[tabNumber+1]);
-    console.log("left " + tabNumber)
+    var tabNumber = _.findIndex(navPages, { "href": location });
+    if (tabNumber > 0) { tabNumber -= 1 }
+    document.getElementById(navPages[tabNumber].id).click();
   }
 
   useHotkeys('shift+right', () => tabNavRight(), { scopes: 'tabNavigation' });
+  useHotkeys('.', () => tabNavRight(), { scopes: 'tabNavigation' });
+  useHotkeys('k', () => tabNavRight(), { scopes: 'tabNavigation' });
   useHotkeys('shift+left', () => tabNavLeft(), { scopes: 'tabNavigation' });
+  useHotkeys('comma', () => tabNavLeft(), { scopes: 'tabNavigation' });
+  useHotkeys('j', () => tabNavLeft(), { scopes: 'tabNavigation' });
 
   return (
     <div className="App">

@@ -12,9 +12,11 @@ import Docxtemplater from "docxtemplater";
 import PizZip from "pizzip";
 import PizZipUtils from "pizzip/utils/index.js";
 import { saveAs } from "file-saver";
+import { useHotkeysContext } from "react-hotkeys-hook";
 
 function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSort, setTeamSort, communityUpdates, setCommunityUpdates, allianceCount, lastVisit, setLastVisit, putTeamData, localUpdates, setLocalUpdates, qualSchedule, playoffSchedule }) {
     const [currentTime, setCurrentTime] = useState(moment());
+    const { disableScope, enableScope } = useHotkeysContext();
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -49,11 +51,13 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
     const handleClose = () => {
         setUpdateTeam(null);
         setShow(false);
+        enableScope('tabNavigation');
     }
 
     const handleCloseDownload = () => {
         setShowDownload(false);
         setGaName("");
+        enableScope('tabNavigation');
     }
 
     const handleSubmit = (mode, e) => {
@@ -97,12 +101,14 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
 
         setUpdateTeam(null);
         setShow(false);
+        enableScope('tabNavigation');
     }
 
     const handleShow = (team, e) => {
         setUpdateTeam(team);
         setFormValue({});
         setShow(true);
+        disableScope('tabNavigation');
     }
 
     const clearVisits = (single, e) => {
@@ -115,6 +121,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
 
         setUpdateTeam(null);
         setShow(false);
+        enableScope('tabNavigation');
     }
 
     const updateForm = (prop, value) => {
@@ -229,14 +236,15 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
 
     function downloadTeamInfoSheets() {
         setShowDownload(true);
+        disableScope('tabNavigation');
     }
 
     function handleSubmitDownload(e) {
         //toDo make this work.
         setShowDownload(false);
-        console.log(e);
         generateDocx(gaName);
         setGaName("");
+        enableScope('tabNavigation');
     }
 
     // The following section creates merged Word docs.
