@@ -42,7 +42,7 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
                 allianceArray.push(allianceMembers?.captain);
                 allianceArray.push(allianceMembers?.round1);
                 allianceArray.push(allianceMembers?.round2);
-                if (allianceMembers.round3) {
+                if (allianceMembers?.round3) {
                     allianceArray.push(allianceMembers?.round3);
                 }
                 if (allianceMembers?.backup) {
@@ -91,7 +91,7 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
     })
 
     teamList?.teams.forEach((team, index) => {
-        teamList.teams[index].highScore = _.orderBy(_.filter(scores, { "teamNumber": team.teamNumber }), "score", "desc")[0];
+        teamList.teams[index].highScore = _.orderBy(_.filter(scores, { "teamNumber": team?.teamNumber }), ["score", "desc"])[0];
     }
     )
 

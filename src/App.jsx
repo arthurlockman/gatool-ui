@@ -682,9 +682,9 @@ function App() {
       result = await httpClient.get(`${selectedYear?.value}/rankings/${selectedEvent?.value.code}`);
       ranks = await result.json();
     } else if (selectedEvent?.value?.code === "PRACTICE1") {
-      ranks = training.ranks.partial;
+      ranks = _.cloneDeep(training.ranks.partial);
     } else {
-      ranks = training.ranks.final;
+      ranks = _.cloneDeep(training.ranks.final);
     }
     if (typeof ranks.Rankings === "undefined") {
       ranks.ranks = ranks.rankings;

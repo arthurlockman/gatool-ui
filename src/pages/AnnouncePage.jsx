@@ -10,12 +10,14 @@ import { useHotkeys } from "react-hotkeys-hook";
 
 const paleGreen = "rgba(144, 238, 144, 0.5)"
 
-function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, setCurrentMatch, playoffSchedule, setPlayoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, getSchedule, getRanks, awardsMenu, showNotes, showAwards, showSponsors, showMottoes, showChampsStats, timeFormat, eventHighScores, backupTeam, setBackupTeam, getWorldStats, nextMatch, previousMatch, setMatchFromMenu}) {
+function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, setCurrentMatch, playoffSchedule, setPlayoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, getSchedule, getRanks, awardsMenu, showNotes, showAwards, showSponsors, showMottoes, showChampsStats, timeFormat, eventHighScores, backupTeam, setBackupTeam, getWorldStats, nextMatch, previousMatch, setMatchFromMenu }) {
 
     function updateTeamDetails(station, matchDetails) {
         var team = {}
         var alliance = station.slice(0, station.length - 1);
-        var allianceNumber = matchDetails?.teams[_.findIndex(matchDetails?.teams, { "station": `${alliance}1` })].alliance;
+        var allianceNumber = matchDetails?.teams[_.findIndex(matchDetails?.teams, { "station": `${alliance}1` })]?.alliance;
+
+
         if (station.slice(-1) !== "4") {
             team = matchDetails?.teams[_.findIndex(matchDetails?.teams, { "station": station })];
             team = _.merge(team,
@@ -35,16 +37,16 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
                     return { "teamNumber": team?.teamNumber, "alliance": team?.alliance }
                 });
                 var allianceTeams = _.filter(playoffTeams, { "alliance": allianceNumber }).map((o) => { return o.teamNumber });
-                var allianceMembers = _.filter(alliances?.alliances, { "number": Number(allianceNumber.slice(-1)) })[0];
+                var allianceMembers = _.filter(alliances?.alliances, { "number": Number(allianceNumber.slice(-1)) })[0] || [];
                 var allianceArray = [];
-                allianceArray.push(allianceMembers.captain);
-                allianceArray.push(allianceMembers.round1);
-                allianceArray.push(allianceMembers.round2);
-                if (allianceMembers.round3) {
-                    allianceArray.push(allianceMembers.round3);
+                allianceArray.push(allianceMembers?.captain);
+                allianceArray.push(allianceMembers?.round1);
+                allianceArray.push(allianceMembers?.round2);
+                if (allianceMembers?.round3) {
+                    allianceArray.push(allianceMembers?.round3);
                 }
-                if (allianceMembers.backup) {
-                    allianceArray.push(allianceMembers.backup);
+                if (allianceMembers?.backup) {
+                    allianceArray.push(allianceMembers?.backup);
                 }
 
                 var remainingTeam = _.difference(allianceArray, allianceTeams);
@@ -60,6 +62,8 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
                 }
             }
         }
+
+
 
         return team;
     }
@@ -90,13 +94,13 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
             teamDetails[station] = updateTeamDetails(station, matchDetails)
         })
     }
-    
-    useHotkeys('right', () => nextMatch(), { scopes: 'matchNavigation'} )
-    useHotkeys('left', () => previousMatch(), { scopes: 'matchNavigation'} )
+
+    useHotkeys('right', () => nextMatch(), { scopes: 'matchNavigation' })
+    useHotkeys('left', () => previousMatch(), { scopes: 'matchNavigation' })
 
     return (
         <Container fluid >
-            {!selectedEvent &&  <div>
+            {!selectedEvent && <div>
                 <Alert variant="warning" >You need to select an event before you can see anything here.</Alert>
             </div>}
             {selectedEvent && (!teamList || teamList?.teams.length === 0) && <div>
@@ -120,7 +124,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
                             )}
                         </tbody>
                     </table>
-                    <BottomButtons previousMatch={previousMatch} nextMatch={nextMatch} matchDetails={matchDetails} playoffSchedule={playoffSchedule}  eventHighScores={eventHighScores}/>
+                    <BottomButtons previousMatch={previousMatch} nextMatch={nextMatch} matchDetails={matchDetails} playoffSchedule={playoffSchedule} eventHighScores={eventHighScores} />
                 </Container>
             }
 
