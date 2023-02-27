@@ -62,16 +62,16 @@ function RanksPage({ selectedEvent, teamList, rankings, rankSort, setRankSort, a
                 
                     <thead className="thead-default">
                         <tr>
-                            <th xs={1} onClick={() => (rankSort === "teamNumber") ? setRankSort("-teamNumber") : setRankSort("teamNumber")}><b>Team #{rankSort === "teamNumber" ? <SortNumericUp /> : ""}{rankSort === "-teamNumber" ? <SortNumericDown /> : ""}</b></th>
-                            <th xs={1} onClick={() => (rankSort === "rank") ? setRankSort("-rank") : setRankSort("rank")}><b>Rank{rankSort === "rank" ? <SortNumericUp /> : ""}{rankSort === "-rank" ? <SortNumericDown /> : ""}</b></th>
-                            <th xs={2} onClick={() => (rankSort === "teamName") ? setRankSort("-teamName") : setRankSort("teamName")}><b>Team Name{rankSort === "teamName" ? <SortAlphaUp /> : ""}{rankSort === "-teamName" ? <SortAlphaDown /> : ""}</b></th>
-                            <th xs={1} onClick={() => (rankSort === "sortOrder1") ? setRankSort("-sortOrder1") : setRankSort("sortOrder1")}><b>RP Avg.{rankSort === "sortOrder1" ? <SortNumericUp /> : ""}{rankSort === "-sortOrder1" ? <SortNumericDown /> : ""}</b></th>
-                            <th xs={1} onClick={() => (rankSort === "wins") ? setRankSort("-wins") : setRankSort("wins")}><b>Wins{rankSort === "wins" ? <SortNumericUp /> : ""}{rankSort === "-wins" ? <SortNumericDown /> : ""}</b></th>
-                            <th xs={1} onClick={() => (rankSort === "losses") ? setRankSort("-losses") : setRankSort("losses")}><b>Losses{rankSort === "losses" ? <SortNumericUp /> : ""}{rankSort === "-losses" ? <SortNumericDown /> : ""}</b></th>
-                            <th xs={1} onClick={() => (rankSort === "ties") ? setRankSort("-ties") : setRankSort("ties")}><b>Ties{rankSort === "ties" ? <SortNumericUp /> : ""}{rankSort === "-ties" ? <SortNumericDown /> : ""}</b></th>
-                            <th xs={1} onClick={() => (rankSort === "qualAverage") ? setRankSort("-qualAverage") : setRankSort("qualAverage")}><b>Qual Avg.{rankSort === "qualAverage" ? <SortNumericUp /> : ""}{rankSort === "-qualAverage" ? <SortNumericDown /> : ""}</b></th>
-                            <th xs={1} onClick={() => (rankSort === "dq") ? setRankSort("-dq") : setRankSort("dq")}><b>DQ{rankSort === "dq" ? <SortNumericUp /> : ""}{rankSort === "-dq" ? <SortNumericDown /> : ""}</b></th>
-                            <th xs={1} onClick={() => (rankSort === "matchesPlayed") ? setRankSort("-matchesPlayed") : setRankSort("matchesPlayed")}><b>Matches Played{rankSort === "matchesPlayed" ? <SortNumericUp /> : ""}{rankSort === "-matchesPlayed" ? <SortNumericDown /> : ""}</b></th>
+                            <th onClick={() => (rankSort === "teamNumber") ? setRankSort("-teamNumber") : setRankSort("teamNumber")}><b>Team #{rankSort === "teamNumber" ? <SortNumericUp /> : ""}{rankSort === "-teamNumber" ? <SortNumericDown /> : ""}</b></th>
+                            <th onClick={() => (rankSort === "rank") ? setRankSort("-rank") : setRankSort("rank")}><b>Rank{rankSort === "rank" ? <SortNumericUp /> : ""}{rankSort === "-rank" ? <SortNumericDown /> : ""}</b></th>
+                            <th onClick={() => (rankSort === "teamName") ? setRankSort("-teamName") : setRankSort("teamName")}><b>Team Name{rankSort === "teamName" ? <SortAlphaUp /> : ""}{rankSort === "-teamName" ? <SortAlphaDown /> : ""}</b></th>
+                            <th onClick={() => (rankSort === "sortOrder1") ? setRankSort("-sortOrder1") : setRankSort("sortOrder1")}><b>RP Avg.{rankSort === "sortOrder1" ? <SortNumericUp /> : ""}{rankSort === "-sortOrder1" ? <SortNumericDown /> : ""}</b></th>
+                            <th onClick={() => (rankSort === "wins") ? setRankSort("-wins") : setRankSort("wins")}><b>Wins{rankSort === "wins" ? <SortNumericUp /> : ""}{rankSort === "-wins" ? <SortNumericDown /> : ""}</b></th>
+                            <th onClick={() => (rankSort === "losses") ? setRankSort("-losses") : setRankSort("losses")}><b>Losses{rankSort === "losses" ? <SortNumericUp /> : ""}{rankSort === "-losses" ? <SortNumericDown /> : ""}</b></th>
+                            <th  onClick={() => (rankSort === "ties") ? setRankSort("-ties") : setRankSort("ties")}><b>Ties{rankSort === "ties" ? <SortNumericUp /> : ""}{rankSort === "-ties" ? <SortNumericDown /> : ""}</b></th>
+                            <th  onClick={() => (rankSort === "qualAverage") ? setRankSort("-qualAverage") : setRankSort("qualAverage")}><b>Qual Avg.{rankSort === "qualAverage" ? <SortNumericUp /> : ""}{rankSort === "-qualAverage" ? <SortNumericDown /> : ""}</b></th>
+                            <th onClick={() => (rankSort === "dq") ? setRankSort("-dq") : setRankSort("dq")}><b>DQ{rankSort === "dq" ? <SortNumericUp /> : ""}{rankSort === "-dq" ? <SortNumericDown /> : ""}</b></th>
+                            <th onClick={() => (rankSort === "matchesPlayed") ? setRankSort("-matchesPlayed") : setRankSort("matchesPlayed")}><b>Matches Played{rankSort === "matchesPlayed" ? <SortNumericUp /> : ""}{rankSort === "-matchesPlayed" ? <SortNumericDown /> : ""}</b></th>
                         </tr>
                     </thead>
                     <tbody>
