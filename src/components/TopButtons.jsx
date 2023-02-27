@@ -69,7 +69,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
         enableScope('tabNavigation');
     }
     
-    var allianceMembers = alliances ? Object.keys(alliances?.Lookup) : null;
+    var allianceMembers = alliances?.Lookup ? Object.keys(alliances?.Lookup) : null;
     var availableTeams = [];
     rankings?.ranks.forEach((team) => {
         if (_.indexOf(allianceMembers, String(team.teamNumber)) < 0) { availableTeams.push({ "label": team.teamNumber, "value": team }) }
