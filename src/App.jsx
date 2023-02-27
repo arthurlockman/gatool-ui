@@ -27,6 +27,7 @@ import Developer from './pages/Developer';
 import { eventNames, specialAwards, hallOfFame, champs, champDivisions, champSubdivisions, miChamps, miDivisions } from './components/Constants';
 import { useOnlineStatus } from './contextProviders/OnlineContext';
 import { toast } from 'react-toastify';
+import { trainingData } from 'components/TrainingMatches';
 
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -87,6 +88,7 @@ const divisions = _.cloneDeep(champDivisions);
 const subdivisions = _.cloneDeep(champSubdivisions);
 const michamps = _.cloneDeep(miChamps);
 const midivisions = _.cloneDeep(miDivisions);
+const training = _.cloneDeep(trainingData);
 
 var eventnames = _.cloneDeep(eventNames);
 var halloffame = _.cloneDeep(hallOfFame);
@@ -244,9 +246,18 @@ function App() {
     }
 
     setScheduleTabReady(TabStates.NotReady);
-
-    var result = await httpClient.get(`${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/qual`);
-    var qualschedule = await result.json();
+    var result = null;
+    var qualschedule = null;
+    if (!selectedEvent?.value?.code.includes("PRACTICE")) {
+      result = await httpClient.get(`${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/qual`);
+      qualschedule = await result.json();
+    } else {
+      if (selectedEvent?.value?.code === "PRACTICE1") {
+        qualschedule = training.schedule.qual.partial;
+      } else {
+        qualschedule = training.schedule.qual.final;
+      }
+    }
     // adds the winner to the schedule.
     if (typeof qualschedule.Schedule !== "undefined") {
       qualschedule.schedule = qualschedule.Schedule;
@@ -276,8 +287,20 @@ function App() {
     //get the playoff schedule
     matches = [];
     result = null;
-    result = await httpClient.get(`${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/playoff`);
-    var playoffschedule = await result.json();
+    var playoffschedule = null;
+    if (!selectedEvent?.value?.code.includes("PRACTICE")) {
+      result = await httpClient.get(`${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/playoff`);
+      playoffschedule = await result.json();
+    } else {
+      if (selectedEvent?.value?.code === "PRACTICE1" || selectedEvent?.value?.code === "PRACTICE2") {
+        playoffschedule = training.schedule.playoff.pending;
+      } else if (selectedEvent?.value?.code === "PRACTICE3") {
+        playoffschedule = training.schedule.playoff.partial;
+      } else {
+        playoffschedule = training.schedule.playoff.final;
+      }
+    }
+
     if (typeof playoffschedule.Schedule !== "undefined") {
       playoffschedule.schedule = playoffschedule.Schedule;
       delete playoffschedule.Schedule;
@@ -299,8 +322,17 @@ function App() {
         return (match?.scoreRedFinal !== null) || (match?.scoreBlueFinal !== null)
       })]?.matchNumber;
 
-      result = await httpClient.get(`${selectedYear?.value}/scores/${selectedEvent?.value.code}/playoff/1/${lastMatchNumber}`);
-      var scores = await result.json();
+      if (!selectedEvent?.value?.code.includes("PRACTICE")) {
+        result = await httpClient.get(`${selectedYear?.value}/scores/${selectedEvent?.value.code}/playoff/1/${lastMatchNumber}`);
+        var scores = await result.json();
+      } else if (selectedEvent?.value?.code === "PRACTICE1" || selectedEvent?.value?.code === "PRACTICE2") {
+        scores = training.scores.playoff.initial;
+      } else if (selectedEvent?.value?.code === "PRACTICE3") {
+        scores = training.scores.playoff.partial;
+      } else {
+        scores = training.scores.playoff.final;
+      }
+
 
       _.forEach(scores.MatchScores, ((score) => {
         if (score.alliances[0].totalPoints === score.alliances[1].totalPoints) {
@@ -359,8 +391,16 @@ function App() {
     }
 
     setTeamDataTabReady(TabStates.NotReady);
-    var result = await httpClient.get(`${selectedYear?.value}/teams?eventCode=${selectedEvent?.value.code}`);
-    var teams = await result.json();
+    var result = null;
+    var teams = null;
+
+    if (!selectedEvent?.value?.code.includes("PRACTICE")) {
+      result = await httpClient.get(`${selectedYear?.value}/teams?eventCode=${selectedEvent?.value?.code}`);
+      teams = await result.json();
+    } else {
+      teams = training.teams.teams;
+    }
+
     if (typeof teams.Teams !== "undefined") {
       teams.teams = teams.Teams;
       delete teams.Teams;
@@ -615,8 +655,15 @@ function App() {
   // This function retrieves communnity updates for a specified event from gatool Cloud.
   async function getCommunityUpdates(notify) {
     setTeamDataTabReady(TabStates.NotReady);
-    var result = await httpClient.get(`${selectedYear?.value}/communityUpdates/${selectedEvent?.value.code}`);
-    var teams = await result.json();
+    var result = null;
+    var teams = null;
+    if (!selectedEvent?.value?.code.includes("PRACTICE")) {
+      result = await httpClient.get(`${selectedYear?.value}/communityUpdates/${selectedEvent?.value.code}`);
+      teams = await result.json();
+    } else {
+      teams = training.teams.communityUpdates;
+    }
+
 
     teams.lastUpdate = moment();
     if (notify) {
@@ -629,8 +676,16 @@ function App() {
   // This function retrieves the ranking data for a specified event from FIRST.
   async function getRanks() {
     setRanksTabReady(TabStates.NotReady);
-    var result = await httpClient.get(`${selectedYear?.value}/rankings/${selectedEvent?.value.code}`);
-    var ranks = await result.json();
+    var result = null;
+    var ranks = null;
+    if (!selectedEvent?.value?.code.includes("PRACTICE")) {
+      result = await httpClient.get(`${selectedYear?.value}/rankings/${selectedEvent?.value.code}`);
+      ranks = await result.json();
+    } else if (selectedEvent?.value?.code === "PRACTICE1") {
+      ranks = training.ranks.partial;
+    } else {
+      ranks = training.ranks.final;
+    }
     if (typeof ranks.Rankings === "undefined") {
       ranks.ranks = ranks.rankings;
       delete ranks.rankings;
@@ -697,8 +752,19 @@ function App() {
 
   // This function retrieves the Playoff Alliance data for a specified event from FIRST.
   async function getAlliances() {
-    var result = await httpClient.get(`${selectedYear?.value}/alliances/${selectedEvent?.value.code}`);
-    var alliances = await result.json();
+    var result = null;
+    var alliances = null;
+    if (!selectedEvent?.value?.code.includes("PRACTICE")) {
+      result = await httpClient.get(`${selectedYear?.value}/alliances/${selectedEvent?.value.code}`);
+      alliances = await result.json();
+    } else if (selectedEvent?.value?.code === "PRACTICE1" || selectedEvent?.value?.code === "PRACTICE2") {
+      alliances = training.alliances.initial;
+    } else if (selectedEvent?.value?.code === "PRACTICE3") {
+      alliances = training.alliances.partial;
+    } else {
+      alliances = training.alliances.final;
+    }
+
     if (typeof alliances.Alliances !== "undefined") {
       alliances.alliances = alliances.Alliances;
       delete alliances.Alliances;
@@ -782,6 +848,10 @@ function App() {
           delete json.Events;
         }
         var timeNow = moment();
+
+        if (selectedYear?.value === "2023") {
+          json.events = json?.events.concat(training.events.events)
+        }
 
         const events = json?.events.map((e) => {
           var color = "";

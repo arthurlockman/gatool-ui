@@ -11,7 +11,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
     const [show, setShow] = useState(null);
     const [teamSelected, setTeamSelected] = useState(null);
     const [confirmSelection, setConfirmSelection] = useState(false);
-    const { disableScope, enableScope } = useHotkeysContext()
+    const { disableScope, enableScope } = useHotkeysContext();
 
     const handleShow = () => {
         setShow(true);
@@ -68,8 +68,8 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
         enableScope('matchNavigation');
         enableScope('tabNavigation');
     }
-
-    var allianceMembers = Object.keys(alliances?.Lookup);
+    
+    var allianceMembers = alliances ? Object.keys(alliances?.Lookup) : null;
     var availableTeams = [];
     rankings?.ranks.forEach((team) => {
         if (_.indexOf(allianceMembers, String(team.teamNumber)) < 0) { availableTeams.push({ "label": team.teamNumber, "value": team }) }
