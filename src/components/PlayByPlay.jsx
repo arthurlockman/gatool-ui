@@ -15,6 +15,10 @@ function PlayByPlay({ station, team, inPlayoffs, selectedYear, selectedEvent, sh
                         {inPlayoffs && <p className={"playByPlayAlliance"}>{team?.alliance}<br />{team?.allianceRole}</p>}
                     </>
                 }
+                {!team?.teamNumber && <>
+                    <div className={"tbd"}>TBD</div>
+                </>
+                }
             </td>
             <td className={`col4 ${allianceColor.toLowerCase()}AlliancePlayByPlay`} >
                 {team?.teamNumber &&
@@ -35,6 +39,9 @@ function PlayByPlay({ station, team, inPlayoffs, selectedYear, selectedEvent, sh
                         {showNotes && <p className={"notes playByPlayWinLossTie"} dangerouslySetInnerHTML={{ __html: team?.updates?.teamNotes }}></p>}
                     </>
                 }
+                {!team?.teamNumber && <>
+                    <div className={"tbd"}>TBD</div>
+                </>}
             </td>
         </>
     )

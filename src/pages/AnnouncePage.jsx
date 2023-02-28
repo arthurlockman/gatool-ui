@@ -1,6 +1,5 @@
 import Announce from "../components/Announce";
 import { Alert, Container } from "react-bootstrap";
-import React from "react";
 import _ from "lodash";
 import { rankHighlight } from "../components/HelperFunctions";
 import BottomButtons from "../components/BottomButtons";
@@ -36,8 +35,8 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
                 var playoffTeams = matchDetails?.teams.map((team) => {
                     return { "teamNumber": team?.teamNumber, "alliance": team?.alliance }
                 });
-                var allianceTeams = _.filter(playoffTeams, { "alliance": allianceNumber }).map((o) => { return o.teamNumber });
-                var allianceMembers = _.filter(alliances?.alliances, { "number": Number(allianceNumber.slice(-1)) })[0] || [];
+                var allianceTeams = allianceNumber ? _.filter(playoffTeams, { "alliance": allianceNumber }).map((o) => { return o.teamNumber }) : [];
+                var allianceMembers = allianceNumber ? _.filter(alliances?.alliances, { "number": Number(allianceNumber.slice(-1)) })[0] : [];
                 var allianceArray = [];
                 allianceArray.push(allianceMembers?.captain);
                 allianceArray.push(allianceMembers?.round1);
@@ -115,10 +114,17 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
                     <table className={"table table-responsive"}>
                         <tbody>
                             {displayOrder.map((station) => {
-                                if (!_.isEmpty(teamDetails[station])) {
+                                if (!_.isEmpty(teamDetails[station]) && !_.isUndefined(teamDetails[station].teamNumber) && !_.isNull(teamDetails[station].teamNumber)) {
                                     return <Announce station={station} team={teamDetails[station]} inPlayoffs={inPlayoffs} key={station} awardsMenu={awardsMenu} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showAwards={showAwards} showSponsors={showSponsors} showMottoes={showMottoes} showChampsStats={showChampsStats} />
                                 } else {
-                                    return ""
+                                    if (station.slice(-1) !== "4") {
+                                        var allianceColor = _.toLower(station.slice(0, -1));
+                                        return (<tr className={`gatool-announce ${allianceColor}Alliance`}>
+                                            <td className={"tbd"}>TBD</td>
+                                        </tr>);
+                                    } else {
+                                        return "";
+                                    }
                                 }
                             }
                             )}
