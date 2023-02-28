@@ -1,6 +1,5 @@
 import Announce from "../components/Announce";
-import { Alert, Container, Row } from "react-bootstrap";
-import React from "react";
+import { Alert, Container } from "react-bootstrap";
 import _ from "lodash";
 import { rankHighlight } from "../components/HelperFunctions";
 import BottomButtons from "../components/BottomButtons";
