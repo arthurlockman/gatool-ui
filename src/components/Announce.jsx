@@ -61,9 +61,9 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
                 <p className={"sponsors"} >{team?.updates?.topSponsorsLocal ? team?.updates?.topSponsorsLocal : team?.topSponsors}</p>
                 <p className={`HOF${allianceColor}`}>
                 {originalAndSustaining.includes(String(team?.teamNumber)) && <span>Original and Sustaining Team<br /></span>}
-                    {team?.hallOfFame.map((award) => {
+                    {team?.hallOfFame ? team?.hallOfFame.map((award) => {
                         return <span key={award.year + award.type + award.challenge} className={`HOF${allianceColor}`}>{award.year} {award.type === "chairmans" ? "Chairman's Award" : "Winner"} {award.challenge}<br /></span>
-                    })}
+                    }) : ""}
 
                 </p>
                 {awards && <p className={"awards"}>
