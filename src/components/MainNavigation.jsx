@@ -67,7 +67,7 @@ function MainNavigation({ scheduleTabReady, teamDataTabReady, ranksTabReady, sta
 
 
   return (
-    <><Navbar bg="light" sticky='top' style={{ color: "black" }}>
+    <><Navbar bg="light" sticky='top' style={{ color: "black"} }>
       <Nav className="me-auto">
         <Nav.Link id={"setupPage"} as={NavLink} style={({ isActive }) => getTabStyle(isActive, null)} to="/"><Gear /><div className='d-none d-md-block navBarText'>Setup</div></Nav.Link>
         <Nav.Link id={"schedulePage"} as={NavLink} style={({ isActive }) => getTabStyle(isActive, scheduleTabReady)} to="/schedule"><Calendar3 /><div className='d-none d-md-block navBarText'>Schedule</div></Nav.Link>

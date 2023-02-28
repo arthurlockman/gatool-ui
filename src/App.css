@@ -1,6 +1,7 @@
 .App {
 	text-align: center;
 	font-size: 14px;
+	width: 95%
 }
 
 .App-logo {
@@ -140,6 +141,7 @@ td {
 
 .playByPlayTable {
 	display: table;
+	width:100%
 }
 
 .playByPlayTableRow {
@@ -567,7 +569,7 @@ td {
 }
 
 .topBorderLine {
-	border-top: 2px darkblue solid ;
+	border-top: 2px darkblue solid;
 }
 
 .tbd {
