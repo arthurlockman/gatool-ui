@@ -2300,7 +2300,7 @@ trainingSchedule.qual.partial = {
 
 trainingSchedule.playoff.pending = {
     "Schedule": []
-  }
+}
 
 trainingSchedule.playoff.final = {
     "Schedule": [
@@ -3914,37 +3914,37 @@ trainingSchedule.playoff.partial = {
             "tournamentLevel": "Playoff",
             "teams": [
                 {
-                    "teamNumber": null,
+                    "teamNumber": 0,
                     "station": "Red1",
                     "surrogate": false,
                     "dq": false
                 },
                 {
-                    "teamNumber": null,
+                    "teamNumber": 0,
                     "station": "Red2",
                     "surrogate": false,
                     "dq": false
                 },
                 {
-                    "teamNumber": null,
+                    "teamNumber": 0,
                     "station": "Red3",
                     "surrogate": false,
                     "dq": false
                 },
                 {
-                    "teamNumber": null,
+                    "teamNumber": 0,
                     "station": "Blue1",
                     "surrogate": false,
                     "dq": false
                 },
                 {
-                    "teamNumber": null,
+                    "teamNumber": 0,
                     "station": "Blue2",
                     "surrogate": false,
                     "dq": false
                 },
                 {
-                    "teamNumber": null,
+                    "teamNumber": 0,
                     "station": "Blue3",
                     "surrogate": false,
                     "dq": false
@@ -3971,37 +3971,37 @@ trainingSchedule.playoff.partial = {
             "tournamentLevel": "Playoff",
             "teams": [
                 {
-                    "teamNumber": null,
+                    "teamNumber": 0,
                     "station": "Red1",
                     "surrogate": false,
                     "dq": false
                 },
                 {
-                    "teamNumber": null,
+                    "teamNumber": 0,
                     "station": "Red2",
                     "surrogate": false,
                     "dq": false
                 },
                 {
-                    "teamNumber": null,
+                    "teamNumber": 0,
                     "station": "Red3",
                     "surrogate": false,
                     "dq": false
                 },
                 {
-                    "teamNumber": null,
+                    "teamNumber": 0,
                     "station": "Blue1",
                     "surrogate": false,
                     "dq": false
                 },
                 {
-                    "teamNumber": null,
+                    "teamNumber": 0,
                     "station": "Blue2",
                     "surrogate": false,
                     "dq": false
                 },
                 {
-                    "teamNumber": null,
+                    "teamNumber": 0,
                     "station": "Blue3",
                     "surrogate": false,
                     "dq": false
@@ -4028,37 +4028,37 @@ trainingSchedule.playoff.partial = {
             "tournamentLevel": "Playoff",
             "teams": [
                 {
-                    "teamNumber": null,
+                    "teamNumber": 0,
                     "station": "Red1",
                     "surrogate": false,
                     "dq": false
                 },
                 {
-                    "teamNumber": null,
+                    "teamNumber": 0,
                     "station": "Red2",
                     "surrogate": false,
                     "dq": false
                 },
                 {
-                    "teamNumber": null,
+                    "teamNumber": 0,
                     "station": "Red3",
                     "surrogate": false,
                     "dq": false
                 },
                 {
-                    "teamNumber": null,
+                    "teamNumber": 0,
                     "station": "Blue1",
                     "surrogate": false,
                     "dq": false
                 },
                 {
-                    "teamNumber": null,
+                    "teamNumber": 0,
                     "station": "Blue2",
                     "surrogate": false,
                     "dq": false
                 },
                 {
-                    "teamNumber": null,
+                    "teamNumber": 0,
                     "station": "Blue3",
                     "surrogate": false,
                     "dq": false
@@ -4085,19 +4085,19 @@ trainingSchedule.playoff.partial = {
             "tournamentLevel": "Playoff",
             "teams": [
                 {
-                    "teamNumber": null,
+                    "teamNumber": 0,
                     "station": "Red1",
                     "surrogate": false,
                     "dq": false
                 },
                 {
-                    "teamNumber": null,
+                    "teamNumber": 0,
                     "station": "Red2",
                     "surrogate": false,
                     "dq": false
                 },
                 {
-                    "teamNumber": null,
+                    "teamNumber": 0,
                     "station": "Red3",
                     "surrogate": false,
                     "dq": false
@@ -4142,37 +4142,37 @@ trainingSchedule.playoff.partial = {
             "tournamentLevel": "Playoff",
             "teams": [
                 {
-                    "teamNumber": null,
+                    "teamNumber": 0,
                     "station": "Red1",
                     "surrogate": false,
                     "dq": false
                 },
                 {
-                    "teamNumber": null,
+                    "teamNumber": 0,
                     "station": "Red2",
                     "surrogate": false,
                     "dq": false
                 },
                 {
-                    "teamNumber": null,
+                    "teamNumber": 0,
                     "station": "Red3",
                     "surrogate": false,
                     "dq": false
                 },
                 {
-                    "teamNumber": null,
+                    "teamNumber": 0,
                     "station": "Blue1",
                     "surrogate": false,
                     "dq": false
                 },
                 {
-                    "teamNumber": null,
+                    "teamNumber": 0,
                     "station": "Blue2",
                     "surrogate": false,
                     "dq": false
                 },
                 {
-                    "teamNumber": null,
+                    "teamNumber": 0,
                     "station": "Blue3",
                     "surrogate": false,
                     "dq": false
@@ -4199,37 +4199,37 @@ trainingSchedule.playoff.partial = {
             "tournamentLevel": "Playoff",
             "teams": [
                 {
-                    "teamNumber": null,
+                    "teamNumber": 0,
                     "station": "Red1",
                     "surrogate": false,
                     "dq": false
                 },
                 {
-                    "teamNumber": null,
+                    "teamNumber": 0,
                     "station": "Red2",
                     "surrogate": false,
                     "dq": false
                 },
                 {
-                    "teamNumber": null,
+                    "teamNumber": 0,
                     "station": "Red3",
                     "surrogate": false,
                     "dq": false
                 },
                 {
-                    "teamNumber": null,
+                    "teamNumber": 0,
                     "station": "Blue1",
                     "surrogate": false,
                     "dq": false
                 },
                 {
-                    "teamNumber": null,
+                    "teamNumber": 0,
                     "station": "Blue2",
                     "surrogate": false,
                     "dq": false
                 },
                 {
-                    "teamNumber": null,
+                    "teamNumber": 0,
                     "station": "Blue3",
                     "surrogate": false,
                     "dq": false
@@ -12135,7 +12135,7 @@ trainingRanks.partial = {
 }
 
 trainingAlliances.initial = {
-    "Alliances":[ ]
+    "Alliances": []
 }
 trainingAlliances.final = {
     "Alliances": [
@@ -12331,7 +12331,7 @@ trainingEvents.events = [{
         "https://www.twitch.tv/firstinspires1"
     ],
     "timezone": "Eastern Standard Time"
-},{
+}, {
     "allianceCount": "EightAlliance",
     "weekNumber": 0,
     "announcements": [],
@@ -12353,7 +12353,7 @@ trainingEvents.events = [{
         "https://www.twitch.tv/firstinspires1"
     ],
     "timezone": "Eastern Standard Time"
-},{
+}, {
     "allianceCount": "EightAlliance",
     "weekNumber": 0,
     "announcements": [],
@@ -12375,7 +12375,7 @@ trainingEvents.events = [{
         "https://www.twitch.tv/firstinspires1"
     ],
     "timezone": "Eastern Standard Time"
-},{
+}, {
     "allianceCount": "EightAlliance",
     "weekNumber": 0,
     "announcements": [],
@@ -12400,10 +12400,10 @@ trainingEvents.events = [{
 }]
 
 export const trainingData = {
-    "events":trainingEvents,
-    "alliances":trainingAlliances,
-    "ranks":trainingRanks,
-    "teams":trainingTeams,
-    "schedule":trainingSchedule,
-    "scores":trainingScores
+    "events": trainingEvents,
+    "alliances": trainingAlliances,
+    "ranks": trainingRanks,
+    "teams": trainingTeams,
+    "schedule": trainingSchedule,
+    "scores": trainingScores
 }

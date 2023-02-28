@@ -114,7 +114,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
                     <table className={"table table-responsive"}>
                         <tbody>
                             {displayOrder.map((station) => {
-                                if (!_.isEmpty(teamDetails[station]) && !_.isUndefined(teamDetails[station].teamNumber) && !_.isNull(teamDetails[station].teamNumber)) {
+                                if (!_.isEmpty(teamDetails[station]) && !_.isUndefined(teamDetails[station].teamNumber) && !_.isNull(teamDetails[station].teamNumber) && teamDetails[station].teamNumber > 0) {
                                     return <Announce station={station} team={teamDetails[station]} inPlayoffs={inPlayoffs} key={station} awardsMenu={awardsMenu} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showAwards={showAwards} showSponsors={showSponsors} showMottoes={showMottoes} showChampsStats={showChampsStats} />
                                 } else {
                                     if (station.slice(-1) !== "4") {
