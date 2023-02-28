@@ -91,7 +91,7 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
     })
 
     teamList?.teams.forEach((team, index) => {
-        teamList.teams[index].highScore = _.orderBy(_.filter(scores, { "teamNumber": team?.teamNumber }), ["score", "desc"])[0];
+        teamList.teams[index].highScore = _.orderBy(_.filter(scores, { "teamNumber": team?.teamNumber }), ["score"], ["desc"])[0];
     }
     )
 
