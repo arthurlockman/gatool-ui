@@ -36,7 +36,7 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule }) {
                                 }
 
                                 return (<tr key={"qualSchedule" + match.matchNumber} className="centerTable">
-                                    <td>{match.actualStartTime ? "Actual:" : "Scheduled:"}<br /> {match.actualStartTime ? moment(match.actualStartTime).format('dd hh:mm A') : moment(match.StartTime).format('dd hh:mm A')}</td>
+                                    <td>{match.actualStartTime ? "Actual:" : "Scheduled:"}<br /> {match.actualStartTime ? moment(match.actualStartTime).format('dd hh:mm A') : moment(match.startTime).format('dd hh:mm A')}</td>
                                     <td>{match.description}</td>
                                     <td>{match.matchNumber}</td>
                                     <td><span className={redStyle}>{match.scoreRedFinal}</span><br /><span className={blueStyle}>{match.scoreBlueFinal}</span></td>
