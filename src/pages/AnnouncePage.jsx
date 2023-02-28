@@ -112,6 +112,14 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
                 <Container fluid>
                     <TopButtons previousMatch={previousMatch} nextMatch={nextMatch} currentMatch={currentMatch} matchMenu={matchMenu} setMatchFromMenu={setMatchFromMenu} selectedEvent={selectedEvent} matchDetails={matchDetails} timeFormat={timeFormat} inPlayoffs={inPlayoffs} alliances={alliances} setAlliances={setAlliances} rankings={rankings} backupTeam={backupTeam} setBackupTeam={setBackupTeam} />
                     <table className={"table table-responsive"}>
+                        <thead>
+                            <tr>
+                                <td>Team #</td>
+                                <td>Team Name</td>
+                                <td>Orgainzation, Sponsors & Awards</td>
+                                <td>Rank</td>
+                            </tr>
+                        </thead>
                         <tbody>
                             {displayOrder.map((station) => {
                                 if (!_.isEmpty(teamDetails[station]) && !_.isUndefined(teamDetails[station].teamNumber) && !_.isNull(teamDetails[station].teamNumber) && teamDetails[station].teamNumber > 0) {
@@ -120,7 +128,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
                                     if (station.slice(-1) !== "4") {
                                         var allianceColor = _.toLower(station.slice(0, -1));
                                         return (<tr className={`gatool-announce ${allianceColor}Alliance`}>
-                                            <td className={"tbd"}>TBD</td>
+                                            <td colSpan={4} className={"tbd"}>TBD</td>
                                         </tr>);
                                     } else {
                                         return "";

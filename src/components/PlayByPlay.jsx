@@ -5,7 +5,7 @@ function PlayByPlay({ station, team, inPlayoffs, selectedYear, selectedEvent, sh
     return (
         <>
             <td className={`col2 ${allianceColor.toLowerCase()}AlliancePlayByPlay align-middle`} align="center" >
-                {team?.teamNumber &&
+                {team?.teamNumber && (team?.teamNumber !== 0) &&
                     <>
                         <p className={"playByPlayteamNumber"}>{team?.teamNumber}</p>
                         <p className={"playByPlaysayNumber"} >{team?.updates?.sayNumber}</p>
@@ -21,7 +21,7 @@ function PlayByPlay({ station, team, inPlayoffs, selectedYear, selectedEvent, sh
                 }
             </td>
             <td className={`col4 ${allianceColor.toLowerCase()}AlliancePlayByPlay`} >
-                {team?.teamNumber &&
+                {team?.teamNumber && (team?.teamNumber !== 0) &&
                     <>
                         <p className={`playByPlayTeamName ${(inPlayoffs && showQualsStats) ? "playByPlayTeamNameStats" : ""}`}>{team?.updates?.nameShortLocal ? team?.updates?.nameShortLocal : team?.nameShort}</p>
                         <p className={"playByPlayRobotName"}>{team?.updates?.robotNameLocal}</p>
