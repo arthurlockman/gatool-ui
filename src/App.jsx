@@ -28,6 +28,7 @@ import { eventNames, specialAwards, hallOfFame, champs, champDivisions, champSub
 import { useOnlineStatus } from './contextProviders/OnlineContext';
 import { toast } from 'react-toastify';
 import { trainingData } from 'components/TrainingMatches';
+import { timeZones } from 'components/TimeZones';
 
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -92,6 +93,8 @@ const training = _.cloneDeep(trainingData);
 
 var eventnames = _.cloneDeep(eventNames);
 var halloffame = _.cloneDeep(hallOfFame);
+
+const timezones = _.cloneDeep(timeZones);
 
 function App() {
   const { isAuthenticated, isLoading } = useAuth0();
@@ -858,6 +861,12 @@ function App() {
           var optionPrefix = "";
           var optionPostfix = "";
           var filters = [];
+
+          // We have four formats available in timezones: abbreviation, description, Livemeeting and Windows. We lookup the Windows
+          // format and convert it to a more standard format. Consider moving off of Moment on to Luxor?
+          
+          e.timeZoneAbbreviation = timezones[_.findIndex(timezones,{"Windows": e.timezone })].Abbreviation;
+
           var eventTime = moment(e.dateEnd);
           e.name = e.name.trim();
           e.name = _.replace(e.name, `- FIRST Robotics Competition -`, `-`);
