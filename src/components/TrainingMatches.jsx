@@ -100,7 +100,7 @@ trainingSchedule.qual.final = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 4909,
+                    "teamNumber": 9995,
                     "station": "Blue2",
                     "surrogate": false,
                     "dq": false
@@ -133,7 +133,7 @@ trainingSchedule.qual.final = {
             "tournamentLevel": "Qualification",
             "teams": [
                 {
-                    "teamNumber": 9101,
+                    "teamNumber": 9999,
                     "station": "Red1",
                     "surrogate": false,
                     "dq": false
@@ -202,7 +202,7 @@ trainingSchedule.qual.final = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 5459,
+                    "teamNumber": 9996,
                     "station": "Red3",
                     "surrogate": false,
                     "dq": false
@@ -220,7 +220,7 @@ trainingSchedule.qual.final = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 7314,
+                    "teamNumber": 9997,
                     "station": "Blue3",
                     "surrogate": false,
                     "dq": false
@@ -277,7 +277,7 @@ trainingSchedule.qual.final = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 8724,
+                    "teamNumber": 9998,
                     "station": "Blue3",
                     "surrogate": false,
                     "dq": false
@@ -361,7 +361,7 @@ trainingSchedule.qual.final = {
             "tournamentLevel": "Qualification",
             "teams": [
                 {
-                    "teamNumber": 4909,
+                    "teamNumber": 9995,
                     "station": "Red1",
                     "surrogate": false,
                     "dq": false
@@ -379,13 +379,13 @@ trainingSchedule.qual.final = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 9101,
+                    "teamNumber": 9999,
                     "station": "Blue1",
                     "surrogate": false,
                     "dq": false
                 },
                 {
-                    "teamNumber": 5459,
+                    "teamNumber": 9996,
                     "station": "Blue2",
                     "surrogate": false,
                     "dq": false
@@ -481,7 +481,7 @@ trainingSchedule.qual.final = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 8724,
+                    "teamNumber": 9998,
                     "station": "Red2",
                     "surrogate": false,
                     "dq": false
@@ -562,7 +562,7 @@ trainingSchedule.qual.final = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 7314,
+                    "teamNumber": 9997,
                     "station": "Blue3",
                     "surrogate": false,
                     "dq": false
@@ -646,13 +646,13 @@ trainingSchedule.qual.final = {
             "tournamentLevel": "Qualification",
             "teams": [
                 {
-                    "teamNumber": 8724,
+                    "teamNumber": 9998,
                     "station": "Red1",
                     "surrogate": false,
                     "dq": false
                 },
                 {
-                    "teamNumber": 9101,
+                    "teamNumber": 9999,
                     "station": "Red2",
                     "surrogate": false,
                     "dq": false
@@ -760,7 +760,7 @@ trainingSchedule.qual.final = {
             "tournamentLevel": "Qualification",
             "teams": [
                 {
-                    "teamNumber": 5459,
+                    "teamNumber": 9996,
                     "station": "Red1",
                     "surrogate": false,
                     "dq": false
@@ -817,7 +817,7 @@ trainingSchedule.qual.final = {
             "tournamentLevel": "Qualification",
             "teams": [
                 {
-                    "teamNumber": 7314,
+                    "teamNumber": 9997,
                     "station": "Red1",
                     "surrogate": false,
                     "dq": false
@@ -847,7 +847,7 @@ trainingSchedule.qual.final = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 4909,
+                    "teamNumber": 9995,
                     "station": "Blue3",
                     "surrogate": false,
                     "dq": false
@@ -904,7 +904,7 @@ trainingSchedule.qual.final = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 9101,
+                    "teamNumber": 9999,
                     "station": "Blue3",
                     "surrogate": false,
                     "dq": false
@@ -955,7 +955,7 @@ trainingSchedule.qual.final = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 8724,
+                    "teamNumber": 9998,
                     "station": "Blue2",
                     "surrogate": false,
                     "dq": false
@@ -1012,7 +1012,7 @@ trainingSchedule.qual.final = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 5459,
+                    "teamNumber": 9996,
                     "station": "Blue2",
                     "surrogate": false,
                     "dq": false
@@ -1069,7 +1069,7 @@ trainingSchedule.qual.final = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 7314,
+                    "teamNumber": 9997,
                     "station": "Blue2",
                     "surrogate": false,
                     "dq": false
@@ -1126,7 +1126,7 @@ trainingSchedule.qual.final = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 4909,
+                    "teamNumber": 9995,
                     "station": "Blue2",
                     "surrogate": false,
                     "dq": false
@@ -1245,7 +1245,7 @@ trainingSchedule.qual.partial = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 4909,
+                    "teamNumber": 9995,
                     "station": "Blue2",
                     "surrogate": false,
                     "dq": false
@@ -1278,7 +1278,7 @@ trainingSchedule.qual.partial = {
             "tournamentLevel": "Qualification",
             "teams": [
                 {
-                    "teamNumber": 9101,
+                    "teamNumber": 9999,
                     "station": "Red1",
                     "surrogate": false,
                     "dq": false
@@ -1347,7 +1347,7 @@ trainingSchedule.qual.partial = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 5459,
+                    "teamNumber": 9996,
                     "station": "Red3",
                     "surrogate": false,
                     "dq": false
@@ -1365,7 +1365,7 @@ trainingSchedule.qual.partial = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 7314,
+                    "teamNumber": 9997,
                     "station": "Blue3",
                     "surrogate": false,
                     "dq": false
@@ -1422,7 +1422,7 @@ trainingSchedule.qual.partial = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 8724,
+                    "teamNumber": 9998,
                     "station": "Blue3",
                     "surrogate": false,
                     "dq": false
@@ -1506,7 +1506,7 @@ trainingSchedule.qual.partial = {
             "tournamentLevel": "Qualification",
             "teams": [
                 {
-                    "teamNumber": 4909,
+                    "teamNumber": 9995,
                     "station": "Red1",
                     "surrogate": false,
                     "dq": false
@@ -1524,13 +1524,13 @@ trainingSchedule.qual.partial = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 9101,
+                    "teamNumber": 9999,
                     "station": "Blue1",
                     "surrogate": false,
                     "dq": false
                 },
                 {
-                    "teamNumber": 5459,
+                    "teamNumber": 9996,
                     "station": "Blue2",
                     "surrogate": false,
                     "dq": false
@@ -1626,7 +1626,7 @@ trainingSchedule.qual.partial = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 8724,
+                    "teamNumber": 9998,
                     "station": "Red2",
                     "surrogate": false,
                     "dq": false
@@ -1707,7 +1707,7 @@ trainingSchedule.qual.partial = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 7314,
+                    "teamNumber": 9997,
                     "station": "Blue3",
                     "surrogate": false,
                     "dq": false
@@ -1791,13 +1791,13 @@ trainingSchedule.qual.partial = {
             "tournamentLevel": "Qualification",
             "teams": [
                 {
-                    "teamNumber": 8724,
+                    "teamNumber": 9998,
                     "station": "Red1",
                     "surrogate": false,
                     "dq": false
                 },
                 {
-                    "teamNumber": 9101,
+                    "teamNumber": 9999,
                     "station": "Red2",
                     "surrogate": false,
                     "dq": false
@@ -1905,7 +1905,7 @@ trainingSchedule.qual.partial = {
             "tournamentLevel": "Qualification",
             "teams": [
                 {
-                    "teamNumber": 5459,
+                    "teamNumber": 9996,
                     "station": "Red1",
                     "surrogate": false,
                     "dq": false
@@ -1962,7 +1962,7 @@ trainingSchedule.qual.partial = {
             "tournamentLevel": "Qualification",
             "teams": [
                 {
-                    "teamNumber": 7314,
+                    "teamNumber": 9997,
                     "station": "Red1",
                     "surrogate": false,
                     "dq": false
@@ -1992,7 +1992,7 @@ trainingSchedule.qual.partial = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 4909,
+                    "teamNumber": 9995,
                     "station": "Blue3",
                     "surrogate": false,
                     "dq": false
@@ -2049,7 +2049,7 @@ trainingSchedule.qual.partial = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 9101,
+                    "teamNumber": 9999,
                     "station": "Blue3",
                     "surrogate": false,
                     "dq": false
@@ -2100,7 +2100,7 @@ trainingSchedule.qual.partial = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 8724,
+                    "teamNumber": 9998,
                     "station": "Blue2",
                     "surrogate": false,
                     "dq": false
@@ -2157,7 +2157,7 @@ trainingSchedule.qual.partial = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 5459,
+                    "teamNumber": 9996,
                     "station": "Blue2",
                     "surrogate": false,
                     "dq": false
@@ -2214,7 +2214,7 @@ trainingSchedule.qual.partial = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 7314,
+                    "teamNumber": 9997,
                     "station": "Blue2",
                     "surrogate": false,
                     "dq": false
@@ -2271,7 +2271,7 @@ trainingSchedule.qual.partial = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 4909,
+                    "teamNumber": 9995,
                     "station": "Blue2",
                     "surrogate": false,
                     "dq": false
@@ -2400,7 +2400,7 @@ trainingSchedule.playoff.final = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 8724,
+                    "teamNumber": 9998,
                     "station": "Blue3",
                     "surrogate": false,
                     "dq": false
@@ -2433,7 +2433,7 @@ trainingSchedule.playoff.final = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 4909,
+                    "teamNumber": 9995,
                     "station": "Red2",
                     "surrogate": false,
                     "dq": false
@@ -2571,7 +2571,7 @@ trainingSchedule.playoff.final = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 8724,
+                    "teamNumber": 9998,
                     "station": "Blue3",
                     "surrogate": false,
                     "dq": false
@@ -2718,7 +2718,7 @@ trainingSchedule.playoff.final = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 4909,
+                    "teamNumber": 9995,
                     "station": "Red2",
                     "surrogate": false,
                     "dq": false
@@ -2907,7 +2907,7 @@ trainingSchedule.playoff.final = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 4909,
+                    "teamNumber": 9995,
                     "station": "Blue2",
                     "surrogate": false,
                     "dq": false
@@ -3060,7 +3060,7 @@ trainingSchedule.playoff.final = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 4909,
+                    "teamNumber": 9995,
                     "station": "Red2",
                     "surrogate": false,
                     "dq": false
@@ -3117,7 +3117,7 @@ trainingSchedule.playoff.final = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 4909,
+                    "teamNumber": 9995,
                     "station": "Red2",
                     "surrogate": false,
                     "dq": false
@@ -3174,7 +3174,7 @@ trainingSchedule.playoff.final = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 4909,
+                    "teamNumber": 9995,
                     "station": "Red2",
                     "surrogate": false,
                     "dq": false
@@ -3231,7 +3231,7 @@ trainingSchedule.playoff.final = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 4909,
+                    "teamNumber": 9995,
                     "station": "Red2",
                     "surrogate": false,
                     "dq": false
@@ -3374,7 +3374,7 @@ trainingSchedule.playoff.partial = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 8724,
+                    "teamNumber": 9998,
                     "station": "Blue3",
                     "surrogate": false,
                     "dq": false
@@ -3407,7 +3407,7 @@ trainingSchedule.playoff.partial = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 4909,
+                    "teamNumber": 9995,
                     "station": "Red2",
                     "surrogate": false,
                     "dq": false
@@ -3545,7 +3545,7 @@ trainingSchedule.playoff.partial = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 8724,
+                    "teamNumber": 9998,
                     "station": "Blue3",
                     "surrogate": false,
                     "dq": false
@@ -3692,7 +3692,7 @@ trainingSchedule.playoff.partial = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 4909,
+                    "teamNumber": 9995,
                     "station": "Red2",
                     "surrogate": false,
                     "dq": false
@@ -3881,7 +3881,7 @@ trainingSchedule.playoff.partial = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 4909,
+                    "teamNumber": 9995,
                     "station": "Blue2",
                     "surrogate": false,
                     "dq": false
@@ -10645,7 +10645,7 @@ trainingTeams.teams = {
             "homeCMP": "CMPTX"
         },
         {
-            "teamNumber": 4909,
+            "teamNumber": 9995,
             "nameFull": "Raytheon&Billerica Memorial High School",
             "nameShort": "Bionics",
             "city": "Billerica",
@@ -10659,7 +10659,7 @@ trainingTeams.teams = {
             "homeCMP": "CMPTX"
         },
         {
-            "teamNumber": 5459,
+            "teamNumber": 9996,
             "nameFull": "Ipswich Education Foundation / Analog Devices Inc. / New England Biolabs / AXIS, Inc. / Josephson Family / Harmonic Drive Inc. / Joset Corp. / Tedford's Hardware and Building Supplies / East Coast Metrology / Dawn Falardeau / James Kernan / Dassault Systems & Ipswich High School",
             "nameShort": "Ipswich TIGERS",
             "city": "Ipswich",
@@ -10673,7 +10673,7 @@ trainingTeams.teams = {
             "homeCMP": "CMPTX"
         },
         {
-            "teamNumber": 7314,
+            "teamNumber": 9997,
             "nameFull": "EEI/NH DOE/newschoolvinyl/SAU 18/Benson Auto/C&C Cars/Watts/May Garden/DeMoulas Super Markets, Inc.&Franklin High School",
             "nameShort": "Tornadoes",
             "city": "Franklin",
@@ -10687,7 +10687,7 @@ trainingTeams.teams = {
             "homeCMP": "CMPTX"
         },
         {
-            "teamNumber": 8724,
+            "teamNumber": 9998,
             "nameFull": "Argosy Foundation/Rockwell Automation/Burk Technology&Family/Community",
             "nameShort": "Mayhem",
             "city": "Bedford",
@@ -10701,7 +10701,7 @@ trainingTeams.teams = {
             "homeCMP": "CMPTX"
         },
         {
-            "teamNumber": 9101,
+            "teamNumber": 9999,
             "nameFull": "Essex High School",
             "nameShort": "HiveMind Robotics",
             "city": "Essex Junction",
@@ -11107,7 +11107,7 @@ trainingTeams.communityUpdates = [
         }
     },
     {
-        "teamNumber": 4909,
+        "teamNumber": 9995,
         "updates": {
             "robotNameLocal": "Equinox",
             "lastUpdate": "2023-02-18T10:26:46-05:00",
@@ -11115,11 +11115,11 @@ trainingTeams.communityUpdates = [
         }
     },
     {
-        "teamNumber": 5459,
+        "teamNumber": 9996,
         "updates": {}
     },
     {
-        "teamNumber": 7314,
+        "teamNumber": 9997,
         "updates": {
             "nameShortLocal": "",
             "cityStateLocal": "",
@@ -11139,7 +11139,7 @@ trainingTeams.communityUpdates = [
         }
     },
     {
-        "teamNumber": 8724,
+        "teamNumber": 9998,
         "updates": {
             "nameShortLocal": "",
             "cityStateLocal": "",
@@ -11159,7 +11159,7 @@ trainingTeams.communityUpdates = [
         }
     },
     {
-        "teamNumber": 9101,
+        "teamNumber": 9999,
         "updates": null
     }
 ]
@@ -11232,7 +11232,7 @@ trainingRanks.final = {
         },
         {
             "rank": 5,
-            "teamNumber": 4909,
+            "teamNumber": 9995,
             "sortOrder1": 2,
             "sortOrder2": 56.75,
             "sortOrder3": 25.5,
@@ -11520,7 +11520,7 @@ trainingRanks.final = {
         },
         {
             "rank": 23,
-            "teamNumber": 7314,
+            "teamNumber": 9997,
             "sortOrder1": 0.75,
             "sortOrder2": 45,
             "sortOrder3": 14.5,
@@ -11552,7 +11552,7 @@ trainingRanks.final = {
         },
         {
             "rank": 25,
-            "teamNumber": 8724,
+            "teamNumber": 9998,
             "sortOrder1": 0.75,
             "sortOrder2": 40.75,
             "sortOrder3": 15,
@@ -11584,7 +11584,7 @@ trainingRanks.final = {
         },
         {
             "rank": 27,
-            "teamNumber": 9101,
+            "teamNumber": 9999,
             "sortOrder1": 0.5,
             "sortOrder2": 42.75,
             "sortOrder3": 19.5,
@@ -11632,7 +11632,7 @@ trainingRanks.final = {
         },
         {
             "rank": 30,
-            "teamNumber": 5459,
+            "teamNumber": 9996,
             "sortOrder1": 0,
             "sortOrder2": 33.25,
             "sortOrder3": 10.5,
@@ -11717,7 +11717,7 @@ trainingRanks.partial = {
         },
         {
             "rank": 5,
-            "teamNumber": 4909,
+            "teamNumber": 9995,
             "sortOrder1": 2,
             "sortOrder2": 56.75,
             "sortOrder3": 25.5,
@@ -12005,7 +12005,7 @@ trainingRanks.partial = {
         },
         {
             "rank": 23,
-            "teamNumber": 7314,
+            "teamNumber": 9997,
             "sortOrder1": 0.75,
             "sortOrder2": 45,
             "sortOrder3": 14.5,
@@ -12037,7 +12037,7 @@ trainingRanks.partial = {
         },
         {
             "rank": 25,
-            "teamNumber": 8724,
+            "teamNumber": 9998,
             "sortOrder1": 0.75,
             "sortOrder2": 40.75,
             "sortOrder3": 15,
@@ -12069,7 +12069,7 @@ trainingRanks.partial = {
         },
         {
             "rank": 27,
-            "teamNumber": 9101,
+            "teamNumber": 9999,
             "sortOrder1": 0.5,
             "sortOrder2": 42.75,
             "sortOrder3": 19.5,
@@ -12117,7 +12117,7 @@ trainingRanks.partial = {
         },
         {
             "rank": 30,
-            "teamNumber": 5459,
+            "teamNumber": 9996,
             "sortOrder1": 0,
             "sortOrder2": 33.25,
             "sortOrder3": 10.5,
@@ -12152,7 +12152,7 @@ trainingAlliances.final = {
         {
             "number": 2,
             "captain": 1073,
-            "round1": 4909,
+            "round1": 9995,
             "round2": 1729,
             "round3": null,
             "backup": null,
@@ -12183,7 +12183,7 @@ trainingAlliances.final = {
             "number": 5,
             "captain": 4041,
             "round1": 238,
-            "round2": 8724,
+            "round2": 9998,
             "round3": null,
             "backup": null,
             "backupReplaced": null,
@@ -12238,7 +12238,7 @@ trainingAlliances.partial = {
         {
             "number": 2,
             "captain": 1073,
-            "round1": 4909,
+            "round1": 9995,
             "round2": 1729,
             "round3": null,
             "backup": null,
@@ -12269,7 +12269,7 @@ trainingAlliances.partial = {
             "number": 5,
             "captain": 4041,
             "round1": 238,
-            "round2": 8724,
+            "round2": 9998,
             "round3": null,
             "backup": null,
             "backupReplaced": null,
