@@ -14,10 +14,10 @@ function RanksPage({ selectedEvent, teamList, rankings, rankSort, setRankSort, a
 
     function rankHighlight(rank) {
         var style = { color: "black", backgroundColor: "white" };
-        if ((rank <= allianceCount.count) && (rank > 1)) {
+        if ((rank <= allianceCount?.count) && (rank > 1)) {
             style.color = "white";
             style.backgroundColor = "green"
-        } else if ((rank < (allianceCount.count + 3)) && (rank > allianceCount.count)) {
+        } else if ((rank < (allianceCount?.count + 3)) && (rank > allianceCount?.count)) {
             style.color = "black";
             style.backgroundColor = "yellow"
         } else if (rank === 1) {

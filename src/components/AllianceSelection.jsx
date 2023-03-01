@@ -87,8 +87,8 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
             asArrays.availableTeams.splice(_.findIndex(asArrays.availableTeams, { "teamNumber": team.teamNumber }), 1);
             asArrays.rankedTeams.splice(_.findIndex(asArrays.rankedTeams, { "teamNumber": team.teamNumber }), 1);
             asArrays.alliances[_.findIndex(asArrays.alliances, { "number": allianceSelectionOrder[asArrays.nextChoice].number })][`round${allianceSelectionOrder[asArrays.nextChoice].round}`] = team;
-            if (asArrays.nextChoice < allianceCount.count) {
-                for (var topAlliance = asArrays.nextChoice; topAlliance < allianceCount.count; topAlliance++) {
+            if (asArrays.nextChoice < allianceCount?.count) {
+                for (var topAlliance = asArrays.nextChoice; topAlliance < allianceCount?.count; topAlliance++) {
                     asArrays.alliances[_.findIndex(asArrays.alliances, { "number": topAlliance + 1 })][`captain`] = asArrays.rankedTeams[topAlliance];
                 }
                 var currentCaptain = asArrays.alliances[_.findIndex(asArrays.alliances, { "number": allianceSelectionOrder[asArrays.nextChoice].number })].captain.teamNumber;
@@ -287,7 +287,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
 
 
         // pick off the top 8 remaining teams to be the backup list
-        backupTeams = asArrays?.rankedTeams.slice(allianceCount.count, allianceCount.count + 8);
+        backupTeams = asArrays?.rankedTeams.slice(allianceCount?.count, allianceCount?.count + 8);
 
         // set up the available teams block
         var rows = asArrays.availableTeams?.length;
@@ -364,7 +364,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                             <tbody>
                                                 <tr>
                                                     <td>
-                                                        <p><strong>Backup Alliances</strong><br />(Teams here are initially ranked {allianceCount.count + 1} to {allianceCount.count + 8} top to bottom. As Alliance Selection progresses, teams will rise up into this section as teams are selected.)</p>
+                                                        <p><strong>Backup Alliances</strong><br />(Teams here are initially ranked {allianceCount?.count + 1} to {allianceCount?.count + 8} top to bottom. As Alliance Selection progresses, teams will rise up into this section as teams are selected.)</p>
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -403,7 +403,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                                 var round3 = alliance[0]?.round3;
                                                                 if (round3) { round3.declined = asArrays?.declined?.includes(round3?.teamNumber); }
                                                                 return (
-                                                                    (allianceNumber <= allianceCount.count) ? <td className={allianceSelectionOrder[asArrays.nextChoice]?.number === allianceNumber ? "dropzone" : ""} key={`AllianceTable${allianceName}`}>
+                                                                    (allianceNumber <= allianceCount?.count) ? <td className={allianceSelectionOrder[asArrays.nextChoice]?.number === allianceNumber ? "dropzone" : ""} key={`AllianceTable${allianceName}`}>
                                                                         <div><b>{allianceName}</b></div>
 
                                                                         {(allianceNumber === asArrays.nextChoice + 1) && <div className={"alliancedrop allianceCaptain"} >Captain<div key={`${allianceName}captainAvailable`} className={captain?.declined ? "allianceDecline" : "allianceTeam"} onClick={(e) => handleShow(captain, allianceNumber === 1 ? "a1captain" : allianceNumber > 1 ? "captain" : captain.declined ? "declined" : "show", e)}>{captain?.teamNumber ? captain?.teamNumber : ""}</div></div>}
