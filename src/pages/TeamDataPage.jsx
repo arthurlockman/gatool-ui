@@ -54,6 +54,15 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         enableScope('tabNavigation');
     }
 
+    const handleTrack = () => {
+        var visits = lastVisit;
+        visits[`${updateTeam.teamNumber}`] = moment();
+        setLastVisit(visits);
+        setUpdateTeam(null);
+        setShow(false);
+        enableScope('tabNavigation');
+    }
+
     const handleCloseDownload = () => {
         setShowDownload(false);
         setGaName("");
@@ -547,7 +556,8 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="warning" size="sm" onClick={(e) => { clearVisits(true, e) }}>Reset visit times</Button>
-                    <Button size="sm" onClick={handleClose}>Close without saving changes</Button>
+                    <Button variant="secondary" size="sm" onClick={handleClose}>Close without saving changes</Button>
+                    <Button variant="info" size="sm" onClick={handleTrack}>Record visit without saving changes</Button>
                     <Button variant="primary" size="sm" onClick={(e) => { handleSubmit("save", e) }}>Submit changes but only keep them locally</Button>
                     <Button variant="success" size="sm" disabled={!isOnline} onClick={(e) => { handleSubmit("update", e) }}>Submit changes and upload to gatool Cloud</Button>
                 </Modal.Footer>
