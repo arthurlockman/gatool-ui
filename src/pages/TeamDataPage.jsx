@@ -529,11 +529,13 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                         </Form.Group>
                         <Form.Group controlId="teamNotesLocal">
                             <Form.Label className={"formLabel"}><b>Team Notes for Announce Screen (These notes are local notes and do not come from <i>FIRST</i>)</b></Form.Label>
-                            <div className={updateTeam.teamNotesLocal ? "form-control formHighlight" : formValue.teamNotesLocal ? "form-control formHighlight" : "form-control"} contentEditable placeholder={"Enter some new notes you would like to appear on the Announce Screen"} dangerouslySetInnerHTML={{ __html: updateTeam.teamNotesLocal }} onKeyDown={(e) => updateForm("teamNotesLocal", e.currentTarget.innerHTML)}></div>
+                            <div className={updateTeam.teamNotesLocal ? "form-control formHighlight" : formValue.teamNotesLocal ? "form-control formHighlight" : "form-control"} contentEditable placeholder={"Enter some new notes you would like to appear on the Announce Screen"} dangerouslySetInnerHTML={{ __html: updateTeam.teamNotesLocal }} onKeyUp={(e) => updateForm("teamNotesLocal", e.currentTarget.innerHTML)}></div>
                         </Form.Group>
                         <Form.Group controlId="teamNotes">
                             <Form.Label className={"formLabel"}><b>Team Notes for the Team Data Screen (These notes are local notes and do not come from <i>FIRST</i>)</b></Form.Label>
-                            <div className={updateTeam.teamNotes ? "form-control formHighlight" : formValue.teamNotes ? "form-control formHighlight" : "form-control"} contentEditable placeholder={"Enter some new notes you would like to appear on the Team Data Screen"} dangerouslySetInnerHTML={{ __html: updateTeam.teamNotes }} onKeyDown={(e) => updateForm("teamNotes", e.currentTarget.innerHTML)}></div>
+                            <div className={updateTeam.teamNotes != "" ? "form-control formHighlight" : formValue.teamNotes !== "" ? "form-control formHighlight" : "form-control"} contentEditable placeholder={"Enter some new notes you would like to appear on the Team Data Screen"} dangerouslySetInnerHTML={{ __html: updateTeam.teamNotes }} onKeyUp={
+                                (e) => updateForm("teamNotes", e.currentTarget.innerHTML)
+                                }></div>
                         </Form.Group>
                         <Form.Group controlId="topSponsors">
                             <Form.Label className={"formLabel"}><b>Top Sponsors (Enter no more than 5 top sponsors from the full sponsor list below)</b></Form.Label>

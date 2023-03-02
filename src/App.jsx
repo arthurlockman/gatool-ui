@@ -660,13 +660,34 @@ function App() {
     setTeamDataTabReady(TabStates.NotReady);
     var result = null;
     var teams = null;
+    var communityUpdateTemplate = {
+      "nameShortLocal":"",
+      "cityStateLocal":"",
+      "topSponsorsLocal":"",
+      "sponsorsLocal":"",
+      "organizationLocal":"",
+      "robotNameLocal":"",
+      "awardsLocal":"",
+      "teamMottoLocal":"",
+      "teamNotesLocal":"",
+      "teamYearsNoCompeteLocal":"",
+      "showRobotName":"",
+      "teamNotes":"",
+      "sayNumber":"",
+      "lastUpdate":"",
+      "source":""
+    } 
+
     if (!selectedEvent?.value?.code.includes("PRACTICE")) {
       result = await httpClient.get(`${selectedYear?.value}/communityUpdates/${selectedEvent?.value.code}`);
       teams = await result.json();
     } else {
       teams = training.teams.communityUpdates;
     }
-
+    teams = teams.map((team) => {
+      team.updates = _.merge(_.cloneDeep(communityUpdateTemplate),team?.updates)
+      return team;
+    })
 
     teams.lastUpdate = moment();
     if (notify) {
