@@ -33,7 +33,7 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
                 <span className={"teamName"}>{team?.updates?.nameShortLocal ? team?.updates?.nameShortLocal : team?.nameShort}</span><br />
                 <span>{team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : team?.city + ", " + team?.stateProv}</span><br />
                 {team?.updates?.robotNameLocal && <span className={"robotName"}>{team?.updates?.robotNameLocal}<br /></span>}
-                {team?.updates?.teamMottoLocal && <span className={"mottoes"}>{team?.updates?.teamMottoLocal}<br /></span>}
+                {team?.updates?.teamMottoLocal && showMottoes && <span className={"mottoes"}>{team?.updates?.teamMottoLocal}<br /></span>}
                 {(selectedEvent?.value?.champLevel === "CHAMPS" || selectedEvent?.value?.champLevel === "CMPDIV" || selectedEvent?.value?.champLevel === "CMPSUB") && showChampsStats && <span className={"champs"}>
                     {team?.champsAppearances?.champsAppearances > 0 && <span><b>{team?.champsAppearances?.champsAppearances} Champs Appearance{team?.champsAppearances?.champsAppearances > 1 ? "s" : ""}</b><br /></span>}
                     {team?.champsAppearances?.champsAppearances > 0 && <span>
@@ -58,7 +58,7 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
             </td>
             <td className={'col7'}>
                 <p className={"announceOrganization"}>{team?.updates?.organizationLocal ? team?.updates?.organizationLocal : team?.schoolName}</p>
-                <p className={"sponsors"} >{team?.updates?.topSponsorsLocal ? team?.updates?.topSponsorsLocal : team?.topSponsors}</p>
+                {showSponsors && <p className={"sponsors"} >{team?.updates?.topSponsorsLocal ? team?.updates?.topSponsorsLocal : team?.topSponsors}</p>}
                 <p className={`HOF${allianceColor}`}>
                 {originalAndSustaining.includes(String(team?.teamNumber)) && <span>Original and Sustaining Team<br /></span>}
                     {team?.hallOfFame ? team?.hallOfFame.map((award) => {
@@ -66,7 +66,7 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
                     }) : ""}
 
                 </p>
-                {awards && <p className={"awards"}>
+                {awards && showAwards && <p className={"awards"}>
                     {awards.map((award) => {
                         if (award.year > selectedYear.value - (awardsMenu?.value || 3)) {
                             return <span key={award.year + award.eventName + award.name + award.person + team.teamNumber} className={award.highlight ? "awardHilight" : ""}>{award.year} {award.eventName} : {award.name}{award.person ? ` : ${award.person}` : ""}<br /></span>
@@ -78,7 +78,7 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
 
 
                 </p>}
-                <p className={"notes"} dangerouslySetInnerHTML={{ __html: team?.updates?.teamNotes }} />
+                {showNotes && <p className={"notes"} dangerouslySetInnerHTML={{ __html: team?.updates?.teamNotes }} />}
             </td>
             <td className={"col1 ranking"} style={team?.rankStyle}>
                 {team?.rank ? team?.rank : ""}
