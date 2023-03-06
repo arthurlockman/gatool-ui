@@ -266,7 +266,8 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
             "images/gatool_team_information_sheets_merge.docx",
             function (error, content) {
                 if (error) {
-                    throw error;
+                    var errorText = "Something went wrong loading the template. Please try again."
+                    throw new Error(errorText);
                 }
                 var zip = new PizZip(content);
                 var doc = new Docxtemplater(zip, {
@@ -520,7 +521,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                         <Form.Group controlId="robotName">
                             <InputGroup>
                                 <Form.Label className={"formLabel"}><b>Robot Name ({updateTeam.robotName ? updateTeam.robotName : "No robot name"}) in TIMS</b> </Form.Label>
-                                <Form.Text ><Form.Check className={"robotNameCheckbox"} type="switch" id="showRobotName" label="Show robot name" defaultChecked={updateTeam?.showRobotName ? updateTeam?.showRobotName : true} onChange={(e) => updateForm("showRobotName", e.target.checked)} /></Form.Text>
+                                <Form.Text><Form.Check className={"robotNameCheckbox"} type="switch" id="showRobotName" label="Show robot name" defaultChecked={updateTeam?.showRobotName ? updateTeam?.showRobotName : true} onChange={(e) => updateForm("showRobotName", e.target.checked)} /></Form.Text>
                             </InputGroup>
                             <Form.Control className={updateTeam.robotNameLocal ? "formHighlight" : formValue.robotNameLocal ? "formHighlight" : ""} type="text" placeholder={updateTeam.robotName} defaultValue={updateTeam.robotNameLocal ? updateTeam.robotNameLocal : updateTeam.robotName} onChange={(e) => updateForm("robotNameLocal", e.target.value)} />
                         </Form.Group>

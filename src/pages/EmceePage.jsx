@@ -30,13 +30,17 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
         var allianceName = "";
         if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[0]?.teamNumber) {
             allianceName = alliances?.Lookup[`${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[0]?.teamNumber}`]?.alliance;
-            if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner.tieWinner === "red") {
-                allianceName += ` (L${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner.level})`;
+            if (matchNumber < 14) {
+                if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner.tieWinner === "red") {
+                    allianceName += ` (L${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner.level})`;
+                }
             }
             if (allianceColor === "blue") {
                 allianceName = alliances?.Lookup[`${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[3]?.teamNumber}`]?.alliance
-                if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner.tieWinner === "blue") {
-                    allianceName += ` (L${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner.level} WIN)`;
+                if (matchNumber < 14) {
+                    if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner.tieWinner === "blue") {
+                        allianceName += ` (L${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner.level} WIN)`;
+                    }
                 }
             }
         }
@@ -46,9 +50,24 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
     if (playoffSchedule?.schedule?.length > 0) {
         schedule = _.concat(qualSchedule?.schedule, playoffSchedule?.schedule);
     }
+
+    var advantage = {};
+    advantage.red = 0;
+    advantage.blue = 0;
+
     if (currentMatch > qualSchedule?.schedule?.length) {
         inPlayoffs = true;
         playoffMatchNumber = currentMatch - qualSchedule?.schedule?.length;
+        if (playoffMatchNumber > 14) {
+            for (var finalsMatches = 14; finalsMatches < playoffMatchNumber; finalsMatches++) {
+                if (matches[_.findIndex(matches, { "matchNumber": finalsMatches })]?.winner.winner === "red") {
+                    advantage.red += 1
+                }
+                if (matches[_.findIndex(matches, { "matchNumber": finalsMatches })]?.winner.winner === "blue") {
+                    advantage.blue += 1
+                }
+            }
+        }
     }
 
     _.forEach(schedule, (match) => {
@@ -65,6 +84,7 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
             scores.push(row);
         })
     })
+
 
     useHotkeys('right', () => nextMatch(), { scopes: 'matchNavigation' });
     useHotkeys('left', () => previousMatch(), { scopes: 'matchNavigation' });
@@ -101,8 +121,15 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
                             {(playoffMatchNumber <= 13) && <>Winner <ArrowRight /> {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.winnerTo <= 13 ? `M${_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.winnerTo}` : "Finals"}<br />
                                 Losing Alliance {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.loserTo ? <><ArrowRight /> M{_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.loserTo} </> : " eliminated"} </>}
                             {(playoffMatchNumber === 14) && <>FINALS MATCH 1</>}
-                            {(playoffMatchNumber === 15) && <span className={`${matches[_.findIndex(matches, { "matchNumber": playoffMatchNumber - 1 })]?.winner.winner}AllianceTeam`}>FINALS MATCH 2<br />ADVANTAGE {_.matches[_.findIndex(matches, { "matchNumber": playoffMatchNumber - 1 })]?.winner.tieWinner ? `${_.upperCase(matches[_.findIndex(matches, { "matchNumber": playoffMatchNumber - 1 })]?.winner.tieWinner)} (L${matches[_.findIndex(matches, { "matchNumber": playoffMatchNumber - 1 })]?.winner.level})` : _.upperCase(matches[_.findIndex(matches, { "matchNumber": playoffMatchNumber - 1 })]?.winner.winner)}</span>}
-                            {(playoffMatchNumber === 16) && <span className={"tieAllianceTeam"}>FINALS TIEBREAKER</span>}
+                            {(playoffMatchNumber === 15) && <span className={`${matches[_.findIndex(matches, { "matchNumber": playoffMatchNumber - 1 })]?.winner.winner}AllianceTeam`}>FINALS MATCH 2<br />
+                                {(advantage.red === advantage.blue) && "EVEN"}
+                                {(advantage.red > advantage.blue) && "ADVANTAGE RED"}
+                                {(advantage.blue > advantage.red) && "ADVANTAGE BLUE"}</span>}
+                            {(playoffMatchNumber >= 16) && <span className={(advantage.red > advantage.blue) ? "redAllianceTeam" : (advantage.blue > advantage.red) ? "blueAllianceTeam" : "tieAllianceTeam"}>FINALS TIEBREAKER<br />
+                                {(advantage.red === advantage.blue) && "EVEN"}
+                                {(advantage.red > advantage.blue) && "ADVANTAGE RED"}
+                                {(advantage.blue > advantage.red) && "ADVANTAGE BLUE"}
+                            </span>}
                         </Col>
                     </Row>
 
