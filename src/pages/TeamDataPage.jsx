@@ -266,7 +266,8 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
             "images/gatool_team_information_sheets_merge.docx",
             function (error, content) {
                 if (error) {
-                    throw error;
+                    var errorText = "Something went wrong loading the template. Please try again."
+                    throw new Error(errorText);
                 }
                 var zip = new PizZip(content);
                 var doc = new Docxtemplater(zip, {

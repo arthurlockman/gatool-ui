@@ -321,12 +321,12 @@ function App() {
       })
 
       // determine the tiebreaker
-      var lastMatchNumber = playoffschedule?.schedule[_.findLastIndex(playoffschedule?.schedule, function (match) {
-        return (match?.scoreRedFinal !== null) || (match?.scoreBlueFinal !== null)
-      })]?.matchNumber;
+      // var lastMatchNumber = playoffschedule?.schedule[_.findLastIndex(playoffschedule?.schedule, function (match) {
+      //   return (match?.scoreRedFinal !== null) || (match?.scoreBlueFinal !== null)
+      // })]?.matchNumber;
 
       if (!selectedEvent?.value?.code.includes("PRACTICE")) {
-        result = await httpClient.get(`${selectedYear?.value}/scores/${selectedEvent?.value.code}/playoff/1/${lastMatchNumber}`);
+        result = await httpClient.get(`${selectedYear?.value}/scores/${selectedEvent?.value.code}/playoff`);
         var scores = await result.json();
       } else if (selectedEvent?.value?.code === "PRACTICE1" || selectedEvent?.value?.code === "PRACTICE2") {
         scores = training.scores.playoff.initial;
@@ -661,22 +661,22 @@ function App() {
     var result = null;
     var teams = null;
     var communityUpdateTemplate = {
-      "nameShortLocal":"",
-      "cityStateLocal":"",
-      "topSponsorsLocal":"",
-      "sponsorsLocal":"",
-      "organizationLocal":"",
-      "robotNameLocal":"",
-      "awardsLocal":"",
-      "teamMottoLocal":"",
-      "teamNotesLocal":"",
-      "teamYearsNoCompeteLocal":"",
-      "showRobotName":"",
-      "teamNotes":"",
-      "sayNumber":"",
-      "lastUpdate":"",
-      "source":""
-    } 
+      "nameShortLocal": "",
+      "cityStateLocal": "",
+      "topSponsorsLocal": "",
+      "sponsorsLocal": "",
+      "organizationLocal": "",
+      "robotNameLocal": "",
+      "awardsLocal": "",
+      "teamMottoLocal": "",
+      "teamNotesLocal": "",
+      "teamYearsNoCompeteLocal": "",
+      "showRobotName": "",
+      "teamNotes": "",
+      "sayNumber": "",
+      "lastUpdate": "",
+      "source": ""
+    }
 
     if (!selectedEvent?.value?.code.includes("PRACTICE")) {
       result = await httpClient.get(`${selectedYear?.value}/communityUpdates/${selectedEvent?.value.code}`);
@@ -685,7 +685,7 @@ function App() {
       teams = training.teams.communityUpdates;
     }
     teams = teams.map((team) => {
-      team.updates = _.merge(_.cloneDeep(communityUpdateTemplate),team?.updates)
+      team.updates = _.merge(_.cloneDeep(communityUpdateTemplate), team?.updates)
       return team;
     })
 
@@ -885,8 +885,8 @@ function App() {
 
           // We have four formats available in timezones: abbreviation, description, Livemeeting and Windows. We lookup the Windows
           // format and convert it to a more standard format. Consider moving off of Moment on to Luxor?
-          
-          e.timeZoneAbbreviation = timezones[_.findIndex(timezones,{"Windows": e.timezone })].Abbreviation;
+
+          e.timeZoneAbbreviation = timezones[_.findIndex(timezones, { "Windows": e.timezone })].Abbreviation;
 
           var eventTime = moment(e.dateEnd);
           e.name = e.name.trim();
