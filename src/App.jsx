@@ -133,6 +133,7 @@ function App() {
   const [lastVisit, setLastVisit] = usePersistentState("cache:lastVisit", {});
   const [localUpdates, setLocalUpdates] = usePersistentState("cache:localUpdates", []);
   const [allianceSelectionArrays, setAllianceSelectionArrays] = usePersistentState("cache:allianceSelectionArrays", {});
+  const [reverseEmcee, setReverseEmcee] = usePersistentState("cache:reverseEmcee",null)
 
   const [backupTeam, setBackupTeam] = useState(null);
 
@@ -1055,7 +1056,7 @@ function App() {
           <Routes>
             <Route path="/" element={<LayoutsWithNavbar scheduleTabReady={scheduleTabReady} teamDataTabReady={teamDataTabReady} ranksTabReady={ranksTabReady} statsTabReady={statsTabReady} allianceSelectionReady={allianceSelectionReady} playoffs={playoffs} />}>
 
-              <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} teamList={teamList} eventFilters={eventFilters} setEventFilters={setEventFilters} timeFilter={timeFilter} setTimeFilter={setTimeFilter} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} rankings={rankings} timeFormat={timeFormat} setTimeFormat={setTimeFormat} showSponsors={showSponsors} setShowSponsors={setShowSponsors} showAwards={showAwards} setShowAwards={setShowAwards} showNotes={showNotes} setShowNotes={setShowNotes} showMottoes={showMottoes} setShowMottoes={setShowMottoes} showChampsStats={showChampsStats} setShowChampsStats={setShowChampsStats} swapScreen={swapScreen} setSwapScreen={setSwapScreen} autoAdvance={autoAdvance} setAutoAdvance={setAutoAdvance} getSchedule={getSchedule} awardsMenu={awardsMenu} setAwardsMenu={setAwardsMenu} showQualsStats={showQualsStats} setShowQualsStats={setShowQualsStats} teamReduction={teamReduction} setTeamReduction={setTeamReduction} playoffCountOverride={playoffCountOverride} setPlayoffCountOverride={setPlayoffCountOverride} allianceCount={allianceCount} localUpdates={localUpdates} setLocalUpdates={setLocalUpdates} putTeamData={putTeamData} getCommunityUpdates={getCommunityUpdates} />} />
+              <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} teamList={teamList} eventFilters={eventFilters} setEventFilters={setEventFilters} timeFilter={timeFilter} setTimeFilter={setTimeFilter} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} rankings={rankings} timeFormat={timeFormat} setTimeFormat={setTimeFormat} showSponsors={showSponsors} setShowSponsors={setShowSponsors} showAwards={showAwards} setShowAwards={setShowAwards} showNotes={showNotes} setShowNotes={setShowNotes} showMottoes={showMottoes} setShowMottoes={setShowMottoes} showChampsStats={showChampsStats} setShowChampsStats={setShowChampsStats} swapScreen={swapScreen} setSwapScreen={setSwapScreen} autoAdvance={autoAdvance} setAutoAdvance={setAutoAdvance} getSchedule={getSchedule} awardsMenu={awardsMenu} setAwardsMenu={setAwardsMenu} showQualsStats={showQualsStats} setShowQualsStats={setShowQualsStats} teamReduction={teamReduction} setTeamReduction={setTeamReduction} playoffCountOverride={playoffCountOverride} setPlayoffCountOverride={setPlayoffCountOverride} allianceCount={allianceCount} localUpdates={localUpdates} setLocalUpdates={setLocalUpdates} putTeamData={putTeamData} getCommunityUpdates={getCommunityUpdates} reverseEmcee={reverseEmcee} setReverseEmcee={setReverseEmcee}/>} />
 
               <Route path="/schedule" element={<SchedulePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} />} />
 
@@ -1073,7 +1074,7 @@ function App() {
 
               <Route path='/stats' element={<StatsPage worldStats={worldStats} selectedEvent={selectedEvent} eventHighScores={eventHighScores} />} />
               <Route path='/cheatsheet' element={<CheatsheetPage />} />
-              <Route path='/emcee' element={<EmceePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} alliances={alliances} currentMatch={currentMatch} nextMatch={nextMatch} previousMatch={previousMatch} />} />
+              <Route path='/emcee' element={<EmceePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} alliances={alliances} currentMatch={currentMatch} nextMatch={nextMatch} previousMatch={previousMatch} reverseEmcee={reverseEmcee}/>} />
               <Route path='/help' element={<HelpPage />} />
               <Route path='/dev' element={<Developer />} />
             </Route>

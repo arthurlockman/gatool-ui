@@ -86,17 +86,22 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         communityUpdatesTemp[_.findIndex(communityUpdatesTemp, { "teamNumber": updateTeam.teamNumber })] = update;
         setCommunityUpdates(communityUpdatesTemp);
 
-        var localUpdatesTemp = _.cloneDeep(localUpdates)
+        var localUpdatesTemp = _.cloneDeep(localUpdates);
+        var itemExists = _.findIndex(localUpdatesTemp,{"teamNumber": updateTeam.teamNumber});
+        if (itemExists >=0) {
+            localUpdatesTemp.splice(itemExists,1);
+        }
         if (mode === "update") {
-            //to do: actually update the team info locally and to the Cloud
             var response = putTeamData(updateTeam.teamNumber, update.updates);
             if (!response) {
+
                 localUpdatesTemp.push({ "teamNumber": updateTeam.teamNumber, "update": update.updates });
                 setLocalUpdates(localUpdatesTemp);
                 var errorText = `Your update for team ${updateTeam.teamNumber} was not successful. We have saved the change locally, and you can send it later from here or the Settings page.`;
                 toast.error(errorText);
                 throw new Error(errorText);
             } else {
+
                 toast.success(`Your update for team ${updateTeam.teamNumber} was successful. Thank you for helping keep the team data current.`)
             }
         } else {
