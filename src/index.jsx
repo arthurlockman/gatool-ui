@@ -7,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import { Auth0Provider } from "@auth0/auth0-react";
 import { AuthClientContextProvider } from './contextProviders/AuthClientContext';
 import { ToastContainer } from 'react-toastify';
@@ -23,6 +24,8 @@ root.render(
           domain="auth.gatool.org"
           clientId="afsE1dlAGS609U32NjmvNMaYSQmtO3NT"
           redirectUri={window.location.origin}
+          useRefreshTokens={true}
+          cacheLocation='localstorage'
         >
           <AuthClientContextProvider>
             <App />
@@ -46,3 +49,6 @@ root.render(
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
+
+// Registers the background service worker
+serviceWorkerRegistration.register();
