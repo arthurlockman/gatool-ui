@@ -3,7 +3,7 @@ import React, { useState, useEffect, useContext } from "react";
 const OnlineStatusContext = React.createContext(true);
 
 export const OnlineStatusProvider = ({ children }) => {
-  const [onlineStatus, setOnlineStatus] = useState(true);
+  const [onlineStatus, setOnlineStatus] = useState(navigator.onLine);
 
   useEffect(() => {
     window.addEventListener("offline", () => {

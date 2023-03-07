@@ -24,6 +24,8 @@ root.render(
           domain="auth.gatool.org"
           clientId="afsE1dlAGS609U32NjmvNMaYSQmtO3NT"
           redirectUri={window.location.origin}
+          useRefreshTokens={true}
+          cacheLocation='localstorage'
         >
           <AuthClientContextProvider>
             <App />

@@ -93,7 +93,7 @@ class AuthClient {
     async getToken() {
         var tokenResponse = await this.tokenGetter({
             audience: 'https://gatool.auth0.com/userinfo',
-            scope: 'openid email profile',
+            scope: 'openid email profile offline_access',
             detailedResponse: true
         });
         return tokenResponse.id_token;
