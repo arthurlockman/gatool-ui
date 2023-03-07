@@ -3,7 +3,7 @@ import _ from "lodash";
 import { ArrowRight } from "react-bootstrap-icons";
 import { useHotkeys } from "react-hotkeys-hook";
 
-function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, currentMatch, nextMatch, previousMatch }) {
+function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, currentMatch, nextMatch, previousMatch, reverseEmcee }) {
     const matchClasses = [
         { "matchNumber": 1, "red": { "class": "success", "from": null }, "blue": { "class": "success", "from": null }, "winnerTo": 7, "loserTo": 5 },
         { "matchNumber": 2, "red": { "class": "success", "from": null }, "blue": { "class": "success", "from": null }, "winnerTo": 7, "loserTo": 5 },
@@ -101,8 +101,9 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
                 <div className={"davidPrice"}>{schedule[currentMatch - 1].matchNumber}</div>
             }
             {selectedEvent && (schedule?.length > 0) && inPlayoffs &&
+                <>
                 <Container fluid>
-                    <Row>
+                    {!reverseEmcee && <Row>
                         {(playoffMatchNumber <= 13) && <Col xs={2} className={"davidPriceDetail redAllianceTeam"}>
                             {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.red.from ? _.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.red.from : ""}
                         </Col>}
@@ -115,7 +116,23 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
                         {(playoffMatchNumber <= 13) && <Col xs={2} className={"davidPriceDetail blueAllianceTeam"}>
                             {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.blue.from ? _.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.blue.from : ""}
                         </Col>}
-                    </Row>
+                    </Row>}
+                    
+                    {reverseEmcee && <Row>
+                        {(playoffMatchNumber <= 13) && <Col xs={2} className={"davidPriceDetail blueAllianceTeam"}>
+                            {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.blue.from ? _.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.blue.from : ""}
+                        </Col>}
+                        <Col xs={(playoffMatchNumber > 13) ? 6 : 4} className={`blueAllianceTeam`}>
+                            <div className={"davidPrice"}>{allianceName(schedule[currentMatch - 1].matchNumber, "blue").replace("Alliance ", "")}</div>
+                        </Col>
+                        <Col xs={(playoffMatchNumber > 13) ? 6 : 4} className={`redAllianceTeam`}>
+                            <div className={"davidPrice"}>{allianceName(schedule[currentMatch - 1].matchNumber, "red").replace("Alliance ", "")}</div>
+                        </Col>
+                        {(playoffMatchNumber <= 13) && <Col xs={2} className={"davidPriceDetail redAllianceTeam"}>
+                            {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.red.from ? _.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.red.from : ""}
+                        </Col>}
+                    </Row>}
+
                     <Row>
                         <Col xs={12} className={"davidPriceDetail"}>
                             {(playoffMatchNumber <= 13) && <>Winner <ArrowRight /> {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.winnerTo <= 13 ? `M${_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.winnerTo}` : "Finals"}<br />
@@ -132,8 +149,8 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
                             </span>}
                         </Col>
                     </Row>
-
                 </Container>
+                </>
 
             }
 
