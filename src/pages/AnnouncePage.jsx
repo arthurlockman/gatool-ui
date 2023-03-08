@@ -78,11 +78,11 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
 
     const matchDetails = schedule[currentMatch - 1];
     const matchMenu = schedule.map((match, index) => {
-        var tag = `${match.description} of ${qualSchedule.schedule.length}`;
-        if (match.tournamentLevel === "Playoff") {
-            tag = match.description;
+        var tag = `${match?.description} of ${qualSchedule?.schedule?.length}`;
+        if (match?.tournamentLevel === "Playoff") {
+            tag = match?.description;
         }
-        return { "value": index + 1, "label": tag, "color": !_.isNull(match.scoreRedFinal) ? paleGreen : "" }
+        return { "value": index + 1, "label": tag, "color": !_.isNull(match?.scoreRedFinal) ? paleGreen : "" }
     })
 
     var displayOrder = ["Red1", "Red2", "Red3", "Red4", "Blue1", "Blue2", "Blue3", "Blue4"];
