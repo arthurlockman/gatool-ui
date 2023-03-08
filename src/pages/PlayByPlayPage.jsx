@@ -76,7 +76,7 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
     }
     var scores = [];
     _.forEach(schedule, (match) => {
-        _.forEach(match.teams, (team) => {
+        _.forEach(match?.teams, (team) => {
             var row = {};
             row.teamNumber = team.teamNumber;
             row.alliance = team.station.substring(0, team.station.length - 1);
@@ -97,11 +97,11 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
 
     var matchDetails = schedule[currentMatch - 1];
     const matchMenu = schedule.map((match, index) => {
-        var tag = `${match.description} of ${qualSchedule.schedule.length}`;
-        if (match.tournamentLevel === "Playoff") {
-            tag = match.description;
+        var tag = `${match?.description} of ${qualSchedule?.schedule?.length}`;
+        if (match?.tournamentLevel === "Playoff") {
+            tag = match?.description;
         }
-        return { "value": index + 1, "label": tag, "color": !_.isNull(match.scoreRedFinal) ? paleGreen : "" }
+        return { "value": index + 1, "label": tag, "color": !_.isNull(match?.scoreRedFinal) ? paleGreen : "" }
     })
 
     var teamDetails = [];
