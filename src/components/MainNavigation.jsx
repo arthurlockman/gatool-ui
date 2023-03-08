@@ -23,6 +23,11 @@ const tabActiveReady = {
   boxShadow: "inset 0px 0px 5px 2px #3d85c6"
 }
 
+const tabActiveReadyOffline = {
+  backgroundColor: "rgba(255, 211, 51, 1.0)",
+  boxShadow: "inset 0px 0px 5px 2px #3d85c6"
+}
+
 const tabActiveStale = {
   backgroundColor: "rgba(255, 153, 51, 1.0)",
   boxShadow: "inset 0px 0px 5px 2px #3d85c6"
@@ -34,6 +39,11 @@ const tabInactive = {
 
 const tabInactiveReady = {
   backgroundColor: "rgba(144, 238, 144, 0.5)",
+  textDecoration: "none"
+}
+
+const tabInactiveReadyOffline = {
+  backgroundColor: "rgba(255, 211, 51, 0.5)",
   textDecoration: "none"
 }
 
@@ -49,13 +59,24 @@ const tabInactiveNotready = {
 
 function MainNavigation({ selectedEvent, qualSchedule, playoffs, teamList, communityUpdates,
   rankings, eventHighScores, worldHighScores, allianceSelectionReady }) {
+  const [scheduleTabReady, setScheduleTabReady] = useState(TabStates.NotReady)
+  const [teamDataTabReady, setTeamDataTabReady] = useState(TabStates.NotReady)
+  const [ranksTabReady, setRanksTabReady] = useState(TabStates.NotReady)
+  const [statsTabReady, setStatsTabReady] = useState(TabStates.NotReady)
+  const isOnline = useOnlineStatus();
+
   function getTabStyle(active, state) {
     if (state === null) { // tab has no ready state
       if (active) return tabActive;
       else return tabInactive;
     } else if (state === TabStates.Ready) { // tab is ready
-      if (active) return tabActiveReady;
-      else return tabInactiveReady;
+      if (!isOnline) {
+        if (active) return tabActiveReadyOffline;
+        else return tabInactiveReadyOffline;
+      } else {
+        if (active) return tabActiveReady;
+        else return tabInactiveReady;
+      }
     } else if (state === TabStates.NotReady) { // tab is not ready
       if (active) return tabActiveNotready;
       else return tabInactiveNotready;
@@ -64,12 +85,6 @@ function MainNavigation({ selectedEvent, qualSchedule, playoffs, teamList, commu
       else return tabInactiveStale;
     }
   }
-
-  const [scheduleTabReady, setScheduleTabReady] = useState(TabStates.NotReady)
-  const [teamDataTabReady, setTeamDataTabReady] = useState(TabStates.NotReady)
-  const [ranksTabReady, setRanksTabReady] = useState(TabStates.NotReady)
-  const [statsTabReady, setStatsTabReady] = useState(TabStates.NotReady)
-  const isOnline = useOnlineStatus();
 
   // Handle ready state for schedule tab
   useEffect(() => {
