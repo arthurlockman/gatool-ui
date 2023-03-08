@@ -277,7 +277,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                 var zip = new PizZip(content);
                 var doc = new Docxtemplater(zip, {
                     paragraphLoop: true,
-                    linebreaks: true,
+                    linebreaks: true
                 });
 
                 var data = [];
@@ -300,6 +300,8 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                     record.rookieYear = team.rookieYear || "";
                     record.eventName = selectedEvent.label;
                     record.sayNumber = team.sayNumber || "";
+                    // eslint-disable-next-line
+                    record.teamNotes = team.teamNotes.replace("<br>","\n").replace(`<\div>`,"\n").replace(/(<([^>]+)>)/gi, "").replace("&amp;","&") || "";
                     record.gaName = gameAnnouncer || false;
                     if (index < teamListExtended.length - 1) {
                         record.lastTeam = false;
