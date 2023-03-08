@@ -79,14 +79,14 @@ function BottomButtons({ previousMatch, nextMatch, matchDetails, playoffSchedule
                     <Button size="lg" variant="outline-success" className={"gatool-button buttonNoWrap"} onClick={previousMatch}><span className={"d-none d-lg-block"}><CaretLeftFill /> Previous Match</span><span className={"d-block d-lg-none"}><CaretLeftFill /> <CaretLeftFill /></span></Button>
                 </Col>
                 {matchDetails?.tournamentLevel === "Playoff" && <Col xs={"5"} lg={"4"} className={"playoffDetails"}>
-                    {(matchDetails.matchNumber <= 13) && <>Winner <ArrowRight /> {_.filter(matchClasses, { "matchNumber": matchDetails.matchNumber })[0]?.winnerTo <= 13 ? `M${_.filter(matchClasses, { "matchNumber": matchDetails.matchNumber })[0]?.winnerTo}${opponent.winner ? ` V ${opponent.winner}`: ""}` : "Finals"}<br />
-                        Losing Alliance {_.filter(matchClasses, { "matchNumber": matchDetails.matchNumber })[0]?.loserTo ? <><ArrowRight /> M{_.filter(matchClasses, { "matchNumber": matchDetails.matchNumber })[0]?.loserTo}{opponent.loser ? ` V ${opponent.loser}`: ""} </> : " eliminated"} </>}
+                    {(matchDetails.matchNumber <= 13) && <>Winner <ArrowRight /> {_.filter(matchClasses, { "matchNumber": matchDetails.matchNumber })[0]?.winnerTo <= 13 ? `M${_.filter(matchClasses, { "matchNumber": matchDetails.matchNumber })[0]?.winnerTo}${opponent.winner ? ` against ${opponent.winner}` : ""}` : "Finals"}<br />
+                        Losing Alliance {_.filter(matchClasses, { "matchNumber": matchDetails.matchNumber })[0]?.loserTo ? <><ArrowRight /> M{_.filter(matchClasses, { "matchNumber": matchDetails.matchNumber })[0]?.loserTo}{opponent.loser ? ` against ${opponent.loser}` : ""} </> : " eliminated"} </>}
                     {(matchDetails.matchNumber === 14) && <>FINALS MATCH 1</>}
                     {(matchDetails.matchNumber === 15) && <span className={`${matches[_.findIndex(matches, { "matchNumber": matchDetails.matchNumber - 1 })]?.winner.winner}AllianceTeam`}>FINALS MATCH 2<br />
                         {(advantage.red === advantage.blue) && "EVEN"}
                         {(advantage.red > advantage.blue) && "ADVANTAGE RED"}
                         {(advantage.blue > advantage.red) && "ADVANTAGE BLUE"}</span>}
-                    {(matchDetails.matchNumber >= 16) && <span className={(advantage.red > advantage.blue) ? "redAllianceTeam" : (advantage.blue > advantage.red) ? "blueAllianceTeam" : "tieAllianceTeam"}>FINALS TIEBREAKER<br />
+                    {(matchDetails.matchNumber >= 16) && <span className={(advantage.red > advantage.blue) ? "redAllianceTeam" : (advantage.blue > advantage.red) ? "blueAllianceTeam" : "tieAllianceTeam"}>{_.toUpper(matchDetails.description)}<br />
                         {(advantage.red === advantage.blue) && "EVEN"}
                         {(advantage.red > advantage.blue) && "ADVANTAGE RED"}
                         {(advantage.blue > advantage.red) && "ADVANTAGE BLUE"}

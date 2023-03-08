@@ -172,7 +172,7 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
                                     {(advantage.red === advantage.blue) && "EVEN"}
                                     {(advantage.red > advantage.blue) && "ADVANTAGE RED"}
                                     {(advantage.blue > advantage.red) && "ADVANTAGE BLUE"}</span>}
-                                {(playoffMatchNumber >= 16) && <span className={(advantage.red > advantage.blue) ? "redAllianceTeam" : (advantage.blue > advantage.red) ? "blueAllianceTeam" : "tieAllianceTeam"}>FINALS TIEBREAKER<br />
+                                {(playoffMatchNumber >= 16) && <span className={(advantage.red > advantage.blue) ? "redAllianceTeam" : (advantage.blue > advantage.red) ? "blueAllianceTeam" : "tieAllianceTeam"}>{_.toUpper(matches[_.findIndex(matches, { "matchNumber": playoffMatchNumber })]?.description)}<br />
                                     {(advantage.red === advantage.blue) && "EVEN"}
                                     {(advantage.red > advantage.blue) && "ADVANTAGE RED"}
                                     {(advantage.blue > advantage.red) && "ADVANTAGE BLUE"}
