@@ -47,17 +47,25 @@ registerRoute(
   createHandlerBoundToURL(process.env.PUBLIC_URL + '/index.html')
 );
 
-// An example runtime caching route for requests that aren't handled by the
-// precache, in this case same-origin .png requests like those from in public/
+// Cache everything that comes from the same origin for two days
 registerRoute(
-  // Add in any other file extensions or routing criteria as needed.
-  ({ url }) => url.origin === self.location.origin && url.pathname.endsWith('.png'), // Customize this strategy as needed, e.g., by changing to CacheFirst.
+  ({ url }) => url.origin === self.location.origin,
   new StaleWhileRevalidate({
-    cacheName: 'images',
+    cacheName: 'public-files',
     plugins: [
-      // Ensure that once this runtime cache reaches a maximum size the
-      // least-recently used images are removed.
-      new ExpirationPlugin({ maxEntries: 50 }),
+      // Expire cached objects after 2 days
+      new ExpirationPlugin({ maxAgeSeconds: 172800, }),
+    ],
+  })
+);
+
+// Cache the most recent 200 avatar PNGs
+registerRoute(
+  ({ url }) => url.pathname.endsWith('avatar.png'),
+  new StaleWhileRevalidate({
+    cacheName: 'avatars',
+    plugins: [
+      new ExpirationPlugin({ maxEntries: 200 }),
     ],
   })
 );
