@@ -22,7 +22,7 @@ const AuthWidget = () => {
         }}>
           {showSpinner ? <Blocks
             visible={true}
-            height="38"
+            height="31"
             width=""
             ariaLabel="blocks-loading"
           /> : <img src={user.picture} alt={user.name} height="31px" style={{

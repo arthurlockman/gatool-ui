@@ -74,10 +74,14 @@ const navPages = [
 const paleYellow = "#fdfaed";
 const paleBlue = "#effdff";
 
-function LayoutsWithNavbar({ scheduleTabReady, teamDataTabReady, ranksTabReady, statsTabReady, allianceSelectionReady, playoffs }) {
+function LayoutsWithNavbar({ selectedEvent, qualSchedule, playoffs, teamList, communityUpdates,
+  rankings, eventHighScores, worldHighScores, allianceSelectionReady }) {
   return (
     <>
-      <MainNavigation scheduleTabReady={scheduleTabReady} teamDataTabReady={teamDataTabReady} ranksTabReady={ranksTabReady} statsTabReady={statsTabReady} allianceSelectionReady={allianceSelectionReady} playoffs={playoffs} />
+      <MainNavigation selectedEvent={selectedEvent} qualSchedule={qualSchedule} playoffs={playoffs}
+        teamList={teamList} communityUpdates={communityUpdates} rankings={rankings} eventHighScores={eventHighScores}
+        worldHighScores={worldHighScores} allianceSelectionReady={allianceSelectionReady}
+      />
       <Outlet />
       <BottomNavigation />
     </>
@@ -133,16 +137,10 @@ function App() {
   const [lastVisit, setLastVisit] = usePersistentState("cache:lastVisit", {});
   const [localUpdates, setLocalUpdates] = usePersistentState("cache:localUpdates", []);
   const [allianceSelectionArrays, setAllianceSelectionArrays] = usePersistentState("cache:allianceSelectionArrays", {});
-  const [reverseEmcee, setReverseEmcee] = usePersistentState("cache:reverseEmcee",null)
+  const [reverseEmcee, setReverseEmcee] = usePersistentState("cache:reverseEmcee", null)
+  const [allianceSelectionReady, setAllianceSelectionReady] = useState(TabStates.NotReady)
 
   const [backupTeam, setBackupTeam] = useState(null);
-
-  // Tab state trackers
-  const [scheduleTabReady, setScheduleTabReady] = useState(TabStates.NotReady);
-  const [teamDataTabReady, setTeamDataTabReady] = useState(TabStates.NotReady);
-  const [ranksTabReady, setRanksTabReady] = useState(TabStates.NotReady);
-  const [statsTabReady, setStatsTabReady] = useState(TabStates.NotReady);
-  const [allianceSelectionReady, setAllianceSelectionReady] = useState(TabStates.NotReady);
 
   // Controllers for table sort order at render time
   const [teamSort, setTeamSort] = useState("");
@@ -249,7 +247,6 @@ function App() {
       }
     }
 
-    setScheduleTabReady(TabStates.NotReady);
     var result = null;
     var qualschedule = null;
     if (!selectedEvent?.value?.code.includes("PRACTICE")) {
@@ -372,15 +369,6 @@ function App() {
     setEventHighScores(highScores);
     playoffschedule.lastUpdate = moment();
     setPlayoffSchedule(playoffschedule);
-    if (qualSchedule?.schedule?.length === 0) {
-      setScheduleTabReady(TabStates.Stale);
-    } else if (qualSchedule?.schedule?.length > 0) {
-      setScheduleTabReady(TabStates.Ready);
-    } else if ((_.indexOf(champsEvents, selectedEvent?.value?.code) >= 0) && (playoffSchedule.schedule.length > 0)) {
-      setScheduleTabReady(TabStates.Ready);
-    } else {
-      setScheduleTabReady(TabStates.NotReady);
-    }
 
   }
 
@@ -394,7 +382,6 @@ function App() {
       }
     }
 
-    setTeamDataTabReady(TabStates.NotReady);
     var result = null;
     var teams = null;
 
@@ -487,8 +474,6 @@ function App() {
       return team;
     });
 
-    setTeamDataTabReady(TabStates.NotReady);
-
     Promise.all(newTeams).then(function (values) {
 
       // Parse awards to ensure we highlight them properly and remove extraneous text i.e. FIRST CHampionship from name
@@ -547,20 +532,11 @@ function App() {
       })
       teams.teams = formattedAwards;
 
-      teams.lastUpdate = moment();
-      setTeamList(teams);
-
-      if (teams?.teams?.length === 0) {
-        setTeamDataTabReady(TabStates.Stale);
-      } else if (teams?.teams?.length > 0) {
-        setTeamDataTabReady(TabStates.Ready);
-      } else {
-        setTeamDataTabReady(TabStates.NotReady);
-      }
+      teams.lastUpdate = moment()
+      setTeamList(teams)
 
       var champsTeams = [];
       if (selectedEvent?.value?.champLevel !== "") {
-        setTeamDataTabReady(TabStates.NotReady);
         champsTeams = teams.teams.map(async team => {
           var champsRequest = await httpClient.get(`/team/${team?.teamNumber}/appearances`);
           var appearances = await champsRequest.json();
@@ -650,7 +626,6 @@ function App() {
           teams.lastUpdate = moment();
           teams.teams = values;
           setTeamList(teams);
-          setTeamDataTabReady(TabStates.Ready);
         })
       }
     })
@@ -658,7 +633,6 @@ function App() {
 
   // This function retrieves communnity updates for a specified event from gatool Cloud.
   async function getCommunityUpdates(notify) {
-    setTeamDataTabReady(TabStates.NotReady);
     var result = null;
     var teams = null;
     var communityUpdateTemplate = {
@@ -695,12 +669,10 @@ function App() {
       toast.success(`Your team data is now up to date.`)
     }
     setCommunityUpdates(teams);
-    setTeamDataTabReady(TabStates.Ready);
   }
 
   // This function retrieves the ranking data for a specified event from FIRST.
   async function getRanks() {
-    setRanksTabReady(TabStates.NotReady);
     var result = null;
     var ranks = null;
     if (!selectedEvent?.value?.code.includes("PRACTICE")) {
@@ -722,19 +694,10 @@ function App() {
 
     ranks.lastUpdate = moment();
     setRankings(ranks);
-    if (ranks?.ranks?.length === 0) {
-      setRanksTabReady(TabStates.Stale);
-    } else if (ranks?.ranks?.length > 0) {
-      setRanksTabReady(TabStates.Ready);
-    } else {
-      setRanksTabReady(TabStates.NotReady);
-    }
-
   }
 
   // This function retrieves the ranking data for a specified event from FIRST.
   async function getWorldStats() {
-    setStatsTabReady(TabStates.NotReady);
     var result = await httpClient.get(`${selectedYear?.value}/highscores`);
     var highscores = await result.json();
     var scores = {};
@@ -767,12 +730,6 @@ function App() {
     scores.highscores = reducedScores;
 
     setWorldStats(scores);
-    if (!_.isEmpty(scores?.highscores)) {
-      setStatsTabReady(TabStates.Ready);
-    } else {
-      setStatsTabReady(TabStates.NotReady);
-    }
-
   }
 
   // This function retrieves the Playoff Alliance data for a specified event from FIRST.
@@ -955,7 +912,6 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedYear, httpClient, setSelectedEvent, setEvents])
 
-
   // check to see if Alliance Slection is ready when QualSchedule and Ranks changes
   useEffect(() => {
     var asReady = false;
@@ -990,10 +946,6 @@ function App() {
       setTeamReduction(null);
       setPlayoffCountOverride(null);
       setAllianceSelectionArrays({});
-      setScheduleTabReady(TabStates.NotReady);
-      setTeamDataTabReady(TabStates.NotReady);
-      setRanksTabReady(TabStates.NotReady);
-      setAllianceSelectionReady(TabStates.NotReady);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedEvent])
@@ -1054,9 +1006,9 @@ function App() {
       </div> :
         canAccessApp() ? <BrowserRouter>
           <Routes>
-            <Route path="/" element={<LayoutsWithNavbar scheduleTabReady={scheduleTabReady} teamDataTabReady={teamDataTabReady} ranksTabReady={ranksTabReady} statsTabReady={statsTabReady} allianceSelectionReady={allianceSelectionReady} playoffs={playoffs} />}>
+            <Route path="/" element={<LayoutsWithNavbar selectedEvent={selectedEvent} qualSchedule={qualSchedule} playoffs={playoffs} teamList={teamList} communityUpdates={communityUpdates} rankings={rankings} eventHighScores={eventHighScores} worldHighScores={worldStats} allianceSelectionReady={allianceSelectionReady} />}>
 
-              <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} teamList={teamList} eventFilters={eventFilters} setEventFilters={setEventFilters} timeFilter={timeFilter} setTimeFilter={setTimeFilter} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} rankings={rankings} timeFormat={timeFormat} setTimeFormat={setTimeFormat} showSponsors={showSponsors} setShowSponsors={setShowSponsors} showAwards={showAwards} setShowAwards={setShowAwards} showNotes={showNotes} setShowNotes={setShowNotes} showMottoes={showMottoes} setShowMottoes={setShowMottoes} showChampsStats={showChampsStats} setShowChampsStats={setShowChampsStats} swapScreen={swapScreen} setSwapScreen={setSwapScreen} autoAdvance={autoAdvance} setAutoAdvance={setAutoAdvance} getSchedule={getSchedule} awardsMenu={awardsMenu} setAwardsMenu={setAwardsMenu} showQualsStats={showQualsStats} setShowQualsStats={setShowQualsStats} teamReduction={teamReduction} setTeamReduction={setTeamReduction} playoffCountOverride={playoffCountOverride} setPlayoffCountOverride={setPlayoffCountOverride} allianceCount={allianceCount} localUpdates={localUpdates} setLocalUpdates={setLocalUpdates} putTeamData={putTeamData} getCommunityUpdates={getCommunityUpdates} reverseEmcee={reverseEmcee} setReverseEmcee={setReverseEmcee}/>} />
+              <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} teamList={teamList} eventFilters={eventFilters} setEventFilters={setEventFilters} timeFilter={timeFilter} setTimeFilter={setTimeFilter} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} rankings={rankings} timeFormat={timeFormat} setTimeFormat={setTimeFormat} showSponsors={showSponsors} setShowSponsors={setShowSponsors} showAwards={showAwards} setShowAwards={setShowAwards} showNotes={showNotes} setShowNotes={setShowNotes} showMottoes={showMottoes} setShowMottoes={setShowMottoes} showChampsStats={showChampsStats} setShowChampsStats={setShowChampsStats} swapScreen={swapScreen} setSwapScreen={setSwapScreen} autoAdvance={autoAdvance} setAutoAdvance={setAutoAdvance} getSchedule={getSchedule} awardsMenu={awardsMenu} setAwardsMenu={setAwardsMenu} showQualsStats={showQualsStats} setShowQualsStats={setShowQualsStats} teamReduction={teamReduction} setTeamReduction={setTeamReduction} playoffCountOverride={playoffCountOverride} setPlayoffCountOverride={setPlayoffCountOverride} allianceCount={allianceCount} localUpdates={localUpdates} setLocalUpdates={setLocalUpdates} putTeamData={putTeamData} getCommunityUpdates={getCommunityUpdates} reverseEmcee={reverseEmcee} setReverseEmcee={setReverseEmcee} />} />
 
               <Route path="/schedule" element={<SchedulePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} />} />
 
@@ -1074,7 +1026,7 @@ function App() {
 
               <Route path='/stats' element={<StatsPage worldStats={worldStats} selectedEvent={selectedEvent} eventHighScores={eventHighScores} />} />
               <Route path='/cheatsheet' element={<CheatsheetPage />} />
-              <Route path='/emcee' element={<EmceePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} alliances={alliances} currentMatch={currentMatch} nextMatch={nextMatch} previousMatch={previousMatch} reverseEmcee={reverseEmcee}/>} />
+              <Route path='/emcee' element={<EmceePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} alliances={alliances} currentMatch={currentMatch} nextMatch={nextMatch} previousMatch={previousMatch} reverseEmcee={reverseEmcee} />} />
               <Route path='/help' element={<HelpPage />} />
               <Route path='/dev' element={<Developer />} />
             </Route>

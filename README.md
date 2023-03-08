@@ -26,6 +26,15 @@ npm run start
 
 This will start the local development server on port 3000.
 
+In order to test the PWA features of the app locally, run:
+
+```
+npm i -g serve
+npm run build && serve -s build
+```
+
+Note that when running as a PWA, debugging will not be available.
+
 ### Deploying
 
 GATool has two main active deployments: [beta](https://beta.gatool.org) and [production](https://gatool.org). Both are hosted on Azure web services and deployed automatically from GitHub.
