@@ -3724,15 +3724,15 @@ trainingSchedule.playoff.partial = {
             ],
             "isReplay": false,
             "matchVideoLink": null,
-            "scoreRedFinal": 70,
-            "scoreRedFoul": 0,
-            "scoreRedAuto": 21,
-            "scoreBlueFinal": 42,
-            "scoreBlueFoul": 0,
-            "scoreBlueAuto": 28,
-            "autoStartTime": "2023-02-18T14:35:39.107",
-            "actualStartTime": "2023-02-18T14:35:39.107",
-            "postResultTime": "2023-02-18T14:38:33.527"
+            "scoreRedFinal": null,
+            "scoreRedFoul": null,
+            "scoreRedAuto": null,
+            "scoreBlueFinal": null,
+            "scoreBlueFoul": null,
+            "scoreBlueAuto": null,
+            "autoStartTime": null,
+            "actualStartTime": null,
+            "postResultTime": null
         },
         {
             "description": "Match 9 (R3)",
@@ -3875,19 +3875,19 @@ trainingSchedule.playoff.partial = {
                     "dq": false
                 },
                 {
-                    "teamNumber": 1073,
+                    "teamNumber": 0,
                     "station": "Blue1",
                     "surrogate": false,
                     "dq": false
                 },
                 {
-                    "teamNumber": 9995,
+                    "teamNumber": 0,
                     "station": "Blue2",
                     "surrogate": false,
                     "dq": false
                 },
                 {
-                    "teamNumber": 1729,
+                    "teamNumber": 0,
                     "station": "Blue3",
                     "surrogate": false,
                     "dq": false
