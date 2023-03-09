@@ -87,9 +87,9 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         setCommunityUpdates(communityUpdatesTemp);
 
         var localUpdatesTemp = _.cloneDeep(localUpdates);
-        var itemExists = _.findIndex(localUpdatesTemp,{"teamNumber": updateTeam.teamNumber});
-        if (itemExists >=0) {
-            localUpdatesTemp.splice(itemExists,1);
+        var itemExists = _.findIndex(localUpdatesTemp, { "teamNumber": updateTeam.teamNumber });
+        if (itemExists >= 0) {
+            localUpdatesTemp.splice(itemExists, 1);
         }
         if (mode === "update") {
             var response = putTeamData(updateTeam.teamNumber, update.updates);
@@ -301,7 +301,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                     record.eventName = selectedEvent.label;
                     record.sayNumber = team.sayNumber || "";
                     // eslint-disable-next-line
-                    record.teamNotes = team.teamNotes.replace("<br>","\n").replace(`<\div>`,"\n").replace(/(<([^>]+)>)/gi, "").replace("&amp;","&") || "";
+                    record.teamNotes = team.teamNotes.replace("<br>", "\n").replace(`<\div>`, "\n").replace(/(<([^>]+)>)/gi, "").replace("&amp;", "&") || "";
                     record.gaName = gameAnnouncer || false;
                     if (index < teamListExtended.length - 1) {
                         record.lastTeam = false;

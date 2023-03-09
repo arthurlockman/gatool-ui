@@ -10,7 +10,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 const paleGreen = "rgba(144, 238, 144, 0.5)"
 
 
-function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, showNotes, showMottoes, showQualsStats, swapScreen, timeFormat, eventHighScores, backupTeam, setBackupTeam, nextMatch, previousMatch, setMatchFromMenu }) {
+function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, showNotes, showMottoes, showQualsStats, swapScreen, timeFormat, eventHighScores, backupTeam, setBackupTeam, nextMatch, previousMatch, setMatchFromMenu, practiceSchedule }) {
     var displayOrder = ["Blue1", "Red3", "Blue2", "Red2", "Blue3", "Red1", "Blue4", "Red4"];
     if (swapScreen === true) { displayOrder = ["Red3", "Blue1", "Red2", "Blue2", "Red1", "Blue3", "Red4", "Blue4"] }
 
@@ -66,12 +66,15 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
         return team;
     }
 
-    var schedule = qualSchedule?.schedule || [];
+    var schedule = practiceSchedule?.schedule || [];
+    if (qualSchedule?.schedule.length >0) {
+        schedule = _.concat(schedule, qualSchedule?.schedule);
+    }
     var inPlayoffs = false;
     if (playoffSchedule?.schedule?.length > 0) {
-        schedule = _.concat(qualSchedule?.schedule, playoffSchedule?.schedule);
+        schedule = _.concat(schedule, playoffSchedule?.schedule);
     }
-    if (currentMatch > qualSchedule?.schedule?.length) {
+    if (currentMatch > qualSchedule?.schedule?.length + playoffSchedule?.schedule?.length) {
         inPlayoffs = true;
     }
     var scores = [];
@@ -98,7 +101,7 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
     var matchDetails = schedule[currentMatch - 1];
     const matchMenu = schedule.map((match, index) => {
         var tag = `${match?.description} of ${qualSchedule?.schedule?.length}`;
-        if (match?.tournamentLevel === "Playoff") {
+        if (match?.tournamentLevel === "Playoff" || match?.tournamentLevel === "Practice") {
             tag = match?.description;
         }
         return { "value": index + 1, "label": tag, "color": !_.isNull(match?.scoreRedFinal) ? paleGreen : "" }
