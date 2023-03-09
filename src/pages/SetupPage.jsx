@@ -140,6 +140,10 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
         setSelectedYear(supportedYears[0]);
     }
 
+    var updatedTeamList = localUpdates.map((update) => {
+        return update.teamNumber
+    })
+
     return (
         <Container fluid>
             {!isOnline && <Row>
@@ -208,7 +212,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                         {playoffSchedule?.lastUpdate && <p><b>Playoff Schedule last updated: </b><br />{moment(playoffSchedule?.lastUpdate).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
                         {teamList?.lastUpdate && <p><b>Team List last updated: </b><br />{moment(teamList?.lastUpdate).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
                         {rankings?.lastUpdate && <p><b>Rankings last updated: </b><br />{moment(rankings?.lastUpdate).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
-                        {localUpdates.length > 0 && <Alert><p><b>You have updates that can be uploaded to gatool Cloud.</b></p><Button disabled={!isOnline} onClick={uploadLocalUpdates}>Upload to gatool Cloud now</Button></Alert>}
+                        {localUpdates.length > 0 && <Alert><p><b>You have {localUpdates.length === 1 ? "an update for team" : "updates for teams"} {updatedTeamList.join(", ")} that can be uploaded to gatool Cloud.</b></p><Button disabled={!isOnline} onClick={uploadLocalUpdates}>Upload to gatool Cloud now</Button></Alert>}
                         <Alert variant={"warning"}><p><b>Update Team Data</b><br />You can refresh your team data if it has changed on another device. <i><b>Know that we fetch all team data automatically when you load an event</b></i>, so you should not need this very often.</p><Button variant={"warning"} disabled={!isOnline} onClick={(e) => { getCommunityUpdates(true, e) }}>Update now</Button></Alert>
                     </Col>
                     <Col sm={4}>
