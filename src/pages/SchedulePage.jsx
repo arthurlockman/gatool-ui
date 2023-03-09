@@ -159,7 +159,7 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                         <Row style={{ cursor: "pointer", color: "darkblue" }} onClick={clickRemovePractice}>
                             <Col xs={2}></Col>
                             <Col xs={1}><img style={{ float: "left" }} width="50" src="images/excelicon.png" alt="Excel Logo" /></Col>
-                            <Col xs={7} className={"leftTable"}><b>You have uploaded a Practice Schedule.<br />Tap here to remove it.</b>
+                            <Col xs={7} className={"leftTable"}><b>You have uploaded a Practice Schedule.<br />Tap here to remove it. Know that we will automatically remove it when we get a Qualification Matches Schedule.</b>
                             </Col><Col xs={2}></Col>
                         </Row>
                     </Container>

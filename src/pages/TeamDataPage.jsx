@@ -55,7 +55,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
     }
 
     const handleTrack = () => {
-        var visits = lastVisit;
+        var visits = _.cloneDeep(lastVisit);
         visits[`${updateTeam.teamNumber}`] = moment();
         setLastVisit(visits);
         setUpdateTeam(null);
@@ -70,7 +70,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
     }
 
     const handleSubmit = (mode, e) => {
-        var visits = lastVisit;
+        var visits = _.cloneDeep(lastVisit);
         visits[`${updateTeam.teamNumber}`] = moment();
         var communityUpdatesTemp = _.cloneDeep(communityUpdates);
         var update = _.filter(communityUpdatesTemp, { "teamNumber": updateTeam.teamNumber })[0];
@@ -127,8 +127,9 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
 
     const clearVisits = (single, e) => {
         if (single) {
-            var visits = lastVisit;
-            delete visits[`${updateTeam.teamNumber}`]
+            var visits = _.cloneDeep(lastVisit);
+            delete visits[`${updateTeam.teamNumber}`];
+            setLastVisit(visits);
         } else {
             setLastVisit({});
         }
