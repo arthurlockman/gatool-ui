@@ -9,7 +9,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 
 const paleGreen = "rgba(144, 238, 144, 0.5)"
 
-function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, awardsMenu, showNotes, showAwards, showSponsors, showMottoes, showChampsStats, timeFormat, eventHighScores, backupTeam, setBackupTeam, nextMatch, previousMatch, setMatchFromMenu }) {
+function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, awardsMenu, showNotes, showAwards, showSponsors, showMottoes, showChampsStats, timeFormat, eventHighScores, backupTeam, setBackupTeam, nextMatch, previousMatch, setMatchFromMenu, practiceSchedule }) {
 
     function updateTeamDetails(station, matchDetails) {
         var team = {}
@@ -67,19 +67,22 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
         return team;
     }
 
-    var schedule = qualSchedule?.schedule || [];
+    var schedule = practiceSchedule?.schedule || [];
+    if (qualSchedule?.schedule.length >0) {
+        schedule = _.concat(schedule, qualSchedule?.schedule);
+    }
     var inPlayoffs = false;
     if (playoffSchedule?.schedule?.length > 0) {
-        schedule = _.concat(qualSchedule?.schedule, playoffSchedule?.schedule);
+        schedule = _.concat(schedule, playoffSchedule?.schedule);
     }
-    if (currentMatch > qualSchedule?.schedule?.length) {
+    if (currentMatch > qualSchedule?.schedule?.length + playoffSchedule?.schedule?.length) {
         inPlayoffs = true;
     }
 
     const matchDetails = schedule[currentMatch - 1];
     const matchMenu = schedule.map((match, index) => {
         var tag = `${match?.description} of ${qualSchedule?.schedule?.length}`;
-        if (match?.tournamentLevel === "Playoff") {
+        if (match?.tournamentLevel === "Playoff" || match?.tournamentLevel === "Practice") {
             tag = match?.description;
         }
         return { "value": index + 1, "label": tag, "color": !_.isNull(match?.scoreRedFinal) ? paleGreen : "" }
