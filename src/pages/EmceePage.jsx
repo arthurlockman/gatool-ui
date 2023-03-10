@@ -93,10 +93,10 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
             }
 
             if (winnerOpponent.lookup >= 0) {
-                opponent.winner = alliances.Lookup[`${winnerMatch?.teams[winnerOpponent.lookup].teamNumber}`]?.alliance;
+                opponent.winner = alliances?.Lookup[`${winnerMatch?.teams[winnerOpponent.lookup].teamNumber}`]?.alliance;
             }
             if (loserOpponent.lookup >= 0) {
-                opponent.loser = alliances.Lookup[`${loserMatch?.teams[loserOpponent.lookup].teamNumber}`]?.alliance;
+                opponent.loser = alliances?.Lookup[`${loserMatch?.teams[loserOpponent.lookup].teamNumber}`]?.alliance;
             }
         }
     }
