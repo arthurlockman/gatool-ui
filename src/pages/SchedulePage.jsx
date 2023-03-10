@@ -2,6 +2,7 @@ import { Alert, Col, Container, Row, Table } from "react-bootstrap";
 import moment from 'moment';
 import { utils, read } from "xlsx";
 import { toast } from "react-toastify";
+import _ from "lodash";
 
 function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSchedule, setPracticeSchedule }) {
 
@@ -66,11 +67,11 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                 toast.error(errorMessage);
             } else {
                 innerSchedule = schedule.map((match) => {
-                    var matchTime = moment(match.Time, "ddd h:mm A").format();
+                    var matchTime = moment(match?.Time, "ddd h:mm A").format();
                     if (match["Red 1"]) {
                         matchNumber++;
                         var tempRow = {
-                            "description": match.Description,
+                            "description": match?.Description,
                             "tournamentLevel": "Practice",
                             "matchNumber": matchNumber,
                             "startTime": matchTime,
@@ -114,13 +115,11 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                                 "dq": !1
                             }]
                         };
-
-
                     }
                     return (tempRow);
                 })
 
-                formattedSchedule.schedule = innerSchedule;
+                formattedSchedule.schedule = _.filter(innerSchedule,"description");
                 setPracticeSchedule(formattedSchedule);
                 toast.success(`Your have successfully loaded your Practice Schedule.`)
                 clearFileInput("BackupFiles");
@@ -133,7 +132,7 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
     }
 
     function removeSurrogate(teamNumber) {
-            teamNumber = teamNumber.replace("*", "");
+        teamNumber = teamNumber.replace("*", "");
         return teamNumber;
     }
 
@@ -145,26 +144,26 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
             {selectedEvent && (!qualSchedule || qualSchedule?.schedule.length === 0) && <div>
                 <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div><div>Awaiting schedule for {selectedEvent.label}<br /><br /></div>
                     {!practiceSchedule && <>
-                    <Container fluid>
-                        <Row style={{ cursor: "pointer", color: "darkblue" }} onClick={clickLoadPractice}>
-                            <Col xs={2}></Col>
-                            <Col xs={1}><input type="file" id="BackupFiles" onChange={handlePracticeFiles} className={"hiddenInput"} /><img style={{ float: "left" }} width="50" src="images/excelicon.png" alt="Excel Logo" /></Col>
-                            <Col xs={7} className={"leftTable"}><b>You can upload a Practice Schedule while you wait for the Quals Schedule to post. You will need to ask your Scorekeeper to export a Schedule Report in Excel format, which you can upload here.<br />Tap here to upload a Practice Schedule.</b>
-                            </Col><Col xs={2}></Col>
-                        </Row>
-                    </Container>
+                        <Container fluid>
+                            <Row style={{ cursor: "pointer", color: "darkblue" }} onClick={clickLoadPractice}>
+                                <Col xs={2}></Col>
+                                <Col xs={1}><input type="file" id="BackupFiles" onChange={handlePracticeFiles} className={"hiddenInput"} /><img style={{ float: "left" }} width="50" src="images/excelicon.png" alt="Excel Logo" /></Col>
+                                <Col xs={7} className={"leftTable"}><b>You can upload a Practice Schedule while you wait for the Quals Schedule to post. You will need to ask your Scorekeeper to export a Schedule Report in Excel format, which you can upload here.<br />Tap here to upload a Practice Schedule.</b>
+                                </Col><Col xs={2}></Col>
+                            </Row>
+                        </Container>
                     </>}
                     {practiceSchedule && <>
-                    <Container fluid>
-                        <Row style={{ cursor: "pointer", color: "darkblue" }} onClick={clickRemovePractice}>
-                            <Col xs={2}></Col>
-                            <Col xs={1}><img style={{ float: "left" }} width="50" src="images/excelicon.png" alt="Excel Logo" /></Col>
-                            <Col xs={7} className={"leftTable"}><b>You have uploaded a Practice Schedule.<br />Tap here to remove it. Know that we will automatically remove it when we get a Qualification Matches Schedule.</b>
-                            </Col><Col xs={2}></Col>
-                        </Row>
-                    </Container>
+                        <Container fluid>
+                            <Row style={{ cursor: "pointer", color: "darkblue" }} onClick={clickRemovePractice}>
+                                <Col xs={2}></Col>
+                                <Col xs={1}><img style={{ float: "left" }} width="50" src="images/excelicon.png" alt="Excel Logo" /></Col>
+                                <Col xs={7} className={"leftTable"}><b>You have uploaded a Practice Schedule.<br />Tap here to remove it. Know that we will automatically remove it when we get a Qualification Matches Schedule.</b>
+                                </Col><Col xs={2}></Col>
+                            </Row>
+                        </Container>
                     </>}
-                    </Alert>
+                </Alert>
             </div>}
             {selectedEvent && (practiceSchedule?.schedule.length > 0 || qualSchedule?.schedule.length > 0) &&
                 <div>
@@ -185,14 +184,14 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                             {practiceSchedule && practiceSchedule?.schedule.length > 0 && practiceSchedule?.schedule.map((match) => {
                                 let redStyle = "red";
                                 let blueStyle = "blue";
-                                return (<tr key={"practiceSchedule" + match.matchNumber} className="centerTable">
-                                    <td>{match.actualStartTime ? "Actual:" : "Scheduled:"}<br /> {match.actualStartTime ? moment(match.actualStartTime).format('dd hh:mm A') : moment(match.startTime).format('dd hh:mm A')}</td>
-                                    <td>{match.description}</td>
-                                    <td>{match.matchNumber}</td>
-                                    <td><span className={redStyle}>{match.scoreRedFinal}</span><br /><span className={blueStyle}>{match.scoreBlueFinal}</span></td>
-                                    <td><span className={redStyle}>{match.teams[0].teamNumber}</span><br /><span className={blueStyle}>{match.teams[3].teamNumber}</span></td>
-                                    <td><span className={redStyle}>{match.teams[1].teamNumber}</span><br /><span className={blueStyle}>{match.teams[4].teamNumber}</span></td>
-                                    <td><span className={redStyle}>{match.teams[2].teamNumber}</span><br /><span className={blueStyle}>{match.teams[5].teamNumber}</span></td>
+                                return (<tr key={"practiceSchedule" + match?.matchNumber} className="centerTable">
+                                    <td>{match?.actualStartTime ? "Actual:" : "Scheduled:"}<br /> {match?.actualStartTime ? moment(match.actualStartTime).format('dd hh:mm A') : moment(match?.startTime).format('dd hh:mm A')}</td>
+                                    <td>{match?.description}</td>
+                                    <td>{match?.matchNumber}</td>
+                                    <td><span className={redStyle}>{match?.scoreRedFinal}</span><br /><span className={blueStyle}>{match?.scoreBlueFinal}</span></td>
+                                    <td><span className={redStyle}>{match?.teams[0]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[3]?.teamNumber}</span></td>
+                                    <td><span className={redStyle}>{match?.teams[1]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[4]?.teamNumber}</span></td>
+                                    <td><span className={redStyle}>{match?.teams[2]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[5]?.teamNumber}</span></td>
                                 </tr>
                                 )
                             })}
