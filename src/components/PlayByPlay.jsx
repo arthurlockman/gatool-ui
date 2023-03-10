@@ -1,3 +1,4 @@
+import _ from "lodash";
 
 function PlayByPlay({ station, team, inPlayoffs, selectedYear, selectedEvent, showNotes, showMottoes, showQualsStats }) {
     var allianceColor = station.slice(0, -1);
@@ -11,7 +12,7 @@ function PlayByPlay({ station, team, inPlayoffs, selectedYear, selectedEvent, sh
                         <p className={"playByPlaysayNumber"} >{team?.updates?.sayNumber}</p>
                         <p className={"playByPlayOrganization"}>{team?.updates?.organizationLocal ? team?.updates?.organizationLocal : team?.schoolName}</p>
                         <p className={"playByPlayCity"}>{team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : team?.city + ", " + team?.stateProv}</p>
-                        {showMottoes && <p className={"playByPlayCity mottoes"}>{team?.updates?.teamMottoLocal}</p>}
+                        {(showMottoes || _.isNull(showMottoes)) && <p className={"playByPlayCity mottoes"}>{team?.updates?.teamMottoLocal}</p>}
                         {inPlayoffs && <p className={"playByPlayAlliance"}>{team?.alliance}<br />{team?.allianceRole}</p>}
                     </>
                 }
@@ -36,7 +37,7 @@ function PlayByPlay({ station, team, inPlayoffs, selectedYear, selectedEvent, sh
                                 </tbody>
                             </table>
                         </div>}
-                        {showNotes && <p className={"notes playByPlayWinLossTie"} dangerouslySetInnerHTML={{ __html: team?.updates?.teamNotes }}></p>}
+                        {(showNotes || _.isNull(showNotes)) && <p className={"notes playByPlayWinLossTie"} dangerouslySetInnerHTML={{ __html: team?.updates?.teamNotes }}></p>}
                     </>
                 }
                 {!team?.teamNumber && <>
