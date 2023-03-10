@@ -19,7 +19,7 @@ import { UseAuthClient } from './contextProviders/AuthClientContext';
 import { useAuth0 } from '@auth0/auth0-react';
 import AnonymousUserPage from './pages/AnonymousUserPage';
 import { Blocks } from 'react-loader-spinner';
-import { Container } from 'react-bootstrap';
+import { Button, Container } from 'react-bootstrap';
 import { usePersistentState } from './hooks/UsePersistentState';
 import _ from 'lodash';
 import moment from 'moment';
@@ -33,6 +33,8 @@ import { timeZones } from 'components/TimeZones';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useHotkeys } from 'react-hotkeys-hook';
+import { useServiceWorker } from 'contextProviders/ServiceWorkerContext';
+import { useSnackbar } from 'notistack';
 
 export const TabStates = {
   NotReady: 'notready',
@@ -110,7 +112,7 @@ function App() {
   const [events, setEvents] = usePersistentState("cache:events", []);
   const [playoffSchedule, setPlayoffSchedule] = usePersistentState("cache:playoffSchedule", null);
   const [qualSchedule, setQualSchedule] = usePersistentState("cache:qualSchedule", null);
-  const [practiceSchedule, setPracticeSchedule] = usePersistentState("cache:practiceSchedule",null);
+  const [practiceSchedule, setPracticeSchedule] = usePersistentState("cache:practiceSchedule", null);
   const [teamList, setTeamList] = usePersistentState("cache:teamList", null);
   const [rankings, setRankings] = usePersistentState("cache:rankings", null);
   const [alliances, setAlliances] = usePersistentState("cache:alliances", null);
@@ -148,6 +150,25 @@ function App() {
   const [rankSort, setRankSort] = useState("");
 
   const isOnline = useOnlineStatus();
+
+  // Handle update notifications from the service worker
+  const { waitingWorker, showReload, reloadPage } = useServiceWorker();
+  const { enqueueSnackbar } = useSnackbar();
+
+
+  useEffect(() => {
+    if (showReload && waitingWorker) {
+      enqueueSnackbar("A new version was released", {
+        persist: true,
+        variant: "success",
+        action: <>
+          <Button className='snackbar-button'
+            color='primary'
+            onClick={reloadPage} >Reload and Update</Button>
+        </>
+      });
+    }
+  }, [waitingWorker, showReload, reloadPage, enqueueSnackbar])
 
   // Handle if users are offline. If they're offline but have an event and year selected, let them in.
   const canAccessApp = () => {
@@ -1013,7 +1034,7 @@ function App() {
 
               <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} teamList={teamList} eventFilters={eventFilters} setEventFilters={setEventFilters} timeFilter={timeFilter} setTimeFilter={setTimeFilter} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} rankings={rankings} timeFormat={timeFormat} setTimeFormat={setTimeFormat} showSponsors={showSponsors} setShowSponsors={setShowSponsors} showAwards={showAwards} setShowAwards={setShowAwards} showNotes={showNotes} setShowNotes={setShowNotes} showMottoes={showMottoes} setShowMottoes={setShowMottoes} showChampsStats={showChampsStats} setShowChampsStats={setShowChampsStats} swapScreen={swapScreen} setSwapScreen={setSwapScreen} autoAdvance={autoAdvance} setAutoAdvance={setAutoAdvance} getSchedule={getSchedule} awardsMenu={awardsMenu} setAwardsMenu={setAwardsMenu} showQualsStats={showQualsStats} setShowQualsStats={setShowQualsStats} teamReduction={teamReduction} setTeamReduction={setTeamReduction} playoffCountOverride={playoffCountOverride} setPlayoffCountOverride={setPlayoffCountOverride} allianceCount={allianceCount} localUpdates={localUpdates} setLocalUpdates={setLocalUpdates} putTeamData={putTeamData} getCommunityUpdates={getCommunityUpdates} reverseEmcee={reverseEmcee} setReverseEmcee={setReverseEmcee} />} />
 
-              <Route path="/schedule" element={<SchedulePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} practiceSchedule={practiceSchedule} setPracticeSchedule={setPracticeSchedule}/>} />
+              <Route path="/schedule" element={<SchedulePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} practiceSchedule={practiceSchedule} setPracticeSchedule={setPracticeSchedule} />} />
 
               <Route path="/teamdata" element={<TeamDataPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} teamSort={teamSort} setTeamSort={setTeamSort} communityUpdates={communityUpdates} setCommunityUpdates={setCommunityUpdates} allianceCount={allianceCount} lastVisit={lastVisit} setLastVisit={setLastVisit} putTeamData={putTeamData} localUpdates={localUpdates} setLocalUpdates={setLocalUpdates} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} />} />
 
@@ -1021,7 +1042,7 @@ function App() {
 
               <Route path='/announce' element={<AnnouncePage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} communityUpdates={communityUpdates} currentMatch={currentMatch} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} alliances={alliances} setAlliances={setAlliances} awardsMenu={awardsMenu} showNotes={showNotes} showAwards={showAwards} showSponsors={showSponsors} showMottoes={showMottoes} showChampsStats={showChampsStats} timeFormat={timeFormat} eventHighScores={eventHighScores} backupTeam={backupTeam} setBackupTeam={setBackupTeam} allianceCount={allianceCount} nextMatch={nextMatch} previousMatch={previousMatch} setMatchFromMenu={setMatchFromMenu} practiceSchedule={practiceSchedule} />} />
 
-              <Route path='/playbyplay' element={<PlayByPlayPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} communityUpdates={communityUpdates} currentMatch={currentMatch} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} alliances={alliances} setAlliances={setAlliances} showMottoes={showMottoes} showNotes={showNotes} showQualsStats={showQualsStats} swapScreen={swapScreen} timeFormat={timeFormat} eventHighScores={eventHighScores} backupTeam={backupTeam} setBackupTeam={setBackupTeam} allianceCount={allianceCount} nextMatch={nextMatch} previousMatch={previousMatch} setMatchFromMenu={setMatchFromMenu} practiceSchedule={practiceSchedule}/>} />
+              <Route path='/playbyplay' element={<PlayByPlayPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} communityUpdates={communityUpdates} currentMatch={currentMatch} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} alliances={alliances} setAlliances={setAlliances} showMottoes={showMottoes} showNotes={showNotes} showQualsStats={showQualsStats} swapScreen={swapScreen} timeFormat={timeFormat} eventHighScores={eventHighScores} backupTeam={backupTeam} setBackupTeam={setBackupTeam} allianceCount={allianceCount} nextMatch={nextMatch} previousMatch={previousMatch} setMatchFromMenu={setMatchFromMenu} practiceSchedule={practiceSchedule} />} />
 
               <Route path='/allianceselection' element={<AllianceSelectionPage selectedYear={selectedYear} selectedEvent={selectedEvent} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} alliances={alliances} rankings={rankings} timeFormat={timeFormat} getRanks={getRanks} allianceSelection={allianceSelection} playoffs={playoffs} teamList={teamList} allianceCount={allianceCount} communityUpdates={communityUpdates} allianceSelectionArrays={allianceSelectionArrays} setAllianceSelectionArrays={setAllianceSelectionArrays} />} />
 
