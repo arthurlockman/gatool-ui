@@ -1,7 +1,6 @@
 import { Row, Col, Button } from "react-bootstrap";
-import { CaretLeftFill, CaretRightFill, ArrowRight } from "react-bootstrap-icons";
+import { CaretLeftFill, CaretRightFill } from "react-bootstrap-icons";
 import PlayoffDetails from "../components/PlayoffDetails";
-import _ from "lodash";
 
 
 function BottomButtons({ previousMatch, nextMatch, matchDetails, playoffSchedule, eventHighScores, alliances }) {
