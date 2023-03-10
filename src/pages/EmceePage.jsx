@@ -1,7 +1,8 @@
 import { Alert, Col, Container, Row } from "react-bootstrap";
 import _ from "lodash";
-import { ArrowRight } from "react-bootstrap-icons";
+import PlayoffDetails from "../components/PlayoffDetails";
 import { useHotkeys } from "react-hotkeys-hook";
+
 
 function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, currentMatch, nextMatch, previousMatch, reverseEmcee }) {
     const matchClasses = [
@@ -115,6 +116,7 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
         })
     })
 
+    var matchDetails = _.filter(matches, {"matchNumber":playoffMatchNumber})[0];
 
     useHotkeys('right', () => nextMatch(), { scopes: 'matchNavigation' });
     useHotkeys('left', () => previousMatch(), { scopes: 'matchNavigation' });
@@ -165,18 +167,7 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
 
                         <Row>
                             <Col xs={12} className={"davidPriceDetail"}>
-                                {(playoffMatchNumber <= 13) && <>Winner <ArrowRight /> {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.winnerTo <= 13 ? `M${_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.winnerTo}${opponent.winner ? ` against ${opponent.winner}` : ""}` : "Finals"}<br />
-                                    Losing Alliance {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.loserTo ? <><ArrowRight /> M{_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.loserTo}{opponent.loser ? ` against ${opponent.loser}` : ""} </> : " eliminated"} </>}
-                                {(playoffMatchNumber === 14) && <>FINALS MATCH 1</>}
-                                {(playoffMatchNumber === 15) && <span className={`${matches[_.findIndex(matches, { "matchNumber": playoffMatchNumber - 1 })]?.winner.winner}AllianceTeam`}>FINALS MATCH 2<br />
-                                    {(advantage.red === advantage.blue) && "EVEN"}
-                                    {(advantage.red > advantage.blue) && "ADVANTAGE RED"}
-                                    {(advantage.blue > advantage.red) && "ADVANTAGE BLUE"}</span>}
-                                {(playoffMatchNumber >= 16) && <span className={(advantage.red > advantage.blue) ? "redAllianceTeam" : (advantage.blue > advantage.red) ? "blueAllianceTeam" : "tieAllianceTeam"}>{_.toUpper(matches[_.findIndex(matches, { "matchNumber": playoffMatchNumber })]?.description)}<br />
-                                    {(advantage.red === advantage.blue) && "EVEN"}
-                                    {(advantage.red > advantage.blue) && "ADVANTAGE RED"}
-                                    {(advantage.blue > advantage.red) && "ADVANTAGE BLUE"}
-                                </span>}
+                                <PlayoffDetails matchDetails={matchDetails} alliances={alliances} matches={matches} />
                             </Col>
                         </Row>
                     </Container>
