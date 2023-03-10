@@ -7,17 +7,17 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import { Auth0Provider } from "@auth0/auth0-react";
 import { AuthClientContextProvider } from './contextProviders/AuthClientContext';
 import { ToastContainer } from 'react-toastify';
 import { OnlineStatusProvider } from './contextProviders/OnlineContext';
 import { HotkeysProvider } from 'react-hotkeys-hook'
+import { SnackbarProvider } from 'notistack';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-  {/* see https://github.com/JohannesKlauss/react-hotkeys-hook/issues/854#issuecomment-1345235881 for why the 'none' scope is needed */}
+    {/* see https://github.com/JohannesKlauss/react-hotkeys-hook/issues/854#issuecomment-1345235881 for why the 'none' scope is needed */}
     <HotkeysProvider initiallyActiveScopes={['matchNavigation', 'tabNavigation', 'none']}>
       <OnlineStatusProvider>
         <Auth0Provider
@@ -28,7 +28,9 @@ root.render(
           cacheLocation='localstorage'
         >
           <AuthClientContextProvider>
-            <App />
+            <SnackbarProvider>
+              <App />
+            </SnackbarProvider>
           </AuthClientContextProvider>
         </Auth0Provider>
         <ToastContainer
@@ -49,6 +51,3 @@ root.render(
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
-
-// Registers the background service worker
-serviceWorkerRegistration.register();
