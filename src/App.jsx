@@ -300,7 +300,7 @@ function App() {
 
     if (qualschedule?.schedule?.length > 0) {
       completedMatchCount = qualschedule?.schedule?.length - _.filter(qualschedule.schedule, { "postResultTime": null }).length;
-      // clear the Practice schedule if there is one loaded and there are matches in teh schedule
+      // clear the Practice schedule if there is one loaded and there are matches in the schedule
       setPracticeSchedule(null);
     }
 
@@ -799,13 +799,20 @@ function App() {
   }
 
   const nextMatch = () => {
-    if (currentMatch < (practiceSchedule?.schedule.length + qualSchedule?.schedule?.length + playoffSchedule?.schedule?.length)) {
+    if (!_.isNull(practiceSchedule) && (currentMatch < practiceSchedule?.schedule?.length)) {
       setCurrentMatch(currentMatch + 1);
       getSchedule();
       getRanks();
       getWorldStats();
     }
     
+    if (currentMatch < (qualSchedule?.schedule?.length + playoffSchedule?.schedule?.length)) {
+      setCurrentMatch(currentMatch + 1);
+      getSchedule();
+      getRanks();
+      getWorldStats();
+    }
+
   }
   const previousMatch = () => {
     if (currentMatch > 1) {
