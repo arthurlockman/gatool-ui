@@ -70,13 +70,13 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
     if (qualSchedule?.schedule.length >0) {
         schedule = _.concat(schedule, qualSchedule?.schedule);
     }
-    var inPlayoffs = false;
+
     if (playoffSchedule?.schedule?.length > 0) {
         schedule = _.concat(schedule, playoffSchedule?.schedule);
     }
-    if (currentMatch > qualSchedule?.schedule?.length + playoffSchedule?.schedule?.length) {
-        inPlayoffs = true;
-    }
+
+    
+    
     var scores = [];
     _.forEach(schedule, (match) => {
         _.forEach(match?.teams, (team) => {
@@ -99,6 +99,7 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
     )
 
     var matchDetails = schedule[currentMatch - 1];
+    var inPlayoffs = (matchDetails?.tournamentLevel === "Playoff" ? true : false)
     const matchMenu = schedule.map((match, index) => {
         var tag = `${match?.description} of ${qualSchedule?.schedule?.length}`;
         if (match?.tournamentLevel === "Playoff" || match?.tournamentLevel === "Practice") {
