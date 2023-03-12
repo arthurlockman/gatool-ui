@@ -92,18 +92,20 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
             localUpdatesTemp.splice(itemExists, 1);
         }
         if (mode === "update") {
-            var response = putTeamData(updateTeam.teamNumber, update.updates);
-            if (!response) {
-
-                localUpdatesTemp.push({ "teamNumber": updateTeam.teamNumber, "update": update.updates });
+            var resp = []
+            resp.push(putTeamData(updateTeam.teamNumber, update.updates));
+            Promise.all(resp).then((response) => {
+                if (response[0].status !== 204) {
+                    localUpdatesTemp.push({ "teamNumber": updateTeam.teamNumber, "update": update.updates });
+                    var errorText = `Your update for team ${updateTeam.teamNumber} was not successful. We have saved the change locally, and you can send it later from here or the Settings page.`;
+                    toast.error(errorText);
+                    throw new Error(errorText);
+                } else {
+                    toast.success(`Your update for team ${updateTeam.teamNumber} was successful. Thank you for helping keep the team data current.`)
+                }
                 setLocalUpdates(localUpdatesTemp);
-                var errorText = `Your update for team ${updateTeam.teamNumber} was not successful. We have saved the change locally, and you can send it later from here or the Settings page.`;
-                toast.error(errorText);
-                throw new Error(errorText);
-            } else {
+            })
 
-                toast.success(`Your update for team ${updateTeam.teamNumber} was successful. Thank you for helping keep the team data current.`)
-            }
         } else {
             localUpdatesTemp.push({ "teamNumber": updateTeam.teamNumber, "update": update.updates });
             toast.success(`We have stored your update for team ${updateTeam.teamNumber}. Remember that this update is only visible to you until you save it to gatool Cloud.`)
