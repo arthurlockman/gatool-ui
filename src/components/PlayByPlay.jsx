@@ -37,7 +37,7 @@ function PlayByPlay({ station, team, inPlayoffs, selectedYear, selectedEvent, sh
                                 </tbody>
                             </table>
                         </div>}
-                        {(showNotes || _.isNull(showNotes)) && <p className={"notes playByPlayWinLossTie"} dangerouslySetInnerHTML={{ __html: team?.updates?.teamNotes }}></p>}
+                        {(showNotes || _.isNull(showNotes)) && <p className={"notes playByPlayWinLossTie"} dangerouslySetInnerHTML={{ __html: team?.updates?.teamNotesLocal }}></p>}
                     </>
                 }
                 {!team?.teamNumber && <>
