@@ -76,8 +76,8 @@ const awardsMenuOptions = [
     { label: "1 (current season only", value: "1" },
 ]
 
-function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee}) {
-    const isOnline = useOnlineStatus()
+function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee }) {
+    const isOnline = useOnlineStatus();
 
     function filterEvents(events) {
         //filter the array
@@ -116,27 +116,24 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
 
     function uploadLocalUpdates() {
         var localUpdatesTemp = _.cloneDeep(localUpdates);
-        var success = [];
-        localUpdatesTemp.forEach((update) => {
-            var result = putTeamData(update.teamNumber, update.update);
+        localUpdatesTemp.forEach(async function (update) {
+            var response = await putTeamData(update.teamNumber, update.update);
             var errorText = "";
-            if (!result) {
+            if (response.status !== 204) {
                 errorText = `Your update for team ${update.teamNumber} was not successful. We have preserved the change locally, and you can send it later from here.`;
                 toast.error(errorText);
                 throw new Error(errorText);
             } else {
                 errorText = `Your update for team ${update.teamNumber} was successful.`;
-                success.push(update);
+                localUpdatesTemp.splice(_.findIndex(localUpdatesTemp, { "teamNumber": update.teamNumber }), 1)
                 toast.success(errorText);
             }
         })
-        success.forEach((item) => {
-            localUpdatesTemp.splice(_.findIndex(localUpdatesTemp, { "teamNumber": item.teamNumber }), 1)
-        })
+
         setLocalUpdates(localUpdatesTemp);
     }
 
-    
+
 
     var updatedTeamList = localUpdates.map((update) => {
         return update.teamNumber
