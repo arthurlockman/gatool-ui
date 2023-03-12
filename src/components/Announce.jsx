@@ -78,7 +78,7 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
 
 
                 </p>}
-                {(showNotes || _.isNull(showNotes)) && <p className={"notes"} dangerouslySetInnerHTML={{ __html: team?.updates?.teamNotesLocal }} />}
+                {(showNotes || _.isNull(showNotes)) && <p dangerouslySetInnerHTML={{ __html: team?.updates?.teamNotesLocal }} />}
             </td>
             <td className={"col1 ranking"} style={team?.rankStyle}>
                 {team?.rank ? team?.rank : ""}
