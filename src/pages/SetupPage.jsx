@@ -116,7 +116,6 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
 
     function uploadLocalUpdates() {
         var localUpdatesTemp = _.cloneDeep(localUpdates);
-        var success = [];
         localUpdatesTemp.forEach(async function (update) {
             var response = await putTeamData(update.teamNumber, update.update);
             var errorText = "";
@@ -130,7 +129,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                 toast.success(errorText);
             }
         })
-        
+
         setLocalUpdates(localUpdatesTemp);
     }
 
