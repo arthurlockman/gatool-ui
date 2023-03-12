@@ -205,13 +205,13 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                                 }
 
                                 return (<tr key={"qualSchedule" + match.matchNumber} className="centerTable">
-                                    <td>{match.actualStartTime ? "Actual:" : "Scheduled:"}<br /> {match.actualStartTime ? moment(match.actualStartTime).format('dd hh:mm A') : moment(match.startTime).format('dd hh:mm A')}</td>
-                                    <td>{match.description}</td>
-                                    <td>{match.matchNumber}</td>
-                                    <td><span className={redStyle}>{match.scoreRedFinal}</span><br /><span className={blueStyle}>{match.scoreBlueFinal}</span></td>
-                                    <td><span className={redStyle}>{match.teams[0].teamNumber}</span><br /><span className={blueStyle}>{match.teams[3].teamNumber}</span></td>
-                                    <td><span className={redStyle}>{match.teams[1].teamNumber}</span><br /><span className={blueStyle}>{match.teams[4].teamNumber}</span></td>
-                                    <td><span className={redStyle}>{match.teams[2].teamNumber}</span><br /><span className={blueStyle}>{match.teams[5].teamNumber}</span></td>
+                                    <td>{match?.actualStartTime ? "Actual:" : "Scheduled:"}<br /> {match?.actualStartTime ? moment(match?.actualStartTime).format('dd hh:mm A') : moment(match?.startTime).format('dd hh:mm A')}</td>
+                                    <td>{match?.description}</td>
+                                    <td>{match?.matchNumber}</td>
+                                    <td><span className={redStyle}>{match?.scoreRedFinal}</span><br /><span className={blueStyle}>{match?.scoreBlueFinal}</span></td>
+                                    <td><span className={redStyle}>{match?.teams[0]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[3]?.teamNumber}</span></td>
+                                    <td><span className={redStyle}>{match?.teams[1]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[4]?.teamNumber}</span></td>
+                                    <td><span className={redStyle}>{match?.teams[2]?.teamNumber}</span><br /><span className={blueStyle}>{match.teams[5]?.teamNumber}</span></td>
                                 </tr>
                                 )
                             })
@@ -226,14 +226,14 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                                     blueStyle += " bold"
                                 }
 
-                                return (<tr key={"playoffSchedule" + match.matchNumber} className="centerTable">
-                                    <td>{match.actualStartTime ? "Actual:" : "Scheduled:"}<br /> {match.actualStartTime ? moment(match.actualStartTime).format('dd hh:mm A') : moment(match.StartTime).format('dd hh:mm A')}</td>
-                                    <td>{match.description}</td>
-                                    <td>{match.matchNumber + qualMatchCount}</td>
-                                    <td><span className={redStyle}>{match.scoreRedFinal}</span><br /><span className={blueStyle}>{match.scoreBlueFinal}</span></td>
-                                    <td><span className={redStyle}>{match.teams[0].teamNumber}</span><br /><span className={blueStyle}>{match.teams[3].teamNumber}</span></td>
-                                    <td><span className={redStyle}>{match.teams[1].teamNumber}</span><br /><span className={blueStyle}>{match.teams[4].teamNumber}</span></td>
-                                    <td><span className={redStyle}>{match.teams[2].teamNumber}</span><br /><span className={blueStyle}>{match.teams[5].teamNumber}</span></td>
+                                return (<tr key={"playoffSchedule" + match?.matchNumber} className="centerTable">
+                                    <td>{match?.actualStartTime ? "Actual:" : "Scheduled:"}<br /> {match?.actualStartTime ? moment(match?.actualStartTime).format('dd hh:mm A') : moment(match?.startTime).format('dd hh:mm A')}</td>
+                                    <td>{match?.description}</td>
+                                    <td>{match?.matchNumber + qualMatchCount}</td>
+                                    <td><span className={redStyle}>{match?.scoreRedFinal}</span><br /><span className={blueStyle}>{match?.scoreBlueFinal}</span></td>
+                                    <td><span className={redStyle}>{match?.teams[0]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[3]?.teamNumber}</span></td>
+                                    <td><span className={redStyle}>{match?.teams[1]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[4]?.teamNumber}</span></td>
+                                    <td><span className={redStyle}>{match?.teams[2]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[5]?.teamNumber}</span></td>
                                 </tr>
                                 )
                             })
