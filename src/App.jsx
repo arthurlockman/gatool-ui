@@ -73,6 +73,14 @@ const navPages = [
   { "href": "emcee", "id": "emceePage" }
 ]
 
+const supportedYears = [
+  { label: '2023', value: '2023' },
+  { label: '2022', value: '2022' },
+  { label: '2021', value: '2021' },
+  { label: '2020', value: '2020' },
+  { label: '2019', value: '2019' }
+];
+
 const paleYellow = "#fdfaed";
 const paleBlue = "#effdff";
 
@@ -155,6 +163,9 @@ function App() {
   const { waitingWorker, showReload, reloadPage } = useServiceWorker();
   const { enqueueSnackbar } = useSnackbar();
 
+  if (!selectedYear) {
+    setSelectedYear(supportedYears[0]);
+  }
 
   useEffect(() => {
     if (showReload && waitingWorker) {
@@ -795,7 +806,7 @@ function App() {
   // This function writes updated team data back to gatool Cloud.
   async function putTeamData(teamNumber, data) {
     var result = await httpClient.put(`team/${teamNumber}/updates`, data);
-    return result.ok;
+    return result;
   }
 
   const nextMatch = () => {
@@ -805,7 +816,7 @@ function App() {
       getRanks();
       getWorldStats();
     }
-    
+
     if (currentMatch < (qualSchedule?.schedule?.length + playoffSchedule?.schedule?.length)) {
       setCurrentMatch(currentMatch + 1);
       getSchedule();

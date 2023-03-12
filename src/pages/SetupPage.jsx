@@ -136,9 +136,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
         setLocalUpdates(localUpdatesTemp);
     }
 
-    if (!selectedYear) {
-        setSelectedYear(supportedYears[0]);
-    }
+    
 
     var updatedTeamList = localUpdates.map((update) => {
         return update.teamNumber
