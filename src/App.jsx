@@ -990,6 +990,7 @@ function App() {
       setTeamReduction(null);
       setPlayoffCountOverride(null);
       setAllianceSelectionArrays({});
+      setRankingsOverride(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedEvent])
@@ -1008,6 +1009,7 @@ function App() {
       setTeamReduction(null);
       setPlayoffCountOverride(null);
       setAllianceSelectionArrays({});
+      setRankingsOverride(null);
       setCurrentMatch(1);
       getSchedule();
       getTeamList();
