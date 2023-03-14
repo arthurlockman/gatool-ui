@@ -11,7 +11,7 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 	const semibold = "600";
 	//const normal = "400";
 
-	var matches = playoffSchedule.schedule;
+	var matches = playoffSchedule?.schedule;
 
 	//returns the three members of an alliance based on the match data.
 	function allianceNumbers(matchNumber, allianceColor) {
