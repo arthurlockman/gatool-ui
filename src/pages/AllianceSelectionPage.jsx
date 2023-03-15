@@ -31,7 +31,7 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
                     <p>When it's time for Alliance Selection, simply tap a team when their number is called. If they accept, tap <b>Gratefully Accept.</b> If they decline, tap <b>Respectfully Decline.</b></p>
                     {!allianceSelection && <Alert variant="danger" ><div onClick={getRanks}><b>Do not proceed with Alliance Selection until you confirm that the rank order below agrees with the rank order in FMS. Check the Alliance leaders and the teams in the Backup Teams box. Tap this alert to see if we can get a more current schedule and rankings.</b></div>
                         <Container fluid><Row className="align-items-center"><Col xs={10}>If you believe that your ranks are correct, and you need to proceed with Alliance Selection even though our confidence is low, you can do so by enabling this option:</Col>
-                            <Col xs={2} AlignMiddle><Switch
+                            <Col xs={2}><Switch
                                 checked={overrideAllianceSelection}
                                 onChange={setOverrideAllianceSelection}
                                 height={20}
