@@ -1,5 +1,4 @@
 
-import React from "react";
 import { Alert, Container, Row, Col } from "react-bootstrap";
 import StatsMatch from "../components/StatsMatch";
 
