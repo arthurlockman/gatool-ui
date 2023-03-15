@@ -168,7 +168,14 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
     allianceSelectionOrder = allianceSelectionOrder.slice(0, allianceCount?.allianceSelectionLength + 1);
 
     var sortedTeams = _.orderBy(rankings?.ranks, "teamNumber", "asc");
-    var asArrays = {};
+    var asArrays = {
+        "alliances":[],
+        "rankedReams": [],
+        "availableTeams": [],
+        "nextChoice": 0,
+        "undo": [],
+        "declined": []
+    };
 
     if (selectedEvent && rankings && teamList && allianceCount && communityUpdates) {
 
@@ -274,10 +281,6 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
             ];
             asArrays.rankedTeams = _.orderBy(sortedTeams, ["rank", "asc"]);
             asArrays.availableTeams = _.orderBy(sortedTeams, ["teamNumber", "asc"]);
-            //asArrays.availableTeams = _.cloneDeep(asArrays.rankedTeams);
-            //asArrays.availableTeams.shift();
-            //asArrays.availableTeams = _.orderBy(asArrays.availableTeams, ["teamNumber", "asc"]);
-            //asArrays.availableTeams.splice(_.findIndex(asArrays.rankedTeams, { "rank": 1 }), 1);
             asArrays.nextChoice = 0;
             asArrays.undo = [];
             asArrays.declined = [];

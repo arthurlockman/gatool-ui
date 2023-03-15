@@ -1,5 +1,4 @@
 import { Alert, Container } from "react-bootstrap";
-import React from "react";
 import _ from "lodash";
 import { rankHighlight } from "../components/HelperFunctions";
 import PlayByPlay from "../components/PlayByPlay";
