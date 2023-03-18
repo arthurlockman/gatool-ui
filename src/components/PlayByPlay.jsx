@@ -26,17 +26,18 @@ function PlayByPlay({ station, team, inPlayoffs, selectedYear, selectedEvent, sh
                     <>
                         <p className={`playByPlayTeamName ${(inPlayoffs && showQualsStats) ? "playByPlayTeamNameStats" : ""}`}>{team?.updates?.nameShortLocal ? team?.updates?.nameShortLocal : team?.nameShort}</p>
                         <p className={"playByPlayRobotName"}>{team?.updates?.robotNameLocal}</p>
-                        {(!inPlayoffs || (inPlayoffs && showQualsStats)) && <div className={"playByPlayWinLossTie text-center"}>
-                            <table className={"wltTable"}>
-                                <tbody>
-                                    <tr>
-                                        <td className={"wltCol"} style={team?.rankStyle}>Rank {team?.rank}<br />AV RP {team?.sortOrder1}</td><td className={"wltCol"}>Qual Avg<br />{team?.qualAverage}</td><td className={"wltCol"}>W-L-T<br />{team?.wins}-{team?.losses}-{team?.ties}</td>
-                                    </tr>
-                                    <tr><td colSpan={3}>Team high score: {team?.highScore?.score}<br />in {team?.highScore?.description}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>}
+                        {(!inPlayoffs || (inPlayoffs && showQualsStats)) && team?.rank &&
+                            <div className={"playByPlayWinLossTie text-center"}>
+                                <table className={"wltTable"}>
+                                    <tbody>
+                                        <tr>
+                                            <td className={"wltCol"} style={team?.rankStyle}>Rank {team?.rank}<br />AV RP {team?.sortOrder1}</td><td className={"wltCol"}>Qual Avg<br />{team?.qualAverage}</td><td className={"wltCol"}>W-L-T<br />{team?.wins}-{team?.losses}-{team?.ties}</td>
+                                        </tr>
+                                        <tr><td colSpan={3}>Team high score: {team?.highScore?.score}<br />in {team?.highScore?.description}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>}
                         {(showNotes || _.isNull(showNotes)) && <p className={"notes playByPlayWinLossTie"} dangerouslySetInnerHTML={{ __html: team?.updates?.teamNotesLocal }}></p>}
                     </>
                 }
