@@ -1,7 +1,7 @@
 
 import _ from "lodash";
 
-function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selectedEvent, showNotes, showAwards, showSponsors, showMottoes, showChampsStats }) {
+function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selectedEvent, showNotes, showAwards, showSponsors, showMottoes, showChampsStats, eventNamesCY }) {
     const originalAndSustaining = ["20", "45", "126", "148", "151", "157", "190", "191", "250"];
     var allianceColor = station.slice(0, -1);
     var awardsYears = team?.awards ? Object.keys(team.awards) : []
@@ -60,7 +60,7 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
                 <p className={"announceOrganization"}>{team?.updates?.organizationLocal ? team?.updates?.organizationLocal : team?.schoolName}</p>
                 {(showSponsors || _.isNull(showSponsors)) && <p className={"sponsors"} >{team?.updates?.topSponsorsLocal ? team?.updates?.topSponsorsLocal : team?.topSponsors}</p>}
                 <p className={`HOF${allianceColor}`}>
-                {originalAndSustaining.includes(String(team?.teamNumber)) && <span>Original and Sustaining Team<br /></span>}
+                    {originalAndSustaining.includes(String(team?.teamNumber)) && <span>Original and Sustaining Team<br /></span>}
                     {team?.hallOfFame ? team?.hallOfFame.map((award) => {
                         return <span key={award.year + award.type + award.challenge} className={`HOF${allianceColor}`}>{award.year} {award.type === "chairmans" ? "Chairman's Award" : "Winner"} {award.challenge}<br /></span>
                     }) : ""}
@@ -69,7 +69,7 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
                 {awards && (showAwards || _.isNull(showAwards)) && <p className={"awards"}>
                     {awards.map((award) => {
                         if (award.year > selectedYear.value - (awardsMenu?.value || 3)) {
-                            return <span key={award.year + award.eventName + award.name + award.person + team.teamNumber} className={award.highlight ? "awardHilight" : ""}>{award.year} {award.eventName} : {award.name}{award.person ? ` : ${award.person}` : ""}<br /></span>
+                            return <span key={award.year + award.eventName + award.name + award.person + team.teamNumber} className={award.highlight ? "awardHilight" : ""}>{award.year} {_.findIndex(eventNamesCY[award.eventName]) >= 0 ? eventNamesCY[award.eventName] : award.eventName} : {award.name}{award.person ? ` : ${award.person}` : ""}<br /></span>
                         } else {
                             return ""
                         }

@@ -372,6 +372,19 @@ td {
 	margin: auto;
 }
 
+
+.scheduleTablered {
+	background-color: #ffd7d7 !important;
+}
+
+.scheduleTableblue {
+	background-color: #ceceff !important;
+}
+
+.scheduleTabletie {
+	background-color: #d3ffe3 !important;
+}
+
 .buttonNoWrap {
 	white-space: nowrap;
 }

@@ -73,7 +73,7 @@ const timeFormatMenu = [
 const awardsMenuOptions = [
     { label: "3 (current and two prior seasons)", value: "3" },
     { label: "2 (current and prior season)", value: "2" },
-    { label: "1 (current season only", value: "1" },
+    { label: "1 (current season only)", value: "1" },
 ]
 
 function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee }) {

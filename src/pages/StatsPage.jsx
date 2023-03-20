@@ -2,7 +2,7 @@
 import { Alert, Container, Row, Col } from "react-bootstrap";
 import StatsMatch from "../components/StatsMatch";
 
-function StatsPage({ worldStats, selectedEvent, eventHighScores }) {
+function StatsPage({ worldStats, selectedEvent, eventHighScores, eventNamesCY }) {
 
     return (
         <Container fluid>
@@ -24,16 +24,16 @@ function StatsPage({ worldStats, selectedEvent, eventHighScores }) {
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <StatsMatch highScores={worldStats?.highscores} matchType={"penaltyFreequal"} matchName={"Qual (no penalties)"} />
-                                        <StatsMatch highScores={worldStats?.highscores} matchType={"penaltyFreeplayoff"} matchName={"Playoff (no penalties)"} />
+                                        <StatsMatch highScores={worldStats?.highscores} matchType={"penaltyFreequal"} matchName={"Qual (no penalties)"} eventNamesCY={eventNamesCY} />
+                                        <StatsMatch highScores={worldStats?.highscores} matchType={"penaltyFreeplayoff"} matchName={"Playoff (no penalties)"} eventNamesCY={eventNamesCY} />
                                     </tr>
                                     <tr>
-                                        <StatsMatch highScores={worldStats?.highscores} matchType={"offsettingqual"} matchName={"Qual (offsetting penalties)"} />
-                                        <StatsMatch highScores={worldStats?.highscores} matchType={"offsettingplayoff"} matchName={"Playoff (offsetting penalties)"} />
+                                        <StatsMatch highScores={worldStats?.highscores} matchType={"offsettingqual"} matchName={"Qual (offsetting penalties)"} eventNamesCY={eventNamesCY} />
+                                        <StatsMatch highScores={worldStats?.highscores} matchType={"offsettingplayoff"} matchName={"Playoff (offsetting penalties)"} eventNamesCY={eventNamesCY} />
                                     </tr>
                                     <tr>
-                                        <StatsMatch highScores={worldStats?.highscores} matchType={"overallqual"} matchName={"Qual (incl. penalties)"} />
-                                        <StatsMatch highScores={worldStats?.highscores} matchType={"overallplayoff"} matchName={"Playoff (incl. penalties)"} />
+                                        <StatsMatch highScores={worldStats?.highscores} matchType={"overallqual"} matchName={"Qual (incl. penalties)"} eventNamesCY={eventNamesCY} />
+                                        <StatsMatch highScores={worldStats?.highscores} matchType={"overallplayoff"} matchName={"Playoff (incl. penalties)"} eventNamesCY={eventNamesCY} />
                                     </tr>
                                 </tbody>
                             </table>
@@ -47,16 +47,16 @@ function StatsPage({ worldStats, selectedEvent, eventHighScores }) {
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <StatsMatch highScores={eventHighScores} matchType={"penaltyFreequal"} matchName={"Qual (no penalties)"} />
-                                        <StatsMatch highScores={eventHighScores} matchType={"penaltyFreeplayoff"} matchName={"Playoff (no penalties)"} />
+                                        <StatsMatch highScores={eventHighScores} matchType={"penaltyFreequal"} matchName={"Qual (no penalties)"} eventNamesCY={eventNamesCY} />
+                                        <StatsMatch highScores={eventHighScores} matchType={"penaltyFreeplayoff"} matchName={"Playoff (no penalties)"} eventNamesCY={eventNamesCY} />
                                     </tr>
                                     <tr>
-                                        <StatsMatch highScores={eventHighScores} matchType={"offsettingqual"} matchName={"Qual (offsetting penalties)"} />
-                                        <StatsMatch highScores={eventHighScores} matchType={"offsettingplayoff"} matchName={"Playoff (offsetting penalties)"} />
+                                        <StatsMatch highScores={eventHighScores} matchType={"offsettingqual"} matchName={"Qual (offsetting penalties)"} eventNamesCY={eventNamesCY} />
+                                        <StatsMatch highScores={eventHighScores} matchType={"offsettingplayoff"} matchName={"Playoff (offsetting penalties)"} eventNamesCY={eventNamesCY} />
                                     </tr>
                                     <tr>
-                                        <StatsMatch highScores={eventHighScores} matchType={"overallqual"} matchName={"Qual (incl. penalties)"} />
-                                        <StatsMatch highScores={eventHighScores} matchType={"overallplayoff"} matchName={"Playoff (incl. penalties)"} />
+                                        <StatsMatch highScores={eventHighScores} matchType={"overallqual"} matchName={"Qual (incl. penalties)"} eventNamesCY={eventNamesCY} />
+                                        <StatsMatch highScores={eventHighScores} matchType={"overallplayoff"} matchName={"Playoff (incl. penalties)"} eventNamesCY={eventNamesCY} />
                                     </tr>
                                 </tbody>
                             </table>
