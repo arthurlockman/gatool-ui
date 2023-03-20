@@ -7,7 +7,7 @@ import Switch from "react-switch";
 
 import './AllianceSelectionPage.css';
 
-function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, playoffSchedule, alliances, rankings, timeFormat, getRanks, allianceSelection, playoffs, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays, rankingsOverride }) {
+function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, playoffSchedule, alliances, rankings, timeFormat, getRanks, allianceSelection, playoffs, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays, rankingsOverride, loadEvent}) {
     const [overrideAllianceSelection, setOverrideAllianceSelection] = useState(false);
 
     var ranksLastUpdateDisplay = "No rankings reporting yet."
@@ -37,7 +37,7 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
                                 height={20}
                                 width={40} />
                         </Col></Row></Container></Alert>}
-                    {allianceSelection && !rankingsOverride && <Alert variant="success" ><div onClick={getRanks}><b>We believe your event is ready for Alliance Selection, but you must confirm that the rank order below agrees with the rank order in FMS before proceeding with Alliance Selection.</b> If you see a discrepancy, tap this alert to see if we can get a more current rankings.</div></Alert>}
+                    {allianceSelection && !rankingsOverride && <Alert variant="success" ><div onClick={loadEvent}><b>We believe your event is ready for Alliance Selection, but you must confirm that the rank order below agrees with the rank order in FMS before proceeding with Alliance Selection. If you see a discrepancy, tap this alert to see if we can get a more current rankings. <i>This will reload your event.</i></b></div></Alert>}
                     {allianceSelection && rankingsOverride && <Alert variant="danger" ><div><b>You have imported a Rankings Report from your Scorekeeper. Please review the table below to ensure that it matches the report</b></div></Alert>}
                 </div>}
                 {selectedEvent && qualSchedule?.schedule?.length > 0 && !playoffs && (allianceSelection || overrideAllianceSelection) &&
