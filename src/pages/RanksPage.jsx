@@ -6,7 +6,7 @@ import _ from "lodash";
 import moment from "moment";
 
 
-function RanksPage({ selectedEvent, teamList, rankings, rankSort, setRankSort, allianceCount, rankingsOverride, setRankingsOverride, setRankings, allianceSelection, getRanks, setAllianceSelectionArrays, playoffs }) {
+function RanksPage({ selectedEvent, teamList, rankings, rankSort, setRankSort, allianceCount, rankingsOverride, setRankingsOverride, setRankings, allianceSelection, getRanks, setAllianceSelectionArrays, playoffs, districtRankings }) {
     // This function clicks the hidden file upload button
     function clickLoadRanks() {
         document.getElementById("RankingsFiles").click();
@@ -133,6 +133,8 @@ function RanksPage({ selectedEvent, teamList, rankings, rankSort, setRankSort, a
 
     var rankingsList = rankings?.ranks?.map((teamRow) => {
         teamRow.teamName = getTeamName(teamRow.teamNumber);
+        if (selectedEvent?.value?.districtCode) {
+            teamRow.districtRanking = _.filter(districtRankings?.districtRanks,{"teamNumber":teamRow.teamNumber})[0]?.rank}
         return teamRow;
     })
 
@@ -197,6 +199,10 @@ function RanksPage({ selectedEvent, teamList, rankings, rankSort, setRankSort, a
                             <th onClick={() => (rankSort === "qualAverage") ? setRankSort("-qualAverage") : setRankSort("qualAverage")}><b>Qual Avg.{rankSort === "qualAverage" ? <SortNumericUp /> : ""}{rankSort === "-qualAverage" ? <SortNumericDown /> : ""}</b></th>
                             <th onClick={() => (rankSort === "dq") ? setRankSort("-dq") : setRankSort("dq")}><b>DQ{rankSort === "dq" ? <SortNumericUp /> : ""}{rankSort === "-dq" ? <SortNumericDown /> : ""}</b></th>
                             <th onClick={() => (rankSort === "matchesPlayed") ? setRankSort("-matchesPlayed") : setRankSort("matchesPlayed")}><b>Matches Played{rankSort === "matchesPlayed" ? <SortNumericUp /> : ""}{rankSort === "-matchesPlayed" ? <SortNumericDown /> : ""}</b></th>
+                            {selectedEvent?.value?.districtCode && 
+                            <th onClick={() => (rankSort === "districtRanking") ? setRankSort("-districtRanking") : setRankSort("districtRanking")}><b>District Ranking{rankSort === "districtRanking" ? <SortNumericUp /> : ""}{rankSort === "-districtRanking" ? <SortNumericDown /> : ""}</b></th>
+                            }
+
                         </tr>
                     </thead>
                     <tbody>
@@ -212,6 +218,11 @@ function RanksPage({ selectedEvent, teamList, rankings, rankSort, setRankSort, a
                                 <td>{rankRow.qualAverage}</td>
                                 <td>{rankRow.dq}</td>
                                 <td>{rankRow.matchesPlayed}</td>
+                                {selectedEvent?.value?.districtCode && 
+                                <td>
+                                   {rankRow?.districtRanking ? rankRow?.districtRanking : "Not in District"}
+                                    </td>
+                                    }
                             </tr>
                         })}
                     </tbody>
