@@ -152,6 +152,7 @@ function App() {
   const [reverseEmcee, setReverseEmcee] = usePersistentState("cache:reverseEmcee", null)
   const [allianceSelectionReady, setAllianceSelectionReady] = useState(TabStates.NotReady)
   const [eventNamesCY, setEventNamesCY] = usePersistentState("cache:eventNamesCY", []);
+  const [districtRankings, setDistrictRankings] = usePersistentState("cache:districtRankings",null);
 
   const [backupTeam, setBackupTeam] = useState(null);
 
@@ -735,6 +736,16 @@ function App() {
     setRankings(ranks);
   }
 
+  // This function retrieves the ranking data for a specific District from FIRST
+  async function getDistrictRanks() {
+    var result = null;
+    var districtranks = null;
+    result = await httpClient.get(`${selectedYear?.value}/district/rankings/${selectedEvent?.value.districtCode}`);
+    districtranks = await result.json();
+    districtranks.lastUpdate = moment();
+    setDistrictRankings(districtranks);
+  }
+
   // This function retrieves the ranking data for a specified event from FIRST.
   async function getWorldStats() {
     var result = await httpClient.get(`${selectedYear?.value}/highscores`);
@@ -859,10 +870,14 @@ function App() {
       setAllianceSelectionArrays({});
       setRankingsOverride(null);
       setCurrentMatch(1);
+      setDistrictRankings(null);
       getSchedule();
       getTeamList();
       getCommunityUpdates();
       getRanks();
+      if (selectedEvent.value.districtCode) {
+        getDistrictRanks();
+      }
       getWorldStats();
     }
   }
@@ -1069,7 +1084,7 @@ function App() {
 
               <Route path="/teamdata" element={<TeamDataPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} teamSort={teamSort} setTeamSort={setTeamSort} communityUpdates={communityUpdates} setCommunityUpdates={setCommunityUpdates} allianceCount={allianceCount} lastVisit={lastVisit} setLastVisit={setLastVisit} putTeamData={putTeamData} localUpdates={localUpdates} setLocalUpdates={setLocalUpdates} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} />} />
 
-              <Route path='/ranks' element={<RanksPage selectedEvent={selectedEvent} teamList={teamList} rankings={rankings} rankSort={rankSort} setRankSort={setRankSort} allianceCount={allianceCount} rankingsOverride={rankingsOverride} setRankingsOverride={setRankingsOverride} allianceSelection={allianceSelection} getRanks={getRanks} setRankings={setRankings} setAllianceSelectionArrays={setAllianceSelectionArrays} playoffs={playoffs} />} />
+              <Route path='/ranks' element={<RanksPage selectedEvent={selectedEvent} teamList={teamList} rankings={rankings} rankSort={rankSort} setRankSort={setRankSort} allianceCount={allianceCount} rankingsOverride={rankingsOverride} setRankingsOverride={setRankingsOverride} allianceSelection={allianceSelection} getRanks={getRanks} setRankings={setRankings} setAllianceSelectionArrays={setAllianceSelectionArrays} playoffs={playoffs} districtRankings={districtRankings}/>} />
 
               <Route path='/announce' element={<AnnouncePage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} communityUpdates={communityUpdates} currentMatch={currentMatch} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} alliances={alliances} setAlliances={setAlliances} awardsMenu={awardsMenu} showNotes={showNotes} showAwards={showAwards} showSponsors={showSponsors} showMottoes={showMottoes} showChampsStats={showChampsStats} timeFormat={timeFormat} eventHighScores={eventHighScores} backupTeam={backupTeam} setBackupTeam={setBackupTeam} allianceCount={allianceCount} nextMatch={nextMatch} previousMatch={previousMatch} setMatchFromMenu={setMatchFromMenu} practiceSchedule={practiceSchedule} eventNamesCY={eventNamesCY} />} />
 
