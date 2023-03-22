@@ -135,6 +135,9 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
             {selectedEvent && (schedule?.length > 0) && inPlayoffs &&
                 <>
                     <Container fluid>
+                        <Row>
+                            <Col className={"davidPriceDetail"} xs={12}>{_.replace(schedule[currentMatch - 1]?.description,"(R","(Round ")}</Col>
+                        </Row>
                         {!reverseEmcee && <Row>
                             {(playoffMatchNumber <= 13) && <Col xs={2} className={"davidPriceDetail redAllianceTeam"}>
                                 {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.red.from ? _.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.red.from : ""}
