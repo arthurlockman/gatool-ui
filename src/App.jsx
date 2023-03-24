@@ -746,7 +746,7 @@ function App() {
     setDistrictRankings(districtranks);
   }
 
-  // This function retrieves the ranking data for a specified event from FIRST.
+  // This function retrieves the rworld high scores for the selected year from FIRST.
   async function getWorldStats() {
     var result = await httpClient.get(`${selectedYear?.value}/highscores`);
     var highscores = await result.json();
@@ -928,7 +928,7 @@ function App() {
           // We have four formats available in timezones: abbreviation, description, Livemeeting and Windows. We lookup the Windows
           // format and convert it to a more standard format. Consider moving off of Moment on to Luxor?
 
-          e.timeZoneAbbreviation = timezones[_.findIndex(timezones, { "Windows": e.timezone })].Abbreviation;
+          e.timeZoneAbbreviation = timezones[_.findIndex(timezones, { "Windows": e.timezone })]?.Abbreviation;
 
           var eventTime = moment(e.dateEnd);
           e.name = e.name.trim();
