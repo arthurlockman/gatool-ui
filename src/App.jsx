@@ -872,7 +872,6 @@ function App() {
       setRankingsOverride(null);
       setCurrentMatch(1);
       setDistrictRankings(null);
-      setShowDistrictChampsStats(null);
       getSchedule();
       getTeamList();
       getCommunityUpdates();
