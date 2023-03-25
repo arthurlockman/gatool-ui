@@ -134,7 +134,11 @@ function RanksPage({ selectedEvent, teamList, rankings, rankSort, setRankSort, a
     var rankingsList = rankings?.ranks?.map((teamRow) => {
         teamRow.teamName = getTeamName(teamRow.teamNumber);
         if (selectedEvent?.value?.districtCode) {
-            teamRow.districtRanking = _.filter(districtRankings?.districtRanks,{"teamNumber":teamRow.teamNumber})[0]?.rank}
+            var teamDistrictRanks = _.filter(districtRankings?.districtRanks,{"teamNumber":teamRow.teamNumber})[0];
+            teamRow.districtRanking = teamDistrictRanks?.rank;
+            teamRow.qualifiedDistrictCmp = teamDistrictRanks?.qualifiedDistrictCmp;
+            teamRow.qualifiedFirstCmp = teamDistrictRanks?.qualifiedFirstCmp;
+        }        
         return teamRow;
     })
 
@@ -221,6 +225,10 @@ function RanksPage({ selectedEvent, teamList, rankings, rankSort, setRankSort, a
                                 {selectedEvent?.value?.districtCode && 
                                 <td>
                                    {rankRow?.districtRanking ? rankRow?.districtRanking : "Not in District"}
+                                   {rankRow?.districtRanking ? <>
+                                   {rankRow?.qualifiedDistrictCmp ? <span><b> D</b></span> : ""}
+                                   {rankRow?.qualifiedFirstCmp ? <span><b> W</b></span> : ""}
+                                   </>: ""}
                                     </td>
                                     }
                             </tr>

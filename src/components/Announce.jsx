@@ -64,8 +64,9 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
                     {team?.hallOfFame ? team?.hallOfFame.map((award) => {
                         return <span key={award.year + award.type + award.challenge} className={`HOF${allianceColor}`}>{award.year} {award.type === "chairmans" ? "Chairman's Award" : "Winner"} {award.challenge}<br /></span>
                     }) : ""}
-
                 </p>
+                {team?.qualifiedDistrictCmp && <p className={"champsQualifiedAnnounce"}>Qualified for District Champs</p>}
+                {team?.qualifiedFirstCmp && <p className={"champsQualifiedAnnounce"}>Qualified for World Champs</p>}
                 {awards && (showAwards || _.isNull(showAwards)) && <p className={"awards"}>
                     {awards.map((award) => {
                         if (award.year > selectedYear.value - (awardsMenu?.value || 3)) {
