@@ -9,7 +9,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 const paleGreen = "rgba(144, 238, 144, 0.5)"
 
 
-function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, showNotes, showMottoes, showQualsStats, swapScreen, timeFormat, eventHighScores, backupTeam, setBackupTeam, nextMatch, previousMatch, setMatchFromMenu, practiceSchedule }) {
+function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, showNotes, showMottoes, showQualsStats, swapScreen, timeFormat, eventHighScores, backupTeam, setBackupTeam, nextMatch, previousMatch, setMatchFromMenu, practiceSchedule, districtRankings }) {
     var displayOrder = ["Blue1", "Red3", "Blue2", "Red2", "Blue3", "Red1", "Blue4", "Red4"];
     if (swapScreen === true) { displayOrder = ["Red3", "Blue1", "Red2", "Blue2", "Red1", "Blue3", "Red4", "Blue4"] }
 
@@ -27,6 +27,12 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
             team.rankStyle = rankHighlight(team?.rank, allianceCount || 8);
             team.alliance = alliances?.Lookup[`${team?.teamNumber}`]?.alliance || null;
             team.allianceRole = alliances?.Lookup[`${team?.teamNumber}`]?.role || null;
+
+            var teamDistrictRanks = _.filter(districtRankings?.districtRanks, { "teamNumber": team.teamNumber })[0] || null;
+            team.districtRanking = teamDistrictRanks?.rank;
+            team.qualifiedDistrictCmp = teamDistrictRanks?.qualifiedDistrictCmp;
+            team.qualifiedFirstCmp = teamDistrictRanks?.qualifiedFirstCmp;
+
         }
 
         if (station.slice(-1) === "4") {
@@ -58,6 +64,11 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
                     team.rankStyle = rankHighlight(team?.rank, allianceCount || 8);
                     team.alliance = alliances?.Lookup[`${remainingTeam[0]}`]?.alliance || null;
                     team.allianceRole = alliances?.Lookup[`${remainingTeam[0]}`]?.role || null;
+
+                    teamDistrictRanks = _.filter(districtRankings?.districtRanks, { "teamNumber": team.teamNumber })[0] || null;
+                    team.districtRanking = teamDistrictRanks?.rank;
+                    team.qualifiedDistrictCmp = teamDistrictRanks?.qualifiedDistrictCmp;
+                    team.qualifiedFirstCmp = teamDistrictRanks?.qualifiedFirstCmp;
                 }
             }
         }
@@ -66,7 +77,7 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
     }
 
     var schedule = practiceSchedule?.schedule || [];
-    if (qualSchedule?.schedule.length >0) {
+    if (qualSchedule?.schedule.length > 0) {
         schedule = _.concat(schedule, qualSchedule?.schedule);
     }
 
@@ -74,8 +85,8 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
         schedule = _.concat(schedule, playoffSchedule?.schedule);
     }
 
-    
-    
+
+
     var scores = [];
     _.forEach(schedule, (match) => {
         _.forEach(match?.teams, (team) => {
@@ -93,7 +104,7 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
     })
 
     teamList?.teams.forEach((team, index) => {
-        teamList.teams[index].highScore = _.orderBy(_.filter(_.filter(scores,"score"), { "teamNumber": team?.teamNumber }), ["score"], ["desc"])[0];
+        teamList.teams[index].highScore = _.orderBy(_.filter(_.filter(scores, "score"), { "teamNumber": team?.teamNumber }), ["score"], ["desc"])[0];
     }
     )
 

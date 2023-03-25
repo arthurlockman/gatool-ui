@@ -9,7 +9,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 
 const paleGreen = "rgba(144, 238, 144, 0.5)"
 
-function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, awardsMenu, showNotes, showAwards, showSponsors, showMottoes, showChampsStats, timeFormat, eventHighScores, backupTeam, setBackupTeam, nextMatch, previousMatch, setMatchFromMenu, practiceSchedule, eventNamesCY }) {
+function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, awardsMenu, showNotes, showAwards, showSponsors, showMottoes, showChampsStats, timeFormat, eventHighScores, backupTeam, setBackupTeam, nextMatch, previousMatch, setMatchFromMenu, practiceSchedule, eventNamesCY, districtRankings }) {
 
     function updateTeamDetails(station, matchDetails) {
         var team = {}
@@ -27,6 +27,11 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
             team.rankStyle = rankHighlight(team?.rank, allianceCount || 8);
             team.alliance = alliances?.Lookup[`${team?.teamNumber}`]?.alliance || null;
             team.allianceRole = alliances?.Lookup[`${team?.teamNumber}`]?.role || null;
+
+            var teamDistrictRanks = _.filter(districtRankings?.districtRanks, { "teamNumber": team.teamNumber })[0] || null;
+            team.districtRanking = teamDistrictRanks?.rank;
+            team.qualifiedDistrictCmp = teamDistrictRanks?.qualifiedDistrictCmp;
+            team.qualifiedFirstCmp = teamDistrictRanks?.qualifiedFirstCmp;
         }
 
         if (station?.slice(-1) === "4") {
@@ -58,6 +63,11 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
                     team.rankStyle = rankHighlight(team?.rank, allianceCount || 8);
                     team.alliance = alliances?.Lookup[`${remainingTeam[0]}`]?.alliance || null;
                     team.allianceRole = alliances?.Lookup[`${remainingTeam[0]}`]?.role || null;
+
+                    var teamDistrictRanks = _.filter(districtRankings?.districtRanks, { "teamNumber": team.teamNumber })[0] || null;
+                    team.districtRanking = teamDistrictRanks?.rank;
+                    team.qualifiedDistrictCmp = teamDistrictRanks?.qualifiedDistrictCmp;
+                    team.qualifiedFirstCmp = teamDistrictRanks?.qualifiedFirstCmp;
                 }
             }
         }

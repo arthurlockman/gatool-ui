@@ -594,3 +594,14 @@ td {
 .notes {
 	font-size: small;
 }
+
+.champsQualified {
+	font-size: medium;
+	font-weight: bolder;
+	color: yellow;
+}
+
+.champsQualifiedAnnounce {
+	font-weight: bolder;
+	color: rgba(16, 70, 0, 0.93);
+}
