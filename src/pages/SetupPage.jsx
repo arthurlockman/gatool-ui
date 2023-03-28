@@ -1,10 +1,11 @@
 import Select from "react-select";
-import { Row, Col, Container, Alert, Button } from 'react-bootstrap';
+import { Row, Col, Container, Alert, Button, Modal } from 'react-bootstrap';
 import moment from "moment/moment";
 import LogoutButton from "../components/LogoutButton";
 import _ from "lodash";
 import Switch from "react-switch";
 import { useOnlineStatus } from "../contextProviders/OnlineContext";
+import { useState } from "react";
 import { toast } from "react-toastify";
 
 import { ArrowClockwise } from 'react-bootstrap-icons';
@@ -76,8 +77,12 @@ const awardsMenuOptions = [
     { label: "1 (current season only)", value: "1" },
 ]
 
+
+
 function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee, showDistrictChampsStats, setShowDistrictChampsStats }) {
     const isOnline = useOnlineStatus();
+
+    const [deleteSavedModal, setDeleteSavedModal] = useState(null);
 
     function filterEvents(events) {
         //filter the array
@@ -131,6 +136,19 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
         })
 
         setLocalUpdates(localUpdatesTemp);
+    }
+
+    function deleteLocalUpdates() {
+        setDeleteSavedModal(true);
+    }
+
+    function confirmDeleteLocalUpdates() {
+        setLocalUpdates([]);
+        setDeleteSavedModal(false);
+    }
+
+    function handleClose() {
+        setDeleteSavedModal(false);
     }
 
 
@@ -207,7 +225,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                         {playoffSchedule?.lastUpdate && <p><b>Playoff Schedule last updated: </b><br />{moment(playoffSchedule?.lastUpdate).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
                         {teamList?.lastUpdate && <p><b>Team List last updated: </b><br />{moment(teamList?.lastUpdate).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
                         {rankings?.lastUpdate && <p><b>Rankings last updated: </b><br />{moment(rankings?.lastUpdate).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
-                        {localUpdates.length > 0 && <Alert><p><b>You have {localUpdates.length === 1 ? "an update for team" : "updates for teams"} {updatedTeamList.join(", ")} that can be uploaded to gatool Cloud.</b></p><Button disabled={!isOnline} onClick={uploadLocalUpdates}>Upload to gatool Cloud now</Button></Alert>}
+                        {localUpdates.length > 0 && <Alert><p><b>You have {localUpdates.length === 1 ? "an update for team" : "updates for teams"} {updatedTeamList.join(", ")} that can be uploaded to gatool Cloud.</b></p><span><Button disabled={!isOnline} onClick={uploadLocalUpdates}>Upload to gatool Cloud now</Button>  <Button disabled={!isOnline} variant={"warning"} onClick={deleteLocalUpdates}>Delete stored updates</Button></span></Alert>}
                         <Alert variant={"warning"}><p><b>Update Team Data</b><br />You can refresh your team data if it has changed on another device. <i><b>Know that we fetch all team data automatically when you load an event</b></i>, so you should not need this very often.</p><Button variant={"warning"} disabled={!isOnline} onClick={(e) => { getCommunityUpdates(true, e) }}>Update now</Button></Alert>
                     </Col>
                     <Col sm={4}>
@@ -312,6 +330,18 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                 <br />
                 <br />
                 <br />
+                <Modal centered={true} show={deleteSavedModal} size="lg" onHide={handleClose}>
+                    <Modal.Header className={"allianceChoice"} closeVariant={"white"} closeButton>
+                        <Modal.Title >Delete Stored Team Details</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <p>Are you sure you want to delete the stored {localUpdates.length === 1 ? "update for team" : "updates for teams"} {updatedTeamList.join(", ")}? You will be able to upload these changes to gatool Cloud one at a time on each team's Team Info Screen.</p>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={handleClose}>Close without deleting updates</Button>
+                        <Button variant="danger" onClick={confirmDeleteLocalUpdates}>Delete stored updates</Button>
+                    </Modal.Footer>
+                </Modal>
             </div>
             }
 
