@@ -1,7 +1,7 @@
 
 import _ from "lodash";
 
-function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selectedEvent, showNotes, showAwards, showSponsors, showMottoes, showChampsStats, eventNamesCY }) {
+function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selectedEvent, showNotes, showAwards, showSponsors, showMottoes, showChampsStats, eventNamesCY, showDistrictChampsStats }) {
     const originalAndSustaining = ["20", "45", "126", "148", "151", "157", "190", "191", "250"];
     var allianceColor = station.slice(0, -1);
     var awardsYears = team?.awards ? Object.keys(team.awards) : []
@@ -45,7 +45,7 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
                         <br /></span>}
                     {team?.champsAppearances?.FOCAppearances > 0 && <span><b>Festival of Champions Team</b><br />{team?.champsAppearances?.FOCAppearancesYears?.join(", ")}</span>}
                 </span>}
-                {(selectedEvent?.value?.champLevel === "DISTCHAMPS" || selectedEvent?.value?.champLevel === "DISTDIV") && showChampsStats && <span className={"champs"}>
+                {(selectedEvent?.value?.champLevel === "DISTCHAMPS" || selectedEvent?.value?.champLevel === "DISTDIV" || (showDistrictChampsStats && inPlayoffs)) && showChampsStats && <span className={"champs"}>
                     {team?.champsAppearances?.districtChampsAppearances > 0 && <span><b>{team?.champsAppearances?.districtChampsAppearances} District Champs Appearance{team?.champsAppearances?.districtChampsAppearances > 1 ? "s" : ""}</b><br /></span>}
                     {team?.champsAppearances?.districtChampsAppearances > 0 && <span>
                         {team?.champsAppearances?.districtChampsAppearancesYears?.join(", ")}

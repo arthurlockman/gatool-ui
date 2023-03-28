@@ -9,7 +9,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 
 const paleGreen = "rgba(144, 238, 144, 0.5)"
 
-function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, awardsMenu, showNotes, showAwards, showSponsors, showMottoes, showChampsStats, timeFormat, eventHighScores, backupTeam, setBackupTeam, nextMatch, previousMatch, setMatchFromMenu, practiceSchedule, eventNamesCY, districtRankings }) {
+function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, awardsMenu, showNotes, showAwards, showSponsors, showMottoes, showChampsStats, timeFormat, eventHighScores, backupTeam, setBackupTeam, nextMatch, previousMatch, setMatchFromMenu, practiceSchedule, eventNamesCY, districtRankings, showDistrictChampsStats }) {
 
     function updateTeamDetails(station, matchDetails) {
         var team = {}
@@ -64,7 +64,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
                     team.alliance = alliances?.Lookup[`${remainingTeam[0]}`]?.alliance || null;
                     team.allianceRole = alliances?.Lookup[`${remainingTeam[0]}`]?.role || null;
 
-                    var teamDistrictRanks = _.filter(districtRankings?.districtRanks, { "teamNumber": team.teamNumber })[0] || null;
+                    teamDistrictRanks = _.filter(districtRankings?.districtRanks, { "teamNumber": team.teamNumber })[0] || null;
                     team.districtRanking = teamDistrictRanks?.rank;
                     team.qualifiedDistrictCmp = teamDistrictRanks?.qualifiedDistrictCmp;
                     team.qualifiedFirstCmp = teamDistrictRanks?.qualifiedFirstCmp;
@@ -134,7 +134,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
                         <tbody>
                             {displayOrder.map((station) => {
                                 if (!_.isEmpty(teamDetails[station]) && !_.isUndefined(teamDetails[station].teamNumber) && !_.isNull(teamDetails[station].teamNumber) && teamDetails[station].teamNumber > 0) {
-                                    return <Announce station={station} team={teamDetails[station]} inPlayoffs={inPlayoffs} key={station} awardsMenu={awardsMenu} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showAwards={showAwards} showSponsors={showSponsors} showMottoes={showMottoes} showChampsStats={showChampsStats} eventNamesCY={eventNamesCY} />
+                                    return <Announce station={station} team={teamDetails[station]} inPlayoffs={inPlayoffs} key={station} awardsMenu={awardsMenu} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showAwards={showAwards} showSponsors={showSponsors} showMottoes={showMottoes} showChampsStats={showChampsStats} eventNamesCY={eventNamesCY} showDistrictChampsStats={showDistrictChampsStats} />
                                 } else {
                                     if (station.slice(-1) !== "4") {
                                         var allianceColor = _.toLower(station.slice(0, -1));
