@@ -225,7 +225,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                         {playoffSchedule?.lastUpdate && <p><b>Playoff Schedule last updated: </b><br />{moment(playoffSchedule?.lastUpdate).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
                         {teamList?.lastUpdate && <p><b>Team List last updated: </b><br />{moment(teamList?.lastUpdate).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
                         {rankings?.lastUpdate && <p><b>Rankings last updated: </b><br />{moment(rankings?.lastUpdate).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
-                        {localUpdates.length > 0 && <Alert><p><b>You have {localUpdates.length === 1 ? "an update for team" : "updates for teams"} {updatedTeamList.join(", ")} that can be uploaded to gatool Cloud.</b></p><span><Button disabled={!isOnline} onClick={uploadLocalUpdates}>Upload to gatool Cloud now</Button>  <Button disabled={!isOnline} variant={"warning"} onClick={deleteLocalUpdates}>Delete stored updates</Button></span></Alert>}
+                        {localUpdates.length > 0 && <Alert><p><b>You have {localUpdates.length === 1 ? "an update for team" : "updates for teams"} {_.sortBy(updatedTeamList).join(", ")} that can be uploaded to gatool Cloud.</b></p><span><Button disabled={!isOnline} onClick={uploadLocalUpdates}>Upload to gatool Cloud now</Button>  <Button disabled={!isOnline} variant={"warning"} onClick={deleteLocalUpdates}>Delete stored updates</Button></span></Alert>}
                         <Alert variant={"warning"}><p><b>Update Team Data</b><br />You can refresh your team data if it has changed on another device. <i><b>Know that we fetch all team data automatically when you load an event</b></i>, so you should not need this very often.</p><Button variant={"warning"} disabled={!isOnline} onClick={(e) => { getCommunityUpdates(true, e) }}>Update now</Button></Alert>
                     </Col>
                     <Col sm={4}>
@@ -331,11 +331,12 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                 <br />
                 <br />
                 <Modal centered={true} show={deleteSavedModal} size="lg" onHide={handleClose}>
-                    <Modal.Header className={"allianceChoice"} closeVariant={"white"} closeButton>
+                    <Modal.Header className={"allianceDecline"} closeVariant={"white"} closeButton>
                         <Modal.Title >Delete Stored Team Details</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <p>Are you sure you want to delete the stored {localUpdates.length === 1 ? "update for team" : "updates for teams"} {updatedTeamList.join(", ")}? You will be able to upload these changes to gatool Cloud one at a time on each team's Team Info Screen.</p>
+                        <p><b>Are you sure you want to delete the stored {localUpdates.length === 1 ? "update for team" : "updates for teams"} {_.sortBy(updatedTeamList).join(", ")}?</b></p>
+                        <p>Know that {localUpdates.length === 1 ? "this update is" : "these updates are"} still loaded and visible in all team displays. If you reload this event, however, {localUpdates.length === 1 ? "this update" : "these updates"} will be lost unless you upload {localUpdates.length === 1 ? "it" : "them"} now from the Team Info screen.</p>
                     </Modal.Body>
                     <Modal.Footer>
                         <Button variant="secondary" onClick={handleClose}>Close without deleting updates</Button>
