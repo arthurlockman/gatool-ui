@@ -59,7 +59,7 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
 
     if (currentMatch > qualSchedule?.schedule?.length) {
         inPlayoffs = true;
-        playoffMatchNumber = currentMatch - qualSchedule?.schedule?.length;
+        playoffMatchNumber = playoffSchedule?.schedule[currentMatch - qualSchedule?.schedule?.length-1]?.matchNumber;
         if (playoffMatchNumber > 14) {
             for (var finalsMatches = 14; finalsMatches < playoffMatchNumber; finalsMatches++) {
                 if (matches[_.findIndex(matches, { "matchNumber": finalsMatches })]?.winner.winner === "red") {

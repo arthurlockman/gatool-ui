@@ -119,7 +119,7 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                     return (tempRow);
                 })
 
-                formattedSchedule.schedule = _.filter(innerSchedule,"description");
+                formattedSchedule.schedule = _.filter(innerSchedule, "description");
                 setPracticeSchedule(formattedSchedule);
                 toast.success(`Your have successfully loaded your Practice Schedule.`)
                 clearFileInput("BackupFiles");
@@ -141,7 +141,7 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
             {!selectedEvent && <div>
                 <Alert variant="warning" >You need to select an event before you can see anything here.</Alert>
             </div>}
-            {selectedEvent && (!qualSchedule || qualSchedule?.schedule.length === 0) && <div>
+            {selectedEvent && (!qualSchedule || qualSchedule?.schedule.length === 0) && (playoffSchedule?.schedule.length === 0) && <div>
                 <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div><div>Awaiting schedule for {selectedEvent.label}<br /><br /></div>
                     {!practiceSchedule && <>
                         <Container fluid>
@@ -165,7 +165,7 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                     </>}
                 </Alert>
             </div>}
-            {selectedEvent && (practiceSchedule?.schedule.length > 0 || qualSchedule?.schedule.length > 0) &&
+            {selectedEvent && (practiceSchedule?.schedule.length > 0 || qualSchedule?.schedule.length > 0 || (qualSchedule?.schedule.length === 0 && playoffSchedule?.schedule.length > 0)) &&
                 <div>
                     <h4>{selectedEvent.label}</h4>
                     <Table responsive striped bordered size="sm">
@@ -222,18 +222,21 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                             {(playoffSchedule && playoffSchedule?.schedule?.length > 0) ? playoffSchedule.schedule.map((match) => {
                                 let redStyle = "red";
                                 let blueStyle = "blue";
+                                let winnerStyle = "tie";
                                 let qualMatchCount = qualSchedule?.schedule?.length;
                                 if (Number(match.scoreRedFinal) > Number(match.scoreBlueFinal)) {
-                                    redStyle += " bold"
+                                    redStyle += " bold";
+                                    winnerStyle = "red";
                                 } else if (Number(match.scoreBlueFinal) > Number(match.scoreRedFinal)) {
-                                    blueStyle += " bold"
+                                    blueStyle += " bold";
+                                    winnerStyle = "blue";
                                 }
 
                                 return (<tr key={"playoffSchedule" + match?.matchNumber} className="centerTable">
                                     <td>{match?.actualStartTime ? "Actual:" : "Scheduled:"}<br /> {match?.actualStartTime ? moment(match?.actualStartTime).format('dd hh:mm A') : moment(match?.startTime).format('dd hh:mm A')}</td>
                                     <td>{match?.description}</td>
                                     <td>{match?.matchNumber + qualMatchCount}</td>
-                                    <td><span className={redStyle}>{match?.scoreRedFinal}</span><br /><span className={blueStyle}>{match?.scoreBlueFinal}</span></td>
+                                    <td className={match?.scoreRedFinal ? `scheduleTable${winnerStyle}` : ""}><span className={redStyle}>{match?.scoreRedFinal}</span><br /><span className={blueStyle}>{match?.scoreBlueFinal}</span></td>
                                     <td><span className={redStyle}>{match?.teams[0]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[3]?.teamNumber}</span></td>
                                     <td><span className={redStyle}>{match?.teams[1]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[4]?.teamNumber}</span></td>
                                     <td><span className={redStyle}>{match?.teams[2]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[5]?.teamNumber}</span></td>

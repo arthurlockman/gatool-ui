@@ -65,13 +65,16 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 		"level": 0
 	}
 	if (matches[18]?.postResultTime) {
-		overtimeOffset = 45;
-
+		overtimeOffset = 75;
 	} else if (matches[17]?.postResultTime) {
-		overtimeOffset = 30;
+		overtimeOffset = 60;
 	} else if (matches[16]?.postResultTime) {
+		overtimeOffset = 45;
+	} else if (matches[15]?.postResultTime) {
+		overtimeOffset = 30;
+	} else if (matches[14]?.postResultTime) {
 		overtimeOffset = 15;
-	}
+	} 
 
 	for (var finalsMatches = 14; finalsMatches < 19; finalsMatches++) {
 		if (matches[_.findIndex(matches, { "matchNumber": finalsMatches })]?.winner.winner === "red") {
@@ -167,8 +170,8 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 						<path fill="#FEE79B" d="M1208.61,362.82h-2.18c0,15.56,5.01,28.17,11.19,28.17C1212.64,390.99,1208.61,378.38,1208.61,362.82z" />
 					</g>
 
-					<circle id="winnerMatch1Dot" fill={(matches[13]?.winner.winner === "red") ? RED : (matches[13]?.winner.winner === "blue") ? BLUE : (matches[13]?.winner.winner === "tie") ? GREEN : "none"} cx={`${1110 - overtimeOffset}`} cy="451" r="8" />
-					<text id="finalsM1Scores" transform={`matrix(1 0 0 1 ${1110 - overtimeOffset} 477.5537)`}>
+					<circle id="winnerMatch1Dot" fill={(matches[13]?.winner.winner === "red") ? RED : (matches[13]?.winner.winner === "blue") ? BLUE : (matches[13]?.winner.winner === "tie") ? GREEN : "none"} cx={`${1132 - overtimeOffset}`} cy="451" r="8" />
+					<text id="finalsM1Scores" transform={`matrix(1 0 0 1 ${1132 - overtimeOffset} 477.5537)`}>
 						<tspan x="0" y="0" fill={RED} fontFamily="'myriad-pro'"
 							fontWeight={(matches[13]?.winner.winner === "red") ? black : semibold}
 							fontStyle={"normal"}
@@ -179,8 +182,8 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 							fontSize="14px" textAnchor="middle">{matches[13]?.scoreBlueFinal}</tspan>
 					</text>
 
-					<circle id="winnerMatch2Dot" fill={(matches[14]?.winner.winner === "red") ? RED : (matches[14]?.winner.winner === "blue") ? BLUE : (matches[14]?.winner.winner === "tie") ? GREEN : "none"} cx={`${1140 - overtimeOffset}`} cy="451" r="8" />
-					<text id="finalsM2Scores" transform={`matrix(1 0 0 1 ${1140 - overtimeOffset} 477.5537)`}>
+					<circle id="winnerMatch2Dot" fill={(matches[14]?.winner.winner === "red") ? RED : (matches[14]?.winner.winner === "blue") ? BLUE : (matches[14]?.winner.winner === "tie") ? GREEN : "none"} cx={`${1162 - overtimeOffset}`} cy="451" r="8" />
+					<text id="finalsM2Scores" transform={`matrix(1 0 0 1 ${1162 - overtimeOffset} 477.5537)`}>
 						<tspan x="0" y="0"
 							fill={RED}
 							fontFamily="'myriad-pro'"
@@ -194,9 +197,9 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 							fontSize="14px" textAnchor="middle">{matches[14]?.scoreBlueFinal}</tspan>
 					</text>
 
-					<circle id="winnerMatch3Dot" fill={(matches[15]?.winner.winner === "red") ? RED : (matches[15]?.winner.winner === "blue") ? BLUE : (matches[15]?.winner.winner === "tie") ? GREEN : "none"} cx={`${1170 - overtimeOffset}`} cy="451" r="8" />
+					<circle id="winnerMatch3Dot" fill={(matches[15]?.winner.winner === "red") ? RED : (matches[15]?.winner.winner === "blue") ? BLUE : (matches[15]?.winner.winner === "tie") ? GREEN : "none"} cx={`${1192 - overtimeOffset}`} cy="451" r="8" />
 					<text id="finalsM3Scores"
-						transform={`matrix(1 0 0 1 ${1170 - overtimeOffset} 477.5537)`}>
+						transform={`matrix(1 0 0 1 ${1192 - overtimeOffset} 477.5537)`}>
 						<tspan x="0" y="0"
 							fill={RED}
 							fontFamily="'myriad-pro'"
@@ -210,9 +213,9 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 							fontSize="14px" textAnchor="middle">{matches[15]?.scoreBlueFinal}</tspan>
 					</text>
 
-					<circle id="winnerMatch4Dot" fill={(matches[16]?.winner.winner === "red") ? RED : (matches[16]?.winner.winner === "blue") ? BLUE : (matches[16]?.winner.winner === "tie") ? GREEN : "none"} cx={`${1170 + overtimeOffset}`} cy="451" r="8" />
+					<circle id="winnerMatch4Dot" fill={(matches[16]?.winner.winner === "red") ? RED : (matches[16]?.winner.winner === "blue") ? BLUE : (matches[16]?.winner.winner === "tie") ? GREEN : "none"} cx={`${1222 - overtimeOffset}`} cy="451" r="8" />
 					<text id="finalsM4Scores"
-						transform={`matrix(1 0 0 1 ${1170 + overtimeOffset} 477.5537)`}>
+						transform={`matrix(1 0 0 1 ${1222 - overtimeOffset} 477.5537)`}>
 						<tspan x="0" y="0"
 							fill={RED}
 							fontFamily="'myriad-pro'"
@@ -226,9 +229,9 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 							fontSize="14px" textAnchor="middle">{matches[16]?.scoreBlueFinal}</tspan>
 					</text>
 
-					<circle id="winnerMatch5Dot" fill={(matches[17]?.winner.winner === "red") ? RED : (matches[17]?.winner.winner === "blue") ? BLUE : (matches[17]?.winner.winner === "tie") ? GREEN : "none"} cx="1200" cy="451" r="8" />
+					<circle id="winnerMatch5Dot" fill={(matches[17]?.winner.winner === "red") ? RED : (matches[17]?.winner.winner === "blue") ? BLUE : (matches[17]?.winner.winner === "tie") ? GREEN : "none"} cx={`${1252 - overtimeOffset}`} cy="451" r="8" />
 					<text id="finalsM5Scores"
-						transform="matrix(1 0 0 1 1200 477.5537)">
+						transform={`matrix(1 0 0 1 ${1252 - overtimeOffset} 477.5537)`}>
 						<tspan x="0" y="0"
 							fill={RED}
 							fontFamily="'myriad-pro'"
@@ -242,9 +245,9 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 							fontSize="14px" textAnchor="middle">{matches[17]?.scoreBlueFinal}</tspan>
 					</text>
 
-					<circle id="winnerMatch6Dot" fill={(matches[18]?.winner.winner === "red") ? RED : (matches[18]?.winner.winner === "blue") ? BLUE : (matches[18]?.winner.winner === "tie") ? GREEN : "none"} cx={`${1200 + overtimeOffset}`} cy="451" r="8" />
+					<circle id="winnerMatch6Dot" fill={(matches[18]?.winner.winner === "red") ? RED : (matches[18]?.winner.winner === "blue") ? BLUE : (matches[18]?.winner.winner === "tie") ? GREEN : "none"} cx={`${1282 - overtimeOffset}`} cy="451" r="8" />
 					<text id="finalsM5Scores"
-						transform={`matrix(1 0 0 1 ${1200 + overtimeOffset} 477.5537)`}>
+						transform={`matrix(1 0 0 1 ${1282 - overtimeOffset} 477.5537)`}>
 						<tspan x="0" y="0"
 							fill={RED}
 							fontFamily="'myriad-pro'"

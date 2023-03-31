@@ -811,11 +811,11 @@ function App() {
     }
     var allianceLookup = {};
     alliances.alliances.forEach(alliance => {
-      allianceLookup[`${alliance.captain}`] = { role: `Captain`, alliance: `Alliance ${alliance.number}`, number: alliance.number, captain: alliance.captain, round1: alliance.round1, round2: alliance.round2, round3: alliance.round3, backup: alliance.backup, backupReplaced: alliance.backupReplaced };
-      allianceLookup[`${alliance.round1}`] = { role: `Round 1 Selection`, alliance: `Alliance ${alliance.number}`, number: alliance.number, captain: alliance.captain, round1: alliance.round1, round2: alliance.round2, round3: alliance.round3, backup: alliance.backup, backupReplaced: alliance.backupReplaced };
-      allianceLookup[`${alliance.round2}`] = { role: `Round 2 Selection`, alliance: `Alliance ${alliance.number}`, number: alliance.number, captain: alliance.captain, round1: alliance.round1, round2: alliance.round2, round3: alliance.round3, backup: alliance.backup, backupReplaced: alliance.backupReplaced };
-      if (alliance.round3) { allianceLookup[`${alliance.round3}`] = { role: `Round 3 Selection`, alliance: `Alliance ${alliance.number}`, number: alliance.number, captain: alliance.captain, round1: alliance.round1, round2: alliance.round2, round3: alliance.round3, backup: alliance.backup, backupReplaced: alliance.backupReplaced }; }
-      if (alliance.backup) { allianceLookup[`${alliance.backup}`] = { role: `Backup for ${alliance.backupReplaced}`, alliance: `Alliance ${alliance.number}`, number: alliance.number, captain: alliance.captain, round1: alliance.round1, round2: alliance.round2, round3: alliance.round3, backup: alliance.backup, backupReplaced: alliance.backupReplaced }; }
+      allianceLookup[`${alliance.captain}`] = { role: `Captain`, alliance: alliance.name, number: alliance.number, captain: alliance.captain, round1: alliance.round1, round2: alliance.round2, round3: alliance.round3, backup: alliance.backup, backupReplaced: alliance.backupReplaced };
+      allianceLookup[`${alliance.round1}`] = { role: `Round 1 Selection`, alliance: alliance.name, number: alliance.number, captain: alliance.captain, round1: alliance.round1, round2: alliance.round2, round3: alliance.round3, backup: alliance.backup, backupReplaced: alliance.backupReplaced };
+      allianceLookup[`${alliance.round2}`] = { role: `Round 2 Selection`, alliance: alliance.name, number: alliance.number, captain: alliance.captain, round1: alliance.round1, round2: alliance.round2, round3: alliance.round3, backup: alliance.backup, backupReplaced: alliance.backupReplaced };
+      if (alliance.round3) { allianceLookup[`${alliance.round3}`] = { role: `Round 3 Selection`, alliance: alliance.name, number: alliance.number, captain: alliance.captain, round1: alliance.round1, round2: alliance.round2, round3: alliance.round3, backup: alliance.backup, backupReplaced: alliance.backupReplaced }; }
+      if (alliance.backup) { allianceLookup[`${alliance.backup}`] = { role: `Backup for ${alliance.backupReplaced}`, alliance: alliance.name, number: alliance.number, captain: alliance.captain, round1: alliance.round1, round2: alliance.round2, round3: alliance.round3, backup: alliance.backup, backupReplaced: alliance.backupReplaced }; }
     })
     alliances.Lookup = allianceLookup;
 
@@ -848,6 +848,7 @@ function App() {
     }
 
   }
+
   const previousMatch = () => {
     if (currentMatch > 1) {
       setCurrentMatch(currentMatch - 1);
