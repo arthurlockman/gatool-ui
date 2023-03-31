@@ -170,7 +170,7 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
 
                         <Row>
                             <Col xs={12} className={"davidPriceDetail"}>
-                                <PlayoffDetails matchDetails={matchDetails} alliances={alliances} matches={matches} />
+                                <PlayoffDetails matchDetails={matchDetails} alliances={alliances} matches={matches} selectedEvent={selectedEvent}/>
                             </Col>
                         </Row>
                     </Container>
