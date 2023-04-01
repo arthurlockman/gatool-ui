@@ -143,7 +143,9 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
                 <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div>Awaiting schedule data for {selectedEvent.label}</Alert>
             </div>}
             {selectedEvent && (schedule?.length > 0) && !inPlayoffs &&
-                <div className={"davidPrice"}>{schedule[currentMatch - 1].matchNumber}</div>
+                <Container fluid {...swipeHandlers}>
+                    <div className={"davidPriceQuals"}>{schedule[currentMatch - 1].matchNumber}</div>
+                </Container>
             }
             {selectedEvent && (schedule?.length > 0) && inPlayoffs &&
                 <>

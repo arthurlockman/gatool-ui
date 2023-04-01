@@ -508,9 +508,17 @@ td {
 	font-size: 500px;
 	text-align: center;
 	font-family: "alternate-gothic-no-1-d", sans-serif;
-	line-height: 85%
+	line-height: 85%;
+	vertical-align: middle;
 }
 
+.davidPriceQuals {
+	font-size: 700px;
+	text-align: center;
+	font-family: "alternate-gothic-no-1-d", sans-serif;
+	line-height: 85%;
+	vertical-align: middle;
+}
 .davidPriceWarning {
 	background-color: #fcf8e3;
 	border-color: #faebcc;
