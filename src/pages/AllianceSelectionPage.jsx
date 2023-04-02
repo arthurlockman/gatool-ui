@@ -7,6 +7,7 @@ import { useState } from "react";
 import Switch from "react-switch";
 
 import './AllianceSelectionPage.css';
+import TwoAllianceBracket from "components/TwollianceBracket";
 
 function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, playoffSchedule, alliances, rankings, timeFormat, getRanks, allianceSelection, playoffs, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays, rankingsOverride, loadEvent}) {
     const [overrideAllianceSelection, setOverrideAllianceSelection] = useState(false);
@@ -50,7 +51,7 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
             {selectedEvent?.value?.allianceCount==="FourAlliance" && playoffs &&
                 <FourAllianceBracket selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} alliances={alliances} />}
             {selectedEvent?.value?.allianceCount==="TwoAlliance" && playoffs &&
-                <FourAllianceBracket selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} alliances={alliances} />}
+                <TwoAllianceBracket selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} alliances={alliances} />}
         </Container>
 
     )
