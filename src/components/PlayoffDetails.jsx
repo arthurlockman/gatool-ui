@@ -79,6 +79,9 @@ function PlayoffDetails({ matchDetails, alliances, matches, selectedEvent }) {
 
             ]
 
+        } else  if (selectedEvent?.value?.allianceCount === "TwoAlliance") {
+            elimLimit = 1;
+        
         }
         if (matchDetails?.matchNumber > elimLimit) {
             for (var finalsMatches = elimLimit; finalsMatches < matchDetails?.matchNumber; finalsMatches++) {

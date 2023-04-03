@@ -264,7 +264,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                         <Switch checked={showChampsStats === null ? false : showChampsStats} onChange={setShowChampsStats} />
                                     </td>
                                     <td>
-                                        <b>Show Champs Statistics on Announce</b>
+                                        <b>Show Champs Statistics on Announce in World and District Champs</b>
                                     </td>
                                 </tr>
                                 {selectedEvent?.value?.districtCode && <tr>
@@ -272,7 +272,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                         <Switch checked={showDistrictChampsStats === null ? false : showDistrictChampsStats} onChange={setShowDistrictChampsStats} />
                                     </td>
                                     <td>
-                                        <b>Show District Champs Statistics on Announce in Playoffs</b>
+                                        <b>Show District Champs Statistics on Announce in Playoffs outside of District Champs</b>
                                     </td>
                                 </tr>}
                                 <tr>
