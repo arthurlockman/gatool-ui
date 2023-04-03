@@ -5,6 +5,7 @@ import PlayByPlay from "../components/PlayByPlay";
 import BottomButtons from "../components/BottomButtons";
 import TopButtons from "../components/TopButtons";
 import { useHotkeys } from "react-hotkeys-hook";
+import { useSwipeable } from "react-swipeable";
 
 const paleGreen = "rgba(144, 238, 144, 0.5)"
 
@@ -125,6 +126,17 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
             teamDetails[station] = updateTeamDetails(station, matchDetails)
         })
     }
+    const swipeHandlers = useSwipeable(
+        {
+            onSwipedLeft: () => {
+                nextMatch();
+            },
+            onSwipedRight: () => {
+                previousMatch();
+            },
+            preventScrollOnSwipe: true,
+        }
+    )
 
     useHotkeys('right', () => nextMatch(), { scopes: 'matchNavigation' });
     useHotkeys('left', () => previousMatch(), { scopes: 'matchNavigation' });
@@ -142,7 +154,7 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
                 <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div>Awaiting schedule data for {selectedEvent.label}</Alert>
             </div>}
             {selectedEvent && teamList?.teams.length > 0 && schedule?.length > 0 &&
-                <Container fluid>
+                <Container fluid {...swipeHandlers}>
                     <TopButtons previousMatch={previousMatch} nextMatch={nextMatch} currentMatch={currentMatch} matchMenu={matchMenu} setMatchFromMenu={setMatchFromMenu} selectedEvent={selectedEvent} matchDetails={matchDetails} timeFormat={timeFormat} inPlayoffs={inPlayoffs} alliances={alliances} setAlliances={setAlliances} rankings={rankings} backupTeam={backupTeam} setBackupTeam={setBackupTeam} />
                     <table className={"playByPlayTable"}>
                         <tbody>
@@ -165,7 +177,7 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
                                 </tr>}
                         </tbody>
                     </table>
-                    <BottomButtons previousMatch={previousMatch} nextMatch={nextMatch} matchDetails={matchDetails} playoffSchedule={playoffSchedule} eventHighScores={eventHighScores} alliances={alliances} />
+                    <BottomButtons previousMatch={previousMatch} nextMatch={nextMatch} matchDetails={matchDetails} playoffSchedule={playoffSchedule} eventHighScores={eventHighScores} alliances={alliances} selectedEvent={selectedEvent}/>
                 </Container>}
         </Container>
     )

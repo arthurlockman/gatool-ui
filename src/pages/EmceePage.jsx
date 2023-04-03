@@ -2,6 +2,7 @@ import { Alert, Col, Container, Row } from "react-bootstrap";
 import _ from "lodash";
 import PlayoffDetails from "../components/PlayoffDetails";
 import { useHotkeys } from "react-hotkeys-hook";
+import { useSwipeable } from "react-swipeable";
 
 
 function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, currentMatch, nextMatch, previousMatch, reverseEmcee }) {
@@ -59,7 +60,7 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
 
     if (currentMatch > qualSchedule?.schedule?.length) {
         inPlayoffs = true;
-        playoffMatchNumber = currentMatch - qualSchedule?.schedule?.length;
+        playoffMatchNumber = playoffSchedule?.schedule[currentMatch - qualSchedule?.schedule?.length - 1]?.matchNumber;
         if (playoffMatchNumber > 14) {
             for (var finalsMatches = 14; finalsMatches < playoffMatchNumber; finalsMatches++) {
                 if (matches[_.findIndex(matches, { "matchNumber": finalsMatches })]?.winner.winner === "red") {
@@ -116,7 +117,19 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
         })
     })
 
-    var matchDetails = _.filter(matches, {"matchNumber":playoffMatchNumber})[0];
+    var matchDetails = _.filter(matches, { "matchNumber": playoffMatchNumber })[0];
+
+    const swipeHandlers = useSwipeable(
+        {
+            onSwipedLeft: () => {
+                nextMatch();
+            },
+            onSwipedRight: () => {
+                previousMatch();
+            },
+            preventScrollOnSwipe: true,
+        }
+    )
 
     useHotkeys('right', () => nextMatch(), { scopes: 'matchNavigation' });
     useHotkeys('left', () => previousMatch(), { scopes: 'matchNavigation' });
@@ -130,13 +143,15 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
                 <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div>Awaiting schedule data for {selectedEvent.label}</Alert>
             </div>}
             {selectedEvent && (schedule?.length > 0) && !inPlayoffs &&
-                <div className={"davidPrice"}>{schedule[currentMatch - 1].matchNumber}</div>
+                <Container fluid {...swipeHandlers}>
+                    <div className={"davidPriceQuals"}>{schedule[currentMatch - 1].matchNumber}</div>
+                </Container>
             }
             {selectedEvent && (schedule?.length > 0) && inPlayoffs &&
                 <>
-                    <Container fluid>
+                    <Container fluid {...swipeHandlers}>
                         <Row>
-                            <Col className={"davidPriceDetail"} xs={12}>{_.replace(schedule[currentMatch - 1]?.description,"(R","(Round ")}</Col>
+                            <Col className={"davidPriceDetail"} xs={12}>{_.replace(schedule[currentMatch - 1]?.description, "(R", "(Round ")}</Col>
                         </Row>
                         {!reverseEmcee && <Row>
                             {(playoffMatchNumber <= 13) && <Col xs={2} className={"davidPriceDetail redAllianceTeam"}>
@@ -170,7 +185,7 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
 
                         <Row>
                             <Col xs={12} className={"davidPriceDetail"}>
-                                <PlayoffDetails matchDetails={matchDetails} alliances={alliances} matches={matches} />
+                                <PlayoffDetails matchDetails={matchDetails} alliances={alliances} matches={matches} selectedEvent={selectedEvent} />
                             </Col>
                         </Row>
                     </Container>

@@ -2,8 +2,9 @@ import { ArrowRight } from "react-bootstrap-icons"
 import _ from "lodash";
 
 
-function PlayoffDetails({ matchDetails, alliances, matches }) {
-    const matchClasses = [
+function PlayoffDetails({ matchDetails, alliances, matches, selectedEvent }) {
+
+    var matchClasses = [
         { "matchNumber": 1, "red": { "class": "success", "from": null }, "blue": { "class": "success", "from": null }, "winnerTo": 7, "loserTo": 5, "winnerVs": "blue", "loserVs": "blue" },
         { "matchNumber": 2, "red": { "class": "success", "from": null }, "blue": { "class": "success", "from": null }, "winnerTo": 7, "loserTo": 5, "winnerVs": "red", "loserVs": "red" },
         { "matchNumber": 3, "red": { "class": "success", "from": null }, "blue": { "class": "success", "from": null }, "winnerTo": 8, "loserTo": 6, "winnerVs": "blue", "loserVs": "blue" },
@@ -23,10 +24,64 @@ function PlayoffDetails({ matchDetails, alliances, matches }) {
     advantage.red = 0;
     advantage.blue = 0;
     var opponent = { "winner": null, "loser": null };
+    var elimLimit = 14;
 
     if (matchDetails?.tournamentLevel === "Playoff") {
-        if (matchDetails?.matchNumber > 14) {
-            for (var finalsMatches = 14; finalsMatches < matchDetails?.matchNumber; finalsMatches++) {
+        if (selectedEvent?.value?.allianceCount === "FourAlliance") {
+            elimLimit = 6;
+            matchClasses = [
+                {
+                    "matchNumber": 1,
+                    "red": { "class": "success", "from": null },
+                    "blue": { "class": "success", "from": null },
+                    "winnerTo": 3,
+                    "loserTo": 4,
+                    "winnerVs": "blue",
+                    "loserVs": "blue"
+                },
+                {
+                    "matchNumber": 2,
+                    "red": { "class": "success", "from": null },
+                    "blue": { "class": "success", "from": null },
+                    "winnerTo": 3,
+                    "loserTo": 4,
+                    "winnerVs": "red",
+                    "loserVs": "red"
+                },
+
+                {
+                    "matchNumber": 3,
+                    "red": { "class": "success", "from": "Won M1" },
+                    "blue": { "class": "success", "from": "Won M2" },
+                    "winnerTo": 6,
+                    "loserTo": 5,
+                    "winnerVs": "blue",
+                    "loserVs": "blue"
+                },
+                {
+                    "matchNumber": 4,
+                    "red": { "class": "davidPriceWarning", "from": "Lost M1" },
+                    "blue": { "class": "davidPriceWarning", "from": "Lost M2" },
+                    "winnerTo": 5,
+                    "loserTo": null,
+                    "winnerVs": "red",
+                    "loserVs": null
+                },
+                {
+                    "matchNumber": 5,
+                    "red": { "class": "davidPriceWarning", "from": "Lost M3" },
+                    "blue": { "class": "davidPriceWarning", "from": "Won M4" },
+                    "winnerTo": 6,
+                    "loserTo": null,
+                    "winnerVs": "red",
+                    "loserVs": null
+                }
+
+            ]
+
+        }
+        if (matchDetails?.matchNumber > elimLimit) {
+            for (var finalsMatches = elimLimit; finalsMatches < matchDetails?.matchNumber; finalsMatches++) {
                 if (matches[_.findIndex(matches, { "matchNumber": finalsMatches })]?.winner.winner === "red") {
                     advantage.red += 1
                 }
@@ -35,7 +90,8 @@ function PlayoffDetails({ matchDetails, alliances, matches }) {
                 }
             }
         }
-        if (matchDetails?.matchNumber < 14) {
+        
+        if (matchDetails?.matchNumber < elimLimit) {
             var winnerMatch = matches[_.findIndex(matches, { "matchNumber": _.filter(matchClasses, { "matchNumber": matchDetails?.matchNumber })[0]?.winnerTo })];
             var winnerOpponent = {};
             winnerOpponent.alliance = _.filter(matchClasses, { "matchNumber": matchDetails?.matchNumber })[0]?.winnerVs;
@@ -70,17 +126,17 @@ function PlayoffDetails({ matchDetails, alliances, matches }) {
 
 
     return <>
-        {(matchDetails.matchNumber <= 13) && <>Winner <ArrowRight /> {_.filter(matchClasses, { "matchNumber": matchDetails.matchNumber })[0]?.winnerTo <= 13 ? `M${_.filter(matchClasses, { "matchNumber": matchDetails.matchNumber })[0]?.winnerTo}${opponent.winner ? ` against ${opponent.winner}` : ""}` : "Finals"}<br />
-            Losing Alliance {_.filter(matchClasses, { "matchNumber": matchDetails.matchNumber })[0]?.loserTo ? <><ArrowRight /> M{_.filter(matchClasses, { "matchNumber": matchDetails.matchNumber })[0]?.loserTo}{opponent.loser ? ` against ${opponent.loser}` : ""} </> : " eliminated"} </>}
-        {(matchDetails.matchNumber === 14) && <>FINALS MATCH 1</>}
-        {(matchDetails.matchNumber === 15) && <span className={`${matches[_.findIndex(matches, { "matchNumber": matchDetails.matchNumber - 1 })]?.winner.winner}AllianceTeam`}>FINALS MATCH 2<br />
+        {(matchDetails?.matchNumber <= (elimLimit - 1)) && <>Winner <ArrowRight /> {_.filter(matchClasses, { "matchNumber": matchDetails?.matchNumber })[0]?.winnerTo <= (elimLimit - 1) ? `M${_.filter(matchClasses, { "matchNumber": matchDetails?.matchNumber })[0]?.winnerTo}${opponent?.winner ? ` against ${opponent?.winner}` : ""}` : "Finals"}<br />
+            Losing Alliance {_.filter(matchClasses, { "matchNumber": matchDetails?.matchNumber })[0]?.loserTo ? <><ArrowRight /> M{_.filter(matchClasses, { "matchNumber": matchDetails?.matchNumber })[0]?.loserTo}{opponent?.loser ? ` against ${opponent?.loser}` : ""} </> : " eliminated"} </>}
+        {(matchDetails?.matchNumber === elimLimit) && <>FINALS MATCH 1</>}
+        {(matchDetails?.matchNumber === (elimLimit + 1)) && <span className={`${matches[_.findIndex(matches, { "matchNumber": matchDetails?.matchNumber - 1 })]?.winner.winner}AllianceTeam`}>FINALS MATCH 2<br />
             {(advantage.red === advantage.blue) && "EVEN"}
             {(advantage.red > advantage.blue) && "ADVANTAGE RED"}
             {(advantage.blue > advantage.red) && "ADVANTAGE BLUE"}</span>}
-        {(matchDetails.matchNumber >= 16) && <span className={(advantage.red > advantage.blue) ? "redAllianceTeam" : (advantage.blue > advantage.red) ? "blueAllianceTeam" : "tieAllianceTeam"}>{_.toUpper(matchDetails.description)}<br />
-            {(advantage.red === advantage.blue) && "EVEN"}
-            {(advantage.red > advantage.blue) && "ADVANTAGE RED"}
-            {(advantage.blue > advantage.red) && "ADVANTAGE BLUE"}
+        {(matchDetails?.matchNumber >= (elimLimit +2)) && <span className={(advantage?.red > advantage?.blue) ? "redAllianceTeam" : (advantage?.blue > advantage?.red) ? "blueAllianceTeam" : "tieAllianceTeam"}>{_.toUpper(matchDetails.description)}<br />
+            {(advantage?.red === advantage?.blue) && "EVEN"}
+            {(advantage?.red > advantage?.blue) && "ADVANTAGE RED"}
+            {(advantage?.blue > advantage?.red) && "ADVANTAGE BLUE"}
         </span>}
     </>
 }

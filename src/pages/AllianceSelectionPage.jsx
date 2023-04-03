@@ -1,11 +1,13 @@
 import { Alert, Col, Row, Container } from "react-bootstrap";
 import Bracket from "../components/Bracket";
+import FourAllianceBracket from "components/FourAllianceBracket";
 import moment from "moment/moment";
 import AllianceSelection from "../components/AllianceSelection";
 import { useState } from "react";
 import Switch from "react-switch";
 
 import './AllianceSelectionPage.css';
+import TwoAllianceBracket from "components/TwollianceBracket";
 
 function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, playoffSchedule, alliances, rankings, timeFormat, getRanks, allianceSelection, playoffs, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays, rankingsOverride, loadEvent}) {
     const [overrideAllianceSelection, setOverrideAllianceSelection] = useState(false);
@@ -21,7 +23,7 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
             <Container fluid>{!selectedEvent && <div>
                 <Alert variant="warning" ><div>You need to select an event before you can see anything here.</div></Alert>
             </div>}
-                {selectedEvent && (!qualSchedule || qualSchedule?.schedule?.length === 0) && <div>
+                {selectedEvent && (!qualSchedule || qualSchedule?.schedule?.length === 0) && (!playoffSchedule || playoffSchedule?.schedule?.length === 0) && <div>
                     <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div><div>Waiting for Qualification Match Schedule</div></Alert>
                 </div>}
                 {selectedEvent && qualSchedule?.schedule?.length > 0 && !playoffs && <div>
@@ -44,9 +46,12 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
                     <div><AllianceSelection selectedYear={selectedYear} selectedEvent={selectedEvent} rankings={rankings} teamList={teamList} allianceCount={allianceCount} communityUpdates={communityUpdates} allianceSelectionArrays={allianceSelectionArrays} setAllianceSelectionArrays={setAllianceSelectionArrays} />
                     </div>}
             </Container>
-            {selectedEvent && playoffs &&
+            {selectedEvent?.value?.allianceCount==="EightAlliance" && playoffs &&
                 <Bracket selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} alliances={alliances} />}
-
+            {selectedEvent?.value?.allianceCount==="FourAlliance" && playoffs &&
+                <FourAllianceBracket selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} alliances={alliances} />}
+            {selectedEvent?.value?.allianceCount==="TwoAlliance" && playoffs &&
+                <TwoAllianceBracket selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} alliances={alliances} />}
         </Container>
 
     )
