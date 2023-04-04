@@ -135,6 +135,7 @@ function App() {
   const [showMottoes, setShowMottoes] = usePersistentState("cache:showMottoes", null);
   const [showChampsStats, setShowChampsStats] = usePersistentState("cache:showChampsStats", null);
   const [showDistrictChampsStats, setShowDistrictChampsStats] = usePersistentState("cache:showDistrictChampsStats", null);
+
   const [swapScreen, setSwapScreen] = usePersistentState("cache:swapScreen", null);
   const [autoAdvance, setAutoAdvance] = usePersistentState("cache:autoAdvance", null);
   const [currentMatch, setCurrentMatch] = usePersistentState("cache:currentMatch", null);
@@ -200,7 +201,7 @@ function App() {
   //functions to retrieve API data
 
   // This function retrieves a schedule from FIRST. It attempts to get both the Qual and Playoff Schedule and sets the global variables
-  async function getSchedule() {
+  async function getSchedule(loadingEvent) {
     var highScores = [];
 
     // returns the winner of the match
@@ -328,6 +329,7 @@ function App() {
     matches = [];
     result = null;
     var playoffschedule = null;
+    completedMatchCount = 0;
     if (!selectedEvent?.value?.code.includes("PRACTICE")) {
       result = await httpClient.get(`${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/playoff`);
       playoffschedule = await result.json();
@@ -352,6 +354,12 @@ function App() {
         match.winner = winner(match);
         return match;
       });
+
+      if (playoffschedule?.schedule?.length > 0) {
+        completedMatchCount = playoffschedule?.schedule?.length - _.filter(playoffschedule.schedule, { "postResultTime": null }).length;
+      }
+
+      playoffschedule.completedMatchCount = completedMatchCount;
       playoffschedule.schedule = matches;
       matches.forEach((match) => {
         isHighScore(match);
@@ -402,7 +410,24 @@ function App() {
 
         }
       }))
+
       getAlliances();
+    }
+    var lastMatchPlayed = 0;
+
+    if (qualschedule?.completedMatchCount > 0) {
+      lastMatchPlayed += qualschedule?.completedMatchCount;
+    }
+
+    if (playoffschedule?.completedMatchCount > 0) {
+      lastMatchPlayed += playoffschedule?.completedMatchCount
+
+    }
+    if (loadingEvent && autoAdvance) {
+      if( (lastMatchPlayed === qualschedule?.schedule.length) || (lastMatchPlayed === qualschedule?.schedule.length + playoffschedule?.schedule.length)) {
+        lastMatchPlayed -= 1;
+      }
+      setCurrentMatch(lastMatchPlayed + 1)
     }
 
     setEventHighScores(highScores);
@@ -706,8 +731,8 @@ function App() {
     }
     teams = teams.map((team) => {
       team.updates = _.merge(_.cloneDeep(communityUpdateTemplate), team?.updates);
-      if (_.findIndex(localUpdates, { "teamNumber": team?.teamNumber })>=0) {
-        team.updates = _.merge(team.updates,_.cloneDeep(localUpdates[_.findIndex(localUpdates, { "teamNumber": team?.teamNumber })].update))
+      if (_.findIndex(localUpdates, { "teamNumber": team?.teamNumber }) >= 0) {
+        team.updates = _.merge(team.updates, _.cloneDeep(localUpdates[_.findIndex(localUpdates, { "teamNumber": team?.teamNumber })].update))
       }
       return team;
     })
@@ -880,7 +905,7 @@ function App() {
       setRankingsOverride(null);
       setCurrentMatch(1);
       setDistrictRankings(null);
-      getSchedule();
+      getSchedule(true);
       getTeamList();
       getCommunityUpdates();
       getRanks();
@@ -1046,7 +1071,6 @@ function App() {
 
   // Retrieve schedule, team list, community updates, high scores and rankings when event selection changes
   useEffect(() => {
-
     loadEvent();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
