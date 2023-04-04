@@ -24,7 +24,7 @@ import { usePersistentState } from './hooks/UsePersistentState';
 import _ from 'lodash';
 import moment from 'moment';
 import Developer from './pages/Developer';
-import { eventNames, specialAwards, hallOfFame, champs, champDivisions, champSubdivisions, miChamps, miDivisions } from './components/Constants';
+import { eventNames, specialAwards, hallOfFame } from './components/Constants';
 import { useOnlineStatus } from './contextProviders/OnlineContext';
 import { toast } from 'react-toastify';
 import { trainingData } from 'components/TrainingMatches';
@@ -98,11 +98,6 @@ function LayoutsWithNavbar({ selectedEvent, qualSchedule, playoffs, teamList, co
   );
 }
 
-const champsEvents = _.cloneDeep(champs);
-const divisions = _.cloneDeep(champDivisions);
-const subdivisions = _.cloneDeep(champSubdivisions);
-const michamps = _.cloneDeep(miChamps);
-const midivisions = _.cloneDeep(miDivisions);
 const training = _.cloneDeep(trainingData);
 
 var eventnames = _.cloneDeep(eventNames);
