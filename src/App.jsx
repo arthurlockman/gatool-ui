@@ -24,7 +24,7 @@ import { usePersistentState } from './hooks/UsePersistentState';
 import _ from 'lodash';
 import moment from 'moment';
 import Developer from './pages/Developer';
-import { eventNames, specialAwards, hallOfFame, champs, champDivisions, champSubdivisions, miChamps, miDivisions } from './components/Constants';
+import { eventNames, specialAwards, hallOfFame } from './components/Constants';
 import { useOnlineStatus } from './contextProviders/OnlineContext';
 import { toast } from 'react-toastify';
 import { trainingData } from 'components/TrainingMatches';
@@ -98,11 +98,6 @@ function LayoutsWithNavbar({ selectedEvent, qualSchedule, playoffs, teamList, co
   );
 }
 
-const champsEvents = _.cloneDeep(champs);
-const divisions = _.cloneDeep(champDivisions);
-const subdivisions = _.cloneDeep(champSubdivisions);
-const michamps = _.cloneDeep(miChamps);
-const midivisions = _.cloneDeep(miDivisions);
 const training = _.cloneDeep(trainingData);
 
 var eventnames = _.cloneDeep(eventNames);
@@ -424,7 +419,7 @@ function App() {
 
     }
     if (loadingEvent && autoAdvance) {
-      if( (lastMatchPlayed === qualschedule?.schedule.length) || (lastMatchPlayed === qualschedule?.schedule.length + playoffschedule?.schedule.length)) {
+      if ((lastMatchPlayed === qualschedule?.schedule.length) || (lastMatchPlayed === qualschedule?.schedule.length + playoffschedule?.schedule.length)) {
         lastMatchPlayed -= 1;
       }
       setCurrentMatch(lastMatchPlayed + 1)
@@ -605,19 +600,21 @@ function App() {
         champsTeams = teams.teams.map(async team => {
           var champsRequest = await httpClient.get(`/team/${team?.teamNumber}/appearances`);
           var appearances = await champsRequest.json();
-          var result = {};
-          result.teamNumber = team?.teamNumber;
-          result.champsAppearances = 0;
-          result.champsAppearancesYears = [];
-          result.einsteinAppearances = 0;
-          result.einsteinAppearancesYears = [];
+          var result =
+          {
+            "teamNumber": team?.teamNumber,
+            "champsAppearances": 0,
+            "champsAppearancesYears": [],
+            "einsteinAppearances": 0,
+            "einsteinAppearancesYears": [],
 
-          result.districtChampsAppearances = 0;
-          result.districtChampsAppearancesYears = [];
-          result.districtEinsteinAppearances = 0;
-          result.districtEinsteinAppearancesYears = [];
-          result.FOCAppearances = 0;
-          result.FOCAppearancesYears = [];
+            "districtChampsAppearances": 0,
+            "districtChampsAppearancesYears": [],
+            "districtEinsteinAppearances": 0,
+            "districtEinsteinAppearancesYears": [],
+            "FOCAppearances": 0,
+            "FOCAppearancesYears": []
+          };
 
           appearances.forEach((appearance) => {
             //check for district code
@@ -625,21 +622,27 @@ function App() {
             //DISTRICT_CMP_DIVISION = 5
             // Ontario (>=2019), Michigan (>=2017), Texas (>=2022), New England (>=2022),
             // Indiana (>=2022) check for Einstein appearances
-            //appearances.district.abbreviation = "ont"
-            //appearances.district.abbreviation = "fim"
+            // appearances.district.abbreviation = "ont"
+            // appearances.district.abbreviation = "fim"
+            // appearances.district.abbreviation = "ne"
+            // appearances.district.abbreviation = "tx" || "fit"
             // >=2017 check for Division appearance then Champs appearances
             //test for champs prior to 2001
+
+            //Use timeDifference to filter out teams from the current year's Einstein appearances 
+            // for World and District Champs events.
+            var timeDifference = moment(appearance?.end_date).diff(moment(), "minutes");
+
             if (appearance.district !== null) {
               if (((appearance.year >= 2019) && (appearance.district.abbreviation === "ont")) ||
                 ((appearance.year >= 2017) && (appearance.district.abbreviation === "fim")) ||
                 ((appearance.year >= 2022) && (appearance.district.abbreviation === "ne")) ||
-                ((appearance.year >= 2022) && (appearance.district.abbreviation === "in")) ||
-                ((appearance.year >= 2022) && (appearance.district.abbreviation === "tx"))) {
+                ((appearance.year >= 2022) && (appearance.district.abbreviation === "tx" || appearance.district.abbreviation === "fit"))) {
                 if (appearance.event_type === 5) {
                   result.districtChampsAppearances += 1;
                   result.districtChampsAppearancesYears.push(appearance.year);
                 }
-                if (appearance.event_type === 2) {
+                if ((appearance.event_type === 2) && (timeDifference < 0)) {
                   result.districtEinsteinAppearances += 1;
                   result.districtEinsteinAppearancesYears.push(appearance.year);
                 }
@@ -673,9 +676,9 @@ function App() {
                 result.champsAppearances += 1;
                 result.champsAppearancesYears.push(appearance.year);
               }
-              // TO FIX: mapping out this year's Einstein appearances.
-              // if (appearance.event_type === 4 && appearance.year < Number(localStorage.currentYear) && inSubdivision()) {
-              if (appearance.event_type === 4) {
+
+              // FIXED: mapping out current year's Einstein appearances.
+              if ((appearance.event_type === 4) && (timeDifference < 0)) {
                 result.einsteinAppearances += 1;
                 result.einsteinAppearancesYears.push(appearance.year);
               }
@@ -1000,11 +1003,26 @@ function App() {
           }
 
           e.champLevel = "";
-          if (champsEvents.indexOf(e?.code) >= 0) { e.champLevel = "CHAMPS" } else
-            if (divisions.indexOf(e?.code) >= 0) { e.champLevel = "CMPDIV" } else
-              if (subdivisions.indexOf(e?.code) >= 0) { e.champLevel = "CMPSUB" } else
-                if (michamps.indexOf(e?.code) >= 0) { e.champLevel = "DISTCHAMPS" } else
-                  if (midivisions.indexOf(e?.code) >= 0) { e.champLevel = "DISTDIV" }
+
+          // old lookup method
+          //if (champsEvents.indexOf(e?.code) >= 0) { e.champLevel = "CHAMPS" } else
+          //  if (divisions.indexOf(e?.code) >= 0) { e.champLevel = "CMPDIV" } else
+          //    if (subdivisions.indexOf(e?.code) >= 0) { } else
+          //      if (michamps.indexOf(e?.code) >= 0) { e.champLevel = "DISTCHAMPS" } else
+          //        if (midivisions.indexOf(e?.code) >= 0) { e.champLevel = "DISTDIV" }
+
+          // new method using event type data        
+          if (e.type === "DistrictChampionship" || e.type === "DistrictChampionshipWithLevels") {
+            e.champLevel = "DISTCHAMPS";
+          } else if (e.type === "DistrictChampionshipDivision") {
+            e.champLevel = "DISTDIV";
+          } else if (e.type === "ChampionshipDivision") {
+            e.champLevel = "CMPDIV";
+          } else if (e.type === "ChampionshipSubdivision") {
+            e.champLevel = "CMPSUB";
+          } else if (e.type === "Championship") {
+            e.champLevel = "CHAMPS";
+          }
 
           return {
             value: e,
