@@ -221,6 +221,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                         {selectedEvent?.value.allianceCount === "SixAlliance" && <p><b>Playoff Type: </b>Round Robin</p>}
                         {selectedEvent?.value.allianceCount === "EightAlliance" && <p><b>Playoff Type: </b>8 Alliance Playoffs</p>}
                         {selectedEvent?.value.allianceCount === "FourAlliance" && <p><b>Playoff Type: </b>4 Alliance Playoff</p>}
+                        {selectedEvent?.value.allianceCount === "TwoAlliance" && <p><b>Playoff Type: </b>Best 2 out of 3 Playoff</p>}
                         {qualSchedule?.lastUpdate && <p><b>Quals Schedule last updated: </b><br />{moment(qualSchedule?.lastUpdate).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
                         {playoffSchedule?.lastUpdate && <p><b>Playoff Schedule last updated: </b><br />{moment(playoffSchedule?.lastUpdate).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
                         {teamList?.lastUpdate && <p><b>Team List last updated: </b><br />{moment(teamList?.lastUpdate).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
@@ -301,10 +302,10 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                 </tr>
                                 <tr>
                                     <td>
-                                        <Switch checked={autoAdvance === null ? false : autoAdvance} onChange={setAutoAdvance} disabled />
+                                        <Switch checked={autoAdvance === null ? false : autoAdvance} onChange={setAutoAdvance} />
                                     </td>
                                     <td>
-                                        <b>Future Feature: Automatically advance to the next match when loading</b>
+                                        <b>Automatically advance to the next match when loading the event</b>
                                     </td>
                                 </tr>
                                 <tr>
