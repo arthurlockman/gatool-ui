@@ -38,8 +38,10 @@ function PlayByPlay({ station, team, inPlayoffs, selectedYear, selectedEvent, sh
                                     </tbody>
                                 </table>
                             </div>}
-                        {team?.qualifiedDistrictCmp && <p className={"champsQualified"}>Qualified for District Champs</p>}
-                        {team?.qualifiedFirstCmp && <p className={"champsQualified"}>Qualified for World Champs</p>}
+                            {(team?.qualifiedDistrictCmp && (selectedEvent?.value?.champLevel === "")) && <>Qualified for District Champs
+                            {team?.qualifiedFirstCmp && <br />}
+                        </>}
+                        {team?.qualifiedFirstCmp && (selectedEvent?.value?.champLevel !== "CMPDIV" && selectedEvent?.value?.champLevel !== "CMPSUB" && selectedEvent?.value?.champLevel !== "CMPSUB")&& <>Qualified for World Champs</>}
                         {(showNotes || _.isNull(showNotes)) && <p className={"notes playByPlayWinLossTie"} dangerouslySetInnerHTML={{ __html: team?.updates?.teamNotesLocal }}></p>}
                     </>
                 }

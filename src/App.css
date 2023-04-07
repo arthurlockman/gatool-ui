@@ -312,6 +312,10 @@ td {
 	line-height: 1
 }
 
+.HOF {
+	font-size: 120%;
+}
+
 .robotName {
 	font-style: italic;
 	font-weight: bold;
