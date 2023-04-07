@@ -985,7 +985,7 @@ function App() {
             optionPostfix = " ••";
             filters.push("offseason");
           }
-          if (e.type.startsWith("Regional")) {
+          if (e.type === "Regional") {
             filters.push("regional");
           } else if (e.type.startsWith("Champion")) {
             filters.push("champs");
