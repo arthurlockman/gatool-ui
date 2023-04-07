@@ -989,7 +989,7 @@ function App() {
             filters.push("regional");
           } else if (e.type.startsWith("Champion")) {
             filters.push("champs");
-          } else if (e.type.startsWith("District")) {
+          } else if (e.districtCode) {
             filters.push("district");
             filters.push(e.districtCode);
           }

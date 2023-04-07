@@ -202,12 +202,14 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                         {!selectedEvent?.value.type.includes("OffSeason") && <p><b>Event Week: </b>{selectedEvent?.value.weekNumber}</p>}
                         {selectedEvent?.value.type === "Regional" && <p><b>Regional Event</b></p>}
                         {selectedEvent?.value.type === "OffSeasonWithAzureSync" && <p><b>FMS Registered Offseason Event</b></p>}
-                        {!(selectedEvent?.value.type === "OffSeason") && <p><b>Offseason Event not registered with FMS</b></p>}
+                        {(selectedEvent?.value.type === "OffSeason") && <p><b>Offseason Event not registered with FMS</b></p>}
                         {selectedEvent?.value.districtCode && <p><b>District Code: </b>{selectedEvent?.value.districtCode}</p>}
                         {selectedEvent?.value.type === "ChampionshipDivision" && <p><b>Championship Division</b></p>}
                         {selectedEvent?.value.type === "ChampionshipSubdivision" && <p><b>Championship Subdivision</b></p>}
                         {selectedEvent?.value.type === "Championship" && <p><b>FIRST Championship</b></p>}
                         {selectedEvent?.value.type === "DistrictChampionship" && <p><b>District Championship</b></p>}
+                        {selectedEvent?.value.type === "DistrictChampionshipDivision" && <p><b>District Championship Division</b></p>}
+                        {selectedEvent?.value.type === "DistrictChampionshipWithLevels" && <p><b>District Championship</b></p>}
                         {selectedEvent?.value.city && <p><b>Event Location: </b><br />{selectedEvent?.value.venue} in {selectedEvent?.value.city}, {selectedEvent?.value.stateprov} {selectedEvent?.value.country}</p>}
                         {teamList?.teams.length > 0 && <p><b>Number of Competing teams: </b>{teamList?.teams.length}</p>}
                         {selectedEvent?.value.dateStart && <p><b>Event Start: </b>{moment(selectedEvent.value.dateStart, 'YYYY-MM-DDTHH:mm:ss').format('ddd, MMM Do YYYY')}</p>}
