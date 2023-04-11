@@ -24,7 +24,7 @@ import { usePersistentState } from './hooks/UsePersistentState';
 import _ from 'lodash';
 import moment from 'moment';
 import Developer from './pages/Developer';
-import { eventNames, specialAwards, hallOfFame } from './components/Constants';
+import { eventNames, specialAwards, hallOfFame, originalAndSustaining } from './components/Constants';
 import { useOnlineStatus } from './contextProviders/OnlineContext';
 import { toast } from 'react-toastify';
 import { trainingData } from 'components/TrainingMatches';
@@ -1133,7 +1133,7 @@ function App() {
 
               <Route path="/schedule" element={<SchedulePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} practiceSchedule={practiceSchedule} setPracticeSchedule={setPracticeSchedule} />} />
 
-              <Route path="/teamdata" element={<TeamDataPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} teamSort={teamSort} setTeamSort={setTeamSort} communityUpdates={communityUpdates} setCommunityUpdates={setCommunityUpdates} allianceCount={allianceCount} lastVisit={lastVisit} setLastVisit={setLastVisit} putTeamData={putTeamData} localUpdates={localUpdates} setLocalUpdates={setLocalUpdates} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} />} />
+              <Route path="/teamdata" element={<TeamDataPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} teamSort={teamSort} setTeamSort={setTeamSort} communityUpdates={communityUpdates} setCommunityUpdates={setCommunityUpdates} allianceCount={allianceCount} lastVisit={lastVisit} setLastVisit={setLastVisit} putTeamData={putTeamData} localUpdates={localUpdates} setLocalUpdates={setLocalUpdates} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} originalAndSustaining={originalAndSustaining} />} />
 
               <Route path='/ranks' element={<RanksPage selectedEvent={selectedEvent} teamList={teamList} rankings={rankings} rankSort={rankSort} setRankSort={setRankSort} allianceCount={allianceCount} rankingsOverride={rankingsOverride} setRankingsOverride={setRankingsOverride} allianceSelection={allianceSelection} getRanks={getRanks} setRankings={setRankings} setAllianceSelectionArrays={setAllianceSelectionArrays} playoffs={playoffs} districtRankings={districtRankings} />} />
 
