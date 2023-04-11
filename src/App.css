@@ -376,6 +376,11 @@ td {
 	margin: auto;
 }
 
+.wltCol {
+	font-size: medium;
+	white-space: nowrap;
+}
+
 
 .scheduleTablered {
 	background-color: #ffd7d7 !important;
@@ -616,4 +621,18 @@ td {
 .champsQualifiedAnnounce {
 	font-weight: bolder;
 	color: rgba(16, 70, 0, 0.93);
+}
+
+@media only screen and (max-width: 820px) {
+	/* For Portrait iPad: */
+	.wltCol {
+		font-size: small;
+	}
+}
+
+@media only screen and (max-width: 768px) {
+	/* For Portrait iPad mini: */
+	.wltCol {
+		font-size: x-small;
+	}
 }
