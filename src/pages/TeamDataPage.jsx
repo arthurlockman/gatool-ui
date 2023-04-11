@@ -14,7 +14,7 @@ import PizZipUtils from "pizzip/utils/index.js";
 import { saveAs } from "file-saver";
 import { useHotkeysContext } from "react-hotkeys-hook";
 
-function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSort, setTeamSort, communityUpdates, setCommunityUpdates, allianceCount, lastVisit, setLastVisit, putTeamData, localUpdates, setLocalUpdates, qualSchedule, playoffSchedule }) {
+function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSort, setTeamSort, communityUpdates, setCommunityUpdates, allianceCount, lastVisit, setLastVisit, putTeamData, localUpdates, setLocalUpdates, qualSchedule, playoffSchedule, originalAndSustaining }) {
     const [currentTime, setCurrentTime] = useState(moment());
     const { disableScope, enableScope } = useHotkeysContext();
 
@@ -524,6 +524,10 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                             <Form.Label className={"formLabel"}><b>Organization/School ({updateTeam.organization ? updateTeam.organization : "No organization in TIMS"} in TIMS)</b></Form.Label>
                             <Form.Control className={updateTeam.organizationLocal ? "formHighlight" : formValue.organizationLocal ? "formHighlight" : ""} type="text" placeholder={updateTeam.organization} defaultValue={updateTeam.organizationLocal ? updateTeam.organizationLocal : updateTeam.organization} onChange={(e) => updateForm("organizationLocal", e.target.value)} />
                         </Form.Group>
+                        <Form.Group controlId="cityState">
+                            <Form.Label className={"formLabel"}><b>City/State ({`${updateTeam?.city}, ${updateTeam?.stateProv} ${(updateTeam?.country !== "USA") ? " " + updateTeam?.country : ""}`}) in TIMS)</b></Form.Label>
+                            <Form.Control className={updateTeam.cityStateLocal ? "formHighlight" : formValue.cityStateLocal ? "formHighlight" : ""} type="text" placeholder={`${updateTeam?.city}, ${updateTeam?.stateProv} ${(updateTeam?.country !== "USA") ? " " + updateTeam?.country : ""}`} defaultValue={updateTeam.cityStateLocal ? updateTeam.cityStateLocal : `${updateTeam?.city}, ${updateTeam?.stateProv} ${(updateTeam?.country !== "USA") ? " " + updateTeam?.country : ""}`} onChange={(e) => updateForm("cityStateLocal", e.target.value)} />
+                        </Form.Group>
                         <Form.Group controlId="sayNumber">
                             <Form.Label className={"formLabel"}><b>How to pronounce the team number (some teams are particular)</b></Form.Label>
                             <Form.Control className={updateTeam.sayNumber ? "formHighlight" : formValue.sayNumber ? "formHighlight" : ""} type="text" placeholder={updateTeam.sayNumber} defaultValue={updateTeam.sayNumber} onChange={(e) => updateForm("sayNumber", e.target.value)} />
@@ -539,13 +543,24 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                             <Form.Label className={"formLabel"}><b>Team Motto (Team Mottoes do not come from <i>FIRST</i>)</b></Form.Label>
                             <Form.Control className={updateTeam.teamMottoLocal ? "formHighlight" : formValue.teamMottoLocal ? "formHighlight" : ""} type="text" placeholder={updateTeam.teamMottoLocal} defaultValue={updateTeam.teamMottoLocal} onChange={(e) => updateForm("teamMottoLocal", e.target.value)} />
                         </Form.Group>
-                        <Form.Group controlId="cityState">
-                            <Form.Label className={"formLabel"}><b>City/State ({`${updateTeam?.city}, ${updateTeam?.stateProv} ${(updateTeam?.country !== "USA") ? " " + updateTeam?.country : ""}`}) in TIMS)</b></Form.Label>
-                            <Form.Control className={updateTeam.cityStateLocal ? "formHighlight" : formValue.cityStateLocal ? "formHighlight" : ""} type="text" placeholder={`${updateTeam?.city}, ${updateTeam?.stateProv} ${(updateTeam?.country !== "USA") ? " " + updateTeam?.country : ""}`} defaultValue={updateTeam.cityStateLocal ? updateTeam.cityStateLocal : `${updateTeam?.city}, ${updateTeam?.stateProv} ${(updateTeam?.country !== "USA") ? " " + updateTeam?.country : ""}`} onChange={(e) => updateForm("cityStateLocal", e.target.value)} />
-                        </Form.Group>
                         <Form.Group controlId="teamYearsNoCompete">
                             <Form.Label className={"formLabel"}><b>Number of seasons NOT competing with FIRST (will be used in calculating Nth season)</b></Form.Label>
                             <Form.Control className={updateTeam.teamYearsNoCompeteLocal ? "formHighlight" : formValue.teamYearsNoCompeteLocal ? "formHighlight" : ""} type="number" placeholder={"Enter the count of years rather than the actual years: i.e. 5, not 2004-2007"} defaultValue={updateTeam.teamYearsNoCompeteLocal} onChange={(e) => updateForm("teamYearsNoCompeteLocal", e.target.value)} />
+                        </Form.Group>
+                        <Form.Group controlId="awardsText">
+                            <Form.Label className={"formLabel"}>
+                                <b>Award/Alliance Selection text (editable portion in <i>bold and italic</i> below):</b><br />
+                                Team {updateTeam?.teamNumber} {updateTeam?.updates?.nameShortLocal ? updateTeam.updates.nameShortLocal : updateTeam?.nameShort}<br />
+                                is <b><i>{formValue?.awardsTextLocal ? formValue?.awardsTextLocal : updateTeam?.awardsTextLocal ? updateTeam?.awardsTextLocal : <>{originalAndSustaining.includes(String(updateTeam?.teamNumber)) ? "an Original and Sustaining Team " : ""}from<br />
+                                    {updateTeam?.updates?.organizationLocal ? updateTeam?.updates?.organizationLocal : updateTeam?.organization}<br />
+                                    in</>}</i></b> {updateTeam?.updates?.cityStateLocal ? updateTeam?.updates?.cityStateLocal : `${updateTeam?.city}, ${updateTeam?.stateProv}`}{updateTeam?.country !== "USA" ? `, ${updateTeam?.country}` : ""}<br />
+                            </Form.Label>
+                            <Form.Control
+                                className={updateTeam?.awardsTextLocal ? "formHighlight" : ""}
+                                type="text"
+                                placeholder={`${originalAndSustaining.includes(String(updateTeam?.teamNumber)) ? "an Original and Sustaining Team " : ""}from ${updateTeam?.updates?.organizationLocal ? updateTeam?.updates?.organizationLocal : updateTeam?.organization} in`}
+                                defaultValue={updateTeam?.awardsTextLocal ? updateTeam?.awardsTextLocal : `${originalAndSustaining.includes(String(updateTeam?.teamNumber)) ? "an Original and Sustaining Team " : ""}from ${updateTeam?.updates?.organizationLocal ? updateTeam?.updates?.organizationLocal : updateTeam?.organization} in`}
+                                onChange={(e) => updateForm("awardsTextLocal", e.target.value)} />
                         </Form.Group>
                         <Form.Group controlId="teamNotesLocal">
                             <Form.Label className={"formLabel"}><b>Team Notes for Announce Screen (These notes are local notes and do not come from <i>FIRST</i>)</b></Form.Label>
@@ -556,12 +571,12 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                             <div className={(!_.isEmpty(updateTeam.teamNotes)) ? "form-control formHighlight" : !_.isEmpty(formValue.teamNotes) ? "form-control formHighlight" : "form-control"} contentEditable placeholder={"Enter some new notes you would like to appear on the Team Data Screen"} dangerouslySetInnerHTML={{ __html: updateTeam.teamNotes }} onKeyUp={(e) => updateForm("teamNotes", e.currentTarget.innerHTML)}></div>
                         </Form.Group>
                         <Form.Group controlId="topSponsors">
-                            <Form.Label className={"formLabel"}><b>Top Sponsors (Enter no more than 5 top sponsors from the full sponsor list below)</b></Form.Label>
+                            <Form.Label className={"formLabel"}><b>Top Sponsors (Enter no more than 5 top sponsors from the full sponsor list below). These will appear under the team name on the Announce Screen.</b></Form.Label>
                             <Form.Control className={updateTeam.topSponsorsLocal ? "formHighlight" : formValue.topSponsorsLocal ? "formHighlight" : ""} type="text" placeholder={updateTeam?.topSponsors} defaultValue={updateTeam.topSponsorsLocal ? updateTeam.topSponsorsLocal : updateTeam?.topSponsors} onChange={(e) => updateForm("topSponsorsLocal", e.target.value)} />
                         </Form.Group>
                         <Form.Group controlId="sponsors">
-                            <Form.Label className={"formLabel"}><b>Full list of Sponsors (For reference only. This field does not appear in the UI. Delete to revert to TIMS value)</b></Form.Label>
-                            <Form.Control className={updateTeam.sponsorsLocal ? "formHighlight" : formValue.sponsorsLocal ? "formHighlight" : ""} type="text" placeholder={updateTeam?.sponsors} defaultValue={updateTeam.sponsorsLocal ? updateTeam.sponsorsLocal : updateTeam?.sponsors} onChange={(e) => updateForm("sponsorsLocal", e.target.value)} />
+                            <Form.Label className={"formLabel"}><b>Full list of Sponsors (For reference only. This field does not appear in the UI and any changes here will not be saved.)</b></Form.Label>
+                            <Form.Control type="text" placeholder={updateTeam?.sponsors} defaultValue={updateTeam?.sponsors} />
                         </Form.Group>
                     </Form>
                 </Modal.Body>
