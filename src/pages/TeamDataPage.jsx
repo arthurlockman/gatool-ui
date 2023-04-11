@@ -357,22 +357,27 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
     // It will only update data that Game Announcers control in the Team Data page.
     function handleRestoreBackup(e) {
         var files = e.target.files;
-        var i, f;
+        var i, f, currentUpdate, newUpdate;
         for (i = 0; i !== files.length; ++i) {
             f = files[i];
             var reader = new FileReader();
+            // eslint-disable-next-line
             reader.onload = function (e) {
                 var communityUpdatesTemp = _.cloneDeep(communityUpdates);
                 // @ts-ignore
                 var data = new Uint8Array(e.target.result);
                 var workbook;
+                var itemExists;
+                var localUpdatesTemp = _.cloneDeep(localUpdates);
                 workbook = read(data, { type: 'array' });
                 var worksheet = workbook.Sheets[workbook.SheetNames[0]];
                 var teams = utils.sheet_to_json(worksheet);
+                var update = {};
+                var keys = [];
                 if (!_.isUndefined(teams[0].teamNumber)) {
                     teams.forEach((team) => {
-                        var update = {}
-                        var keys = Object.keys(team);
+                        update = {}
+                        keys = Object.keys(team);
                         update.teamNumber = team.teamNumber;
                         update.updates = {};
                         keys.forEach((key) => {
@@ -393,10 +398,32 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                             update.updates["sayNumber"] = team["sayNumber"];
                             update.updates.lastUpdate = moment().format();
                         };
-                        communityUpdatesTemp[_.findIndex(communityUpdatesTemp, { "teamNumber": team.teamNumber })] = update;
+                        newUpdate = _.cloneDeep(update);
+                        currentUpdate = _.cloneDeep(communityUpdates[_.findIndex(communityUpdatesTemp, { "teamNumber": team.teamNumber })]);
+                        if (newUpdate?.updates) {
+                            delete newUpdate.updates.lastUpdate;
+                            delete newUpdate.updates.source;
+                        }
+                        if (currentUpdate?.updates) {
+                            delete currentUpdate.updates.lastUpdate;
+                            delete currentUpdate.updates.source;
+                        }
+
+                        if (!_.isEqual(newUpdate, currentUpdate) && currentUpdate) {
+                            itemExists = _.findIndex(localUpdatesTemp, { "teamNumber": update?.teamNumber });
+                            if (itemExists >= 0) {
+                                localUpdatesTemp.splice(itemExists, 1);
+                            }
+                            localUpdatesTemp.push({ "teamNumber": update.teamNumber, "update": update.updates });
+                        }
+                        communityUpdatesTemp[_.findIndex(communityUpdatesTemp, { "teamNumber": team?.teamNumber })] = update;
+
                     })
+                    if (localUpdatesTemp?.length > 0) {
+                        setLocalUpdates(localUpdatesTemp);
+                    }
                     setCommunityUpdates(communityUpdatesTemp);
-                    toast.success(`Your have successfully loaded updates for this event from Excel. Please check each team's details to ensure your changes were recorded properly.`)
+                    toast.success(`Your have successfully loaded updates for this event from Excel. Please check each team's details to ensure your changes were recorded properly. ${localUpdatesTemp?.length > 0 ? "Any inbound changes are stored as Local Updates, which you can push to gatool Cloud on the Setup page." : ""}`)
                     clearFileInput("BackupFiles");
                     document.getElementById("BackupFiles").addEventListener('change', handleRestoreBackup);
                 } else {
