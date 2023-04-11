@@ -361,19 +361,23 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         for (i = 0; i !== files.length; ++i) {
             f = files[i];
             var reader = new FileReader();
+            // eslint-disable-next-line
             reader.onload = function (e) {
                 var communityUpdatesTemp = _.cloneDeep(communityUpdates);
                 // @ts-ignore
                 var data = new Uint8Array(e.target.result);
                 var workbook;
+                var itemExists;
                 var localUpdatesTemp = _.cloneDeep(localUpdates);
                 workbook = read(data, { type: 'array' });
                 var worksheet = workbook.Sheets[workbook.SheetNames[0]];
                 var teams = utils.sheet_to_json(worksheet);
+                var update = {};
+                var keys = [];
                 if (!_.isUndefined(teams[0].teamNumber)) {
                     teams.forEach((team) => {
-                        var update = {}
-                        var keys = Object.keys(team);
+                        update = {}
+                        keys = Object.keys(team);
                         update.teamNumber = team.teamNumber;
                         update.updates = {};
                         keys.forEach((key) => {
@@ -406,7 +410,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                         }
 
                         if (!_.isEqual(newUpdate, currentUpdate) && currentUpdate) {
-                            var itemExists = _.findIndex(localUpdatesTemp, { "teamNumber": update?.teamNumber });
+                            itemExists = _.findIndex(localUpdatesTemp, { "teamNumber": update?.teamNumber });
                             if (itemExists >= 0) {
                                 localUpdatesTemp.splice(itemExists, 1);
                             }
