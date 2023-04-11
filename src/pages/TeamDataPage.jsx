@@ -549,7 +549,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                         </Form.Group>
                         <Form.Group controlId="awardsText">
                             <Form.Label className={"formLabel"}>
-                                <b>Award/Alliance Selection text (editable portion in <i>bold and italic</i> below):</b><br />
+                                <b>Award/Alliance Selection text</b> (editable portion in <b><i>bold and italic</i></b> below):<br />
                                 Team {updateTeam?.teamNumber} {updateTeam?.updates?.nameShortLocal ? updateTeam.updates.nameShortLocal : updateTeam?.nameShort}<br />
                                 is <b><i>{formValue?.awardsTextLocal ? formValue?.awardsTextLocal : updateTeam?.awardsTextLocal ? updateTeam?.awardsTextLocal : <>{originalAndSustaining.includes(String(updateTeam?.teamNumber)) ? "an Original and Sustaining Team " : ""}from<br />
                                     {updateTeam?.updates?.organizationLocal ? updateTeam?.updates?.organizationLocal : updateTeam?.organization}<br />
