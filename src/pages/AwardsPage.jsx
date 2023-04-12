@@ -2,7 +2,7 @@ import { Alert, Container, Button, Row, Col, Modal, Form, InputGroup } from "rea
 import { useState } from 'react';
 import { Trophy } from "react-bootstrap-icons";
 import _ from "lodash";
-import { useHotkeysContext } from "react-hotkeys-hook";
+import { useHotkeysContext, useHotkeys } from "react-hotkeys-hook";
 
 
 
@@ -56,6 +56,7 @@ function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates })
         setAwardTeam(null);
         setShow(false);
         enableScope('tabNavigation');
+        disableScope('formEnter');
     }
 
     const handleShow = (e) => {
@@ -79,18 +80,24 @@ function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates })
 
     const handleFilterSelect = (e) => {
         e.preventDefault();
-        var team = _.filter(sortedTeams, { 'teamNumber': Number(e.currentTarget[0].value) })[0];
-        if (_.isEmpty(team)) {
-            team = _.filter(sortedTeams, (team) => { return String(team?.teamNumber).startsWith(teamFilter) })[0]
+        var team = {};
+        if (e.currentTarget[0].value) {
+            team = _.filter(sortedTeams, { 'teamNumber': Number(e.currentTarget[0].value) })[0];
+            if (_.isEmpty(team)) {
+                team = _.filter(sortedTeams, (team) => { return String(team?.teamNumber).startsWith(teamFilter) })[0]
+            }
+            // @ts-ignore
+            document.getElementById("filterControl").value = "";
+            setTeamFilter("");
+            setAwardTeam(team);
+            setShow(true);
+            enableScope('formEnter');
+            disableScope('tabNavigation');
         }
-        // @ts-ignore
-        document.getElementById("filterControl").value = "";
-        setTeamFilter("");
-        setAwardTeam(team);
-        setShow(true);
-        disableScope('tabNavigation');
 
     }
+
+    useHotkeys('return', () => handleClose(), { scopes: 'formEnter' });
 
     return (
         <Container fluid>
@@ -135,7 +142,7 @@ function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates })
                                 Founded in {awardTeam?.rookieYear}, this is their {awardTeam?.yearsDisplay} season competing with <i><b>FIRST</b></i>. </span>
                         </Modal.Body>
                         <Modal.Footer>
-                            <Button variant="success" type="submit" onClick={handleClose}>
+                            <Button variant="success" onClick={handleClose}>
                                 <Trophy /> Congratulations!
                             </Button>
                         </Modal.Footer>

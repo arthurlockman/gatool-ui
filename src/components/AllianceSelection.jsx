@@ -315,7 +315,6 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
     }
 
 
-
     return (
         <>
             <Container fluid>
