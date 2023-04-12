@@ -1,4 +1,4 @@
-import { Alert, Container, Button, Row, Col, Modal } from "react-bootstrap";
+import { Alert, Container, Button, Row, Col, Modal, Form, InputGroup } from "react-bootstrap";
 import { useState } from 'react';
 import { Trophy } from "react-bootstrap-icons";
 import _ from "lodash";
@@ -8,8 +8,11 @@ import { useHotkeysContext } from "react-hotkeys-hook";
 
 function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates }) {
     const originalAndSustaining = ["20", "45", "126", "148", "151", "157", "190", "191", "250"];
-
     const { disableScope, enableScope } = useHotkeysContext();
+
+    const [show, setShow] = useState(false);
+    const [awardTeam, setAwardTeam] = useState(null);
+    const [teamFilter, setTeamFilter] = useState("");
 
     var columns = [[], [], [], [], [], []];
     var sortedTeams = _.orderBy(teamList?.teams, "teamNumber", "asc");
@@ -47,19 +50,43 @@ function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates })
         })
     }
 
-    const [show, setShow] = useState(false);
-    const [awardTeam, setAwardTeam] = useState(null);
+
 
     const handleClose = () => {
         setAwardTeam(null);
         setShow(false);
         enableScope('tabNavigation');
     }
+
     const handleShow = (e) => {
         var team = JSON.parse(e.currentTarget.value);
         setAwardTeam(team);
         setShow(true);
         disableScope('tabNavigation');
+    }
+
+    const filterTeams = (e) => {
+        e.preventDefault();
+        if (e.currentTarget.valueAsNumber === "") {
+            setTeamFilter("");
+        } else {
+            setTeamFilter(e.currentTarget.value);
+        }
+    }
+
+    const handleFilterSelect = (e) => {
+        e.preventDefault();
+        var team = _.filter(sortedTeams, { 'teamNumber': Number(e.currentTarget[0].value) })[0];
+        if (_.isEmpty(team)) {
+            team = _.filter(sortedTeams, (team) => { return String(team?.teamNumber).startsWith(teamFilter) })[0]
+        }
+        // @ts-ignore
+        document.getElementById("filterControl").value = "";
+        setTeamFilter("");
+        setAwardTeam(team);
+        setShow(true);
+        disableScope('tabNavigation');
+
     }
 
     return (
@@ -75,10 +102,19 @@ function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates })
                 <Container fluid>
                     <h4>{selectedEvent?.label}</h4>
                     <p>When it's time for Awards, simply tap a team when their number is called, announce the team, and click <b>Congratulations.</b></p>
+                    <div>
+                        <Form onSubmit={handleFilterSelect}>
+                            <InputGroup className="mb-3" >
+                                <InputGroup.Text>Filter the teams</InputGroup.Text>
+                                <Form.Control id={"filterControl"} type="number" placeholder="Enter a number" aria-label="Team Number" onChange={filterTeams} />
+                                {(_.filter(sortedTeams, { 'teamNumber': Number(teamFilter) }).length === 1 || (_.filter(sortedTeams, (team) => { return String(team?.teamNumber).startsWith(teamFilter) }).length === 1)) && <Button variant="primary" type="submit">Select this team</Button>}
+                            </InputGroup>
+                        </Form>
+                    </div>
                     <Row key={selectedEvent.label}>{columns.map((column, index) => {
                         return (<Col xs="2" key={index}>
                             {column.map((team) => {
-                                return (<Row className={"awardsButton"} key={team.teamNumber} ><Button value={JSON.stringify(team)} onClick={handleShow} size="sm" variant="outline-success">{team.teamNumber}</Button></Row>)
+                                return ((String(team?.teamNumber).startsWith(teamFilter) || teamFilter === "") && <Row className={"awardsButton"} key={team.teamNumber} ><Button value={JSON.stringify(team)} onClick={handleShow} size="sm" variant={(team?.teamNumber === Number(teamFilter) || (_.filter(sortedTeams, (team) => { return String(team?.teamNumber).startsWith(teamFilter) }).length === 1)) ? "success" : "outline-success"}>{team?.teamNumber}</Button></Row>)
                             })}
                         </Col>)
                     })}
@@ -90,13 +126,13 @@ function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates })
                         <Modal.Body>
                             <span className={"allianceAnnounceDialog"}>Team {awardTeam?.teamNumber} {awardTeam?.updates?.nameShortLocal ? awardTeam.updates.nameShortLocal : awardTeam?.nameShort}<br />
                                 is {awardTeam?.awardsTextLocal ? awardTeam?.awardsTextLocal : <>{originalAndSustaining.includes(String(awardTeam?.teamNumber)) ? "an Original and Sustaining Team " : ""}from<br />
-                                {awardTeam?.updates?.organizationLocal ? awardTeam?.updates?.organizationLocal : awardTeam?.organization}<br />
-                                in</>} {awardTeam?.updates?.cityStateLocal ? awardTeam?.updates?.cityStateLocal : `${awardTeam?.city}, ${awardTeam?.stateProv}`}{awardTeam?.country !== "USA" ? `, ${awardTeam?.country}` : ""}<br />
+                                    {awardTeam?.updates?.organizationLocal ? awardTeam?.updates?.organizationLocal : awardTeam?.organization}<br />
+                                    in</>} {awardTeam?.updates?.cityStateLocal ? awardTeam?.updates?.cityStateLocal : `${awardTeam?.city}, ${awardTeam?.stateProv}`}{awardTeam?.country !== "USA" ? `, ${awardTeam?.country}` : ""}<br />
                                 <br />
                                 Founded in {awardTeam?.rookieYear}, this is their {awardTeam?.yearsDisplay} season competing with <i><b>FIRST</b></i>. </span>
                         </Modal.Body>
                         <Modal.Footer>
-                            <Button variant="success" onClick={handleClose}>
+                            <Button variant="success" type="submit" onClick={handleClose}>
                                 <Trophy /> Congratulations!
                             </Button>
                         </Modal.Footer>
