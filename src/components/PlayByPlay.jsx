@@ -1,6 +1,6 @@
 import _ from "lodash";
 
-function PlayByPlay({ station, team, inPlayoffs, selectedYear, selectedEvent, showNotes, showMottoes, showQualsStats }) {
+function PlayByPlay({ station, team, inPlayoffs, selectedYear, selectedEvent, showNotes, showMottoes, showQualsStats, showQualsStatsQuals }) {
     var allianceColor = station.slice(0, -1);
 
     return (
@@ -17,7 +17,7 @@ function PlayByPlay({ station, team, inPlayoffs, selectedYear, selectedEvent, sh
                     </>
                 }
                 {!team?.teamNumber && <>
-                    <div className={"tbd"}>TBD</div>
+                    <div className={"tbd"}>{""}</div>
                 </>
                 }
             </td>
@@ -26,7 +26,7 @@ function PlayByPlay({ station, team, inPlayoffs, selectedYear, selectedEvent, sh
                     <>
                         <p className={`playByPlayTeamName ${(inPlayoffs && showQualsStats) ? "playByPlayTeamNameStats" : ""}`}>{team?.updates?.nameShortLocal ? team?.updates?.nameShortLocal : team?.nameShort}</p>
                         <p className={"playByPlayRobotName"}>{team?.updates?.robotNameLocal}</p>
-                        {(!inPlayoffs || (inPlayoffs && showQualsStats)) && team?.rank &&
+                        {((!inPlayoffs && (_.isNull(showQualsStatsQuals) || showQualsStatsQuals)) || (inPlayoffs && showQualsStats)) && team?.rank &&
                             <div className={"playByPlayWinLossTie text-center"}>
                                 <table className={"wltTable"}>
                                     <tbody>
@@ -38,15 +38,19 @@ function PlayByPlay({ station, team, inPlayoffs, selectedYear, selectedEvent, sh
                                     </tbody>
                                 </table>
                             </div>}
-                            {(team?.qualifiedDistrictCmp && (selectedEvent?.value?.champLevel === "")) && <>Qualified for District Champs
-                            {team?.qualifiedFirstCmp && <br />}
-                        </>}
-                        {team?.qualifiedFirstCmp && (selectedEvent?.value?.champLevel !== "CMPDIV" && selectedEvent?.value?.champLevel !== "CMPSUB" && selectedEvent?.value?.champLevel !== "CMPSUB")&& <>Qualified for World Champs</>}
+
+                        {(team?.qualifiedDistrictCmp || team?.qualifiedFirstCmp) &&
+                            <p className={"champsQualified"}>
+                                {(team?.qualifiedDistrictCmp && (selectedEvent?.value?.champLevel === "")) && <>Qualified for District Champs
+                                    {team?.qualifiedFirstCmp && <br />}
+                                </>}
+                                {team?.qualifiedFirstCmp && (selectedEvent?.value?.champLevel !== "CMPDIV" && selectedEvent?.value?.champLevel !== "CMPSUB" && selectedEvent?.value?.champLevel !== "CMPSUB") && <>Qualified for World Champs</>}
+                            </p>}
                         {(showNotes || _.isNull(showNotes)) && <p className={"notes playByPlayWinLossTie"} dangerouslySetInnerHTML={{ __html: team?.updates?.teamNotesLocal }}></p>}
                     </>
                 }
                 {!team?.teamNumber && <>
-                    <div className={"tbd"}>TBD</div>
+                    <div className={"tbd"}>No fourth Alliance member</div>
                 </>}
             </td>
         </>

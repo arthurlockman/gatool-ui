@@ -10,7 +10,7 @@ import { useSwipeable } from "react-swipeable";
 const paleGreen = "rgba(144, 238, 144, 0.5)"
 
 
-function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, showNotes, showMottoes, showQualsStats, swapScreen, timeFormat, eventHighScores, backupTeam, setBackupTeam, nextMatch, previousMatch, setMatchFromMenu, practiceSchedule, districtRankings }) {
+function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, showNotes, showMottoes, showQualsStats, showQualsStatsQuals, swapScreen, timeFormat, eventHighScores, backupTeam, setBackupTeam, nextMatch, previousMatch, setMatchFromMenu, practiceSchedule, districtRankings }) {
     var displayOrder = ["Blue1", "Red3", "Blue2", "Red2", "Blue3", "Red1", "Blue4", "Red4"];
     if (swapScreen === true) { displayOrder = ["Red3", "Blue1", "Red2", "Blue2", "Red1", "Blue3", "Red4", "Blue4"] }
 
@@ -159,25 +159,25 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
                     <table className={"playByPlayTable"}>
                         <tbody>
                             <tr className={"gatool-playbyplay"}>
-                                <PlayByPlay station={displayOrder[0]} team={teamDetails[displayOrder[0]]} inPlayoffs={inPlayoffs} key={displayOrder[0]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} />
-                                <PlayByPlay station={displayOrder[1]} team={teamDetails[displayOrder[1]]} inPlayoffs={inPlayoffs} key={displayOrder[1]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} />
+                                <PlayByPlay station={displayOrder[0]} team={teamDetails[displayOrder[0]]} inPlayoffs={inPlayoffs} key={displayOrder[0]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} />
+                                <PlayByPlay station={displayOrder[1]} team={teamDetails[displayOrder[1]]} inPlayoffs={inPlayoffs} key={displayOrder[1]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} />
                             </tr>
                             <tr className={"gatool-playbyplay"}>
-                                <PlayByPlay station={displayOrder[2]} team={teamDetails[displayOrder[2]]} inPlayoffs={inPlayoffs} key={displayOrder[2]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} />
-                                <PlayByPlay station={displayOrder[3]} team={teamDetails[displayOrder[3]]} inPlayoffs={inPlayoffs} key={displayOrder[3]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} />
+                                <PlayByPlay station={displayOrder[2]} team={teamDetails[displayOrder[2]]} inPlayoffs={inPlayoffs} key={displayOrder[2]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} />
+                                <PlayByPlay station={displayOrder[3]} team={teamDetails[displayOrder[3]]} inPlayoffs={inPlayoffs} key={displayOrder[3]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} />
                             </tr>
                             <tr className={"gatool-playbyplay"}>
-                                <PlayByPlay station={displayOrder[4]} team={teamDetails[displayOrder[4]]} inPlayoffs={inPlayoffs} key={displayOrder[4]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} />
-                                <PlayByPlay station={displayOrder[5]} team={teamDetails[displayOrder[5]]} inPlayoffs={inPlayoffs} key={displayOrder[5]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} />
+                                <PlayByPlay station={displayOrder[4]} team={teamDetails[displayOrder[4]]} inPlayoffs={inPlayoffs} key={displayOrder[4]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} />
+                                <PlayByPlay station={displayOrder[5]} team={teamDetails[displayOrder[5]]} inPlayoffs={inPlayoffs} key={displayOrder[5]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} />
                             </tr>
                             {inPlayoffs && (!_.isEmpty(teamDetails["Red4"]) || !_.isEmpty(teamDetails["Blue4"])) &&
                                 <tr className={"gatool-playbyplay"}>
-                                    <PlayByPlay station={displayOrder[6]} team={teamDetails[displayOrder[6]]} inPlayoffs={inPlayoffs} key={displayOrder[6]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} />
-                                    <PlayByPlay station={displayOrder[7]} team={teamDetails[displayOrder[7]]} inPlayoffs={inPlayoffs} key={displayOrder[7]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} />
+                                    <PlayByPlay station={displayOrder[6]} team={teamDetails[displayOrder[6]]} inPlayoffs={inPlayoffs} key={displayOrder[6]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} />
+                                    <PlayByPlay station={displayOrder[7]} team={teamDetails[displayOrder[7]]} inPlayoffs={inPlayoffs} key={displayOrder[7]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} />
                                 </tr>}
                         </tbody>
                     </table>
-                    <BottomButtons previousMatch={previousMatch} nextMatch={nextMatch} matchDetails={matchDetails} playoffSchedule={playoffSchedule} eventHighScores={eventHighScores} alliances={alliances} selectedEvent={selectedEvent}/>
+                    <BottomButtons previousMatch={previousMatch} nextMatch={nextMatch} matchDetails={matchDetails} playoffSchedule={playoffSchedule} eventHighScores={eventHighScores} alliances={alliances} selectedEvent={selectedEvent} />
                 </Container>}
         </Container>
     )
