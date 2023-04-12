@@ -60,6 +60,9 @@ function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates })
 
     const handleShow = (e) => {
         var team = JSON.parse(e.currentTarget.value);
+        // @ts-ignore
+        document.getElementById("filterControl").value = "";
+        setTeamFilter("");
         setAwardTeam(team);
         setShow(true);
         disableScope('tabNavigation');
