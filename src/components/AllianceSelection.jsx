@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button, Container, Form, InputGroup, Modal } from "react-bootstrap";
 import _ from "lodash";
 import { HandThumbsDownFill, HandThumbsUpFill, TrophyFill } from "react-bootstrap-icons";
-import { useHotkeysContext } from "react-hotkeys-hook";
+import { useHotkeysContext, useHotkeys } from "react-hotkeys-hook";
 
 
 function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays }) {
@@ -65,6 +65,8 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         setAllianceTeam(null);
         setAllianceMode("");
         setShow(false);
+        disableScope("allianceAccept");
+        disableScope("allianceDecline");
         enableScope('tabNavigation');
     }
 
@@ -72,12 +74,16 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         setAllianceTeam(team);
         setAllianceMode(mode || "show");
         setShow(true);
+        enableScope("allianceAccept");
+        enableScope("allianceDecline");
         disableScope('tabNavigation');
     }
     const handleAccept = (team, mode, e) => {
         if (mode === "accept") {
             setAllianceTeam(team);
             setAllianceMode("accept");
+            enableScope("allianceAccept");
+            disableScope("allianceDecline");
             setShow(true);
         }
         if (mode === "confirm") {
@@ -99,6 +105,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
 
 
             setAllianceSelectionArrays(asArrays);
+            enableScope("undo");
             handleClose();
         }
 
@@ -107,6 +114,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         if (mode === "decline") {
             setAllianceTeam(team);
             setAllianceMode("decline");
+            disableScope('allianceAccept');
             setShow(true);
         }
         if (mode === "confirm") {
@@ -128,6 +136,9 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         asArrays.nextChoice = undo.nextChoice;
         asArrays.rankedTeams = undo.rankedTeams;
         setAllianceSelectionArrays(asArrays);
+        if (asArrays?.undo?.length === 0) {
+            disableScope("undo")
+        }
     }
 
     const filterTeams = (e) => {
@@ -147,6 +158,9 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         setTeamFilter("");
         setAllianceTeam(team);
         setAllianceMode("show");
+        enableScope("allianceAccept");
+        enableScope("allianceDecline");
+        disableScope('tabNavigation');
         setShow(true);
 
     }
@@ -169,7 +183,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
 
     var sortedTeams = _.orderBy(rankings?.ranks, "teamNumber", "asc");
     var asArrays = {
-        "alliances":[],
+        "alliances": [],
         "rankedReams": [],
         "availableTeams": [],
         "nextChoice": 0,
@@ -314,6 +328,9 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         alliances = asArrays.alliances;
     }
 
+    useHotkeys('return', () => document.getElementById("acceptButton").click(), { scopes: 'allianceAccept' });
+    useHotkeys('d', () => document.getElementById("declineButton").click(), { scopes: 'allianceDecline' });
+    useHotkeys('meta+z, ctrl+z', () => document.getElementById("undoButton").click(), { scopes: 'undo' });
 
     return (
         <>
@@ -326,7 +343,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                 <Form.Control id={"filterControl"} type="number" placeholder="Enter a number" aria-label="Team Number" onChange={filterTeams} />
                                 {(_.filter(asArrays?.availableTeams, { 'teamNumber': Number(teamFilter) }).length === 1) && <Button variant="primary" type="submit">Select this team</Button>}
                                 <span>    </span>
-                                {(asArrays?.undo?.length > 0) && <Button size="sm" onClick={handleUndo} active >Undo Previous Choice</Button>}
+                                {(asArrays?.undo?.length > 0) && <Button id="undoButton" size="sm" onClick={handleUndo} active >Undo Previous Choice</Button>}
                                 {(asArrays?.undo?.length === 0) && <Button size="sm" onClick={handleUndo} disabled >Undo Previous Choice</Button>}
                                 <span>    </span><Button size="sm" variant="warning" onClick={handleReset} active>Restart Alliance Selection</Button>
                             </InputGroup>
@@ -438,8 +455,8 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                     <Modal.Body>
                         {(allianceMode === "show" || allianceMode === "a1captain") && <span className={"allianceAnnounceDialog"}>Team {allianceTeam?.teamNumber} {allianceTeam?.updates?.nameShortLocal ? allianceTeam?.updates.nameShortLocal : allianceTeam?.nameShort}<br />
                             is {allianceTeam?.awardsTextLocal ? allianceTeam?.awardsTextLocal : <>{(originalAndSustaining.indexOf(String(allianceTeam?.teamNumber)) >= 0) ? "an Original and Sustaining Team " : ""}from<br />
-                            {allianceTeam?.updates?.organizationLocal ? allianceTeam?.updates?.organizationLocal : allianceTeam?.organization}<br />
-                            in</>} {allianceTeam?.updates?.cityStateLocal ? allianceTeam?.updates?.cityStateLocal : `${allianceTeam?.city}, ${allianceTeam?.stateProv}`}{allianceTeam?.country !== "USA" ? `, ${allianceTeam?.country}` : ""}<br /></span>}
+                                {allianceTeam?.updates?.organizationLocal ? allianceTeam?.updates?.organizationLocal : allianceTeam?.organization}<br />
+                                in</>} {allianceTeam?.updates?.cityStateLocal ? allianceTeam?.updates?.cityStateLocal : `${allianceTeam?.city}, ${allianceTeam?.stateProv}`}{allianceTeam?.country !== "USA" ? `, ${allianceTeam?.country}` : ""}<br /></span>}
                         {allianceMode === "accept" && <span className={"allianceAnnounceDialog"}>Team {allianceTeam?.teamNumber} {allianceTeam?.updates?.nameShortLocal ? allianceTeam?.updates?.nameShortLocal : allianceTeam?.nameShort}<br />
                             has been asked to join Alliance {allianceSelectionOrder[asArrays.nextChoice]?.number}.<br />Do they accept?</span>}
                         {allianceMode === "decline" && <span className={"allianceAnnounceDialog"}>Team {allianceTeam?.teamNumber} {allianceTeam?.updates?.nameShortLocal ? allianceTeam?.updates?.nameShortLocal : allianceTeam?.nameShort}<br />
@@ -459,10 +476,10 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                             {allianceMode === "declined" && <span> <TrophyFill /> Sorry</span>}
                             {(allianceMode === "decline" || allianceMode === "accept") && <span><TrophyFill /> Oops, they reconsidered.</span>}
                         </Button>
-                        {(allianceMode === "show" || allianceMode === "decline") && <Button variant="danger" size="sm" onClick={(e) => { handleDecline(allianceTeam, allianceMode === "decline" ? "confirm" : "decline", e) }}>
+                        {(allianceMode === "show" || allianceMode === "decline") && <Button id="declineButton" variant="danger" size="sm" onClick={(e) => { handleDecline(allianceTeam, allianceMode === "decline" ? "confirm" : "decline", e) }}>
                             <HandThumbsDownFill /> Respectfully Decline
                         </Button>}
-                        {(allianceMode === "show" || allianceMode === "accept") && <Button variant="success" size="sm" onClick={(e) => { handleAccept(allianceTeam, allianceMode === "accept" ? "confirm" : "accept", e) }}>
+                        {(allianceMode === "show" || allianceMode === "accept") && <Button id="acceptButton" variant="success" size="sm" onClick={(e) => { handleAccept(allianceTeam, allianceMode === "accept" ? "confirm" : "accept", e) }}>
                             <HandThumbsUpFill /> Gratefully Accept
                         </Button>}
                     </Modal.Footer>

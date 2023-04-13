@@ -483,15 +483,15 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                 </Table>
                 <Table responsive striped bordered size="sm" className={"teamTable"}>
                     <thead className="thead-default">
-                        <tr>
+                        <tr className={"teamTableHeader"}>
                             <th onClick={() => (teamSort === "teamNumber") ? setTeamSort("-teamNumber") : setTeamSort("teamNumber")}><b>Team #{teamSort === "teamNumber" ? <SortNumericDown /> : ""}{teamSort === "-teamNumber" ? <SortNumericUp /> : ""}</b></th>
                             <th onClick={() => (teamSort === "rank") ? setTeamSort("-rank") : setTeamSort("rank")}> <b>Rank{teamSort === "rank" ? <SortNumericDown /> : ""}{teamSort === "-rank" ? <SortNumericUp /> : ""}</b></th>
                             <th onClick={() => (teamSort === "nameShort") ? setTeamSort("-nameShort") : setTeamSort("nameShort")}><b>Team Name{teamSort === "nameShort" ? <SortAlphaDown /> : ""}{teamSort === "-nameShort" ? <SortAlphaUp /> : ""}</b></th>
                             <th onClick={() => (teamSort === "citySort") ? setTeamSort("-citySort") : setTeamSort("citySort")}><b>City{teamSort === "citySort" ? <SortAlphaDown /> : ""}{teamSort === "-citySort" ? <SortAlphaUp /> : ""}</b></th>
                             <th  ><b>Top Sponsors</b></th>
-                            <th  ><b>Organization</b></th>
+                            <th  onClick={() => (teamSort === "organization") ? setTeamSort("-organization") : setTeamSort("organization")}><b>Organization{teamSort === "organization" ? <SortAlphaDown /> : ""}{teamSort === "-organization" ? <SortAlphaUp /> : ""}</b></th>
                             <th onClick={() => (teamSort === "rookieYear") ? setTeamSort("-rookieYear") : setTeamSort("rookieYear")}><b>Rookie Year{teamSort === "rookieYear" ? <SortNumericDown /> : ""}{teamSort === "-rookieYear" ? <SortNumericUp /> : ""}</b></th>
-                            <th  ><b>Robot Name</b></th>
+                            <th  onClick={() => (teamSort === "robotNameLocal") ? setTeamSort("-robotNameLocal") : setTeamSort("robotNameLocal")}><b>Robot Name{teamSort === "robotNameLocal" ? <SortAlphaDown /> : ""}{teamSort === "-robotNameLocal" ? <SortAlphaUp /> : ""}</b></th>
                             <th  ><b>Additional Notes</b></th>
                         </tr>
                     </thead>
@@ -605,6 +605,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                             <Form.Label className={"formLabel"}><b>Full list of Sponsors (For reference only. This field does not appear in the UI and any changes here will not be saved.)</b></Form.Label>
                             <Form.Control type="text" placeholder={updateTeam?.sponsors} defaultValue={updateTeam?.sponsors} />
                         </Form.Group>
+                        <br />
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>
@@ -613,6 +614,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                     <Button variant="info" size="sm" onClick={handleTrack}>Record visit without saving changes</Button>
                     <Button variant="primary" size="sm" onClick={(e) => { handleSubmit("save", e) }}>Submit changes but only keep them locally</Button>
                     <Button variant="success" size="sm" disabled={!isOnline} onClick={(e) => { handleSubmit("update", e) }}>Submit changes and upload to gatool Cloud</Button>
+                    <br />
                 </Modal.Footer>
             </Modal>}
         </Container>
