@@ -1055,7 +1055,7 @@ function App() {
     setAllianceSelectionReady(TabStates.NotReady);
     var matchesPerTeam = 0;
     matchesPerTeam = _.toInteger(6 * qualSchedule?.schedule?.length / (teamList?.teamCountTotal - teamReduction));
-    // In order to start Alliance Selection, we need the following conditions to be trueL
+    // In order to start Alliance Selection, we need the following conditions to be true:
     // All matches must have been completed
     // All teams must have completed their scheduled matches
     // We test these in different places: the schedule and the rankings. This ensures that
