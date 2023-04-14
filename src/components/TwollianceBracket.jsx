@@ -152,7 +152,7 @@ function TwoAllianceBracket({ selectedEvent, playoffSchedule, alliances }) {
 
 						<text transform="translate(495 268.01)" fill="#fff" textAnchor="middle" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="17.32px">
 							<tspan x="0" y="0">{allianceName(1, "blue") ? allianceName(1, "blue") : "Alliance 2"}</tspan>
-							<tspan x="0" y="20.78">{allianceNumbers(1, "red")}</tspan></text>
+							<tspan x="0" y="20.78">{allianceNumbers(1, "blue")}</tspan></text>
 					</g>
 					<g id="trophy">
 						<rect x="635.08" y="281.65" width="37.8" height="2.36" fill="#4a4f5d" />
