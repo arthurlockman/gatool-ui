@@ -1069,7 +1069,7 @@ export const originalAndSustaining = ["20", "45", "126", "148", "151", "157", "1
 
 //Championship events receive special treatment. We define the Championship events here, including Michigan.
 export const champSubdivisions = ["ARCHIMEDES", "CARSON", "CARVER", "CURIE", "DALY", "DARWIN", "GALILEO", "HOPPER", "NEWTON", "ROEBLING", "TESLA", "TURING"];
-export const champDivisions = ["ARDA", "CANE", "CATE", "CUDA", "GARO", "HOTU"];
+export const champDivisions = ["ARDA", "CANE", "CATE", "CUDA", "GARO", "HOTU", "ARPKY","CPRA","DCMP","GCMP","HCMP","JCMP","MPCIA","NPFCMP"];
 export const champs = ["CMP", "CMPTX", "CMPMO", "CMPMI"];
 export const miDivisions = ["MICMP1", "MICMP2", "MICMP3", "MICMP4","ONCMP1","ONCMP2","NECMP1","NECMP2","TXCMP1","TXCMP2"];
 export const miChamps = ["MICMP","ONCMP","NECMP","TXCMP"];
