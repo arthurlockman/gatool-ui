@@ -1,10 +1,30 @@
 .allianceContainer {
-	align-content: center;
+	display: flex;
+	flex-flow: column wrap;
+	justify-content: center;
+	vertical-align: middle;
+	text-align: center;
+	background: rgba(255, 187, 248, 1.00);
 }
 
-.availableTeams {
+.alliance {
+	display: flex;
+	flex-flow: column wrap;
+	justify-content: center;
+	vertical-align: middle;
 	text-align: center;
-	background: rgba(255, 187, 248, 1.00)
+	margin-top: 5px;
+	margin-bottom: 5px;
+	padding-left: 6px;
+	padding-right: 6px;
+}
+
+.availableTeam {
+	max-width: 60px;
+	margin: 5px
+}
+.availableRow {
+	justify-content: center;
 }
 
 .backupAlliancesTable {
@@ -13,13 +33,18 @@
 }
 
 .alliancesTeamsTable {
+	display: flex;
+	min-width: 0;
+	justify-content: center;
+	flex-flow: column wrap;
+	word-break: break-word;
 	text-align: center;
 	background: rgba(157, 203, 250, 1.00);
-	white-space: nowrap;
 }
 
 .dropzone {
 	border: 4px solid rgba(255, 0, 0, 1.00);
+	padding: 5px;
 	transition: background-color 0.3s;
 }
 
@@ -81,6 +106,7 @@
 }
 
 .alliancedrop {
+	word-break: break-all;
 	padding: 5px;
 	margin-bottom: 5px;
 	border: 1px solid;
@@ -89,7 +115,7 @@
 }
 
 .allianceTeam {
-	font-size: 18px;
+	font-size: medium;
 	padding: 5px;
 	border: 1px solid;
 	border-radius: 5px;

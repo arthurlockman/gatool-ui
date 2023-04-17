@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Container, Form, InputGroup, Modal } from "react-bootstrap";
+import { Button, Col, Container, Form, InputGroup, Modal, Row } from "react-bootstrap";
 import _ from "lodash";
 import { HandThumbsDownFill, HandThumbsUpFill, TrophyFill } from "react-bootstrap-icons";
 import { useHotkeysContext, useHotkeys } from "react-hotkeys-hook";
@@ -336,58 +336,59 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         <>
             <Container fluid>
                 {selectedEvent && rankings?.ranks?.length > 0 && teamList?.teams?.length > 0 && allianceCount &&
-                    <div>
-                        <Form onSubmit={handleFilterSelect}>
-                            <InputGroup className="mb-3" >
-                                <InputGroup.Text>Filter the teams</InputGroup.Text>
-                                <Form.Control id={"filterControl"} type="number" placeholder="Enter a number" aria-label="Team Number" onChange={filterTeams} />
-                                {(_.filter(asArrays?.availableTeams, { 'teamNumber': Number(teamFilter) }).length === 1) && <Button variant="primary" type="submit">Select this team</Button>}
-                                <span>    </span>
-                                {(asArrays?.undo?.length > 0) && <Button id="undoButton" size="sm" onClick={handleUndo} active >Undo Previous Choice</Button>}
-                                {(asArrays?.undo?.length === 0) && <Button size="sm" onClick={handleUndo} disabled >Undo Previous Choice</Button>}
-                                <span>    </span><Button size="sm" variant="warning" onClick={handleReset} active>Restart Alliance Selection</Button>
-                            </InputGroup>
-                        </Form>
-                        <table>
-                            <tbody>
-                                <tr>
-                                    <td>
-                                        <table className="availableTeams">
-                                            <tbody>
-                                                <tr key={"titleRow"}>
-                                                    <td colSpan={5} key={"Title"} ><strong>Teams for Alliance Selection</strong></td>
-                                                </tr>
-                                                <tr key={"AvailableTeams"}>
-                                                    {availColumns.map((column, index) => {
-                                                        return (<td key={`availableTableColumn${index}`}>
-                                                            {column.map((team) => {
-                                                                var declined = asArrays?.declined.includes(team?.teamNumber);
-                                                                return (
-                                                                    <>
-                                                                        {(asArrays?.nextChoice < allianceSelectionOrder?.length && team.rank !== 1) &&
-                                                                            (String(team?.teamNumber).startsWith(teamFilter) || teamFilter === "") && <div key={"availableButton" + team?.teamNumber} className={declined ? "allianceDecline" : "allianceTeam"} onClick={(e) => handleShow(team, declined ? "declined" : "show", e)}><b>{team.teamNumber}</b></div>}
+                    <>
+                        <Row><br />
+                        </Row>
+                        <Row>
+                            <Form onSubmit={handleFilterSelect}>
+                                <InputGroup className="mb-3" >
+                                    <InputGroup.Text>Filter the teams</InputGroup.Text>
+                                    <Form.Control id={"filterControl"} type="number" placeholder="Enter a number" aria-label="Team Number" onChange={filterTeams} />
+                                    {(_.filter(asArrays?.availableTeams, { 'teamNumber': Number(teamFilter) }).length === 1) && <Button variant="primary" type="submit">Select this team</Button>}
+                                    <span>    </span>
+                                    {(asArrays?.undo?.length > 0) && <Button id="undoButton" size="sm" onClick={handleUndo} active >Undo Previous Choice</Button>}
+                                    {(asArrays?.undo?.length === 0) && <Button size="sm" onClick={handleUndo} disabled >Undo Previous Choice</Button>}
+                                    <span>    </span><Button size="sm" variant="warning" onClick={handleReset} active>Restart Alliance Selection</Button>
+                                </InputGroup>
+                            </Form>
+                        </Row>
+                        <Row>
+                            <Container fluid>
+                                <Row>
+                                    <Col xs={inChamps?4:5}>
+                                        <Container fluid className="allianceContainer">
+                                            <Col>
+                                                <Row key={"titleRow"}>
+                                                    <div><strong>Teams for Alliance Selection</strong></div>
+                                                </Row>
+                                                <Row key={"AvailableTeams"} className={"availableRow"}>
+                                                    {asArrays.availableTeams?.map((team) => {
+                                                        var declined = asArrays?.declined.includes(team?.teamNumber);
+                                                        return (
+                                                            <>
+                                                                {(asArrays?.nextChoice < allianceSelectionOrder?.length && team.rank !== 1) &&
+                                                                    (String(team?.teamNumber).startsWith(teamFilter) || teamFilter === "") && <div key={"availableButton" + team?.teamNumber} className={declined ? "availableTeam allianceDecline" : "availableTeam allianceTeam"} onClick={(e) => handleShow(team, declined ? "declined" : "show", e)}><b>{team.teamNumber}</b></div>}
 
-                                                                        {(asArrays?.nextChoice >= allianceSelectionOrder?.length || team.rank === 1) &&
-                                                                            (String(team?.teamNumber).startsWith(teamFilter) || teamFilter === "") && <div key={"availableButtonDisabled" + team?.teamNumber} className={declined ? "allianceDecline" : "allianceTeam"} ><b>{team?.teamNumber}</b></div>}
-                                                                    </>
-                                                                )
-                                                            })}
-                                                        </td>)
+                                                                {(asArrays?.nextChoice >= allianceSelectionOrder?.length || team.rank === 1) &&
+                                                                    (String(team?.teamNumber).startsWith(teamFilter) || teamFilter === "") && <div key={"availableButtonDisabled" + team?.teamNumber} className={declined ? "availableTeam allianceDecline" : "availableTeam allianceTeam"} ><b>{team?.teamNumber}</b></div>}
+                                                            </>
+                                                        )
                                                     })}
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </td>
-                                    <td  >
-                                        <table className={"backupAlliancesTable"}>
-                                            <tbody>
-                                                <tr>
-                                                    <td>
+                                                </Row>
+                                            </Col>
+
+                                        </Container>
+                                    </Col>
+                                    <Col xs={2} >
+                                        <Container fluid className={"backupAlliancesTable"}>
+                                            
+                                                <Row>
+                                                    <Col>
                                                         <p><strong>Backup Alliances</strong><br />(Teams here are initially ranked {allianceCount?.count + 1} to {allianceCount?.count + 8} top to bottom. As Alliance Selection progresses, teams will rise up into this section as teams are selected.)</p>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
+                                                    </Col>
+                                                </Row>
+                                                <Row>
+                                                    <Col>
                                                         {backupTeams.map((team) => {
                                                             var declined = asArrays.declined.includes(team.teamNumber);
                                                             return (
@@ -398,18 +399,18 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                                 </>
                                                             )
                                                         })}
-                                                    </td>
-                                                </tr>
+                                                    </Col>
+                                                </Row>
 
-                                            </tbody>
-                                        </table>
-                                    </td>
-                                    <td>
-                                        <table className={"alliancesTeamsTable"}>
-                                            <tbody>
-                                                {allianceDisplayOrder.map((row) => {
-                                                    return (
-                                                        <tr key={`allianceDisplay${row[0]}`}>
+                                            
+                                        </Container>
+                                    </Col>
+                                    <Col xs={inChamps?6:5}>
+                                        <Container fluid className={"alliancesTeamsTable"}>
+                                            {allianceDisplayOrder.map((row) => {
+                                                return (
+                                                    <Col xs={12}>
+                                                        <Row key={`allianceDisplay${row[0]}`} >
                                                             {row.map((allianceNumber) => {
                                                                 var alliance = _.filter(alliances, { "number": allianceNumber })
                                                                 var allianceName = alliance[0]?.name;
@@ -422,31 +423,97 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                                 var round3 = alliance[0]?.round3;
                                                                 if (round3) { round3.declined = asArrays?.declined?.includes(round3?.teamNumber); }
                                                                 return (
-                                                                    (allianceNumber <= allianceCount?.count) ? <td className={allianceSelectionOrder[asArrays?.nextChoice]?.number === allianceNumber ? "dropzone" : ""} key={`AllianceTable${allianceName}`}>
-                                                                        <div><b>{allianceName}</b></div>
+                                                                    (allianceNumber <= allianceCount?.count) ?
+                                                                        <Col xs={6}>
+                                                                            <Container fluid className={allianceSelectionOrder[asArrays?.nextChoice]?.number === allianceNumber ? "alliance dropzone" : "alliance"} key={`AllianceTable${allianceName}`}>
+                                                                                <Row>
+                                                                                    <Col xs={12}><b>{allianceName}</b></Col>
+                                                                                </Row>
 
-                                                                        {(allianceNumber === asArrays?.nextChoice + 1) && <div className={"alliancedrop allianceCaptain"} >Captain<div key={`${allianceName}captainAvailable`} className={captain?.declined ? "allianceDecline" : "allianceTeam"} onClick={(e) => handleShow(captain, allianceNumber === 1 ? "a1captain" : allianceNumber > 1 ? "captain" : captain?.declined ? "declined" : "show", e)}>{captain?.teamNumber ? captain?.teamNumber : ""}</div></div>}
+                                                                                {(allianceNumber === asArrays?.nextChoice + 1) &&
+                                                                                    <Row>
+                                                                                        <Col xs={12} className={"alliancedrop allianceCaptain"} >
+                                                                                        <div><b>Captain</b></div>
+                                                                                            <div key={`${allianceName}captainAvailable`}
+                                                                                                className={captain?.declined ? "allianceDecline" : "allianceTeam"}
+                                                                                                onClick={(e) => handleShow(captain, allianceNumber === 1 ? "a1captain" : allianceNumber > 1 ? "captain" : captain?.declined ? "declined" : "show", e)}>
+                                                                                                {captain?.teamNumber ? <b>{captain?.teamNumber}</b> : <div>TBD</div>}
+                                                                                            </div>
+                                                                                        </Col>
+                                                                                    </Row>}
 
-                                                                        {(allianceNumber > asArrays.nextChoice + 1) && <div className={"alliancedrop allianceCaptain"} >Captain<div key={`${allianceName}captainAvailable`} className={captain?.declined ? "allianceDecline" : "allianceTeam"} onClick={(e) => handleShow(captain, captain?.declined ? "declined" : "show", e)}>{captain?.teamNumber ? captain?.teamNumber : ""}</div></div>}
+                                                                                {(allianceNumber > asArrays.nextChoice + 1) &&
+                                                                                    <Row>
+                                                                                        <Col xs={12} className={"alliancedrop allianceCaptain"} >
+                                                                                            <div><b>Captain</b></div>
+                                                                                            <div key={`${allianceName}captainAvailable`}
+                                                                                                className={captain?.declined ? "allianceDecline" : "allianceTeam"}
+                                                                                                onClick={(e) => handleShow(captain, captain?.declined ? "declined" : "show", e)}>
+                                                                                                {captain?.teamNumber ? <b>{captain?.teamNumber}</b> : <div>TBD</div>}
+                                                                                            </div>
+                                                                                        </Col>
+                                                                                    </Row>}
 
-                                                                        {(allianceNumber < asArrays?.nextChoice + 1) && <div className={"alliancedrop allianceCaptain"} >Captain<div key={`${allianceName}captainunavailable`} className={captain?.declined ? "allianceDecline" : "allianceTeam"} >{captain?.teamNumber ? captain?.teamNumber : ""}</div></div>}
+                                                                                {(allianceNumber < asArrays?.nextChoice + 1) &&
+                                                                                    <Row>
+                                                                                        <Col xs={12} className={"alliancedrop allianceCaptain"} >
+                                                                                            <div><b>Captain</b></div>
+                                                                                            <div key={`${allianceName}captainunavailable`}
+                                                                                                className={captain?.declined ? "allianceDecline" : "allianceTeam"} >
+                                                                                                {captain?.teamNumber ? <b>{captain?.teamNumber}</b> : <div>TBD</div>}
+                                                                                            </div>
+                                                                                        </Col>
+                                                                                    </Row>}
 
-                                                                        <div className={(allianceSelectionOrder[asArrays?.nextChoice]?.number === allianceNumber) && (allianceSelectionOrder[asArrays?.nextChoice]?.round === 1) ? "alliancedrop nextAllianceChoice" : "alliancedrop"}>1st choice{round1?.teamNumber ? <div key={`${allianceName}round1`} className={round1?.declined ? "allianceDecline" : "allianceTeam"}>{round1?.teamNumber}</div> : ""}</div>
+                                                                                <Row>
+                                                                                    <Col xs={inChamps ? 4 : 6} className={(allianceSelectionOrder[asArrays?.nextChoice]?.number === allianceNumber) && (allianceSelectionOrder[asArrays?.nextChoice]?.round === 1) ? "alliancedrop nextAllianceChoice" : "alliancedrop"}>
+                                                                                        <div><b>1<sup>st</sup> pick</b></div>
+                                                                                        {round1?.teamNumber ?
+                                                                                        <div key={`${allianceName}round1`}
+                                                                                            className={round1?.declined ? "allianceDecline" : "allianceTeam"}>
+                                                                                            <b>{round1?.teamNumber}</b>
+                                                                                        </div> : <div>TBD</div>}
+                                                                                    </Col>
 
-                                                                        <div className={(allianceSelectionOrder[asArrays?.nextChoice]?.number === allianceNumber) && (allianceSelectionOrder[asArrays?.nextChoice]?.round === 2) ? "alliancedrop nextAllianceChoice" : "alliancedrop"}>2nd choice{round2?.teamNumber ? <div key={`${allianceName}round2`} className={"allianceTeam"}>{round2?.teamNumber}</div> : ""}</div>
+                                                                                    <Col xs={inChamps ? 4 : 6} className={(allianceSelectionOrder[asArrays?.nextChoice]?.number === allianceNumber) && (allianceSelectionOrder[asArrays?.nextChoice]?.round === 2) ? "alliancedrop nextAllianceChoice" : "alliancedrop"}>
+                                                                                        <div><b>2<sup>nd</sup> pick</b></div>
+                                                                                        {round2?.teamNumber ?
+                                                                                            <div key={`${allianceName}round2`}
+                                                                                                className={"allianceTeam"}>
+                                                                                                <b>{round2?.teamNumber}</b>
+                                                                                            </div> : <div>TBD</div>}
+                                                                                    </Col>
 
-                                                                        {inChamps && <div className={(allianceSelectionOrder[asArrays?.nextChoice]?.number === allianceNumber) && (allianceSelectionOrder[asArrays?.nextChoice]?.round === 3) ? "alliancedrop nextAllianceChoice" : "alliancedrop"}>3rd choice{round3?.teamNumber ? <div key={`${allianceName}round3`} className={"allianceTeam"}>{round3?.teamNumber}</div> : ""}</div>}
-                                                                    </td> : <td></td>
+
+                                                                                    {inChamps &&
+                                                                                        <Col xs={inChamps ? 4 : 6} className={(allianceSelectionOrder[asArrays?.nextChoice]?.number === allianceNumber) && (allianceSelectionOrder[asArrays?.nextChoice]?.round === 3) ? "alliancedrop nextAllianceChoice" : "alliancedrop"}>
+                                                                                            <div><b>3<sup>rd</sup> pick</b></div>
+                                                                                            {round3?.teamNumber ?
+                                                                                                <div key={`${allianceName}round3`}
+                                                                                                    className={"allianceTeam"}>
+                                                                                                    <b>{round3?.teamNumber}</b>
+                                                                                                </div> : <div>TBD</div>}
+                                                                                        </Col>}
+                                                                                </Row>
+
+                                                                            </Container>
+                                                                        </Col>
+                                                                        : <Col xs={6}></Col>
                                                                 )
                                                             })}
-                                                        </tr>
-                                                    )
-                                                })}
-                                            </tbody>
-                                        </table>
-                                    </td>
-                                </tr>
-                            </tbody></table></div>
+
+                                                        </Row>
+                                                    </Col>
+                                                )
+                                            })}
+
+                                        </Container>
+                                    </Col>
+                                </Row>
+
+                            </Container>
+                        </Row>
+                    </>
                 }
                 {allianceTeam && <Modal centered={true} show={show} onHide={handleClose}>
                     <Modal.Header className={allianceMode === "decline" ? "allianceDecline" : "allianceChoice"} closeVariant={"white"} closeButton>
