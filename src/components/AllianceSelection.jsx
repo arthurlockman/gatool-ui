@@ -435,7 +435,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                                                         <Col xs={12} className={"alliancedrop allianceCaptain"} >
                                                                                             <div><b>Captain</b></div>
                                                                                             <div key={`${allianceName}captainAvailable`}
-                                                                                                className={captain?.declined ? "allianceDecline" : "allianceTeam"}
+                                                                                                className={captain?.declined ? "allianceDecline allianceTeamChoice" : "allianceTeam allianceTeamChoice"}
                                                                                                 onClick={(e) => handleShow(captain, allianceNumber === 1 ? "a1captain" : allianceNumber > 1 ? "captain" : captain?.declined ? "declined" : "show", e)}>
                                                                                                 {captain?.teamNumber ? <b>{captain?.teamNumber}</b> : <div>TBD</div>}
                                                                                             </div>
@@ -447,7 +447,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                                                         <Col xs={12} className={"alliancedrop allianceCaptain"} >
                                                                                             <div><b>Captain</b></div>
                                                                                             <div key={`${allianceName}captainAvailable`}
-                                                                                                className={captain?.declined ? "allianceDecline" : "allianceTeam"}
+                                                                                                className={captain?.declined ? "allianceDecline allianceTeamChoice" : "allianceTeam allianceTeamChoice"}
                                                                                                 onClick={(e) => handleShow(captain, captain?.declined ? "declined" : "show", e)}>
                                                                                                 {captain?.teamNumber ? <b>{captain?.teamNumber}</b> : <div>TBD</div>}
                                                                                             </div>
@@ -459,7 +459,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                                                         <Col xs={12} className={"alliancedrop allianceCaptain"} >
                                                                                             <div><b>Captain</b></div>
                                                                                             <div key={`${allianceName}captainunavailable`}
-                                                                                                className={captain?.declined ? "allianceDecline" : "allianceTeam"} >
+                                                                                                className={captain?.declined ? "allianceDeclinea llianceTeamChoice" : "allianceTeam allianceTeamChoice"} >
                                                                                                 {captain?.teamNumber ? <b>{captain?.teamNumber}</b> : <div>TBD</div>}
                                                                                             </div>
                                                                                         </Col>
@@ -470,7 +470,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                                                         <div><b>1<sup>st</sup> pick</b></div>
                                                                                         {round1?.teamNumber ?
                                                                                             <div key={`${allianceName}round1`}
-                                                                                                className={round1?.declined ? "allianceDecline" : "allianceTeam"}>
+                                                                                                className={round1?.declined ? "allianceDecline allianceTeamChoice" : "allianceTeam allianceTeamChoice"}>
                                                                                                 <b>{round1?.teamNumber}</b>
                                                                                             </div> : <div>TBD</div>}
                                                                                     </Col>
@@ -479,7 +479,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                                                         <div><b>2<sup>nd</sup> pick</b></div>
                                                                                         {round2?.teamNumber ?
                                                                                             <div key={`${allianceName}round2`}
-                                                                                                className={"allianceTeam"}>
+                                                                                                className={"allianceTeam allianceTeamChoice"}>
                                                                                                 <b>{round2?.teamNumber}</b>
                                                                                             </div> : <div>TBD</div>}
                                                                                     </Col>
@@ -490,7 +490,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                                                             <div><b>3<sup>rd</sup> pick</b></div>
                                                                                             {round3?.teamNumber ?
                                                                                                 <div key={`${allianceName}round3`}
-                                                                                                    className={"allianceTeam"}>
+                                                                                                    className={"allianceTeam allianceTeamChoice"}>
                                                                                                     <b>{round3?.teamNumber}</b>
                                                                                                 </div> : <div>TBD</div>}
                                                                                         </Col>}
