@@ -143,7 +143,7 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
 
     return (
 
-        <Container fluid>
+        < >
             {!selectedEvent && <div>
                 <Alert variant="warning" >You need to select an event before you can see anything here.</Alert>
             </div>}
@@ -179,7 +179,7 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
                     </table>
                     <BottomButtons previousMatch={previousMatch} nextMatch={nextMatch} matchDetails={matchDetails} playoffSchedule={playoffSchedule} eventHighScores={eventHighScores} alliances={alliances} selectedEvent={selectedEvent} />
                 </Container>}
-        </Container>
+        </>
     )
 }
 

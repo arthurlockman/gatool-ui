@@ -122,7 +122,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
     useHotkeys('left', () => previousMatch(), { scopes: 'matchNavigation' })
 
     return (
-        <Container fluid >
+        <  >
             {!selectedEvent && <div>
                 <Alert variant="warning" >You need to select an event before you can see anything here.</Alert>
             </div>}
@@ -166,7 +166,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
                 </Container>
             }
 
-        </Container>
+        </>
     )
 }
 
