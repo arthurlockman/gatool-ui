@@ -19,10 +19,11 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
 
 
     return (
-        <Container fluid>
-            <Container fluid>{!selectedEvent && <div>
-                <Alert variant="warning" ><div>You need to select an event before you can see anything here.</div></Alert>
-            </div>}
+        < >
+            
+                {!selectedEvent && <div>
+                    <Alert variant="warning" ><div>You need to select an event before you can see anything here.</div></Alert>
+                </div>}
                 {selectedEvent && (!qualSchedule || qualSchedule?.schedule?.length === 0) && (!playoffSchedule || playoffSchedule?.schedule?.length === 0) &&
                     <div>
                         <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div><div>Waiting for Qualification Match Schedule</div></Alert>
@@ -59,16 +60,17 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
                             </Alert>}
                     </div>}
                 {selectedEvent && qualSchedule?.schedule?.length > 0 && !playoffs && (allianceSelection || overrideAllianceSelection) &&
-                    <div><AllianceSelection selectedYear={selectedYear} selectedEvent={selectedEvent} rankings={rankings} teamList={teamList} allianceCount={allianceCount} communityUpdates={communityUpdates} allianceSelectionArrays={allianceSelectionArrays} setAllianceSelectionArrays={setAllianceSelectionArrays} />
+                    <div>
+                        <AllianceSelection selectedYear={selectedYear} selectedEvent={selectedEvent} rankings={rankings} teamList={teamList} allianceCount={allianceCount} communityUpdates={communityUpdates} allianceSelectionArrays={allianceSelectionArrays} setAllianceSelectionArrays={setAllianceSelectionArrays} />
                     </div>}
-            </Container>
+            
             {selectedEvent?.value?.allianceCount === "EightAlliance" && playoffs &&
                 <Bracket selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} alliances={alliances} />}
             {selectedEvent?.value?.allianceCount === "FourAlliance" && playoffs &&
                 <FourAllianceBracket selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} alliances={alliances} />}
             {selectedEvent?.value?.allianceCount === "TwoAlliance" && playoffs &&
                 <TwoAllianceBracket selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} alliances={alliances} />}
-        </Container>
+        </>
 
     )
 }
