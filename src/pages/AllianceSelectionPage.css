@@ -44,7 +44,8 @@
 
 .dropzone {
 	border: 4px solid rgba(255, 0, 0, 1.00);
-	padding: 5px;
+	padding-left: 15px;
+	padding-right: 15px;
 	transition: background-color 0.3s;
 }
 
@@ -121,11 +122,14 @@
 	border-radius: 5px;
 	background: rgba(255, 255, 255, 1.00);
 	margin-bottom: 10px;
-
 }
 
 .allianceTeam:hover {
 	background: rgb(191, 253, 247);
+}
+
+.allianceTeamChoice {
+	margin-bottom: 0px;
 }
 
 .allianceChoice {
