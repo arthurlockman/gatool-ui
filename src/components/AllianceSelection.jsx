@@ -513,6 +513,8 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
 
                             </Container>
                         </Row>
+                        <Row><br /><br />
+                        </Row>
                     </>
                 }
                 {allianceTeam && <Modal centered={true} show={show} onHide={handleClose}>
