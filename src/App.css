@@ -126,7 +126,8 @@ td {
 	background-color: red;
 	font-size: x-large;
 	font-weight: bold;
-	color: white
+	color: white;
+	padding: 4px;
 }
 
 .blueAlliancePlayByPlay {
@@ -137,11 +138,12 @@ td {
 	font-size: x-large;
 	font-weight: bold;
 	color: white;
+	padding: 4px;
 }
 
 .playByPlayTable {
 	display: table;
-	width:100%
+	width:100%;
 }
 
 .playByPlayTableRow {

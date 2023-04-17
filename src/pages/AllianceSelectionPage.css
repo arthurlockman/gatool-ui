@@ -11,10 +11,9 @@
 	justify-content: center;
 	vertical-align: middle;
 	text-align: center;
-	margin-top: 7px;
-	margin-bottom: 7px;
-	padding-left: 6px;
-	padding-right: 6px;
+	
+	padding: 6px;
+	
 }
 
 .availableTeam {
