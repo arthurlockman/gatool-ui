@@ -355,7 +355,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                         <Row>
                             <Container fluid>
                                 <Row>
-                                    <Col xs={inChamps?4:5}>
+                                    <Col xs={inChamps ? 4 : 5}>
                                         <Container fluid className="allianceContainer">
                                             <Col>
                                                 <Row key={"titleRow"}>
@@ -381,31 +381,31 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                     </Col>
                                     <Col xs={2} >
                                         <Container fluid className={"backupAlliancesTable"}>
-                                            
-                                                <Row>
-                                                    <Col>
-                                                        <p><strong>Backup Alliances</strong><br />(Teams here are initially ranked {allianceCount?.count + 1} to {allianceCount?.count + 8} top to bottom. As Alliance Selection progresses, teams will rise up into this section as teams are selected.)</p>
-                                                    </Col>
-                                                </Row>
-                                                <Row>
-                                                    <Col>
-                                                        {backupTeams.map((team) => {
-                                                            var declined = asArrays.declined.includes(team.teamNumber);
-                                                            return (
-                                                                <>{(asArrays?.nextChoice < allianceSelectionOrder?.length) &&
-                                                                    <div key={"backupButton" + team?.teamNumber} className={declined ? "allianceDecline" : "allianceTeam"} onClick={(e) => handleShow(team, declined ? "declined" : "show", e)}><b>{team?.teamNumber}</b></div>}
-                                                                    {(asArrays?.nextChoice >= allianceSelectionOrder?.length) &&
-                                                                        <div key={"backupButtonDisabled" + team?.teamNumber} className={declined ? "allianceDecline" : "allianceTeam"} ><b>{team.teamNumber}</b></div>}
-                                                                </>
-                                                            )
-                                                        })}
-                                                    </Col>
-                                                </Row>
 
-                                            
+                                            <Row>
+                                                <Col>
+                                                    <p><strong>Backup Alliances</strong><br />(Teams here are initially ranked {allianceCount?.count + 1} to {allianceCount?.count + 8} top to bottom. As Alliance Selection progresses, teams will rise up into this section as teams are selected.)</p>
+                                                </Col>
+                                            </Row>
+                                            <Row>
+                                                <Col >
+                                                    {backupTeams.map((team) => {
+                                                        var declined = asArrays.declined.includes(team.teamNumber);
+                                                        return (
+                                                            <>{(asArrays?.nextChoice < allianceSelectionOrder?.length) &&
+                                                                <div key={"backupButton" + team?.teamNumber} className={declined ? "allianceDecline" : "allianceTeam"} onClick={(e) => handleShow(team, declined ? "declined" : "show", e)}><b>{team?.teamNumber}</b></div>}
+                                                                {(asArrays?.nextChoice >= allianceSelectionOrder?.length) &&
+                                                                    <div key={"backupButtonDisabled" + team?.teamNumber} className={declined ? "allianceDecline" : "allianceTeam"} ><b>{team.teamNumber}</b></div>}
+                                                            </>
+                                                        )
+                                                    })}
+                                                </Col>
+                                            </Row>
+
+
                                         </Container>
                                     </Col>
-                                    <Col xs={inChamps?6:5}>
+                                    <Col xs={inChamps ? 6 : 5}>
                                         <Container fluid className={"alliancesTeamsTable"}>
                                             {allianceDisplayOrder.map((row) => {
                                                 return (
@@ -433,7 +433,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                                                 {(allianceNumber === asArrays?.nextChoice + 1) &&
                                                                                     <Row>
                                                                                         <Col xs={12} className={"alliancedrop allianceCaptain"} >
-                                                                                        <div><b>Captain</b></div>
+                                                                                            <div><b>Captain</b></div>
                                                                                             <div key={`${allianceName}captainAvailable`}
                                                                                                 className={captain?.declined ? "allianceDecline" : "allianceTeam"}
                                                                                                 onClick={(e) => handleShow(captain, allianceNumber === 1 ? "a1captain" : allianceNumber > 1 ? "captain" : captain?.declined ? "declined" : "show", e)}>
@@ -469,10 +469,10 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                                                     <Col xs={inChamps ? 4 : 6} className={(allianceSelectionOrder[asArrays?.nextChoice]?.number === allianceNumber) && (allianceSelectionOrder[asArrays?.nextChoice]?.round === 1) ? "alliancedrop nextAllianceChoice" : "alliancedrop"}>
                                                                                         <div><b>1<sup>st</sup> pick</b></div>
                                                                                         {round1?.teamNumber ?
-                                                                                        <div key={`${allianceName}round1`}
-                                                                                            className={round1?.declined ? "allianceDecline" : "allianceTeam"}>
-                                                                                            <b>{round1?.teamNumber}</b>
-                                                                                        </div> : <div>TBD</div>}
+                                                                                            <div key={`${allianceName}round1`}
+                                                                                                className={round1?.declined ? "allianceDecline" : "allianceTeam"}>
+                                                                                                <b>{round1?.teamNumber}</b>
+                                                                                            </div> : <div>TBD</div>}
                                                                                     </Col>
 
                                                                                     <Col xs={inChamps ? 4 : 6} className={(allianceSelectionOrder[asArrays?.nextChoice]?.number === allianceNumber) && (allianceSelectionOrder[asArrays?.nextChoice]?.round === 2) ? "alliancedrop nextAllianceChoice" : "alliancedrop"}>

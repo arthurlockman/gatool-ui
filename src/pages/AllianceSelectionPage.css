@@ -1,6 +1,5 @@
 .allianceContainer {
 	display: flex;
-	flex-flow: column wrap;
 	justify-content: center;
 	vertical-align: middle;
 	text-align: center;
@@ -8,13 +7,12 @@
 }
 
 .alliance {
-	display: flex;
 	flex-flow: column wrap;
 	justify-content: center;
 	vertical-align: middle;
 	text-align: center;
-	margin-top: 5px;
-	margin-bottom: 5px;
+	margin-top: 7px;
+	margin-bottom: 7px;
 	padding-left: 6px;
 	padding-right: 6px;
 }
@@ -24,7 +22,10 @@
 	margin: 5px
 }
 .availableRow {
+	display: flex;
+	flex-flow: row wrap ;
 	justify-content: center;
+	height:fit-content;
 }
 
 .backupAlliancesTable {
