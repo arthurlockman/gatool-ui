@@ -603,7 +603,7 @@ export const hallOfFame = [{
 }, {
     "Year": 2014,
     "Chairmans": 27,
-    "Challenge": "Arial Assist",
+    "Challenge": "Aerial Assist",
     "Winner1": 254,
     "Winner2": 469,
     "Winner3": 2848,
