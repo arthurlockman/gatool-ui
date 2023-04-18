@@ -21,7 +21,7 @@ function CheatsheetPage({ teamList, communityUpdates }) {
         card.frontHTML = `<h1>${team.teamNumber}</h1>`;
         card.frontContentStyle = cardStyle;
         card.backContentStyle = cardStyle;
-        card.backHTML = `<h1>${team?.updates?.nameShortLocal ? team?.updates?.nameShortLocal : team?.nameShort}</h1>`;
+        card.backHTML = `<h1>${team?.updates?.nameShortLocal ? team?.updates?.nameShortLocal : team?.nameShort}<br />${team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : team?.city + ", " + team?.stateProv}</h1>`;
         return card;
     })
 
