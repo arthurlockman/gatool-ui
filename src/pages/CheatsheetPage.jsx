@@ -2,7 +2,7 @@ import { Container, Row } from "react-bootstrap";
 import { FlashcardArray } from "react-quizlet-flashcard";
 import _ from "lodash";
 
-function CheatsheetPage({ teamList, communityUpdates }) {
+function CheatsheetPage({ teamList, communityUpdates, selectedEvent }) {
     var sortedTeams = _.orderBy(teamList?.teams, "teamNumber", "asc");
     var cardStyle = {
         display: "flex",
@@ -18,10 +18,10 @@ function CheatsheetPage({ teamList, communityUpdates }) {
         };
         team = _.merge(team, communityUpdates[_.findIndex(communityUpdates, { "teamNumber": team?.teamNumber })], teamList?.teams[_.findIndex(teamList?.teams, { "teamNumber": team?.teamNumber })]);
         card.id = index;
-        card.frontHTML = `<h1>${team.teamNumber}</h1>`;
+        card.frontHTML = `<h1><b>${team.teamNumber}</b></h1>`;
         card.frontContentStyle = cardStyle;
         card.backContentStyle = cardStyle;
-        card.backHTML = `<h1>${team?.updates?.nameShortLocal ? team?.updates?.nameShortLocal : team?.nameShort}<br />${team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : team?.city + ", " + team?.stateProv}</h1>`;
+        card.backHTML = `<h1><b>${team?.updates?.nameShortLocal ? team?.updates?.nameShortLocal : team?.nameShort}</b><br />${team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : team?.city + ", " + team?.stateProv}</h1>`;
         return card;
     })
 
@@ -32,7 +32,7 @@ function CheatsheetPage({ teamList, communityUpdates }) {
                 <p><br /></p></div>
             {cards.length > 0 &&
                 <Container fluid className={"flashCards"}>
-                    <Row><h3>Here are some helpful flash cards you can use to learn the names of the teams.</h3></Row>
+                    <Row><h3>Here are some helpful flash cards you can use to learn the names of the teams at {selectedEvent?.label}.</h3></Row>
                     <Row><FlashcardArray cards={cards} /></Row>
                     <Row><br /><br /></Row>
                 </Container>}
