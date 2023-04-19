@@ -22,7 +22,7 @@ function CheatsheetPage({ teamList, communityUpdates, selectedEvent }) {
         card.frontHTML = `<h1><b>${team.teamNumber}</b>${team?.updates?.sayNumber ? `<br />${team?.updates?.sayNumber}`:""}</h1>`;
         card.frontContentStyle = cardStyle;
         card.backContentStyle = cardStyle;
-        card.backHTML = `<h1><b>${team?.updates?.nameShortLocal ? team?.updates?.nameShortLocal : team?.nameShort}</b><br />${team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : team?.city + ", " + team?.stateProv}</h1>`;
+        card.backHTML = `<h1><b>${team?.updates?.nameShortLocal ? team?.updates?.nameShortLocal : team?.nameShort}</b><br />${team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : team?.city + ", " + team?.stateProv + (team?.country === "USA" ? "" : " "+team?.country)}</h1>`;
         return card;
     })
 
