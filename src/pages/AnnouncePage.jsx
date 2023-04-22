@@ -36,7 +36,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
         }
 
         if (station?.slice(-1) === "4") {
-            if (inPlayoffs) {
+            if (inPlayoffs || selectedEvent?.value?.type==="CHAMPS") {
 
                 var playoffTeams = matchDetails?.teams.map((team) => {
                     return { "teamNumber": team?.teamNumber, "alliance": team?.alliance }
