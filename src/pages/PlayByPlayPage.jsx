@@ -43,7 +43,8 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
                     return { "teamNumber": team?.teamNumber, "alliance": team.alliance }
                 });
                 var allianceTeams = _.filter(playoffTeams, { "alliance": allianceNumber }).map((o) => { return o.teamNumber });
-                var allianceMembers = _.filter(alliances?.alliances, { "number": Number(allianceNumber?.slice(-1)) })[0];
+                //var allianceMembers = _.filter(alliances?.alliances, { "number": Number(allianceNumber?.slice(-1)) })[0];
+                var allianceMembers = allianceNumber ? _.filter(alliances?.alliances, { "name": allianceNumber})[0] : [];
                 var allianceArray = [];
                 allianceArray.push(allianceMembers?.captain);
                 allianceArray.push(allianceMembers?.round1);
@@ -170,7 +171,7 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
                                 <PlayByPlay station={displayOrder[4]} team={teamDetails[displayOrder[4]]} inPlayoffs={inPlayoffs} key={displayOrder[4]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} />
                                 <PlayByPlay station={displayOrder[5]} team={teamDetails[displayOrder[5]]} inPlayoffs={inPlayoffs} key={displayOrder[5]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} />
                             </tr>
-                            {inPlayoffs && (!_.isEmpty(teamDetails["Red4"]) || !_.isEmpty(teamDetails["Blue4"])) &&
+                            {(inPlayoffs || selectedEvent?.value?.champLevel==="CHAMPS" )&& (!_.isEmpty(teamDetails["Red4"]) || !_.isEmpty(teamDetails["Blue4"])) &&
                                 <tr className={"gatool-playbyplay"}>
                                     <PlayByPlay station={displayOrder[6]} team={teamDetails[displayOrder[6]]} inPlayoffs={inPlayoffs} key={displayOrder[6]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} />
                                     <PlayByPlay station={displayOrder[7]} team={teamDetails[displayOrder[7]]} inPlayoffs={inPlayoffs} key={displayOrder[7]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} />

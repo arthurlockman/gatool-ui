@@ -499,7 +499,7 @@ export const hallOfFame = [{
     "Winner1": 1619,
     "Winner2": 254,
     "Winner3": 3175,
-    "Winner4": 6627,
+    "Winner4": 6672,
     "Winner5": null
 },{
     "Year": 2021,

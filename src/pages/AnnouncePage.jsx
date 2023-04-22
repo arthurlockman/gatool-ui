@@ -36,13 +36,14 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
         }
 
         if (station?.slice(-1) === "4") {
-            if (inPlayoffs) {
+            if (inPlayoffs || selectedEvent?.value?.champLevel==="CHAMPS") {
 
                 var playoffTeams = matchDetails?.teams.map((team) => {
                     return { "teamNumber": team?.teamNumber, "alliance": team?.alliance }
                 });
                 var allianceTeams = allianceNumber ? _.filter(playoffTeams, { "alliance": allianceNumber }).map((o) => { return o.teamNumber }) : [];
-                var allianceMembers = allianceNumber ? _.filter(alliances?.alliances, { "number": Number(allianceNumber.slice(-1)) })[0] : [];
+                // var allianceMembers = allianceNumber ? _.filter(alliances?.alliances, { "number": Number(allianceNumber.slice(-1)) })[0] : [];
+                var allianceMembers = allianceNumber ? _.filter(alliances?.alliances, { "name": allianceNumber })[0] : [];
                 var allianceArray = [];
                 allianceArray.push(allianceMembers?.captain);
                 allianceArray.push(allianceMembers?.round1);
