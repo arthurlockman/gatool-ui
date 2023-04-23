@@ -74,13 +74,14 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
     rankings?.ranks.forEach((team) => {
         if (_.indexOf(allianceMembers, String(team.teamNumber)) < 0) { availableTeams.push({ "label": team.teamNumber, "value": team }) }
     })
+    const addBackupButton = inPlayoffs && selectedEvent.value.champLevel !== "CHAMPS" && selectedEvent.value.champLevel !== "CMPDIV" && selectedEvent.value.champLevel !== "CMPSUB";
 
     return (
         <>
             <Row style={{ "paddingTop": "10px", "paddingBottom": "10px" }}>
                 <Col xs={"2"} lg={"3"}><Button size="lg" variant="outline-success" className={"gatool-button buttonNoWrap"} onClick={previousMatch}><span className={"d-none d-lg-block"}><CaretLeftFill /> Previous Match</span><span className={"d-block d-lg-none"}><CaretLeftFill /> <CaretLeftFill /></span></Button></Col>
                 <MatchClock matchDetails={matchDetails} timeFormat={timeFormat} />
-                <Col xs={inPlayoffs ? "4" : "5"} lg={inPlayoffs ? "3" : "4"}><b>{selectedEvent?.label.replace("FIRST Championship - ", "").replace("FIRST In Texas District Championship - ", "").replace("FIRST Ontario Provincial Championship - ", "").replace("New England FIRST District Championship - ", "")}</b><br />
+                <Col xs={addBackupButton ? "4" : "5"} lg={inPlayoffs ? "3" : "4"}><b>{selectedEvent?.label.replace("FIRST Championship - ", "").replace("FIRST In Texas District Championship - ", "").replace("FIRST Ontario Provincial Championship - ", "").replace("New England FIRST District Championship - ", "")}</b><br />
                     <Select options={matchMenu} value={currentMatch ? matchMenu[currentMatch - 1] : matchMenu[0]} onChange={handleMatchSelection} styles={{
                         option: (styles, { data }) => {
                             return {
@@ -91,7 +92,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
                         },
                     }} ref={selectRef}/>
                 </Col>
-                {inPlayoffs && <Col className="promoteBackup" xs={1} onClick={handleShow}>+<ArrowUpSquareFill />+<br />backup</Col>}
+                {addBackupButton && <Col className="promoteBackup" xs={1} onClick={handleShow}>+<ArrowUpSquareFill />+<br />backup</Col>}
                 <Col xs={"2"} lg={"3"}><Button size="lg" variant="outline-success" className={"gatool-button buttonNoWrap"} onClick={nextMatch}><span className={"d-none d-lg-block"}>Next Match <CaretRightFill /></span><span className={"d-block d-lg-none"}><CaretRightFill /> <CaretRightFill /></span></Button></Col>
                 <Modal centered={true} show={show} onHide={handleClose}>
                     <Modal.Header className={"promoteBackup"} closeButton closeVariant="white">
