@@ -494,7 +494,7 @@ export const allianceShortNames = {
 
 export const hallOfFame = [{
     "Year": 2023,
-    "Chairmans": 321,
+    "Impact": 321,
     "Challenge": "Charged Up Houston",
     "Winner1": 1323,
     "Winner2": 4414,
