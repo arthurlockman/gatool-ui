@@ -573,6 +573,9 @@ function App() {
         _.filter(halloffame, { "Chairmans": team.teamNumber }).forEach((award) => {
           team.hallOfFame.push({ "year": award.Year, "challenge": award.Challenge, "type": "chairmans" })
         });
+        _.filter(halloffame, { "Impact": team.teamNumber }).forEach((award) => {
+          team.hallOfFame.push({ "year": award.Year, "challenge": award.Challenge, "type": "impact" })
+        });
         _.filter(halloffame, { "Winner1": team.teamNumber }).forEach((award) => {
           team.hallOfFame.push({ "year": award.Year, "challenge": award.Challenge, "type": "winner" })
         });

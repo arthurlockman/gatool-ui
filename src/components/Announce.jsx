@@ -62,7 +62,7 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
                 <p className={`HOF${allianceColor}`}>
                     {originalAndSustaining.includes(String(team?.teamNumber)) && <span>Original and Sustaining Team<br /></span>}
                     {team?.hallOfFame ? team?.hallOfFame.map((award) => {
-                        return <span key={award.year + award.type + award.challenge} className={`HOF${allianceColor} ${award.type === "chairmans" ? "HOF" : ""}`}>{award.year} {award.type === "chairmans" ? "Chairman's Award" : award.type === "impact" ? "Impact Award" : "Winner"} {award.challenge}<br /></span>
+                        return <span key={award.year + award.type + award.challenge} className={`HOF${allianceColor} ${award.type === "chairmans" ? "HOF" : ""}`}>{award.year} {award.type === "chairmans" ? "Chairman's Award" : award.type === "impact" ? "FIRST Impact Award" : "Winner"} {award.challenge}<br /></span>
                     }) : ""}
                 </p>
                 {(team?.qualifiedDistrictCmp || team?.qualifiedFirstCmp) &&
