@@ -592,6 +592,8 @@ function App() {
           team.hallOfFame.push({ "year": award.Year, "challenge": award.Challenge, "type": "winner" })
         });
 
+        team.hallOfFame = _.orderBy(team.hallOfFame, ['type','year'],['asc','asc']);
+
         return team;
 
       })
