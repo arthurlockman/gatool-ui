@@ -493,6 +493,15 @@ export const allianceShortNames = {
 };
 
 export const hallOfFame = [{
+    "Year": 2023,
+    "Chairmans": 321,
+    "Challenge": "Charged Up Houston",
+    "Winner1": 1323,
+    "Winner2": 4414,
+    "Winner3": 4096,
+    "Winner4": 2609,
+    "Winner5": null
+},{
     "Year": 2022,
     "Chairmans": 1629,
     "Challenge": "Rapid React Houston",
