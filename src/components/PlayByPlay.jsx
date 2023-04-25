@@ -11,7 +11,7 @@ function PlayByPlay({ station, team, inPlayoffs, selectedYear, selectedEvent, sh
                         <p className={"playByPlayteamNumber"}>{team?.teamNumber}</p>
                         <p className={"playByPlaysayNumber"} >{team?.updates?.sayNumber}</p>
                         <p className={team?.updates?.organizationLocal ? (team?.updates?.organizationLocal.length > 60 ? "playByPlayOrganization narrowFont" : "playByPlayOrganization"): (team?.schoolName.length > 60 ? "playByPlayOrganization narrowFont" : "playByPlayOrganization")}>{team?.updates?.organizationLocal ? team?.updates?.organizationLocal : team?.schoolName}</p>
-                        <p className={"playByPlayCity"}>{team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : team?.city + ", " + team?.stateProv}</p>
+                        <p className={"playByPlayCity"}>{team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : `${team?.city}, ${team?.stateProv}${team?.country !== "USA" ? `, ${team?.country}` : ""}`}</p>
                         {(showMottoes || _.isNull(showMottoes)) && <p className={"playByPlayCity mottoes"}>{team?.updates?.teamMottoLocal}</p>}
                         {inPlayoffs && <p className={"playByPlayAlliance"}>{team?.alliance}<br />{team?.allianceRole}</p>}
                     </>

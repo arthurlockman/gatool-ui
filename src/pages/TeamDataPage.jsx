@@ -295,7 +295,6 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                     record.nameShort = team.nameShortLocal || team.nameShort;
                     record.organization = team.organizationLocal || team.organization;
                     record.robotName = team.robotNameLocal || team.robotName;
-                    record.cityState = team.cityStateLocal || team.cityState;
                     record.cityState = team.cityStateLocal || `${team.city}, ${team.stateProv}${team.country !== "USA" ? `, ${team.country}` : ""}`;
                     record.topSponsors = team.topSponsorsLocal || team.topSponsors;
                     record.teamYearsNoCompete = team.teamYearsNoCompeteLocal || "";
@@ -497,7 +496,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                     </thead>
                     <tbody>
                         {teamList && teamList.teams && teamListExtended.map((team) => {
-                            var cityState = `${team?.city}, ${team?.stateProv} ${(team?.country !== "USA") ? " " + team?.country : ""}`;
+                            var cityState = `${team?.city}, ${team?.stateProv}${(team?.country !== "USA") ? ", " + team?.country : ""}`;
                             var avatar = `<img src='https://api.gatool.org/v3/${selectedYear.value}/avatars/team/${team?.teamNumber}/avatar.png' onerror="this.style.display='none'">&nbsp`;
                             var teamNameWithAvatar = team?.nameShortLocal ? team?.nameShortLocal : team?.nameShort;
                             teamNameWithAvatar = avatar + "<br />" + teamNameWithAvatar;
@@ -552,8 +551,8 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                             <Form.Control className={updateTeam.organizationLocal ? "formHighlight" : formValue.organizationLocal ? "formHighlight" : ""} type="text" placeholder={updateTeam.organization} defaultValue={updateTeam.organizationLocal ? updateTeam.organizationLocal : updateTeam.organization} onChange={(e) => updateForm("organizationLocal", e.target.value)} />
                         </Form.Group>
                         <Form.Group controlId="cityState">
-                            <Form.Label className={"formLabel"}><b>City/State ({`${updateTeam?.city}, ${updateTeam?.stateProv} ${(updateTeam?.country !== "USA") ? " " + updateTeam?.country : ""}`}) in TIMS)</b></Form.Label>
-                            <Form.Control className={updateTeam.cityStateLocal ? "formHighlight" : formValue.cityStateLocal ? "formHighlight" : ""} type="text" placeholder={`${updateTeam?.city}, ${updateTeam?.stateProv} ${(updateTeam?.country !== "USA") ? " " + updateTeam?.country : ""}`} defaultValue={updateTeam.cityStateLocal ? updateTeam.cityStateLocal : `${updateTeam?.city}, ${updateTeam?.stateProv} ${(updateTeam?.country !== "USA") ? " " + updateTeam?.country : ""}`} onChange={(e) => updateForm("cityStateLocal", e.target.value)} />
+                            <Form.Label className={"formLabel"}><b>City/State ({`${updateTeam?.city}, ${updateTeam?.stateProv}${(updateTeam?.country !== "USA") ? ", " + updateTeam?.country : ""}`}) in TIMS)</b></Form.Label>
+                            <Form.Control className={updateTeam.cityStateLocal ? "formHighlight" : formValue.cityStateLocal ? "formHighlight" : ""} type="text" placeholder={`${updateTeam?.city}, ${updateTeam?.stateProv} ${(updateTeam?.country !== "USA") ? " " + updateTeam?.country : ""}`} defaultValue={updateTeam.cityStateLocal ? updateTeam.cityStateLocal : `${updateTeam?.city}, ${updateTeam?.stateProv}${(updateTeam?.country !== "USA") ? ", " + updateTeam?.country : ""}`} onChange={(e) => updateForm("cityStateLocal", e.target.value)} />
                         </Form.Group>
                         <Form.Group controlId="sayNumber">
                             <Form.Label className={"formLabel"}><b>How to pronounce the team number (some teams are particular)</b></Form.Label>
