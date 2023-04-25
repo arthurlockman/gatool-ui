@@ -324,6 +324,10 @@ td {
 	color: #FF4000
 }
 
+.narrowFont {
+	font-family: Helvetica-Narrow, "Helvetica Narrow", Arial-Narrow, "Arial Narrow";
+}
+
 @keyframes App-logo-spin {
 	from {
 		transform: rotate(0deg);
