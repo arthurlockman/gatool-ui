@@ -41,6 +41,17 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         return updateDelay
     }
 
+    //Display a warning on the Team Data screen if the data is over 6 months old
+    function updateWarning(updateTime) {
+        var timeDifference = 0;
+        var updateDelay = false;
+        timeDifference = moment(currentTime).diff(updateTime, "months");
+        if (timeDifference >= 6) {
+            updateDelay = true;
+        }
+        return updateDelay
+    }
+
 
     const [show, setShow] = useState(false);
     const [showDownload, setShowDownload] = useState(false);
@@ -295,7 +306,6 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                     record.nameShort = team.nameShortLocal || team.nameShort;
                     record.organization = team.organizationLocal || team.organization;
                     record.robotName = team.robotNameLocal || team.robotName;
-                    record.cityState = team.cityStateLocal || team.cityState;
                     record.cityState = team.cityStateLocal || `${team.city}, ${team.stateProv}${team.country !== "USA" ? `, ${team.country}` : ""}`;
                     record.topSponsors = team.topSponsorsLocal || team.topSponsors;
                     record.teamYearsNoCompete = team.teamYearsNoCompeteLocal || "";
@@ -497,14 +507,14 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                     </thead>
                     <tbody>
                         {teamList && teamList.teams && teamListExtended.map((team) => {
-                            var cityState = `${team?.city}, ${team?.stateProv} ${(team?.country !== "USA") ? " " + team?.country : ""}`;
+                            var cityState = `${team?.city}, ${team?.stateProv}${(team?.country !== "USA") ? ", " + team?.country : ""}`;
                             var avatar = `<img src='https://api.gatool.org/v3/${selectedYear.value}/avatars/team/${team?.teamNumber}/avatar.png' onerror="this.style.display='none'">&nbsp`;
                             var teamNameWithAvatar = team?.nameShortLocal ? team?.nameShortLocal : team?.nameShort;
                             teamNameWithAvatar = avatar + "<br />" + teamNameWithAvatar;
 
                             return <tr key={`teamDataRow${team?.teamNumber}`}>
-                                <td className={`teamNumberButton ${lastVisit[`${team?.teamNumber}`] ? "teamTableButtonHighlight" : ""}`} onClick={(e) => handleShow(team, e)} key={"teamData" + team?.teamNumber}><span className={"teamDataNumber"}>{team?.teamNumber}</span><br />{lastVisit[`${team?.teamNumber}`] ? moment(lastVisit[`${team?.teamNumber}`]).fromNow() : "No recent visit."}</td>
-                                <td style={rankHighlight(team?.rank ? team?.rank : 100, allianceCount?.count)}>{team?.rank}</td>
+                                <td className={`teamNumberButton ${lastVisit[`${team?.teamNumber}`] ? "teamTableButtonHighlight" : ""}${updateWarning(team.lastUpdate) ? " staleTeam" : ""}`} onClick={(e) => handleShow(team, e)} key={"teamData" + team?.teamNumber}><span className={"teamDataNumber"}>{team?.teamNumber}</span><br />{lastVisit[`${team?.teamNumber}`] ? moment(lastVisit[`${team?.teamNumber}`]).fromNow() : updateWarning(team.lastUpdate) ? <b><i>Needs review!</i></b> : "No recent visit."}</td>
+                                <td style={rankHighlight(team?.rank ? team?.rank : 100, allianceCount || {"count":8})}>{team?.rank}</td>
                                 <td dangerouslySetInnerHTML={{ __html: teamNameWithAvatar }} style={updateHighlight(team?.nameShortLocal)}></td>
                                 <td style={updateHighlight(team?.cityStateLocal)}>{team?.cityStateLocal ? team?.cityStateLocal : cityState} </td>
                                 <td style={updateHighlight(team?.topSponsorsLocal)}>{team?.topSponsorsLocal ? team?.topSponsorsLocal : team?.topSponsors}</td>
@@ -552,8 +562,8 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                             <Form.Control className={updateTeam.organizationLocal ? "formHighlight" : formValue.organizationLocal ? "formHighlight" : ""} type="text" placeholder={updateTeam.organization} defaultValue={updateTeam.organizationLocal ? updateTeam.organizationLocal : updateTeam.organization} onChange={(e) => updateForm("organizationLocal", e.target.value)} />
                         </Form.Group>
                         <Form.Group controlId="cityState">
-                            <Form.Label className={"formLabel"}><b>City/State ({`${updateTeam?.city}, ${updateTeam?.stateProv} ${(updateTeam?.country !== "USA") ? " " + updateTeam?.country : ""}`}) in TIMS)</b></Form.Label>
-                            <Form.Control className={updateTeam.cityStateLocal ? "formHighlight" : formValue.cityStateLocal ? "formHighlight" : ""} type="text" placeholder={`${updateTeam?.city}, ${updateTeam?.stateProv} ${(updateTeam?.country !== "USA") ? " " + updateTeam?.country : ""}`} defaultValue={updateTeam.cityStateLocal ? updateTeam.cityStateLocal : `${updateTeam?.city}, ${updateTeam?.stateProv} ${(updateTeam?.country !== "USA") ? " " + updateTeam?.country : ""}`} onChange={(e) => updateForm("cityStateLocal", e.target.value)} />
+                            <Form.Label className={"formLabel"}><b>City/State ({`${updateTeam?.city}, ${updateTeam?.stateProv}${(updateTeam?.country !== "USA") ? ", " + updateTeam?.country : ""}`}) in TIMS)</b></Form.Label>
+                            <Form.Control className={updateTeam.cityStateLocal ? "formHighlight" : formValue.cityStateLocal ? "formHighlight" : ""} type="text" placeholder={`${updateTeam?.city}, ${updateTeam?.stateProv} ${(updateTeam?.country !== "USA") ? " " + updateTeam?.country : ""}`} defaultValue={updateTeam.cityStateLocal ? updateTeam.cityStateLocal : `${updateTeam?.city}, ${updateTeam?.stateProv}${(updateTeam?.country !== "USA") ? ", " + updateTeam?.country : ""}`} onChange={(e) => updateForm("cityStateLocal", e.target.value)} />
                         </Form.Group>
                         <Form.Group controlId="sayNumber">
                             <Form.Label className={"formLabel"}><b>How to pronounce the team number (some teams are particular)</b></Form.Label>

@@ -25,7 +25,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
                 rankings?.ranks[_.findIndex(rankings?.ranks, { "teamNumber": team?.teamNumber })],
                 communityUpdates[_.findIndex(communityUpdates, { "teamNumber": team?.teamNumber })]
             );
-            team.rankStyle = rankHighlight(team?.rank, allianceCount || 8);
+            team.rankStyle = rankHighlight(team?.rank, allianceCount || {"count":8});
             team.alliance = alliances?.Lookup[`${team?.teamNumber}`]?.alliance || null;
             team.allianceRole = alliances?.Lookup[`${team?.teamNumber}`]?.role || null;
 
@@ -62,7 +62,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
                         rankings?.ranks[_.findIndex(rankings?.ranks, { "teamNumber": remainingTeam[0] })],
                         communityUpdates[_.findIndex(communityUpdates, { "teamNumber": remainingTeam[0] })]
                     );
-                    team.rankStyle = rankHighlight(team?.rank, allianceCount || 8);
+                    team.rankStyle = rankHighlight(team?.rank, allianceCount || {"count":8});
                     team.alliance = alliances?.Lookup[`${remainingTeam[0]}`]?.alliance || null;
                     team.allianceRole = alliances?.Lookup[`${remainingTeam[0]}`]?.role || null;
 

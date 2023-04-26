@@ -324,6 +324,15 @@ td {
 	color: #FF4000
 }
 
+.narrowFont {
+	font-family: Helvetica-Narrow, "Helvetica Narrow", Arial-Narrow, "Arial Narrow";
+}
+
+.staleTeam {
+	border-left: 5px solid red !important;
+	color: red !important;
+}
+
 @keyframes App-logo-spin {
 	from {
 		transform: rotate(0deg);
