@@ -41,6 +41,17 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         return updateDelay
     }
 
+    //Display a warning on the Team Data screen if the data is over 6 months old
+    function updateWarning(updateTime) {
+        var timeDifference = 0;
+        var updateDelay = false;
+        timeDifference = moment(currentTime).diff(updateTime, "months");
+        if (timeDifference >= 6) {
+            updateDelay = true;
+        }
+        return updateDelay
+    }
+
 
     const [show, setShow] = useState(false);
     const [showDownload, setShowDownload] = useState(false);
@@ -502,7 +513,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                             teamNameWithAvatar = avatar + "<br />" + teamNameWithAvatar;
 
                             return <tr key={`teamDataRow${team?.teamNumber}`}>
-                                <td className={`teamNumberButton ${lastVisit[`${team?.teamNumber}`] ? "teamTableButtonHighlight" : ""}`} onClick={(e) => handleShow(team, e)} key={"teamData" + team?.teamNumber}><span className={"teamDataNumber"}>{team?.teamNumber}</span><br />{lastVisit[`${team?.teamNumber}`] ? moment(lastVisit[`${team?.teamNumber}`]).fromNow() : "No recent visit."}</td>
+                                <td className={`teamNumberButton ${lastVisit[`${team?.teamNumber}`] ? "teamTableButtonHighlight" : ""}${updateWarning(team.lastUpdate) ? " staleTeam" : ""}`} onClick={(e) => handleShow(team, e)} key={"teamData" + team?.teamNumber}><span className={"teamDataNumber"}>{team?.teamNumber}</span><br />{lastVisit[`${team?.teamNumber}`] ? moment(lastVisit[`${team?.teamNumber}`]).fromNow() : updateWarning(team.lastUpdate) ? <b><i>Needs review!</i></b> : "No recent visit."}</td>
                                 <td style={rankHighlight(team?.rank ? team?.rank : 100, allianceCount || {"count":8})}>{team?.rank}</td>
                                 <td dangerouslySetInnerHTML={{ __html: teamNameWithAvatar }} style={updateHighlight(team?.nameShortLocal)}></td>
                                 <td style={updateHighlight(team?.cityStateLocal)}>{team?.cityStateLocal ? team?.cityStateLocal : cityState} </td>
