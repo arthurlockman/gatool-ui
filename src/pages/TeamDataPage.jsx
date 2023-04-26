@@ -14,7 +14,7 @@ import PizZipUtils from "pizzip/utils/index.js";
 import { saveAs } from "file-saver";
 import { useHotkeysContext } from "react-hotkeys-hook";
 
-function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSort, setTeamSort, communityUpdates, setCommunityUpdates, allianceCount, lastVisit, setLastVisit, putTeamData, localUpdates, setLocalUpdates, qualSchedule, playoffSchedule, originalAndSustaining }) {
+function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSort, setTeamSort, communityUpdates, setCommunityUpdates, allianceCount, lastVisit, setLastVisit, putTeamData, localUpdates, setLocalUpdates, qualSchedule, playoffSchedule, originalAndSustaining, monthsWarning }) {
     const [currentTime, setCurrentTime] = useState(moment());
     const { disableScope, enableScope } = useHotkeysContext();
 
@@ -46,7 +46,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         var timeDifference = 0;
         var updateDelay = false;
         timeDifference = moment(currentTime).diff(updateTime, "months");
-        if (timeDifference >= 6) {
+        if (timeDifference >= monthsWarning?.value) {
             updateDelay = true;
         }
         return updateDelay
