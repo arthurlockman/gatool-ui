@@ -50,7 +50,8 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
                             </Alert>}
                         {allianceSelection && !rankingsOverride &&
                             <Alert variant="success" >
-                                <div onClick={loadEvent}><b>We believe your event is ready for Alliance Selection, but you must confirm that the rank order below agrees with the rank order in FMS before proceeding with Alliance Selection. If you see a discrepancy, tap this alert to see if we can get a more current rankings. <i>This will reload your event.</i></b>
+                                <div onClick={loadEvent}><b>We believe your event is ready for Alliance Selection, but you must confirm that the rank order below agrees with the rank order in FMS before proceeding with Alliance Selection. If you see a discrepancy, tap this alert to see if we can get a more current rankings. <i>This will reload your event.</i></b><br />
+                                We last had a ranking update at {moment(rankings?.lastModified).format("ddd, MMM Do YYYY, " + timeFormat.value)}
                                 </div>
                             </Alert>}
                         {allianceSelection && rankingsOverride &&
