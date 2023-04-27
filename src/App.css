@@ -31,7 +31,7 @@
 }
 
 body {
-	font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+	font-family: ibm-plex-sans, Helvetica, Arial, "Lucida Grande", sans-serif;
 	line-height: normal;
 }
 
@@ -325,7 +325,8 @@ td {
 }
 
 .narrowFont {
-	font-family: Helvetica-Narrow, "Helvetica Narrow", Arial-Narrow, "Arial Narrow";
+	font-family: ibm-plex-sans-condensed, Arial-Narrow, "Arial Narrow";
+	font-style: normal;
 }
 
 .staleTeam {

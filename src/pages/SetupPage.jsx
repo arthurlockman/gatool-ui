@@ -231,10 +231,12 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                         {selectedEvent?.value.allianceCount === "EightAlliance" && <p><b>Playoff Type: </b>8 Alliance Playoffs</p>}
                         {selectedEvent?.value.allianceCount === "FourAlliance" && <p><b>Playoff Type: </b>4 Alliance Playoff</p>}
                         {selectedEvent?.value.allianceCount === "TwoAlliance" && <p><b>Playoff Type: </b>Best 2 out of 3 Playoff</p>}
-                        {qualSchedule?.lastUpdate && <p><b>Quals Schedule last updated: </b><br />{moment(qualSchedule?.lastUpdate).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
-                        {playoffSchedule?.lastUpdate && <p><b>Playoff Schedule last updated: </b><br />{moment(playoffSchedule?.lastUpdate).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
+                        {qualSchedule?.scheduleLastModified && <p><b>Quals Schedule last updated: </b><br />{moment(qualSchedule?.scheduleLastModified).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
+                        {qualSchedule?.matchesLastModified && <p><b>Quals Results last updated: </b><br />{moment(qualSchedule?.matchesLastModified).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
+                        {playoffSchedule?.scheduleLastModified && <p><b>Playoff Schedule last updated: </b><br />{moment(playoffSchedule?.scheduleLastModified).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
+                        {playoffSchedule?.matchesLastModified && <p><b>Playoff Results last updated: </b><br />{moment(playoffSchedule?.matchesLastModified).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
                         {teamList?.lastUpdate && <p><b>Team List last updated: </b><br />{moment(teamList?.lastUpdate).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
-                        {rankings?.lastUpdate && <p><b>Rankings last updated: </b><br />{moment(rankings?.lastUpdate).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
+                        {rankings?.lastModified && <p><b>Rankings last updated: </b><br />{moment(rankings?.lastModified).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
                         {localUpdates.length > 0 && <Alert><p><b>You have {localUpdates.length === 1 ? "an update for team" : "updates for teams"} {_.sortBy(updatedTeamList).join(", ")} that can be uploaded to gatool Cloud.</b></p><span><Button disabled={!isOnline} onClick={uploadLocalUpdates}>Upload to gatool Cloud now</Button>  <Button disabled={!isOnline} variant={"warning"} onClick={deleteLocalUpdates}>Delete stored updates</Button></span></Alert>}
                         <Alert variant={"warning"}><p><b>Update Team Data</b><br />You can refresh your team data if it has changed on another device. <i><b>Know that we fetch all team data automatically when you load an event</b></i>, so you should not need this very often.</p><Button variant={"warning"} disabled={!isOnline} onClick={(e) => { getCommunityUpdates(true, e) }}>Update now</Button></Alert>
                     </Col>
