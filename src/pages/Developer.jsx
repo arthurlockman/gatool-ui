@@ -22,7 +22,7 @@ function Developer() {
 
     return (
         <>
-            {user.email.endsWith("rthr.me") || user.email.endsWith("adobe.com") ? <>
+            {(user["https://gatool.org/roles"].indexOf("admin") >= 0) ? <>
                 <Form.Control as="textarea" rows={3} value={token ? token : ""} readOnly />
                 <Button onClick={() => {
                     navigator.clipboard.writeText(token)
