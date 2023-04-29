@@ -14,7 +14,7 @@ import PizZipUtils from "pizzip/utils/index.js";
 import { saveAs } from "file-saver";
 import { useHotkeysContext } from "react-hotkeys-hook";
 
-function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSort, setTeamSort, communityUpdates, setCommunityUpdates, allianceCount, lastVisit, setLastVisit, putTeamData, localUpdates, setLocalUpdates, qualSchedule, playoffSchedule, originalAndSustaining, monthsWarning }) {
+function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSort, setTeamSort, communityUpdates, setCommunityUpdates, allianceCount, lastVisit, setLastVisit, putTeamData, localUpdates, setLocalUpdates, qualSchedule, playoffSchedule, originalAndSustaining, monthsWarning, user }) {
     const [currentTime, setCurrentTime] = useState(moment());
     const { disableScope, enableScope } = useHotkeysContext();
 
@@ -132,10 +132,12 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
     }
 
     const handleShow = (team, e) => {
-        setUpdateTeam(team);
-        setFormValue({});
-        setShow(true);
-        disableScope('tabNavigation');
+        if (user["https://gatool.org/roles"].indexOf("user") >= 0) {
+            setUpdateTeam(team);
+            setFormValue({});
+            setShow(true);
+            disableScope('tabNavigation');
+        }
     }
 
     const clearVisits = (single, e) => {
@@ -471,9 +473,9 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                             <td>
                                 <span style={{ cursor: "pointer", color: "darkblue" }} onClick={downloadTeamInfoSheets}><img style={{ float: "left" }} width="30" src="images/wordicon.png" alt="Word Logo" /> <b>Tap here to download a merged document (docx).</b></span>
                             </td>
-                            <td>
+                            {(user["https://gatool.org/roles"].indexOf("user") >= 0) && <td>
                                 <span style={{ cursor: "pointer", color: "darkblue" }} onClick={clickRestoreBackup}><input type="file" id="BackupFiles" onChange={handleRestoreBackup} className={"hiddenInput"} /><b><img style={{ float: "left" }} width="30" src="images/excelicon.png" alt="Excel Logo" /> Tap here to restore team data from Excel</b></span>
-                            </td>
+                            </td>}
                         </tr>
                     </thead>
 
@@ -485,9 +487,9 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                             <td>
                                 <p>This merged doc contains all of the information in your Teams List, merged onto a template you can print and distribute to teams. <i>Note: this will save to Files on iOS 13+</i></p>
                             </td>
-                            <td>
+                            {(user["https://gatool.org/roles"].indexOf("user") >= 0) && <td>
                                 <p>You can export your teams data to Excel using the button on the left, and then restore it from backup here. This is handy in low or no network situations, where you may be unable to update changes to gatool Cloud. <i>Note: Be careful if you modify the Excel file and then import it here.</i></p>
-                            </td>
+                            </td>}
                         </tr>
                     </tbody>
                 </Table>
@@ -499,9 +501,9 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                             <th onClick={() => (teamSort === "nameShort") ? setTeamSort("-nameShort") : setTeamSort("nameShort")}><b>Team Name{teamSort === "nameShort" ? <SortAlphaDown /> : ""}{teamSort === "-nameShort" ? <SortAlphaUp /> : ""}</b></th>
                             <th onClick={() => (teamSort === "citySort") ? setTeamSort("-citySort") : setTeamSort("citySort")}><b>City{teamSort === "citySort" ? <SortAlphaDown /> : ""}{teamSort === "-citySort" ? <SortAlphaUp /> : ""}</b></th>
                             <th  ><b>Top Sponsors</b></th>
-                            <th  onClick={() => (teamSort === "organization") ? setTeamSort("-organization") : setTeamSort("organization")}><b>Organization{teamSort === "organization" ? <SortAlphaDown /> : ""}{teamSort === "-organization" ? <SortAlphaUp /> : ""}</b></th>
+                            <th onClick={() => (teamSort === "organization") ? setTeamSort("-organization") : setTeamSort("organization")}><b>Organization{teamSort === "organization" ? <SortAlphaDown /> : ""}{teamSort === "-organization" ? <SortAlphaUp /> : ""}</b></th>
                             <th onClick={() => (teamSort === "rookieYear") ? setTeamSort("-rookieYear") : setTeamSort("rookieYear")}><b>Rookie Year{teamSort === "rookieYear" ? <SortNumericDown /> : ""}{teamSort === "-rookieYear" ? <SortNumericUp /> : ""}</b></th>
-                            <th  onClick={() => (teamSort === "robotNameLocal") ? setTeamSort("-robotNameLocal") : setTeamSort("robotNameLocal")}><b>Robot Name{teamSort === "robotNameLocal" ? <SortAlphaDown /> : ""}{teamSort === "-robotNameLocal" ? <SortAlphaUp /> : ""}</b></th>
+                            <th onClick={() => (teamSort === "robotNameLocal") ? setTeamSort("-robotNameLocal") : setTeamSort("robotNameLocal")}><b>Robot Name{teamSort === "robotNameLocal" ? <SortAlphaDown /> : ""}{teamSort === "-robotNameLocal" ? <SortAlphaUp /> : ""}</b></th>
                             <th  ><b>Additional Notes</b></th>
                         </tr>
                     </thead>
@@ -514,7 +516,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
 
                             return <tr key={`teamDataRow${team?.teamNumber}`}>
                                 <td className={`teamNumberButton ${lastVisit[`${team?.teamNumber}`] ? "teamTableButtonHighlight" : ""}${updateWarning(team.lastUpdate) ? " staleTeam" : ""}`} onClick={(e) => handleShow(team, e)} key={"teamData" + team?.teamNumber}><span className={"teamDataNumber"}>{team?.teamNumber}</span><br />{lastVisit[`${team?.teamNumber}`] ? moment(lastVisit[`${team?.teamNumber}`]).fromNow() : updateWarning(team.lastUpdate) ? <b><i>Needs review!</i></b> : "No recent visit."}</td>
-                                <td style={rankHighlight(team?.rank ? team?.rank : 100, allianceCount || {"count":8})}>{team?.rank}</td>
+                                <td style={rankHighlight(team?.rank ? team?.rank : 100, allianceCount || { "count": 8 })}>{team?.rank}</td>
                                 <td dangerouslySetInnerHTML={{ __html: teamNameWithAvatar }} style={updateHighlight(team?.nameShortLocal)}></td>
                                 <td style={updateHighlight(team?.cityStateLocal)}>{team?.cityStateLocal ? team?.cityStateLocal : cityState} </td>
                                 <td style={updateHighlight(team?.topSponsorsLocal)}>{team?.topSponsorsLocal ? team?.topSponsorsLocal : team?.topSponsors}</td>
