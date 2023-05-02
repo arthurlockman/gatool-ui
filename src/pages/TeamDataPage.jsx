@@ -14,7 +14,7 @@ import PizZipUtils from "pizzip/utils/index.js";
 import { saveAs } from "file-saver";
 import { useHotkeysContext } from "react-hotkeys-hook";
 
-function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSort, setTeamSort, communityUpdates, setCommunityUpdates, allianceCount, lastVisit, setLastVisit, putTeamData, localUpdates, setLocalUpdates, qualSchedule, playoffSchedule, originalAndSustaining, monthsWarning, user }) {
+function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSort, setTeamSort, communityUpdates, setCommunityUpdates, allianceCount, lastVisit, setLastVisit, putTeamData, localUpdates, setLocalUpdates, qualSchedule, playoffSchedule, originalAndSustaining, monthsWarning, user, getTeamHistory, timeFormat }) {
     const [currentTime, setCurrentTime] = useState(moment());
     const { disableScope, enableScope } = useHotkeysContext();
 
@@ -58,6 +58,8 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
     const [updateTeam, setUpdateTeam] = useState(null);
     const [formValue, setFormValue] = useState(null);
     const [gaName, setGaName] = useState("");
+    const [showHistory, setShowHistory] = useState(false);
+    const [teamHistory, setTeamHistory] = useState(null);
 
     const handleClose = () => {
         setUpdateTeam(null);
@@ -138,6 +140,21 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
             setShow(true);
             disableScope('tabNavigation');
         }
+    }
+
+    const handleHistory = async (team, e) => {
+        if (user["https://gatool.org/roles"].indexOf("user") >= 0) {
+            var history = await getTeamHistory(team.teamNumber);
+            setShowHistory(true);
+            setTeamHistory(_.orderBy(history, ['modifiedDate'], ['desc']));
+            disableScope('tabNavigation');
+        }
+    }
+
+    const handleCloseHistory = () => {
+        setShowHistory(false);
+        setTeamHistory(null);
+        enableScope('tabNavigation');
     }
 
     const clearVisits = (single, e) => {
@@ -551,8 +568,9 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                 </Modal.Header>
                 <Modal.Body>
                     <p>Use this form to update team information for <b>Team {updateTeam.teamNumber}.</b> Editable fields are shown below. Your changes will be stored locally on your machine and should not be erased if you close your browser. We do recommend using the Save to Home Screen feature on Android and iOS, and the Save App feature from Chrome on desktop, if you are offline.</p>
-                    <p>Tap on each item to update its value. Tap <b>DONE</b> when you're finished editing, or browse to another tab to cancel editing. Items <span className={"teamTableHighlight"}><b>highlighted in green</b></span> have local changes. Motto and Notes do not exist in TIMS, so they are always local. To reset any value to the TIMS value, simply delete it here and tap DONE.</p>
-                    <p>You can load changes to Team Data from gatool Cloud, or you can sync your local values with gatool Cloud using the buttons at the bottom of this screen.</p>
+                    <p>Tap on each item to update its value. Tap <b>DONE</b> when you're finished editing, or browse to another tab to cancel editing. Items <span className={"teamTableHighlight"}><b>highlighted in green</b></span> have local changes. <b>Motto</b> and <b>Notes</b> do not exist in TIMS, so they are always local. To reset any value to the TIMS value, simply delete it here and tap DONE.</p>
+                    <p>You can upload your local values to gatool Cloud using the buttons at the bottom of this screen.</p>
+                    <p onClick={(e) => handleHistory(updateTeam, e)}><b>Tap here to see prior team data updates.</b></p>
                     <div className={updateClass(updateTeam?.lastUpdate)}><p>Last updated in gatool Cloud: {moment(updateTeam?.lastUpdate).fromNow()}</p></div>
                     <Form>
                         <Form.Group controlId="teamName">
@@ -629,6 +647,67 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                     <br />
                 </Modal.Footer>
             </Modal>}
+
+            <Modal fullscreen={true} centered={true} show={showHistory} onHide={handleCloseHistory}>
+                <Modal.Header className={"allianceChoice"} closeVariant={"white"} closeButton>
+                    <Modal.Title >Team Update History</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>The table below shows the recorded values for each of the customizable fields we record in gatool Cloud.</p>
+                    <Table bordered striped size="sm">
+                        <thead><tr>
+                            <td>Date modified</td>
+                            <td>Team Name</td>
+                            <td>Org Name</td>
+                            <td>Robot Name</td>
+                            <td>Motto</td>
+                            <td>City/State</td>
+                            <td>Top Sponsors</td>
+                            <td>Awards text</td>
+                            <td>Team Table Notes</td>
+                            <td>Announce Screen Notes</td>
+                            {(user["https://gatool.org/roles"].indexOf("admin") >= 0) && <td>
+                                Source</td>}
+                        </tr>
+                        </thead>
+                        <tbody>
+                            <tr key={updateTeam?.lastUpdate}>
+                                <td>{moment(updateTeam?.lastUpdate).format("MMM Do YYYY, " + timeFormat.value)}</td>
+                                <td>{updateTeam?.nameShortLocal}</td>
+                                <td>{updateTeam?.organizationLocal}</td>
+                                <td>{updateTeam?.robotNameLocal}</td>
+                                <td>{updateTeam?.teamMottoLocal}</td>
+                                <td>{updateTeam?.cityStateLocal}</td>
+                                <td>{updateTeam?.topSponsorsLocal}</td>
+                                <td>{updateTeam?.awardsTextLocal}</td>
+                                <td>{updateTeam?.teamNotes}</td>
+                                <td>{updateTeam?.teamNotesLocal}</td>
+                                {(user["https://gatool.org/roles"].indexOf("admin") >= 0) && <td>
+                                    {updateTeam?.source}</td>}
+                            </tr>
+                            {teamHistory && teamHistory.map((team) => {
+                                return <tr key={team?.lastUpdate}>
+                                    <td>{moment(team?.lastUpdate).format("MMM Do YYYY, " + timeFormat.value)}</td>
+                                    <td>{team?.nameShortLocal}</td>
+                                    <td>{team?.organizationLocal}</td>
+                                    <td>{team?.robotNameLocal}</td>
+                                    <td>{team?.teamMottoLocal}</td>
+                                    <td>{team?.cityStateLocal}</td>
+                                    <td>{team?.topSponsorsLocal}</td>
+                                    <td>{team?.awardsTextLocal}</td>
+                                    <td>{team?.teamNotes}</td>
+                                    <td>{team?.teamNotesLocal}</td>
+                                    {(user["https://gatool.org/roles"].indexOf("admin") >= 0) && <td>
+                                        {team?.source}</td>}
+                                </tr>
+                            })}</tbody>
+                    </Table>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="success" size="sm" onClick={handleCloseHistory}>close</Button>
+                </Modal.Footer>
+            </Modal>
+
         </Container>
     )
 }
