@@ -1,4 +1,4 @@
-import { Alert, Button, Col, Container, Form, InputGroup, Modal, Row, Table } from "react-bootstrap";
+import { Alert, Button, Container, Form, InputGroup, Modal, Table } from "react-bootstrap";
 import { SortAlphaDown, SortAlphaUp, SortNumericDown, SortNumericUp } from 'react-bootstrap-icons';
 import { merge, orderBy, find } from "lodash";
 import { rankHighlight } from "../components/HelperFunctions";
