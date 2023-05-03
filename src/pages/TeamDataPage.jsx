@@ -1,5 +1,5 @@
 import { Alert, Button, Container, Form, InputGroup, Modal, Table } from "react-bootstrap";
-import { SortAlphaDown, SortAlphaUp, SortNumericDown, SortNumericUp } from 'react-bootstrap-icons';
+import { CalendarPlusFill, SortAlphaDown, SortAlphaUp, SortNumericDown, SortNumericUp } from 'react-bootstrap-icons';
 import { merge, orderBy, find } from "lodash";
 import { rankHighlight } from "../components/HelperFunctions";
 import { useEffect, useState } from "react";
@@ -569,8 +569,8 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                 <Modal.Body>
                     <p>Use this form to update team information for <b>Team {updateTeam.teamNumber}.</b> Editable fields are shown below. Your changes will be stored locally on your machine and should not be erased if you close your browser. We do recommend using the Save to Home Screen feature on Android and iOS, and the Save App feature from Chrome on desktop, if you are offline.</p>
                     <p>Tap on each item to update its value. Tap <b>DONE</b> when you're finished editing, or browse to another tab to cancel editing. Items <span className={"teamTableHighlight"}><b>highlighted in green</b></span> have local changes. <b>Motto</b> and <b>Notes</b> do not exist in TIMS, so they are always local. To reset any value to the TIMS value, simply delete it here and tap DONE.</p>
-                    <p>You can upload your local values to gatool Cloud using the buttons at the bottom of this screen.</p>
-                    <p onClick={(e) => handleHistory(updateTeam, e)}><b>Tap here to see prior team data updates.</b></p>
+                    <p>You can upload this form to gatool Cloud, or keep the values locally for later upload, using the buttons at the bottom of this screen.</p>
+                    <p onClick={(e) => handleHistory(updateTeam, e)}><b><CalendarPlusFill/> Tap here to see prior team data updates.</b></p>
                     <div className={updateClass(updateTeam?.lastUpdate)}><p>Last updated in gatool Cloud: {moment(updateTeam?.lastUpdate).fromNow()}</p></div>
                     <Form>
                         <Form.Group controlId="teamName">

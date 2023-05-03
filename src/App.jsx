@@ -42,13 +42,16 @@ export const TabStates = {
   Ready: 'ready'
 };
 
-// Tiebreakers
-// Order Sort
-// Criteria 2023 has been updated.
-// 1st Cumulative TECH FOUL points due to opponent rule violations
-// 2nd ALLIANCE CHARGE STATION points
-// 3rd ALLIANCE AUTO points
-// 4th MATCH is replayed
+/** 
+ * Tiebreakers constant defines the sort order for breaking ties during playoffs.
+ * Criteria 2023 has been updated.
+ * 1st Cumulative TECH FOUL points due to opponent rule violations
+ * 2nd ALLIANCE CHARGE STATION points
+ * 3rd ALLIANCE AUTO points
+ * 4th MATCH is replayed
+ * @constant {object}
+ * @default
+ */
 const playoffTiebreakers = {
   "2024": ["foulPoints", "autoPoints"],// Update after rules release
   "2023": ["foulPoints", "totalChargeStationPoints", "autoPoints"],
@@ -106,7 +109,7 @@ var halloffame = _.cloneDeep(hallOfFame);
 const timezones = _.cloneDeep(timeZones);
 
 function App() {
-  const {isAuthenticated, isLoading, user } = useAuth0();
+  const { isAuthenticated, isLoading, user } = useAuth0();
 
   // eslint-disable-next-line no-unused-vars
   const [httpClient] = UseAuthClient();
@@ -188,6 +191,12 @@ function App() {
     return isOnline ? isAuthenticated : selectedEvent && selectedYear
   }
 
+  /**
+   * Trim all values in an array
+   * @function trimArray
+   * @param arr the array to trim
+   * @return {array} the trimmed array
+   */
   function trimArray(arr) {
     for (var i = 0; i <= arr.length - 1; i++) {
       arr[i] = arr[i].trim();
@@ -197,11 +206,32 @@ function App() {
 
   //functions to retrieve API data
 
-  // This function retrieves a schedule from FIRST. It attempts to get both the Qual and Playoff Schedule and sets the global variables
+  /**
+   * This function retrieves a schedule from FIRST. It attempts to get both the Qual and Playoff Schedule and sets the global variables
+   * 
+   * It uses the Hybrid Schedule endpoint to fetch the Qual schedule, then process the match data.
+   * 
+   * It then uses the Hybrid Schedule endpoint to fetch the Playoff Schedule. As it processes match results,
+   * 
+   * it will keep track of the event high scores by event stage and penalty conditions.
+   * 
+   * @async
+   * @function getSchedule
+   * @param loadingEvent Boolean to set the current match to the last match played when loading an event
+   * @param selectedEvent The currently selected event, which is a persistent state variable
+   * @param selectedYear The currently selected year, which is a persistent state variable
+   * 
+   * @return Sets the event high scores, qual schedule and playoff
+  */
   async function getSchedule(loadingEvent) {
     var highScores = [];
 
-    // returns the winner of the match
+    /** 
+     * Returns the winner of the match
+     * @function winner
+     * @param {object} match - The match to test
+     * @return an object containing the winning alliance, and in the event of a tie, the tiebreaker level.
+     */
     function winner(match) {
       var winner = { winner: "", tieWinner: "", level: 0 }
       if (match?.scoreRedFinal || match?.scoreBlueFinal) {
@@ -219,7 +249,12 @@ function App() {
       return winner;
     }
 
-    //checks to see if the match is a high score
+    /**
+    * Checks to see if the match is an event high score 
+    * @function isHighScore
+    * @param {object} match - The match to test
+    * @return Adds the match to the highScores object if it is a high scoring match
+    */
     function isHighScore(match) {
       var tempMatch = {};
       if (!_.isNull(match.scoreRedFinal)) {
@@ -417,8 +452,10 @@ function App() {
         }
       }))
 
+      // since we have a playoff schedule, we need to fetch the Alliances.
       getAlliances();
     }
+
     var lastMatchPlayed = 0;
 
     if (qualschedule?.completedMatchCount > 0) {
@@ -442,8 +479,20 @@ function App() {
 
   }
 
-  // This function retrieves a a list of teams for a specific event from FIRST. It parses the list and modifies some of the data to produce more readable content.
+  /**
+   *  This function retrieves a a list of teams for a specific event from FIRST. It parses the list and modifies some of the data to produce more readable content.
+   * @async
+   * @function getTeamList
+   * @return sets the teamList
+   */
   async function getTeamList() {
+
+    /**
+     * Determines whether an award, by name, deserves special highlighting in the Announce Screen
+     * @function awardsHilight
+     * @param awardName The name of the award to highlight
+     * @return true if "special" award; false if not
+     */
     function awardsHilight(awardName) {
       if (awardName === "District Chairman's Award" || awardName === "District Event Winner" || awardName === "District Event Finalist" || awardName === "Regional Engineering Inspiration Award" || awardName === "District Engineering Inspiration Award" || awardName === "Engineering Inspiration Award" || awardName === "District Championship Finalist" || awardName === "District Championship Winner" || awardName === "Regional Winners" || awardName === "Regional Finalists" || awardName === "Regional Chairman's Award" || awardName === "FIRST Dean's List Finalist Award" || awardName === "District Championship Dean's List Semi-Finalist" || awardName === "Championship Subdivision Winner" || awardName === "Championship Subdivision Finalist" || awardName === "Championship Division Winner" || awardName === "Championship Division Finalist" || awardName === "Championship Winner" || awardName === "Championship Finalist" || awardName === "Chairman's Award" || awardName === "Chairman's Award Finalist" || awardName === "FIRST Dean's List Award" || awardName === "Woodie Flowers Award" || awardName === "Innovation Challenge Winner" || awardName === "Innovation Challenge Finalist" || awardName === "FIRST Impact Award" || awardName === "District FIRST Impact Award") {
         return true;
@@ -720,7 +769,16 @@ function App() {
     })
   }
 
-  // This function retrieves communnity updates for a specified event from gatool Cloud.
+  /**
+   * This function retrieves communnity updates for a specified event from gatool Cloud.
+   * @async
+   * @function getCommunityUpdates
+   * @param notify boolean set to Toast if the request is successful
+   * @param selectedYear The currently selected year, which is a persistent state variable
+   * @param selectedEvent The currently selected event, which is a persistent state variable
+   * 
+   * @return sets the communityUpdates persistent state
+   */
   async function getCommunityUpdates(notify) {
     var result = null;
     var teams = null;
@@ -763,7 +821,14 @@ function App() {
     setCommunityUpdates(teams);
   }
 
-  // This function retrieves the ranking data for a specified event from FIRST.
+  /**
+   * This function retrieves the ranking data for a specified event from FIRST.
+   * @async
+   * @function getRanks
+   * @param selectedYear The currently selected year, which is a persistent state variable
+   * @param selectedEvent The currently selected event, which is a persistent state variable
+   * @return sets rankings
+   */
   async function getRanks() {
     var result = null;
     var ranks = null;
@@ -771,9 +836,9 @@ function App() {
       result = await httpClient.get(`${selectedYear?.value}/rankings/${selectedEvent?.value.code}`);
       ranks = await result.json();
     } else if (selectedEvent?.value?.code === "PRACTICE1") {
-      ranks = {rankings: _.cloneDeep(training.ranks.partial)};
+      ranks = { rankings: _.cloneDeep(training.ranks.partial) };
     } else {
-      ranks = {rankings: _.cloneDeep(training.ranks.final)};
+      ranks = { rankings: _.cloneDeep(training.ranks.final) };
     }
 
     if (typeof ranks.Rankings === "undefined") {
@@ -796,7 +861,13 @@ function App() {
     setRankings(ranks);
   }
 
-  // This function retrieves the ranking data for a specific District from FIRST
+  /** This function retrieves the ranking data for a specific District from FIRST
+   * @async
+   * @function getDistrictRanks
+   * @param selectedYear The currently selected year, which is a persistent state variable
+   * @param selectedEvent The currently selected event, which is a persistent state variable
+   * @return sets districtRankings
+   */
   async function getDistrictRanks() {
     var result = null;
     var districtranks = null;
@@ -806,7 +877,13 @@ function App() {
     setDistrictRankings(districtranks);
   }
 
-  // This function retrieves the rworld high scores for the selected year from FIRST.
+  /**
+   * This function retrieves the rworld high scores for the selected year from FIRST.
+   * @async
+   * @function getWorldStats
+   * @param selectedYear The currently selected year, which is a persistent state variable
+   * @returns sets the world high scores
+   */
   async function getWorldStats() {
     var result = await httpClient.get(`${selectedYear?.value}/highscores`);
     var highscores = await result.json();
@@ -842,7 +919,14 @@ function App() {
     setWorldStats(scores);
   }
 
-  // This function retrieves the Playoff Alliance data for a specified event from FIRST.
+  /**
+   * This function retrieves the Playoff Alliance data for a specified event from FIRST. It also formats the Alliance data to better support lookups in the playoff Bracket and on Announce and Play By Play.
+   * @async
+   * @function getAlliances
+   * @param selectedYear The currently selected year, which is a persistent state variable
+   * @param selectedEvent The currently selected event, which is a persistent state variable
+   * @returns sets alliances
+   */
   async function getAlliances() {
     var result = null;
     var alliances = null;
@@ -878,13 +962,26 @@ function App() {
     }
   }
 
-  // This function writes updated team data back to gatool Cloud.
+  /**
+   * This function writes updated team data back to gatool Cloud.
+   * @async
+   * @function putTeamData
+   * @param {number} teamNumber the team number of the team whose data will be put to gatool Cloud
+   * @param {object} data the data to be put to gatool Cloud
+   * @returns {Promise<object>} result
+   */ 
   async function putTeamData(teamNumber, data) {
     var result = await httpClient.put(`team/${teamNumber}/updates`, data);
     return result;
   }
 
-  // This function reads the team data update history gatool Cloud.
+  /** 
+   * This function reads the team data update history gatool Cloud.
+   * @async
+   * @function getTeamHistory
+   * @param {number} teamNumber the number of the team whose data we want to fetch
+   * @returns {Promise<object>} The team's update history array
+   */
   async function getTeamHistory(teamNumber) {
     var result = await httpClient.get(`team/${teamNumber}/updates/history/`);
     var history = await result.json();
@@ -1160,11 +1257,11 @@ function App() {
           <Routes>
             <Route path="/" element={<LayoutsWithNavbar selectedEvent={selectedEvent} qualSchedule={qualSchedule} playoffs={playoffs} teamList={teamList} communityUpdates={communityUpdates} rankings={rankings} eventHighScores={eventHighScores} worldHighScores={worldStats} allianceSelectionReady={allianceSelectionReady} />}>
 
-              <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} teamList={teamList} eventFilters={eventFilters} setEventFilters={setEventFilters} timeFilter={timeFilter} setTimeFilter={setTimeFilter} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} rankings={rankings} timeFormat={timeFormat} setTimeFormat={setTimeFormat} showSponsors={showSponsors} setShowSponsors={setShowSponsors} showAwards={showAwards} setShowAwards={setShowAwards} showNotes={showNotes} setShowNotes={setShowNotes} showMottoes={showMottoes} setShowMottoes={setShowMottoes} showChampsStats={showChampsStats} setShowChampsStats={setShowChampsStats} swapScreen={swapScreen} setSwapScreen={setSwapScreen} autoAdvance={autoAdvance} setAutoAdvance={setAutoAdvance} getSchedule={getSchedule} awardsMenu={awardsMenu} setAwardsMenu={setAwardsMenu} showQualsStats={showQualsStats} setShowQualsStats={setShowQualsStats} showQualsStatsQuals={showQualsStatsQuals} setShowQualsStatsQuals={setShowQualsStatsQuals} teamReduction={teamReduction} setTeamReduction={setTeamReduction} playoffCountOverride={playoffCountOverride} setPlayoffCountOverride={setPlayoffCountOverride} allianceCount={allianceCount} localUpdates={localUpdates} setLocalUpdates={setLocalUpdates} putTeamData={putTeamData} getCommunityUpdates={getCommunityUpdates} reverseEmcee={reverseEmcee} setReverseEmcee={setReverseEmcee} showDistrictChampsStats={showDistrictChampsStats} setShowDistrictChampsStats={setShowDistrictChampsStats} monthsWarning={monthsWarning} setMonthsWarning={setMonthsWarning} user={user}/>} />
+              <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} teamList={teamList} eventFilters={eventFilters} setEventFilters={setEventFilters} timeFilter={timeFilter} setTimeFilter={setTimeFilter} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} rankings={rankings} timeFormat={timeFormat} setTimeFormat={setTimeFormat} showSponsors={showSponsors} setShowSponsors={setShowSponsors} showAwards={showAwards} setShowAwards={setShowAwards} showNotes={showNotes} setShowNotes={setShowNotes} showMottoes={showMottoes} setShowMottoes={setShowMottoes} showChampsStats={showChampsStats} setShowChampsStats={setShowChampsStats} swapScreen={swapScreen} setSwapScreen={setSwapScreen} autoAdvance={autoAdvance} setAutoAdvance={setAutoAdvance} getSchedule={getSchedule} awardsMenu={awardsMenu} setAwardsMenu={setAwardsMenu} showQualsStats={showQualsStats} setShowQualsStats={setShowQualsStats} showQualsStatsQuals={showQualsStatsQuals} setShowQualsStatsQuals={setShowQualsStatsQuals} teamReduction={teamReduction} setTeamReduction={setTeamReduction} playoffCountOverride={playoffCountOverride} setPlayoffCountOverride={setPlayoffCountOverride} allianceCount={allianceCount} localUpdates={localUpdates} setLocalUpdates={setLocalUpdates} putTeamData={putTeamData} getCommunityUpdates={getCommunityUpdates} reverseEmcee={reverseEmcee} setReverseEmcee={setReverseEmcee} showDistrictChampsStats={showDistrictChampsStats} setShowDistrictChampsStats={setShowDistrictChampsStats} monthsWarning={monthsWarning} setMonthsWarning={setMonthsWarning} user={user} />} />
 
               <Route path="/schedule" element={<SchedulePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} practiceSchedule={practiceSchedule} setPracticeSchedule={setPracticeSchedule} />} />
 
-              <Route path="/teamdata" element={<TeamDataPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} teamSort={teamSort} setTeamSort={setTeamSort} communityUpdates={communityUpdates} setCommunityUpdates={setCommunityUpdates} allianceCount={allianceCount} lastVisit={lastVisit} setLastVisit={setLastVisit} putTeamData={putTeamData} localUpdates={localUpdates} setLocalUpdates={setLocalUpdates} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} originalAndSustaining={originalAndSustaining} monthsWarning={monthsWarning} user={user} getTeamHistory={getTeamHistory} timeFormat={timeFormat}/>} />
+              <Route path="/teamdata" element={<TeamDataPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} teamSort={teamSort} setTeamSort={setTeamSort} communityUpdates={communityUpdates} setCommunityUpdates={setCommunityUpdates} allianceCount={allianceCount} lastVisit={lastVisit} setLastVisit={setLastVisit} putTeamData={putTeamData} localUpdates={localUpdates} setLocalUpdates={setLocalUpdates} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} originalAndSustaining={originalAndSustaining} monthsWarning={monthsWarning} user={user} getTeamHistory={getTeamHistory} timeFormat={timeFormat} />} />
 
               <Route path='/ranks' element={<RanksPage selectedEvent={selectedEvent} teamList={teamList} rankings={rankings} rankSort={rankSort} setRankSort={setRankSort} allianceCount={allianceCount} rankingsOverride={rankingsOverride} setRankingsOverride={setRankingsOverride} allianceSelection={allianceSelection} getRanks={getRanks} setRankings={setRankings} setAllianceSelectionArrays={setAllianceSelectionArrays} playoffs={playoffs} districtRankings={districtRankings} />} />
 
