@@ -389,7 +389,7 @@ function App() {
     }
     playoffschedule.scheduleLastModified = playoffschedule.schedule?.headers ? moment(playoffschedule.schedule?.headers.schedule["last-modified"]) : moment();
     playoffschedule.matchesLastModified = playoffschedule.schedule?.headers ? moment(playoffschedule.schedule?.headers.matches["last-modified"]) : moment();
-    if (playoffschedule?.schedule.schedule.length > 0) {
+    if (playoffschedule?.schedule?.schedule?.length > 0) {
       // adds the winner to the schedule.
       matches = playoffschedule.schedule.schedule.map((match) => {
         match.winner = winner(match);
@@ -454,7 +454,7 @@ function App() {
 
       // since we have a playoff schedule, we need to fetch the Alliances.
       getAlliances();
-    }
+    } else {playoffschedule.schedule = playoffschedule.schedule.schedule}
 
     var lastMatchPlayed = 0;
 
