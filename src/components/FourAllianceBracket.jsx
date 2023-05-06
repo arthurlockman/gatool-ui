@@ -108,14 +108,14 @@ function FourAllianceBracket({ selectedEvent, playoffSchedule, alliances }) {
 			tournamentWinner.blue += 1
 		}
 	}
-	if (tournamentWinner.red === 2) {
+	if (tournamentWinner?.red === 2) {
 		tournamentWinner.winner = "red";
-	} else if (tournamentWinner.blue === 2) {
+	} else if (tournamentWinner?.blue === 2) {
 		tournamentWinner.winner = "blue";
 	} else if (matchWinner(11)?.tieWinner === "red") {
 		tournamentWinner.winner = "red";
 		tournamentWinner.level = matchWinner(11)?.level;
-	} else if (matchWinner(11).tieWinner === "blue") {
+	} else if (matchWinner(11)?.tieWinner === "blue") {
 		tournamentWinner.winner = "blue";
 		tournamentWinner.level = matchWinner(11)?.level;
 	}

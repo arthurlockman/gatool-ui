@@ -262,9 +262,9 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                         record[team.station] = team.teamNumber
                     })
                 } else if (key === "winner") {
-                    record.winner = match.winner.winner;
-                    record.tieWinner = match.winner.tieWinner;
-                    record.tieBreakerLevel = match.winner.level;
+                    record.winner = match?.winner?.winner;
+                    record.tieWinner = match?.winner?.tieWinner;
+                    record.tieBreakerLevel = match?.winner?.level;
                 } else {
                     record[key] = match[key];
                 }
