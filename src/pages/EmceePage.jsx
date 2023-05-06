@@ -33,14 +33,14 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
         if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[0]?.teamNumber) {
             allianceName = alliances?.Lookup[`${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[0]?.teamNumber}`]?.alliance;
             if (matchNumber < 14) {
-                if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner.tieWinner === "red") {
+                if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner?.tieWinner === "red") {
                     allianceName += ` (L${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner.level})`;
                 }
             }
             if (allianceColor === "blue") {
                 allianceName = alliances?.Lookup[`${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[3]?.teamNumber}`]?.alliance
                 if (matchNumber < 14) {
-                    if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner.tieWinner === "blue") {
+                    if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner?.tieWinner === "blue") {
                         allianceName += ` (L${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner.level} WIN)`;
                     }
                 }
