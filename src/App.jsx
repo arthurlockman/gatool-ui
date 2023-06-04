@@ -155,7 +155,14 @@ function App() {
   const [allianceSelectionReady, setAllianceSelectionReady] = useState(TabStates.NotReady)
   const [eventNamesCY, setEventNamesCY] = usePersistentState("cache:eventNamesCY", []);
   const [districtRankings, setDistrictRankings] = usePersistentState("cache:districtRankings", null);
-  const [adHocMatch, setAdHocMatch] = usePersistentState("cache:adHocMatch", null);
+  const [adHocMatch, setAdHocMatch] = usePersistentState("cache:adHocMatch", [
+    { teamNumber: null, station: 'Red1', surrogate: false, dq: false },
+    { teamNumber: null, station: 'Red2', surrogate: false, dq: false },
+    { teamNumber: null, station: 'Red3', surrogate: false, dq: false },
+    { teamNumber: null, station: 'Blue1', surrogate: false, dq: false },
+    { teamNumber: null, station: 'Blue2', surrogate: false, dq: false },
+    { teamNumber: null, station: 'Blue3', surrogate: false, dq: false }
+  ]);
   const [adHocMode, setAdHocMode] = usePersistentState("cache:adHocMode", null);
   const [backupTeam, setBackupTeam] = useState(null);
 
