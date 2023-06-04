@@ -1,6 +1,6 @@
 import _ from "lodash";
 
-function PlayByPlay({ station, team, inPlayoffs, selectedYear, selectedEvent, showNotes, showMottoes, showQualsStats, showQualsStatsQuals }) {
+function PlayByPlay({ station, team, inPlayoffs, selectedYear, selectedEvent, showNotes, showMottoes, showQualsStats, showQualsStatsQuals, adHocMode }) {
     var allianceColor = station.slice(0, -1);
 
     return (
@@ -10,7 +10,7 @@ function PlayByPlay({ station, team, inPlayoffs, selectedYear, selectedEvent, sh
                     <>
                         <p className={"playByPlayteamNumber"}>{team?.teamNumber}</p>
                         <p className={"playByPlaysayNumber"} >{team?.updates?.sayNumber}</p>
-                        <p className={team?.updates?.organizationLocal ? (team?.updates?.organizationLocal.length > 60 ? "playByPlayOrganization narrowFont" : "playByPlayOrganization"): (team?.schoolName.length > 60 ? "playByPlayOrganization narrowFont" : "playByPlayOrganization")}>{team?.updates?.organizationLocal ? team?.updates?.organizationLocal : team?.schoolName}</p>
+                        <p className={team?.updates?.organizationLocal ? (team?.updates?.organizationLocal.length > 60 ? "playByPlayOrganization narrowFont" : "playByPlayOrganization") : (team?.schoolName.length > 60 ? "playByPlayOrganization narrowFont" : "playByPlayOrganization")}>{team?.updates?.organizationLocal ? team?.updates?.organizationLocal : team?.schoolName}</p>
                         <p className={"playByPlayCity"}>{team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : `${team?.city}, ${team?.stateProv}${team?.country !== "USA" ? `, ${team?.country}` : ""}`}</p>
                         {(showMottoes || _.isNull(showMottoes)) && <p className={"playByPlayCity mottoes"}>{team?.updates?.teamMottoLocal}</p>}
                         {inPlayoffs && <p className={"playByPlayAlliance"}>{team?.alliance}<br />{team?.allianceRole}</p>}
@@ -24,7 +24,7 @@ function PlayByPlay({ station, team, inPlayoffs, selectedYear, selectedEvent, sh
             <td className={`col4 ${allianceColor.toLowerCase()}AlliancePlayByPlay`} >
                 {team?.teamNumber && (team?.teamNumber !== 0) &&
                     <>
-                        <p className={`playByPlayTeamName ${(inPlayoffs && showQualsStats) ? "playByPlayTeamNameStats" : ""} ${team?.updates?.nameShortLocal ? (team?.updates?.nameShortLocal.length > 60 ? " narrowFont" : ""): (team?.nameShort.length > 60 ? " narrowFont" : "")}`}>{team?.updates?.nameShortLocal ? team?.updates?.nameShortLocal : team?.nameShort}</p>
+                        <p className={`playByPlayTeamName ${(inPlayoffs && showQualsStats) ? "playByPlayTeamNameStats" : ""} ${team?.updates?.nameShortLocal ? (team?.updates?.nameShortLocal.length > 60 ? " narrowFont" : "") : (team?.nameShort.length > 60 ? " narrowFont" : "")}`}>{team?.updates?.nameShortLocal ? team?.updates?.nameShortLocal : team?.nameShort}</p>
                         <p className={"playByPlayRobotName"}>{team?.updates?.robotNameLocal}</p>
                         {((!inPlayoffs && (_.isNull(showQualsStatsQuals) || showQualsStatsQuals)) || (inPlayoffs && showQualsStats)) && team?.rank &&
                             <div className={"playByPlayWinLossTie text-center"}>
@@ -50,7 +50,7 @@ function PlayByPlay({ station, team, inPlayoffs, selectedYear, selectedEvent, sh
                     </>
                 }
                 {!team?.teamNumber && <>
-                    <div className={"tbd"}>No fourth Alliance member</div>
+                    <div className={"tbd"}>{adHocMode ? "Please choose a team" : "No fourth Alliance member"}</div>
                 </>}
             </td>
         </>

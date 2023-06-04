@@ -10,14 +10,14 @@ import { useSwipeable } from "react-swipeable";
 const paleGreen = "rgba(144, 238, 144, 0.5)"
 
 
-function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, showNotes, showMottoes, showQualsStats, showQualsStatsQuals, swapScreen, timeFormat, eventHighScores, backupTeam, setBackupTeam, nextMatch, previousMatch, setMatchFromMenu, practiceSchedule, districtRankings }) {
+function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, showNotes, showMottoes, showQualsStats, showQualsStatsQuals, swapScreen, timeFormat, eventHighScores, backupTeam, setBackupTeam, nextMatch, previousMatch, setMatchFromMenu, practiceSchedule, districtRankings, adHocMatch, setAdHocMatch, adHocMode }) {
     var displayOrder = ["Blue1", "Red3", "Blue2", "Red2", "Blue3", "Red1", "Blue4", "Red4"];
     if (swapScreen === true) { displayOrder = ["Red3", "Blue1", "Red2", "Blue2", "Red1", "Blue3", "Red4", "Blue4"] }
 
     function updateTeamDetails(station, matchDetails) {
         var team = {}
         var alliance = station.slice(0, station.length - 1);
-        var allianceNumber = matchDetails?.teams[_.findIndex(matchDetails?.teams, { "station": `${alliance}1` })].alliance;
+        var allianceNumber = matchDetails?.teams[_.findIndex(matchDetails?.teams, { "station": `${alliance}1` })]?.alliance;
         if (station.slice(-1) !== "4") {
             team = matchDetails?.teams[_.findIndex(matchDetails?.teams, { "station": station })];
             team = _.merge(team,
@@ -25,7 +25,7 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
                 rankings?.ranks[_.findIndex(rankings?.ranks, { "teamNumber": team?.teamNumber })],
                 communityUpdates[_.findIndex(communityUpdates, { "teamNumber": team?.teamNumber })]
             );
-            team.rankStyle = rankHighlight(team?.rank, allianceCount || {"count":8});
+            team.rankStyle = rankHighlight(team?.rank, allianceCount || { "count": 8 });
             team.alliance = alliances?.Lookup[`${team?.teamNumber}`]?.alliance || null;
             team.allianceRole = alliances?.Lookup[`${team?.teamNumber}`]?.role || null;
 
@@ -44,7 +44,7 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
                 });
                 var allianceTeams = _.filter(playoffTeams, { "alliance": allianceNumber }).map((o) => { return o.teamNumber });
                 //var allianceMembers = _.filter(alliances?.alliances, { "number": Number(allianceNumber?.slice(-1)) })[0];
-                var allianceMembers = allianceNumber ? _.filter(alliances?.alliances, { "name": allianceNumber})[0] : [];
+                var allianceMembers = allianceNumber ? _.filter(alliances?.alliances, { "name": allianceNumber })[0] : [];
                 var allianceArray = [];
                 allianceArray.push(allianceMembers?.captain);
                 allianceArray.push(allianceMembers?.round1);
@@ -63,7 +63,7 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
                         rankings?.ranks[_.findIndex(rankings?.ranks, { "teamNumber": remainingTeam[0] })],
                         communityUpdates[_.findIndex(communityUpdates, { "teamNumber": remainingTeam[0] })]
                     );
-                    team.rankStyle = rankHighlight(team?.rank, allianceCount || {"count":8});
+                    team.rankStyle = rankHighlight(team?.rank, allianceCount || { "count": 8 });
                     team.alliance = alliances?.Lookup[`${remainingTeam[0]}`]?.alliance || null;
                     team.allianceRole = alliances?.Lookup[`${remainingTeam[0]}`]?.role || null;
 
@@ -110,7 +110,38 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
     }
     )
 
-    var matchDetails = schedule[currentMatch - 1];
+    const matchDetails = (!adHocMode ? schedule[currentMatch - 1] :
+        {
+            description: "Practice Match",
+            startTime: null,
+            matchNumber: 1,
+            field: "Primary",
+            tournamentLevel: "Practice",
+            teams: [
+                { teamNumber: adHocMatch[0]?.teamNumber ? adHocMatch[0]?.teamNumber : null, station: 'Red1', surrogate: false, dq: false },
+                { teamNumber: adHocMatch[1]?.teamNumber ? adHocMatch[1]?.teamNumber : null, station: 'Red2', surrogate: false, dq: false },
+                { teamNumber: adHocMatch[2]?.teamNumber ? adHocMatch[2]?.teamNumber : null, station: 'Red3', surrogate: false, dq: false },
+                { teamNumber: adHocMatch[3]?.teamNumber ? adHocMatch[3]?.teamNumber : null, station: 'Blue1', surrogate: false, dq: false },
+                { teamNumber: adHocMatch[4]?.teamNumber ? adHocMatch[4]?.teamNumber : null, station: 'Blue2', surrogate: false, dq: false },
+                { teamNumber: adHocMatch[5]?.teamNumber ? adHocMatch[5]?.teamNumber : null, station: 'Blue3', surrogate: false, dq: false }
+            ],
+            isReplay: false,
+            matchVideoLink: null,
+            scoreRedFinal: null,
+            scoreRedFoul: null,
+            scoreRedAuto: null,
+            scoreBlueFinal: null,
+            scoreBlueFoul: null,
+            scoreBlueAuto: null,
+            autoStartTime: null,
+            actualStartTime: null,
+            postResultTime: null,
+            winner: {
+                winner: null,
+                tieWinner: null,
+                level: null,
+            },
+        });
     var inPlayoffs = (matchDetails?.tournamentLevel === "Playoff" ? true : false)
     const matchMenu = schedule.map((match, index) => {
         var tag = `${match?.description} of ${qualSchedule?.schedule?.length}`;
@@ -156,29 +187,29 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
             </div>}
             {selectedEvent && teamList?.teams.length > 0 && schedule?.length > 0 &&
                 <Container fluid {...swipeHandlers}>
-                    <TopButtons previousMatch={previousMatch} nextMatch={nextMatch} currentMatch={currentMatch} matchMenu={matchMenu} setMatchFromMenu={setMatchFromMenu} selectedEvent={selectedEvent} matchDetails={matchDetails} timeFormat={timeFormat} inPlayoffs={inPlayoffs} alliances={alliances} setAlliances={setAlliances} rankings={rankings} backupTeam={backupTeam} setBackupTeam={setBackupTeam} />
+                    <TopButtons previousMatch={previousMatch} nextMatch={nextMatch} currentMatch={currentMatch} matchMenu={matchMenu} setMatchFromMenu={setMatchFromMenu} selectedEvent={selectedEvent} matchDetails={matchDetails} timeFormat={timeFormat} inPlayoffs={inPlayoffs} alliances={alliances} setAlliances={setAlliances} rankings={rankings} backupTeam={backupTeam} setBackupTeam={setBackupTeam} teamList={teamList} adHocMatch={adHocMatch} setAdHocMatch={setAdHocMatch} adHocMode={adHocMode} />
                     <table className={"playByPlayTable"}>
                         <tbody>
                             <tr className={"gatool-playbyplay"}>
-                                <PlayByPlay station={displayOrder[0]} team={teamDetails[displayOrder[0]]} inPlayoffs={inPlayoffs} key={displayOrder[0]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} />
-                                <PlayByPlay station={displayOrder[1]} team={teamDetails[displayOrder[1]]} inPlayoffs={inPlayoffs} key={displayOrder[1]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} />
+                                <PlayByPlay station={displayOrder[0]} team={teamDetails[displayOrder[0]]} inPlayoffs={inPlayoffs} key={displayOrder[0]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} adHocMode={adHocMode} />
+                                <PlayByPlay station={displayOrder[1]} team={teamDetails[displayOrder[1]]} inPlayoffs={inPlayoffs} key={displayOrder[1]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} adHocMode={adHocMode} />
                             </tr>
                             <tr className={"gatool-playbyplay"}>
-                                <PlayByPlay station={displayOrder[2]} team={teamDetails[displayOrder[2]]} inPlayoffs={inPlayoffs} key={displayOrder[2]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} />
-                                <PlayByPlay station={displayOrder[3]} team={teamDetails[displayOrder[3]]} inPlayoffs={inPlayoffs} key={displayOrder[3]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} />
+                                <PlayByPlay station={displayOrder[2]} team={teamDetails[displayOrder[2]]} inPlayoffs={inPlayoffs} key={displayOrder[2]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} adHocMode={adHocMode} />
+                                <PlayByPlay station={displayOrder[3]} team={teamDetails[displayOrder[3]]} inPlayoffs={inPlayoffs} key={displayOrder[3]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} adHocMode={adHocMode} />
                             </tr>
                             <tr className={"gatool-playbyplay"}>
-                                <PlayByPlay station={displayOrder[4]} team={teamDetails[displayOrder[4]]} inPlayoffs={inPlayoffs} key={displayOrder[4]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} />
-                                <PlayByPlay station={displayOrder[5]} team={teamDetails[displayOrder[5]]} inPlayoffs={inPlayoffs} key={displayOrder[5]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} />
+                                <PlayByPlay station={displayOrder[4]} team={teamDetails[displayOrder[4]]} inPlayoffs={inPlayoffs} key={displayOrder[4]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} adHocMode={adHocMode} />
+                                <PlayByPlay station={displayOrder[5]} team={teamDetails[displayOrder[5]]} inPlayoffs={inPlayoffs} key={displayOrder[5]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} adHocMode={adHocMode} />
                             </tr>
-                            {(inPlayoffs || selectedEvent?.value?.champLevel==="CHAMPS" )&& (!_.isEmpty(teamDetails["Red4"]) || !_.isEmpty(teamDetails["Blue4"])) &&
+                            {(inPlayoffs || selectedEvent?.value?.champLevel === "CHAMPS") && (!_.isEmpty(teamDetails["Red4"]) || !_.isEmpty(teamDetails["Blue4"])) &&
                                 <tr className={"gatool-playbyplay"}>
-                                    <PlayByPlay station={displayOrder[6]} team={teamDetails[displayOrder[6]]} inPlayoffs={inPlayoffs} key={displayOrder[6]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} />
-                                    <PlayByPlay station={displayOrder[7]} team={teamDetails[displayOrder[7]]} inPlayoffs={inPlayoffs} key={displayOrder[7]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} />
+                                    <PlayByPlay station={displayOrder[6]} team={teamDetails[displayOrder[6]]} inPlayoffs={inPlayoffs} key={displayOrder[6]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} adHocMode={adHocMode} />
+                                    <PlayByPlay station={displayOrder[7]} team={teamDetails[displayOrder[7]]} inPlayoffs={inPlayoffs} key={displayOrder[7]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} adHocMode={adHocMode} />
                                 </tr>}
                         </tbody>
                     </table>
-                    <BottomButtons previousMatch={previousMatch} nextMatch={nextMatch} matchDetails={matchDetails} playoffSchedule={playoffSchedule} eventHighScores={eventHighScores} alliances={alliances} selectedEvent={selectedEvent} />
+                    <BottomButtons previousMatch={previousMatch} nextMatch={nextMatch} matchDetails={matchDetails} playoffSchedule={playoffSchedule} eventHighScores={eventHighScores} alliances={alliances} selectedEvent={selectedEvent} adHocMode={adHocMode} />
                 </Container>}
         </>
     )

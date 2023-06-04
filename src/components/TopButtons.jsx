@@ -1,14 +1,15 @@
 import { useRef, useState } from "react";
-import { Row, Col, Button, Modal, Container } from "react-bootstrap";
+import { Row, Col, Button, Modal, Container, Table } from "react-bootstrap";
 import { ArrowUpSquareFill, CaretLeftFill, CaretRightFill } from "react-bootstrap-icons";
 import Select from "react-select";
 import MatchClock from "../components/MatchClock";
 import _ from "lodash";
 import { useHotkeysContext } from "react-hotkeys-hook";
 
-function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatchFromMenu, selectedEvent, matchDetails, timeFormat, alliances, setAlliances, rankings, inPlayoffs, backupTeam, setBackupTeam }) {
+function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatchFromMenu, selectedEvent, matchDetails, timeFormat, alliances, setAlliances, rankings, inPlayoffs, backupTeam, setBackupTeam, teamList, adHocMatch, setAdHocMatch, adHocMode }) {
 
     const [show, setShow] = useState(null);
+    const [showAdHoc, setAdHoc] = useState(null);
     const [teamSelected, setTeamSelected] = useState(null);
     const [confirmSelection, setConfirmSelection] = useState(false);
     const { disableScope, enableScope } = useHotkeysContext();
@@ -17,6 +18,18 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
         setShow(true);
         disableScope('matchNavigation');
         disableScope('tabNavigation');
+    }
+
+    const handleAdHoc = () => {
+        setAdHoc(true);
+        disableScope('matchNavigation');
+        disableScope('tabNavigation');
+    }
+
+    const handleCloseAdHoc = () => {
+        setAdHoc(false);
+        enableScope('matchNavigation');
+        enableScope('tabNavigation');
     }
 
     const handleClose = () => {
@@ -68,7 +81,27 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
         enableScope('matchNavigation');
         enableScope('tabNavigation');
     }
-    
+
+
+
+    const adHocStation = (value) => {
+        var station = value[0];
+        var teamNumber = value[1].value;
+        var adHocMatchNew = _.cloneDeep(adHocMatch);
+        if (_.isNull(adHocMatchNew)) {
+            adHocMatchNew = [
+                { teamNumber: null, station: 'Red1' },
+                { teamNumber: null, station: 'Red2' },
+                { teamNumber: null, station: 'Red3' },
+                { teamNumber: null, station: 'Blue1' },
+                { teamNumber: null, station: 'Blue2' },
+                { teamNumber: null, station: 'Blue3' }
+            ]
+        }
+        adHocMatchNew[_.findIndex(adHocMatchNew, { "station": station })].teamNumber = teamNumber;
+        setAdHocMatch(adHocMatchNew);
+    }
+
     var allianceMembers = alliances?.Lookup ? Object.keys(alliances?.Lookup) : null;
     var availableTeams = [];
     rankings?.ranks.forEach((team) => {
@@ -76,13 +109,20 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
     })
     const addBackupButton = inPlayoffs && selectedEvent.value.champLevel !== "CHAMPS" && selectedEvent.value.champLevel !== "CMPDIV" && selectedEvent.value.champLevel !== "CMPSUB";
 
+    const eventTeams = teamList?.teams.map((team) => {
+        return ({ "label": team.teamNumber, "value": team.teamNumber })
+    }
+    )
+
     return (
         <>
             <Row style={{ "paddingTop": "10px", "paddingBottom": "10px" }}>
-                <Col xs={"2"} lg={"3"}><Button size="lg" variant="outline-success" className={"gatool-button buttonNoWrap"} onClick={previousMatch}><span className={"d-none d-lg-block"}><CaretLeftFill /> Previous Match</span><span className={"d-block d-lg-none"}><CaretLeftFill /> <CaretLeftFill /></span></Button></Col>
-                <MatchClock matchDetails={matchDetails} timeFormat={timeFormat} />
+                <Col xs={adHocMode ? "1" : "2"} lg={adHocMode ? "2" : "3"}>
+                    {!adHocMode && <Button size="lg" variant="outline-success" className={"gatool-button buttonNoWrap"} onClick={previousMatch}><span className={"d-none d-lg-block"}><CaretLeftFill /> Previous Match</span><span className={"d-block d-lg-none"}><CaretLeftFill /> <CaretLeftFill /></span></Button>}
+                </Col>
+                {!adHocMode && <MatchClock matchDetails={matchDetails} timeFormat={timeFormat} />}
                 <Col xs={addBackupButton ? "4" : "5"} lg={inPlayoffs ? "3" : "4"}><b>{selectedEvent?.label.replace("FIRST Championship - ", "").replace("FIRST In Texas District Championship - ", "").replace("FIRST Ontario Provincial Championship - ", "").replace("New England FIRST District Championship - ", "")}</b><br />
-                    <Select options={matchMenu} value={currentMatch ? matchMenu[currentMatch - 1] : matchMenu[0]} onChange={handleMatchSelection} styles={{
+                    {!adHocMode && <Select options={matchMenu} value={currentMatch ? matchMenu[currentMatch - 1] : matchMenu[0]} onChange={handleMatchSelection} styles={{
                         option: (styles, { data }) => {
                             return {
                                 ...styles,
@@ -90,10 +130,13 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
                                 color: "black"
                             };
                         },
-                    }} ref={selectRef}/>
+                    }} ref={selectRef} />}
                 </Col>
                 {addBackupButton && <Col className="promoteBackup" xs={1} onClick={handleShow}>+<ArrowUpSquareFill />+<br />backup</Col>}
-                <Col xs={"2"} lg={"3"}><Button size="lg" variant="outline-success" className={"gatool-button buttonNoWrap"} onClick={nextMatch}><span className={"d-none d-lg-block"}>Next Match <CaretRightFill /></span><span className={"d-block d-lg-none"}><CaretRightFill /> <CaretRightFill /></span></Button></Col>
+                {adHocMode && <Col className="promoteBackup" xs={1} onClick={handleAdHoc}>Change<br />Teams</Col>}
+                <Col xs={"2"} lg={"3"}>
+                    {!adHocMode && <Button size="lg" variant="outline-success" className={"gatool-button buttonNoWrap"} onClick={nextMatch}><span className={"d-none d-lg-block"}>Next Match <CaretRightFill /></span><span className={"d-block d-lg-none"}><CaretRightFill /> <CaretRightFill /></span></Button>}
+                </Col>
                 <Modal centered={true} show={show} onHide={handleClose}>
                     <Modal.Header className={"promoteBackup"} closeButton closeVariant="white">
                         <Modal.Title>Alliance Backup</Modal.Title>
@@ -119,6 +162,28 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
 
 
 
+                        </Container>
+                    </Modal.Body>
+                </Modal>
+                <Modal centered={true} show={showAdHoc} onHide={handleCloseAdHoc}>
+                    <Modal.Header className={"promoteBackup"} closeButton closeVariant="white">
+                        <Modal.Title>Configure Teams for Match</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Container>
+                            Select teams for each station below.
+                            <Table>
+                                <Row>
+                                    <Col className="redAlliance"><b>Red 1</b> <Select options={eventTeams} value={adHocMatch[0]?.teamNumber ? { "value": adHocMatch[0]?.teamNumber, "label": adHocMatch[0]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Red1", e]) }} /></Col>
+                                    <Col className="blueAlliance"><b>Blue 1</b> <Select options={eventTeams} value={adHocMatch[3]?.teamNumber ? {"value" : adHocMatch[3]?.teamNumber,"label" : adHocMatch[3]?.teamNumber} : ""} onChange={(e) => { adHocStation(["Blue1", e]) }} /></Col></Row>
+                                <Row>
+                                    <Col className="redAlliance"><b>Red 2</b> <Select options={eventTeams} value={adHocMatch[1]?.teamNumber ? {"value" : adHocMatch[1]?.teamNumber,"label" : adHocMatch[1]?.teamNumber} : ""} onChange={(e) => { adHocStation(["Red2", e]) }} /></Col>
+                                    <Col className="blueAlliance"><b>Blue 2</b> <Select options={eventTeams} value={adHocMatch[4]?.teamNumber ? {"value" : adHocMatch[4]?.teamNumber,"label" : adHocMatch[4]?.teamNumber} : ""} onChange={(e) => { adHocStation(["Blue2", e]) }} /></Col></Row>
+                                <Row>
+                                    <Col className="redAlliance"><b>Red 3</b> <Select options={eventTeams} value={adHocMatch[2]?.teamNumber ? {"value" : adHocMatch[2]?.teamNumber,"label" : adHocMatch[2]?.teamNumber} : ""} onChange={(e) => { adHocStation(["Red3", e]) }} /></Col>
+                                <Col className="blueAlliance"><b>Blue 3</b> <Select options={eventTeams} value={adHocMatch[5]?.teamNumber ? {"value" : adHocMatch[5]?.teamNumber,"label" : adHocMatch[5]?.teamNumber} : ""} onChange={(e) => { adHocStation(["Blue3", e]) }} /></Col>
+                                </Row>
+                            </Table>
                         </Container>
                     </Modal.Body>
                 </Modal>
