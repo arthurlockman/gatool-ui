@@ -117,7 +117,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
     return (
         <>
             <Row style={{ "paddingTop": "10px", "paddingBottom": "10px" }}>
-                <Col xs={adHocMode ? "1" : "2"} lg={adHocMode ? "2" : "3"}>
+                <Col xs={"2"} lg={"3"}>
                     {!adHocMode && <Button size="lg" variant="outline-success" className={"gatool-button buttonNoWrap"} onClick={previousMatch}><span className={"d-none d-lg-block"}><CaretLeftFill /> Previous Match</span><span className={"d-block d-lg-none"}><CaretLeftFill /> <CaretLeftFill /></span></Button>}
                 </Col>
                 {!adHocMode && <MatchClock matchDetails={matchDetails} timeFormat={timeFormat} />}
@@ -131,6 +131,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
                             };
                         },
                     }} ref={selectRef} />}
+                    {adHocMode && <span className="announceOrganization">TEST MATCH</span>}
                 </Col>
                 {addBackupButton && <Col className="promoteBackup" xs={1} onClick={handleShow}>+<ArrowUpSquareFill />+<br />backup</Col>}
                 {adHocMode && <Col className="promoteBackup" xs={1} onClick={handleAdHoc}>Change<br />Teams</Col>}

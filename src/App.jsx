@@ -1047,6 +1047,14 @@ function App() {
       setRankingsOverride(null);
       setCurrentMatch(1);
       setDistrictRankings(null);
+      setAdHocMatch([
+        { teamNumber: null, station: 'Red1', surrogate: false, dq: false },
+        { teamNumber: null, station: 'Red2', surrogate: false, dq: false },
+        { teamNumber: null, station: 'Red3', surrogate: false, dq: false },
+        { teamNumber: null, station: 'Blue1', surrogate: false, dq: false },
+        { teamNumber: null, station: 'Blue2', surrogate: false, dq: false },
+        { teamNumber: null, station: 'Blue3', surrogate: false, dq: false }
+      ]);
       getSchedule(true);
       getTeamList();
       getCommunityUpdates();
