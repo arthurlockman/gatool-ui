@@ -1145,6 +1145,12 @@ function App() {
           } else {
             filters.push("past")
           }
+          if (eventTime.diff(timeNow,'days') <= 7 && eventTime.diff(timeNow,'days') > 0) {
+            filters.push("thisWeek")
+          }
+          if (eventTime.diff(timeNow,'weeks') <= 4 && eventTime.diff(timeNow,'weeks') > 0) {
+            filters.push("thisMonth")
+          }
           if (e.type !== "OffSeason" && e.type !== "OffSeasonWithAzureSync") {
             filters.push("week" + e.weekNumber);
           }

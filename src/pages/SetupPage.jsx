@@ -39,6 +39,8 @@ const filterTime = [
     { value: "all", label: "All Events" },
     { value: "past", label: "Past Events" },
     { value: "future", label: "Future Events" },
+    { value: "thisWeek", label: "This Week" },
+    { value: "thisMonth", label: "This Month" },
     { value: "week0", label: "Week 0" },
     { value: "week1", label: "Week 1" },
     { value: "week2", label: "Week 2" },
