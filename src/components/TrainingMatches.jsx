@@ -1,3 +1,5 @@
+import moment from "moment"; 
+
 const trainingSchedule = {};
 trainingSchedule.qual = {};
 trainingSchedule.playoff = {};
@@ -12322,8 +12324,8 @@ trainingEvents.events = [{
     "city": "Nashua",
     "stateprov": "NH",
     "country": "USA",
-    "dateStart": "2023-02-18T00:00:00",
-    "dateEnd": "2023-02-18T23:59:00",
+    "dateStart": moment().format(),
+    "dateEnd": moment().format(),
     "address": "194 Lund Rd",
     "website": "N/A",
     "webcasts": [
@@ -12344,8 +12346,8 @@ trainingEvents.events = [{
     "city": "Nashua",
     "stateprov": "NH",
     "country": "USA",
-    "dateStart": "2023-02-18T00:00:00",
-    "dateEnd": "2023-02-18T23:59:00",
+    "dateStart": moment().format(),
+    "dateEnd": moment().format(),
     "address": "194 Lund Rd",
     "website": "N/A",
     "webcasts": [
@@ -12366,8 +12368,8 @@ trainingEvents.events = [{
     "city": "Nashua",
     "stateprov": "NH",
     "country": "USA",
-    "dateStart": "2023-02-18T00:00:00",
-    "dateEnd": "2023-02-18T23:59:00",
+    "dateStart": moment().format(),
+    "dateEnd": moment().format(),
     "address": "194 Lund Rd",
     "website": "N/A",
     "webcasts": [
@@ -12388,9 +12390,31 @@ trainingEvents.events = [{
     "city": "Nashua",
     "stateprov": "NH",
     "country": "USA",
-    "dateStart": "2023-02-18T00:00:00",
-    "dateEnd": "2023-02-18T23:59:00",
+    "dateStart": moment().format(),
+    "dateEnd": moment().format(),
     "address": "194 Lund Rd",
+    "website": "N/A",
+    "webcasts": [
+        "https://www.twitch.tv/firstinspires",
+        "https://www.twitch.tv/firstinspires1"
+    ],
+    "timezone": "Eastern Standard Time"
+}, {
+    "allianceCount": "EightAlliance",
+    "weekNumber": 0,
+    "announcements": [],
+    "code": "OFFLINE",
+    "divisionCode": null,
+    "name": "OFFLINE",
+    "type": "OffSeasonWithAzureSync",
+    "districtCode": null,
+    "venue": "OFFLINE",
+    "city": "City",
+    "stateprov": "State",
+    "country": "Country",
+    "dateStart": moment().format(),
+    "dateEnd": moment().format(),
+    "address": "Street",
     "website": "N/A",
     "webcasts": [
         "https://www.twitch.tv/firstinspires",

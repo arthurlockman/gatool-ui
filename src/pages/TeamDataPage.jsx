@@ -22,6 +22,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         const interval = setInterval(() => {
             setCurrentTime(moment());
         }, 1000);
+        // @ts-ignore
         return () => clearInterval(interval);
     }, []);
 

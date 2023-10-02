@@ -327,7 +327,10 @@ function App() {
 
     var result = null;
     var qualschedule = null;
-    if (!selectedEvent?.value?.code.includes("PRACTICE")) {
+    if (selectedEvent?.value?.code.includes("OFFLINE")) {
+      //do something
+      qualschedule = { "schedule": { "schedule": [] } };
+    } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
       result = await httpClient.get(`${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/qual`);
       qualschedule = await result.json();
     } else {
@@ -375,7 +378,10 @@ function App() {
     result = null;
     var playoffschedule = null;
     completedMatchCount = 0;
-    if (!selectedEvent?.value?.code.includes("PRACTICE")) {
+    if (selectedEvent?.value?.code.includes("OFFLINE")) {
+      //do something
+      playoffschedule = { "schedule": { "schedule": [] } };
+    } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
       result = await httpClient.get(`${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/playoff`);
       playoffschedule = await result.json();
     } else {
@@ -491,9 +497,10 @@ function App() {
    *  This function retrieves a a list of teams for a specific event from FIRST. It parses the list and modifies some of the data to produce more readable content.
    * @async
    * @function getTeamList
+   * @param adHocTeamList When loading a team list from a spreadsheet, this is the array of teams in the event
    * @return sets the teamList
    */
-  async function getTeamList() {
+  async function getTeamList(adHocTeamList) {
 
     /**
      * Determines whether an award, by name, deserves special highlighting in the Announce Screen
@@ -512,7 +519,33 @@ function App() {
     var result = null;
     var teams = null;
 
-    if (!selectedEvent?.value?.code.includes("PRACTICE")) {
+    if (selectedEvent?.value?.code.includes("OFFLINE")) {
+      teams = {
+        "teamCountTotal": 0,
+        "teamCountPage": 1,
+        "pageCurrent": 1,
+        "pageTotal": 1,
+        "teams": []
+      };
+      if (adHocTeamList) {
+        //https://api.gatool.org/v3/2023/teams?teamNumber=172
+
+        var adHocTeams = adHocTeamList.map(async team => {
+          var request = await httpClient.get(`${selectedYear?.value}/teams?teamNumber=${team}`);
+          var teamDetails = await request.json();
+
+          return teamDetails.teams[0];
+        });
+
+        await Promise.all(adHocTeams).then(function (values) {
+          //do something with the team list
+          console.log(values);
+          teams.teams = values;
+          getCommunityUpdates(false, values);
+        });
+
+      }
+    } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
       result = await httpClient.get(`${selectedYear?.value}/teams?eventCode=${selectedEvent?.value?.code}`);
       teams = await result.json();
     } else {
@@ -601,7 +634,7 @@ function App() {
       return team;
     });
 
-    Promise.all(newTeams).then(function (values) {
+    await Promise.all(newTeams).then(function (values) {
 
       // Parse awards to ensure we highlight them properly and remove extraneous text i.e. FIRST CHampionship from name
       var formattedAwards = values.map(team => {
@@ -784,12 +817,12 @@ function App() {
    * @param notify boolean set to Toast if the request is successful
    * @param selectedYear The currently selected year, which is a persistent state variable
    * @param selectedEvent The currently selected event, which is a persistent state variable
-   * 
+   * @param adHocTeamList A list of team numbers to support offline events
    * @return sets the communityUpdates persistent state
    */
-  async function getCommunityUpdates(notify) {
+  async function getCommunityUpdates(notify, adHocTeamList) {
     var result = null;
-    var teams = null;
+    var teams = [];
     var communityUpdateTemplate = {
       "nameShortLocal": "",
       "cityStateLocal": "",
@@ -808,12 +841,44 @@ function App() {
       "source": ""
     }
 
-    if (!selectedEvent?.value?.code.includes("PRACTICE")) {
+    if (selectedEvent?.value?.code.includes("OFFLINE")) {
+      //Do something with the team list
+      if (adHocTeamList) {
+        // https://api.gatool.org/v3/team/172/updates
+        console.log("Teams List loaded. Update from the Community")
+        var adHocTeams = adHocTeamList.map(async team => {
+          var request = await httpClient.get(`/team/${team?.teamNumber}/updates`);
+          var teamDetails = { "teamNumber": team?.teamNumber };
+          var teamUpdate = await request.json();
+          teamDetails.updates = teamUpdate;
+          teamDetails.teamNumber = team?.teamNumber
+          return teamDetails;
+        });
+
+        await Promise.all(adHocTeams).then(function (values) {
+          teams = values;
+          teams = teams.map((team) => {
+            team.updates = _.merge(_.cloneDeep(communityUpdateTemplate), team?.updates);
+            if (_.findIndex(localUpdates, { "teamNumber": team?.teamNumber }) >= 0) {
+              team.updates = _.merge(team.updates, _.cloneDeep(localUpdates[_.findIndex(localUpdates, { "teamNumber": team?.teamNumber })].update))
+            }
+            return team;
+          })
+
+        });
+
+      } else {
+        console.log("no teams loaded yet")
+        teams = [];
+      }
+
+    } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
       result = await httpClient.get(`${selectedYear?.value}/communityUpdates/${selectedEvent?.value.code}`);
       teams = await result.json();
     } else {
       teams = training.teams.communityUpdates;
     }
+
     teams = teams.map((team) => {
       team.updates = _.merge(_.cloneDeep(communityUpdateTemplate), team?.updates);
       if (_.findIndex(localUpdates, { "teamNumber": team?.teamNumber }) >= 0) {
@@ -840,7 +905,10 @@ function App() {
   async function getRanks() {
     var result = null;
     var ranks = null;
-    if (!selectedEvent?.value?.code.includes("PRACTICE")) {
+    if (selectedEvent?.value?.code.includes("OFFLINE")) {
+      ranks = { "rankings": { "Rankings": [] } };
+    }
+    else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
       result = await httpClient.get(`${selectedYear?.value}/rankings/${selectedEvent?.value.code}`);
       ranks = await result.json();
     } else if (selectedEvent?.value?.code === "PRACTICE1") {
@@ -1145,10 +1213,10 @@ function App() {
           } else {
             filters.push("past")
           }
-          if (eventTime.diff(timeNow,'days') <= 7 && eventTime.diff(timeNow,'days') > 0) {
+          if (eventTime.diff(timeNow, 'days') <= 7 && eventTime.diff(timeNow, 'days') > 0) {
             filters.push("thisWeek")
           }
-          if (eventTime.diff(timeNow,'weeks') <= 4 && eventTime.diff(timeNow,'weeks') > 0) {
+          if (eventTime.diff(timeNow, 'weeks') <= 4 && eventTime.diff(timeNow, 'weeks') > 0) {
             filters.push("thisMonth")
           }
           if (e.type !== "OffSeason" && e.type !== "OffSeasonWithAzureSync") {
@@ -1284,7 +1352,7 @@ function App() {
 
               <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} teamList={teamList} eventFilters={eventFilters} setEventFilters={setEventFilters} timeFilter={timeFilter} setTimeFilter={setTimeFilter} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} rankings={rankings} timeFormat={timeFormat} setTimeFormat={setTimeFormat} showSponsors={showSponsors} setShowSponsors={setShowSponsors} showAwards={showAwards} setShowAwards={setShowAwards} showNotes={showNotes} setShowNotes={setShowNotes} showMottoes={showMottoes} setShowMottoes={setShowMottoes} showChampsStats={showChampsStats} setShowChampsStats={setShowChampsStats} swapScreen={swapScreen} setSwapScreen={setSwapScreen} autoAdvance={autoAdvance} setAutoAdvance={setAutoAdvance} getSchedule={getSchedule} awardsMenu={awardsMenu} setAwardsMenu={setAwardsMenu} showQualsStats={showQualsStats} setShowQualsStats={setShowQualsStats} showQualsStatsQuals={showQualsStatsQuals} setShowQualsStatsQuals={setShowQualsStatsQuals} teamReduction={teamReduction} setTeamReduction={setTeamReduction} playoffCountOverride={playoffCountOverride} setPlayoffCountOverride={setPlayoffCountOverride} allianceCount={allianceCount} localUpdates={localUpdates} setLocalUpdates={setLocalUpdates} putTeamData={putTeamData} getCommunityUpdates={getCommunityUpdates} reverseEmcee={reverseEmcee} setReverseEmcee={setReverseEmcee} showDistrictChampsStats={showDistrictChampsStats} setShowDistrictChampsStats={setShowDistrictChampsStats} monthsWarning={monthsWarning} setMonthsWarning={setMonthsWarning} user={user} adHocMode={adHocMode} setAdHocMode={setAdHocMode} />} />
 
-              <Route path="/schedule" element={<SchedulePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} practiceSchedule={practiceSchedule} setPracticeSchedule={setPracticeSchedule} />} />
+              <Route path="/schedule" element={<SchedulePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} practiceSchedule={practiceSchedule} setPracticeSchedule={setPracticeSchedule} getTeamList={getTeamList} />} />
 
               <Route path="/teamdata" element={<TeamDataPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} teamSort={teamSort} setTeamSort={setTeamSort} communityUpdates={communityUpdates} setCommunityUpdates={setCommunityUpdates} allianceCount={allianceCount} lastVisit={lastVisit} setLastVisit={setLastVisit} putTeamData={putTeamData} localUpdates={localUpdates} setLocalUpdates={setLocalUpdates} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} originalAndSustaining={originalAndSustaining} monthsWarning={monthsWarning} user={user} getTeamHistory={getTeamHistory} timeFormat={timeFormat} />} />
 

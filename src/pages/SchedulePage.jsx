@@ -4,7 +4,7 @@ import { utils, read } from "xlsx";
 import { toast } from "react-toastify";
 import _ from "lodash";
 
-function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSchedule, setPracticeSchedule }) {
+function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSchedule, setPracticeSchedule, getTeamList }) {
 
     // This function clicks the hidden file upload button
     function clickLoadPractice() {
@@ -28,6 +28,25 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
         oldInput.parentNode.replaceChild(newInput, oldInput)
     }
 
+    // This function adds teams to the team list if there are additional teams in the schedule
+
+    function addTeamsToTeamList(formattedSchedule) {
+        var tempTeamList = [];
+        _.forEach(formattedSchedule.schedule, function (row) {
+            //do something
+            _.forEach(row.teams, function (team) {
+
+                if (_.findIndex(tempTeamList, team.teamNumber) < 0) {
+                    tempTeamList.push(team.teamNumber);
+                };
+            })
+
+        });
+        tempTeamList = _.uniq(tempTeamList);
+        console.log(tempTeamList);
+        getTeamList(tempTeamList);
+    }
+
     // This function imports a Practice Schedule from Excel.
     function handlePracticeFiles(e) {
         var files = e.target.files;
@@ -39,24 +58,40 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
             var workbook;
             workbook = read(data, { type: 'array' });
             var worksheet = workbook.Sheets[workbook.SheetNames[0]];
-            var schedule = utils.sheet_to_json(worksheet, { range: 4 });
+            var schedule = utils.sheet_to_json(worksheet, { range: 4 });;
             var formattedSchedule = {};
             var matchNumber = 0;
             var errorMatches = [];
             var errorMessage = "";
             var innerSchedule = [];
-            schedule.forEach((match) => {
+            const basicMatch = {
+                Time: "",
+                Description: "",
+                "Blue 1": "",
+                "Blue 2": "",
+                "Blue 3": "",
+                "Red 1": "",
+                "Red 2": "",
+                "Red 3": "",
+            }
+            const matchKeys = ["Red 1", "Red 2", "Red 3", "Blue 1", "Blue 2", "Blue 3"];
+            schedule = schedule.map((match) => {
+                match = _.merge(_.cloneDeep(basicMatch), match)
                 var scheduleKeys = Object.keys(match);
                 scheduleKeys.forEach((key) => {
                     match[key] = match[key].toString();
                 })
-
-                if (scheduleKeys.length < 8) {
-                    if (match["Description"].includes("Practice")) {
-                        errorMatches.push(match);
+                // detect matches with missing teams
+                if (match["Description"]?.includes("Practice")) {
+                    for (var i = 0; i < matchKeys.length; i++) {
+                        if (match[matchKeys[i]] === "") {
+                            errorMatches.push(match);
+                            break;
+                        }
                     }
                 }
-            })
+                return match;
+            });
 
             if (errorMatches.length > 0) {
                 errorMessage = "Your Practice Schedule has missing data from the following match" + ((errorMatches.length > 1) ? "es:" : ":") + "</br>";
@@ -84,32 +119,32 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                             "scoreBlueFoul": null,
                             "scoreBlueAuto": null,
                             "teams": [{
-                                "teamNumber": parseInt(removeSurrogate(match["Red 1"])),
+                                "teamNumber": match["Red 1"] !== "" ? parseInt(removeSurrogate(match["Red 1"])) : null,
                                 "station": "Red1",
                                 "surrogate": (match["Red 1"].toString().includes("*")) ? !0 : !1,
                                 "dq": !1
                             }, {
-                                "teamNumber": parseInt(removeSurrogate(match["Red 2"])),
+                                "teamNumber": match["Red 2"] !== "" ? parseInt(removeSurrogate(match["Red 2"])) : null,
                                 "station": "Red2",
                                 "surrogate": (match["Red 2"].toString().includes("*")) ? !0 : !1,
                                 "dq": !1
                             }, {
-                                "teamNumber": parseInt(removeSurrogate(match["Red 3"])),
+                                "teamNumber": match["Red 3"] !== "" ? parseInt(removeSurrogate(match["Red 3"])) : null,
                                 "station": "Red3",
                                 "surrogate": (match["Red 3"].toString().includes("*")) ? !0 : !1,
                                 "dq": !1
                             }, {
-                                "teamNumber": parseInt(removeSurrogate(match["Blue 1"])),
+                                "teamNumber": match["Blue 1"] !== "" ? parseInt(removeSurrogate(match["Blue 1"])) : null,
                                 "station": "Blue1",
                                 "surrogate": (match["Blue 1"].toString().includes("*")) ? !0 : !1,
                                 "dq": !1
                             }, {
-                                "teamNumber": parseInt(removeSurrogate(match["Blue 2"])),
+                                "teamNumber": match["Blue 2"] !== "" ? parseInt(removeSurrogate(match["Blue 2"])) : null,
                                 "station": "Blue2",
                                 "surrogate": (match["Blue 2"].toString().includes("*")) ? !0 : !1,
                                 "dq": !1
                             }, {
-                                "teamNumber": parseInt(removeSurrogate(match["Blue 3"])),
+                                "teamNumber": match["Blue 3"] !== "" ? parseInt(removeSurrogate(match["Blue 3"])) : null,
                                 "station": "Blue3",
                                 "surrogate": (match["Blue 3"].toString().includes("*")) ? !0 : !1,
                                 "dq": !1
@@ -121,7 +156,8 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
 
                 formattedSchedule.schedule = _.filter(innerSchedule, "description");
                 setPracticeSchedule(formattedSchedule);
-                toast.success(`Your have successfully loaded your Practice Schedule.`)
+                addTeamsToTeamList(formattedSchedule);
+                toast.success(`Your have successfully loaded your ${selectedEvent?.value?.code.includes("OFFLINE") ? "Offline" : "Practice"} Schedule.`)
                 clearFileInput("BackupFiles");
                 document.getElementById("BackupFiles").addEventListener('change', handlePracticeFiles);
             }
@@ -142,13 +178,19 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                 <Alert variant="warning" >You need to select an event before you can see anything here.</Alert>
             </div>}
             {selectedEvent && (!qualSchedule || qualSchedule?.schedule.length === 0) && (playoffSchedule?.schedule.length === 0) && <div>
-                <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div><div>Awaiting schedule for {selectedEvent.label}<br /><br /></div>
+                <Alert variant="warning" >
+                    {!practiceSchedule && <>
+                        <div><img src="loadingIcon.gif" alt="Loading data..." /></div>
+                        <div>Awaiting schedule for {selectedEvent.label}<br /><br /></div>
+                    </>}
                     {!practiceSchedule && <>
                         <Container fluid>
                             <Row style={{ cursor: "pointer", color: "darkblue" }} onClick={clickLoadPractice}>
                                 <Col xs={2}></Col>
                                 <Col xs={1}><input type="file" id="BackupFiles" onChange={handlePracticeFiles} className={"hiddenInput"} /><img style={{ float: "left" }} width="50" src="images/excelicon.png" alt="Excel Logo" /></Col>
-                                <Col xs={7} className={"leftTable"}><b>You can upload a Practice Schedule while you wait for the Quals Schedule to post. You will need to ask your Scorekeeper to export a Schedule Report in Excel format, which you can upload here.<br />Tap here to upload a Practice Schedule.</b>
+                                <Col xs={7} className={"leftTable"}>
+                                    {selectedEvent?.value?.code.includes("OFFLINE") && <b>You can upload a Qualification Match Schedule for your Offline event. You will need to ask your Scorekeeper to export a Schedule Report in Excel format, which you can upload here. We will determine the team list from the Qualification Schedule.<br />Tap here to upload a Practice Schedule.</b>}
+                                    {!selectedEvent?.value?.code.includes("OFFLINE") && <b>You can upload a Practice Schedule while you wait for the Quals Schedule to post. You will need to ask your Scorekeeper to export a Schedule Report in Excel format, which you can upload here.<br />Tap here to upload a Practice Schedule.</b>}
                                 </Col><Col xs={2}></Col>
                             </Row>
                         </Container>
@@ -158,7 +200,9 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                             <Row style={{ cursor: "pointer", color: "darkblue" }} onClick={clickRemovePractice}>
                                 <Col xs={2}></Col>
                                 <Col xs={1}><img style={{ float: "left" }} width="50" src="images/excelicon.png" alt="Excel Logo" /></Col>
-                                <Col xs={7} className={"leftTable"}><b>You have uploaded a Practice Schedule.<br />Tap here to remove it. Know that we will automatically remove it when we get a Qualification Matches Schedule.</b>
+                                <Col xs={7} className={"leftTable"}>
+                                    {selectedEvent?.value?.code.includes("OFFLINE") && <b>You have uploaded an Offline Schedule.<br />Tap here to remove it. You can add a playoff schedule, when one becomes available.</b>}
+                                    {!selectedEvent?.value?.code.includes("OFFLINE") && <b>You have uploaded a Practice Schedule.<br />Tap here to remove it. Know that we will automatically remove it when we get a Qualification Matches Schedule.</b>}
                                 </Col><Col xs={2}></Col>
                             </Row>
                         </Container>
