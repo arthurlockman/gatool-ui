@@ -10,7 +10,7 @@ import { useSwipeable } from "react-swipeable";
 
 const paleGreen = "rgba(144, 238, 144, 0.5)"
 
-function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, awardsMenu, showNotes, showAwards, showSponsors, showMottoes, showChampsStats, timeFormat, eventHighScores, backupTeam, setBackupTeam, nextMatch, previousMatch, setMatchFromMenu, practiceSchedule, eventNamesCY, districtRankings, showDistrictChampsStats, adHocMatch, setAdHocMatch, adHocMode }) {
+function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, awardsMenu, showNotes, showAwards, showSponsors, showMottoes, showChampsStats, timeFormat, eventHighScores, backupTeam, setBackupTeam, nextMatch, previousMatch, setMatchFromMenu, practiceSchedule, eventNamesCY, districtRankings, showDistrictChampsStats, adHocMatch, setAdHocMatch, adHocMode, offlinePlayoffSchedule }) {
 
     function updateTeamDetails(station, matchDetails) {
         var team = {}
@@ -80,6 +80,10 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
     }
 
     var schedule = practiceSchedule?.schedule || [];
+    if (offlinePlayoffSchedule?.schedule.length > 0) {
+        schedule = _.concat(schedule, offlinePlayoffSchedule?.schedule);
+    }
+
     if (qualSchedule?.schedule.length > 0) {
         schedule = _.concat(schedule, qualSchedule?.schedule);
     }
@@ -87,6 +91,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
     if (playoffSchedule?.schedule?.length > 0) {
         schedule = _.concat(schedule, playoffSchedule?.schedule);
     }
+    
     const matchDetails = (!adHocMode ? schedule[currentMatch - 1] :
         {
             description: "Practice Match",

@@ -10,7 +10,7 @@ import { useSwipeable } from "react-swipeable";
 const paleGreen = "rgba(144, 238, 144, 0.5)"
 
 
-function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, showNotes, showMottoes, showQualsStats, showQualsStatsQuals, swapScreen, timeFormat, eventHighScores, backupTeam, setBackupTeam, nextMatch, previousMatch, setMatchFromMenu, practiceSchedule, districtRankings, adHocMatch, setAdHocMatch, adHocMode }) {
+function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, showNotes, showMottoes, showQualsStats, showQualsStatsQuals, swapScreen, timeFormat, eventHighScores, backupTeam, setBackupTeam, nextMatch, previousMatch, setMatchFromMenu, practiceSchedule, offlinePlayoffSchedule, districtRankings, adHocMatch, setAdHocMatch, adHocMode }) {
     var displayOrder = ["Blue1", "Red3", "Blue2", "Red2", "Blue3", "Red1", "Blue4", "Red4"];
     if (swapScreen === true) { displayOrder = ["Red3", "Blue1", "Red2", "Blue2", "Red1", "Blue3", "Red4", "Blue4"] }
 
@@ -79,6 +79,9 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
     }
 
     var schedule = practiceSchedule?.schedule || [];
+    if (offlinePlayoffSchedule?.schedule.length > 0) {
+        schedule = _.concat(schedule, offlinePlayoffSchedule?.schedule);
+    }
     if (qualSchedule?.schedule.length > 0) {
         schedule = _.concat(schedule, qualSchedule?.schedule);
     }
