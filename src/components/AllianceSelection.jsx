@@ -335,7 +335,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
     return (
         <>
             <Container fluid>
-                {selectedEvent && rankings?.ranks?.length > 0 && teamList?.teams?.length > 0 && allianceCount &&
+                {selectedEvent && rankings?.ranks?.length > 0 && teamList?.teams?.length > 0 && allianceCount && allianceCount?.count > 0 &&
                     <>
                         <Row><br />
                         </Row>

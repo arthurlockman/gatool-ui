@@ -9,7 +9,7 @@ import Switch from "react-switch";
 import './AllianceSelectionPage.css';
 import TwoAllianceBracket from "components/TwollianceBracket";
 
-function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, playoffSchedule, alliances, rankings, timeFormat, getRanks, allianceSelection, playoffs, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays, rankingsOverride, loadEvent }) {
+function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, playoffSchedule, alliances, rankings, timeFormat, getRanks, allianceSelection, playoffs, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays, rankingsOverride, loadEvent, practiceSchedule }) {
     const [overrideAllianceSelection, setOverrideAllianceSelection] = useState(false);
 
     var ranksLastUpdateDisplay = "No rankings reporting yet."
@@ -20,51 +20,58 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
 
     return (
         < >
-            
-                {!selectedEvent && <div>
-                    <Alert variant="warning" ><div>You need to select an event before you can see anything here.</div></Alert>
+
+            {!selectedEvent && <div>
+                <Alert variant="warning" ><div>You need to select an event before you can see anything here.</div></Alert>
+            </div>}
+            {selectedEvent && (!qualSchedule || qualSchedule?.schedule?.length === 0) && (!practiceSchedule || practiceSchedule?.schedule?.length === 0) && (!playoffSchedule || playoffSchedule?.schedule?.length === 0) &&
+                <div>
+                    <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div><div>Waiting for Qualification Match Schedule</div></Alert>
                 </div>}
-                {selectedEvent && (!qualSchedule || qualSchedule?.schedule?.length === 0) && (!playoffSchedule || playoffSchedule?.schedule?.length === 0) &&
-                    <div>
-                        <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div><div>Waiting for Qualification Match Schedule</div></Alert>
-                    </div>}
-                {selectedEvent && qualSchedule?.schedule?.length > 0 && !playoffs &&
-                    <div>
-                        <h5><b>{selectedEvent.label}</b><br />(Rankings last updated: {ranksLastUpdateDisplay})</h5>
-                        <p>Before the selection begins and to help introduce the Alliance Captains with the MC, tap the Alliance Captains to see their team name, school/orgainzaiton, and home town.</p>
-                        <p><b>IMPORTANT: Tap <i>Alliance Captain Announce</i> to continue announcing the Captains.</b></p>
-                        <p>When it's time for Alliance Selection, simply tap a team when their number is called. If they accept, tap <b>Gratefully Accept.</b> If they decline, tap <b>Respectfully Decline.</b></p>
-                        {!allianceSelection &&
-                            <Alert variant="danger" ><div onClick={getRanks}><b>Do not proceed with Alliance Selection until you confirm that the rank order below agrees with the rank order in FMS. Check the Alliance leaders and the teams in the Backup Teams box. Tap this alert to see if we can get a more current schedule and rankings.</b></div>
-                                <Container fluid>
-                                    <Row className="align-items-center">
-                                        <Col xs={10}>If you believe that your ranks are correct, and you need to proceed with Alliance Selection even though our confidence is low, you can do so by enabling this option:</Col>
-                                        <Col xs={2}><Switch
-                                            checked={overrideAllianceSelection}
-                                            onChange={setOverrideAllianceSelection}
-                                            height={20}
-                                            width={40} />
-                                        </Col>
-                                    </Row>
-                                </Container>
-                            </Alert>}
-                        {allianceSelection && !rankingsOverride &&
-                            <Alert variant="success" >
-                                <div onClick={loadEvent}><b>We believe your event is ready for Alliance Selection, but you must confirm that the rank order below agrees with the rank order in FMS before proceeding with Alliance Selection. If you see a discrepancy, tap this alert to see if we can get a more current rankings. <i>This will reload your event.</i></b><br />
+            {selectedEvent && (qualSchedule?.schedule?.length > 0 || practiceSchedule?.schedule?.length > 0) && !playoffs &&
+                <div>
+                    <h5><b>{selectedEvent.label}</b><br />(Rankings last updated: {ranksLastUpdateDisplay})</h5>
+                    <p>Before the selection begins and to help introduce the Alliance Captains with the MC, tap the Alliance Captains to see their team name, school/orgainzaiton, and home town.</p>
+                    <p><b>IMPORTANT: Tap <i>Alliance Captain Announce</i> to continue announcing the Captains.</b></p>
+                    <p>When it's time for Alliance Selection, simply tap a team when their number is called. If they accept, tap <b>Gratefully Accept.</b> If they decline, tap <b>Respectfully Decline.</b></p>
+                    {!allianceSelection &&
+                        <Alert variant="danger" ><div onClick={getRanks}><b>Do not proceed with Alliance Selection until you confirm that the rank order below agrees with the rank order in FMS. Check the Alliance leaders and the teams in the Backup Teams box. Tap this alert to see if we can get a more current schedule and rankings.</b></div>
+                            <Container fluid>
+                                <Row className="align-items-center">
+                                    <Col xs={10}>If you believe that your ranks are correct, and you need to proceed with Alliance Selection even though our confidence is low, you can do so by enabling this option:</Col>
+                                    <Col xs={2}><Switch
+                                        checked={overrideAllianceSelection}
+                                        onChange={setOverrideAllianceSelection}
+                                        height={20}
+                                        width={40} />
+                                    </Col>
+                                </Row>
+                            </Container>
+                        </Alert>}
+                    {allianceSelection && !rankingsOverride && !rankingsOverride && !selectedEvent?.value?.code.includes("OFFLINE") &&
+                        <Alert variant="success" >
+                            <div onClick={loadEvent}><b>We believe your event is ready for Alliance Selection, but you must confirm that the rank order below agrees with the rank order in FMS before proceeding with Alliance Selection. If you see a discrepancy, tap this alert to see if we can get a more current rankings. <i>This will reload your event.</i></b><br />
                                 We last had a ranking update at {moment(rankings?.lastModified).format("ddd, MMM Do YYYY, " + timeFormat.value)}
-                                </div>
-                            </Alert>}
-                        {allianceSelection && rankingsOverride &&
-                            <Alert variant="danger" >
-                                <div><b>You have imported a Rankings Report from your Scorekeeper. Please review the table below to ensure that it matches the report</b>
-                                </div>
-                            </Alert>}
-                    </div>}
-                {selectedEvent && qualSchedule?.schedule?.length > 0 && !playoffs && (allianceSelection || overrideAllianceSelection) &&
-                    <div>
-                        <AllianceSelection selectedYear={selectedYear} selectedEvent={selectedEvent} rankings={rankings} teamList={teamList} allianceCount={allianceCount} communityUpdates={communityUpdates} allianceSelectionArrays={allianceSelectionArrays} setAllianceSelectionArrays={setAllianceSelectionArrays} />
-                    </div>}
-            
+                            </div>
+                        </Alert>}
+                    {allianceSelection && rankingsOverride &&
+                        <Alert variant="danger" >
+                            <div><b>You have imported a Rankings Report from your Scorekeeper. Please review the table below to ensure that it matches the report.<br/> If you see TBD in place of the Captains' numbers, please click Restart Alliance Selection.</b>
+                            </div>
+                            {selectedEvent && rankings?.ranks?.length > 0 && teamList?.teams?.length > 0 && allianceCount && allianceCount?.count <= 0 &&
+                                <h4>
+                                    Please choose an Alliance Count on the Setup Page to proceed.
+                                    
+                                </h4>
+
+                            }
+                        </Alert>}
+                </div>}
+            {selectedEvent && (qualSchedule?.schedule?.length > 0 || practiceSchedule?.schedule?.length > 0) && !playoffs && (allianceSelection || overrideAllianceSelection) &&
+                <div>
+                    <AllianceSelection selectedYear={selectedYear} selectedEvent={selectedEvent} rankings={rankings} teamList={teamList} allianceCount={allianceCount} communityUpdates={communityUpdates} allianceSelectionArrays={allianceSelectionArrays} setAllianceSelectionArrays={setAllianceSelectionArrays} />
+                </div>}
+
             {selectedEvent?.value?.allianceCount === "EightAlliance" && playoffs &&
                 <Bracket selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} alliances={alliances} />}
             {selectedEvent?.value?.allianceCount === "FourAlliance" && playoffs &&
