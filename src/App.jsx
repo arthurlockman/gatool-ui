@@ -25,6 +25,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import Developer from './pages/Developer';
 import { eventNames, specialAwards, hallOfFame, originalAndSustaining } from './components/Constants';
+import {appUpdates} from './components/AppUpdates';
 import { useOnlineStatus } from './contextProviders/OnlineContext';
 import { toast } from 'react-toastify';
 import { trainingData } from 'components/TrainingMatches';
@@ -183,7 +184,8 @@ function App() {
 
   useEffect(() => {
     if (showReload && waitingWorker) {
-      enqueueSnackbar("A new version was released", {
+      enqueueSnackbar(<>A new version was released. Here's what changed on {appUpdates[0].date}:<br />
+      {appUpdates[0].message}</>, {
         persist: true,
         variant: "success",
         action: <>
