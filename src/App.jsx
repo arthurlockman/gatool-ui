@@ -175,7 +175,7 @@ function App() {
   const isOnline = useOnlineStatus();
 
   // Handle update notifications from the service worker
-  const { waitingWorker, showReload, reloadPage } = useServiceWorker();
+  const { waitingWorker, showReload, showReloaded, reloadPage, closePage } = useServiceWorker();
   const { enqueueSnackbar } = useSnackbar();
 
   if (!selectedYear) {
@@ -184,8 +184,7 @@ function App() {
 
   useEffect(() => {
     if (showReload && waitingWorker) {
-      enqueueSnackbar(<>A new version was released. Here's what changed on {appUpdates[0].date}:<br />
-      {appUpdates[0].message}</>, {
+      enqueueSnackbar('A new version was released.', {
         persist: true,
         variant: "success",
         action: <>
@@ -195,7 +194,20 @@ function App() {
         </>
       });
     }
-  }, [waitingWorker, showReload, reloadPage, enqueueSnackbar])
+
+    if (showReloaded && waitingWorker) {
+      enqueueSnackbar(<>A new version was released. Here's what changed on {appUpdates[0].date}:<br />
+      {appUpdates[0].message}</>, {
+        persist: true,
+        variant: "success",
+        action: <>
+          <Button className='snackbar-button'
+            color='primary'
+            onClick={closePage}>Close</Button>
+        </>
+      });
+    }
+  }, [waitingWorker, showReload, showReloaded, reloadPage, closePage, enqueueSnackbar])
 
   // Handle if users are offline. If they're offline but have an event and year selected, let them in.
   const canAccessApp = () => {
