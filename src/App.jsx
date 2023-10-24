@@ -167,6 +167,7 @@ function App() {
   ]);
   const [adHocMode, setAdHocMode] = usePersistentState("cache:adHocMode", null);
   const [backupTeam, setBackupTeam] = useState(null);
+  const [showReloaded, setShowReloaded] = usePersistentState("cache:showReloaded", false);
 
   // Controllers for table sort order at render time
   const [teamSort, setTeamSort] = useState("");
@@ -175,14 +176,19 @@ function App() {
   const isOnline = useOnlineStatus();
 
   // Handle update notifications from the service worker
-  const { waitingWorker, showReload, showReloaded, reloadPage, closePage } = useServiceWorker();
+  const { waitingWorker, showReload, reloadPage } = useServiceWorker();
   const { enqueueSnackbar } = useSnackbar();
+
 
   if (!selectedYear) {
     setSelectedYear(supportedYears[0]);
   }
 
   useEffect(() => {
+    const closeSnackBar = () => {
+      setShowReloaded(false);
+    }
+
     if (showReload && waitingWorker) {
       enqueueSnackbar('A new version was released.', {
         persist: true,
@@ -195,7 +201,7 @@ function App() {
       });
     }
 
-    if (showReloaded && waitingWorker) {
+    if (showReloaded) {
       enqueueSnackbar(<div>A new version was released. Here's what changed on {appUpdates[0].date}:<br />
         {appUpdates[0].message}</div>, {
         persist: true,
@@ -203,11 +209,11 @@ function App() {
         action: <>
           <Button className='snackbar-button'
             color='primary'
-            onClick={closePage}>Return to Announcing</Button>
+            onClick={closeSnackBar}>Return to Announcing</Button>
         </>
       });
     }
-  }, [waitingWorker, showReload, showReloaded, reloadPage, closePage, enqueueSnackbar])
+  }, [waitingWorker, showReload, showReloaded, setShowReloaded, reloadPage, enqueueSnackbar])
 
   // Handle if users are offline. If they're offline but have an event and year selected, let them in.
   const canAccessApp = () => {

@@ -18,17 +18,11 @@ export const useServiceWorker = () => {
         window.location.reload()
     }, [waitingWorker])
 
-    const closePage = useCallback(() => {
-        waitingWorker?.postMessage({ type: "SKIP_WAITING" })
-        setShowReload(false)
-        setShowReloaded(false)
-    }, [waitingWorker])
-
     useEffect(() => {
         serviceWorkerRegistration.register({
             onUpdate: onSWUpdate
         })
     }, [onSWUpdate])
 
-    return { showReload, showReloaded, waitingWorker, reloadPage, closePage }
+    return { showReload, showReloaded, waitingWorker, reloadPage }
 }
