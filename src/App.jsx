@@ -196,14 +196,14 @@ function App() {
     }
 
     if (showReloaded && waitingWorker) {
-      enqueueSnackbar(<>A new version was released. Here's what changed on {appUpdates[0].date}:<br />
-        {appUpdates[0].message}</>, {
+      enqueueSnackbar(<div>A new version was released. Here's what changed on {appUpdates[0].date}:<br />
+        {appUpdates[0].message}</div>, {
         persist: true,
         variant: "success",
         action: <>
           <Button className='snackbar-button'
             color='primary'
-            onClick={closePage}>Close</Button>
+            onClick={closePage}>Return to Announcing</Button>
         </>
       });
     }
