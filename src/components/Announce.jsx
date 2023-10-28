@@ -86,7 +86,7 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
                 </p>}
                 {(showNotes || _.isNull(showNotes)) && <p dangerouslySetInnerHTML={{ __html: team?.updates?.teamNotesLocal }} />}
             </td>
-            <td className={"col1 ranking"} style={team?.rankStyle}>
+            <td className={"col1 ranking"} style={team?.rankStyle.backgroundColor === "" ? {backgroundColor:_.toLower(allianceColor)==="red"?"#F7B3B4":"#98B4F4"} : team?.rankStyle }>
                 {team?.rank ? team?.rank : ""}
             </td>
         </tr>
