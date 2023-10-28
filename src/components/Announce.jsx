@@ -23,13 +23,13 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
 
     return (
         <><tr key={station} className={`gatool-announce ${_.toLower(allianceColor)}Alliance`} >
-            <td className={'col1'} >
+            <td className={'col1'} style={{backgroundColor:_.toLower(allianceColor)==="red"?"#F7B3B4":"#98B4F4"}}>
                 <span className={"announceTeamNumber"} ><b>{team.teamNumber}</b></span><br />
                 {team?.updates?.sayNumber && <span className={"playByPlaysayNumber"}>{team.updates?.sayNumber}<br /></span>}
                 <span >{team?.rookieYear}<br />({years === 1 ? "" : years}{yearsDisplay} season)</span>
                 {inPlayoffs && <p className={"announceAlliance"}>{team.alliance}<br />{team.allianceRole}</p>}
             </td>
-            <td className={'col2'}>
+            <td className={'col2'} style={{backgroundColor:_.toLower(allianceColor)==="red"?"#F7B3B4":"#98B4F4"}}>
                 <span className={"teamName"}>{team?.updates?.nameShortLocal ? team?.updates?.nameShortLocal : team?.nameShort}</span><br />
                 <span>{team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : `${team?.city}, ${team?.stateProv}${team?.country !== "USA" ? `, ${team?.country}` : ""}`}</span><br />
                 {team?.updates?.robotNameLocal && <span className={"robotName"}>{team?.updates?.robotNameLocal}<br /></span>}
@@ -56,7 +56,7 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
                         <br /></span>}
                 </span>}
             </td>
-            <td className={'col7'}>
+            <td className={'col7'} style={{backgroundColor:_.toLower(allianceColor)==="red"?"#F7B3B4":"#98B4F4"}}>
                 <p className={"announceOrganization"}>{team?.updates?.organizationLocal ? team?.updates?.organizationLocal : team?.schoolName}</p>
                 {(showSponsors || _.isNull(showSponsors)) && <p className={"sponsors"} >{team?.updates?.topSponsorsLocal ? team?.updates?.topSponsorsLocal : team?.topSponsors}</p>}
                 <p className={`HOF${allianceColor}`}>
@@ -86,7 +86,7 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
                 </p>}
                 {(showNotes || _.isNull(showNotes)) && <p dangerouslySetInnerHTML={{ __html: team?.updates?.teamNotesLocal }} />}
             </td>
-            <td className={"col1 ranking"} style={team?.rankStyle}>
+            <td className={"col1 ranking"} style={team?.rankStyle.backgroundColor === "" ? {backgroundColor:_.toLower(allianceColor)==="red"?"#F7B3B4":"#98B4F4"} : team?.rankStyle }>
                 {team?.rank ? team?.rank : ""}
             </td>
         </tr>

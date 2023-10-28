@@ -4,6 +4,7 @@ import * as serviceWorkerRegistration from '../serviceWorkerRegistration'
 export const useServiceWorker = () => {
     const [waitingWorker, setWaitingWorker] = useState(null)
     const [showReload, setShowReload] = useState(false)
+    const [showReloaded, setShowReloaded] = useState(false)
 
     const onSWUpdate = useCallback((registration) => {
         setShowReload(true)
@@ -13,6 +14,7 @@ export const useServiceWorker = () => {
     const reloadPage = useCallback(() => {
         waitingWorker?.postMessage({ type: "SKIP_WAITING" })
         setShowReload(false)
+        setShowReloaded(true)
         window.location.reload()
     }, [waitingWorker])
 
@@ -22,5 +24,5 @@ export const useServiceWorker = () => {
         })
     }, [onSWUpdate])
 
-    return { showReload, waitingWorker, reloadPage }
+    return { showReload, showReloaded, waitingWorker, reloadPage }
 }
