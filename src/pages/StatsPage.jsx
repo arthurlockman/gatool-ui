@@ -16,24 +16,24 @@ function StatsPage({ worldStats, selectedEvent, eventHighScores, eventNamesCY })
                 <Container fluid>
                     <Row>
                         <Col xs={"12"} sm={"6"}>
-                            <table className="table table-condensed gatool-worldHighScores">
+                            <table className="table table-condensed gatool-worldHighScores" style={{backgroundColor: "#f2dede"}}>
                                 <thead>
                                     <tr>
-                                        <td colSpan={2}>World High Scores {worldStats?.year}</td>
+                                        <td style={{backgroundColor: "#f2dede"}} colSpan={2}>World High Scores {worldStats?.year}</td>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <StatsMatch highScores={worldStats?.highscores} matchType={"penaltyFreequal"} matchName={"Qual (no penalties)"} eventNamesCY={eventNamesCY} />
-                                        <StatsMatch highScores={worldStats?.highscores} matchType={"penaltyFreeplayoff"} matchName={"Playoff (no penalties)"} eventNamesCY={eventNamesCY} />
+                                    <tr >
+                                        <StatsMatch highScores={worldStats?.highscores} matchType={"penaltyFreequal"} matchName={"Qual (no penalties)"} eventNamesCY={eventNamesCY} tableType={"world"}/>
+                                        <StatsMatch highScores={worldStats?.highscores} matchType={"penaltyFreeplayoff"} matchName={"Playoff (no penalties)"} eventNamesCY={eventNamesCY} tableType={"world"}/>
                                     </tr>
                                     <tr>
-                                        <StatsMatch highScores={worldStats?.highscores} matchType={"offsettingqual"} matchName={"Qual (offsetting penalties)"} eventNamesCY={eventNamesCY} />
-                                        <StatsMatch highScores={worldStats?.highscores} matchType={"offsettingplayoff"} matchName={"Playoff (offsetting penalties)"} eventNamesCY={eventNamesCY} />
+                                        <StatsMatch highScores={worldStats?.highscores} matchType={"offsettingqual"} matchName={"Qual (offsetting penalties)"} eventNamesCY={eventNamesCY} tableType={"world"}/>
+                                        <StatsMatch highScores={worldStats?.highscores} matchType={"offsettingplayoff"} matchName={"Playoff (offsetting penalties)"} eventNamesCY={eventNamesCY} tableType={"world"}/>
                                     </tr>
                                     <tr>
-                                        <StatsMatch highScores={worldStats?.highscores} matchType={"overallqual"} matchName={"Qual (incl. penalties)"} eventNamesCY={eventNamesCY} />
-                                        <StatsMatch highScores={worldStats?.highscores} matchType={"overallplayoff"} matchName={"Playoff (incl. penalties)"} eventNamesCY={eventNamesCY} />
+                                        <StatsMatch highScores={worldStats?.highscores} matchType={"overallqual"} matchName={"Qual (incl. penalties)"} eventNamesCY={eventNamesCY} tableType={"world"}/>
+                                        <StatsMatch highScores={worldStats?.highscores} matchType={"overallplayoff"} matchName={"Playoff (incl. penalties)"} eventNamesCY={eventNamesCY} tableType={"world"}/>
                                     </tr>
                                 </tbody>
                             </table>
@@ -42,21 +42,21 @@ function StatsPage({ worldStats, selectedEvent, eventHighScores, eventNamesCY })
                             <table className="table table-condensed gatool-eventHighScores">
                                 <thead>
                                     <tr>
-                                        <td colSpan={2}>Event High Scores: {selectedEvent.label}</td>
+                                        <td colSpan={2} style={{backgroundColor: "#d9edf7"}}>Event High Scores: {selectedEvent.label}</td>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <StatsMatch highScores={eventHighScores} matchType={"penaltyFreequal"} matchName={"Qual (no penalties)"} eventNamesCY={eventNamesCY} />
-                                        <StatsMatch highScores={eventHighScores} matchType={"penaltyFreeplayoff"} matchName={"Playoff (no penalties)"} eventNamesCY={eventNamesCY} />
+                                        <StatsMatch highScores={eventHighScores} matchType={"penaltyFreequal"} matchName={"Qual (no penalties)"} eventNamesCY={eventNamesCY} tableType={"event"}/>
+                                        <StatsMatch highScores={eventHighScores} matchType={"penaltyFreeplayoff"} matchName={"Playoff (no penalties)"} eventNamesCY={eventNamesCY}  tableType={"event"}/>
                                     </tr>
                                     <tr>
-                                        <StatsMatch highScores={eventHighScores} matchType={"offsettingqual"} matchName={"Qual (offsetting penalties)"} eventNamesCY={eventNamesCY} />
-                                        <StatsMatch highScores={eventHighScores} matchType={"offsettingplayoff"} matchName={"Playoff (offsetting penalties)"} eventNamesCY={eventNamesCY} />
+                                        <StatsMatch highScores={eventHighScores} matchType={"offsettingqual"} matchName={"Qual (offsetting penalties)"} eventNamesCY={eventNamesCY}  tableType={"event"}/>
+                                        <StatsMatch highScores={eventHighScores} matchType={"offsettingplayoff"} matchName={"Playoff (offsetting penalties)"} eventNamesCY={eventNamesCY}  tableType={"event"}/>
                                     </tr>
                                     <tr>
-                                        <StatsMatch highScores={eventHighScores} matchType={"overallqual"} matchName={"Qual (incl. penalties)"} eventNamesCY={eventNamesCY} />
-                                        <StatsMatch highScores={eventHighScores} matchType={"overallplayoff"} matchName={"Playoff (incl. penalties)"} eventNamesCY={eventNamesCY} />
+                                        <StatsMatch highScores={eventHighScores} matchType={"overallqual"} matchName={"Qual (incl. penalties)"} eventNamesCY={eventNamesCY}  tableType={"event"}/>
+                                        <StatsMatch highScores={eventHighScores} matchType={"overallplayoff"} matchName={"Playoff (incl. penalties)"} eventNamesCY={eventNamesCY}  tableType={"event"}/>
                                     </tr>
                                 </tbody>
                             </table>

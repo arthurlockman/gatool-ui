@@ -101,7 +101,7 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
             row.score = match[`score${row.alliance}Final`];
             row.level = match.level;
             row.description = match.description;
-            row.alliancePartners = _.filter(match.teams, function (o) { return o.station.substring(0, team.station.length - 1) === row.alliance }).map((q) => {
+            row.alliancePartners = _.filter(match?.teams, function (o) { return o.station.substring(0, team.station.length - 1) === row.alliance }).map((q) => {
                 return q.teamNumber;
             })
             scores.push(row);

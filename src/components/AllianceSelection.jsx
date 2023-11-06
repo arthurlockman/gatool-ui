@@ -48,10 +48,12 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         }
     })
 
-    var inChamps = false;
-    if (selectedEvent?.value?.champLevel === "CHAMPS" || selectedEvent?.value?.champLevel === "CMPDIV" || selectedEvent?.value?.champLevel === "CMPSUB") {
-        inChamps = true;
-    }
+    const inChamps =
+      selectedEvent?.value?.champLevel === "CHAMPS" ||
+      selectedEvent?.value?.champLevel === "CMPDIV" ||
+      selectedEvent?.value?.champLevel === "CMPSUB"
+        ? true
+        : false;
 
     var allianceDisplayOrder = [];
     if (allianceCount?.count <= 4) {
