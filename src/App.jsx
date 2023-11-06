@@ -236,6 +236,19 @@ function App() {
   //functions to retrieve API data
 
   /**
+ * Returns whether the event is Champs
+ * @constant inWorldChamps
+ * @return {boolean}
+ * */
+  const inWorldChamps = () => {
+    if (selectedEvent?.value?.champLevel === "CHAMPS") {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  /**
    * This function retrieves a schedule from FIRST. It attempts to get both the Qual and Playoff Schedule and sets the global variables
    * 
    * It uses the Hybrid Schedule endpoint to fetch the Qual schedule, then process the match data.
@@ -489,6 +502,21 @@ function App() {
 
       // since we have a playoff schedule, we need to fetch the Alliances.
       getAlliances();
+
+      // If we are in World Champs, we need to determine the team list from the schedule
+      var tempChampsTeamList = [];
+      if (playoffSchedule?.schedule?.length > 0) {
+        playoffSchedule?.schedule.forEach((match) => {
+          match?.teams.forEach((team) => {
+            tempChampsTeamList.push(team.teamNumber);
+          })
+        })
+
+        // We have bypassed getting the team list and details in the normal loading cycle,
+        // so we need to get the details now from this array of competing teams
+        getTeamList(_.uniq(tempChampsTeamList));
+      }
+
     } else { playoffschedule.schedule = playoffschedule.schedule.schedule }
 
     var lastMatchPlayed = 0;
@@ -540,7 +568,7 @@ function App() {
     var result = null;
     var teams = null;
 
-    if (selectedEvent?.value?.code.includes("OFFLINE")) {
+    if (selectedEvent?.value?.code.includes("OFFLINE") || inWorldChamps()) {
       teams = {
         "teamCountTotal": 0,
         "teamCountPage": 1,
@@ -560,7 +588,7 @@ function App() {
 
         await Promise.all(adHocTeams).then(function (values) {
           //do something with the team list
-          console.log(values);
+          // console.log(values);
           teams.teams = values;
           getCommunityUpdates(false, values);
         });

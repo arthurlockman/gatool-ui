@@ -259,7 +259,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
             keys = Object.keys(match);
             keys.forEach((key) => {
                 if (key === "teams") {
-                    match.teams.forEach((team) => {
+                    match?.teams.forEach((team) => {
                         record[team.station] = team.teamNumber
                     })
                 } else if (key === "winner") {
