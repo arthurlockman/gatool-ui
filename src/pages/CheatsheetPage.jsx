@@ -2,7 +2,7 @@ import { Container, Row } from "react-bootstrap";
 import { FlashcardArray } from "react-quizlet-flashcard";
 import _ from "lodash";
 
-function CheatsheetPage({ teamList, communityUpdates, selectedEvent }) {
+function CheatsheetPage({ teamList, communityUpdates, selectedEvent, selectedYear }) {
     const sortedTeams = _.orderBy(teamList?.teams, "teamNumber", "asc");
     const cardStyle = {
         display: "flex",
@@ -17,12 +17,13 @@ function CheatsheetPage({ teamList, communityUpdates, selectedEvent }) {
             frontHTML: "",
             backHTML: ""
         };
+        var avatar = `<img src='https://api.gatool.org/v3/${selectedYear.value}/avatars/team/${team?.teamNumber}/avatar.png' onerror="this.style.display='none'">&nbsp`;
         team = _.merge(team, communityUpdates[_.findIndex(communityUpdates, { "teamNumber": team?.teamNumber })], teamList?.teams[_.findIndex(teamList?.teams, { "teamNumber": team?.teamNumber })]);
         card.id = index;
         card.frontHTML = `<h1><b>${team.teamNumber}</b>${team?.updates?.sayNumber ? `<br />${team?.updates?.sayNumber}`:""}</h1>`;
         card.frontContentStyle = cardStyle;
         card.backContentStyle = cardStyle;
-        card.backHTML = `<h1><b>${team?.updates?.nameShortLocal ? team?.updates?.nameShortLocal : team?.nameShort}</b><br />${team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : team?.city + ", " + team?.stateProv + (team?.country === "USA" ? "" : " "+team?.country)}</h1>`;
+        card.backHTML = `<h1>${avatar}<br /><b>${team?.updates?.nameShortLocal ? team?.updates?.nameShortLocal : team?.nameShort}</b><br />${team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : team?.city + ", " + team?.stateProv + (team?.country === "USA" ? "" : " "+team?.country)}</h1>`;
         return card;
     })
 
