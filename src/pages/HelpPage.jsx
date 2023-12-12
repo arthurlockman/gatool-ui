@@ -3,7 +3,7 @@ function HelpPage() {
         <iframe style={{
             bottom: 0,
             width: "100%", height: "90vh"
-        }} src={process.env.PUBLIC_URL + '/help.html'} title="Help" />
+        }} src={"https://github.com/arthurlockman/gatool-ui/wiki"} title="Help" />
     )
 }
 
