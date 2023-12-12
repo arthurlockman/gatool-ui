@@ -1224,7 +1224,7 @@ function App() {
         }
         var timeNow = moment();
 
-        if (selectedYear?.value === "2023") {
+        if (selectedYear?.value === supportedYears[0].value) {
           json.events = json?.events.concat(training.events.events)
         }
 

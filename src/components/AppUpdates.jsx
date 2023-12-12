@@ -1,6 +1,11 @@
 
 export const appUpdates = [
     {
+        date: "December 11, 2023",
+        message: <ul>
+            <li>Updated to include 2024 season</li>
+        </ul>
+    },{
         date: "October 23, 2023",
         message: <ul>
             <li>Added support for uploading Rankings for Offline events</li>
