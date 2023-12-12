@@ -161,7 +161,7 @@ function MainNavigation({ selectedEvent, qualSchedule, playoffs, teamList, commu
           <Nav.Link id={"statsPage"} as={NavLink} style={({ isActive }) => getTabStyle(isActive, statsTabReady)} to="/stats"><Flag /><div className='d-none d-md-block navBarText'>Stats</div></Nav.Link>
           <Nav.Link id={"cheatSheetPage"} as={NavLink} style={({ isActive }) => getTabStyle(isActive, null)} to="/cheatsheet"><Eye /><div className='d-none d-md-block navBarText'>Cheat Sheet</div></Nav.Link>
           <Nav.Link id={"emceePage"} as={NavLink} style={({ isActive }) => getTabStyle(isActive, null)} to="/emcee"><Gift /><div className='d-none d-md-block navBarText'>Emcee #s</div></Nav.Link>
-          <Nav.Link as={NavLink} className='d-none d-md-block navBarText' style={({ isActive }) => getTabStyle(isActive, null)} to="/help"><QuestionOctagon /><div className='d-none d-md-block navBarText'>Help</div></Nav.Link>
+          <Nav.Link as={NavLink} className='d-none d-md-block navBarText' style={({ isActive }) => getTabStyle(isActive, null)} to="https://github.com/arthurlockman/gatool-ui/wiki" target="_blank" rel="noopener noreferrer"><QuestionOctagon /><div className='d-none d-md-block navBarText'>Help</div></Nav.Link>
         </Nav>
         {
           !isOnline &&
