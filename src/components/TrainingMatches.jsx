@@ -9,13 +9,14 @@ const trainingTeams = {};
 const trainingRanks = {};
 const trainingAlliances = {};
 const trainingEvents = {};
+const today=moment().format('YYYY[-]MM[-]DD');
 
 trainingSchedule.qual.final = {
     "Schedule": [
         {
             "description": "Qualification 1",
             "level": "Qualification",
-            "startTime": "2024-02-18T08:40:00",
+            "startTime": today+"T08:40:00",
             "matchNumber": 1,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -65,14 +66,14 @@ trainingSchedule.qual.final = {
             "scoreBlueFinal": 54,
             "scoreBlueFoul": 15,
             "scoreBlueAuto": 11,
-            "autoStartTime": "2024-02-18T09:00:19.763",
-            "actualStartTime": "2024-02-18T09:00:19.763",
-            "postResultTime": "2024-02-18T09:03:51.97"
+            "autoStartTime": today+"T09:00:19.763",
+            "actualStartTime": today+"T09:00:19.763",
+            "postResultTime": today+"T09:03:51.97"
         },
         {
             "description": "Qualification 2",
             "level": "Qualification",
-            "startTime": "2024-02-18T08:48:00",
+            "startTime": today+"T08:48:00",
             "matchNumber": 2,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -122,14 +123,14 @@ trainingSchedule.qual.final = {
             "scoreBlueFinal": 27,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 0,
-            "autoStartTime": "2024-02-18T09:09:19.997",
-            "actualStartTime": "2024-02-18T09:09:19.997",
-            "postResultTime": "2024-02-18T09:12:38.38"
+            "autoStartTime": today+"T09:09:19.997",
+            "actualStartTime": today+"T09:09:19.997",
+            "postResultTime": today+"T09:12:38.38"
         },
         {
             "description": "Qualification 3",
             "level": "Qualification",
-            "startTime": "2024-02-18T08:56:00",
+            "startTime": today+"T08:56:00",
             "matchNumber": 3,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -179,14 +180,14 @@ trainingSchedule.qual.final = {
             "scoreBlueFinal": 71,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 12,
-            "autoStartTime": "2024-02-18T09:20:33.153",
-            "actualStartTime": "2024-02-18T09:20:33.153",
-            "postResultTime": "2024-02-18T09:23:37.63"
+            "autoStartTime": today+"T09:20:33.153",
+            "actualStartTime": today+"T09:20:33.153",
+            "postResultTime": today+"T09:23:37.63"
         },
         {
             "description": "Qualification 4",
             "level": "Qualification",
-            "startTime": "2024-02-18T09:04:00",
+            "startTime": today+"T09:04:00",
             "matchNumber": 4,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -236,14 +237,14 @@ trainingSchedule.qual.final = {
             "scoreBlueFinal": 60,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 21,
-            "autoStartTime": "2024-02-18T09:33:19.947",
-            "actualStartTime": "2024-02-18T09:33:19.947",
-            "postResultTime": "2024-02-18T09:38:11.74"
+            "autoStartTime": today+"T09:33:19.947",
+            "actualStartTime": today+"T09:33:19.947",
+            "postResultTime": today+"T09:38:11.74"
         },
         {
             "description": "Qualification 5",
             "level": "Qualification",
-            "startTime": "2024-02-18T09:12:00",
+            "startTime": today+"T09:12:00",
             "matchNumber": 5,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -293,14 +294,14 @@ trainingSchedule.qual.final = {
             "scoreBlueFinal": 75,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 30,
-            "autoStartTime": "2024-02-18T09:46:08.13",
-            "actualStartTime": "2024-02-18T09:46:08.13",
-            "postResultTime": "2024-02-18T09:49:53.033"
+            "autoStartTime": today+"T09:46:08.13",
+            "actualStartTime": today+"T09:46:08.13",
+            "postResultTime": today+"T09:49:53.033"
         },
         {
             "description": "Qualification 6",
             "level": "Qualification",
-            "startTime": "2024-02-18T09:20:00",
+            "startTime": today+"T09:20:00",
             "matchNumber": 6,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -350,14 +351,14 @@ trainingSchedule.qual.final = {
             "scoreBlueFinal": 48,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 3,
-            "autoStartTime": "2024-02-18T09:55:12.317",
-            "actualStartTime": "2024-02-18T09:55:12.317",
-            "postResultTime": "2024-02-18T09:58:23.383"
+            "autoStartTime": today+"T09:55:12.317",
+            "actualStartTime": today+"T09:55:12.317",
+            "postResultTime": today+"T09:58:23.383"
         },
         {
             "description": "Qualification 7",
             "level": "Qualification",
-            "startTime": "2024-02-18T09:28:00",
+            "startTime": today+"T09:28:00",
             "matchNumber": 7,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -407,14 +408,14 @@ trainingSchedule.qual.final = {
             "scoreBlueFinal": 36,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 3,
-            "autoStartTime": "2024-02-18T10:06:14.35",
-            "actualStartTime": "2024-02-18T10:06:14.35",
-            "postResultTime": "2024-02-18T10:09:11.45"
+            "autoStartTime": today+"T10:06:14.35",
+            "actualStartTime": today+"T10:06:14.35",
+            "postResultTime": today+"T10:09:11.45"
         },
         {
             "description": "Qualification 8",
             "level": "Qualification",
-            "startTime": "2024-02-18T09:36:00",
+            "startTime": today+"T09:36:00",
             "matchNumber": 8,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -464,14 +465,14 @@ trainingSchedule.qual.final = {
             "scoreBlueFinal": 87,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 21,
-            "autoStartTime": "2024-02-18T10:14:36.097",
-            "actualStartTime": "2024-02-18T10:14:36.097",
-            "postResultTime": "2024-02-18T10:17:30.183"
+            "autoStartTime": today+"T10:14:36.097",
+            "actualStartTime": today+"T10:14:36.097",
+            "postResultTime": today+"T10:17:30.183"
         },
         {
             "description": "Qualification 9",
             "level": "Qualification",
-            "startTime": "2024-02-18T09:44:00",
+            "startTime": today+"T09:44:00",
             "matchNumber": 9,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -521,14 +522,14 @@ trainingSchedule.qual.final = {
             "scoreBlueFinal": 55,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 15,
-            "autoStartTime": "2024-02-18T10:21:50.17",
-            "actualStartTime": "2024-02-18T10:21:50.17",
-            "postResultTime": "2024-02-18T10:25:12.093"
+            "autoStartTime": today+"T10:21:50.17",
+            "actualStartTime": today+"T10:21:50.17",
+            "postResultTime": today+"T10:25:12.093"
         },
         {
             "description": "Qualification 10",
             "level": "Qualification",
-            "startTime": "2024-02-18T09:52:00",
+            "startTime": today+"T09:52:00",
             "matchNumber": 10,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -578,14 +579,14 @@ trainingSchedule.qual.final = {
             "scoreBlueFinal": 38,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 9,
-            "autoStartTime": "2024-02-18T10:32:54.977",
-            "actualStartTime": "2024-02-18T10:32:54.977",
-            "postResultTime": "2024-02-18T10:35:53.643"
+            "autoStartTime": today+"T10:32:54.977",
+            "actualStartTime": today+"T10:32:54.977",
+            "postResultTime": today+"T10:35:53.643"
         },
         {
             "description": "Qualification 11",
             "level": "Qualification",
-            "startTime": "2024-02-18T10:00:00",
+            "startTime": today+"T10:00:00",
             "matchNumber": 11,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -635,14 +636,14 @@ trainingSchedule.qual.final = {
             "scoreBlueFinal": 30,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 7,
-            "autoStartTime": "2024-02-18T10:42:23.343",
-            "actualStartTime": "2024-02-18T10:42:23.343",
-            "postResultTime": "2024-02-18T10:45:32.54"
+            "autoStartTime": today+"T10:42:23.343",
+            "actualStartTime": today+"T10:42:23.343",
+            "postResultTime": today+"T10:45:32.54"
         },
         {
             "description": "Qualification 12",
             "level": "Qualification",
-            "startTime": "2024-02-18T10:08:00",
+            "startTime": today+"T10:08:00",
             "matchNumber": 12,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -692,14 +693,14 @@ trainingSchedule.qual.final = {
             "scoreBlueFinal": 89,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 19,
-            "autoStartTime": "2024-02-18T10:49:51.207",
-            "actualStartTime": "2024-02-18T10:49:51.207",
-            "postResultTime": "2024-02-18T10:53:10.59"
+            "autoStartTime": today+"T10:49:51.207",
+            "actualStartTime": today+"T10:49:51.207",
+            "postResultTime": today+"T10:53:10.59"
         },
         {
             "description": "Qualification 13",
             "level": "Qualification",
-            "startTime": "2024-02-18T10:16:00",
+            "startTime": today+"T10:16:00",
             "matchNumber": 13,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -749,14 +750,14 @@ trainingSchedule.qual.final = {
             "scoreBlueFinal": 56,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 12,
-            "autoStartTime": "2024-02-18T10:59:57.627",
-            "actualStartTime": "2024-02-18T10:59:57.627",
-            "postResultTime": "2024-02-18T11:03:43.653"
+            "autoStartTime": today+"T10:59:57.627",
+            "actualStartTime": today+"T10:59:57.627",
+            "postResultTime": today+"T11:03:43.653"
         },
         {
             "description": "Qualification 14",
             "level": "Qualification",
-            "startTime": "2024-02-18T10:24:00",
+            "startTime": today+"T10:24:00",
             "matchNumber": 14,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -806,14 +807,14 @@ trainingSchedule.qual.final = {
             "scoreBlueFinal": 45,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 3,
-            "autoStartTime": "2024-02-18T11:08:49.24",
-            "actualStartTime": "2024-02-18T11:08:49.24",
-            "postResultTime": "2024-02-18T11:11:48.237"
+            "autoStartTime": today+"T11:08:49.24",
+            "actualStartTime": today+"T11:08:49.24",
+            "postResultTime": today+"T11:11:48.237"
         },
         {
             "description": "Qualification 15",
             "level": "Qualification",
-            "startTime": "2024-02-18T10:32:00",
+            "startTime": today+"T10:32:00",
             "matchNumber": 15,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -863,14 +864,14 @@ trainingSchedule.qual.final = {
             "scoreBlueFinal": 84,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 12,
-            "autoStartTime": "2024-02-18T11:19:33.533",
-            "actualStartTime": "2024-02-18T11:19:33.533",
-            "postResultTime": "2024-02-18T11:22:26.573"
+            "autoStartTime": today+"T11:19:33.533",
+            "actualStartTime": today+"T11:19:33.533",
+            "postResultTime": today+"T11:22:26.573"
         },
         {
             "description": "Qualification 16",
             "level": "Qualification",
-            "startTime": "2024-02-18T10:40:00",
+            "startTime": today+"T10:40:00",
             "matchNumber": 16,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -920,14 +921,14 @@ trainingSchedule.qual.final = {
             "scoreBlueFinal": 43,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 3,
-            "autoStartTime": "2024-02-18T11:28:53.717",
-            "actualStartTime": "2024-02-18T11:28:53.717",
-            "postResultTime": "2024-02-18T11:33:02.15"
+            "autoStartTime": today+"T11:28:53.717",
+            "actualStartTime": today+"T11:28:53.717",
+            "postResultTime": today+"T11:33:02.15"
         },
         {
             "description": "Qualification 17",
             "level": "Qualification",
-            "startTime": "2024-02-18T10:48:00",
+            "startTime": today+"T10:48:00",
             "matchNumber": 17,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -977,14 +978,14 @@ trainingSchedule.qual.final = {
             "scoreBlueFinal": 34,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 9,
-            "autoStartTime": "2024-02-18T11:38:01.23",
-            "actualStartTime": "2024-02-18T11:38:01.23",
-            "postResultTime": "2024-02-18T11:41:22.18"
+            "autoStartTime": today+"T11:38:01.23",
+            "actualStartTime": today+"T11:38:01.23",
+            "postResultTime": today+"T11:41:22.18"
         },
         {
             "description": "Qualification 18",
             "level": "Qualification",
-            "startTime": "2024-02-18T10:56:00",
+            "startTime": today+"T10:56:00",
             "matchNumber": 18,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -1034,14 +1035,14 @@ trainingSchedule.qual.final = {
             "scoreBlueFinal": 43,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 15,
-            "autoStartTime": "2024-02-18T11:46:56.483",
-            "actualStartTime": "2024-02-18T11:46:56.483",
-            "postResultTime": "2024-02-18T11:50:34.317"
+            "autoStartTime": today+"T11:46:56.483",
+            "actualStartTime": today+"T11:46:56.483",
+            "postResultTime": today+"T11:50:34.317"
         },
         {
             "description": "Qualification 19",
             "level": "Qualification",
-            "startTime": "2024-02-18T11:04:00",
+            "startTime": today+"T11:04:00",
             "matchNumber": 19,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -1091,14 +1092,14 @@ trainingSchedule.qual.final = {
             "scoreBlueFinal": 22,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 0,
-            "autoStartTime": "2024-02-18T11:55:15.077",
-            "actualStartTime": "2024-02-18T11:55:15.077",
-            "postResultTime": "2024-02-18T11:58:06.353"
+            "autoStartTime": today+"T11:55:15.077",
+            "actualStartTime": today+"T11:55:15.077",
+            "postResultTime": today+"T11:58:06.353"
         },
         {
             "description": "Qualification 20",
             "level": "Qualification",
-            "startTime": "2024-02-18T11:12:00",
+            "startTime": today+"T11:12:00",
             "matchNumber": 20,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -1148,9 +1149,9 @@ trainingSchedule.qual.final = {
             "scoreBlueFinal": 76,
             "scoreBlueFoul": 10,
             "scoreBlueAuto": 9,
-            "autoStartTime": "2024-02-18T12:03:23.77",
-            "actualStartTime": "2024-02-18T12:03:23.77",
-            "postResultTime": "2024-02-18T12:07:14.917"
+            "autoStartTime": today+"T12:03:23.77",
+            "actualStartTime": today+"T12:03:23.77",
+            "postResultTime": today+"T12:07:14.917"
         }
     ]
 }
@@ -1160,7 +1161,7 @@ trainingSchedule.qual.partial = {
         {
             "description": "Qualification 1",
             "level": "Qualification",
-            "startTime": "2024-02-18T08:40:00",
+            "startTime": today+"T08:40:00",
             "matchNumber": 1,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -1210,14 +1211,14 @@ trainingSchedule.qual.partial = {
             "scoreBlueFinal": 54,
             "scoreBlueFoul": 15,
             "scoreBlueAuto": 11,
-            "autoStartTime": "2024-02-18T09:00:19.763",
-            "actualStartTime": "2024-02-18T09:00:19.763",
-            "postResultTime": "2024-02-18T09:03:51.97"
+            "autoStartTime": today+"T09:00:19.763",
+            "actualStartTime": today+"T09:00:19.763",
+            "postResultTime": today+"T09:03:51.97"
         },
         {
             "description": "Qualification 2",
             "level": "Qualification",
-            "startTime": "2024-02-18T08:48:00",
+            "startTime": today+"T08:48:00",
             "matchNumber": 2,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -1267,14 +1268,14 @@ trainingSchedule.qual.partial = {
             "scoreBlueFinal": 27,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 0,
-            "autoStartTime": "2024-02-18T09:09:19.997",
-            "actualStartTime": "2024-02-18T09:09:19.997",
-            "postResultTime": "2024-02-18T09:12:38.38"
+            "autoStartTime": today+"T09:09:19.997",
+            "actualStartTime": today+"T09:09:19.997",
+            "postResultTime": today+"T09:12:38.38"
         },
         {
             "description": "Qualification 3",
             "level": "Qualification",
-            "startTime": "2024-02-18T08:56:00",
+            "startTime": today+"T08:56:00",
             "matchNumber": 3,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -1324,14 +1325,14 @@ trainingSchedule.qual.partial = {
             "scoreBlueFinal": 71,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 12,
-            "autoStartTime": "2024-02-18T09:20:33.153",
-            "actualStartTime": "2024-02-18T09:20:33.153",
-            "postResultTime": "2024-02-18T09:23:37.63"
+            "autoStartTime": today+"T09:20:33.153",
+            "actualStartTime": today+"T09:20:33.153",
+            "postResultTime": today+"T09:23:37.63"
         },
         {
             "description": "Qualification 4",
             "level": "Qualification",
-            "startTime": "2024-02-18T09:04:00",
+            "startTime": today+"T09:04:00",
             "matchNumber": 4,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -1381,14 +1382,14 @@ trainingSchedule.qual.partial = {
             "scoreBlueFinal": 60,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 21,
-            "autoStartTime": "2024-02-18T09:33:19.947",
-            "actualStartTime": "2024-02-18T09:33:19.947",
-            "postResultTime": "2024-02-18T09:38:11.74"
+            "autoStartTime": today+"T09:33:19.947",
+            "actualStartTime": today+"T09:33:19.947",
+            "postResultTime": today+"T09:38:11.74"
         },
         {
             "description": "Qualification 5",
             "level": "Qualification",
-            "startTime": "2024-02-18T09:12:00",
+            "startTime": today+"T09:12:00",
             "matchNumber": 5,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -1438,14 +1439,14 @@ trainingSchedule.qual.partial = {
             "scoreBlueFinal": 75,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 30,
-            "autoStartTime": "2024-02-18T09:46:08.13",
-            "actualStartTime": "2024-02-18T09:46:08.13",
-            "postResultTime": "2024-02-18T09:49:53.033"
+            "autoStartTime": today+"T09:46:08.13",
+            "actualStartTime": today+"T09:46:08.13",
+            "postResultTime": today+"T09:49:53.033"
         },
         {
             "description": "Qualification 6",
             "level": "Qualification",
-            "startTime": "2024-02-18T09:20:00",
+            "startTime": today+"T09:20:00",
             "matchNumber": 6,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -1495,14 +1496,14 @@ trainingSchedule.qual.partial = {
             "scoreBlueFinal": 48,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 3,
-            "autoStartTime": "2024-02-18T09:55:12.317",
-            "actualStartTime": "2024-02-18T09:55:12.317",
-            "postResultTime": "2024-02-18T09:58:23.383"
+            "autoStartTime": today+"T09:55:12.317",
+            "actualStartTime": today+"T09:55:12.317",
+            "postResultTime": today+"T09:58:23.383"
         },
         {
             "description": "Qualification 7",
             "level": "Qualification",
-            "startTime": "2024-02-18T09:28:00",
+            "startTime": today+"T09:28:00",
             "matchNumber": 7,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -1552,14 +1553,14 @@ trainingSchedule.qual.partial = {
             "scoreBlueFinal": 36,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 3,
-            "autoStartTime": "2024-02-18T10:06:14.35",
-            "actualStartTime": "2024-02-18T10:06:14.35",
-            "postResultTime": "2024-02-18T10:09:11.45"
+            "autoStartTime": today+"T10:06:14.35",
+            "actualStartTime": today+"T10:06:14.35",
+            "postResultTime": today+"T10:09:11.45"
         },
         {
             "description": "Qualification 8",
             "level": "Qualification",
-            "startTime": "2024-02-18T09:36:00",
+            "startTime": today+"T09:36:00",
             "matchNumber": 8,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -1609,14 +1610,14 @@ trainingSchedule.qual.partial = {
             "scoreBlueFinal": 87,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 21,
-            "autoStartTime": "2024-02-18T10:14:36.097",
-            "actualStartTime": "2024-02-18T10:14:36.097",
-            "postResultTime": "2024-02-18T10:17:30.183"
+            "autoStartTime": today+"T10:14:36.097",
+            "actualStartTime": today+"T10:14:36.097",
+            "postResultTime": today+"T10:17:30.183"
         },
         {
             "description": "Qualification 9",
             "level": "Qualification",
-            "startTime": "2024-02-18T09:44:00",
+            "startTime": today+"T09:44:00",
             "matchNumber": 9,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -1666,14 +1667,14 @@ trainingSchedule.qual.partial = {
             "scoreBlueFinal": 55,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 15,
-            "autoStartTime": "2024-02-18T10:21:50.17",
-            "actualStartTime": "2024-02-18T10:21:50.17",
-            "postResultTime": "2024-02-18T10:25:12.093"
+            "autoStartTime": today+"T10:21:50.17",
+            "actualStartTime": today+"T10:21:50.17",
+            "postResultTime": today+"T10:25:12.093"
         },
         {
             "description": "Qualification 10",
             "level": "Qualification",
-            "startTime": "2024-02-18T09:52:00",
+            "startTime": today+"T09:52:00",
             "matchNumber": 10,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -1723,14 +1724,14 @@ trainingSchedule.qual.partial = {
             "scoreBlueFinal": 38,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 9,
-            "autoStartTime": "2024-02-18T10:32:54.977",
-            "actualStartTime": "2024-02-18T10:32:54.977",
-            "postResultTime": "2024-02-18T10:35:53.643"
+            "autoStartTime": today+"T10:32:54.977",
+            "actualStartTime": today+"T10:32:54.977",
+            "postResultTime": today+"T10:35:53.643"
         },
         {
             "description": "Qualification 11",
             "level": "Qualification",
-            "startTime": "2024-02-18T10:00:00",
+            "startTime": today+"T10:00:00",
             "matchNumber": 11,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -1787,7 +1788,7 @@ trainingSchedule.qual.partial = {
         {
             "description": "Qualification 12",
             "level": "Qualification",
-            "startTime": "2024-02-18T10:08:00",
+            "startTime": today+"T10:08:00",
             "matchNumber": 12,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -1844,7 +1845,7 @@ trainingSchedule.qual.partial = {
         {
             "description": "Qualification 13",
             "level": "Qualification",
-            "startTime": "2024-02-18T10:16:00",
+            "startTime": today+"T10:16:00",
             "matchNumber": 13,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -1901,7 +1902,7 @@ trainingSchedule.qual.partial = {
         {
             "description": "Qualification 14",
             "level": "Qualification",
-            "startTime": "2024-02-18T10:24:00",
+            "startTime": today+"T10:24:00",
             "matchNumber": 14,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -1958,7 +1959,7 @@ trainingSchedule.qual.partial = {
         {
             "description": "Qualification 15",
             "level": "Qualification",
-            "startTime": "2024-02-18T10:32:00",
+            "startTime": today+"T10:32:00",
             "matchNumber": 15,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -2015,7 +2016,7 @@ trainingSchedule.qual.partial = {
         {
             "description": "Qualification 16",
             "level": "Qualification",
-            "startTime": "2024-02-18T10:40:00",
+            "startTime": today+"T10:40:00",
             "matchNumber": 16,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -2072,7 +2073,7 @@ trainingSchedule.qual.partial = {
         {
             "description": "Qualification 17",
             "level": "Qualification",
-            "startTime": "2024-02-18T10:48:00",
+            "startTime": today+"T10:48:00",
             "matchNumber": 17,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -2129,7 +2130,7 @@ trainingSchedule.qual.partial = {
         {
             "description": "Qualification 18",
             "level": "Qualification",
-            "startTime": "2024-02-18T10:56:00",
+            "startTime": today+"T10:56:00",
             "matchNumber": 18,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -2186,7 +2187,7 @@ trainingSchedule.qual.partial = {
         {
             "description": "Qualification 19",
             "level": "Qualification",
-            "startTime": "2024-02-18T11:04:00",
+            "startTime": today+"T11:04:00",
             "matchNumber": 19,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -2243,7 +2244,7 @@ trainingSchedule.qual.partial = {
         {
             "description": "Qualification 20",
             "level": "Qualification",
-            "startTime": "2024-02-18T11:12:00",
+            "startTime": today+"T11:12:00",
             "matchNumber": 20,
             "field": "Primary",
             "tournamentLevel": "Qualification",
@@ -2309,7 +2310,7 @@ trainingSchedule.playoff.final = {
         {
             "description": "Match 1 (R1)",
             "level": "Playoff",
-            "startTime": "2024-02-18T13:15:00",
+            "startTime": today+"T13:15:00",
             "matchNumber": 1,
             "field": "Primary",
             "tournamentLevel": "Playoff",
@@ -2359,14 +2360,14 @@ trainingSchedule.playoff.final = {
             "scoreBlueFinal": 52,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 9,
-            "autoStartTime": "2024-02-18T13:22:34.033",
-            "actualStartTime": "2024-02-18T13:22:34.033",
-            "postResultTime": "2024-02-18T13:25:43.507"
+            "autoStartTime": today+"T13:22:34.033",
+            "actualStartTime": today+"T13:22:34.033",
+            "postResultTime": today+"T13:25:43.507"
         },
         {
             "description": "Match 2 (R1)",
             "level": "Playoff",
-            "startTime": "2024-02-18T13:23:00",
+            "startTime": today+"T13:23:00",
             "matchNumber": 2,
             "field": "Primary",
             "tournamentLevel": "Playoff",
@@ -2416,14 +2417,14 @@ trainingSchedule.playoff.final = {
             "scoreBlueFinal": 57,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 20,
-            "autoStartTime": "2024-02-18T13:32:31.237",
-            "actualStartTime": "2024-02-18T13:32:31.237",
-            "postResultTime": "2024-02-18T13:35:36.173"
+            "autoStartTime": today+"T13:32:31.237",
+            "actualStartTime": today+"T13:32:31.237",
+            "postResultTime": today+"T13:35:36.173"
         },
         {
             "description": "Match 3 (R1)",
             "level": "Playoff",
-            "startTime": "2024-02-18T13:31:00",
+            "startTime": today+"T13:31:00",
             "matchNumber": 3,
             "field": "Primary",
             "tournamentLevel": "Playoff",
@@ -2473,14 +2474,14 @@ trainingSchedule.playoff.final = {
             "scoreBlueFinal": 52,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 15,
-            "autoStartTime": "2024-02-18T13:43:56.353",
-            "actualStartTime": "2024-02-18T13:43:56.353",
-            "postResultTime": "2024-02-18T13:49:08.837"
+            "autoStartTime": today+"T13:43:56.353",
+            "actualStartTime": today+"T13:43:56.353",
+            "postResultTime": today+"T13:49:08.837"
         },
         {
             "description": "Match 4 (R1)",
             "level": "Playoff",
-            "startTime": "2024-02-18T13:39:00",
+            "startTime": today+"T13:39:00",
             "matchNumber": 4,
             "field": "Primary",
             "tournamentLevel": "Playoff",
@@ -2530,14 +2531,14 @@ trainingSchedule.playoff.final = {
             "scoreBlueFinal": 56,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 9,
-            "autoStartTime": "2024-02-18T13:53:35.27",
-            "actualStartTime": "2024-02-18T13:53:35.27",
-            "postResultTime": "2024-02-18T13:56:28.297"
+            "autoStartTime": today+"T13:53:35.27",
+            "actualStartTime": today+"T13:53:35.27",
+            "postResultTime": today+"T13:56:28.297"
         },
         {
             "description": "Match 5 (R2)",
             "level": "Playoff",
-            "startTime": "2024-02-18T13:47:00",
+            "startTime": today+"T13:47:00",
             "matchNumber": 5,
             "field": "Primary",
             "tournamentLevel": "Playoff",
@@ -2587,14 +2588,14 @@ trainingSchedule.playoff.final = {
             "scoreBlueFinal": 19,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 9,
-            "autoStartTime": "2024-02-18T14:10:14.743",
-            "actualStartTime": "2024-02-18T14:10:14.743",
-            "postResultTime": "2024-02-18T14:14:00.213"
+            "autoStartTime": today+"T14:10:14.743",
+            "actualStartTime": today+"T14:10:14.743",
+            "postResultTime": today+"T14:14:00.213"
         },
         {
             "description": "Match 6 (R2)",
             "level": "Playoff",
-            "startTime": "2024-02-18T13:55:00",
+            "startTime": today+"T13:55:00",
             "matchNumber": 6,
             "field": "Primary",
             "tournamentLevel": "Playoff",
@@ -2644,14 +2645,14 @@ trainingSchedule.playoff.final = {
             "scoreBlueFinal": 79,
             "scoreBlueFoul": 5,
             "scoreBlueAuto": 18,
-            "autoStartTime": "2024-02-18T14:19:29.367",
-            "actualStartTime": "2024-02-18T14:19:29.367",
-            "postResultTime": "2024-02-18T14:22:57.677"
+            "autoStartTime": today+"T14:19:29.367",
+            "actualStartTime": today+"T14:19:29.367",
+            "postResultTime": today+"T14:22:57.677"
         },
         {
             "description": "Match 7 (R2)",
             "level": "Playoff",
-            "startTime": "2024-02-18T14:03:00",
+            "startTime": today+"T14:03:00",
             "matchNumber": 7,
             "field": "Primary",
             "tournamentLevel": "Playoff",
@@ -2701,14 +2702,14 @@ trainingSchedule.playoff.final = {
             "scoreBlueFinal": 38,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 3,
-            "autoStartTime": "2024-02-18T14:27:45.15",
-            "actualStartTime": "2024-02-18T14:27:45.15",
-            "postResultTime": "2024-02-18T14:30:39.073"
+            "autoStartTime": today+"T14:27:45.15",
+            "actualStartTime": today+"T14:27:45.15",
+            "postResultTime": today+"T14:30:39.073"
         },
         {
             "description": "Match 8 (R2)",
             "level": "Playoff",
-            "startTime": "2024-02-18T14:11:00",
+            "startTime": today+"T14:11:00",
             "matchNumber": 8,
             "field": "Primary",
             "tournamentLevel": "Playoff",
@@ -2758,14 +2759,14 @@ trainingSchedule.playoff.final = {
             "scoreBlueFinal": 42,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 28,
-            "autoStartTime": "2024-02-18T14:35:39.107",
-            "actualStartTime": "2024-02-18T14:35:39.107",
-            "postResultTime": "2024-02-18T14:38:33.527"
+            "autoStartTime": today+"T14:35:39.107",
+            "actualStartTime": today+"T14:35:39.107",
+            "postResultTime": today+"T14:38:33.527"
         },
         {
             "description": "Match 9 (R3)",
             "level": "Playoff",
-            "startTime": "2024-02-18T14:19:00",
+            "startTime": today+"T14:19:00",
             "matchNumber": 9,
             "field": "Primary",
             "tournamentLevel": "Playoff",
@@ -2815,14 +2816,14 @@ trainingSchedule.playoff.final = {
             "scoreBlueFinal": 91,
             "scoreBlueFoul": 10,
             "scoreBlueAuto": 18,
-            "autoStartTime": "2024-02-18T14:53:07.623",
-            "actualStartTime": "2024-02-18T14:53:07.623",
-            "postResultTime": "2024-02-18T14:56:10.14"
+            "autoStartTime": today+"T14:53:07.623",
+            "actualStartTime": today+"T14:53:07.623",
+            "postResultTime": today+"T14:56:10.14"
         },
         {
             "description": "Match 10 (R3)",
             "level": "Playoff",
-            "startTime": "2024-02-18T14:27:00",
+            "startTime": today+"T14:27:00",
             "matchNumber": 10,
             "field": "Primary",
             "tournamentLevel": "Playoff",
@@ -2872,14 +2873,14 @@ trainingSchedule.playoff.final = {
             "scoreBlueFinal": 62,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 9,
-            "autoStartTime": "2024-02-18T15:02:19.657",
-            "actualStartTime": "2024-02-18T15:02:19.657",
-            "postResultTime": "2024-02-18T15:06:00.917"
+            "autoStartTime": today+"T15:02:19.657",
+            "actualStartTime": today+"T15:02:19.657",
+            "postResultTime": today+"T15:06:00.917"
         },
         {
             "description": "Match 11 (R4)",
             "level": "Playoff",
-            "startTime": "2024-02-18T14:35:00",
+            "startTime": today+"T14:35:00",
             "matchNumber": 11,
             "field": "Primary",
             "tournamentLevel": "Playoff",
@@ -2929,14 +2930,14 @@ trainingSchedule.playoff.final = {
             "scoreBlueFinal": 106,
             "scoreBlueFoul": 10,
             "scoreBlueAuto": 24,
-            "autoStartTime": "2024-02-18T15:23:18.87",
-            "actualStartTime": "2024-02-18T15:23:18.87",
-            "postResultTime": "2024-02-18T15:28:39.213"
+            "autoStartTime": today+"T15:23:18.87",
+            "actualStartTime": today+"T15:23:18.87",
+            "postResultTime": today+"T15:28:39.213"
         },
         {
             "description": "Match 12 (R4)",
             "level": "Playoff",
-            "startTime": "2024-02-18T14:43:00",
+            "startTime": today+"T14:43:00",
             "matchNumber": 12,
             "field": "Primary",
             "tournamentLevel": "Playoff",
@@ -2986,14 +2987,14 @@ trainingSchedule.playoff.final = {
             "scoreBlueFinal": 104,
             "scoreBlueFoul": 5,
             "scoreBlueAuto": 30,
-            "autoStartTime": "2024-02-18T15:33:15.133",
-            "actualStartTime": "2024-02-18T15:33:15.133",
-            "postResultTime": "2024-02-18T15:36:29.997"
+            "autoStartTime": today+"T15:33:15.133",
+            "actualStartTime": today+"T15:33:15.133",
+            "postResultTime": today+"T15:36:29.997"
         },
         {
             "description": "Match 13 (R5)",
             "level": "Playoff",
-            "startTime": "2024-02-18T14:51:00",
+            "startTime": today+"T14:51:00",
             "matchNumber": 13,
             "field": "Primary",
             "tournamentLevel": "Playoff",
@@ -3043,14 +3044,14 @@ trainingSchedule.playoff.final = {
             "scoreBlueFinal": 95,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 30,
-            "autoStartTime": "2024-02-18T15:59:26.87",
-            "actualStartTime": "2024-02-18T15:59:26.87",
-            "postResultTime": "2024-02-18T16:02:55.607"
+            "autoStartTime": today+"T15:59:26.87",
+            "actualStartTime": today+"T15:59:26.87",
+            "postResultTime": today+"T16:02:55.607"
         },
         {
             "description": "Final 1",
             "level": "Playoff",
-            "startTime": "2024-02-18T14:59:00",
+            "startTime": today+"T14:59:00",
             "matchNumber": 14,
             "field": "Primary",
             "tournamentLevel": "Playoff",
@@ -3100,14 +3101,14 @@ trainingSchedule.playoff.final = {
             "scoreBlueFinal": 120,
             "scoreBlueFoul": 20,
             "scoreBlueAuto": 27,
-            "autoStartTime": "2024-02-18T16:26:10.907",
-            "actualStartTime": "2024-02-18T16:26:10.907",
-            "postResultTime": "2024-02-18T16:29:33.733"
+            "autoStartTime": today+"T16:26:10.907",
+            "actualStartTime": today+"T16:26:10.907",
+            "postResultTime": today+"T16:29:33.733"
         },
         {
             "description": "Final 2",
             "level": "Playoff",
-            "startTime": "2024-02-18T15:07:00",
+            "startTime": today+"T15:07:00",
             "matchNumber": 15,
             "field": "Primary",
             "tournamentLevel": "Playoff",
@@ -3157,14 +3158,14 @@ trainingSchedule.playoff.final = {
             "scoreBlueFinal": 102,
             "scoreBlueFoul": 10,
             "scoreBlueAuto": 24,
-            "autoStartTime": "2024-02-18T16:49:45.2",
-            "actualStartTime": "2024-02-18T16:49:45.2",
-            "postResultTime": "2024-02-18T16:54:46.087"
+            "autoStartTime": today+"T16:49:45.2",
+            "actualStartTime": today+"T16:49:45.2",
+            "postResultTime": today+"T16:54:46.087"
         },
         {
             "description": "Final Tiebreaker",
             "level": "Playoff",
-            "startTime": "2024-02-18T15:15:00",
+            "startTime": today+"T15:15:00",
             "matchNumber": 16,
             "field": "Primary",
             "tournamentLevel": "Playoff",
@@ -3214,14 +3215,14 @@ trainingSchedule.playoff.final = {
             "scoreBlueFinal": 90,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 12,
-            "autoStartTime": "2024-02-18T17:06:41.037",
-            "actualStartTime": "2024-02-18T17:06:41.037",
-            "postResultTime": "2024-02-18T17:10:01.573"
+            "autoStartTime": today+"T17:06:41.037",
+            "actualStartTime": today+"T17:06:41.037",
+            "postResultTime": today+"T17:10:01.573"
         },
         {
             "description": "Overtime 1",
             "level": "Playoff",
-            "startTime": "2024-02-18T17:10:00.693",
+            "startTime": today+"T17:10:00.693",
             "matchNumber": 17,
             "field": "Primary",
             "tournamentLevel": "Playoff",
@@ -3271,9 +3272,9 @@ trainingSchedule.playoff.final = {
             "scoreBlueFinal": 81,
             "scoreBlueFoul": 25,
             "scoreBlueAuto": 12,
-            "autoStartTime": "2024-02-18T17:21:33.857",
-            "actualStartTime": "2024-02-18T17:21:33.857",
-            "postResultTime": "2024-02-18T17:27:10.973"
+            "autoStartTime": today+"T17:21:33.857",
+            "actualStartTime": today+"T17:21:33.857",
+            "postResultTime": today+"T17:27:10.973"
         }
     ]
 }
@@ -3283,7 +3284,7 @@ trainingSchedule.playoff.partial = {
         {
             "description": "Match 1 (R1)",
             "level": "Playoff",
-            "startTime": "2024-02-18T13:15:00",
+            "startTime": today+"T13:15:00",
             "matchNumber": 1,
             "field": "Primary",
             "tournamentLevel": "Playoff",
@@ -3333,14 +3334,14 @@ trainingSchedule.playoff.partial = {
             "scoreBlueFinal": 52,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 9,
-            "autoStartTime": "2024-02-18T13:22:34.033",
-            "actualStartTime": "2024-02-18T13:22:34.033",
-            "postResultTime": "2024-02-18T13:25:43.507"
+            "autoStartTime": today+"T13:22:34.033",
+            "actualStartTime": today+"T13:22:34.033",
+            "postResultTime": today+"T13:25:43.507"
         },
         {
             "description": "Match 2 (R1)",
             "level": "Playoff",
-            "startTime": "2024-02-18T13:23:00",
+            "startTime": today+"T13:23:00",
             "matchNumber": 2,
             "field": "Primary",
             "tournamentLevel": "Playoff",
@@ -3390,14 +3391,14 @@ trainingSchedule.playoff.partial = {
             "scoreBlueFinal": 57,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 20,
-            "autoStartTime": "2024-02-18T13:32:31.237",
-            "actualStartTime": "2024-02-18T13:32:31.237",
-            "postResultTime": "2024-02-18T13:35:36.173"
+            "autoStartTime": today+"T13:32:31.237",
+            "actualStartTime": today+"T13:32:31.237",
+            "postResultTime": today+"T13:35:36.173"
         },
         {
             "description": "Match 3 (R1)",
             "level": "Playoff",
-            "startTime": "2024-02-18T13:31:00",
+            "startTime": today+"T13:31:00",
             "matchNumber": 3,
             "field": "Primary",
             "tournamentLevel": "Playoff",
@@ -3447,14 +3448,14 @@ trainingSchedule.playoff.partial = {
             "scoreBlueFinal": 52,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 15,
-            "autoStartTime": "2024-02-18T13:43:56.353",
-            "actualStartTime": "2024-02-18T13:43:56.353",
-            "postResultTime": "2024-02-18T13:49:08.837"
+            "autoStartTime": today+"T13:43:56.353",
+            "actualStartTime": today+"T13:43:56.353",
+            "postResultTime": today+"T13:49:08.837"
         },
         {
             "description": "Match 4 (R1)",
             "level": "Playoff",
-            "startTime": "2024-02-18T13:39:00",
+            "startTime": today+"T13:39:00",
             "matchNumber": 4,
             "field": "Primary",
             "tournamentLevel": "Playoff",
@@ -3504,14 +3505,14 @@ trainingSchedule.playoff.partial = {
             "scoreBlueFinal": 56,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 9,
-            "autoStartTime": "2024-02-18T13:53:35.27",
-            "actualStartTime": "2024-02-18T13:53:35.27",
-            "postResultTime": "2024-02-18T13:56:28.297"
+            "autoStartTime": today+"T13:53:35.27",
+            "actualStartTime": today+"T13:53:35.27",
+            "postResultTime": today+"T13:56:28.297"
         },
         {
             "description": "Match 5 (R2)",
             "level": "Playoff",
-            "startTime": "2024-02-18T13:47:00",
+            "startTime": today+"T13:47:00",
             "matchNumber": 5,
             "field": "Primary",
             "tournamentLevel": "Playoff",
@@ -3561,14 +3562,14 @@ trainingSchedule.playoff.partial = {
             "scoreBlueFinal": 19,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 9,
-            "autoStartTime": "2024-02-18T14:10:14.743",
-            "actualStartTime": "2024-02-18T14:10:14.743",
-            "postResultTime": "2024-02-18T14:14:00.213"
+            "autoStartTime": today+"T14:10:14.743",
+            "actualStartTime": today+"T14:10:14.743",
+            "postResultTime": today+"T14:14:00.213"
         },
         {
             "description": "Match 6 (R2)",
             "level": "Playoff",
-            "startTime": "2024-02-18T13:55:00",
+            "startTime": today+"T13:55:00",
             "matchNumber": 6,
             "field": "Primary",
             "tournamentLevel": "Playoff",
@@ -3618,14 +3619,14 @@ trainingSchedule.playoff.partial = {
             "scoreBlueFinal": 79,
             "scoreBlueFoul": 5,
             "scoreBlueAuto": 18,
-            "autoStartTime": "2024-02-18T14:19:29.367",
-            "actualStartTime": "2024-02-18T14:19:29.367",
-            "postResultTime": "2024-02-18T14:22:57.677"
+            "autoStartTime": today+"T14:19:29.367",
+            "actualStartTime": today+"T14:19:29.367",
+            "postResultTime": today+"T14:22:57.677"
         },
         {
             "description": "Match 7 (R2)",
             "level": "Playoff",
-            "startTime": "2024-02-18T14:03:00",
+            "startTime": today+"T14:03:00",
             "matchNumber": 7,
             "field": "Primary",
             "tournamentLevel": "Playoff",
@@ -3675,14 +3676,14 @@ trainingSchedule.playoff.partial = {
             "scoreBlueFinal": 38,
             "scoreBlueFoul": 0,
             "scoreBlueAuto": 3,
-            "autoStartTime": "2024-02-18T14:27:45.15",
-            "actualStartTime": "2024-02-18T14:27:45.15",
-            "postResultTime": "2024-02-18T14:30:39.073"
+            "autoStartTime": today+"T14:27:45.15",
+            "actualStartTime": today+"T14:27:45.15",
+            "postResultTime": today+"T14:30:39.073"
         },
         {
             "description": "Match 8 (R2)",
             "level": "Playoff",
-            "startTime": "2024-02-18T14:11:00",
+            "startTime": today+"T14:11:00",
             "matchNumber": 8,
             "field": "Primary",
             "tournamentLevel": "Playoff",
@@ -3739,7 +3740,7 @@ trainingSchedule.playoff.partial = {
         {
             "description": "Match 9 (R3)",
             "level": "Playoff",
-            "startTime": "2024-02-18T14:19:00",
+            "startTime": today+"T14:19:00",
             "matchNumber": 9,
             "field": "Primary",
             "tournamentLevel": "Playoff",
@@ -3796,7 +3797,7 @@ trainingSchedule.playoff.partial = {
         {
             "description": "Match 10 (R3)",
             "level": "Playoff",
-            "startTime": "2024-02-18T14:27:00",
+            "startTime": today+"T14:27:00",
             "matchNumber": 10,
             "field": "Primary",
             "tournamentLevel": "Playoff",
@@ -3853,7 +3854,7 @@ trainingSchedule.playoff.partial = {
         {
             "description": "Match 11 (R4)",
             "level": "Playoff",
-            "startTime": "2024-02-18T14:35:00",
+            "startTime": today+"T14:35:00",
             "matchNumber": 11,
             "field": "Primary",
             "tournamentLevel": "Playoff",
@@ -3910,7 +3911,7 @@ trainingSchedule.playoff.partial = {
         {
             "description": "Match 12 (R4)",
             "level": "Playoff",
-            "startTime": "2024-02-18T14:43:00",
+            "startTime": today+"T14:43:00",
             "matchNumber": 12,
             "field": "Primary",
             "tournamentLevel": "Playoff",
@@ -3967,7 +3968,7 @@ trainingSchedule.playoff.partial = {
         {
             "description": "Match 13 (R5)",
             "level": "Playoff",
-            "startTime": "2024-02-18T14:51:00",
+            "startTime": today+"T14:51:00",
             "matchNumber": 13,
             "field": "Primary",
             "tournamentLevel": "Playoff",
@@ -4024,7 +4025,7 @@ trainingSchedule.playoff.partial = {
         {
             "description": "Final 1",
             "level": "Playoff",
-            "startTime": "2024-02-18T14:59:00",
+            "startTime": today+"T14:59:00",
             "matchNumber": 14,
             "field": "Primary",
             "tournamentLevel": "Playoff",
@@ -4081,7 +4082,7 @@ trainingSchedule.playoff.partial = {
         {
             "description": "Final 2",
             "level": "Playoff",
-            "startTime": "2024-02-18T15:07:00",
+            "startTime": today+"T15:07:00",
             "matchNumber": 15,
             "field": "Primary",
             "tournamentLevel": "Playoff",
@@ -4138,7 +4139,7 @@ trainingSchedule.playoff.partial = {
         {
             "description": "Final Tiebreaker",
             "level": "Playoff",
-            "startTime": "2024-02-18T15:15:00",
+            "startTime": today+"T15:15:00",
             "matchNumber": 16,
             "field": "Primary",
             "tournamentLevel": "Playoff",
@@ -4195,7 +4196,7 @@ trainingSchedule.playoff.partial = {
         {
             "description": "Overtime 1",
             "level": "Playoff",
-            "startTime": "2024-02-18T17:10:00.693",
+            "startTime": today+"T17:10:00.693",
             "matchNumber": 17,
             "field": "Primary",
             "tournamentLevel": "Playoff",
@@ -10980,7 +10981,7 @@ trainingTeams.communityUpdates = [
             "showRobotName": false,
             "teamNotes": "",
             "sayNumber": "Ten seventy three",
-            "lastUpdate": "2024-02-18T11:18:01-05:00",
+            "lastUpdate": today+"T11:18:01-05:00",
             "source": "jlockman@adobe.com"
         }
     },
@@ -11112,7 +11113,7 @@ trainingTeams.communityUpdates = [
         "teamNumber": 9995,
         "updates": {
             "robotNameLocal": "Equinox",
-            "lastUpdate": "2024-02-18T10:26:46-05:00",
+            "lastUpdate": today+"T10:26:46-05:00",
             "source": "jlockman@adobe.com"
         }
     },
