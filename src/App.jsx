@@ -13,7 +13,6 @@ import AwardsPage from './pages/AwardsPage';
 import StatsPage from './pages/StatsPage';
 import CheatsheetPage from './pages/CheatsheetPage';
 import EmceePage from './pages/EmceePage';
-import HelpPage from './pages/HelpPage';
 import { useEffect, useState } from 'react';
 import { UseAuthClient } from './contextProviders/AuthClientContext';
 import { useAuth0 } from '@auth0/auth0-react';
@@ -43,7 +42,7 @@ export const TabStates = {
   Ready: 'ready'
 };
 
-/** 
+/**
  * Tiebreakers constant defines the sort order for breaking ties during playoffs.
  * Criteria 2023 has been updated.
  * 1st Cumulative TECH FOUL points due to opponent rule violations
@@ -250,25 +249,25 @@ function App() {
 
   /**
    * This function retrieves a schedule from FIRST. It attempts to get both the Qual and Playoff Schedule and sets the global variables
-   * 
+   *
    * It uses the Hybrid Schedule endpoint to fetch the Qual schedule, then process the match data.
-   * 
+   *
    * It then uses the Hybrid Schedule endpoint to fetch the Playoff Schedule. As it processes match results,
-   * 
+   *
    * it will keep track of the event high scores by event stage and penalty conditions.
-   * 
+   *
    * @async
    * @function getSchedule
    * @param loadingEvent Boolean to set the current match to the last match played when loading an event
    * @param selectedEvent The currently selected event, which is a persistent state variable
    * @param selectedYear The currently selected year, which is a persistent state variable
-   * 
+   *
    * @return Sets the event high scores, qual schedule and playoff
   */
   async function getSchedule(loadingEvent) {
     var highScores = [];
 
-    /** 
+    /**
      * Returns the winner of the match
      * @function winner
      * @param {object} match - The match to test
@@ -292,7 +291,7 @@ function App() {
     }
 
     /**
-    * Checks to see if the match is an event high score 
+    * Checks to see if the match is an event high score
     * @function isHighScore
     * @param {object} match - The match to test
     * @return Adds the match to the highScores object if it is a high scoring match
@@ -704,7 +703,7 @@ function App() {
         events.forEach((event) => {
           eventnames[selectedYear?.value][event?.value?.code] = event?.value?.name;
         })
-      
+
         setEventNamesCY(eventnames[selectedYear?.value]);
 
         awardYears?.forEach(year => {
@@ -785,7 +784,7 @@ function App() {
             // >=2017 check for Division appearance then Champs appearances
             //test for champs prior to 2001
 
-            //Use timeDifference to filter out teams from the current year's Einstein appearances 
+            //Use timeDifference to filter out teams from the current year's Einstein appearances
             // for World and District Champs events.
             var timeDifference = moment(appearance?.end_date).diff(moment(), "minutes");
 
@@ -1101,7 +1100,7 @@ function App() {
     return result;
   }
 
-  /** 
+  /**
    * This function reads the team data update history gatool Cloud.
    * @async
    * @function getTeamHistory
@@ -1290,7 +1289,7 @@ function App() {
           //      if (michamps.indexOf(e?.code) >= 0) { e.champLevel = "DISTCHAMPS" } else
           //        if (midivisions.indexOf(e?.code) >= 0) { e.champLevel = "DISTDIV" }
 
-          // new method using event type data        
+          // new method using event type data
           if (e.type === "DistrictChampionship" || e.type === "DistrictChampionshipWithLevels") {
             e.champLevel = "DISTCHAMPS";
           } else if (e.type === "DistrictChampionshipDivision") {
@@ -1427,7 +1426,6 @@ function App() {
               <Route path='/stats' element={<StatsPage worldStats={worldStats} selectedEvent={selectedEvent} eventHighScores={eventHighScores} eventNamesCY={eventNamesCY} />} />
               <Route path='/cheatsheet' element={<CheatsheetPage teamList={teamList} communityUpdates={communityUpdates} selectedEvent={selectedEvent} selectedYear={selectedYear}/>} />
               <Route path='/emcee' element={<EmceePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} alliances={alliances} currentMatch={currentMatch} nextMatch={nextMatch} previousMatch={previousMatch} reverseEmcee={reverseEmcee} />} />
-              <Route path='/help' element={<HelpPage />} />
               <Route path='/dev' element={<Developer />} />
             </Route>
           </Routes>
