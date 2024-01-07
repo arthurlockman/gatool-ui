@@ -80,7 +80,7 @@ const monthsWarningMenu = [
 
 
 
-function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, showQualsStatsQuals, setShowQualsStatsQuals, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee, showDistrictChampsStats, setShowDistrictChampsStats, monthsWarning, setMonthsWarning, user, adHocMode, setAdHocMode, supportedYears }) {
+function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, autoUpdate,setAutoUpdate,getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, showQualsStatsQuals, setShowQualsStatsQuals, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee, showDistrictChampsStats, setShowDistrictChampsStats, monthsWarning, setMonthsWarning, user, adHocMode, setAdHocMode, supportedYears }) {
     const isOnline = useOnlineStatus();
 
     const [deleteSavedModal, setDeleteSavedModal] = useState(null);
@@ -318,7 +318,15 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                         <Switch checked={autoAdvance === null ? false : autoAdvance} onChange={setAutoAdvance} />
                                     </td>
                                     <td>
-                                        <b>Automatically advance to the next match when loading the event</b>
+                                        <b>Automatically advance to the next match when loading the event <i style={{"color":"red"}}>(Only affects when you load an event)</i></b>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <Switch checked={autoUpdate === null ? false : autoUpdate} onChange={setAutoUpdate} />
+                                    </td>
+                                    <td>
+                                        <b>Automatically track event progress, refreshing every 30 seconds <i style={{"color":"red"}}>(will advance matches on all screens)</i></b>
                                     </td>
                                 </tr>
                                 <tr>
