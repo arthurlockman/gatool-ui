@@ -472,7 +472,7 @@ export var eventNames = {
     "2021": events2021,
     "2022": events2022,
     "2023": events2023,
-    "2024": events2024
+    "2024": events2024,
 }
 
 export const allianceShortNames = {
