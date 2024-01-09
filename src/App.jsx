@@ -29,6 +29,7 @@ import { useOnlineStatus } from './contextProviders/OnlineContext';
 import { toast } from 'react-toastify';
 import { trainingData } from 'components/TrainingMatches';
 import { timeZones } from 'components/TimeZones';
+import { useInterval } from 'react-interval-hook';
 
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -1400,28 +1401,36 @@ function App() {
   * @async
   * @function loadEvent
   */
-  const updateEventData = () => {
-    console.log("fetching event data now");
-    if (!selectedEvent?.value?.code.includes("OFFLINE")) {
-      console.log("Online event. Getting schedule and ranks");
-      getSchedule();
-      getRanks();
-    } else {
-      console.log("Offline event. Just get the world stats if you can");
+
+  const { start, stop } = useInterval(
+    () => {
+      console.log("fetching event data now");
+      if (!selectedEvent?.value?.code.includes("OFFLINE")) {
+        console.log("Online event. Getting schedule and ranks");
+        getSchedule();
+        getRanks();
+      } else {
+        console.log("Offline event. Just get the world stats if you can");
+      }
+      getWorldStats();
+    },
+    30000,
+    {
+      autoStart: false,
+      immediate: false,
+      selfCorrecting: true, 
+      onFinish: () => {
+        console.log('Event refresh canceled.');
+    },
     }
-    getWorldStats();
-  }
+  )
 
   // Automatically keep event details up to date. Checks every 30 seconds if active.
   useEffect(() => {
     if (autoUpdate) {
-      const interval = setInterval(() => {
-        // to do: update event details and move to current match
-        updateEventData();
-      }, 30000);
-      return () => clearInterval(interval);
-    }
-  }, [autoUpdate, updateEventData]);
+      start()
+    } else { stop() }
+  }, [autoUpdate, start, stop]);
 
 
 
