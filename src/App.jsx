@@ -29,6 +29,7 @@ import { useOnlineStatus } from './contextProviders/OnlineContext';
 import { toast } from 'react-toastify';
 import { trainingData } from 'components/TrainingMatches';
 import { timeZones } from 'components/TimeZones';
+import { useInterval } from 'react-interval-hook';
 
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -53,7 +54,7 @@ export const TabStates = {
  * @default
  */
 const playoffTiebreakers = {
-  "2024": ["foulPoints", "autoPoints","endgamePoints"],// Update after rules release
+  "2024": ["foulPoints", "autoPoints", "endgamePoints"],// Update after rules release
   "2023": ["foulPoints", "totalChargeStationPoints", "autoPoints"],
   "2022": ["foulPoints", "endgamePoints", "autoCargoTotal+autoTaxiPoints"],
   "2021": ["foulPoints", "autoPoints", "endgamePoints", "controlPanelPoints+teleopCellPoints"],
@@ -138,6 +139,7 @@ function App() {
 
   const [swapScreen, setSwapScreen] = usePersistentState("cache:swapScreen", null);
   const [autoAdvance, setAutoAdvance] = usePersistentState("cache:autoAdvance", null);
+  const [autoUpdate, setAutoUpdate] = usePersistentState("cache:autoUpdate", null);
   const [currentMatch, setCurrentMatch] = usePersistentState("cache:currentMatch", null);
   const [awardsMenu, setAwardsMenu] = usePersistentState("cache:awardsMenu", null);
   const [showQualsStats, setShowQualsStats] = usePersistentState("cache:showQualsStats", null);
@@ -443,8 +445,8 @@ function App() {
         return match;
       });
 
-      if (playoffschedule?.schedule?.length > 0) {
-        completedMatchCount = playoffschedule?.schedule?.length - _.filter(playoffschedule.schedule, { "postResultTime": null }).length;
+      if (playoffschedule?.schedule?.schedule?.length > 0) {
+        completedMatchCount = playoffschedule?.schedule?.schedule?.length - _.filter(playoffschedule.schedule.schedule, { "postResultTime": null }).length;
       }
 
       playoffschedule.completedMatchCount = completedMatchCount;
@@ -528,7 +530,7 @@ function App() {
       lastMatchPlayed += playoffschedule?.completedMatchCount
 
     }
-    if (loadingEvent && autoAdvance) {
+    if ((loadingEvent && autoAdvance) || autoUpdate) {
       if ((lastMatchPlayed === qualschedule?.schedule.length) || (lastMatchPlayed === qualschedule?.schedule.length + playoffschedule?.schedule.length)) {
         lastMatchPlayed -= 1;
       }
@@ -1113,6 +1115,11 @@ function App() {
     return history;
   }
 
+  /**
+  * This function advances to the next match. It will refresh scores, ranks and world stats when appropriate.
+  * @async
+  * @function nextMatch
+  */
   const nextMatch = () => {
     if (!adHocMode) {
       if ((practiceSchedule?.schedule?.length > 0) && (currentMatch < (practiceSchedule?.schedule?.length + (offlinePlayoffSchedule?.schedule?.length || 0)))) {
@@ -1135,6 +1142,11 @@ function App() {
     }
   }
 
+  /**
+   * This function navigates to the previous match. It will refresh scores, ranks and world stats when appropriate.
+   * @async
+   * @function previousMatch
+   */
   const previousMatch = () => {
     if (!adHocMode) {
       if (currentMatch > 1) {
@@ -1148,6 +1160,13 @@ function App() {
     }
   }
 
+  /**
+   * This function sets the current match from the match dropdown. It will refresh scores, ranks, and world stats as appropriate.
+   * @async
+   * @function previousMatch
+   * @param e The menu select event which contains the selected match
+   * 
+   */
   const setMatchFromMenu = (e) => {
     setCurrentMatch(e.value);
     getSchedule();
@@ -1155,6 +1174,11 @@ function App() {
     getWorldStats();
   }
 
+  /**
+    * This function loads an event when a user selects an event from the menu. It will reset all event data, load the event details, team lists, team updates, refresh scores, ranks and world stats when appropriate.
+    * @async
+    * @function loadEvent
+    */
   const loadEvent = () => {
     if (httpClient && selectedEvent && selectedYear) {
       setQualSchedule(null);
@@ -1372,6 +1396,43 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [httpClient, selectedEvent])
 
+  /**
+  * This function loads an event when a user selects an event from the menu. It will reset all event data, load the event details, team lists, team updates, refresh scores, ranks and world stats when appropriate.
+  * @async
+  * @function loadEvent
+  */
+
+  const { start, stop } = useInterval(
+    () => {
+      console.log("fetching event data now");
+      if (!selectedEvent?.value?.code.includes("OFFLINE")) {
+        console.log("Online event. Getting schedule and ranks");
+        getSchedule();
+        getRanks();
+      } else {
+        console.log("Offline event. Just get the world stats if you can");
+      }
+      getWorldStats();
+    },
+    30000,
+    {
+      autoStart: false,
+      immediate: false,
+      selfCorrecting: true, 
+      onFinish: () => {
+        console.log('Event refresh canceled.');
+    },
+    }
+  )
+
+  // Automatically keep event details up to date. Checks every 30 seconds if active.
+  useEffect(() => {
+    if (autoUpdate) {
+      start()
+    } else { stop() }
+  }, [autoUpdate, start, stop]);
+
+
 
   // controllers for tab navigation
   //const navigate = useNavigate();
@@ -1407,7 +1468,7 @@ function App() {
           <Routes>
             <Route path="/" element={<LayoutsWithNavbar selectedEvent={selectedEvent} qualSchedule={qualSchedule} playoffs={playoffs} teamList={teamList} communityUpdates={communityUpdates} rankings={rankings} eventHighScores={eventHighScores} worldHighScores={worldStats} allianceSelectionReady={allianceSelectionReady} />}>
 
-              <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} teamList={teamList} eventFilters={eventFilters} setEventFilters={setEventFilters} timeFilter={timeFilter} setTimeFilter={setTimeFilter} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} rankings={rankings} timeFormat={timeFormat} setTimeFormat={setTimeFormat} showSponsors={showSponsors} setShowSponsors={setShowSponsors} showAwards={showAwards} setShowAwards={setShowAwards} showNotes={showNotes} setShowNotes={setShowNotes} showMottoes={showMottoes} setShowMottoes={setShowMottoes} showChampsStats={showChampsStats} setShowChampsStats={setShowChampsStats} swapScreen={swapScreen} setSwapScreen={setSwapScreen} autoAdvance={autoAdvance} setAutoAdvance={setAutoAdvance} getSchedule={getSchedule} awardsMenu={awardsMenu} setAwardsMenu={setAwardsMenu} showQualsStats={showQualsStats} setShowQualsStats={setShowQualsStats} showQualsStatsQuals={showQualsStatsQuals} setShowQualsStatsQuals={setShowQualsStatsQuals} teamReduction={teamReduction} setTeamReduction={setTeamReduction} playoffCountOverride={playoffCountOverride} setPlayoffCountOverride={setPlayoffCountOverride} allianceCount={allianceCount} localUpdates={localUpdates} setLocalUpdates={setLocalUpdates} putTeamData={putTeamData} getCommunityUpdates={getCommunityUpdates} reverseEmcee={reverseEmcee} setReverseEmcee={setReverseEmcee} showDistrictChampsStats={showDistrictChampsStats} setShowDistrictChampsStats={setShowDistrictChampsStats} monthsWarning={monthsWarning} setMonthsWarning={setMonthsWarning} user={user} adHocMode={adHocMode} setAdHocMode={setAdHocMode} supportedYears={supportedYears}/>} />
+              <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} teamList={teamList} eventFilters={eventFilters} setEventFilters={setEventFilters} timeFilter={timeFilter} setTimeFilter={setTimeFilter} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} rankings={rankings} timeFormat={timeFormat} setTimeFormat={setTimeFormat} showSponsors={showSponsors} setShowSponsors={setShowSponsors} showAwards={showAwards} setShowAwards={setShowAwards} showNotes={showNotes} setShowNotes={setShowNotes} showMottoes={showMottoes} setShowMottoes={setShowMottoes} showChampsStats={showChampsStats} setShowChampsStats={setShowChampsStats} swapScreen={swapScreen} setSwapScreen={setSwapScreen} autoAdvance={autoAdvance} setAutoAdvance={setAutoAdvance} autoUpdate={autoUpdate} setAutoUpdate={setAutoUpdate} getSchedule={getSchedule} awardsMenu={awardsMenu} setAwardsMenu={setAwardsMenu} showQualsStats={showQualsStats} setShowQualsStats={setShowQualsStats} showQualsStatsQuals={showQualsStatsQuals} setShowQualsStatsQuals={setShowQualsStatsQuals} teamReduction={teamReduction} setTeamReduction={setTeamReduction} playoffCountOverride={playoffCountOverride} setPlayoffCountOverride={setPlayoffCountOverride} allianceCount={allianceCount} localUpdates={localUpdates} setLocalUpdates={setLocalUpdates} putTeamData={putTeamData} getCommunityUpdates={getCommunityUpdates} reverseEmcee={reverseEmcee} setReverseEmcee={setReverseEmcee} showDistrictChampsStats={showDistrictChampsStats} setShowDistrictChampsStats={setShowDistrictChampsStats} monthsWarning={monthsWarning} setMonthsWarning={setMonthsWarning} user={user} adHocMode={adHocMode} setAdHocMode={setAdHocMode} supportedYears={supportedYears} />} />
 
               <Route path="/schedule" element={<SchedulePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} practiceSchedule={practiceSchedule} setPracticeSchedule={setPracticeSchedule} getTeamList={getTeamList} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} offlinePlayoffSchedule={offlinePlayoffSchedule} loadEvent={loadEvent} />} />
 
@@ -1424,7 +1485,7 @@ function App() {
               <Route path='/awards' element={<AwardsPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} communityUpdates={communityUpdates} />} />
 
               <Route path='/stats' element={<StatsPage worldStats={worldStats} selectedEvent={selectedEvent} eventHighScores={eventHighScores} eventNamesCY={eventNamesCY} />} />
-              <Route path='/cheatsheet' element={<CheatsheetPage teamList={teamList} communityUpdates={communityUpdates} selectedEvent={selectedEvent} selectedYear={selectedYear}/>} />
+              <Route path='/cheatsheet' element={<CheatsheetPage teamList={teamList} communityUpdates={communityUpdates} selectedEvent={selectedEvent} selectedYear={selectedYear} />} />
               <Route path='/emcee' element={<EmceePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} alliances={alliances} currentMatch={currentMatch} nextMatch={nextMatch} previousMatch={previousMatch} reverseEmcee={reverseEmcee} />} />
               <Route path='/dev' element={<Developer />} />
             </Route>
