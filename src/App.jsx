@@ -1416,7 +1416,7 @@ function App() {
     },
     30000,
     {
-      autoStart: false,
+      autoStart: true,
       immediate: false,
       selfCorrecting: true, 
       onFinish: () => {
