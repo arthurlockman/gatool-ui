@@ -302,7 +302,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
     }
     function generateDocx(gameAnnouncer) {
         loadFile(
-            "images/gatool_team_information_sheets_merge.docx",
+            "images/gatool_team_information_sheets_merge_2024.docx",
             function (error, content) {
                 if (error) {
                     var errorText = "Something went wrong loading the template. Please try again."
