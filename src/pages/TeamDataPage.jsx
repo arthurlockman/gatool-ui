@@ -316,9 +316,19 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
 
                 var data = [];
                 var record = {};
+                var gameAnnouncerFixed=gameAnnouncer.trim();
+                
+                if (gameAnnouncer.split(",").length>1) {
+                    var gaTemp = _.map(gameAnnouncer.split(","),_.trim);
+                    if (gaTemp.length>2) {
+                        var gaLast = gaTemp.pop();
+                        gameAnnouncerFixed = `${gaTemp.join(", ")} and ${gaLast}`
+                    } else if( gaTemp.length === 2) {
+                        gameAnnouncerFixed = gaTemp.join(" and ");
+                    }
+                }
 
                 //Create record list from all of the team data
-
                 data = teamListExtended.map((team, index) => {
                     record = {};
                     record.tn = team.teamNumber;
@@ -334,8 +344,13 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                     record.eventName = selectedEvent.label;
                     record.sayNumber = team.sayNumber || "";
                     // eslint-disable-next-line
-                    record.teamNotes = team.teamNotes.replace("<br>", "\n").replace(`<\div>`, "\n").replace(/(<([^>]+)>)/gi, "").replace("&amp;", "&") || "";
-                    record.gaName = gameAnnouncer || false;
+                    //let tmp = document.createElement("DIV");
+                    //tmp.innerHTML = team.teamNotes;
+                    //record.teamNotes = tmp.textContent || tmp.innerText || "";
+                    //record.teamNotes = team.teamNotes.replace("<br>", "\n").replace(/\<\div>/g, "\n").replace(/\&amp;/g, "&").replace(/\&nbsp;/g, ' ').replace(/(<([^>]+)>)/gi, "") || "";
+                    record.teamNotes = team.teamNotes.replace("<br>", "\n").replace("<\div>", "<\div>\n").replace(/&amp;/g, "&").replace(/&nbsp;/g, ' ').replace(/(<([^>]+)>)/gi, "") || "";
+                    record.gaName = gameAnnouncerFixed || false;
+                    record.gaNames = gameAnnouncer.split(",").length > 1 || false;
                     if (index < teamListExtended.length - 1) {
                         record.lastTeam = false;
                     } else {
@@ -553,7 +568,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                     <Modal.Title >Download Team Info Sheets</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <p>You are about to download a Word Docx which contains all of the team data we know about the teams. If you have loaded team data from gatool cloud, or if you have made local changes, those changes will be reflected on the sheets. <br /> If you would like us to personalize the sheets with your name as the Game Announcer, please enter it below:</p>
+                    <p>You are about to download a Word Docx which contains all of the team data we know about the teams. If you have loaded team data from gatool cloud, or if you have made local changes, those changes will be reflected on the sheets. <br /> <br /><b>If you would like us to personalize the sheets with your names as the Game Announcers, please enter them below, separated by commas:</b></p>
                     <Form>
                         <Form.Control type="text" onChange={(e) => updateGaForm(e.target.value)} />
                     </Form>
@@ -571,7 +586,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                     <p>Use this form to update team information for <b>Team {updateTeam.teamNumber}.</b> Editable fields are shown below. Your changes will be stored locally on your machine and should not be erased if you close your browser. We do recommend using the Save to Home Screen feature on Android and iOS, and the Save App feature from Chrome on desktop, if you are offline.</p>
                     <p>Tap on each item to update its value. Tap <b>DONE</b> when you're finished editing, or browse to another tab to cancel editing. Items <span className={"teamTableHighlight"}><b>highlighted in green</b></span> have local changes. <b>Motto</b> and <b>Notes</b> do not exist in TIMS, so they are always local. To reset any value to the TIMS value, simply delete it here and tap DONE.</p>
                     <p>You can upload this form to gatool Cloud, or keep the values locally for later upload, using the buttons at the bottom of this screen.</p>
-                    <p onClick={(e) => handleHistory(updateTeam, e)}><b><CalendarPlusFill/> Tap here to see prior team data updates.</b></p>
+                    <p onClick={(e) => handleHistory(updateTeam, e)}><b><CalendarPlusFill /> Tap here to see prior team data updates.</b></p>
                     <div className={updateClass(updateTeam?.lastUpdate)}><p>Last updated in gatool Cloud: {moment(updateTeam?.lastUpdate).fromNow()}</p></div>
                     <Form>
                         <Form.Group controlId="teamName">
