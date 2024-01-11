@@ -343,11 +343,10 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                     record.rookieYear = team.rookieYear || "";
                     record.eventName = selectedEvent.label;
                     record.sayNumber = team.sayNumber || "";
-                    // eslint-disable-next-line
                     //let tmp = document.createElement("DIV");
                     //tmp.innerHTML = team.teamNotes;
                     //record.teamNotes = tmp.textContent || tmp.innerText || "";
-                    //record.teamNotes = team.teamNotes.replace("<br>", "\n").replace(/\<\div>/g, "\n").replace(/\&amp;/g, "&").replace(/\&nbsp;/g, ' ').replace(/(<([^>]+)>)/gi, "") || "";
+                    // eslint-disable-next-line
                     record.teamNotes = team.teamNotes.replace("<br>", "\n").replace("<\div>", "<\div>\n").replace(/&amp;/g, "&").replace(/&nbsp;/g, ' ').replace(/(<([^>]+)>)/gi, "") || "";
                     record.gaName = gameAnnouncerFixed || false;
                     record.gaNames = gameAnnouncer.split(",").length > 1 || false;
