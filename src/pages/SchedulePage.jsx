@@ -4,7 +4,7 @@ import { utils, read } from "xlsx";
 import { toast } from "react-toastify";
 import _ from "lodash";
 
-function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSchedule, setPracticeSchedule, offlinePlayoffSchedule, setOfflinePlayoffSchedule, getTeamList,loadEvent }) {
+function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSchedule, setPracticeSchedule, offlinePlayoffSchedule, setOfflinePlayoffSchedule, getTeamList, loadEvent }) {
 
     // This function clicks the hidden file upload button
     function clickLoadPractice() {
@@ -23,7 +23,12 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
         document.getElementById("LoadOfflinePlayoffs").click();
     }
 
-    // This function clears the file input by removing and recreating the file input button
+    /** 
+     * This function clears the file input by removing and recreating the file input button
+     *
+     * @function clearFileInput
+     * @param id text The ID to delete and recreate
+    */
     function clearFileInput(id) {
         var oldInput = document.getElementById(id);
         var newInput = document.createElement("input");
@@ -36,8 +41,12 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
         oldInput.parentNode.replaceChild(newInput, oldInput)
     }
 
-    // This function adds teams to the team list if there are additional teams in the schedule
-
+    /** 
+     * This function reads a schedule array and determines the participating teams from the schedule.
+     * It then creates a team list from the unique teams in the schedule.
+     * @function addTeamsToTeamList
+     * @param formattedSchedule the schedule to parse
+    */
     function addTeamsToTeamList(formattedSchedule) {
         var tempTeamList = [];
         _.forEach(formattedSchedule.schedule, function (row) {
@@ -55,7 +64,11 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
         getTeamList(tempTeamList);
     }
 
-    // This function imports a Practice Schedule from Excel.
+    /**
+     * This function imports a Practice Schedule from Excel.
+     * @param e the file upload button event
+     */
+
     function handlePracticeFiles(e) {
         var forPlayoffs = e.target.id === "BackupFiles" ? false : true;
         var files = e.target.files;
