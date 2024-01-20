@@ -26,8 +26,10 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         return () => clearInterval(interval);
     }, []);
 
-    //display the delay on the Announce Screen if we have a schedule
-
+    /**
+     * Display the delay on the Announce Screen if we have a schedule
+     * @param {moment.Moment} updateTime 
+     */
     function updateClass(updateTime) {
         var timeDifference = 0;
         var updateDelay = "";
@@ -42,7 +44,10 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         return updateDelay
     }
 
-    //Display a warning on the Team Data screen if the data is over 6 months old
+    /**
+     * /Display a warning on the Team Data screen if the data is over 6 months old
+     * @param {moment.Moment} updateTime 
+     */
     function updateWarning(updateTime) {
         var timeDifference = 0;
         var updateDelay = false;
@@ -83,6 +88,12 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         enableScope('tabNavigation');
     }
 
+    /**
+     * Stores the team updates for a specific team. If we are unable to save to gatool Cloud, it will store the update locally
+     * for update later.
+     * @param {string} mode - determines whether to send the update to gatool Cloud. "update" = send to cloud 
+     * @param {*} e - the inbound event from clicking the button. 
+     */
     const handleSubmit = (mode, e) => {
         var visits = _.cloneDeep(lastVisit);
         visits[`${updateTeam.teamNumber}`] = moment();
@@ -134,6 +145,11 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         enableScope('tabNavigation');
     }
 
+    /**
+     * Opens the team data screen so that a user can view and edit the team details 
+     * @param {number} team - The number of the team to display
+     * @param {*} e  - the inbound event from clicking the button. 
+     */
     const handleShow = (team, e) => {
         if (user["https://gatool.org/roles"].indexOf("user") >= 0) {
             setUpdateTeam(team);
@@ -316,14 +332,14 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
 
                 var data = [];
                 var record = {};
-                var gameAnnouncerFixed=gameAnnouncer.trim();
-                
-                if (gameAnnouncer.split(",").length>1) {
-                    var gaTemp = _.map(gameAnnouncer.split(","),_.trim);
-                    if (gaTemp.length>2) {
+                var gameAnnouncerFixed = gameAnnouncer.trim();
+
+                if (gameAnnouncer.split(",").length > 1) {
+                    var gaTemp = _.map(gameAnnouncer.split(","), _.trim);
+                    if (gaTemp.length > 2) {
                         var gaLast = gaTemp.pop();
                         gameAnnouncerFixed = `${gaTemp.join(", ")} and ${gaLast}`
-                    } else if( gaTemp.length === 2) {
+                    } else if (gaTemp.length === 2) {
                         gameAnnouncerFixed = gaTemp.join(" and ");
                     }
                 }
