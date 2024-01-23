@@ -13,18 +13,13 @@ import PizZip from "pizzip";
 import PizZipUtils from "pizzip/utils/index.js";
 import { saveAs } from "file-saver";
 import { useHotkeysContext } from "react-hotkeys-hook";
+import ReactQuill from "react-quill";
+import 'react-quill/dist/quill.snow.css';
+import { useInterval } from 'react-interval-hook';
 
 function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSort, setTeamSort, communityUpdates, setCommunityUpdates, allianceCount, lastVisit, setLastVisit, putTeamData, localUpdates, setLocalUpdates, qualSchedule, playoffSchedule, originalAndSustaining, monthsWarning, user, getTeamHistory, timeFormat }) {
     const [currentTime, setCurrentTime] = useState(moment());
     const { disableScope, enableScope } = useHotkeysContext();
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setCurrentTime(moment());
-        }, 1000);
-        // @ts-ignore
-        return () => clearInterval(interval);
-    }, []);
 
     /**
      * Display the delay on the Announce Screen if we have a schedule
@@ -66,6 +61,82 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
     const [gaName, setGaName] = useState("");
     const [showHistory, setShowHistory] = useState(false);
     const [teamHistory, setTeamHistory] = useState(null);
+
+    /**
+     * Quill Modules
+     */
+    const modules = {
+        toolbar: [
+            [{ header: '1' }, { header: '2' }],
+            [{ size: [] }],
+            ['bold', 'italic', 'underline'],
+            [
+                { list: 'ordered' },
+                { list: 'bullet' },
+                { indent: '-1' },
+                { indent: '+1' },
+            ],
+            ['link'],
+            ['clean'],
+        ],
+        clipboard: {
+            // toggle to add extra line breaks when pasting HTML:
+            matchVisual: false,
+        },
+    }
+    const modules2 = {
+        toolbar: [
+            ['bold', 'italic', 'underline'],
+            ['clean'],
+        ],
+        clipboard: {
+            // toggle to add extra line breaks when pasting HTML:
+            matchVisual: false,
+        },
+    }
+
+    /*
+     * Quill editor formats
+     * See https://quilljs.com/docs/formats/
+     */
+    const formats = [
+        'header',
+        'size',
+        'bold',
+        'italic',
+        'underline',
+        'list',
+        'bullet',
+        'indent',
+        'link',
+    ]
+    const formats2 = [
+        'bold',
+        'italic',
+        'underline',
+    ]
+
+    const { start, stop } = useInterval(
+        () => {
+            setCurrentTime(moment());
+        },
+        1000,
+        {
+            autoStart: true,
+            immediate: false,
+            selfCorrecting: true,
+            onFinish: () => {
+                console.log('Clock Stopped in TeamUpdate Page.');
+            },
+        }
+    )
+
+    // Automatically updates the curent time. Checks every second if active.
+    useEffect(() => {
+        if (teamList && !updateTeam) {
+            start()
+        } else { stop() }
+    }, [teamList, updateTeam, start, stop]);
 
     const handleClose = () => {
         setUpdateTeam(null);
@@ -209,9 +280,10 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
             backgroundColor: ""
         }
         if (update) {
-            style.backgroundColor = "rgb(195, 244, 199)"
-            return style;
+            style.backgroundColor = "rgb(195, 244, 199)";
+            style.margin = "0px";
         }
+        return style;
     }
 
     var teamListExtended = teamList?.teams?.map((teamRow) => {
@@ -571,7 +643,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                                 <td style={updateHighlight(team?.organizationLocal)}>{team?.organizationLocal ? team?.organizationLocal : team?.schoolName}</td>
                                 <td>{team?.rookieYear}</td>
                                 <td style={updateHighlight(team?.robotNameLocal)}>{team?.robotNameLocal}</td>
-                                <td align="left" style={updateHighlight(!_.isEmpty(team?.teamNotes))} dangerouslySetInnerHTML={{ __html: team?.teamNotes }}></td>
+                                <td align="left" style={updateHighlight(!_.isEmpty(team?.teamNotes)) } className="teamNotes" dangerouslySetInnerHTML={{ __html: team?.teamNotes }}></td>
                             </tr>
                         })}
                     </tbody>
@@ -651,12 +723,12 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                                 onChange={(e) => updateForm("awardsTextLocal", e.target.value)} />
                         </Form.Group>
                         <Form.Group controlId="teamNotesLocal">
-                            <Form.Label className={"formLabel"}><b>Team Notes for Announce Screen (These notes are local notes and do not come from <i>FIRST</i>)</b></Form.Label>
-                            <div className={!_.isEmpty(updateTeam.teamNotesLocal) ? "form-control formHighlight" : !_.isEmpty(formValue.teamNotesLocal) ? "form-control formHighlight" : "form-control"} contentEditable placeholder={"Enter some new notes you would like to appear on the Announce Screen"} dangerouslySetInnerHTML={{ __html: updateTeam.teamNotesLocal }} onKeyUp={(e) => updateForm("teamNotesLocal", e.currentTarget.innerHTML)}></div>
+                            <Form.Label className={"formLabel"}><b>Team Notes for Announce and Play-by-Play Screens (These notes are local notes and do not come from <i>FIRST</i>)</b></Form.Label>
+                            <ReactQuill theme="snow" modules={modules2} formats={formats2} value={updateTeam.teamNotesLocal} placeholder={"Enter some new notes you would like to appear on the Announce Screen"} onChange={(e) => updateForm("teamNotesLocal", e)} ></ReactQuill>
                         </Form.Group>
                         <Form.Group controlId="teamNotes">
                             <Form.Label className={"formLabel"}><b>Team Notes for the Team Data Screen (These notes are local notes and do not come from <i>FIRST</i>)</b></Form.Label>
-                            <div className={(!_.isEmpty(updateTeam.teamNotes)) ? "form-control formHighlight" : !_.isEmpty(formValue.teamNotes) ? "form-control formHighlight" : "form-control"} contentEditable placeholder={"Enter some new notes you would like to appear on the Team Data Screen"} dangerouslySetInnerHTML={{ __html: updateTeam.teamNotes }} onKeyUp={(e) => updateForm("teamNotes", e.currentTarget.innerHTML)}></div>
+                            <ReactQuill theme="snow" modules={modules} formats={formats} value={updateTeam.teamNotes} placeholder={"Enter some new notes you would like to appear on the Team Data Screen"} onChange={(e) => updateForm("teamNotes", e)}></ReactQuill>
                         </Form.Group>
                         <Form.Group controlId="topSponsors">
                             <Form.Label className={"formLabel"}><b>Top Sponsors (Enter no more than 5 top sponsors from the full sponsor list below). These will appear under the team name on the Announce Screen.</b></Form.Label>
