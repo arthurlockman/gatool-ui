@@ -35,7 +35,7 @@ function Developer() {
      * This function clears the file input by removing and recreating the file input button
      *
      * @function clearFileInput
-     * @param [text] id The ID to delete and recreate
+     * @param {string} id - The ID to delete and recreate
     */
     function clearFileInput(id) {
         var oldInput = document.getElementById(id);
@@ -55,7 +55,7 @@ function Developer() {
      * It also destroys and recreates the button, and then re-attaches the proper event listener.
      *
      * @function handleUserUpload
-     * @param [event] e The file upload event, which contains a pointer to the file.
+     * @param {*} e - The file upload event, which contains a pointer to the file.
     */
     function handleUserUpload(e) {
         var files = e.target.files;
@@ -101,8 +101,8 @@ function Developer() {
     /** 
      * This function creates a downloadable file from an object
      * @function downloadObjectAsJson
-     * @param [text] exportName The name of the file
-     * @param [object] exportObj The object you want to include in the file
+     * @param {string} exportName - The name of the file
+     * @param {Object} exportObj - The object you want to include in the file
     */
     function downloadObjectAsJson(exportObj, exportName) {
         var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj));

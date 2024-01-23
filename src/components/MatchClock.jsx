@@ -1,16 +1,32 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import moment from 'moment/moment';
 import { Col } from 'react-bootstrap';
+import { useInterval } from 'react-interval-hook';
 
 const MatchClock = ({ matchDetails, timeFormat }) => {
     const [currentTime, setCurrentTime] = useState(moment());
 
-    useEffect(() => {
-        const interval = setInterval(() => {
+    const { start, stop } = useInterval(
+        () => {
             setCurrentTime(moment());
-        }, 1000);
-        return () => clearInterval(interval);
-    }, []);
+        },
+        1000,
+        {
+            autoStart: true,
+            immediate: false,
+            selfCorrecting: true,
+            onFinish: () => {
+                console.log('Event refresh canceled.');
+            },
+        }
+    )
+
+    // Automatically updates the curent time. Checks every second if active.
+    useEffect(() => {
+        if (matchDetails) {
+            start()
+        } else { stop() }
+    }, [matchDetails, start, stop]);
 
     //display the delay on the Announce Screen if we have a schedule
     var timeDifference = 0;
