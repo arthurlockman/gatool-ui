@@ -70,6 +70,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
             [{ header: '1' }, { header: '2' }],
             [{ size: [] }],
             ['bold', 'italic', 'underline'],
+            [ { 'color': [] } ],
             [
                 { list: 'ordered' },
                 { list: 'bullet' },
@@ -103,6 +104,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         'header',
         'size',
         'bold',
+        'color',
         'italic',
         'underline',
         'list',
@@ -643,7 +645,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                                 <td style={updateHighlight(team?.organizationLocal)}>{team?.organizationLocal ? team?.organizationLocal : team?.schoolName}</td>
                                 <td>{team?.rookieYear}</td>
                                 <td style={updateHighlight(team?.robotNameLocal)}>{team?.robotNameLocal}</td>
-                                <td align="left" style={updateHighlight(!_.isEmpty(team?.teamNotes)) } className="teamNotes" dangerouslySetInnerHTML={{ __html: team?.teamNotes }}></td>
+                                <td align="left" style={updateHighlight(!_.isEmpty(team?.teamNotes))} className="teamNotes" dangerouslySetInnerHTML={{ __html: team?.teamNotes }}></td>
                             </tr>
                         })}
                     </tbody>
