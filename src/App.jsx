@@ -1420,7 +1420,7 @@ function App() {
       immediate: false,
       selfCorrecting: true, 
       onFinish: () => {
-        console.log('Event refresh canceled.');
+        console.log('Event refresh stopped at App level.');
     },
     }
   )
