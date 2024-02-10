@@ -54,7 +54,7 @@ export const TabStates = {
  * @default
  */
 const playoffTiebreakers = {
-  "2024": ["foulPoints", "autoPoints", "endgamePoints"],// Update after rules release
+  "2024": ["foulPoints", "autoPoints", "endGameTotalStagePoints"],// Update after rules release
   "2023": ["foulPoints", "totalChargeStationPoints", "autoPoints"],
   "2022": ["foulPoints", "endgamePoints", "autoCargoTotal+autoTaxiPoints"],
   "2021": ["foulPoints", "autoPoints", "endgamePoints", "controlPanelPoints+teleopCellPoints"],
