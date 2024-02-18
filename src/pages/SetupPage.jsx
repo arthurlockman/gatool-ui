@@ -326,7 +326,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                         <Switch checked={autoUpdate === null ? false : autoUpdate} onChange={setAutoUpdate} />
                                     </td>
                                     <td>
-                                        <b>Automatically track event progress, refreshing every 30 seconds <i style={{"color":"red"}}>(will advance matches on all screens)</i></b>
+                                        <b>Automatically track event progress, refreshing every 15 seconds <i style={{"color":"red"}}>(will advance matches on all screens)</i></b>
                                     </td>
                                 </tr>
                                 <tr>

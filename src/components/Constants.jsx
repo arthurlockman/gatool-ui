@@ -1087,3 +1087,4 @@ export const champDivisions = ["ARDA", "CANE", "CATE", "CUDA", "GARO", "HOTU", "
 export const champs = ["CMP", "CMPTX", "CMPMO", "CMPMI"];
 export const miDivisions = ["MICMP1", "MICMP2", "MICMP3", "MICMP4","ONCMP1","ONCMP2","NECMP1","NECMP2","TXCMP1","TXCMP2"];
 export const miChamps = ["MICMP","ONCMP","NECMP","TXCMP"];
+export const refreshRate = 15; //Refresh rate in seconds for auto update
