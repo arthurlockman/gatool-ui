@@ -23,7 +23,7 @@ import { usePersistentState } from './hooks/UsePersistentState';
 import _ from 'lodash';
 import moment from 'moment';
 import Developer from './pages/Developer';
-import { eventNames, specialAwards, hallOfFame, originalAndSustaining } from './components/Constants';
+import { eventNames, specialAwards, hallOfFame, originalAndSustaining, refreshRate } from './components/Constants';
 import { appUpdates } from './components/AppUpdates';
 import { useOnlineStatus } from './contextProviders/OnlineContext';
 import { toast } from 'react-toastify';
@@ -1266,7 +1266,7 @@ function App() {
           var eventTime = moment(e.dateEnd);
           e.name = e.name.trim();
           e.name = _.replace(e.name, `- FIRST Robotics Competition -`, `-`);
-          if (e.code === "week0") {
+          if (e.code === "week0" || e.code === "WEEK0") {
             filters.push("week0")
           }
           if (e.type === "OffSeasonWithAzureSync") {
@@ -1414,7 +1414,7 @@ function App() {
       }
       getWorldStats();
     },
-    30000,
+    refreshRate * 1000,
     {
       autoStart: true,
       immediate: false,
@@ -1425,7 +1425,7 @@ function App() {
     }
   )
 
-  // Automatically keep event details up to date. Checks every 30 seconds if active.
+  // Automatically keep event details up to date. Checks every 15 seconds if active.
   useEffect(() => {
     if (autoUpdate) {
       start()
