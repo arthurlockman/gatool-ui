@@ -6,7 +6,7 @@ import MatchClock from "../components/MatchClock";
 import _ from "lodash";
 import { useHotkeysContext } from "react-hotkeys-hook";
 
-function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatchFromMenu, selectedEvent, matchDetails, timeFormat, alliances, setAlliances, rankings, inPlayoffs, backupTeam, setBackupTeam, teamList, adHocMatch, setAdHocMatch, adHocMode }) {
+function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatchFromMenu, selectedEvent, matchDetails, timeFormat, alliances, setAlliances, rankings, inPlayoffs, backupTeam, setBackupTeam, teamList, adHocMatch, setAdHocMatch, adHocMode, swapScreen }) {
 
     const [show, setShow] = useState(null);
     const [showAdHoc, setAdHoc] = useState(null);
@@ -109,10 +109,16 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
     })
     const addBackupButton = inPlayoffs && selectedEvent.value.champLevel !== "CHAMPS" && selectedEvent.value.champLevel !== "CMPDIV" && selectedEvent.value.champLevel !== "CMPSUB";
 
-    const eventTeams = teamList?.teams.map((team) => {
+    let eventTeams = teamList?.teams.map((team) => {
         return ({ "label": team.teamNumber, "value": team.teamNumber })
     }
     )
+
+    _.forEach(adHocMatch, (item) => {
+        _.remove(eventTeams, { "value": item.teamNumber })
+    }
+    )
+    eventTeams.unshift({ "label": "None", "value": null });
 
     return (
         <>
@@ -160,9 +166,6 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
                             {teamSelected && confirmSelection && <><Row><Col>Are you sure you want to replace team {teamSelected?.teamNumber} with {backupTeam?.backup?.teamNumber}?</Col></Row>
                                 <Row> <Col><Button onClick={handleBackupConfirm}>Yes</Button></Col>
                                 </Row></>}
-
-
-
                         </Container>
                     </Modal.Body>
                 </Modal>
@@ -172,19 +175,36 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
                     </Modal.Header>
                     <Modal.Body>
                         <Container>
-                            Select teams for each station below.
-                            <Table>
+                            <div>Select teams for each station below.</div>
+                            {!swapScreen && <Table>
                                 <Row>
-                                    <Col className="redAlliance"><b>Red 1</b> <Select options={eventTeams} value={adHocMatch[0]?.teamNumber ? { "value": adHocMatch[0]?.teamNumber, "label": adHocMatch[0]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Red1", e]) }} /></Col>
-                                    <Col className="blueAlliance"><b>Blue 1</b> <Select options={eventTeams} value={adHocMatch[3]?.teamNumber ? {"value" : adHocMatch[3]?.teamNumber,"label" : adHocMatch[3]?.teamNumber} : ""} onChange={(e) => { adHocStation(["Blue1", e]) }} /></Col></Row>
-                                <Row>
-                                    <Col className="redAlliance"><b>Red 2</b> <Select options={eventTeams} value={adHocMatch[1]?.teamNumber ? {"value" : adHocMatch[1]?.teamNumber,"label" : adHocMatch[1]?.teamNumber} : ""} onChange={(e) => { adHocStation(["Red2", e]) }} /></Col>
-                                    <Col className="blueAlliance"><b>Blue 2</b> <Select options={eventTeams} value={adHocMatch[4]?.teamNumber ? {"value" : adHocMatch[4]?.teamNumber,"label" : adHocMatch[4]?.teamNumber} : ""} onChange={(e) => { adHocStation(["Blue2", e]) }} /></Col></Row>
-                                <Row>
-                                    <Col className="redAlliance"><b>Red 3</b> <Select options={eventTeams} value={adHocMatch[2]?.teamNumber ? {"value" : adHocMatch[2]?.teamNumber,"label" : adHocMatch[2]?.teamNumber} : ""} onChange={(e) => { adHocStation(["Red3", e]) }} /></Col>
-                                <Col className="blueAlliance"><b>Blue 3</b> <Select options={eventTeams} value={adHocMatch[5]?.teamNumber ? {"value" : adHocMatch[5]?.teamNumber,"label" : adHocMatch[5]?.teamNumber} : ""} onChange={(e) => { adHocStation(["Blue3", e]) }} /></Col>
+                                    <Col className="blueAlliance"><div style={{ backgroundColor: "#98B4F4" }}><b>Blue 1</b> <Select options={eventTeams} tabIndex={4} value={adHocMatch[3]?.teamNumber ? { "value": adHocMatch[3]?.teamNumber, "label": adHocMatch[3]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Blue1", e]) }} /></div></Col>
+                                    <Col className="redAlliance"><div style={{ backgroundColor: "#F7B3B4" }}><b>Red 3</b> <Select options={eventTeams} tabIndex={3} value={adHocMatch[2]?.teamNumber ? { "value": adHocMatch[2]?.teamNumber, "label": adHocMatch[2]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Red3", e]) }} /></div></Col>
                                 </Row>
-                            </Table>
+                                <Row>
+                                    <Col className="blueAlliance"><div style={{ backgroundColor: "#98B4F4" }}><b>Blue 2</b> <Select options={eventTeams} tabIndex={5} value={adHocMatch[4]?.teamNumber ? { "value": adHocMatch[4]?.teamNumber, "label": adHocMatch[4]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Blue2", e]) }} /></div></Col>
+                                    <Col className="redAlliance"><div style={{ backgroundColor: "#F7B3B4" }}><b>Red 2</b> <Select options={eventTeams} tabIndex={2} value={adHocMatch[1]?.teamNumber ? { "value": adHocMatch[1]?.teamNumber, "label": adHocMatch[1]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Red2", e]) }} /></div></Col>
+                                </Row>
+                                <Row>
+                                    <Col className="blueAlliance"><div style={{ backgroundColor: "#98B4F4" }}><b>Blue 3</b> <Select options={eventTeams} tabIndex={6} value={adHocMatch[5]?.teamNumber ? { "value": adHocMatch[5]?.teamNumber, "label": adHocMatch[5]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Blue3", e]) }} /></div></Col>
+                                    <Col className="redAlliance" ><div style={{ backgroundColor: "#F7B3B4" }}><b>Red 1</b><Select options={eventTeams} tabIndex={1} value={adHocMatch[0]?.teamNumber ? { "value": adHocMatch[0]?.teamNumber, "label": adHocMatch[0]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Red1", e]) }} /></div> </Col>
+
+                                </Row>
+                            </Table>}
+                            {swapScreen && <Table>
+                                <Row>
+                                    <Col className="redAlliance"><div style={{ backgroundColor: "#F7B3B4" }}><b>Red 3</b> <Select options={eventTeams} tabIndex={4} value={adHocMatch[2]?.teamNumber ? { "value": adHocMatch[2]?.teamNumber, "label": adHocMatch[2]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Red3", e]) }} /></div></Col>
+                                    <Col className="blueAlliance"><div style={{ backgroundColor: "#98B4F4" }}><b>Blue 1</b> <Select options={eventTeams} tabIndex={3} value={adHocMatch[3]?.teamNumber ? { "value": adHocMatch[3]?.teamNumber, "label": adHocMatch[3]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Blue1", e]) }} /></div></Col>
+                                </Row>
+                                <Row>
+                                    <Col className="redAlliance"><div style={{ backgroundColor: "#F7B3B4" }}><b>Red 2</b> <Select options={eventTeams} tabIndex={5} value={adHocMatch[1]?.teamNumber ? { "value": adHocMatch[1]?.teamNumber, "label": adHocMatch[1]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Red2", e]) }} /></div></Col>
+                                    <Col className="blueAlliance"><div style={{ backgroundColor: "#98B4F4" }}><b>Blue 2</b> <Select options={eventTeams} tabIndex={2} value={adHocMatch[4]?.teamNumber ? { "value": adHocMatch[4]?.teamNumber, "label": adHocMatch[4]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Blue2", e]) }} /></div></Col>
+                                </Row>
+                                <Row>
+                                    <Col className="redAlliance" ><div style={{ backgroundColor: "#F7B3B4" }}><b>Red 1</b><Select options={eventTeams} tabIndex={6} value={adHocMatch[0]?.teamNumber ? { "value": adHocMatch[0]?.teamNumber, "label": adHocMatch[0]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Red1", e]) }} /></div> </Col>
+                                    <Col className="blueAlliance"><div style={{ backgroundColor: "#98B4F4" }}><b>Blue 3</b> <Select options={eventTeams} tabIndex={1} value={adHocMatch[5]?.teamNumber ? { "value": adHocMatch[5]?.teamNumber, "label": adHocMatch[5]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Blue3", e]) }} /></div></Col>
+                                </Row>
+                            </Table>}
                         </Container>
                     </Modal.Body>
                 </Modal>
