@@ -159,7 +159,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
                                     })}
                                 </Row></>}
 
-                            {teamSelected && !confirmSelection && <><Row><Col>Select a team from the backup teams to replace team {teamSelected?.teamNumber} with team </Col></Row>
+                            {teamSelected && !confirmSelection && <><Row><Col>Select a team from the backup teams to replace team {teamSelected?.teamNumber}</Col></Row>
                                 <Row> <Col><Select options={availableTeams} onChange={handleBackupSelect} /></Col>
                                 </Row></>}
 
