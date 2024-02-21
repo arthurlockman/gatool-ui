@@ -122,6 +122,7 @@ function App() {
   const [practiceSchedule, setPracticeSchedule] = usePersistentState("cache:practiceSchedule", null);
   const [offlinePlayoffSchedule, setOfflinePlayoffSchedule] = usePersistentState("cache:offlinePlayoffSchedule", null);
   const [teamList, setTeamList] = usePersistentState("cache:teamList", null);
+  const [robotImages,setRobotImages] = usePersistentState("cache:robotImages",null);
   const [rankings, setRankings] = usePersistentState("cache:rankings", null);
   const [rankingsOverride, setRankingsOverride] = usePersistentState("cache:rankingsOverride", null);
   const [alliances, setAlliances] = usePersistentState("cache:alliances", null);
@@ -1004,6 +1005,20 @@ function App() {
     setDistrictRankings(districtranks);
   }
 
+  async function getRobotImages() {
+    var teams = _.cloneDeep(teamList);
+    var robotImageList = teams.teams.map(async team => {
+      var media = await httpClient.get(`${selectedYear?.value}/team/${team?.teamNumber}/media`);
+      var mediaArray = await media.json();
+      var image = _.filter(mediaArray,{"type": "imgur"})[0];
+      return {"teamNumber":team?.teamNumber,"imageURL":image?.direct_url || null};
+    });
+    Promise.all(robotImageList).then((values)=> {
+      setRobotImages(values);
+    })
+  }
+  
+
   /**
    * This function retrieves the rworld high scores for the selected year from FIRST.
    * @async
@@ -1207,6 +1222,7 @@ function App() {
       getSchedule(true);
       getTeamList();
       getCommunityUpdates();
+      getRobotImages();
       getRanks();
       if (selectedEvent.value.districtCode) {
         getDistrictRanks();
@@ -1485,7 +1501,7 @@ function App() {
               <Route path='/awards' element={<AwardsPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} communityUpdates={communityUpdates} />} />
 
               <Route path='/stats' element={<StatsPage worldStats={worldStats} selectedEvent={selectedEvent} eventHighScores={eventHighScores} eventNamesCY={eventNamesCY} />} />
-              <Route path='/cheatsheet' element={<CheatsheetPage teamList={teamList} communityUpdates={communityUpdates} selectedEvent={selectedEvent} selectedYear={selectedYear} />} />
+              <Route path='/cheatsheet' element={<CheatsheetPage teamList={teamList} communityUpdates={communityUpdates} selectedEvent={selectedEvent} selectedYear={selectedYear} robotImages={robotImages}/>} />
               <Route path='/emcee' element={<EmceePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} alliances={alliances} currentMatch={currentMatch} nextMatch={nextMatch} previousMatch={previousMatch} reverseEmcee={reverseEmcee} />} />
               <Route path='/dev' element={<Developer />} />
             </Route>
