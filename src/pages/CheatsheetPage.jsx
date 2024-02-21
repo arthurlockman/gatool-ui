@@ -18,7 +18,7 @@ function CheatsheetPage({ teamList, communityUpdates, selectedEvent, selectedYea
             backHTML: ""
         };
         var avatar = `<img src='https://api.gatool.org/v3/${selectedYear.value}/avatars/team/${team?.teamNumber}/avatar.png' onerror="this.style.display='none'">&nbsp`;
-        var robotImage = `<img width="300px" src='${_.filter(robotImages,{"teamNumber" : team?.teamNumber})[0].imageURL}' onerror="this.style.display='none'">&nbsp`
+        var robotImage = `<img width="300px" src='${_.filter(robotImages,{"teamNumber" : team?.teamNumber})[0]?.imageURL}' onerror="this.style.display='none'">&nbsp`
         team = _.merge(team, communityUpdates[_.findIndex(communityUpdates, { "teamNumber": team?.teamNumber })], teamList?.teams[_.findIndex(teamList?.teams, { "teamNumber": team?.teamNumber })]);
         card.id = index;
         card.frontHTML = `<h1>${robotImage}<br /><b>${team.teamNumber}</b></h1>`;
