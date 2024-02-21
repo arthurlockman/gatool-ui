@@ -533,6 +533,14 @@ td {
 	vertical-align: middle;
 }
 
+.davidPriceSmall {
+	font-size: 300px;
+	text-align: center;
+	font-family: "alternate-gothic-no-1-d", sans-serif;
+	line-height: 85%;
+	vertical-align: middle;
+}
+
 .davidPriceQuals {
 	font-size: 700px;
 	text-align: center;
@@ -540,6 +548,15 @@ td {
 	line-height: 85%;
 	vertical-align: middle;
 }
+
+.davidPriceQualsSmall {
+	font-size: 600px;
+	text-align: center;
+	font-family: "alternate-gothic-no-1-d", sans-serif;
+	line-height: 85%;
+	vertical-align: middle;
+}
+
 .davidPriceWarning {
 	background-color: #fcf8e3;
 	border-color: #faebcc;
@@ -552,6 +569,13 @@ td {
 
 .davidPriceDetail {
 	font-size: 100px;
+	text-align: center;
+	font-family: "alternate-gothic-no-1-d", sans-serif;
+	line-height: 100%
+}
+
+.davidPriceDetailSmall {
+	font-size: 70px;
 	text-align: center;
 	font-family: "alternate-gothic-no-1-d", sans-serif;
 	line-height: 100%
