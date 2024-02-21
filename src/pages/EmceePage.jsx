@@ -3,9 +3,11 @@ import _ from "lodash";
 import PlayoffDetails from "../components/PlayoffDetails";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useSwipeable } from "react-swipeable";
+import useWindowDimensions from "hooks/UseWindowDimensions";
 
 
 function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, currentMatch, nextMatch, previousMatch, reverseEmcee }) {
+    const { height, width } = useWindowDimensions();
     const matchClasses = [
         { "matchNumber": 1, "red": { "class": "success", "from": null }, "blue": { "class": "success", "from": null }, "winnerTo": 7, "loserTo": 5, "winnerVs": "blue", "loserVs": "blue" },
         { "matchNumber": 2, "red": { "class": "success", "from": null }, "blue": { "class": "success", "from": null }, "winnerTo": 7, "loserTo": 5, "winnerVs": "red", "loserVs": "red" },
@@ -134,6 +136,10 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
     useHotkeys('right', () => nextMatch(), { scopes: 'matchNavigation' });
     useHotkeys('left', () => previousMatch(), { scopes: 'matchNavigation' });
 
+    const smallScreen = width * height <= 786500;
+    // const portrait = width < height;
+
+
     return (
         <Container fluid>
             {!selectedEvent && <div>
@@ -144,17 +150,17 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
             </div>}
             {selectedEvent && (schedule?.length > 0) && !inPlayoffs &&
                 <Container fluid {...swipeHandlers}>
-                    <div className={"davidPriceQuals"}>{schedule[currentMatch - 1]?.matchNumber}</div>
+                    <div className={smallScreen ? "davidPriceQualsSmall" : "davidPriceQuals"}>{schedule[currentMatch - 1]?.matchNumber}</div>
                 </Container>
             }
             {selectedEvent && (schedule?.length > 0) && inPlayoffs &&
                 <>
                     <Container fluid {...swipeHandlers}>
                         <Row>
-                            <Col className={"davidPriceDetail"} xs={12}>{_.replace(schedule[currentMatch - 1]?.description, "(R", "(Round ")}</Col>
+                            <Col className={smallScreen ? "davidPriceDetailSmall" : "davidPriceDetail"} xs={12}>{_.replace(schedule[currentMatch - 1]?.description, "(R", "(Round ")}</Col>
                         </Row>
                         {!reverseEmcee && <Row>
-                            {(playoffMatchNumber <= 13) && <Col xs={2} className={"davidPriceDetail redAllianceTeam"}>
+                            {(playoffMatchNumber <= 13) && <Col xs={2} className={smallScreen ? "davidPriceDetailSmall redAllianceTeam" : "davidPriceDetail redAllianceTeam"}>
                                 {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.red.from ? _.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.red.from : ""}
                             </Col>}
                             <Col xs={(playoffMatchNumber > 13) ? 6 : 4} className={`redAllianceTeam`}>
@@ -163,13 +169,13 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
                             <Col xs={(playoffMatchNumber > 13) ? 6 : 4} className={`blueAllianceTeam`}>
                                 <div className={"davidPrice"}>{allianceName(schedule[currentMatch - 1]?.matchNumber, "blue")?.replace("Alliance ", "").slice(0,1)}</div>
                             </Col>
-                            {(playoffMatchNumber <= 13) && <Col xs={2} className={"davidPriceDetail blueAllianceTeam"}>
+                            {(playoffMatchNumber <= 13) && <Col xs={2} className={smallScreen ? "davidPriceDetailSmall blueAllianceTeam" : "davidPriceDetail blueAllianceTeam"}>
                                 {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.blue.from ? _.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.blue.from : ""}
                             </Col>}
                         </Row>}
 
                         {reverseEmcee && <Row>
-                            {(playoffMatchNumber <= 13) && <Col xs={2} className={"davidPriceDetail blueAllianceTeam"}>
+                            {(playoffMatchNumber <= 13) && <Col xs={2} className={smallScreen ? "davidPriceDetailSmall blueAllianceTeam" : "davidPriceDetail blueAllianceTeam"}>
                                 {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.blue.from ? _.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.blue.from : ""}
                             </Col>}
                             <Col xs={(playoffMatchNumber > 13) ? 6 : 4} className={`blueAllianceTeam`}>
@@ -178,13 +184,13 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
                             <Col xs={(playoffMatchNumber > 13) ? 6 : 4} className={`redAllianceTeam`}>
                                 <div className={"davidPrice"}>{allianceName(schedule[currentMatch - 1]?.matchNumber, "red")?.replace("Alliance ", "").slice(0,1)}</div>
                             </Col>
-                            {(playoffMatchNumber <= 13) && <Col xs={2} className={"davidPriceDetail redAllianceTeam"}>
+                            {(playoffMatchNumber <= 13) && <Col xs={2} className={smallScreen ? "davidPriceDetailSmall redAllianceTeam" : "davidPriceDetail redAllianceTeam"}>
                                 {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.red.from ? _.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.red.from : ""}
                             </Col>}
                         </Row>}
 
                         <Row>
-                            <Col xs={12} className={"davidPriceDetail"}>
+                            <Col xs={12} className={smallScreen ? "davidPriceDetailSmall" : "davidPriceDetail"}>
                                 <PlayoffDetails matchDetails={matchDetails} alliances={alliances} matches={matches} selectedEvent={selectedEvent} />
                             </Col>
                         </Row>
