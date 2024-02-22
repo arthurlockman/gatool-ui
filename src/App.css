@@ -541,6 +541,14 @@ td {
 	vertical-align: middle;
 }
 
+.davidPriceSmallPortrait {
+	font-size: 250px;
+	text-align: center;
+	font-family: "alternate-gothic-no-1-d", sans-serif;
+	line-height: 85%;
+	vertical-align: middle;
+}
+
 .davidPriceQuals {
 	font-size: 700px;
 	text-align: center;
@@ -576,6 +584,13 @@ td {
 
 .davidPriceDetailSmall {
 	font-size: 70px;
+	text-align: center;
+	font-family: "alternate-gothic-no-1-d", sans-serif;
+	line-height: 100%
+}
+
+.davidPriceDetailSmallPortrait {
+	font-size: 60px;
 	text-align: center;
 	font-family: "alternate-gothic-no-1-d", sans-serif;
 	line-height: 100%
