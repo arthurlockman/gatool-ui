@@ -164,10 +164,10 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
                                 {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.red.from ? _.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.red.from : ""}
                             </Col>}
                             <Col xs={(playoffMatchNumber > 13) ? 6 : 4} className={`redAllianceTeam`}>
-                                <div className={"davidPrice"}>{allianceName(schedule[currentMatch - 1]?.matchNumber, "red")?.replace("Alliance ", "").slice(0,1)}</div>
+                                <div className={`davidPrice${smallScreen}`}>{allianceName(schedule[currentMatch - 1]?.matchNumber, "red")?.replace("Alliance ", "").slice(0,1)}</div>
                             </Col>
                             <Col xs={(playoffMatchNumber > 13) ? 6 : 4} className={`blueAllianceTeam`}>
-                                <div className={"davidPrice"}>{allianceName(schedule[currentMatch - 1]?.matchNumber, "blue")?.replace("Alliance ", "").slice(0,1)}</div>
+                                <div className={`davidPrice${smallScreen}`}>{allianceName(schedule[currentMatch - 1]?.matchNumber, "blue")?.replace("Alliance ", "").slice(0,1)}</div>
                             </Col>
                             {(playoffMatchNumber <= 13) && <Col xs={2} className={`davidPriceDetail${smallScreen}${portrait} blueAllianceTeam`}>
                                 {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.blue.from ? _.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.blue.from : ""}
@@ -179,10 +179,10 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
                                 {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.blue.from ? _.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.blue.from : ""}
                             </Col>}
                             <Col xs={(playoffMatchNumber > 13) ? 6 : 4} className={`blueAllianceTeam`}>
-                                <div className={"davidPrice"}>{allianceName(schedule[currentMatch - 1]?.matchNumber, "blue")?.replace("Alliance ", "").slice(0,1)}</div>
+                                <div className={`davidPrice${smallScreen}`}>{allianceName(schedule[currentMatch - 1]?.matchNumber, "blue")?.replace("Alliance ", "").slice(0,1)}</div>
                             </Col>
                             <Col xs={(playoffMatchNumber > 13) ? 6 : 4} className={`redAllianceTeam`}>
-                                <div className={"davidPrice"}>{allianceName(schedule[currentMatch - 1]?.matchNumber, "red")?.replace("Alliance ", "").slice(0,1)}</div>
+                                <div className={`davidPrice${smallScreen}`}>{allianceName(schedule[currentMatch - 1]?.matchNumber, "red")?.replace("Alliance ", "").slice(0,1)}</div>
                             </Col>
                             {(playoffMatchNumber <= 13) && <Col xs={2} className={`davidPriceDetail${smallScreen}${portrait} redAllianceTeam`}>
                                 {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.red.from ? _.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.red.from : ""}
