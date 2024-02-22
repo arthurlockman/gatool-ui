@@ -137,7 +137,7 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
     useHotkeys('left', () => previousMatch(), { scopes: 'matchNavigation' });
 
     const smallScreen = width * height <= 786500 ? "Small" : "";
-    const portrait = width < height && smallScreen === "Small" ? "Portrait" : "";
+    const portrait = width > height && smallScreen === "Small" ? "Landscape" : "";
 
 
     return (

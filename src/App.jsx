@@ -1007,7 +1007,7 @@ function App() {
 
   async function getRobotImages() {
     var teams = _.cloneDeep(teamList);
-    var robotImageList = teams.teams.map(async team => {
+    var robotImageList = teams?.teams.map(async team => {
       var media = await httpClient.get(`${selectedYear?.value}/team/${team?.teamNumber}/media`);
       var mediaArray = await media.json();
       var image = _.filter(mediaArray,{"type": "imgur"})[0];
