@@ -541,7 +541,7 @@ td {
 	vertical-align: middle;
 }
 
-.davidPriceSmallPortrait {
+.davidPriceSmallLandscape {
 	font-size: 250px;
 	text-align: center;
 	font-family: "alternate-gothic-no-1-d", sans-serif;
@@ -589,7 +589,7 @@ td {
 	line-height: 100%
 }
 
-.davidPriceDetailSmallPortrait {
+.davidPriceDetailSmallLandscape {
 	font-size: 60px;
 	text-align: center;
 	font-family: "alternate-gothic-no-1-d", sans-serif;
