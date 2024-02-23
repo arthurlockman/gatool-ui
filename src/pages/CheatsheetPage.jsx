@@ -19,7 +19,7 @@ function CheatsheetPage({ teamList, communityUpdates, selectedEvent, selectedYea
             backHTML: ""
         };
         var avatar = `<img src="https://api.gatool.org/v3/${selectedYear.value}/avatars/team/${team?.teamNumber}/avatar.png" onerror="this.style.display='none'">&nbsp`;
-        var robotImage = _.filter(robotImages, { "teamNumber": team?.teamNumber })[0]?.imageURL ? `<img width="300px" src="${_.filter(robotImages, { "teamNumber": team?.teamNumber })[0]?.imageURL}" onerror="this.style.display='none'">&nbsp` : ""
+        var robotImage = _.filter(robotImages, { "teamNumber": team?.teamNumber })[0]?.imageURL ? `<img width="300px" src="${_.filter(robotImages, { "teamNumber": team?.teamNumber })[0]?.imageURL}" onerror="this.style.display='none'">` : ""
         team = _.merge(team, communityUpdates[_.findIndex(communityUpdates, { "teamNumber": team?.teamNumber })], teamList?.teams[_.findIndex(teamList?.teams, { "teamNumber": team?.teamNumber })]);
         card.id = index;
         card.frontHTML = `<h1>${robotImage}<br /><b>${team.teamNumber}</b></h1>`;
@@ -58,7 +58,7 @@ function CheatsheetPage({ teamList, communityUpdates, selectedEvent, selectedYea
     return (
         <Container fluid>
             <img onClick={() => { downloadPDF("/cheatsheet/crescendo-cheat-sheet.pdf") }} src="/cheatsheet/crescendo-cheat-sheet.png" width="100%" alt="Cheatsheet"></img>
-            <div><h3>Here is a very useful summary for the playoffs, provided by Bill Aucoin.<br /><span style={{ cursor: "pointer", color: "blue" }} onClick={() => { downloadPDF("/cheatsheet/2024_GA_TACAIDS.pdf") }}>Download PDF.</span></h3>
+            <div><h3>Here is a very useful summary for the playoffs, provided by Bill Aucoin.<br /><span style={{ cursor: "pointer", color: "blue" }} onClick={() => { downloadPDF("/cheatsheet/2024.Typical.Playoff.MATCH.Schedule.v1.pdf") }}>Download PDF.</span></h3>
                 <p><br /></p></div>
             {cards.length > 0 &&
                 <Container fluid className={"flashCards"}>
