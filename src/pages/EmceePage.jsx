@@ -150,7 +150,7 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
             </div>}
             {selectedEvent && (schedule?.length > 0) && !inPlayoffs &&
                 <Container fluid {...swipeHandlers}>
-                    <div className={`davidPriceQuals${smallScreen}${portrait}`}>{schedule[currentMatch - 1]?.matchNumber}</div>
+                    <div className={`davidPriceQuals`}>{schedule[currentMatch - 1]?.matchNumber}</div>
                 </Container>
             }
             {selectedEvent && (schedule?.length > 0) && inPlayoffs &&
