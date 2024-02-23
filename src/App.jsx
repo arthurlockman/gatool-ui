@@ -853,10 +853,12 @@ function App() {
 
           teams.teams = values;
           setTeamList(teams);
+          getRobotImages(teams);
         })
       } else {
         teams.lastUpdate = moment();
         setTeamList(teams);
+        getRobotImages(teams);
       }
 
     })
@@ -1005,15 +1007,21 @@ function App() {
     setDistrictRankings(districtranks);
   }
 
-  async function getRobotImages() {
-    var teams = _.cloneDeep(teamList);
+  /** This function retrieves URLs for robot images from The Blue Alliance
+   * @async
+   * @function getRobotImages
+   * @param selectedYear The currently selected year, which is a persistent state variable
+   * @param teams The event's team list
+   * @return sets the array of URLs
+   */
+  async function getRobotImages(teams) {
     var robotImageList = teams?.teams.map(async team => {
       var media = await httpClient.get(`${selectedYear?.value}/team/${team?.teamNumber}/media`);
       var mediaArray = await media.json();
       var image = _.filter(mediaArray,{"type": "imgur"})[0];
       return {"teamNumber":team?.teamNumber,"imageURL":image?.direct_url || null};
     });
-    Promise.all(robotImageList).then((values)=> {
+    await Promise.all(robotImageList).then((values)=> {
       setRobotImages(values);
     })
   }
@@ -1222,7 +1230,6 @@ function App() {
       getSchedule(true);
       getTeamList();
       getCommunityUpdates();
-      getRobotImages();
       getRanks();
       if (selectedEvent.value.districtCode) {
         getDistrictRanks();
