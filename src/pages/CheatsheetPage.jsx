@@ -1,5 +1,6 @@
 import { Container, Row } from "react-bootstrap";
 import { FlashcardArray } from "react-quizlet-flashcard";
+import { saveAs } from "file-saver";
 import _ from "lodash";
 
 function CheatsheetPage({ teamList, communityUpdates, selectedEvent, selectedYear, robotImages }) {
@@ -18,20 +19,46 @@ function CheatsheetPage({ teamList, communityUpdates, selectedEvent, selectedYea
             backHTML: ""
         };
         var avatar = `<img src="https://api.gatool.org/v3/${selectedYear.value}/avatars/team/${team?.teamNumber}/avatar.png" onerror="this.style.display='none'">&nbsp`;
-        var robotImage = _.filter(robotImages,{"teamNumber" : team?.teamNumber})[0]?.imageURL ? `<img width="300px" src="${_.filter(robotImages,{"teamNumber" : team?.teamNumber})[0]?.imageURL}" onerror="this.style.display='none'">&nbsp` : ""
+        var robotImage = _.filter(robotImages, { "teamNumber": team?.teamNumber })[0]?.imageURL ? `<img width="300px" src="${_.filter(robotImages, { "teamNumber": team?.teamNumber })[0]?.imageURL}" onerror="this.style.display='none'">&nbsp` : ""
         team = _.merge(team, communityUpdates[_.findIndex(communityUpdates, { "teamNumber": team?.teamNumber })], teamList?.teams[_.findIndex(teamList?.teams, { "teamNumber": team?.teamNumber })]);
         card.id = index;
         card.frontHTML = `<h1>${robotImage}<br /><b>${team.teamNumber}</b></h1>`;
         card.frontContentStyle = cardStyle;
         card.backContentStyle = cardStyle;
-        card.backHTML = `<h1>${avatar}<br /><b>${team?.updates?.nameShortLocal ? team?.updates?.nameShortLocal : team?.nameShort}</b><br />${team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : team?.city + ", " + team?.stateProv + (team?.country === "USA" ? "" : " "+team?.country)}</h1>`;
+        card.backHTML = `<h1>${avatar}<br /><b>${team?.updates?.nameShortLocal ? team?.updates?.nameShortLocal : team?.nameShort}</b><br />${team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : team?.city + ", " + team?.stateProv + (team?.country === "USA" ? "" : " " + team?.country)}</h1>`;
         return card;
     })
+    function downloadPDF(filePath) {
+        var oReq = new XMLHttpRequest();
+
+
+        // Configure XMLHttpRequest
+        oReq.open("GET", filePath, true);
+
+        // Important to use the blob response type
+        oReq.responseType = "blob";
+
+        // When the file request finishes
+        // Is up to you, the configuration for error events etc.
+        oReq.onload = function () {
+            // Once the file is downloaded, open a new window with the PDF
+            // Remember to allow the POP-UPS in your browser
+            var file = new Blob([oReq.response], {
+                type: 'application/pdf'
+            });
+
+            // Generate file download directly in the browser !
+            var fileName = filePath.split("/").pop();
+            saveAs(file, fileName);
+        };
+
+        oReq.send();
+    }
 
     return (
         <Container fluid>
-            <a href="/cheatsheet/crescendo-cheat-sheet.pdf" download><img src="/cheatsheet/crescendo-cheat-sheet.png" width="100%" alt="Cheatsheet"></img></a>
-            <div><h3>Here is a very useful summary for the playoffs, provided by Bill Aucoin.<br /><a href="/cheatsheet/2024_GA_TACAIDS.pdf" download>Download PDF.</a></h3>
+            <img onClick={() => { downloadPDF("/cheatsheet/crescendo-cheat-sheet.pdf") }} src="/cheatsheet/crescendo-cheat-sheet.png" width="100%" alt="Cheatsheet"></img>
+            <div><h3>Here is a very useful summary for the playoffs, provided by Bill Aucoin.<br /><span style={{ cursor: "pointer", color: "blue" }} onClick={() => { downloadPDF("/cheatsheet/2024_GA_TACAIDS.pdf") }}>Download PDF.</span></h3>
                 <p><br /></p></div>
             {cards.length > 0 &&
                 <Container fluid className={"flashCards"}>
