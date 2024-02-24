@@ -66,6 +66,7 @@ function CheatsheetPage({ teamList, communityUpdates, selectedEvent, selectedYea
                     <Row><FlashcardArray cards={cards} /></Row>
                     <Row><br /><br /></Row>
                 </Container>}
+                <div><br /></div>
         </Container>
     )
 }

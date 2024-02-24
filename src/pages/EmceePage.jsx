@@ -32,15 +32,18 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
     // returns the name of the alliance
     function allianceName(matchNumber, allianceColor) {
         var allianceName = "";
+        var captain = ";"
         if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[0]?.teamNumber) {
             allianceName = alliances?.Lookup[`${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[0]?.teamNumber}`]?.alliance;
+            captain = alliances?.Lookup[`${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[0]?.teamNumber}`]?.captain;
             if (matchNumber < 14) {
                 if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner?.tieWinner === "red") {
                     allianceName += ` (L${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner.level})`;
                 }
             }
             if (allianceColor === "blue") {
-                allianceName = alliances?.Lookup[`${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[3]?.teamNumber}`]?.alliance
+                allianceName = alliances?.Lookup[`${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[3]?.teamNumber}`]?.alliance;
+                captain = alliances?.Lookup[`${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[3]?.teamNumber}`]?.captain;
                 if (matchNumber < 14) {
                     if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner?.tieWinner === "blue") {
                         allianceName += ` (L${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner.level} WIN)`;
@@ -48,7 +51,7 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
                 }
             }
         }
-        return allianceName;
+        return {"allianceName": allianceName, "captain":captain};
     }
 
     if (playoffSchedule?.schedule?.length > 0) {
@@ -164,10 +167,12 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
                                 {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.red.from ? _.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.red.from : ""}
                             </Col>}
                             <Col xs={(playoffMatchNumber > 13) ? 6 : 4} className={`redAllianceTeam`}>
-                                <div className={`davidPrice${smallScreen}`}>{allianceName(schedule[currentMatch - 1]?.matchNumber, "red")?.replace("Alliance ", "").slice(0,1)}</div>
+                                <div className={`davidPrice${smallScreen}`}>{allianceName(schedule[currentMatch - 1]?.matchNumber, "red")?.allianceName.replace("Alliance ", "").slice(0,1)}</div>
+                                <div className={`davidPriceDetail${smallScreen}${portrait} davidPriceCaptain`}>C: {allianceName(schedule[currentMatch - 1]?.matchNumber, "red")?.captain}</div>
                             </Col>
                             <Col xs={(playoffMatchNumber > 13) ? 6 : 4} className={`blueAllianceTeam`}>
-                                <div className={`davidPrice${smallScreen}`}>{allianceName(schedule[currentMatch - 1]?.matchNumber, "blue")?.replace("Alliance ", "").slice(0,1)}</div>
+                                <div className={`davidPrice${smallScreen}`}>{allianceName(schedule[currentMatch - 1]?.matchNumber, "blue")?.allianceName.replace("Alliance ", "").slice(0,1)}</div>
+                                <div className={`davidPriceDetail${smallScreen}${portrait} davidPriceCaptain`}>C: {allianceName(schedule[currentMatch - 1]?.matchNumber, "blue")?.captain}</div>
                             </Col>
                             {(playoffMatchNumber <= 13) && <Col xs={2} className={`davidPriceDetail${smallScreen}${portrait} blueAllianceTeam`}>
                                 {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.blue.from ? _.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.blue.from : ""}
@@ -179,10 +184,12 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
                                 {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.blue.from ? _.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.blue.from : ""}
                             </Col>}
                             <Col xs={(playoffMatchNumber > 13) ? 6 : 4} className={`blueAllianceTeam`}>
-                                <div className={`davidPrice${smallScreen}`}>{allianceName(schedule[currentMatch - 1]?.matchNumber, "blue")?.replace("Alliance ", "").slice(0,1)}</div>
+                                <div className={`davidPrice${smallScreen}`}>{allianceName(schedule[currentMatch - 1]?.matchNumber, "blue")?.allianceName.replace("Alliance ", "").slice(0,1)}</div>
+                                <div className={`davidPriceDetail${smallScreen}${portrait} davidPriceCaptain`}>C: {allianceName(schedule[currentMatch - 1]?.matchNumber, "blue")?.captain}</div>
                             </Col>
                             <Col xs={(playoffMatchNumber > 13) ? 6 : 4} className={`redAllianceTeam`}>
-                                <div className={`davidPrice${smallScreen}`}>{allianceName(schedule[currentMatch - 1]?.matchNumber, "red")?.replace("Alliance ", "").slice(0,1)}</div>
+                                <div className={`davidPrice${smallScreen}`}>{allianceName(schedule[currentMatch - 1]?.matchNumber, "red")?.allianceName.replace("Alliance ", "").slice(0,1)}</div>
+                                <div className={`davidPriceDetail${smallScreen}${portrait} davidPriceCaptain`}>C: {allianceName(schedule[currentMatch - 1]?.matchNumber, "red")?.captain}</div>
                             </Col>
                             {(playoffMatchNumber <= 13) && <Col xs={2} className={`davidPriceDetail${smallScreen}${portrait} redAllianceTeam`}>
                                 {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.red.from ? _.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.red.from : ""}
