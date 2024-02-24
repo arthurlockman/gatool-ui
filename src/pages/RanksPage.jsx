@@ -292,6 +292,7 @@ function RanksPage({ selectedEvent, teamList, rankings, rankSort, setRankSort, a
                             })}
                         </tbody>
                     </Table>
+                    <div><br /></div>
                 </div>
             }
 
