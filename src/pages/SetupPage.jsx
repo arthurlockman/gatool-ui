@@ -191,7 +191,8 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                 </Col>
             </Row>}
             {!selectedEvent && <div>
-                <Alert variant="warning" >You need to select an event before you can see anything here.</Alert>
+                <Alert variant="warning" >You need to select an event before you can see anything here. <LogoutButton disabled={!isOnline} /></Alert>
+                
             </div>}
             {selectedEvent && <div>
                 <Row><Button size="lg" onClick={getSchedule} variant="outline-success" disabled={!isOnline}><b><ArrowClockwise /> Tap to refresh Schedule.</b> <br />Use after Alliance Selection to load Playoffs.</Button></Row>
