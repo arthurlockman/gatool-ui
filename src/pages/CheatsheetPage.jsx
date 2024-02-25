@@ -58,7 +58,7 @@ function CheatsheetPage({ teamList, communityUpdates, selectedEvent, selectedYea
     return (
         <Container fluid>
             <img onClick={() => { downloadPDF("/cheatsheet/crescendo-cheat-sheet.pdf") }} src="/cheatsheet/crescendo-cheat-sheet.png" width="100%" alt="Cheatsheet"></img>
-            <div><h3>Here is a very useful summary for the playoffs, provided by Bill Aucoin.<br /><span style={{ cursor: "pointer", color: "blue" }} onClick={() => { downloadPDF("/cheatsheet/2024.Typical.Playoff.MATCH.Schedule.v1.pdf") }}>Download PDF.</span></h3>
+            <div><h3>Here is a very useful summary for the playoffs, provided by Bill Aucoin.<br /><span style={{ cursor: "pointer", color: "blue" }} onClick={() => { downloadPDF("/cheatsheet/2024.Typical.Playoff.MATCH.Schedule.v2.pdf") }}>Download PDF.</span></h3>
                 <p><br /></p></div>
             {cards.length > 0 &&
                 <Container fluid className={"flashCards"}>
