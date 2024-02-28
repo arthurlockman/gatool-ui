@@ -733,22 +733,22 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                             <ReactQuill theme="snow" modules={modules} formats={formats} value={updateTeam.teamNotes} placeholder={"Enter some new notes you would like to appear on the Team Data Screen"} onChange={(e) => updateForm("teamNotes", e)}></ReactQuill>
                         </Form.Group>
                         <Form.Group controlId="topSponsors">
-                            <Form.Label className={"formLabel"}><b>Top Sponsors (Enter no more than 5 top sponsors from the full sponsor list below). These will appear under the team name on the Announce Screen.</b></Form.Label>
+                            <Form.Label className={"formLabel"}><b>Top Sponsors (Enter no more than 5 top sponsors from the full sponsor list below). These will appear under the team name on the Announce Screen. Delete the text to reset to TIMS value.</b></Form.Label>
                             <Form.Control className={updateTeam.topSponsorsLocal ? "formHighlight" : formValue.topSponsorsLocal ? "formHighlight" : ""} type="text" placeholder={updateTeam?.topSponsors} defaultValue={updateTeam.topSponsorsLocal ? updateTeam.topSponsorsLocal : updateTeam?.topSponsors} onChange={(e) => updateForm("topSponsorsLocal", e.target.value)} />
                         </Form.Group>
                         <Form.Group controlId="sponsors">
-                            <Form.Label className={"formLabel"}><b>Full list of Sponsors (For reference only. This field does not appear in the UI and any changes here will not be saved.)</b></Form.Label>
-                            <Form.Control type="text" placeholder={updateTeam?.sponsors} defaultValue={updateTeam?.sponsors} />
+                            <Form.Label className={"formLabel"}><b>Full list of Sponsors (For reference only. This field is not editable, does not appear in the UI, and any changes here will not be saved.)</b></Form.Label>
+                            <Form.Control type="text" placeholder={updateTeam?.sponsors} defaultValue={updateTeam?.sponsors} disabled/>
                         </Form.Group>
                         <br />
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="warning" size="sm" onClick={(e) => { clearVisits(true, e) }}>Reset visit times</Button>
-                    <Button variant="secondary" size="sm" onClick={handleClose}>Close without saving changes</Button>
-                    <Button variant="info" size="sm" onClick={handleTrack}>Record visit without saving changes</Button>
-                    <Button variant="primary" size="sm" onClick={(e) => { handleSubmit("save", e) }}>Submit changes but only keep them locally</Button>
-                    <Button variant="success" size="sm" disabled={!isOnline} onClick={(e) => { handleSubmit("update", e) }}>Submit changes and upload to gatool Cloud</Button>
+                    <Button variant="warning" size="sm" onClick={(e) => { clearVisits(true, e) }}>Reset <br />visit times</Button>
+                    <Button variant="secondary" size="sm" onClick={handleClose}>Close without<br />saving changes</Button>
+                    <Button variant="info" size="sm" onClick={handleTrack}>Record visit without<br />saving changes</Button>
+                    <Button variant="primary" size="sm" onClick={(e) => { handleSubmit("save", e) }}>Submit changes<br />but only keep them locally</Button>
+                    <Button variant="success" size="sm" disabled={!isOnline} onClick={(e) => { handleSubmit("update", e) }}>Submit changes <br />and upload to gatool Cloud</Button>
                     <br />
                 </Modal.Footer>
             </Modal>}
