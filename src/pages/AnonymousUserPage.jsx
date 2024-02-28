@@ -12,9 +12,7 @@ function AnonymousUserPage() {
                     during the <i><b>FIRST</b></i> Robotics season. As a web-based tool, it uses up-to-date information about the event to
                     provide a comprehensive set of useful data to Game Announcers. It is designed to work on desktops,
                     laptops and tablet devices. In a pinch, it can be used on a mobile phone.</p>
-                <p>You will need a login to
-                    access the tool. All registered GAs and MCs will receive an invitation with a login and password. </p>
-                <p><a href="https://youtu.be/-n96KgtgYF0">Watch an overview of gatool on YouTube to learn more!</a></p>
+                <p>You will need a login to access the tool. Please review the Emcee and Game Announcer role training presentation at the <a href="https://www.firstinspires.org/resource-library/frc/emcee-and-game-announcer-training-material">FIRST Resource Center</a> to request access to this tool. After you request access, expect a delay of 12 to 24 hrs before you receive notification that you have been provisioned.</p>
                 <LoginButton size="lg" block />
             </Container>
         </div>

@@ -122,7 +122,7 @@ function App() {
   const [practiceSchedule, setPracticeSchedule] = usePersistentState("cache:practiceSchedule", null);
   const [offlinePlayoffSchedule, setOfflinePlayoffSchedule] = usePersistentState("cache:offlinePlayoffSchedule", null);
   const [teamList, setTeamList] = usePersistentState("cache:teamList", null);
-  const [robotImages,setRobotImages] = usePersistentState("cache:robotImages",null);
+  const [robotImages, setRobotImages] = usePersistentState("cache:robotImages", null);
   const [rankings, setRankings] = usePersistentState("cache:rankings", null);
   const [rankingsOverride, setRankingsOverride] = usePersistentState("cache:rankingsOverride", null);
   const [alliances, setAlliances] = usePersistentState("cache:alliances", null);
@@ -186,9 +186,11 @@ function App() {
     setSelectedYear(supportedYears[0]);
   }
 
+  // Display an alert when there are updates to the app. This allows the user to update the cached code.
   useEffect(() => {
-    const closeSnackBar = () => {
-      setShowReloaded(false);
+    const reload = ()=>{
+      setShowReloaded(true);
+      reloadPage();
     }
 
     if (showReload && waitingWorker) {
@@ -198,9 +200,17 @@ function App() {
         action: <>
           <Button className='snackbar-button'
             color='primary'
-            onClick={reloadPage}>Reload and Update</Button>
+            onClick={reload}>Reload and Update</Button>
         </>
       });
+    }
+
+  }, [waitingWorker, showReload, setShowReloaded, reloadPage, enqueueSnackbar])
+
+  // Display an alert when updates have been made to the app. The user can clear the message.
+  useEffect(() => {
+    const closeSnackBar = () => {
+      setShowReloaded(false);
     }
 
     if (showReloaded) {
@@ -215,7 +225,7 @@ function App() {
         </>
       });
     }
-  }, [waitingWorker, showReload, showReloaded, setShowReloaded, reloadPage, enqueueSnackbar])
+  }, [showReloaded, setShowReloaded, enqueueSnackbar])
 
   // Handle if users are offline. If they're offline but have an event and year selected, let them in.
   const canAccessApp = () => {
@@ -853,12 +863,12 @@ function App() {
 
           teams.teams = values;
           setTeamList(teams);
-          getRobotImages(teams);
+          //getRobotImages(teams);
         })
       } else {
         teams.lastUpdate = moment();
         setTeamList(teams);
-        getRobotImages(teams);
+        //getRobotImages(teams);
       }
 
     })
@@ -1014,18 +1024,18 @@ function App() {
    * @param teams The event's team list
    * @return sets the array of URLs
    */
-  async function getRobotImages(teams) {
-    var robotImageList = teams?.teams.map(async team => {
+  async function getRobotImages() {
+    var robotImageList = teamList?.teams.map(async team => {
       var media = await httpClient.get(`${selectedYear?.value}/team/${team?.teamNumber}/media`);
       var mediaArray = await media.json();
-      var image = _.filter(mediaArray,{"type": "imgur"})[0];
-      return {"teamNumber":team?.teamNumber,"imageURL":image?.direct_url || null};
+      var image = _.filter(mediaArray, { "type": "imgur" })[0];
+      return { "teamNumber": team?.teamNumber, "imageURL": image?.direct_url || null };
     });
-    await Promise.all(robotImageList).then((values)=> {
+    await Promise.all(robotImageList).then((values) => {
       setRobotImages(values);
     })
   }
-  
+
 
   /**
    * This function retrieves the rworld high scores for the selected year from FIRST.
@@ -1209,6 +1219,8 @@ function App() {
       setPracticeSchedule(null);
       setOfflinePlayoffSchedule(null);
       setTeamList(null);
+      setCommunityUpdates(null);
+      setRobotImages(null);
       setRankings(null);
       setEventHighScores(null);
       setPlayoffs(false);
@@ -1229,7 +1241,6 @@ function App() {
       ]);
       getSchedule(true);
       getTeamList();
-      getCommunityUpdates();
       getRanks();
       if (selectedEvent.value.districtCode) {
         getDistrictRanks();
@@ -1237,6 +1248,14 @@ function App() {
       getWorldStats();
     }
   }
+
+  // Retrieve Community Updates when the team list changes
+  useEffect(() => {
+    if (teamList) {
+      getCommunityUpdates();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [httpClient, teamList])
 
   //update the Alliance Count when conditions change
   useEffect(() => {
@@ -1419,6 +1438,15 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [httpClient, selectedEvent])
 
+  // Retrieve robot images when the team list changes
+  useEffect(() => {
+    if (teamList) {
+      getRobotImages();
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [httpClient, teamList])
+
   /**
   * This function loads an event when a user selects an event from the menu. It will reset all event data, load the event details, team lists, team updates, refresh scores, ranks and world stats when appropriate.
   * @async
@@ -1441,10 +1469,10 @@ function App() {
     {
       autoStart: true,
       immediate: false,
-      selfCorrecting: true, 
+      selfCorrecting: true,
       onFinish: () => {
         console.log('Event refresh stopped at App level.');
-    },
+      },
     }
   )
 
@@ -1508,7 +1536,7 @@ function App() {
               <Route path='/awards' element={<AwardsPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} communityUpdates={communityUpdates} />} />
 
               <Route path='/stats' element={<StatsPage worldStats={worldStats} selectedEvent={selectedEvent} eventHighScores={eventHighScores} eventNamesCY={eventNamesCY} />} />
-              <Route path='/cheatsheet' element={<CheatsheetPage teamList={teamList} communityUpdates={communityUpdates} selectedEvent={selectedEvent} selectedYear={selectedYear} robotImages={robotImages}/>} />
+              <Route path='/cheatsheet' element={<CheatsheetPage teamList={teamList} communityUpdates={communityUpdates} selectedEvent={selectedEvent} selectedYear={selectedYear} robotImages={robotImages} />} />
               <Route path='/emcee' element={<EmceePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} alliances={alliances} currentMatch={currentMatch} nextMatch={nextMatch} previousMatch={previousMatch} reverseEmcee={reverseEmcee} />} />
               <Route path='/dev' element={<Developer />} />
             </Route>

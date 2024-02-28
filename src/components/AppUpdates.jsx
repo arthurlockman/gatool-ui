@@ -1,6 +1,13 @@
 
 export const appUpdates = [
     {
+        date: "February 28, 2024",
+        message: <ul>
+            <li>Updates to Anonymous user page</li>
+            <li>Fixing a crasher on the Cheat Sheet screen</li>
+            <li>Updates to the Sponsor field workflow</li>
+        </ul>
+    },{
         date: "February 25, 2024",
         message: <ul>
             <li>Added V2 of Bill Aucoin's playoff guide</li>
