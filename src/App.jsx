@@ -188,7 +188,7 @@ function App() {
 
   // Display an alert when there are updates to the app. This allows the user to update the cached code.
   useEffect(() => {
-    const reload = ()=>{
+    const reload = () => {
       setShowReloaded(true);
       reloadPage();
     }
@@ -1055,24 +1055,26 @@ function App() {
 
 
     highscores.forEach((score) => {
-      var details = {};
-      if (!_.isEmpty(eventnames[worldStats?.year])) {
-        details.eventName = eventnames[worldStats?.year][score?.matchData?.event?.eventCode] || score?.matchData?.event?.eventCode;
-      } else {
-        details.eventName = score?.matchData?.event?.eventCode;
-      }
+      if (score?.matchData?.match) {
+        var details = {};
+        if (!_.isEmpty(eventnames[worldStats?.year])) {
+          details.eventName = eventnames[worldStats?.year][score?.matchData?.event?.eventCode] || score?.matchData?.event?.eventCode;
+        } else {
+          details.eventName = score?.matchData?.event?.eventCode;
+        }
 
-      //if (worldStats) {
-      //  details.eventName = eventnames[worldStats?.year][score?.matchData?.event?.eventCode]
-      //} else {
-      //  details.eventName = score?.matchData?.event?.eventCode;
-      //}
-      details.alliance = _.upperFirst(score?.matchData?.highScoreAlliance);
-      details.scoreType = score?.type + score?.level;
-      details.matchName = score?.matchData?.match?.description;
-      details.allianceMembers = _.filter(score?.matchData?.match?.teams, function (o) { return _.startsWith(o.station, details.alliance) }).map((team) => { return team.teamNumber }).join(" ")
-      details.score = score?.matchData?.match[`score${details.alliance}Final`];
-      reducedScores[details.scoreType] = details;
+        //if (worldStats) {
+        //  details.eventName = eventnames[worldStats?.year][score?.matchData?.event?.eventCode]
+        //} else {
+        //  details.eventName = score?.matchData?.event?.eventCode;
+        //}
+        details.alliance = _.upperFirst(score?.matchData?.highScoreAlliance);
+        details.scoreType = score?.type + score?.level;
+        details.matchName = score?.matchData?.match?.description;
+        details.allianceMembers = _.filter(score?.matchData?.match?.teams, function (o) { return _.startsWith(o.station, details.alliance) }).map((team) => { return team.teamNumber }).join(" ")
+        details.score = score.matchData.match[`score${details.alliance}Final`];
+        reducedScores[details.scoreType] = details;
+      }
     })
     scores.highscores = reducedScores;
 
@@ -1198,7 +1200,7 @@ function App() {
    * @async
    * @function previousMatch
    * @param e The menu select event which contains the selected match
-   * 
+   *
    */
   const setMatchFromMenu = (e) => {
     setCurrentMatch(e.value);
