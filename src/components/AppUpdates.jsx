@@ -6,6 +6,7 @@ export const appUpdates = [
             <li>Updates to Anonymous user page</li>
             <li>Fixing a crasher on the Cheat Sheet screen</li>
             <li>Updates to the Sponsor field workflow</li>
+            <li>Restored World High Scores on Stats page</li>
         </ul>
     },{
         date: "February 25, 2024",
