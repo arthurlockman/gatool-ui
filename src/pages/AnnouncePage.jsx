@@ -192,7 +192,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
                             <tr>
                                 <td>Team #</td>
                                 <td>Team Name</td>
-                                <td>Orgainzation, Sponsors & Awards</td>
+                                <td>Organization, Sponsors & Awards</td>
                                 <td>Rank</td>
                             </tr>
                         </thead>
