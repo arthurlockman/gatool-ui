@@ -88,14 +88,13 @@ const supportedYears = [
 const paleYellow = "#fdfaed";
 const paleBlue = "#effdff";
 
-function LayoutsWithNavbar({ selectedEvent, qualSchedule, playoffs, teamList, communityUpdates,
+function LayoutsWithNavbar({ selectedEvent, practiceSchedule, qualSchedule, playoffs, teamList, communityUpdates,
   rankings, eventHighScores, worldHighScores, allianceSelectionReady }) {
   return (
     <>
       <MainNavigation selectedEvent={selectedEvent} qualSchedule={qualSchedule} playoffs={playoffs}
         teamList={teamList} communityUpdates={communityUpdates} rankings={rankings} eventHighScores={eventHighScores}
-        worldHighScores={worldHighScores} allianceSelectionReady={allianceSelectionReady}
-      />
+        worldHighScores={worldHighScores} allianceSelectionReady={allianceSelectionReady} practiceSchedule={practiceSchedule} />
       <Outlet />
       <BottomNavigation />
     </>
@@ -120,6 +119,7 @@ function App() {
   const [playoffSchedule, setPlayoffSchedule] = usePersistentState("cache:playoffSchedule", null);
   const [qualSchedule, setQualSchedule] = usePersistentState("cache:qualSchedule", null);
   const [practiceSchedule, setPracticeSchedule] = usePersistentState("cache:practiceSchedule", null);
+  const [practiceFileUploaded, setPracticeFileUploaded] = usePersistentState("cache:practiceFileUploaded", false);
   const [offlinePlayoffSchedule, setOfflinePlayoffSchedule] = usePersistentState("cache:offlinePlayoffSchedule", null);
   const [teamList, setTeamList] = usePersistentState("cache:teamList", null);
   const [robotImages, setRobotImages] = usePersistentState("cache:robotImages", null);
@@ -374,7 +374,28 @@ function App() {
     }
 
     var result = null;
+    var practiceschedule = null;
     var qualschedule = null;
+    var playoffschedule = null;
+
+    if (selectedEvent?.value?.code.includes("OFFLINE")) {
+      //do something
+      practiceschedule = { "schedule": { "schedule": [] } };
+    } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
+      result = await httpClient.get(`${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/practice`);
+      practiceschedule = await result.json();
+    }
+    if (typeof practiceschedule.Schedule !== "undefined") {
+      practiceschedule.schedule = practiceschedule.Schedule;
+      delete practiceschedule.Schedule;
+    }
+    if (typeof practiceschedule.schedule?.Schedule !== "undefined") {
+      practiceschedule.schedule.schedule = practiceschedule.schedule.Schedule;
+      delete practiceschedule.schedule.Schedule;
+    }
+    practiceschedule.lastUpdate = moment();
+    setPracticeSchedule(practiceschedule);
+
     if (selectedEvent?.value?.code.includes("OFFLINE")) {
       //do something
       qualschedule = { "schedule": { "schedule": [] } };
@@ -424,7 +445,6 @@ function App() {
     //get the playoff schedule
     matches = [];
     result = null;
-    var playoffschedule = null;
     completedMatchCount = 0;
     if (selectedEvent?.value?.code.includes("OFFLINE")) {
       //do something
@@ -513,9 +533,6 @@ function App() {
 
         }
       }))
-
-      // since we have a playoff schedule, we need to fetch the Alliances.
-      getAlliances();
 
       // If we are in World Champs, we need to determine the team list from the schedule
       var tempChampsTeamList = [];
@@ -1160,6 +1177,7 @@ function App() {
   const nextMatch = () => {
     if (!adHocMode) {
       if ((practiceSchedule?.schedule?.length > 0) && (currentMatch < (practiceSchedule?.schedule?.length + (offlinePlayoffSchedule?.schedule?.length || 0)))) {
+        setAdHocMatch(practiceSchedule?.schedule[currentMatch].teams);
         setCurrentMatch(currentMatch + 1);
         if (!selectedEvent?.value?.code.includes("OFFLINE")) {
           getSchedule();
@@ -1187,8 +1205,11 @@ function App() {
   const previousMatch = () => {
     if (!adHocMode) {
       if (currentMatch > 1) {
+        if (practiceSchedule?.schedule?.length > 0) {
+          setAdHocMatch(practiceSchedule?.schedule[currentMatch - 2].teams);
+        }
         setCurrentMatch(currentMatch - 1);
-        if (!(practiceSchedule?.schedule?.length > 0)) {
+        if (!selectedEvent?.value?.code.includes("OFFLINE")) {
           getSchedule();
           getRanks();
         }
@@ -1206,6 +1227,9 @@ function App() {
    */
   const setMatchFromMenu = (e) => {
     setCurrentMatch(e.value);
+    if (practiceSchedule?.schedule?.length > 0) {
+      setAdHocMatch(practiceSchedule?.schedule[e.value - 1].teams);
+    }
     getSchedule();
     getRanks();
     getWorldStats();
@@ -1235,14 +1259,7 @@ function App() {
       setRankingsOverride(null);
       setCurrentMatch(1);
       setDistrictRankings(null);
-      setAdHocMatch([
-        { teamNumber: null, station: 'Red1', surrogate: false, dq: false },
-        { teamNumber: null, station: 'Red2', surrogate: false, dq: false },
-        { teamNumber: null, station: 'Red3', surrogate: false, dq: false },
-        { teamNumber: null, station: 'Blue1', surrogate: false, dq: false },
-        { teamNumber: null, station: 'Blue2', surrogate: false, dq: false },
-        { teamNumber: null, station: 'Blue3', surrogate: false, dq: false }
-      ]);
+      setAdHocMatch(null);
       getSchedule(true);
       getTeamList();
       getRanks();
@@ -1260,6 +1277,14 @@ function App() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [httpClient, teamList])
+
+  // Retrieve Alliances when the team list changes
+  useEffect(() => {
+    if (playoffSchedule?.schedule.length > 0) {
+      getAlliances();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [httpClient, playoffSchedule])
 
   //update the Alliance Count when conditions change
   useEffect(() => {
@@ -1521,11 +1546,11 @@ function App() {
       </div> :
         canAccessApp() ? <BrowserRouter>
           <Routes>
-            <Route path="/" element={<LayoutsWithNavbar selectedEvent={selectedEvent} qualSchedule={qualSchedule} playoffs={playoffs} teamList={teamList} communityUpdates={communityUpdates} rankings={rankings} eventHighScores={eventHighScores} worldHighScores={worldStats} allianceSelectionReady={allianceSelectionReady} />}>
+            <Route path="/" element={<LayoutsWithNavbar selectedEvent={selectedEvent} qualSchedule={qualSchedule} playoffs={playoffs} teamList={teamList} communityUpdates={communityUpdates} rankings={rankings} eventHighScores={eventHighScores} worldHighScores={worldStats} allianceSelectionReady={allianceSelectionReady} practiceSchedule={practiceSchedule} />}>
 
               <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} teamList={teamList} eventFilters={eventFilters} setEventFilters={setEventFilters} timeFilter={timeFilter} setTimeFilter={setTimeFilter} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} rankings={rankings} timeFormat={timeFormat} setTimeFormat={setTimeFormat} showSponsors={showSponsors} setShowSponsors={setShowSponsors} showAwards={showAwards} setShowAwards={setShowAwards} showNotes={showNotes} setShowNotes={setShowNotes} showMottoes={showMottoes} setShowMottoes={setShowMottoes} showChampsStats={showChampsStats} setShowChampsStats={setShowChampsStats} swapScreen={swapScreen} setSwapScreen={setSwapScreen} autoAdvance={autoAdvance} setAutoAdvance={setAutoAdvance} autoUpdate={autoUpdate} setAutoUpdate={setAutoUpdate} getSchedule={getSchedule} awardsMenu={awardsMenu} setAwardsMenu={setAwardsMenu} showQualsStats={showQualsStats} setShowQualsStats={setShowQualsStats} showQualsStatsQuals={showQualsStatsQuals} setShowQualsStatsQuals={setShowQualsStatsQuals} teamReduction={teamReduction} setTeamReduction={setTeamReduction} playoffCountOverride={playoffCountOverride} setPlayoffCountOverride={setPlayoffCountOverride} allianceCount={allianceCount} localUpdates={localUpdates} setLocalUpdates={setLocalUpdates} putTeamData={putTeamData} getCommunityUpdates={getCommunityUpdates} reverseEmcee={reverseEmcee} setReverseEmcee={setReverseEmcee} showDistrictChampsStats={showDistrictChampsStats} setShowDistrictChampsStats={setShowDistrictChampsStats} monthsWarning={monthsWarning} setMonthsWarning={setMonthsWarning} user={user} adHocMode={adHocMode} setAdHocMode={setAdHocMode} supportedYears={supportedYears} reloadPage={reloadPage} />} />
 
-              <Route path="/schedule" element={<SchedulePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} practiceSchedule={practiceSchedule} setPracticeSchedule={setPracticeSchedule} getTeamList={getTeamList} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} offlinePlayoffSchedule={offlinePlayoffSchedule} loadEvent={loadEvent} />} />
+              <Route path="/schedule" element={<SchedulePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} practiceSchedule={practiceSchedule} setPracticeSchedule={setPracticeSchedule} getTeamList={getTeamList} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} offlinePlayoffSchedule={offlinePlayoffSchedule} loadEvent={loadEvent} practiceFileUploaded={practiceFileUploaded} setPracticeFileUploaded={setPracticeFileUploaded} />} />
 
               <Route path="/teamdata" element={<TeamDataPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} teamSort={teamSort} setTeamSort={setTeamSort} communityUpdates={communityUpdates} setCommunityUpdates={setCommunityUpdates} allianceCount={allianceCount} lastVisit={lastVisit} setLastVisit={setLastVisit} putTeamData={putTeamData} localUpdates={localUpdates} setLocalUpdates={setLocalUpdates} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} originalAndSustaining={originalAndSustaining} monthsWarning={monthsWarning} user={user} getTeamHistory={getTeamHistory} timeFormat={timeFormat} />} />
 

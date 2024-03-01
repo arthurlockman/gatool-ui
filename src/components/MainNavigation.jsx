@@ -57,7 +57,7 @@ const tabInactiveNotready = {
   textDecoration: "none"
 }
 
-function MainNavigation({ selectedEvent, qualSchedule, playoffs, teamList, communityUpdates,
+function MainNavigation({ selectedEvent, practiceSchedule, qualSchedule, playoffs, teamList, communityUpdates,
   rankings, eventHighScores, worldHighScores, allianceSelectionReady }) {
   const [scheduleTabReady, setScheduleTabReady] = useState(TabStates.NotReady)
   const [teamDataTabReady, setTeamDataTabReady] = useState(TabStates.NotReady)
@@ -89,17 +89,18 @@ function MainNavigation({ selectedEvent, qualSchedule, playoffs, teamList, commu
   // Handle ready state for schedule tab
   useEffect(() => {
     // GREEN: Event Selected, Qual Schedule loaded, has >0 matches in the array
+    // GREEN: Event Selected, Practice Schedule loaded, has >0 matches in the array
     // YELLOW: Event Selected, Qual Schedule loaded, has 0 matches in the array
     // RED: Event Selected, No qual schedule loaded
 
-    if (selectedEvent && qualSchedule && qualSchedule.schedule.length > 0) {
+    if (selectedEvent && (practiceSchedule?.schedule.length > 0 || qualSchedule?.schedule.length > 0)) {
       setScheduleTabReady(TabStates.Ready)
-    } else if (selectedEvent && qualSchedule && qualSchedule.schedule?.length === 0) {
+    } else if (selectedEvent && qualSchedule && qualSchedule?.schedule?.length === 0) {
       setScheduleTabReady(TabStates.Stale)
     } else {
       setScheduleTabReady(TabStates.NotReady)
     }
-  }, [qualSchedule, selectedEvent])
+  }, [qualSchedule, practiceSchedule, selectedEvent])
 
   // Handle ready state for the team data tab
   useEffect(() => {
@@ -124,7 +125,7 @@ function MainNavigation({ selectedEvent, qualSchedule, playoffs, teamList, commu
 
     if (selectedEvent && rankings && rankings.ranks.length > 0) {
       setRanksTabReady(TabStates.Ready)
-    } else if (selectedEvent && rankings && rankings.ranks.length === 0) {
+    } else if (selectedEvent && rankings && rankings?.ranks.length === 0) {
       setRanksTabReady(TabStates.Stale)
     } else {
       setRanksTabReady(TabStates.NotReady)

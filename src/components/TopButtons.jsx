@@ -90,13 +90,13 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
         var adHocMatchNew = _.cloneDeep(adHocMatch);
         if (_.isNull(adHocMatchNew)) {
             adHocMatchNew = [
-                { teamNumber: null, station: 'Red1' },
-                { teamNumber: null, station: 'Red2' },
-                { teamNumber: null, station: 'Red3' },
-                { teamNumber: null, station: 'Blue1' },
-                { teamNumber: null, station: 'Blue2' },
-                { teamNumber: null, station: 'Blue3' }
-            ]
+                { teamNumber: null, station: 'Red1', surrogate: false, dq: false },
+                { teamNumber: null, station: 'Red2', surrogate: false, dq: false },
+                { teamNumber: null, station: 'Red3', surrogate: false, dq: false },
+                { teamNumber: null, station: 'Blue1', surrogate: false, dq: false },
+                { teamNumber: null, station: 'Blue2', surrogate: false, dq: false },
+                { teamNumber: null, station: 'Blue3', surrogate: false, dq: false }
+              ]
         }
         adHocMatchNew[_.findIndex(adHocMatchNew, { "station": station })].teamNumber = teamNumber;
         setAdHocMatch(adHocMatchNew);
@@ -107,7 +107,8 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
     rankings?.ranks.forEach((team) => {
         if (_.indexOf(allianceMembers, String(team.teamNumber)) < 0) { availableTeams.push({ "label": team.teamNumber, "value": team }) }
     })
-    const addBackupButton = inPlayoffs && selectedEvent.value.champLevel !== "CHAMPS" && selectedEvent.value.champLevel !== "CMPDIV" && selectedEvent.value.champLevel !== "CMPSUB";
+    const inPractice = matchDetails?.description.toLowerCase().includes("practice");
+    const addBackupButton = inPlayoffs && selectedEvent?.value?.champLevel !== "CHAMPS" && selectedEvent?.value?.champLevel !== "CMPDIV" && selectedEvent?.value?.champLevel !== "CMPSUB";
 
     let eventTeams = teamList?.teams.map((team) => {
         return ({ "label": team.teamNumber, "value": team.teamNumber })
@@ -124,10 +125,10 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
         <>
             <Row style={{ "paddingTop": "10px", "paddingBottom": "10px" }}>
                 <Col xs={"2"} lg={"3"}>
-                    {!adHocMode && <Button size="lg" variant="outline-success" className={"gatool-button buttonNoWrap"} onClick={previousMatch}><span className={"d-none d-lg-block"}><CaretLeftFill /> Previous Match</span><span className={"d-block d-lg-none"}><CaretLeftFill /> <CaretLeftFill /></span></Button>}
+                    {!adHocMode && <Button size="lg" variant="outline-success" className={"gatool-button buttonNoWrap"} onClick={previousMatch}>{inPractice ? <span><CaretLeftFill /> <CaretLeftFill /></span> : <><span className={"d-none d-lg-block"}><CaretLeftFill /> Previous Match</span><span className={"d-block d-lg-none"}><CaretLeftFill /> <CaretLeftFill /></span></>}</Button>}
                 </Col>
                 {!adHocMode && <MatchClock matchDetails={matchDetails} timeFormat={timeFormat} />}
-                <Col xs={addBackupButton ? "4" : "5"} lg={inPlayoffs ? "3" : "4"}><b>{selectedEvent?.label.replace("FIRST Championship - ", "").replace("FIRST In Texas District Championship - ", "").replace("FIRST Ontario Provincial Championship - ", "").replace("New England FIRST District Championship - ", "")}</b><br />
+                <Col xs={addBackupButton || inPractice ? "4" : "5"} lg={inPlayoffs || inPractice ? "3" : "4"}><b>{selectedEvent?.label.replace("FIRST Championship - ", "").replace("FIRST In Texas District Championship - ", "").replace("FIRST Ontario Provincial Championship - ", "").replace("New England FIRST District Championship - ", "")}</b><br />
                     {!adHocMode && <Select options={matchMenu} value={currentMatch ? matchMenu[currentMatch - 1] : matchMenu[0]} onChange={handleMatchSelection} styles={{
                         option: (styles, { data }) => {
                             return {
@@ -140,9 +141,9 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
                     {adHocMode && <span className="announceOrganization">TEST MATCH</span>}
                 </Col>
                 {addBackupButton && <Col className="promoteBackup" xs={1} onClick={handleShow}>+<ArrowUpSquareFill />+<br />backup</Col>}
-                {adHocMode && <Col className="promoteBackup" xs={1} onClick={handleAdHoc}>Change<br />Teams</Col>}
+                {(adHocMode || inPractice) && <Col className="promoteBackup" xs={1} onClick={handleAdHoc}>Change<br />Teams</Col>}
                 <Col xs={"2"} lg={"3"}>
-                    {!adHocMode && <Button size="lg" variant="outline-success" className={"gatool-button buttonNoWrap"} onClick={nextMatch}><span className={"d-none d-lg-block"}>Next Match <CaretRightFill /></span><span className={"d-block d-lg-none"}><CaretRightFill /> <CaretRightFill /></span></Button>}
+                    {!adHocMode && <Button size="lg" variant="outline-success" className={"gatool-button buttonNoWrap"} onClick={nextMatch}>{inPractice ? <span><CaretRightFill /> <CaretRightFill /></span> :<><span className={"d-none d-lg-block"}>Next Match <CaretRightFill /></span><span className={"d-block d-lg-none"}><CaretRightFill /> <CaretRightFill /></span></>}</Button>}
                 </Col>
                 <Modal centered={true} show={show} onHide={handleClose}>
                     <Modal.Header className={"promoteBackup"} closeButton closeVariant="white">
@@ -175,8 +176,9 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
                     </Modal.Header>
                     <Modal.Body>
                         <Container>
-                            <div>Select teams for each station below.</div>
-                            {!swapScreen && <Table>
+                            {adHocMatch && <div>Select teams for each station below.</div>}
+                            {!adHocMatch && <div>Awaiting match data...</div>}
+                            {!swapScreen && adHocMatch && <Table>
                                 <Row>
                                     <Col className="blueAlliance"><div style={{ backgroundColor: "#98B4F4" }}><b>Blue 1</b> <Select options={eventTeams} tabIndex={4} value={adHocMatch[3]?.teamNumber ? { "value": adHocMatch[3]?.teamNumber, "label": adHocMatch[3]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Blue1", e]) }} /></div></Col>
                                     <Col className="redAlliance"><div style={{ backgroundColor: "#F7B3B4" }}><b>Red 3</b> <Select options={eventTeams} tabIndex={3} value={adHocMatch[2]?.teamNumber ? { "value": adHocMatch[2]?.teamNumber, "label": adHocMatch[2]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Red3", e]) }} /></div></Col>
@@ -191,7 +193,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
 
                                 </Row>
                             </Table>}
-                            {swapScreen && <Table>
+                            {swapScreen && adHocMatch && <Table>
                                 <Row>
                                     <Col className="redAlliance"><div style={{ backgroundColor: "#F7B3B4" }}><b>Red 3</b> <Select options={eventTeams} tabIndex={4} value={adHocMatch[2]?.teamNumber ? { "value": adHocMatch[2]?.teamNumber, "label": adHocMatch[2]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Red3", e]) }} /></div></Col>
                                     <Col className="blueAlliance"><div style={{ backgroundColor: "#98B4F4" }}><b>Blue 1</b> <Select options={eventTeams} tabIndex={3} value={adHocMatch[3]?.teamNumber ? { "value": adHocMatch[3]?.teamNumber, "label": adHocMatch[3]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Blue1", e]) }} /></div></Col>

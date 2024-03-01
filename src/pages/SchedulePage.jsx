@@ -4,7 +4,7 @@ import { utils, read } from "xlsx";
 import { toast } from "react-toastify";
 import _ from "lodash";
 
-function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSchedule, setPracticeSchedule, offlinePlayoffSchedule, setOfflinePlayoffSchedule, getTeamList, loadEvent }) {
+function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSchedule, setPracticeSchedule, offlinePlayoffSchedule, setOfflinePlayoffSchedule, getTeamList, loadEvent, practiceFileUploaded, setPracticeFileUploaded }) {
 
     // This function clicks the hidden file upload button
     function clickLoadPractice() {
@@ -14,6 +14,7 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
     // This function removes the Practice Schedule
     function clickRemovePractice() {
         setPracticeSchedule(null);
+        setPracticeFileUploaded(false);
         setOfflinePlayoffSchedule(null);
         loadEvent();
     }
@@ -60,7 +61,7 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
 
         });
         tempTeamList = _.uniq(tempTeamList);
-        console.log(tempTeamList);
+        //console.log(tempTeamList);
         getTeamList(tempTeamList);
     }
 
@@ -180,6 +181,9 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                 !forPlayoffs ? setPracticeSchedule(formattedSchedule) : setOfflinePlayoffSchedule(formattedSchedule);
                 addTeamsToTeamList(formattedSchedule);
                 toast.success(`Your have successfully loaded your ${selectedEvent?.value?.code.includes("OFFLINE") ? "Offline" : "Practice"} Schedule.`)
+                if (!selectedEvent?.value?.code.includes("OFFLINE")) {
+                    setPracticeFileUploaded(true);
+                }
                 if (!forPlayoffs) {
                     clearFileInput("BackupFiles");
                     document.getElementById("BackupFiles").addEventListener('change', handlePracticeFiles);
@@ -207,34 +211,37 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
             </div>}
             {selectedEvent && (!qualSchedule || qualSchedule?.schedule.length === 0) && (playoffSchedule?.schedule.length === 0) && <div>
                 <Alert variant="warning" >
-                    {!practiceSchedule && <>
+                    {(!practiceSchedule || practiceSchedule?.schedule.length === 0 ) && !practiceFileUploaded && <>
                         <div><img src="loadingIcon.gif" alt="Loading data..." /></div>
                         <div>Awaiting schedule for {selectedEvent.label}<br /><br /></div>
-                    </>}
-                    {!practiceSchedule && <>
                         <Container fluid>
                             <Row>
                                 <Col xs={2}></Col>
                                 <Col xs={1}><input type="file" id="BackupFiles" onChange={handlePracticeFiles} className={"hiddenInput"} /><img style={{ float: "left" }} width="50" src="images/excelicon.png" alt="Excel Logo" /></Col>
                                 <Col xs={7} className={"leftTable"} style={{ cursor: "pointer", color: "darkblue" }} onClick={clickLoadPractice}>
-                                    {selectedEvent?.value?.code.includes("OFFLINE") && <b>You can upload a Qualification Match Schedule for your Offline event. You will need to ask your Scorekeeper to export a Schedule Report in Excel format, which you can upload here. We will determine the team list from the Qualification Schedule.<br />Tap here to upload a Practice Schedule.</b>}
+                                    {selectedEvent?.value?.code.includes("OFFLINE") && <b>You can upload a Qualification Match Schedule for your Offline event. You will need to ask your Scorekeeper to export a Schedule Report in Excel format, which you can upload here. We will determine the team list from the Qualification Schedule.<br />Tap here to upload a Qualification Schedule.</b>}
                                     {!selectedEvent?.value?.code.includes("OFFLINE") && <b>You can upload a Practice Schedule while you wait for the Quals Schedule to post. You will need to ask your Scorekeeper to export a Schedule Report in Excel format, which you can upload here.<br />Tap here to upload a Practice Schedule.</b>}
                                 </Col><Col xs={2}></Col>
                             </Row>
                         </Container>
                     </>}
-                    {practiceSchedule && <>
+                    {practiceSchedule?.schedule.length > 0 && <>
                         <Container fluid>
                             <Row >
                                 <Col xs={2}></Col>
-                                <Col xs={1}><input type="file" id="LoadOfflinePlayoffs" onChange={handlePracticeFiles} className={"hiddenInput"} /><img style={{ float: "left" }} width="50" src="images/excelicon.png" alt="Excel Logo" /></Col>
-                                <Col xs={selectedEvent?.value?.code.includes("OFFLINE") ? 4 : 7} className={"leftTable"} style={{ cursor: "pointer", color: "darkblue" }} onClick={clickRemovePractice}>
-                                    {selectedEvent?.value?.code.includes("OFFLINE") && <b>You have uploaded an Offline Schedule.<br />Tap here to remove it. You can add a playoff schedule, when one becomes available.</b>}
-                                    {!selectedEvent?.value?.code.includes("OFFLINE") && <b>You have uploaded a Practice Schedule.<br />Tap here to remove it. Know that we will automatically remove it when we get a Qualification Matches Schedule.</b>}
-                                </Col>
-                                {selectedEvent?.value?.code.includes("OFFLINE") && <Col xs={3} className={"leftTable"} style={{ cursor: "pointer", color: "darkblue" }} onClick={clickLoadOfflinePlayoffs}>
-                                    <b>You can now load your Offline Playoff Schedule. You may need to do this after each phase of the playoffs.<br />Tap here to remove it and replace it, as necessary.</b>
-                                </Col>}
+                                {practiceFileUploaded && <>
+                                    <Col xs={1}><input type="file" id="LoadOfflinePlayoffs" onChange={handlePracticeFiles} className={"hiddenInput"} /><img style={{ float: "left" }} width="50" src="images/excelicon.png" alt="Excel Logo" /></Col>
+                                    <Col xs={selectedEvent?.value?.code.includes("OFFLINE") ? 4 : 7} className={"leftTable"} style={{ cursor: "pointer", color: "darkblue" }} onClick={clickRemovePractice}>
+                                        {selectedEvent?.value?.code.includes("OFFLINE") && <b>You have uploaded an Offline Schedule.<br />Tap here to remove it. You can add a playoff schedule, when one becomes available.</b>}
+                                        {!selectedEvent?.value?.code.includes("OFFLINE") && <b>You have uploaded a Practice Schedule.<br />Tap here to remove it. Know that we will automatically remove it when we get a Qualification Matches Schedule.</b>}
+                                    </Col>
+                                </>}
+                                {!practiceFileUploaded && 
+                                <Col xs={8}><b>Practice Matches</b><br />Your event has not yet posted a Qualification Match schedule. You can use this practice match schedule to help observe teams and practice for the tournament. Please do not announce matches during the Practice Match period.</Col>}
+                                {selectedEvent?.value?.code.includes("OFFLINE") &&
+                                    <Col xs={3} className={"leftTable"} style={{ cursor: "pointer", color: "darkblue" }} onClick={clickLoadOfflinePlayoffs}>
+                                        <b>You can now load your Offline Playoff Schedule. You may need to do this after each phase of the playoffs.<br />Tap here to remove it and replace it, as necessary.</b>
+                                    </Col>}
                                 <Col xs={2}></Col>
                             </Row>
                         </Container>
@@ -309,7 +316,7 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                                 )
                             })
                             }
-                            {(playoffSchedule && playoffSchedule?.schedule?.length > 0) ? playoffSchedule.schedule.map((match) => {
+                            {(playoffSchedule && playoffSchedule?.schedule?.length > 0) && playoffSchedule.schedule.map((match) => {
                                 let redStyle = "red";
                                 let blueStyle = "blue";
                                 let winnerStyle = "tie";
@@ -332,9 +339,14 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                                     <td><span className={redStyle}>{match?.teams[2]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[5]?.teamNumber}</span></td>
                                 </tr>
                                 )
-                            }) : !offlinePlayoffSchedule &&
+                            })}
+                            {(!qualSchedule || qualSchedule?.schedule.length === 0) &&
                             <tr>
-                                <td colSpan={7}>No playoff schedule available yet.</td>
+                                <td colSpan={7}>No Qualification match schedule available yet.</td>
+                            </tr>}
+                            {!offlinePlayoffSchedule &&
+                            <tr>
+                                <td colSpan={7}>No Playoff patch schedule available yet.</td>
                             </tr>}
                         </tbody>
                     </Table>
