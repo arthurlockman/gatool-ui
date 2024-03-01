@@ -5,6 +5,8 @@ export const appUpdates = [
         message: <ul>
             <li>Added support for Practice Matches</li>
             <li>Fixed the auto advance feature</li>
+            <li>Added match time clock to the Emcee screen</li>
+            <li>Updated match clock to display how many minutes ahead/behind</li>
             <li>Fixed a typo on Announce Screen</li>
         </ul>
     },{
