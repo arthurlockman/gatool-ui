@@ -432,7 +432,7 @@ function App() {
     var completedMatchCount = 0;
 
     if (qualschedule?.schedule?.length > 0) {
-      completedMatchCount = qualschedule?.schedule?.length - _.filter(qualschedule.schedule, { "postResultTime": null }).length;
+      completedMatchCount = qualschedule?.schedule?.length - _.filter(qualschedule.schedule, { "actualStartTime": null }).length;
       // clear the Practice schedule if there is one loaded and there are matches in the schedule
       setPracticeSchedule(null);
     }
@@ -479,7 +479,7 @@ function App() {
       });
 
       if (playoffschedule?.schedule?.schedule?.length > 0) {
-        completedMatchCount = playoffschedule?.schedule?.schedule?.length - _.filter(playoffschedule.schedule.schedule, { "postResultTime": null }).length;
+        completedMatchCount = playoffschedule?.schedule?.schedule?.length - _.filter(playoffschedule.schedule.schedule, { "actualStartTime": null }).length;
       }
 
       playoffschedule.completedMatchCount = completedMatchCount;
@@ -1278,7 +1278,7 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [httpClient, teamList])
 
-  // Retrieve Alliances when the team list changes
+  // Retrieve Alliances when we have a playoff schedule
   useEffect(() => {
     if (playoffSchedule?.schedule.length > 0) {
       getAlliances();
