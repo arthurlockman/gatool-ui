@@ -7,6 +7,8 @@ export const appUpdates = [
             <li>Fixed the auto advance feature</li>
             <li>Added match time clock to the Emcee screen</li>
             <li>Updated match clock to display how many minutes ahead/behind</li>
+            <li>Separating switches to display notes on Announce and Play-by-play</li>
+            <li>Fixed winner highlighting issue in Playoff Bracket</li>
             <li>Fixed a typo on Announce Screen</li>
         </ul>
     },{
