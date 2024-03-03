@@ -23,7 +23,9 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
     }
 
     const handleResetAllianceSelection = () => {
-        handleReset();
+        if (overrideAllianceSelection) {
+            handleReset();
+        }
         getRanks();
         handleClose();
     }
