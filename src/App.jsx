@@ -394,8 +394,10 @@ function App() {
       practiceschedule.schedule.schedule = practiceschedule?.schedule?.Schedule;
       delete practiceschedule.schedule.Schedule;
     }
-    practiceschedule.lastUpdate = moment();
-    setPracticeSchedule(practiceschedule);
+    if (practiceSchedule?.schedule) {
+      practiceschedule.lastUpdate = moment();
+      setPracticeSchedule(practiceschedule);
+    }
 
     if (selectedEvent?.value?.code.includes("OFFLINE")) {
       //do something
