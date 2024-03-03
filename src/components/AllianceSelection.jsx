@@ -1,16 +1,16 @@
 import { useState } from "react";
 import { Button, Col, Container, Form, InputGroup, Modal, Row } from "react-bootstrap";
 import _ from "lodash";
-import { HandThumbsDownFill, HandThumbsUpFill, TrophyFill } from "react-bootstrap-icons";
+import { HandThumbsDownFill, HandThumbsUpFill, TrophyFill, XSquare } from "react-bootstrap-icons";
 import { useHotkeysContext, useHotkeys } from "react-hotkeys-hook";
+import { useEffect } from "react";
 
 
-function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays }) {
+function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays, handleReset, teamFilter, setTeamFilter }) {
 
     const [show, setShow] = useState(false);
     const [allianceTeam, setAllianceTeam] = useState(null);
     const [allianceMode, setAllianceMode] = useState(null);
-    const [teamFilter, setTeamFilter] = useState("");
     const { disableScope, enableScope } = useHotkeysContext();
 
     const allianceSelectionOrderBase = [
@@ -49,11 +49,11 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
     })
 
     const inChamps =
-      selectedEvent?.value?.champLevel === "CHAMPS" ||
-      selectedEvent?.value?.champLevel === "CMPDIV" ||
-      selectedEvent?.value?.champLevel === "CMPSUB"
-        ? true
-        : false;
+        selectedEvent?.value?.champLevel === "CHAMPS" ||
+            selectedEvent?.value?.champLevel === "CMPDIV" ||
+            selectedEvent?.value?.champLevel === "CMPSUB"
+            ? true
+            : false;
 
     var allianceDisplayOrder = [];
     if (allianceCount?.count <= 4) {
@@ -62,6 +62,11 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         allianceDisplayOrder = [[1, 6], [2, 5], [3, 4]]
     } else { allianceDisplayOrder = [[1, 8], [2, 7], [3, 6], [4, 5]] }
 
+    const resetFilter = () => {
+        // @ts-ignore
+        document.getElementById("filterControl").value = "";
+        setTeamFilter("")
+    }
 
     const handleClose = () => {
         setAllianceTeam(null);
@@ -80,6 +85,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         enableScope("allianceDecline");
         disableScope('tabNavigation');
     }
+
     const handleAccept = (team, mode, e) => {
         if (mode === "accept") {
             setAllianceTeam(team);
@@ -112,6 +118,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         }
 
     }
+
     const handleDecline = (team, mode, e) => {
         if (mode === "decline") {
             setAllianceTeam(team);
@@ -164,22 +171,19 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         enableScope("allianceDecline");
         disableScope('tabNavigation');
         setShow(true);
-
     }
 
-    const handleReset = () => {
-        // @ts-ignore
-        document.getElementById("filterControl").value = "";
-        setTeamFilter("");
-        setAllianceSelectionArrays({});
-    }
+    useEffect(() => {
+        if (teamFilter !== "") {
+            enableScope("allianceFilter");
+        } else {
+            disableScope("allianceFilter");
+        }
+    }, [teamFilter, enableScope, disableScope])
 
     var availColumns = [[], [], [], [], []];
     var backupTeams = [];
     var alliances = null;
-
-
-
 
     allianceSelectionOrder = allianceSelectionOrder.slice(0, allianceCount?.allianceSelectionLength + 1);
 
@@ -333,6 +337,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
     useHotkeys('return', () => document.getElementById("acceptButton").click(), { scopes: 'allianceAccept' });
     useHotkeys('d', () => document.getElementById("declineButton").click(), { scopes: 'allianceDecline' });
     useHotkeys('meta+z, ctrl+z', () => document.getElementById("undoButton").click(), { scopes: 'undo' });
+    useHotkeys('esc', () => document.getElementById("resetFilter").click(), { scopes: 'allianceFilter' });
 
     return (
         <>
@@ -346,6 +351,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                 <InputGroup className="mb-3" >
                                     <InputGroup.Text>Filter the teams</InputGroup.Text>
                                     <Form.Control id={"filterControl"} type="number" placeholder="Enter a number" aria-label="Team Number" onChange={filterTeams} />
+                                    <InputGroup.Text id="resetFilter" onClick={resetFilter}><XSquare /></InputGroup.Text>
                                     {(_.filter(asArrays?.availableTeams, { 'teamNumber': Number(teamFilter) }).length === 1) && <Button variant="primary" type="submit">Select this team</Button>}
                                     <span>    </span>
                                     {(asArrays?.undo?.length > 0) && <Button id="undoButton" size="sm" onClick={handleUndo} active >Undo Previous Choice</Button>}
@@ -520,7 +526,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                     </>
                 }
                 {allianceTeam && <Modal centered={true} show={show} onHide={handleClose}>
-                    <Modal.Header className={allianceMode === "decline" ? "allianceDecline" : "allianceChoice"} closeVariant={"white"} closeButton>
+                    <Modal.Header className={allianceMode === "decline" ? "allianceSelectionDecline" : "allianceChoice"} closeVariant={"white"} closeButton>
                         <Modal.Title >{allianceMode === "decline" ? "Team declines the offer" : allianceMode === "accept" ? "Are you sure they want to accept?" : allianceMode === "a1captaion" ? "Top Seeded Alliance" : "Alliance Choice"}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>

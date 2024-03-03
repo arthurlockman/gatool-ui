@@ -379,19 +379,19 @@ function App() {
     var qualschedule = null;
     var playoffschedule = null;
 
-    if (selectedEvent?.value?.code.includes("OFFLINE")) {
+    if (selectedEvent?.value?.code.includes("OFFLINE") || selectedEvent?.value?.code.includes("PRACTICE")) {
       //do something
       practiceschedule = { "schedule": { "schedule": [] } };
     } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
       result = await httpClient.get(`${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/practice`);
       practiceschedule = await result.json();
     }
-    if (typeof practiceschedule.Schedule !== "undefined") {
-      practiceschedule.schedule = practiceschedule.Schedule;
+    if (typeof practiceschedule?.Schedule !== "undefined") {
+      practiceschedule.schedule = practiceschedule?.Schedule;
       delete practiceschedule.Schedule;
     }
-    if (typeof practiceschedule.schedule?.Schedule !== "undefined") {
-      practiceschedule.schedule.schedule = practiceschedule.schedule.Schedule;
+    if (typeof practiceschedule?.schedule?.Schedule !== "undefined") {
+      practiceschedule.schedule.schedule = practiceschedule?.schedule?.Schedule;
       delete practiceschedule.schedule.Schedule;
     }
     practiceschedule.lastUpdate = moment();
@@ -1422,44 +1422,28 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedYear, httpClient, setSelectedEvent, setEvents])
 
-  // check to see if Alliance Slection is ready when QualSchedule and Ranks changes
+  // check to see if Alliance Selection is ready when QualSchedule and Ranks changes
   useEffect(() => {
-    var asReady = false;
-    setAllianceSelectionReady(TabStates.NotReady);
-    var matchesPerTeam = 0;
-    matchesPerTeam = _.toInteger(6 * qualSchedule?.schedule?.length / (teamList?.teamCountTotal - teamReduction));
-    // In order to start Alliance Selection, we need the following conditions to be true:
-    // All matches must have been completed
-    // All teams must have completed their scheduled matches
-    // We test these in different places: the schedule and the rankings. This ensures that
-    // we have both API results, and that they are both current and complete.
+    if (rankings && qualSchedule && teamList && playoffSchedule?.schedule.length===0) {
+      var asReady = false;
+      setAllianceSelectionReady(TabStates.NotReady);
+      var matchesPerTeam = 0;
+      matchesPerTeam = _.toInteger(6 * qualSchedule?.schedule?.length / (teamList?.teamCountTotal - teamReduction));
+      // In order to start Alliance Selection, we need the following conditions to be true:
+      // All matches must have been completed
+      // All teams must have completed their scheduled matches
+      // We test these in different places: the schedule and the rankings. This ensures that
+      // we have both API results, and that they are both current and complete.
 
-    if ((qualSchedule?.schedule?.length === qualSchedule?.completedMatchCount) && (_.filter(rankings?.ranks, { "matchesPlayed": matchesPerTeam }).length === (teamList?.teamCountTotal - teamReduction))) {
-      asReady = true;
-      setAllianceSelectionReady(TabStates.Ready);
+      if ((qualSchedule?.schedule?.length === qualSchedule?.completedMatchCount) && (_.filter(rankings?.ranks, { "matchesPlayed": matchesPerTeam }).length === (teamList?.teamCountTotal - teamReduction))) {
+        asReady = true;
+        setAllianceSelectionReady(TabStates.Ready);
+      }
+
+      setAllianceSelection(asReady);
     }
 
-    setAllianceSelection(asReady);
-
-  }, [rankings, qualSchedule, teamList, teamReduction, setAllianceSelection])
-
-  // Reset the event data when the selectedEvent changes
-  useEffect(() => {
-    if (!selectedEvent) {
-      setPlayoffSchedule(null);
-      setQualSchedule(null);
-      setTeamList(null);
-      setRankings(null);
-      setPlayoffs(false);
-      setEventHighScores(null);
-      setAllianceCount(null);
-      setTeamReduction(null);
-      setPlayoffCountOverride(null);
-      setAllianceSelectionArrays({});
-      setRankingsOverride(null);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedEvent])
+  }, [rankings, qualSchedule, teamList, teamReduction, playoffSchedule, setAllianceSelection])
 
   // Retrieve schedule, team list, community updates, high scores and rankings when event selection changes
   useEffect(() => {

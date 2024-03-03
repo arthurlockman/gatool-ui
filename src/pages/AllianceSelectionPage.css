@@ -152,3 +152,14 @@
 	background-color: plum;
 	color: black
 }
+
+.allianceSelectionDecline {
+	font-size: 18px;
+	padding: 5px;
+	border: 1px solid;
+	border-radius: 5px;
+	background: rgba(255, 255, 255, 1.00);
+	margin-bottom: 10px;
+	background-color: rgb(207, 50, 65);
+	color: white
+}
