@@ -1,4 +1,5 @@
 import _ from "lodash";
+import { Alert } from "react-bootstrap";
 function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 	//Ball colors
 	const GOLD = "#FFCA10";
@@ -20,7 +21,7 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 		"winner": "",
 		"level": 0
 	}
-	
+
 	//returns the three members of an alliance based on the match data.
 	function allianceNumbers(matchNumber, allianceColor) {
 		var alliance = "TBD";
@@ -88,41 +89,47 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 		return winner;
 	}
 
-	if (matches[18]?.actualStartTime) {
-		overtimeOffset = 75;
-	} else if (matches[17]?.actualStartTime) {
-		overtimeOffset = 60;
-	} else if (matches[16]?.actualStartTime) {
-		overtimeOffset = 45;
-	} else if (matches[15]?.actualStartTime) {
-		overtimeOffset = 30;
-	} else if (matches[14]?.actualStartTime) {
-		overtimeOffset = 15;
-	}
+	if (matches) {
+		if (matches[18]?.actualStartTime) {
+			overtimeOffset = 75;
+		} else if (matches[17]?.actualStartTime) {
+			overtimeOffset = 60;
+		} else if (matches[16]?.actualStartTime) {
+			overtimeOffset = 45;
+		} else if (matches[15]?.actualStartTime) {
+			overtimeOffset = 30;
+		} else if (matches[14]?.actualStartTime) {
+			overtimeOffset = 15;
+		}
 
-	for (var finalsMatches = 14; finalsMatches < 19; finalsMatches++) {
-		if (matches[_.findIndex(matches, { "matchNumber": finalsMatches })]?.winner.winner === "red") {
-			tournamentWinner.red += 1
+
+		for (var finalsMatches = 14; finalsMatches < 19; finalsMatches++) {
+			if (matches[_.findIndex(matches, { "matchNumber": finalsMatches })]?.winner.winner === "red") {
+				tournamentWinner.red += 1
+			}
+			if (matches[_.findIndex(matches, { "matchNumber": finalsMatches })]?.winner.winner === "blue") {
+				tournamentWinner.blue += 1
+			}
 		}
-		if (matches[_.findIndex(matches, { "matchNumber": finalsMatches })]?.winner.winner === "blue") {
-			tournamentWinner.blue += 1
+		if (tournamentWinner.red === 2) {
+			tournamentWinner.winner = "red";
+		} else if (tournamentWinner.blue === 2) {
+			tournamentWinner.winner = "blue";
+		} else if (matchWinner(19)?.tieWinner === "red") {
+			tournamentWinner.winner = "red";
+			tournamentWinner.level = matchWinner(19)?.level;
+		} else if (matchWinner(19)?.tieWinner === "blue") {
+			tournamentWinner.winner = "blue";
+			tournamentWinner.level = matchWinner(19)?.level;
 		}
-	}
-	if (tournamentWinner.red === 2) {
-		tournamentWinner.winner = "red";
-	} else if (tournamentWinner.blue === 2) {
-		tournamentWinner.winner = "blue";
-	} else if (matchWinner(19)?.tieWinner === "red") {
-		tournamentWinner.winner = "red";
-		tournamentWinner.level = matchWinner(19)?.level;
-	} else if (matchWinner(19)?.tieWinner === "blue") {
-		tournamentWinner.winner = "blue";
-		tournamentWinner.level = matchWinner(19)?.level;
 	}
 
 	return (
 		<div>
-			{/* <?xml version="1.0" encoding="utf-8"?> */}
+			{!matches && <div>
+                    <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div><div>Waiting for Playoff Match Schedule</div></Alert>
+                </div>}
+			{matches && <>{/* <?xml version="1.0" encoding="utf-8"?> */}
 			{/* <!-- Generator: Adobe Illustrator 27.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  --> */}
 			<svg version="1.1" id="bracket" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 				viewBox="0 0 1280 810" enableBackground="new 0 0 1280 810" xmlSpace="preserve">
@@ -560,7 +567,7 @@ function Bracket({ selectedEvent, playoffSchedule, alliances }) {
 					</g>
 				</g>
 			</svg>
-
+			</>}
 		</div>
 	)
 }
