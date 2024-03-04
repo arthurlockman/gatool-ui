@@ -754,6 +754,9 @@ td {
 	.playByPlayCity {
 		font-size: small;
 	}
+	.playByPlayAlliance {
+		font-size: 16px;
+	}
 
 }
 
@@ -785,9 +788,12 @@ td {
 		font-size: small;
 	}
 	.playByPlayOrganization {
-		font-size: smaller;
+		font-size: small;
 	}
 	.playByPlayCity {
-		font-size: smaller;
+		font-size: small;
+	}
+	.playByPlayAlliance {
+		font-size: 14px;
 	}
 }
