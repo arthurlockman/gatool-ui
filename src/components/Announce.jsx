@@ -3,7 +3,7 @@ import _ from "lodash";
 
 const announceBackground = {"red":"#F7B3B4","blue":"#98B4F4"}
 
-function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selectedEvent, showNotes, showAwards, showSponsors, showMottoes, showChampsStats, eventNamesCY, showDistrictChampsStats, adHocMode }) {
+function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selectedEvent, showNotesAnnounce, showAwards, showSponsors, showMottoes, showChampsStats, eventNamesCY, showDistrictChampsStats }) {
     const originalAndSustaining = ["20", "45", "126", "148", "151", "157", "190", "191", "250"];
     var allianceColor = station.slice(0, -1);
     var awardsYears = team?.awards ? Object.keys(team.awards) : []
@@ -86,7 +86,7 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
 
 
                 </p>}
-                {(showNotes || _.isNull(showNotes)) && <p className="teamNotes" dangerouslySetInnerHTML={{ __html: team?.updates?.teamNotesLocal }} />}
+                {(showNotesAnnounce || _.isNull(showNotesAnnounce)) && <p className="teamNotes" dangerouslySetInnerHTML={{ __html: team?.updates?.teamNotesLocal }} />}
             </td>
             <td className={"col1 ranking"} style={team?.rankStyle.backgroundColor === "" ? {backgroundColor:_.toLower(allianceColor)==="red"?announceBackground.red:announceBackground.blue} : team?.rankStyle }>
                 {team?.rank ? team?.rank : ""}

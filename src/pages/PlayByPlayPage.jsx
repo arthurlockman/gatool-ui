@@ -78,10 +78,14 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
         return team;
     }
 
-    var schedule = practiceSchedule?.schedule || [];
+    var schedule = [];
+    if (practiceSchedule?.schedule.length > 0 && qualSchedule?.schedule.length === 0) {
+        schedule = practiceSchedule?.schedule;
+    }
     if (offlinePlayoffSchedule?.schedule.length > 0) {
         schedule = _.concat(schedule, offlinePlayoffSchedule?.schedule);
     }
+
     if (qualSchedule?.schedule.length > 0) {
         schedule = _.concat(schedule, qualSchedule?.schedule);
     }
@@ -113,7 +117,7 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
     }
     )
 
-    const matchDetails = (!adHocMode ? schedule[currentMatch - 1] :
+    var matchDetails = (!adHocMode ? schedule[currentMatch - 1] :
         {
             description: "Practice Match",
             startTime: null,
@@ -145,6 +149,11 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
                 level: null,
             },
         });
+
+    if (practiceSchedule?.schedule.length > 0 && adHocMatch && (!qualSchedule || qualSchedule?.schedule.length === 0)) {
+        matchDetails.teams = adHocMatch
+    };
+
     var inPlayoffs = (matchDetails?.tournamentLevel === "Playoff" ? true : false)
     const matchMenu = schedule.map((match, index) => {
         var tag = `${match?.description} of ${qualSchedule?.schedule?.length}`;
@@ -155,12 +164,19 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
     })
 
     var teamDetails = [];
-    if (teamList && matchDetails) {
+    if (teamList && matchDetails && communityUpdates) {
         //fill in the team details
         displayOrder.forEach((station) => {
             teamDetails[station] = updateTeamDetails(station, matchDetails)
         })
     }
+
+    if (practiceSchedule?.schedule.length > 0) {
+        if (!adHocMatch) (
+            setAdHocMatch(matchDetails?.teams)
+        )
+    }
+
     const swipeHandlers = useSwipeable(
         {
             onSwipedLeft: () => {

@@ -61,7 +61,7 @@ function FourAllianceBracket({ selectedEvent, playoffSchedule, alliances }) {
 	// return the score of the match, by matchNumber
 	function matchScore(matchNumber, alliance) {
 		var score = null;
-		if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.postResultTime) {
+		if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.actualStartTime) {
 			if (alliance === "red") {
 				score = matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.scoreRedFinal;
 			} else if (alliance === "blue") {
@@ -75,7 +75,7 @@ function FourAllianceBracket({ selectedEvent, playoffSchedule, alliances }) {
 	// return the winner of the match, by matchNumber
 	function matchWinner(matchNumber) {
 		var winner = null;
-		if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.postResultTime) {
+		if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.actualStartTime) {
 			winner = matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner
 		}
 		return winner;
@@ -88,15 +88,15 @@ function FourAllianceBracket({ selectedEvent, playoffSchedule, alliances }) {
 		"winner": "",
 		"level": 0
 	}
-	if (matches[10]?.postResultTime) {
+	if (matches[10]?.actualStartTime) {
 		overtimeOffset = 75;
-	} else if (matches[9]?.postResultTime) {
+	} else if (matches[9]?.actualStartTime) {
 		overtimeOffset = 60;
-	} else if (matches[8]?.postResultTime) {
+	} else if (matches[8]?.actualStartTime) {
 		overtimeOffset = 45;
-	} else if (matches[7]?.postResultTime) {
+	} else if (matches[7]?.actualStartTime) {
 		overtimeOffset = 30;
-	} else if (matches[6]?.postResultTime) {
+	} else if (matches[6]?.actualStartTime) {
 		overtimeOffset = 15;
 	}
 

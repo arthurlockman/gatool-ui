@@ -4,9 +4,9 @@ import PlayoffDetails from "../components/PlayoffDetails";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useSwipeable } from "react-swipeable";
 import useWindowDimensions from "hooks/UseWindowDimensions";
+import EmceeClock from "components/EmceeClock";
 
-
-function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, currentMatch, nextMatch, previousMatch, reverseEmcee }) {
+function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, currentMatch, nextMatch, previousMatch, reverseEmcee, timeFormat }) {
     const { height, width } = useWindowDimensions();
     const matchClasses = [
         { "matchNumber": 1, "red": { "class": "success", "from": null }, "blue": { "class": "success", "from": null }, "winnerTo": 7, "loserTo": 5, "winnerVs": "blue", "loserVs": "blue" },
@@ -122,7 +122,7 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
         })
     })
 
-    var matchDetails = _.filter(matches, { "matchNumber": playoffMatchNumber })[0];
+    var matchDetails = _.filter(matches, { "matchNumber": playoffMatchNumber })[0] || _.filter(schedule,{ "matchNumber": currentMatch })[0];
 
     const swipeHandlers = useSwipeable(
         {
@@ -152,14 +152,16 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
                 <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div>Awaiting schedule data for {selectedEvent.label}</Alert>
             </div>}
             {selectedEvent && (schedule?.length > 0) && !inPlayoffs &&
-                <Container fluid {...swipeHandlers}>
+                <Container fluid {...swipeHandlers} style={{textAlign: "center",padding:"7px"}}>
+                    <EmceeClock matchDetails={matchDetails} timeFormat={timeFormat}/>
                     <div className={`davidPriceQuals`}>{schedule[currentMatch - 1]?.matchNumber}</div>
                 </Container>
             }
             {selectedEvent && (schedule?.length > 0) && inPlayoffs &&
                 <>
                     <Container fluid {...swipeHandlers}>
-                        <Row>
+                    <EmceeClock matchDetails={matchDetails} timeFormat={timeFormat}/>
+                    <Row>
                             <Col className={`davidPriceDetail${smallScreen}${portrait}`} xs={12}>{_.replace(schedule[currentMatch - 1]?.description, "(R", "(Round ")}</Col>
                         </Row>
                         {!reverseEmcee && <Row>

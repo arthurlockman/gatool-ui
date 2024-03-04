@@ -1,6 +1,17 @@
 
 export const appUpdates = [
     {
+        date: "March 3, 2024",
+        message: <ul>
+            <li>Added support for Practice Matches</li>
+            <li>Fixed the auto advance feature</li>
+            <li>Added match time clock to the Emcee screen</li>
+            <li>Updated match clock to display how many minutes ahead/behind</li>
+            <li>Separating switches to display notes on Announce and Play-by-play</li>
+            <li>Fixed winner highlighting issue in Playoff Bracket</li>
+            <li>Fixed a typo on Announce Screen</li>
+        </ul>
+    },{
         date: "February 28, 2024",
         message: <ul>
             <li>Updates to Anonymous user page</li>

@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import moment from 'moment/moment';
-import { Col } from 'react-bootstrap';
 import { useInterval } from 'react-interval-hook';
 
-const MatchClock = ({ matchDetails, timeFormat }) => {
+const EmceeClock = ({ matchDetails, timeFormat }) => {
     const [currentTime, setCurrentTime] = useState(moment());
 
     const { start, stop } = useInterval(
@@ -56,12 +55,12 @@ const MatchClock = ({ matchDetails, timeFormat }) => {
 
     }
     return (
-        <Col xs={"3"} lg={"2"} className={matchDelay}>
+        <div className={matchDelay} style={{marginBottom:"10px"}}>
             <div><b>{moment(currentTime).format(timeFormat.value)}</b></div>
-            {matchDetails?.actualStartTime && <div>Actual match time:<br />{moment(matchDetails?.actualStartTime).format("MMM Do, " + timeFormat.value)}</div>}
+            {matchDetails?.actualStartTime && <div>Actual match time: {moment(matchDetails?.actualStartTime).format("MMM Do, " + timeFormat.value)}</div>}
             {!matchDetails?.actualStartTime && <div><h5><b>{Math.abs(timeDifference)} minutes {timeDifference <=0 ? "ahead" : "behind"}</b></h5></div>}
-        </Col>
+        </div>
     );
 };
 
-export default MatchClock;
+export default EmceeClock;

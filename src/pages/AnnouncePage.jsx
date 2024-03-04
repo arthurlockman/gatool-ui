@@ -10,7 +10,7 @@ import { useSwipeable } from "react-swipeable";
 
 const paleGreen = "rgba(144, 238, 144, 0.5)"
 
-function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, awardsMenu, showNotes, showAwards, showSponsors, showMottoes, showChampsStats, timeFormat, eventHighScores, backupTeam, setBackupTeam, nextMatch, previousMatch, setMatchFromMenu, practiceSchedule, eventNamesCY, districtRankings, showDistrictChampsStats, adHocMatch, setAdHocMatch, adHocMode, offlinePlayoffSchedule, swapScreen }) {
+function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, awardsMenu, showNotesAnnounce, showAwards, showSponsors, showMottoes, showChampsStats, timeFormat, eventHighScores, backupTeam, setBackupTeam, nextMatch, previousMatch, setMatchFromMenu, practiceSchedule, eventNamesCY, districtRankings, showDistrictChampsStats, adHocMatch, setAdHocMatch, adHocMode, offlinePlayoffSchedule, swapScreen }) {
 
     function updateTeamDetails(station, matchDetails) {
         var team = {}
@@ -79,7 +79,10 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
         return team;
     }
 
-    var schedule = practiceSchedule?.schedule || [];
+    var schedule = [];
+    if (practiceSchedule?.schedule.length > 0 && qualSchedule?.schedule.length === 0) {
+        schedule = practiceSchedule?.schedule;
+    }
     if (offlinePlayoffSchedule?.schedule.length > 0) {
         schedule = _.concat(schedule, offlinePlayoffSchedule?.schedule);
     }
@@ -91,8 +94,8 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
     if (playoffSchedule?.schedule?.length > 0) {
         schedule = _.concat(schedule, playoffSchedule?.schedule);
     }
-    
-    const matchDetails = (!adHocMode ? schedule[currentMatch - 1] :
+
+    var matchDetails = (!adHocMode ? schedule[currentMatch - 1] :
         {
             description: "Practice Match",
             startTime: null,
@@ -124,7 +127,11 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
                 level: null,
             },
         });
-        
+
+    if (practiceSchedule?.schedule.length > 0 && adHocMatch && (!qualSchedule || qualSchedule?.schedule.length === 0)) {
+        matchDetails.teams = adHocMatch
+    };
+
     var inPlayoffs = (matchDetails?.tournamentLevel === "Playoff" ? true : false);
 
     const matchMenu = schedule.map((match, index) => {
@@ -137,12 +144,19 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
 
     var displayOrder = ["Red1", "Red2", "Red3", "Red4", "Blue1", "Blue2", "Blue3", "Blue4"];
     var teamDetails = [];
-    if (teamList && matchDetails) {
+    if (teamList && matchDetails && communityUpdates) {
         //fill in the team details
         displayOrder.forEach((station) => {
             teamDetails[station] = updateTeamDetails(station, matchDetails)
         })
     }
+
+    if (practiceSchedule?.schedule.length > 0) {
+        if (!adHocMatch) {
+            setAdHocMatch(matchDetails?.teams);
+        }
+    }
+
 
     const swipeHandlers = useSwipeable(
         {
@@ -178,14 +192,14 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
                             <tr>
                                 <td>Team #</td>
                                 <td>Team Name</td>
-                                <td>Orgainzation, Sponsors & Awards</td>
+                                <td>Organization, Sponsors & Awards</td>
                                 <td>Rank</td>
                             </tr>
                         </thead>
                         <tbody>
                             {displayOrder.map((station) => {
                                 if (!_.isEmpty(teamDetails[station]) && !_.isUndefined(teamDetails[station].teamNumber) && !_.isNull(teamDetails[station].teamNumber) && teamDetails[station].teamNumber > 0) {
-                                    return <Announce station={station} team={teamDetails[station]} inPlayoffs={inPlayoffs} key={station} awardsMenu={awardsMenu} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showAwards={showAwards} showSponsors={showSponsors} showMottoes={showMottoes} showChampsStats={showChampsStats} eventNamesCY={eventNamesCY} showDistrictChampsStats={showDistrictChampsStats} adHocMode={adHocMode}/>
+                                    return <Announce station={station} team={teamDetails[station]} inPlayoffs={inPlayoffs} key={station} awardsMenu={awardsMenu} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotesAnnounce={showNotesAnnounce} showAwards={showAwards} showSponsors={showSponsors} showMottoes={showMottoes} showChampsStats={showChampsStats} eventNamesCY={eventNamesCY} showDistrictChampsStats={showDistrictChampsStats} />
                                 } else {
                                     if (station.slice(-1) !== "4") {
                                         var allianceColor = _.toLower(station.slice(0, -1));
