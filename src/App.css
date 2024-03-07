@@ -727,6 +727,37 @@ td {
 	.wltCol {
 		font-size: small;
 	}
+	.redAlliancePlayByPlay {
+		font-size: large;
+	}
+	.blueAlliancePlayByPlay {
+		font-size: large;
+	}
+	.playByPlayTeamName {
+		font-size: 30px;
+	}
+	.playByPlayTeamNameStats {
+		font-size: 18px;
+	}
+	.playByPlayWinLossTie {
+		font-size: medium;
+	}
+	.playByPlayteamNumber {
+		font-size: 30px;
+	}
+	.playByPlaysayNumber {
+		font-size: medium;
+	}
+	.playByPlayOrganization {
+		font-size: small;
+	}
+	.playByPlayCity {
+		font-size: small;
+	}
+	.playByPlayAlliance {
+		font-size: 16px;
+	}
+
 }
 
 @media only screen and (max-width: 768px) {
@@ -734,5 +765,35 @@ td {
 	/* For Portrait iPad mini: */
 	.wltCol {
 		font-size: x-small;
+	}
+	.redAlliancePlayByPlay {
+		font-size: medium;
+	}
+	.blueAlliancePlayByPlay {
+		font-size: medium;
+	}
+	.playByPlayTeamName {
+		font-size: 24px;
+	}
+	.playByPlayTeamNameStats {
+		font-size: 14px;
+	}
+	.playByPlayWinLossTie {
+		font-size: small;
+	}
+	.playByPlayteamNumber {
+		font-size: 24px;
+	}
+	.playByPlaysayNumber {
+		font-size: small;
+	}
+	.playByPlayOrganization {
+		font-size: small;
+	}
+	.playByPlayCity {
+		font-size: small;
+	}
+	.playByPlayAlliance {
+		font-size: 14px;
 	}
 }
