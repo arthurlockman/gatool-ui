@@ -176,6 +176,9 @@ function App() {
   const [rankSort, setRankSort] = useState("");
 
   const isOnline = useOnlineStatus();
+  const [teamListLoading, setTeamListLoading] = useState(false);
+  const [loadingCommunityUpdates, setLoadingCommunityUpdates] = useState(false);
+  const [haveChampsTeams, setHaveChampsTeams] = useState(false);
 
   // Handle update notifications from the service worker
   const { waitingWorker, showReload, reloadPage } = useServiceWorker();
@@ -544,16 +547,18 @@ function App() {
 
       // If we are in World Champs, we need to determine the team list from the schedule
       var tempChampsTeamList = [];
-      if (playoffSchedule?.schedule?.length > 0) {
-        playoffSchedule?.schedule.forEach((match) => {
-          match?.teams.forEach((team) => {
-            tempChampsTeamList.push(team.teamNumber);
+      if (playoffSchedule?.schedule?.length > 0 && selectedEvent?.value?.type === "Championship") {
+        if (!haveChampsTeams) {
+          playoffSchedule?.schedule.forEach((match) => {
+            match?.teams.forEach((team) => {
+              tempChampsTeamList.push(team.teamNumber);
+            })
           })
-        })
-
-        // We have bypassed getting the team list and details in the normal loading cycle,
-        // so we need to get the details now from this array of competing teams
-        getTeamList(_.uniq(tempChampsTeamList));
+          // We have bypassed getting the team list and details in the normal loading cycle,
+          // so we need to get the details now from this array of competing teams
+          setHaveChampsTeams(true);
+          await getTeamList(_.uniq(tempChampsTeamList));
+        }
       }
 
     } else { playoffschedule.schedule = playoffschedule.schedule.schedule }
@@ -590,362 +595,368 @@ function App() {
    * @return sets the teamList
    */
   async function getTeamList(adHocTeamList) {
-    console.log(`Fetching team list for ${selectedEvent?.value?.name}...`)
-    /**
-     * Determines whether an award, by name, deserves special highlighting in the Announce Screen
-     * @function awardsHilight
-     * @param awardName The name of the award to highlight
-     * @return true if "special" award; false if not
-     */
-    function awardsHilight(awardName) {
-      if (awardName === "District Chairman's Award" || awardName === "District Event Winner" || awardName === "District Event Finalist" || awardName === "Regional Engineering Inspiration Award" || awardName === "District Engineering Inspiration Award" || awardName === "Engineering Inspiration Award" || awardName === "District Championship Finalist" || awardName === "District Championship Winner" || awardName === "Regional Winners" || awardName === "Regional Finalists" || awardName === "Regional Chairman's Award" || awardName === "FIRST Dean's List Finalist Award" || awardName === "District Championship Dean's List Semi-Finalist" || awardName === "Championship Subdivision Winner" || awardName === "Championship Subdivision Finalist" || awardName === "Championship Division Winner" || awardName === "Championship Division Finalist" || awardName === "Championship Winner" || awardName === "Championship Finalist" || awardName === "Chairman's Award" || awardName === "Chairman's Award Finalist" || awardName === "FIRST Dean's List Award" || awardName === "Woodie Flowers Award" || awardName === "Innovation Challenge Winner" || awardName === "Innovation Challenge Finalist" || awardName === "FIRST Impact Award" || awardName === "District FIRST Impact Award") {
-        return true;
-      } else {
-        return false;
+    if (!teamListLoading) {
+      console.log(`Fetching team list for ${selectedEvent?.value?.name}...`)
+      setTeamListLoading(true);
+      /**
+       * Determines whether an award, by name, deserves special highlighting in the Announce Screen
+       * @function awardsHilight
+       * @param awardName The name of the award to highlight
+       * @return true if "special" award; false if not
+       */
+      function awardsHilight(awardName) {
+        if (awardName === "District Chairman's Award" || awardName === "District Event Winner" || awardName === "District Event Finalist" || awardName === "Regional Engineering Inspiration Award" || awardName === "District Engineering Inspiration Award" || awardName === "Engineering Inspiration Award" || awardName === "District Championship Finalist" || awardName === "District Championship Winner" || awardName === "Regional Winners" || awardName === "Regional Finalists" || awardName === "Regional Chairman's Award" || awardName === "FIRST Dean's List Finalist Award" || awardName === "District Championship Dean's List Semi-Finalist" || awardName === "Championship Subdivision Winner" || awardName === "Championship Subdivision Finalist" || awardName === "Championship Division Winner" || awardName === "Championship Division Finalist" || awardName === "Championship Winner" || awardName === "Championship Finalist" || awardName === "Chairman's Award" || awardName === "Chairman's Award Finalist" || awardName === "FIRST Dean's List Award" || awardName === "Woodie Flowers Award" || awardName === "Innovation Challenge Winner" || awardName === "Innovation Challenge Finalist" || awardName === "FIRST Impact Award" || awardName === "District FIRST Impact Award") {
+          return true;
+        } else {
+          return false;
+        }
       }
-    }
 
-    var result = null;
-    var teams = null;
+      var result = null;
+      var teams = null;
 
-    if (selectedEvent?.value?.code.includes("OFFLINE") || inWorldChamps()) {
-      teams = {
-        "teamCountTotal": 0,
-        "teamCountPage": 1,
-        "pageCurrent": 1,
-        "pageTotal": 1,
-        "teams": []
-      };
-      if (adHocTeamList) {
-        //https://api.gatool.org/v3/2023/teams?teamNumber=172
+      if (selectedEvent?.value?.code.includes("OFFLINE") || inWorldChamps()) {
+        teams = {
+          "teamCountTotal": 0,
+          "teamCountPage": 1,
+          "pageCurrent": 1,
+          "pageTotal": 1,
+          "teams": []
+        };
+        if (adHocTeamList) {
+          //https://api.gatool.org/v3/2023/teams?teamNumber=172
 
-        var adHocTeams = adHocTeamList.map(async team => {
-          var request = await httpClient.get(`${selectedYear?.value}/teams?teamNumber=${team}`);
-          var teamDetails = await request.json();
-
-          return teamDetails.teams[0];
-        });
-
-        await Promise.all(adHocTeams).then(function (values) {
-          //do something with the team list
-          // console.log(values);
-          teams.teams = values;
-          getCommunityUpdates(false, values);
-        });
-
-      }
-    } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
-      result = await httpClient.get(`${selectedYear?.value}/teams?eventCode=${selectedEvent?.value?.code}`);
-      teams = await result.json();
-    } else {
-      teams = training.teams.teams;
-    }
-
-    if (typeof teams.Teams !== "undefined") {
-      teams.teams = teams.Teams;
-      delete teams.Teams;
-    }
-
-    // handle District EI teams
-    // if District Champs, filter list of events by district code
-    var districtEvents = null;
-    if (events && (selectedEvent?.value?.type === "DistrictChampionship" || selectedEvent?.value?.type === "DistrictChampionshipWithLevels")) {
-      districtEvents = _.filter(events, { "value": { "districtCode": selectedEvent?.value?.districtCode } })
-      // get awards for those filtered events
-      var districtEITeams = districtEvents.map(async event => {
-        var request = await httpClient.get(`${selectedYear?.value}/awards/event/${event?.value?.code}`);
-        var eventDetails = await request.json();
-        // filter that list by EI {awardId: "633"} {name: "District Engineering Inspiration Award"}
-        return _.filter(eventDetails?.Awards, { "awardId": 633 });
-      });
-
-      await Promise.all(districtEITeams).then(async function (values) {
-        var tempTeams = [];
-        values.forEach((value) => {
-          // @ts-ignore
-          if (value[0]?.teamNumber) {
-            if (_.findIndex(teams.teams, { "teamNumber": value[0]?.teamNumber }) < 0) {
-              // @ts-ignore
-              tempTeams.push(value[0]?.teamNumber)
-            }
-          }
-        })
-        // get team details for those teams not in this event
-        if (tempTeams.length > 0) {
-          var EITeamData = tempTeams.map(async teamNumber => {
-            var request = await httpClient.get(`${selectedYear?.value}/teams?teamNumber=${teamNumber}`);
+          var adHocTeams = adHocTeamList.map(async team => {
+            var request = await httpClient.get(`${selectedYear?.value}/teams?teamNumber=${team}`);
             var teamDetails = await request.json();
+
             return teamDetails.teams[0];
           });
 
-          await Promise.all(EITeamData).then((values) => {
-            // merge with teams.teams
-            if (values.length > 0) {
-              values.forEach((value) => {
-                teams.teams.push(value)
-              })
+          await Promise.all(adHocTeams).then(function (values) {
+            //do something with the team list
+            // console.log(values);
+            teams.teams = values;
+            getCommunityUpdates(false, values);
+          });
+
+        }
+      } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
+        result = await httpClient.get(`${selectedYear?.value}/teams?eventCode=${selectedEvent?.value?.code}`);
+        teams = await result.json();
+      } else {
+        teams = training.teams.teams;
+      }
+
+      if (typeof teams.Teams !== "undefined") {
+        teams.teams = teams.Teams;
+        delete teams.Teams;
+      }
+
+      // handle District EI teams
+      // if District Champs, filter list of events by district code
+      var districtEvents = null;
+      if (events && (selectedEvent?.value?.type === "DistrictChampionship" || selectedEvent?.value?.type === "DistrictChampionshipWithLevels")) {
+        districtEvents = _.filter(events, { "value": { "districtCode": selectedEvent?.value?.districtCode } })
+        // get awards for those filtered events
+        var districtEITeams = districtEvents.map(async event => {
+          var request = await httpClient.get(`${selectedYear?.value}/awards/event/${event?.value?.code}`);
+          var eventDetails = await request.json();
+          // filter that list by EI {awardId: "633"} {name: "District Engineering Inspiration Award"}
+          return _.filter(eventDetails?.Awards, { "awardId": 633 });
+        });
+
+        await Promise.all(districtEITeams).then(async function (values) {
+          var tempTeams = [];
+          values.forEach((value) => {
+            // @ts-ignore
+            if (value[0]?.teamNumber) {
+              if (_.findIndex(teams.teams, { "teamNumber": value[0]?.teamNumber }) < 0) {
+                // @ts-ignore
+                tempTeams.push(value[0]?.teamNumber)
+              }
             }
           })
-        }
+          // get team details for those teams not in this event
+          if (tempTeams.length > 0) {
+            var EITeamData = tempTeams.map(async teamNumber => {
+              var request = await httpClient.get(`${selectedYear?.value}/teams?teamNumber=${teamNumber}`);
+              var teamDetails = await request.json();
+              return teamDetails.teams[0];
+            });
+
+            await Promise.all(EITeamData).then((values) => {
+              // merge with teams.teams
+              if (values.length > 0) {
+                values.forEach((value) => {
+                  teams.teams.push(value)
+                })
+              }
+            })
+          }
 
 
-      });
-    }
+        });
+      }
 
-    // Fix the sponsors now that teams are loaded
+      // Fix the sponsors now that teams are loaded
 
-    // prepare to separate and combine sponsors and organization name
-    var teamListSponsorsFixed = teams?.teams?.map((teamRow) => {
-      var sponsors = {
-        organization: "",
-        sponsors: "",
-        topSponsors: "",
-        sponsorsRaw: teamRow.nameFull,
-        sponsorArray: [],
-        topSponsorsArray: [],
-        organizationArray: [],
-        lastSponsor: ""
-      };
+      // prepare to separate and combine sponsors and organization name
+      var teamListSponsorsFixed = teams?.teams?.map((teamRow) => {
+        var sponsors = {
+          organization: "",
+          sponsors: "",
+          topSponsors: "",
+          sponsorsRaw: teamRow.nameFull,
+          sponsorArray: [],
+          topSponsorsArray: [],
+          organizationArray: [],
+          lastSponsor: ""
+        };
 
-      if (teamRow.schoolName) {
-        sponsors.organization = teamRow.schoolName;
-        if (sponsors.organization === sponsors.sponsorsRaw) {
-          sponsors.sponsorArray[0] = sponsors.sponsorsRaw
+        if (teamRow.schoolName) {
+          sponsors.organization = teamRow.schoolName;
+          if (sponsors.organization === sponsors.sponsorsRaw) {
+            sponsors.sponsorArray[0] = sponsors.sponsorsRaw
+          } else {
+            sponsors.sponsorArray = trimArray(sponsors.sponsorsRaw.split("/"));
+            sponsors.sponsorArray.push(sponsors.sponsorArray.pop().split("&")[0]);
+          }
         } else {
-          sponsors.sponsorArray = trimArray(sponsors.sponsorsRaw.split("/"));
-          sponsors.sponsorArray.push(sponsors.sponsorArray.pop().split("&")[0]);
+          sponsors.sponsorArray = trimArray(teamRow.nameFull.split("/"))
         }
-      } else {
-        sponsors.sponsorArray = trimArray(teamRow.nameFull.split("/"))
-      }
 
-      sponsors.organizationArray = trimArray(teamRow.nameFull.split("/").pop().split("&"));
+        sponsors.organizationArray = trimArray(teamRow.nameFull.split("/").pop().split("&"));
 
-      if (!sponsors.sponsorArray && !sponsors.organizationArray && !sponsors.organization) {
-        sponsors.organization = "No organization in TIMS";
-        sponsors.sponsors = "No sponsors in TIMS";
-        sponsors.topSponsorsArray[0] = sponsors.sponsors
-      }
-
-      if (sponsors.sponsorArray.length === 1) {
-        sponsors.sponsors = sponsors.sponsorArray[0];
-        sponsors.topSponsors = sponsors.sponsors
-      } else {
-        if (sponsors.organizationArray.length > 1 && !sponsors.organization) {
-          sponsors.sponsorArray.pop();
-          sponsors.sponsorArray.push(sponsors.organizationArray.slice(0).shift())
+        if (!sponsors.sponsorArray && !sponsors.organizationArray && !sponsors.organization) {
+          sponsors.organization = "No organization in TIMS";
+          sponsors.sponsors = "No sponsors in TIMS";
+          sponsors.topSponsorsArray[0] = sponsors.sponsors
         }
-        sponsors.topSponsorsArray = sponsors.sponsorArray.slice(0, 5);
-        sponsors.lastSponsor = sponsors.sponsorArray.pop();
-        sponsors.sponsors = sponsors.sponsorArray.join(", ");
-        sponsors.sponsors += " & " + sponsors.lastSponsor;
-        sponsors.lastSponsor = sponsors.topSponsorsArray.pop();
-        sponsors.topSponsors = sponsors.topSponsorsArray.join(", ");
-        sponsors.topSponsors += " & " + sponsors.lastSponsor;
-      }
 
-      if (sponsors.organizationArray.length === 1 && !sponsors.organization) {
-        sponsors.organization = sponsors.organizationArray[0]
-      } else {
-        if (!sponsors.organization) {
-          sponsors.organizationArray.shift();
-          sponsors.organization = sponsors.organizationArray.join(" & ")
+        if (sponsors.sponsorArray.length === 1) {
+          sponsors.sponsors = sponsors.sponsorArray[0];
+          sponsors.topSponsors = sponsors.sponsors
+        } else {
+          if (sponsors.organizationArray.length > 1 && !sponsors.organization) {
+            sponsors.sponsorArray.pop();
+            sponsors.sponsorArray.push(sponsors.organizationArray.slice(0).shift())
+          }
+          sponsors.topSponsorsArray = sponsors.sponsorArray.slice(0, 5);
+          sponsors.lastSponsor = sponsors.sponsorArray.pop();
+          sponsors.sponsors = sponsors.sponsorArray.join(", ");
+          sponsors.sponsors += " & " + sponsors.lastSponsor;
+          sponsors.lastSponsor = sponsors.topSponsorsArray.pop();
+          sponsors.topSponsors = sponsors.topSponsorsArray.join(", ");
+          sponsors.topSponsors += " & " + sponsors.lastSponsor;
         }
-      }
 
-      teamRow.sponsors = sponsors.sponsors;
-      teamRow.topSponsors = sponsors.topSponsors;
-      teamRow.organization = sponsors.organization;
-      return teamRow;
-    })
+        if (sponsors.organizationArray.length === 1 && !sponsors.organization) {
+          sponsors.organization = sponsors.organizationArray[0]
+        } else {
+          if (!sponsors.organization) {
+            sponsors.organizationArray.shift();
+            sponsors.organization = sponsors.organizationArray.join(" & ")
+          }
+        }
 
-    teams.teams = teamListSponsorsFixed;
+        teamRow.sponsors = sponsors.sponsors;
+        teamRow.topSponsors = sponsors.topSponsors;
+        teamRow.organization = sponsors.organization;
+        return teamRow;
+      })
 
-    //fetch awards for the current teams
-    var newTeams = teams.teams.map(async team => {
-      var request = await httpClient.get(`${selectedYear?.value}/team/${team?.teamNumber}/awards`);
-      var awards = await request.json();
-      team.awards = awards;
-      return team;
-    });
+      teams.teams = teamListSponsorsFixed;
 
-    await Promise.all(newTeams).then(function (values) {
+      //fetch awards for the current teams
+      var newTeams = teams.teams.map(async team => {
+        var request = await httpClient.get(`${selectedYear?.value}/team/${team?.teamNumber}/awards`);
+        var awards = await request.json();
+        team.awards = awards;
+        return team;
+      });
 
-      // Parse awards to ensure we highlight them properly and remove extraneous text i.e. FIRST CHampionship from name
-      var formattedAwards = values.map(team => {
-        // Add in special awards not reported by FIRST APIs (from 2021 season)
-        for (var index = 0; index < 3; index++) {
-          const targetYear = (parseInt(selectedYear?.value) - index)
-          let items = specialAwards.filter(item => item.Year === targetYear);
-          if (items.length > 0) {
-            let teamAwards = items[0].awards.filter(item => item.teamNumber === team.teamNumber);
-            if (teamAwards.length > 0) {
-              team.awards[`${selectedYear?.value - index}`].Awards = _.concat(team.awards[`${selectedYear?.value - index}`].Awards, teamAwards);
+      await Promise.all(newTeams).then(function (values) {
+
+        // Parse awards to ensure we highlight them properly and remove extraneous text i.e. FIRST CHampionship from name
+        var formattedAwards = values.map(team => {
+          // Add in special awards not reported by FIRST APIs (from 2021 season)
+          for (var index = 0; index < 3; index++) {
+            const targetYear = (parseInt(selectedYear?.value) - index)
+            let items = specialAwards.filter(item => item.Year === targetYear);
+            if (items.length > 0) {
+              let teamAwards = items[0].awards.filter(item => item.teamNumber === team.teamNumber);
+              if (teamAwards.length > 0) {
+                team.awards[`${selectedYear?.value - index}`].Awards = _.concat(team.awards[`${selectedYear?.value - index}`].Awards, teamAwards);
+              }
             }
           }
-        }
-        var awardYears = Object.keys(team?.awards);
+          var awardYears = Object.keys(team?.awards);
 
 
-        events.forEach((event) => {
-          eventnames[selectedYear?.value][event?.value?.code] = event?.value?.name;
+          events.forEach((event) => {
+            eventnames[selectedYear?.value][event?.value?.code] = event?.value?.name;
+          })
+
+          setEventNamesCY(eventnames[selectedYear?.value]);
+
+          awardYears?.forEach(year => {
+            if (team?.awards[`${year}`] !== null) {
+              team.awards[`${year}`].Awards = team?.awards[`${year}`]?.Awards.map(award => {
+                award.highlight = awardsHilight(award.name);
+                award.eventName = eventnames[`${year}`][award.eventCode];
+                award.year = year
+                return award;
+              })
+            } else {
+              team.awards[`${year}`] = { "Awards": [] }
+            }
+          })
+          team.hallOfFame = [];
+          _.filter(halloffame, { "Chairmans": team.teamNumber }).forEach((award) => {
+            team.hallOfFame.push({ "year": award.Year, "challenge": award.Challenge, "type": "chairmans" })
+          });
+          _.filter(halloffame, { "Impact": team.teamNumber }).forEach((award) => {
+            team.hallOfFame.push({ "year": award.Year, "challenge": award.Challenge, "type": "impact" })
+          });
+          _.filter(halloffame, { "Winner1": team.teamNumber }).forEach((award) => {
+            team.hallOfFame.push({ "year": award.Year, "challenge": award.Challenge, "type": "winner" })
+          });
+          _.filter(halloffame, { "Winner2": team.teamNumber }).forEach((award) => {
+            team.hallOfFame.push({ "year": award.Year, "challenge": award.Challenge, "type": "winner" })
+          });
+          _.filter(halloffame, { "Winner3": team.teamNumber }).forEach((award) => {
+            team.hallOfFame.push({ "year": award.Year, "challenge": award.Challenge, "type": "winner" })
+          });
+          _.filter(halloffame, { "Winner4": team.teamNumber }).forEach((award) => {
+            team.hallOfFame.push({ "year": award.Year, "challenge": award.Challenge, "type": "winner" })
+          });
+          _.filter(halloffame, { "Winner5": team.teamNumber }).forEach((award) => {
+            team.hallOfFame.push({ "year": award.Year, "challenge": award.Challenge, "type": "winner" })
+          });
+
+          team.hallOfFame = _.orderBy(team.hallOfFame, ['type', 'year'], ['asc', 'asc']);
+
+          return team;
+
         })
-
-        setEventNamesCY(eventnames[selectedYear?.value]);
-
-        awardYears?.forEach(year => {
-          if (team?.awards[`${year}`] !== null) {
-            team.awards[`${year}`].Awards = team?.awards[`${year}`]?.Awards.map(award => {
-              award.highlight = awardsHilight(award.name);
-              award.eventName = eventnames[`${year}`][award.eventCode];
-              award.year = year
-              return award;
-            })
-          } else {
-            team.awards[`${year}`] = { "Awards": [] }
-          }
-        })
-        team.hallOfFame = [];
-        _.filter(halloffame, { "Chairmans": team.teamNumber }).forEach((award) => {
-          team.hallOfFame.push({ "year": award.Year, "challenge": award.Challenge, "type": "chairmans" })
-        });
-        _.filter(halloffame, { "Impact": team.teamNumber }).forEach((award) => {
-          team.hallOfFame.push({ "year": award.Year, "challenge": award.Challenge, "type": "impact" })
-        });
-        _.filter(halloffame, { "Winner1": team.teamNumber }).forEach((award) => {
-          team.hallOfFame.push({ "year": award.Year, "challenge": award.Challenge, "type": "winner" })
-        });
-        _.filter(halloffame, { "Winner2": team.teamNumber }).forEach((award) => {
-          team.hallOfFame.push({ "year": award.Year, "challenge": award.Challenge, "type": "winner" })
-        });
-        _.filter(halloffame, { "Winner3": team.teamNumber }).forEach((award) => {
-          team.hallOfFame.push({ "year": award.Year, "challenge": award.Challenge, "type": "winner" })
-        });
-        _.filter(halloffame, { "Winner4": team.teamNumber }).forEach((award) => {
-          team.hallOfFame.push({ "year": award.Year, "challenge": award.Challenge, "type": "winner" })
-        });
-        _.filter(halloffame, { "Winner5": team.teamNumber }).forEach((award) => {
-          team.hallOfFame.push({ "year": award.Year, "challenge": award.Challenge, "type": "winner" })
-        });
-
-        team.hallOfFame = _.orderBy(team.hallOfFame, ['type', 'year'], ['asc', 'asc']);
-
-        return team;
-
-      })
-      teams.teams = formattedAwards;
+        teams.teams = formattedAwards;
 
 
 
-      var champsTeams = [];
-      if (selectedEvent?.value?.champLevel !== "" || showDistrictChampsStats) {
-        champsTeams = teams.teams.map(async team => {
-          var champsRequest = await httpClient.get(`/team/${team?.teamNumber}/appearances`);
-          var appearances = await champsRequest.json();
-          var result =
-          {
-            "teamNumber": team?.teamNumber,
-            "champsAppearances": 0,
-            "champsAppearancesYears": [],
-            "einsteinAppearances": 0,
-            "einsteinAppearancesYears": [],
+        var champsTeams = [];
+        if (selectedEvent?.value?.champLevel !== "" || showDistrictChampsStats) {
+          champsTeams = teams.teams.map(async team => {
+            var champsRequest = await httpClient.get(`/team/${team?.teamNumber}/appearances`);
+            var appearances = await champsRequest.json();
+            var result =
+            {
+              "teamNumber": team?.teamNumber,
+              "champsAppearances": 0,
+              "champsAppearancesYears": [],
+              "einsteinAppearances": 0,
+              "einsteinAppearancesYears": [],
 
-            "districtChampsAppearances": 0,
-            "districtChampsAppearancesYears": [],
-            "districtEinsteinAppearances": 0,
-            "districtEinsteinAppearancesYears": [],
-            "FOCAppearances": 0,
-            "FOCAppearancesYears": []
-          };
+              "districtChampsAppearances": 0,
+              "districtChampsAppearancesYears": [],
+              "districtEinsteinAppearances": 0,
+              "districtEinsteinAppearancesYears": [],
+              "FOCAppearances": 0,
+              "FOCAppearancesYears": []
+            };
 
-          appearances.forEach((appearance) => {
-            //check for district code
-            //DISTRICT_CMP = 2
-            //DISTRICT_CMP_DIVISION = 5
-            // Ontario (>=2019), Michigan (>=2017), Texas (>=2022), New England (>=2022),
-            // Indiana (>=2022) check for Einstein appearances
-            // appearances.district.abbreviation = "ont"
-            // appearances.district.abbreviation = "fim"
-            // appearances.district.abbreviation = "ne"
-            // appearances.district.abbreviation = "tx" || "fit"
-            // >=2017 check for Division appearance then Champs appearances
-            //test for champs prior to 2001
+            appearances.forEach((appearance) => {
+              //check for district code
+              //DISTRICT_CMP = 2
+              //DISTRICT_CMP_DIVISION = 5
+              // Ontario (>=2019), Michigan (>=2017), Texas (>=2022), New England (>=2022),
+              // Indiana (>=2022) check for Einstein appearances
+              // appearances.district.abbreviation = "ont"
+              // appearances.district.abbreviation = "fim"
+              // appearances.district.abbreviation = "ne"
+              // appearances.district.abbreviation = "tx" || "fit"
+              // >=2017 check for Division appearance then Champs appearances
+              //test for champs prior to 2001
 
-            //Use timeDifference to filter out teams from the current year's Einstein appearances
-            // for World and District Champs events.
-            var timeDifference = moment(appearance?.end_date).diff(moment(), "minutes");
+              //Use timeDifference to filter out teams from the current year's Einstein appearances
+              // for World and District Champs events.
+              var timeDifference = moment(appearance?.end_date).diff(moment(), "minutes");
 
-            if (appearance.district !== null) {
-              if (((appearance.year >= 2019) && (appearance.district.abbreviation === "ont")) ||
-                ((appearance.year >= 2017) && (appearance.district.abbreviation === "fim")) ||
-                ((appearance.year >= 2022) && (appearance.district.abbreviation === "ne")) ||
-                ((appearance.year >= 2022) && (appearance.district.abbreviation === "tx" || appearance.district.abbreviation === "fit"))) {
-                if (appearance.event_type === 5) {
-                  result.districtChampsAppearances += 1;
-                  result.districtChampsAppearancesYears.push(appearance.year);
+              if (appearance.district !== null) {
+                if (((appearance.year >= 2019) && (appearance.district.abbreviation === "ont")) ||
+                  ((appearance.year >= 2017) && (appearance.district.abbreviation === "fim")) ||
+                  ((appearance.year >= 2022) && (appearance.district.abbreviation === "ne")) ||
+                  ((appearance.year >= 2022) && (appearance.district.abbreviation === "tx" || appearance.district.abbreviation === "fit"))) {
+                  if (appearance.event_type === 5) {
+                    result.districtChampsAppearances += 1;
+                    result.districtChampsAppearancesYears.push(appearance.year);
+                  }
+                  if ((appearance.event_type === 2) && (timeDifference < 0)) {
+                    result.districtEinsteinAppearances += 1;
+                    result.districtEinsteinAppearancesYears.push(appearance.year);
+                  }
+                } else {
+                  if (appearance.event_type === 2) {
+                    result.districtChampsAppearances += 1;
+                    result.districtChampsAppearancesYears.push(appearance.year);
+                  }
+
                 }
-                if ((appearance.event_type === 2) && (timeDifference < 0)) {
-                  result.districtEinsteinAppearances += 1;
-                  result.districtEinsteinAppearancesYears.push(appearance.year);
+              }
+
+
+              //check for champs Division code
+              //CMP_DIVISION = 3
+              //CMP_FINALS = 4
+              //FOC = 6
+              // >=2001 check for Division appearance then Champs appearances
+              if (appearance.event_type === 6) {
+                result.FOCAppearances += 1;
+                result.FOCAppearancesYears.push(appearance.year);
+              }
+              //test for champs prior to 2001
+              if (appearance.year < 2001) {
+                if (appearance.event_type === 4) {
+                  result.champsAppearances += 1;
+                  result.champsAppearancesYears.push(appearance.year);
                 }
               } else {
-                if (appearance.event_type === 2) {
-                  result.districtChampsAppearances += 1;
-                  result.districtChampsAppearancesYears.push(appearance.year);
+                if (appearance.event_type === 3) {
+                  result.champsAppearances += 1;
+                  result.champsAppearancesYears.push(appearance.year);
+                }
+
+                // FIXED: mapping out current year's Einstein appearances.
+                if ((appearance.event_type === 4) && (timeDifference < 0)) {
+                  result.einsteinAppearances += 1;
+                  result.einsteinAppearancesYears.push(appearance.year);
                 }
 
               }
-            }
+            })
 
+            team.champsAppearances = result;
+            return team;
+          });
 
-            //check for champs Division code
-            //CMP_DIVISION = 3
-            //CMP_FINALS = 4
-            //FOC = 6
-            // >=2001 check for Division appearance then Champs appearances
-            if (appearance.event_type === 6) {
-              result.FOCAppearances += 1;
-              result.FOCAppearancesYears.push(appearance.year);
-            }
-            //test for champs prior to 2001
-            if (appearance.year < 2001) {
-              if (appearance.event_type === 4) {
-                result.champsAppearances += 1;
-                result.champsAppearancesYears.push(appearance.year);
-              }
-            } else {
-              if (appearance.event_type === 3) {
-                result.champsAppearances += 1;
-                result.champsAppearancesYears.push(appearance.year);
-              }
+          Promise.all(champsTeams).then(function (values) {
+            teams.lastUpdate = moment();
 
-              // FIXED: mapping out current year's Einstein appearances.
-              if ((appearance.event_type === 4) && (timeDifference < 0)) {
-                result.einsteinAppearances += 1;
-                result.einsteinAppearancesYears.push(appearance.year);
-              }
-
-            }
+            teams.teams = values;
+            setTeamList(teams);
+            //getRobotImages(teams);
           })
-
-          team.champsAppearances = result;
-          return team;
-        });
-
-        Promise.all(champsTeams).then(function (values) {
+        } else {
           teams.lastUpdate = moment();
-
-          teams.teams = values;
           setTeamList(teams);
           //getRobotImages(teams);
-        })
-      } else {
-        teams.lastUpdate = moment();
-        setTeamList(teams);
-        //getRobotImages(teams);
-      }
+        }
 
-    })
+      })
+      setTeamListLoading(false);
+    } else {
+      console.log("Team List is loading. Skipping...");
+    }
   }
 
   /**
@@ -959,81 +970,84 @@ function App() {
    * @return sets the communityUpdates persistent state
    */
   async function getCommunityUpdates(notify, adHocTeamList) {
-    console.log(`Fetching community updates for ${selectedEvent?.value?.name}...`)
-    var result = null;
-    var teams = [];
-    var communityUpdateTemplate = {
-      "nameShortLocal": "",
-      "cityStateLocal": "",
-      "topSponsorsLocal": "",
-      "sponsorsLocal": "",
-      "organizationLocal": "",
-      "robotNameLocal": "",
-      "awardsLocal": "",
-      "teamMottoLocal": "",
-      "teamNotesLocal": "",
-      "teamYearsNoCompeteLocal": "",
-      "showRobotName": "",
-      "teamNotes": "",
-      "sayNumber": "",
-      "lastUpdate": "",
-      "source": ""
-    }
-
-    if (selectedEvent?.value?.code.includes("OFFLINE")) {
-      //Do something with the team list
-      if (adHocTeamList) {
-        // https://api.gatool.org/v3/team/172/updates
-        console.log("Teams List loaded. Update from the Community")
-        var adHocTeams = adHocTeamList.map(async team => {
-          var request = await httpClient.get(`/team/${team?.teamNumber}/updates`);
-          var teamDetails = { "teamNumber": team?.teamNumber };
-          var teamUpdate = await request.json();
-          teamDetails.updates = teamUpdate;
-          teamDetails.teamNumber = team?.teamNumber
-          return teamDetails;
-        });
-
-        await Promise.all(adHocTeams).then(function (values) {
-          teams = values;
-          teams = teams.map((team) => {
-            team.updates = _.merge(_.cloneDeep(communityUpdateTemplate), team?.updates);
-            if (_.findIndex(localUpdates, { "teamNumber": team?.teamNumber }) >= 0) {
-              team.updates = _.merge(team.updates, _.cloneDeep(localUpdates[_.findIndex(localUpdates, { "teamNumber": team?.teamNumber })].update))
-            }
-            return team;
-          })
-
-        });
-
-      } else {
-        console.log("no teams loaded yet")
-        teams = [];
+    if (!loadingCommunityUpdates) {
+      setLoadingCommunityUpdates(true);
+      console.log(`Fetching community updates for ${selectedEvent?.value?.name}...`)
+      var result = null;
+      var teams = [];
+      var communityUpdateTemplate = {
+        "nameShortLocal": "",
+        "cityStateLocal": "",
+        "topSponsorsLocal": "",
+        "sponsorsLocal": "",
+        "organizationLocal": "",
+        "robotNameLocal": "",
+        "awardsLocal": "",
+        "teamMottoLocal": "",
+        "teamNotesLocal": "",
+        "teamYearsNoCompeteLocal": "",
+        "showRobotName": "",
+        "teamNotes": "",
+        "sayNumber": "",
+        "lastUpdate": "",
+        "source": ""
       }
 
-    } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
-      result = await httpClient.get(`${selectedYear?.value}/communityUpdates/${selectedEvent?.value.code}`);
-      teams = await result.json();
-    } else {
-      teams = training.teams.communityUpdates;
-    }
+      if (selectedEvent?.value?.code.includes("OFFLINE")) {
+        //Do something with the team list
+        if (adHocTeamList) {
+          // https://api.gatool.org/v3/team/172/updates
+          console.log("Teams List loaded. Update from the Community")
+          var adHocTeams = adHocTeamList.map(async team => {
+            var request = await httpClient.get(`/team/${team?.teamNumber}/updates`);
+            var teamDetails = { "teamNumber": team?.teamNumber };
+            var teamUpdate = await request.json();
+            teamDetails.updates = teamUpdate;
+            teamDetails.teamNumber = team?.teamNumber
+            return teamDetails;
+          });
 
-    if (teams?.length > 0) {
-      teams = teams.map((team) => {
-        team.updates = _.merge(_.cloneDeep(communityUpdateTemplate), team?.updates);
-        if (_.findIndex(localUpdates, { "teamNumber": team?.teamNumber }) >= 0) {
-          team.updates = _.merge(team.updates, _.cloneDeep(localUpdates[_.findIndex(localUpdates, { "teamNumber": team?.teamNumber })].update))
+          await Promise.all(adHocTeams).then(function (values) {
+            teams = values;
+            teams = teams.map((team) => {
+              team.updates = _.merge(_.cloneDeep(communityUpdateTemplate), team?.updates);
+              if (_.findIndex(localUpdates, { "teamNumber": team?.teamNumber }) >= 0) {
+                team.updates = _.merge(team.updates, _.cloneDeep(localUpdates[_.findIndex(localUpdates, { "teamNumber": team?.teamNumber })].update))
+              }
+              return team;
+            })
+
+          });
+
+        } else {
+          console.log("no teams loaded yet")
+          teams = [];
         }
-        return team;
-      })
 
-      teams.lastUpdate = moment();
-      if (notify) {
-        toast.success(`Your team data is now up to date.`)
+      } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
+        result = await httpClient.get(`${selectedYear?.value}/communityUpdates/${selectedEvent?.value.code}`);
+        teams = await result.json();
+      } else {
+        teams = training.teams.communityUpdates;
       }
-      setCommunityUpdates(teams);
-    }
 
+      if (teams?.length > 0) {
+        teams = teams.map((team) => {
+          team.updates = _.merge(_.cloneDeep(communityUpdateTemplate), team?.updates);
+          if (_.findIndex(localUpdates, { "teamNumber": team?.teamNumber }) >= 0) {
+            team.updates = _.merge(team.updates, _.cloneDeep(localUpdates[_.findIndex(localUpdates, { "teamNumber": team?.teamNumber })].update))
+          }
+          return team;
+        })
+
+        teams.lastUpdate = moment();
+        if (notify) {
+          toast.success(`Your team data is now up to date.`)
+        }
+        setCommunityUpdates(teams);
+        setLoadingCommunityUpdates(false);
+      }
+    }
   }
 
   /**
@@ -1239,7 +1253,7 @@ function App() {
   */
   const nextMatch = () => {
     if (!adHocMode) {
-      if ((practiceSchedule?.schedule?.length > 0) && (currentMatch < (practiceSchedule?.schedule?.length + (offlinePlayoffSchedule?.schedule?.length || 0)))) {
+      if ((practiceSchedule?.schedule?.length === 0 && qualSchedule.schedule.length === 0 && playoffSchedule?.schedule?.length > 0) || ((practiceSchedule?.schedule?.length > 0) && (currentMatch < (practiceSchedule?.schedule?.length + (offlinePlayoffSchedule?.schedule?.length || 0))))) {
         setAdHocMatch(practiceSchedule?.schedule[currentMatch].teams);
         setCurrentMatch(currentMatch + 1);
         if (!selectedEvent?.value?.code.includes("OFFLINE")) {
@@ -1248,7 +1262,7 @@ function App() {
         getWorldStats();
       }
 
-      if (currentMatch < (qualSchedule?.schedule?.length + playoffSchedule?.schedule?.length)) {
+      if (currentMatch < ((qualSchedule?.schedule?.length || qualSchedule?.schedule?.schedule.length) + playoffSchedule?.schedule?.length)) {
         setCurrentMatch(currentMatch + 1);
         if (!selectedEvent?.value?.code.includes("OFFLINE")) {
           getSchedule();
@@ -1299,28 +1313,30 @@ function App() {
     * @async
     * @function loadEvent
     */
-  const loadEvent = () => {
+  const loadEvent = async () => {
+    console.log("starting to load event");
     if (httpClient && selectedEvent?.value?.name && selectedYear?.value) {
       console.log(`Conditions match to load ${selectedEvent?.value?.name}...`)
-      setQualSchedule(null);
-      setPlayoffSchedule(null);
-      setPracticeSchedule(null);
-      setOfflinePlayoffSchedule(null);
-      setTeamList(null);
-      setCommunityUpdates(null);
-      setRobotImages(null);
-      setRankings(null);
-      setEventHighScores(null);
-      setPlayoffs(false);
-      setAllianceCount(null);
-      setTeamReduction(null);
-      setPlayoffCountOverride(null);
-      setAllianceSelectionArrays({});
-      setAllianceSelection(false);
-      setRankingsOverride(null);
-      setCurrentMatch(1);
-      setDistrictRankings(null);
-      setAdHocMatch(null);
+      await setPracticeSchedule(null);
+      await setQualSchedule(null);
+      await setPlayoffSchedule(null);
+      await setOfflinePlayoffSchedule(null);
+      await setTeamList(null);
+      await setCommunityUpdates(null);
+      await setRobotImages(null);
+      await setRankings(null);
+      await setEventHighScores(null);
+      await setPlayoffs(false);
+      await setAllianceCount(null);
+      await setTeamReduction(null);
+      await setPlayoffCountOverride(null);
+      await setAllianceSelectionArrays({});
+      await setAllianceSelection(false);
+      await setRankingsOverride(null);
+      await setCurrentMatch(1);
+      await setDistrictRankings(null);
+      await setAdHocMatch(null);
+      setHaveChampsTeams(false);
       getTeamList();
       getSchedule(true);
       getWorldStats();
@@ -1329,7 +1345,7 @@ function App() {
 
   // Retrieve Community Updates when the team list changes
   useEffect(() => {
-    if (teamList?.teams?.length > 0) {
+    if (teamList?.teams?.length > 0 && !loadingCommunityUpdates) {
       getCommunityUpdates();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1480,7 +1496,7 @@ function App() {
 
   // check to see if Alliance Selection is ready when QualSchedule and Ranks changes
   useEffect(() => {
-    if (rankings && qualSchedule && teamList && playoffSchedule?.schedule.length === 0) {
+    if (rankings?.ranks.length > 0 && qualSchedule?.schedule.length > 0 && teamList?.teams.length > 0 && playoffSchedule?.schedule.length === 0) {
       var asReady = false;
       var matchesPerTeam = 0;
       matchesPerTeam = _.toInteger(6 * qualSchedule?.schedule?.length / (teamList?.teamCountTotal - teamReduction));
@@ -1501,22 +1517,22 @@ function App() {
 
   // Retrieve schedule, team list, community updates, high scores and rankings when event selection changes
   useEffect(() => {
-    if (events.length > 0) {
+    if (events.length > 0 && selectedEvent?.value) {
       loadEvent();
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [httpClient, selectedEvent?.value])
+  }, [httpClient, selectedEvent])
 
   // Retrieve robot images when the team list changes
   useEffect(() => {
-    console.log(`Fetching robot images for ${selectedEvent?.value?.name}...`)
     if (teamList?.teams?.length > 0 && selectedEvent?.value?.name && isOnline) {
+      console.log(`Fetching robot images for ${selectedEvent?.value?.name}...`)
       getRobotImages();
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [httpClient, teamList?.teams.length>0])
+  }, [httpClient, teamList?.lastUpdate])
 
 
   const { start, stop } = useInterval(
