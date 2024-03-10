@@ -280,6 +280,7 @@ function App() {
    * @return Sets the event high scores, qual schedule and playoff
   */
   async function getSchedule(loadingEvent) {
+    console.log(`Fetching schedule for ${selectedEvent?.value?.name}...`)
     var highScores = [];
 
     /**
@@ -378,6 +379,7 @@ function App() {
     var qualschedule = null;
     var playoffschedule = null;
 
+    console.log(`Fetching Practice Schedule for ${selectedEvent?.value?.name}...`)
     if (selectedEvent?.value?.code.includes("OFFLINE") || selectedEvent?.value?.code.includes("PRACTICE")) {
       //do something
       practiceschedule = { "schedule": { "schedule": [] } };
@@ -398,6 +400,7 @@ function App() {
       setPracticeSchedule(practiceschedule);
     }
 
+    console.log(`Fetching Qual Schedule for ${selectedEvent?.value?.name}...`)
     if (selectedEvent?.value?.code.includes("OFFLINE")) {
       //do something
       qualschedule = { "schedule": { "schedule": [] } };
@@ -413,23 +416,25 @@ function App() {
     }
     // adds the winner to the schedule.
     if (typeof qualschedule.Schedule !== "undefined") {
-      qualschedule.schedule = qualschedule.Schedule;
+      qualschedule.schedule = qualschedule?.Schedule;
       delete qualschedule.Schedule;
     }
     if (typeof qualschedule.schedule?.Schedule !== "undefined") {
-      qualschedule.schedule.schedule = qualschedule.schedule.Schedule;
+      qualschedule.schedule.schedule = qualschedule?.schedule?.Schedule;
       delete qualschedule.schedule.Schedule;
     }
-    var matches = qualschedule?.schedule.schedule.map((match) => {
+    var matches = qualschedule?.schedule?.schedule.map((match) => {
       match.winner = winner(match);
       return match;
     });
-    qualschedule.scheduleLastModified = qualschedule.schedule?.headers ? moment(qualschedule.schedule?.headers.schedule["last-modified"]) : moment();
-    qualschedule.matchesLastModified = qualschedule.schedule?.headers ? moment(qualschedule.schedule?.headers.matches["last-modified"]) : moment();
-    qualschedule.schedule = matches;
-    matches.forEach((match) => {
-      isHighScore(match);
-    })
+    if (matches?.length > 0) {
+      qualschedule.scheduleLastModified = qualschedule.schedule?.headers ? moment(qualschedule.schedule?.headers.schedule["last-modified"]) : moment();
+      qualschedule.matchesLastModified = qualschedule.schedule?.headers ? moment(qualschedule.schedule?.headers.matches["last-modified"]) : moment();
+      qualschedule.schedule = matches;
+      matches.forEach((match) => {
+        isHighScore(match);
+      })
+    }
 
     var completedMatchCount = 0;
 
@@ -444,6 +449,7 @@ function App() {
     qualschedule.lastUpdate = moment();
     setQualSchedule(qualschedule);
 
+    console.log(`Fetching Playoff Schedule for ${selectedEvent?.value?.name}...`)
     //get the playoff schedule
     matches = [];
     result = null;
@@ -572,6 +578,7 @@ function App() {
     setEventHighScores(highScores);
     playoffschedule.lastUpdate = moment();
     setPlayoffSchedule(playoffschedule);
+    getRanks();
 
   }
 
@@ -583,7 +590,7 @@ function App() {
    * @return sets the teamList
    */
   async function getTeamList(adHocTeamList) {
-
+    console.log(`Fetching team list for ${selectedEvent?.value?.name}...`)
     /**
      * Determines whether an award, by name, deserves special highlighting in the Announce Screen
      * @function awardsHilight
@@ -637,6 +644,52 @@ function App() {
     if (typeof teams.Teams !== "undefined") {
       teams.teams = teams.Teams;
       delete teams.Teams;
+    }
+
+    // handle District EI teams
+    // if District Champs, filter list of events by district code
+    var districtEvents = null;
+    if (events && (selectedEvent?.value?.type === "DistrictChampionship" || selectedEvent?.value?.type === "DistrictChampionshipWithLevels")) {
+      districtEvents = _.filter(events, { "value": { "districtCode": selectedEvent?.value?.districtCode } })
+      // get awards for those filtered events
+      var districtEITeams = districtEvents.map(async event => {
+        var request = await httpClient.get(`${selectedYear?.value}/awards/event/${event?.value?.code}`);
+        var eventDetails = await request.json();
+        // filter that list by EI {awardId: "633"} {name: "District Engineering Inspiration Award"}
+        return _.filter(eventDetails?.Awards, { "awardId": 633 });
+      });
+
+      await Promise.all(districtEITeams).then(async function (values) {
+        var tempTeams = [];
+        values.forEach((value) => {
+          // @ts-ignore
+          if (value[0]?.teamNumber) {
+            if (_.findIndex(teams.teams, { "teamNumber": value[0]?.teamNumber }) < 0) {
+              // @ts-ignore
+              tempTeams.push(value[0]?.teamNumber)
+            }
+          }
+        })
+        // get team details for those teams not in this event
+        if (tempTeams.length > 0) {
+          var EITeamData = tempTeams.map(async teamNumber => {
+            var request = await httpClient.get(`${selectedYear?.value}/teams?teamNumber=${teamNumber}`);
+            var teamDetails = await request.json();
+            return teamDetails.teams[0];
+          });
+
+          await Promise.all(EITeamData).then((values) => {
+            // merge with teams.teams
+            if (values.length > 0) {
+              values.forEach((value) => {
+                teams.teams.push(value)
+              })
+            }
+          })
+        }
+
+
+      });
     }
 
     // Fix the sponsors now that teams are loaded
@@ -906,6 +959,7 @@ function App() {
    * @return sets the communityUpdates persistent state
    */
   async function getCommunityUpdates(notify, adHocTeamList) {
+    console.log(`Fetching community updates for ${selectedEvent?.value?.name}...`)
     var result = null;
     var teams = [];
     var communityUpdateTemplate = {
@@ -964,19 +1018,22 @@ function App() {
       teams = training.teams.communityUpdates;
     }
 
-    teams = teams.map((team) => {
-      team.updates = _.merge(_.cloneDeep(communityUpdateTemplate), team?.updates);
-      if (_.findIndex(localUpdates, { "teamNumber": team?.teamNumber }) >= 0) {
-        team.updates = _.merge(team.updates, _.cloneDeep(localUpdates[_.findIndex(localUpdates, { "teamNumber": team?.teamNumber })].update))
-      }
-      return team;
-    })
+    if (teams?.length > 0) {
+      teams = teams.map((team) => {
+        team.updates = _.merge(_.cloneDeep(communityUpdateTemplate), team?.updates);
+        if (_.findIndex(localUpdates, { "teamNumber": team?.teamNumber }) >= 0) {
+          team.updates = _.merge(team.updates, _.cloneDeep(localUpdates[_.findIndex(localUpdates, { "teamNumber": team?.teamNumber })].update))
+        }
+        return team;
+      })
 
-    teams.lastUpdate = moment();
-    if (notify) {
-      toast.success(`Your team data is now up to date.`)
+      teams.lastUpdate = moment();
+      if (notify) {
+        toast.success(`Your team data is now up to date.`)
+      }
+      setCommunityUpdates(teams);
     }
-    setCommunityUpdates(teams);
+
   }
 
   /**
@@ -988,6 +1045,7 @@ function App() {
    * @return sets rankings
    */
   async function getRanks() {
+    console.log(`Fetching Ranks for ${selectedEvent?.value?.name}...`)
     var result = null;
     var ranks = null;
     if (selectedEvent?.value?.code.includes("OFFLINE")) {
@@ -1020,6 +1078,9 @@ function App() {
     ranks.lastModified = ranks.headers ? moment(ranks?.headers["last-modified"]) : moment();
     ranks.lastUpdate = moment();
     setRankings(ranks);
+    if (selectedEvent.value.districtCode) {
+      getDistrictRanks();
+    }
   }
 
   /** This function retrieves the ranking data for a specific District from FIRST
@@ -1129,7 +1190,7 @@ function App() {
       delete alliances.Alliances;
     }
     var allianceLookup = {};
-    alliances.alliances.forEach(alliance => {
+    alliances?.alliances.forEach(alliance => {
       allianceLookup[`${alliance.captain}`] = { role: `Captain`, alliance: alliance.name, number: alliance.number, captain: alliance.captain, round1: alliance.round1, round2: alliance.round2, round3: alliance.round3, backup: alliance.backup, backupReplaced: alliance.backupReplaced };
       allianceLookup[`${alliance.round1}`] = { role: `Round 1 Selection`, alliance: alliance.name, number: alliance.number, captain: alliance.captain, round1: alliance.round1, round2: alliance.round2, round3: alliance.round3, backup: alliance.backup, backupReplaced: alliance.backupReplaced };
       allianceLookup[`${alliance.round2}`] = { role: `Round 2 Selection`, alliance: alliance.name, number: alliance.number, captain: alliance.captain, round1: alliance.round1, round2: alliance.round2, round3: alliance.round3, backup: alliance.backup, backupReplaced: alliance.backupReplaced };
@@ -1183,7 +1244,6 @@ function App() {
         setCurrentMatch(currentMatch + 1);
         if (!selectedEvent?.value?.code.includes("OFFLINE")) {
           getSchedule();
-          getRanks();
         }
         getWorldStats();
       }
@@ -1192,7 +1252,6 @@ function App() {
         setCurrentMatch(currentMatch + 1);
         if (!selectedEvent?.value?.code.includes("OFFLINE")) {
           getSchedule();
-          getRanks();
         }
         getWorldStats();
       }
@@ -1213,7 +1272,6 @@ function App() {
         setCurrentMatch(currentMatch - 1);
         if (!selectedEvent?.value?.code.includes("OFFLINE")) {
           getSchedule();
-          getRanks();
         }
         getWorldStats();
       }
@@ -1233,7 +1291,6 @@ function App() {
       setAdHocMatch(practiceSchedule?.schedule[e.value - 1].teams);
     }
     getSchedule();
-    getRanks();
     getWorldStats();
   }
 
@@ -1243,7 +1300,8 @@ function App() {
     * @function loadEvent
     */
   const loadEvent = () => {
-    if (httpClient && selectedEvent && selectedYear) {
+    if (httpClient && selectedEvent?.value?.name && selectedYear?.value) {
+      console.log(`Conditions match to load ${selectedEvent?.value?.name}...`)
       setQualSchedule(null);
       setPlayoffSchedule(null);
       setPracticeSchedule(null);
@@ -1263,20 +1321,15 @@ function App() {
       setCurrentMatch(1);
       setDistrictRankings(null);
       setAdHocMatch(null);
-      getSchedule(true);
       getTeamList();
-      getRanks();
-      
-      if (selectedEvent.value.districtCode) {
-        getDistrictRanks();
-      }
+      getSchedule(true);
       getWorldStats();
     }
   }
 
   // Retrieve Community Updates when the team list changes
   useEffect(() => {
-    if (teamList) {
+    if (teamList?.teams?.length > 0) {
       getCommunityUpdates();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1427,7 +1480,7 @@ function App() {
 
   // check to see if Alliance Selection is ready when QualSchedule and Ranks changes
   useEffect(() => {
-    if (rankings && qualSchedule && teamList && playoffSchedule?.schedule.length===0) {
+    if (rankings && qualSchedule && teamList && playoffSchedule?.schedule.length === 0) {
       var asReady = false;
       var matchesPerTeam = 0;
       matchesPerTeam = _.toInteger(6 * qualSchedule?.schedule?.length / (teamList?.teamCountTotal - teamReduction));
@@ -1448,25 +1501,23 @@ function App() {
 
   // Retrieve schedule, team list, community updates, high scores and rankings when event selection changes
   useEffect(() => {
-    loadEvent();
+    if (events.length > 0) {
+      loadEvent();
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [httpClient, selectedEvent])
+  }, [httpClient, selectedEvent?.value])
 
   // Retrieve robot images when the team list changes
   useEffect(() => {
-    if (teamList) {
+    console.log(`Fetching robot images for ${selectedEvent?.value?.name}...`)
+    if (teamList?.teams?.length > 0 && selectedEvent?.value?.name && isOnline) {
       getRobotImages();
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [httpClient, teamList])
+  }, [httpClient, teamList?.teams.length>0])
 
-  /**
-  * This function loads an event when a user selects an event from the menu. It will reset all event data, load the event details, team lists, team updates, refresh scores, ranks and world stats when appropriate.
-  * @async
-  * @function loadEvent
-  */
 
   const { start, stop } = useInterval(
     () => {
@@ -1474,7 +1525,6 @@ function App() {
       if (!selectedEvent?.value?.code.includes("OFFLINE")) {
         console.log("Online event. Getting schedule and ranks");
         getSchedule();
-        getRanks();
       } else {
         console.log("Offline event. Just get the world stats if you can");
       }

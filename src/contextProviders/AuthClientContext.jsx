@@ -37,6 +37,10 @@ class AuthClient {
         if (response.status === 401) {
             errorText += " Your session may have expired. Please log out and log in again."
         }
+        if (response.status === 404) {
+            errorText += " We couldn't find "+path;
+            return response;
+        }
         if (response.status === 500) {
             errorText += " Something happened in the backend that we don't understand. We have logged the request and will investigate soon."
         }

@@ -94,14 +94,14 @@ function MainNavigation({ selectedEvent, practiceSchedule, qualSchedule, playoff
     // YELLOW: Event Selected, Qual Schedule loaded, has 0 matches in the array
     // RED: Event Selected, No qual schedule loaded
 
-    if (selectedEvent && (practiceSchedule?.schedule.length > 0 || qualSchedule?.schedule.length > 0)) {
+    if (selectedEvent && (practiceSchedule?.schedule?.length > 0 || qualSchedule?.schedule?.length > 0 || playoffs)) {
       setScheduleTabReady(TabStates.Ready)
     } else if (selectedEvent && qualSchedule && qualSchedule?.schedule?.length === 0) {
       setScheduleTabReady(TabStates.Stale)
     } else {
       setScheduleTabReady(TabStates.NotReady)
     }
-  }, [qualSchedule, practiceSchedule, selectedEvent])
+  }, [qualSchedule, practiceSchedule, selectedEvent, playoffs])
 
   // Handle ready state for the team data tab
   useEffect(() => {
@@ -133,7 +133,7 @@ function MainNavigation({ selectedEvent, practiceSchedule, qualSchedule, playoff
     }
   }, [selectedEvent, rankings])
 
-  // Handle ready state for the ranks tab
+  // Handle ready state for the Alliance Selection tab
   useEffect(() => {
     // GREEN: Event Selected, allianceSelection is true or playoffs is true
     // YELLOW: Event Selected, Ranks loaded, rankings array empty, Alliance Selection is fales and playoffs is false
@@ -154,7 +154,7 @@ function MainNavigation({ selectedEvent, practiceSchedule, qualSchedule, playoff
     // YELLOW: Event Selected, World High Scores Available, no matches complete for selected event
     // RED: Event Selected, no world high scores available
 
-    if (selectedEvent && eventHighScores?.overallqual && worldHighScores) {
+    if (selectedEvent && (eventHighScores?.overallqual || eventHighScores?.overallplayoff) && worldHighScores) {
       setStatsTabReady(TabStates.Ready)
     } else if (selectedEvent && worldHighScores) {
       setStatsTabReady(TabStates.Stale)
