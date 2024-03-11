@@ -694,6 +694,7 @@ td {
 
 .teamNotes p {
 	margin: 0px;
+	line-height: 1em;
 }
 
 .teamNotes h1 {
