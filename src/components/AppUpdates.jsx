@@ -1,11 +1,12 @@
 
 export const appUpdates = [
     {
-        date: "March 10, 2024",
+        date: "March 10 & 11, 2024",
         message: <ul>
             <li>Major performance improvement when loading events</li>
             <li>Major performance improvement when changing matches</li>
             <li>Adding District EI winners to District Champs team list</li>
+            <li>Adding switch to automatically hide Sponsors on Announce</li>
             <li>Fixed Tab highlighting</li>
             <li>Layout adjustments for tablets</li>
         </ul>
