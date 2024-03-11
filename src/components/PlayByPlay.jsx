@@ -2,6 +2,7 @@ import _ from "lodash";
 
 function PlayByPlay({ station, team, inPlayoffs, selectedYear, selectedEvent, showNotes, showMottoes, showQualsStats, showQualsStatsQuals, adHocMode }) {
     var allianceColor = station.slice(0, -1);
+    const portrait = window?.screen?.orientation.type.includes("landscape") ? "landscape" : "portrait";
 
     return (
         <>
@@ -13,7 +14,7 @@ function PlayByPlay({ station, team, inPlayoffs, selectedYear, selectedEvent, sh
                         <p className={team?.updates?.organizationLocal ? (team?.updates?.organizationLocal?.length > 60 ? "playByPlayOrganization narrowFont" : "playByPlayOrganization") : (team?.schoolName?.length > 60 ? "playByPlayOrganization narrowFont" : "playByPlayOrganization")}>{team?.updates?.organizationLocal ? team?.updates?.organizationLocal : team?.schoolName}</p>
                         <p className={"playByPlayCity"}>{team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : `${team?.city}, ${team?.stateProv}${team?.country !== "USA" ? `, ${team?.country}` : ""}`}</p>
                         {(showMottoes || _.isNull(showMottoes)) && <p className={"playByPlayCity mottoes"}>{team?.updates?.teamMottoLocal}</p>}
-                        {inPlayoffs && <p className={"playByPlayAlliance"}>{team?.alliance}<br />{team?.allianceRole}</p>}
+                        {inPlayoffs && <p className={"playByPlayAlliance hideLandscape"}>{team?.alliance}<br />{team?.allianceRole}</p>}
                     </>
                 }
                 {!team?.teamNumber && <>
@@ -47,6 +48,7 @@ function PlayByPlay({ station, team, inPlayoffs, selectedYear, selectedEvent, sh
                                 {team?.qualifiedFirstCmp && (selectedEvent?.value?.champLevel !== "CMPDIV" && selectedEvent?.value?.champLevel !== "CMPSUB" && selectedEvent?.value?.champLevel !== "CMPSUB") && <>Qualified for World Champs</>}
                             </p>}
                         {(showNotes || _.isNull(showNotes)) && <p className={"notes playByPlayWinLossTie teamNotes"} dangerouslySetInnerHTML={{ __html: team?.updates?.teamNotesLocal }}></p>}
+                        {inPlayoffs && <p className={"playByPlayAlliance showLandscape"}>{team?.alliance}<br />{team?.allianceRole}</p>}
                     </>
                 }
                 {!team?.teamNumber && <>

@@ -154,7 +154,8 @@ td {
 
 .playByPlayTeamName {
 	font-size: 36px;
-	margin: 0px
+	margin: 0px;
+	line-height: 1em;
 }
 
 .playByPlayTeamNameStats {
@@ -206,7 +207,8 @@ td {
 .playByPlayAlliance {
 	font-size: 20px;
 	line-height: 100%;
-	margin-top: 5px
+	margin-top: 5px;
+	display: block;
 }
 
 .playByPlayChampsAlliance {
@@ -720,6 +722,13 @@ td {
     width: 100% !important;
 }
 
+.hideLandscape {
+	display: block;
+}
+.showLandscape {
+	display: none;
+}
+
 
 @media only screen and (max-width: 820px) and (orientation: portrait){
 
@@ -810,5 +819,11 @@ td {
 	}
 	.playByPlayTeamName {
 		font-size: 28px;
+	}
+	.hideLandscape {
+		display: none;
+	}
+	.showLandscape {
+		display: block;
 	}
 }
