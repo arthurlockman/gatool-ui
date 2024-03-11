@@ -2,7 +2,6 @@ import _ from "lodash";
 
 function PlayByPlay({ station, team, inPlayoffs, selectedYear, selectedEvent, showNotes, showMottoes, showQualsStats, showQualsStatsQuals, adHocMode }) {
     var allianceColor = station.slice(0, -1);
-    const portrait = window?.screen?.orientation.type.includes("landscape") ? "landscape" : "portrait";
 
     return (
         <>
