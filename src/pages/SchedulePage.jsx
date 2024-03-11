@@ -211,7 +211,7 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
             </div>}
             {selectedEvent && (!qualSchedule || qualSchedule?.schedule.length === 0) && (playoffSchedule?.schedule.length === 0) && <div>
                 <Alert variant="warning" >
-                    {(!practiceSchedule || practiceSchedule?.schedule.length === 0 ) && !practiceFileUploaded && <>
+                    {(!practiceSchedule || practiceSchedule?.schedule.length === 0) && !practiceFileUploaded && <>
                         <div><img src="loadingIcon.gif" alt="Loading data..." /></div>
                         <div>Awaiting schedule for {selectedEvent.label}<br /><br /></div>
                         <Container fluid>
@@ -236,8 +236,8 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                                         {!selectedEvent?.value?.code.includes("OFFLINE") && <b>You have uploaded a Practice Schedule.<br />Tap here to remove it. Know that we will automatically remove it when we get a Qualification Matches Schedule.</b>}
                                     </Col>
                                 </>}
-                                {!practiceFileUploaded && 
-                                <Col xs={8}><b>Practice Matches</b><br />Your event has not yet posted a Qualification Match schedule. You can use this practice match schedule to help observe teams and practice for the tournament. Please do not announce matches during the Practice Match period.</Col>}
+                                {!practiceFileUploaded &&
+                                    <Col xs={8}><b>Practice Matches</b><br />Your event has not yet posted a Qualification Match schedule. You can use this practice match schedule to help observe teams and practice for the tournament. Please do not announce matches during the Practice Match period.</Col>}
                                 {selectedEvent?.value?.code.includes("OFFLINE") &&
                                     <Col xs={3} className={"leftTable"} style={{ cursor: "pointer", color: "darkblue" }} onClick={clickLoadOfflinePlayoffs}>
                                         <b>You can now load your Offline Playoff Schedule. You may need to do this after each phase of the playoffs.<br />Tap here to remove it and replace it, as necessary.</b>
@@ -248,7 +248,7 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                     </>}
                 </Alert>
             </div>}
-            {selectedEvent && (practiceSchedule?.schedule.length > 0 || qualSchedule?.schedule.length > 0 || (qualSchedule?.schedule.length === 0 && playoffSchedule?.schedule.length > 0)) &&
+            {selectedEvent && (practiceSchedule?.schedule.length > 0 || qualSchedule?.schedule.length > 0 || (qualSchedule?.schedule.length === 0 && playoffSchedule?.schedule.length > 0) || (qualSchedule?.schedule?.schedule.length === 0 && playoffSchedule?.schedule.length > 0)) &&
                 <div>
                     <h4>{selectedEvent.label}</h4>
                     <Table responsive striped bordered size="sm">
@@ -292,7 +292,7 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                                 </tr>
                                 )
                             })}
-                            {qualSchedule && qualSchedule?.schedule?.map((match) => {
+                            {qualSchedule?.schedule?.length > 0 && qualSchedule?.schedule?.map((match) => {
                                 let redStyle = "red";
                                 let blueStyle = "blue";
                                 let winnerStyle = "tie";
@@ -332,7 +332,7 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                                 return (<tr key={"playoffSchedule" + match?.matchNumber} className="centerTable">
                                     <td>{match?.actualStartTime ? "Actual:" : "Scheduled:"}<br /> {match?.actualStartTime ? moment(match?.actualStartTime).format('dd hh:mm A') : moment(match?.startTime).format('dd hh:mm A')}</td>
                                     <td>{match?.description}</td>
-                                    <td>{match?.matchNumber + qualMatchCount}</td>
+                                    <td>{match?.matchNumber + (qualMatchCount || 0)}</td>
                                     <td className={match?.scoreRedFinal ? `scheduleTable${winnerStyle}` : ""}><span className={redStyle}>{match?.scoreRedFinal}</span><br /><span className={blueStyle}>{match?.scoreBlueFinal}</span></td>
                                     <td><span className={redStyle}>{match?.teams[0]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[3]?.teamNumber}</span></td>
                                     <td><span className={redStyle}>{match?.teams[1]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[4]?.teamNumber}</span></td>
@@ -341,13 +341,13 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                                 )
                             })}
                             {(!qualSchedule || qualSchedule?.schedule.length === 0) &&
-                            <tr>
-                                <td colSpan={7}>No Qualification match schedule available yet.</td>
-                            </tr>}
-                            {!offlinePlayoffSchedule &&
-                            <tr>
-                                <td colSpan={7}>No Playoff patch schedule available yet.</td>
-                            </tr>}
+                                <tr>
+                                    <td colSpan={7}>No Qualification match schedule available yet.</td>
+                                </tr>}
+                            {!offlinePlayoffSchedule && playoffSchedule?.schedule?.length === 0 &&
+                                <tr>
+                                    <td colSpan={7}>No Playoff match schedule available yet.</td>
+                                </tr>}
                         </tbody>
                     </Table>
                 </div>}

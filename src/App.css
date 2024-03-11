@@ -37,7 +37,7 @@ body {
 
 th,
 td {
-	padding: 10px;
+	padding: 5px;
 }
 
 .red {
@@ -199,7 +199,7 @@ td {
 .playByPlayCity {
 	font-size: medium;
 	line-height: 100%;
-	padding-top: 15px;
+	padding-top: 10px;
 	margin: 0px
 }
 
@@ -526,7 +526,7 @@ td {
 }
 
 .davidPrice {
-	font-size: 500px;
+	font-size: 400px;
 	text-align: center;
 	font-family: "alternate-gothic-no-1-d", sans-serif;
 	line-height: 85%;
@@ -581,7 +581,7 @@ td {
 }
 
 .davidPriceDetail {
-	font-size: 100px;
+	font-size: 80px;
 	text-align: center;
 	font-family: "alternate-gothic-no-1-d", sans-serif;
 	line-height: 90%
@@ -721,7 +721,7 @@ td {
 }
 
 
-@media only screen and (max-width: 820px) {
+@media only screen and (max-width: 820px) and (orientation: portrait){
 
 	/* For Portrait iPad: */
 	.wltCol {
@@ -760,7 +760,7 @@ td {
 
 }
 
-@media only screen and (max-width: 768px) {
+@media only screen and (max-width: 768px) and (orientation: portrait) {
 
 	/* For Portrait iPad mini: */
 	.wltCol {
@@ -795,5 +795,20 @@ td {
 	}
 	.playByPlayAlliance {
 		font-size: 14px;
+	}
+}
+
+@media screen and (max-width: 1180px) and (orientation: landscape) {
+	.wltCol {
+		font-size: small;
+	}
+	.playByPlayWinLossTie {
+		font-size:small;
+	}
+	.playByPlayRobotName {
+		font-size:medium;
+	}
+	.playByPlayTeamName {
+		font-size: 28px;
 	}
 }
