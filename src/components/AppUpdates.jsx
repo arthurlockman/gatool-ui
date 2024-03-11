@@ -7,6 +7,7 @@ export const appUpdates = [
             <li>Major performance improvement when changing matches</li>
             <li>Adding District EI winners to District Champs team list</li>
             <li>Fixed Tab highlighting</li>
+            <li>Layout adjustments for tablets</li>
         </ul>
     },{
         date: "March 3, 2024",
