@@ -689,10 +689,12 @@ function App() {
               // merge with teams.teams
               if (values.length > 0) {
                 values.forEach((value) => {
-                  teams.teams.push(value)
+                  teams.teams.push(value);
                 })
+                teams.teams = _.sortBy(teams.teams, ["teamNumber"]);
               }
             })
+
           }
 
 

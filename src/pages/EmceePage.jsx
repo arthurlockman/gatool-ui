@@ -23,11 +23,14 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
         { "matchNumber": 12, "red": { "class": "davidPriceWarning", "from": "Won M10" }, "blue": { "class": "davidPriceWarning", "from": "Won M9" }, "winnerTo": 13, "loserTo": null, "winnerVs": "red", "loserVs": null },
         { "matchNumber": 13, "red": { "class": "davidPriceWarning", "from": "Lost M11" }, "blue": { "class": "davidPriceWarning", "from": "Won M12" }, "winnerTo": 14, "loserTo": null, "winnerVs": "red", "loserVs": null }
     ]
-    var schedule = qualSchedule?.schedule || [];
+    var schedule = qualSchedule?.schedule?.schedule || qualSchedule?.schedule || [];
     var inPlayoffs = false;
     var playoffMatchNumber = -1;
     var scores = [];
     var matches = playoffSchedule?.schedule;
+    if (selectedEvent?.value?.type === "Championship" || selectedEvent?.value?.type === "DistrictChampionshipWithLevels") {
+        inPlayoffs=true;
+    }
 
     // returns the name of the alliance
     function allianceName(matchNumber, allianceColor) {
@@ -55,7 +58,7 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
     }
 
     if (playoffSchedule?.schedule?.length > 0) {
-        schedule = _.concat(qualSchedule?.schedule, playoffSchedule?.schedule);
+        schedule = _.concat((qualSchedule?.schedule?.schedule || qualSchedule?.schedule), playoffSchedule?.schedule);
     }
 
     var advantage = {};
@@ -63,9 +66,9 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
     advantage.blue = 0;
     var opponent = { "winner": null, "loser": null };
 
-    if (currentMatch > qualSchedule?.schedule?.length) {
+    if (currentMatch > (qualSchedule?.schedule?.schedule?.length || qualSchedule?.schedule?.length)) {
         inPlayoffs = true;
-        playoffMatchNumber = playoffSchedule?.schedule[currentMatch - qualSchedule?.schedule?.length - 1]?.matchNumber;
+        playoffMatchNumber = playoffSchedule?.schedule[currentMatch - (qualSchedule?.schedule?.schedule?.length || qualSchedule?.schedule?.length) - 1]?.matchNumber;
         if (playoffMatchNumber > 14) {
             for (var finalsMatches = 14; finalsMatches < playoffMatchNumber; finalsMatches++) {
                 if (matches[_.findIndex(matches, { "matchNumber": finalsMatches })]?.winner.winner === "red") {
