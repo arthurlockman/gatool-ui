@@ -1340,6 +1340,7 @@ function App() {
       await setDistrictRankings(null);
       await setAdHocMatch(null);
       setHaveChampsTeams(false);
+      setTeamListLoading(false);
       getTeamList();
       getSchedule(true);
       getWorldStats();
