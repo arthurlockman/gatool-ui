@@ -80,7 +80,7 @@ const monthsWarningMenu = [
 
 
 
-function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showNotesAnnounce, setShowNotesAnnounce, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, autoUpdate, setAutoUpdate, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, showQualsStatsQuals, setShowQualsStatsQuals, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee, showDistrictChampsStats, setShowDistrictChampsStats, monthsWarning, setMonthsWarning, user, adHocMode, setAdHocMode, supportedYears, reloadPage }) {
+function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showNotesAnnounce, setShowNotesAnnounce, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, autoUpdate, setAutoUpdate, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, showQualsStatsQuals, setShowQualsStatsQuals, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee, showDistrictChampsStats, setShowDistrictChampsStats, monthsWarning, setMonthsWarning, user, adHocMode, setAdHocMode, supportedYears, reloadPage, autoHideSponsors, setAutoHideSponsors }) {
     const isOnline = useOnlineStatus();
 
     const [deleteSavedModal, setDeleteSavedModal] = useState(null);
@@ -239,8 +239,12 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                         <table>
                             <tbody>
                                 <tr>
-                                    <td><Switch checked={showSponsors === null ? true : showSponsors} onChange={setShowSponsors} /></td>
+                                    <td><Switch checked={showSponsors === null ? false : showSponsors} onChange={setShowSponsors} /></td>
                                     <td><b>Show Sponsors on Announce </b></td>
+                                </tr>
+                                <tr>
+                                    <td><Switch checked={autoHideSponsors === null ? true : autoHideSponsors} onChange={setAutoHideSponsors} /></td>
+                                    <td><b>Hide Sponsors on Announce after first appearance</b></td>
                                 </tr>
                                 <tr>
                                     <td>

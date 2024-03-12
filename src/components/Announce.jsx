@@ -3,7 +3,7 @@ import _ from "lodash";
 
 const announceBackground = {"red":"#F7B3B4","blue":"#98B4F4"}
 
-function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selectedEvent, showNotesAnnounce, showAwards, showSponsors, showMottoes, showChampsStats, eventNamesCY, showDistrictChampsStats }) {
+function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selectedEvent, showNotesAnnounce, showAwards, showSponsors, autoHideSponsors, showMottoes, showChampsStats, eventNamesCY, showDistrictChampsStats }) {
     const originalAndSustaining = ["20", "45", "126", "148", "151", "157", "190", "191", "250"];
     var allianceColor = station.slice(0, -1);
     var awardsYears = team?.awards ? Object.keys(team.awards) : []
@@ -60,7 +60,7 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
             </td>
             <td className={'col7'} style={{backgroundColor:_.toLower(allianceColor)==="red"?announceBackground.red:announceBackground.blue}}>
                 <p className={"announceOrganization"}>{team?.updates?.organizationLocal ? team?.updates?.organizationLocal : team?.schoolName}</p>
-                {(showSponsors || _.isNull(showSponsors)) && <p className={"sponsors"} >{team?.updates?.topSponsorsLocal ? team?.updates?.topSponsorsLocal : team?.topSponsors}</p>}
+                {(showSponsors || ((autoHideSponsors || _.isNull(autoHideSponsors)) && !team?.rank)) && <p className={"sponsors"} >{team?.updates?.topSponsorsLocal ? team?.updates?.topSponsorsLocal : team?.topSponsors}</p>}
                 <p className={`HOF${allianceColor}`}>
                     {originalAndSustaining.includes(String(team?.teamNumber)) && <span>Original and Sustaining Team<br /></span>}
                     {team?.hallOfFame ? team?.hallOfFame.map((award) => {

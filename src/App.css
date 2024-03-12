@@ -154,7 +154,8 @@ td {
 
 .playByPlayTeamName {
 	font-size: 36px;
-	margin: 0px
+	margin: 0px;
+	line-height: 1em;
 }
 
 .playByPlayTeamNameStats {
@@ -206,7 +207,8 @@ td {
 .playByPlayAlliance {
 	font-size: 20px;
 	line-height: 100%;
-	margin-top: 5px
+	margin-top: 5px;
+	display: block;
 }
 
 .playByPlayChampsAlliance {
@@ -692,6 +694,7 @@ td {
 
 .teamNotes p {
 	margin: 0px;
+	line-height: 1em;
 }
 
 .teamNotes h1 {
@@ -718,6 +721,13 @@ td {
 
 .FlashcardArrayWrapper {
     width: 100% !important;
+}
+
+.hideLandscape {
+	display: block;
+}
+.showLandscape {
+	display: none;
 }
 
 
@@ -798,7 +808,7 @@ td {
 	}
 }
 
-@media screen and (max-width: 1180px) and (orientation: landscape) {
+@media screen and (max-width: 1194px) and (orientation: landscape) {
 	.wltCol {
 		font-size: small;
 	}
@@ -810,5 +820,11 @@ td {
 	}
 	.playByPlayTeamName {
 		font-size: 28px;
+	}
+	.hideLandscape {
+		display: none;
+	}
+	.showLandscape {
+		display: block;
 	}
 }
