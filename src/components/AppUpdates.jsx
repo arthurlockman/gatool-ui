@@ -1,6 +1,11 @@
 
 export const appUpdates = [
     {
+        date: "March 14, 2024",
+        message: <ul>
+            <li>Fixed blank Schedule page when no schedule is available</li>
+        </ul>
+    },{
         date: "March 10 & 11, 2024",
         message: <ul>
             <li>Major performance improvement when loading events</li>

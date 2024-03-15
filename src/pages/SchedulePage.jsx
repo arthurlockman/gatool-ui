@@ -106,7 +106,7 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                 })
                 // detect matches with missing teams
                 if (match["Description"]?.includes("Practice")) {
-                    for (var i = 0; i < matchKeys.length; i++) {
+                    for (var i = 0; i < matchKeys?.length; i++) {
                         if (match[matchKeys[i]] === "") {
                             errorMatches.push(match);
                             break;
@@ -116,8 +116,8 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                 return match;
             });
 
-            if (errorMatches.length > 0) {
-                errorMessage = "Your Practice Schedule has missing data from the following match" + ((errorMatches.length > 1) ? "es:" : ":") + "</br>";
+            if (errorMatches?.length > 0) {
+                errorMessage = "Your Practice Schedule has missing data from the following match" + ((errorMatches?.length > 1) ? "es:" : ":") + "</br>";
                 errorMatches.forEach((match) => {
                     errorMessage += match["Description"] + "</br>"
                 })
@@ -209,9 +209,9 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
             {!selectedEvent && <div>
                 <Alert variant="warning" >You need to select an event before you can see anything here.</Alert>
             </div>}
-            {selectedEvent && (!qualSchedule || qualSchedule?.schedule.length === 0) && (playoffSchedule?.schedule.length === 0) && <div>
+            {selectedEvent && (!qualSchedule || qualSchedule?.schedule?.length === 0 || qualSchedule?.schedule?.schedule?.length === 0) && (!playoffSchedule || playoffSchedule?.schedule?.length === 0 || playoffSchedule?.schedule?.schedule?.length === 0) && <div>
                 <Alert variant="warning" >
-                    {(!practiceSchedule || practiceSchedule?.schedule.length === 0) && !practiceFileUploaded && <>
+                    {(!practiceSchedule || practiceSchedule?.schedule?.length === 0 || practiceSchedule?.schedule?.schedule?.length === 0) && !practiceFileUploaded && <>
                         <div><img src="loadingIcon.gif" alt="Loading data..." /></div>
                         <div>Awaiting schedule for {selectedEvent.label}<br /><br /></div>
                         <Container fluid>
@@ -225,7 +225,7 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                             </Row>
                         </Container>
                     </>}
-                    {practiceSchedule?.schedule.length > 0 && <>
+                    {practiceSchedule?.schedule?.length > 0 && <>
                         <Container fluid>
                             <Row >
                                 <Col xs={2}></Col>
@@ -248,7 +248,7 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                     </>}
                 </Alert>
             </div>}
-            {selectedEvent && (practiceSchedule?.schedule.length > 0 || qualSchedule?.schedule.length > 0 || (qualSchedule?.schedule.length === 0 && playoffSchedule?.schedule.length > 0) || (qualSchedule?.schedule?.schedule.length === 0 && playoffSchedule?.schedule.length > 0)) &&
+            {selectedEvent && (practiceSchedule?.schedule?.length > 0 || qualSchedule?.schedule?.length > 0 || (qualSchedule?.schedule?.length === 0 && playoffSchedule?.schedule?.length > 0) || (qualSchedule?.schedule?.schedule?.length === 0 && playoffSchedule?.schedule?.length > 0)) &&
                 <div>
                     <h4>{selectedEvent.label}</h4>
                     <Table responsive striped bordered size="sm">
@@ -264,7 +264,7 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                             </tr>
                         </thead>
                         <tbody>
-                            {practiceSchedule && practiceSchedule?.schedule.length > 0 && practiceSchedule?.schedule.map((match) => {
+                            {practiceSchedule && practiceSchedule?.schedule?.length > 0 && practiceSchedule?.schedule.map((match) => {
                                 let redStyle = "red";
                                 let blueStyle = "blue";
                                 return (<tr key={"practiceSchedule" + match?.matchNumber} className="centerTable">
@@ -278,7 +278,7 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                                 </tr>
                                 )
                             })}
-                            {offlinePlayoffSchedule && offlinePlayoffSchedule?.schedule.length > 0 && offlinePlayoffSchedule?.schedule.map((match) => {
+                            {offlinePlayoffSchedule && offlinePlayoffSchedule?.schedule?.length > 0 && offlinePlayoffSchedule?.schedule.map((match) => {
                                 let redStyle = "red";
                                 let blueStyle = "blue";
                                 return (<tr key={"practiceSchedule" + match?.matchNumber} className="centerTable">
@@ -340,11 +340,11 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                                 </tr>
                                 )
                             })}
-                            {(!qualSchedule || qualSchedule?.schedule.length === 0) &&
+                            {(!qualSchedule || qualSchedule?.schedule?.length === 0 || qualSchedule?.schedule?.schedule?.length === 0) &&
                                 <tr>
                                     <td colSpan={7}>No Qualification match schedule available yet.</td>
                                 </tr>}
-                            {!offlinePlayoffSchedule && playoffSchedule?.schedule?.length === 0 &&
+                            {!offlinePlayoffSchedule && (playoffSchedule?.schedule?.length === 0 || playoffSchedule?.schedule?.schedule?.length === 0 )&&
                                 <tr>
                                     <td colSpan={7}>No Playoff match schedule available yet.</td>
                                 </tr>}
