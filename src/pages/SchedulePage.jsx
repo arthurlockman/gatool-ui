@@ -125,7 +125,7 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                 toast.error(errorMessage);
             } else {
                 innerSchedule = schedule.map((match) => {
-                    var matchTime = moment(match?.Time, "ddd h:mm A").format();
+                    var matchTime = moment(match?.Time, "ddd h:mm A").format() === "Invalid date" ? moment() : moment(match?.Time, "ddd h:mm A").format();
                     if (match["Red 1"]) {
                         matchNumber++;
                         var tempRow = {
@@ -217,11 +217,14 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                         <Container fluid>
                             <Row>
                                 <Col xs={2}></Col>
-                                <Col xs={1}><input type="file" id="BackupFiles" onChange={handlePracticeFiles} className={"hiddenInput"} /><img style={{ float: "left" }} width="50" src="images/excelicon.png" alt="Excel Logo" /></Col>
+                                <Col xs={1}>
+                                    <input type="file" id="BackupFiles" onChange={handlePracticeFiles} className={"hiddenInput"} /><img style={{ float: "left" }} width="50" src="images/excelicon.png" alt="Excel Logo" />
+                                </Col>
                                 <Col xs={7} className={"leftTable"} style={{ cursor: "pointer", color: "darkblue" }} onClick={clickLoadPractice}>
                                     {selectedEvent?.value?.code.includes("OFFLINE") && <b>You can upload a Qualification Match Schedule for your Offline event. You will need to ask your Scorekeeper to export a Schedule Report in Excel format, which you can upload here. We will determine the team list from the Qualification Schedule.<br />Tap here to upload a Qualification Schedule.</b>}
                                     {!selectedEvent?.value?.code.includes("OFFLINE") && <b>You can upload a Practice Schedule while you wait for the Quals Schedule to post. You will need to ask your Scorekeeper to export a Schedule Report in Excel format, which you can upload here.<br />Tap here to upload a Practice Schedule.</b>}
-                                </Col><Col xs={2}></Col>
+                                </Col>
+                                <Col xs={2}></Col>
                             </Row>
                         </Container>
                     </>}
@@ -240,6 +243,7 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                                     <Col xs={8}><b>Practice Matches</b><br />Your event has not yet posted a Qualification Match schedule. You can use this practice match schedule to help observe teams and practice for the tournament. Please do not announce matches during the Practice Match period.</Col>}
                                 {selectedEvent?.value?.code.includes("OFFLINE") &&
                                     <Col xs={3} className={"leftTable"} style={{ cursor: "pointer", color: "darkblue" }} onClick={clickLoadOfflinePlayoffs}>
+                                        <input type="file" id="LoadOfflinePlayoffs" onChange={handlePracticeFiles} className={"hiddenInput"} />
                                         <b>You can now load your Offline Playoff Schedule. You may need to do this after each phase of the playoffs.<br />Tap here to remove it and replace it, as necessary.</b>
                                     </Col>}
                                 <Col xs={2}></Col>
@@ -344,7 +348,7 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                                 <tr>
                                     <td colSpan={7}>No Qualification match schedule available yet.</td>
                                 </tr>}
-                            {!offlinePlayoffSchedule && (playoffSchedule?.schedule?.length === 0 || playoffSchedule?.schedule?.schedule?.length === 0 )&&
+                            {!offlinePlayoffSchedule && (playoffSchedule?.schedule?.length === 0 || playoffSchedule?.schedule?.schedule?.length === 0) &&
                                 <tr>
                                     <td colSpan={7}>No Playoff match schedule available yet.</td>
                                 </tr>}

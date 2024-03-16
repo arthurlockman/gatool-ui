@@ -80,10 +80,10 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
     }
 
     var schedule = [];
-    if (practiceSchedule?.schedule.length > 0 && qualSchedule?.schedule.length === 0) {
+    if (practiceSchedule?.schedule?.length > 0 && (qualSchedule?.schedule?.length === 0 || qualSchedule?.schedule?.schedule?.length === 0)) {
         schedule = practiceSchedule?.schedule;
     }
-    if (offlinePlayoffSchedule?.schedule.length > 0) {
+    if (offlinePlayoffSchedule?.schedule?.length > 0) {
         schedule = _.concat(schedule, offlinePlayoffSchedule?.schedule);
     }
 
@@ -184,7 +184,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
             {selectedEvent && teamList && (!schedule || schedule?.length === 0) && <div>
                 <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div>Awaiting schedule data for {selectedEvent.label}</Alert>
             </div>}
-            {selectedEvent && teamList?.teams.length > 0 && schedule?.length > 0 &&
+            {selectedEvent && teamList?.teams.length > 0 && (schedule?.length > 0 || practiceSchedule?.schedule.length>0)&&
                 <Container fluid {...swipeHandlers}>
                     <TopButtons previousMatch={previousMatch} nextMatch={nextMatch} currentMatch={currentMatch} matchMenu={matchMenu} setMatchFromMenu={setMatchFromMenu} selectedEvent={selectedEvent} matchDetails={matchDetails} timeFormat={timeFormat} inPlayoffs={inPlayoffs} alliances={alliances} setAlliances={setAlliances} rankings={rankings} backupTeam={backupTeam} setBackupTeam={setBackupTeam} teamList={teamList} adHocMatch={adHocMatch} setAdHocMatch={setAdHocMatch} adHocMode={adHocMode} swapScreen={swapScreen} />
                     <table className={"table table-responsive"}>

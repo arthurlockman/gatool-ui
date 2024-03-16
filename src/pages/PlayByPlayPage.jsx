@@ -79,7 +79,7 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
     }
 
     var schedule = [];
-    if (practiceSchedule?.schedule.length > 0 && qualSchedule?.schedule.length === 0) {
+    if (practiceSchedule?.schedule?.length > 0 && (qualSchedule?.schedule?.length === 0 || qualSchedule?.schedule?.schedule?.length === 0)) {
         schedule = practiceSchedule?.schedule;
     }
     if (offlinePlayoffSchedule?.schedule.length > 0) {

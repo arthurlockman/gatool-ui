@@ -746,6 +746,7 @@ function App() {
             sponsors.sponsorArray.push(sponsors.organizationArray.slice(0).shift())
           }
           sponsors.topSponsorsArray = sponsors.sponsorArray.slice(0, 5);
+          sponsors.topSponsorsArrayUnchanged = sponsors.topSponsorsArray;
           sponsors.lastSponsor = sponsors.sponsorArray.pop();
           sponsors.sponsors = sponsors.sponsorArray.join(", ");
           sponsors.sponsors += " & " + sponsors.lastSponsor;
@@ -765,6 +766,7 @@ function App() {
 
         teamRow.sponsors = sponsors.sponsors;
         teamRow.topSponsors = sponsors.topSponsors;
+        teamRow.topSponsorsArray = sponsors.topSponsorsArrayUnchanged;
         teamRow.organization = sponsors.organization;
         return teamRow;
       })
