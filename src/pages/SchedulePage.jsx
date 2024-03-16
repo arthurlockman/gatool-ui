@@ -4,7 +4,7 @@ import { utils, read } from "xlsx";
 import { toast } from "react-toastify";
 import _ from "lodash";
 
-function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSchedule, setPracticeSchedule, offlinePlayoffSchedule, setOfflinePlayoffSchedule, getTeamList, loadEvent, practiceFileUploaded, setPracticeFileUploaded }) {
+function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSchedule, setPracticeSchedule, offlinePlayoffSchedule, setOfflinePlayoffSchedule, getTeamList, loadEvent, practiceFileUploaded, setPracticeFileUploaded, setTeamListLoading }) {
 
     // This function clicks the hidden file upload button
     function clickLoadPractice() {
@@ -75,6 +75,7 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
         var files = e.target.files;
         var f = files[0];
         var reader = new FileReader();
+        setTeamListLoading(false);
         reader.onload = function (e) {
             // @ts-ignore
             var data = new Uint8Array(e.target.result);
