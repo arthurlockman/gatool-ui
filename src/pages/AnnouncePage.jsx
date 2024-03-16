@@ -95,7 +95,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
         schedule = _.concat(schedule, playoffSchedule?.schedule);
     }
 
-    var matchDetails = (!adHocMode ? schedule[currentMatch - 1] :
+    var matchDetails = (!adHocMode ? schedule[currentMatch - 1] : adHocMatch ?
         {
             description: "Practice Match",
             startTime: null,
@@ -126,7 +126,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
                 tieWinner: null,
                 level: null,
             },
-        });
+        }:null);
 
     if (practiceSchedule?.schedule.length > 0 && adHocMatch && (!qualSchedule || qualSchedule?.schedule.length === 0)) {
         matchDetails.teams = adHocMatch
@@ -151,7 +151,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
         })
     }
 
-    if (practiceSchedule?.schedule.length > 0) {
+    if (practiceSchedule?.schedule?.schedule?.length > 0 || practiceSchedule?.schedule?.length > 0) {
         if (!adHocMatch) {
             setAdHocMatch(matchDetails?.teams);
         }
