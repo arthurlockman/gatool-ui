@@ -1,6 +1,13 @@
 
 export const appUpdates = [
     {
+        date: "March 15, 2024",
+        message: <ul>
+            <li>Enabled Offline Qual Schedule upload from Schedule Tab</li>
+            <li>Enabled Offline Playoff Schedule upload from Schedule Tab</li>
+            <li>Fixed issue which prevented Team Lists from loading when selecting an event</li>
+        </ul>
+    },{
         date: "March 14, 2024",
         message: <ul>
             <li>Fixed blank Schedule page when no schedule is available</li>
