@@ -180,7 +180,7 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                 formattedSchedule.schedule = _.filter(innerSchedule, "description");
                 !forPlayoffs ? setPracticeSchedule(formattedSchedule) : setOfflinePlayoffSchedule(formattedSchedule);
                 addTeamsToTeamList(formattedSchedule);
-                toast.success(`Your have successfully loaded your ${selectedEvent?.value?.code.includes("OFFLINE") ? "Offline" : "Practice"} Schedule.`)
+                toast.success(`Your have successfully loaded your ${selectedEvent?.value?.code.includes("OFFLINE") ? "Offline" : "Practice"} Schedule. Loading team details now...`)
                 if (!selectedEvent?.value?.code.includes("OFFLINE")) {
                     setPracticeFileUploaded(true);
                 }
