@@ -1258,8 +1258,8 @@ function App() {
   */
   const nextMatch = () => {
     if (!adHocMode) {
-      if ((practiceSchedule?.schedule?.length === 0 && qualSchedule.schedule.length === 0 && playoffSchedule?.schedule?.length > 0) || ((practiceSchedule?.schedule?.length > 0) && (currentMatch < (practiceSchedule?.schedule?.length + (offlinePlayoffSchedule?.schedule?.length || 0))))) {
-        setAdHocMatch(practiceSchedule?.schedule[currentMatch].teams);
+      if ((practiceSchedule?.schedule?.length === 0 && qualSchedule?.schedule?.length === 0 && playoffSchedule?.schedule?.length > 0) || ((practiceSchedule?.schedule?.length > 0 || practiceSchedule?.schedule?.schedule?.length > 0) && (currentMatch < ((practiceSchedule?.schedule?.length || practiceSchedule?.schedule?.schedule?.length) + (offlinePlayoffSchedule?.schedule?.length || offlinePlayoffSchedule?.schedule?.schedule?.length ||0))))) {
+        setAdHocMatch(practiceSchedule?.schedule[currentMatch]?.teams || practiceSchedule?.schedule[currentMatch]?.schedule?.teams);
         setCurrentMatch(currentMatch + 1);
         if (!selectedEvent?.value?.code.includes("OFFLINE")) {
           getSchedule();
@@ -1286,7 +1286,7 @@ function App() {
     if (!adHocMode) {
       if (currentMatch > 1) {
         if (practiceSchedule?.schedule?.length > 0) {
-          setAdHocMatch(practiceSchedule?.schedule[currentMatch - 2].teams);
+          setAdHocMatch(practiceSchedule?.schedule[currentMatch - 2]?.teams || practiceSchedule?.schedule?.schedule?.teams);
         }
         setCurrentMatch(currentMatch - 1);
         if (!selectedEvent?.value?.code.includes("OFFLINE")) {
