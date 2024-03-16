@@ -1300,17 +1300,20 @@ function App() {
   /**
    * This function sets the current match from the match dropdown. It will refresh scores, ranks, and world stats as appropriate.
    * @async
-   * @function previousMatch
+   * @function setMatchFromMenu
    * @param e The menu select event which contains the selected match
    *
    */
   const setMatchFromMenu = (e) => {
     setCurrentMatch(e.value);
-    if (practiceSchedule?.schedule?.length > 0) {
+    if (practiceSchedule?.schedule?.length > 0 && !selectedEvent?.value?.name.includes("OFFLINE")) {
       setAdHocMatch(practiceSchedule?.schedule[e.value - 1].teams);
     }
-    getSchedule();
-    getWorldStats();
+    if(!selectedEvent?.value?.name.includes("OFFLINE")) {
+      getSchedule();
+      getWorldStats();
+    };
+    
   }
 
   /**
@@ -1341,6 +1344,8 @@ function App() {
       await setCurrentMatch(1);
       await setDistrictRankings(null);
       await setAdHocMatch(null);
+      setLoadingCommunityUpdates(false);
+      setTeamListLoading(false);
       setHaveChampsTeams(false);
       setTeamListLoading(false);
       getTeamList();
