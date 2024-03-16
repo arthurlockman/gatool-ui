@@ -29,7 +29,7 @@ function BottomButtons({ previousMatch, nextMatch, matchDetails, playoffSchedule
                     in {eventHighScore?.matchName}<br />
                     ({eventHighScore?.allianceMembers})</b></p></Col>}
 
-                {matchDetails?.tournamentLevel !== "Playoff" && !eventHighScore && <Col xs={"8"} lg={"6"}><h4>{matchDetails.description}</h4></Col>}
+                {matchDetails?.tournamentLevel !== "Playoff" && !eventHighScore && <Col xs={"8"} lg={"6"}><h4>{matchDetails?.description}</h4></Col>}
 
                 <Col xs={"2"} lg={"3"}>
                     {!adHocMode && <Button size="lg" variant="outline-success" className={"gatool-button buttonNoWrap"} onClick={nextMatch}><span className={"d-none d-lg-block"}>Next Match <CaretRightFill /></span><span className={"d-block d-lg-none"}><CaretRightFill /> <CaretRightFill /></span></Button>}
