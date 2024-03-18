@@ -181,7 +181,7 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                 formattedSchedule.schedule = _.filter(innerSchedule, "description");
                 !forPlayoffs ? setPracticeSchedule(formattedSchedule) : setOfflinePlayoffSchedule(formattedSchedule);
                 addTeamsToTeamList(formattedSchedule);
-                toast.success(`Your have successfully loaded your ${selectedEvent?.value?.code.includes("OFFLINE") ? "Offline" : "Practice"} Schedule. Loading team details now...`)
+                toast.success(`Your have successfully loaded your ${selectedEvent?.value?.code.includes("OFFLINE") ? "Offline" : "Practice"} Schedule.`)
                 if (!selectedEvent?.value?.code.includes("OFFLINE")) {
                     setPracticeFileUploaded(true);
                 }
@@ -229,40 +229,45 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                             </Row>
                         </Container>
                     </>}
-                    {practiceSchedule?.schedule?.length > 0 && <>
+                    {(practiceSchedule?.schedule?.length > 0 || practiceSchedule?.schedule?.schedule?.length > 0) &&
                         <Container fluid>
-                            <>
-
-                                {practiceFileUploaded &&
-                                    <Row>
-                                        <Col xs={2}></Col>
-                                        <Col xs={1}><input type="file" id="LoadOfflinePlayoffs" onChange={handlePracticeFiles} className={"hiddenInput"} /><img style={{ float: "left" }} width="50" src="images/excelicon.png" alt="Excel Logo" /></Col>
-                                        <Col xs={selectedEvent?.value?.code.includes("OFFLINE") ? 4 : 7} className={"leftTable"} style={{ cursor: "pointer", color: "darkblue" }} onClick={clickRemovePractice}>
-                                            {selectedEvent?.value?.code.includes("OFFLINE") && <b>You have uploaded an Offline Schedule.<br />Tap here to remove it. You can add a playoff schedule, when one becomes available.</b>}
-                                            {!selectedEvent?.value?.code.includes("OFFLINE") && <b>You have uploaded a Practice Schedule.<br />Tap here to remove it. Know that we will automatically remove it when we get a Qualification Matches Schedule.</b>}
-                                        </Col>
-                                        <Col xs={2}></Col>
-                                    </Row>
-                                }
-                                {!practiceFileUploaded &&
-                                    <Row>
-                                        <Col xs={2}></Col>
-                                        <Col xs={8}><b>Practice Matches</b><br />Your event has not yet posted a Qualification Match schedule. You can use this practice match schedule to help observe teams and practice for the tournament. Please do not announce matches during the Practice Match period.</Col>
-                                        <Col xs={2}></Col>
-                                    </Row>}
-                                {selectedEvent?.value?.code.includes("OFFLINE") &&
-                                    <Row>
-                                        <Col xs={1}>
-                                            <input type="file" id="LoadOfflinePlayoffs" onChange={handlePracticeFiles} className={"hiddenInput"} /><img style={{ float: "left" }} width="50" src="images/excelicon.png" alt="Excel Logo" />
-                                            </Col>
-                                        <Col xs={selectedEvent?.value?.code.includes("OFFLINE") ? 7 : 4} className={"leftTable"} style={{ cursor: "pointer", color: "darkblue" }} onClick={clickLoadOfflinePlayoffs}>
+                            {practiceFileUploaded &&
+                                <Row>
+                                    <Col xs={2}></Col>
+                                    <Col xs={1}><input type="file" id="LoadOfflinePlayoffs" onChange={handlePracticeFiles} className={"hiddenInput"} /><img style={{ float: "left" }} width="50" src="images/excelicon.png" alt="Excel Logo" /></Col>
+                                    <Col xs={selectedEvent?.value?.code.includes("OFFLINE") ? 4 : 7} className={"leftTable"} style={{ cursor: "pointer", color: "darkblue" }} onClick={clickRemovePractice}>
+                                        {selectedEvent?.value?.code.includes("OFFLINE") && <b>You have uploaded an Offline Schedule.<br />Tap here to remove it. You can add a playoff schedule, when one becomes available.</b>}
+                                        {!selectedEvent?.value?.code.includes("OFFLINE") && <b>You have uploaded a Practice Schedule.<br />Tap here to remove it. Know that we will automatically remove it when we get a Qualification Matches Schedule.</b>}
+                                    </Col>
+                                    <Col xs={2}></Col>
+                                </Row>
+                            }
+                            {!practiceFileUploaded &&
+                                <Row>
+                                    <Col xs={2}></Col>
+                                    <Col xs={8}><b>Practice Matches</b><br />Your event has not yet posted a Qualification Match schedule. You can use this practice match schedule to help observe teams and practice for the tournament. Please do not announce matches during the Practice Match period.</Col>
+                                    <Col xs={2}></Col>
+                                </Row>}
+                            {selectedEvent?.value?.code.includes("OFFLINE") &&
+                                <Row>
+                                    <Col xs={1}></Col>
+                                    <Col xs={1}>
+                                        <input type="file" id="LoadOfflineQuals" onChange={handlePracticeFiles} className={"hiddenInput"} /><img style={{ float: "left" }} width="50" src="images/excelicon.png" alt="Excel Logo" />
+                                    </Col>
+                                    <Col xs={3} className={"leftTable"} style={{ cursor: "pointer", color: "darkblue" }} onClick={clickRemovePractice}>
+                                        {selectedEvent?.value?.code.includes("OFFLINE") && <b>You have uploaded an Offline Schedule.<br />Tap here to remove it. You can add a playoff schedule, when one becomes available.</b>}
+                                    </Col>
+                                    <Col xs={2}></Col>
+                                    <Col xs={1}>
+                                        <input type="file" id="LoadOfflinePlayoffs" onChange={handlePracticeFiles} className={"hiddenInput"} /><img style={{ float: "left" }} width="50" src="images/excelicon.png" alt="Excel Logo" />
+                                    </Col>
+                                    <Col xs={3} className={"leftTable"} style={{ cursor: "pointer", color: "darkblue" }} onClick={clickLoadOfflinePlayoffs}>
                                         <b>You can now load your Offline Playoff Schedule. You may need to do this after each phase of the playoffs.<br />Tap here to remove it and replace it, as necessary.</b>
-                                        </Col>
-                                        <Col xs={2}></Col>
-                                    </Row>}
-                            </>
+                                    </Col>
+                                    <Col xs={1}></Col>
+                                </Row>}
                         </Container>
-                    </>}
+                    }
                 </Alert>
             </div>}
             {selectedEvent && (practiceSchedule?.schedule?.length > 0 || qualSchedule?.schedule?.length > 0 || (qualSchedule?.schedule?.length === 0 && playoffSchedule?.schedule?.length > 0) || (qualSchedule?.schedule?.schedule?.length === 0 && playoffSchedule?.schedule?.length > 0)) &&
