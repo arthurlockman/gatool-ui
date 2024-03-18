@@ -204,7 +204,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
                                     if (station.slice(-1) !== "4") {
                                         var allianceColor = _.toLower(station.slice(0, -1));
                                         return (<tr className={`gatool-announce ${allianceColor}Alliance`}>
-                                            <td colSpan={4} className={"tbd"}>{adHocMode ? "Please choose a team" : "TBD"}</td>
+                                            <td colSpan={4} className={"tbd"}>{adHocMode ? "No team selected" : "TBD"}</td>
                                         </tr>);
                                     } else {
                                         return "";

@@ -6,6 +6,7 @@ export const appUpdates = [
             <li>Test match fixes</li>
             <li>System wide notifications in Settings page</li>
             <li>Restored all controls for OFFLINE match schedule loading/unloading</li>
+            <li>Better controls for managing overlapping team list loads</li>
         </ul>
     },{
         date: "March 15, 2024",

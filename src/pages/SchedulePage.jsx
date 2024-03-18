@@ -4,7 +4,7 @@ import { utils, read } from "xlsx";
 import { toast } from "react-toastify";
 import _ from "lodash";
 
-function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSchedule, setPracticeSchedule, offlinePlayoffSchedule, setOfflinePlayoffSchedule, getTeamList, loadEvent, practiceFileUploaded, setPracticeFileUploaded, setTeamListLoading }) {
+function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSchedule, setPracticeSchedule, offlinePlayoffSchedule, setOfflinePlayoffSchedule, getTeamList, loadEvent, practiceFileUploaded, setPracticeFileUploaded, setTeamListLoading, getAlliances }) {
 
     // This function clicks the hidden file upload button
     function clickLoadPractice() {
@@ -76,6 +76,11 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
         var f = files[0];
         var reader = new FileReader();
         setTeamListLoading(false);
+        var alliancesTemp = {
+            "Alliances": [],
+            "count": 8
+        }
+
         reader.onload = function (e) {
             // @ts-ignore
             var data = new Uint8Array(e.target.result);
@@ -131,7 +136,7 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                         matchNumber++;
                         var tempRow = {
                             "description": match?.Description,
-                            "tournamentLevel": "Practice",
+                            "tournamentLevel": forPlayoffs ? "Playoff" : "Practice",
                             "matchNumber": matchNumber,
                             "startTime": matchTime,
                             "actualStartTime": null,
@@ -177,6 +182,85 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                     }
                     return (tempRow);
                 })
+
+                if (forPlayoffs) {
+                    
+                        alliancesTemp.Alliances = [{
+                            "number": 1,
+                            "captain": innerSchedule[0].teams[0].teamNumber,
+                            "round1": innerSchedule[0].teams[1].teamNumber,
+                            "round2": innerSchedule[0].teams[2].teamNumber,
+                            "round3": null,
+                            "backup": null,
+                            "backupReplaced": null,
+                            "name": `Alliance 1`
+                        },{
+                            "number": 8,
+                            "captain": innerSchedule[0].teams[3].teamNumber,
+                            "round1": innerSchedule[0].teams[4].teamNumber,
+                            "round2": innerSchedule[0].teams[5].teamNumber,
+                            "round3": null,
+                            "backup": null,
+                            "backupReplaced": null,
+                            "name": `Alliance 8`
+                        },{
+                            "number": 4,
+                            "captain": innerSchedule[1].teams[0].teamNumber,
+                            "round1": innerSchedule[1].teams[1].teamNumber,
+                            "round2": innerSchedule[1].teams[2].teamNumber,
+                            "round3": null,
+                            "backup": null,
+                            "backupReplaced": null,
+                            "name": `Alliance 4`
+                        },{
+                            "number": 5,
+                            "captain": innerSchedule[1].teams[3].teamNumber,
+                            "round1": innerSchedule[1].teams[4].teamNumber,
+                            "round2": innerSchedule[1].teams[5].teamNumber,
+                            "round3": null,
+                            "backup": null,
+                            "backupReplaced": null,
+                            "name": `Alliance 5`
+                        },{
+                            "number": 2,
+                            "captain": innerSchedule[2].teams[0].teamNumber,
+                            "round1": innerSchedule[2].teams[1].teamNumber,
+                            "round2": innerSchedule[2].teams[2].teamNumber,
+                            "round3": null,
+                            "backup": null,
+                            "backupReplaced": null,
+                            "name": `Alliance 2`
+                        },{
+                            "number": 7,
+                            "captain": innerSchedule[2].teams[3].teamNumber,
+                            "round1": innerSchedule[2].teams[4].teamNumber,
+                            "round2": innerSchedule[2].teams[5].teamNumber,
+                            "round3": null,
+                            "backup": null,
+                            "backupReplaced": null,
+                            "name": `Alliance 7`
+                        },{
+                            "number": 3,
+                            "captain": innerSchedule[3].teams[0].teamNumber,
+                            "round1": innerSchedule[3].teams[1].teamNumber,
+                            "round2": innerSchedule[3].teams[2].teamNumber,
+                            "round3": null,
+                            "backup": null,
+                            "backupReplaced": null,
+                            "name": `Alliance 3`
+                        },{
+                            "number": 6,
+                            "captain": innerSchedule[3].teams[3].teamNumber,
+                            "round1": innerSchedule[3].teams[4].teamNumber,
+                            "round2": innerSchedule[3].teams[5].teamNumber,
+                            "round3": null,
+                            "backup": null,
+                            "backupReplaced": null,
+                            "name": `Alliance 6`
+                        }
+                    ]
+                    getAlliances(alliancesTemp);
+                }
 
                 formattedSchedule.schedule = _.filter(innerSchedule, "description");
                 !forPlayoffs ? setPracticeSchedule(formattedSchedule) : setOfflinePlayoffSchedule(formattedSchedule);
