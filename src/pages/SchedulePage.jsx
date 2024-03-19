@@ -12,10 +12,10 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
     }
 
     // This function removes the Practice Schedule
-    function clickRemovePractice() {
-        setPracticeSchedule(null);
-        setPracticeFileUploaded(false);
-        setOfflinePlayoffSchedule(null);
+    const clickRemovePractice = async () => {
+        await setPracticeSchedule(null);
+        await setPracticeFileUploaded(false);
+        await setOfflinePlayoffSchedule(null);
         loadEvent();
     }
 
@@ -318,7 +318,7 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                             {practiceFileUploaded &&
                                 <Row>
                                     <Col xs={2}></Col>
-                                    <Col xs={1}><input type="file" id="LoadOfflinePlayoffs" onChange={handlePracticeFiles} className={"hiddenInput"} /><img style={{ float: "left" }} width="50" src="images/excelicon.png" alt="Excel Logo" /></Col>
+                                    <Col xs={1}><input type="file" id="RemoveOfflinePractive" onChange={handlePracticeFiles} className={"hiddenInput"} /><img style={{ float: "left" }} width="50" src="images/excelicon.png" alt="Excel Logo" /></Col>
                                     <Col xs={selectedEvent?.value?.code.includes("OFFLINE") ? 4 : 7} className={"leftTable"} style={{ cursor: "pointer", color: "darkblue" }} onClick={clickRemovePractice}>
                                         {selectedEvent?.value?.code.includes("OFFLINE") && <b>You have uploaded an Offline Schedule.<br />Tap here to remove it. You can add a playoff schedule, when one becomes available.</b>}
                                         {!selectedEvent?.value?.code.includes("OFFLINE") && <b>You have uploaded a Practice Schedule.<br />Tap here to remove it. Know that we will automatically remove it when we get a Qualification Matches Schedule.</b>}
@@ -326,7 +326,7 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                                     <Col xs={2}></Col>
                                 </Row>
                             }
-                            {!practiceFileUploaded &&
+                            {!practiceFileUploaded && !selectedEvent?.value?.code.includes("OFFLINE") &&
                                 <Row>
                                     <Col xs={2}></Col>
                                     <Col xs={8}><b>Practice Matches</b><br />Your event has not yet posted a Qualification Match schedule. You can use this practice match schedule to help observe teams and practice for the tournament. Please do not announce matches during the Practice Match period.</Col>

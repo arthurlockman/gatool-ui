@@ -1,10 +1,15 @@
 
 export const appUpdates = [
     {
+        date: "March 19, 2024",
+        message: <ul>
+            <li>Practice Match upload fix</li>
+            <li>Patched bug that prevented community updates from loading</li>
+        </ul>
+    },{
         date: "March 18, 2024",
         message: <ul>
             <li>Test match fixes</li>
-            <li>System wide notifications in Settings page</li>
             <li>Restored all controls for OFFLINE match schedule loading/unloading</li>
             <li>Better controls for managing overlapping team list loads</li>
         </ul>
