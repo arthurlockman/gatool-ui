@@ -400,7 +400,7 @@ function App() {
       delete practiceschedule.schedule.Schedule;
     }
 
-    if (practiceschedule?.schedule?.length>0 && practiceFileUploaded) {
+    if (practiceschedule?.schedule?.length > 0 && practiceFileUploaded) {
       setPracticeFileUploaded(false);
       practiceschedule.lastUpdate = moment();
       setPracticeSchedule(practiceschedule);
@@ -637,8 +637,8 @@ function App() {
           });
 
           await Promise.all(adHocTeams).then(function (values) {
-            //do something with the team list
-            // console.log(values);
+            // set the team list from the team list.
+            console.log(`Fetching community updates for ${selectedEvent?.value?.name} from getTeamList`);
             teams.teams = values;
             getCommunityUpdates(false, values);
           });
@@ -1008,7 +1008,10 @@ function App() {
           var adHocTeams = adHocTeamList.map(async team => {
             var request = await httpClient.get(`/team/${team?.teamNumber}/updates`);
             var teamDetails = { "teamNumber": team?.teamNumber };
-            var teamUpdate = await request.json();
+            var teamUpdate = _.cloneDeep(communityUpdateTemplate);
+            if (request.status === 200) {
+              teamUpdate = await request?.json();
+            }
             teamDetails.updates = teamUpdate;
             teamDetails.teamNumber = team?.teamNumber
             return teamDetails;
@@ -1204,8 +1207,8 @@ function App() {
       alliances = training.alliances.partial;
     } else if (selectedEvent?.value?.code === "PRACTICE4") {
       alliances = training.alliances.final;
-    } 
-    
+    }
+
     if (typeof alliances.Alliances !== "undefined") {
       alliances.alliances = alliances.Alliances;
       delete alliances.Alliances;
