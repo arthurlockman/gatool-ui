@@ -117,7 +117,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
             }
         })
     }
-
+    availableTeams=_.orderBy(availableTeams,["label"],"asc");
     const inPractice = matchDetails?.description.toLowerCase().includes("practice");
     const addBackupButton = inPlayoffs && selectedEvent?.value?.champLevel !== "CHAMPS" && selectedEvent?.value?.champLevel !== "CMPDIV" && selectedEvent?.value?.champLevel !== "CMPSUB";
 
