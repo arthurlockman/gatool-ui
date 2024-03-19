@@ -1,6 +1,14 @@
 
 export const appUpdates = [
     {
+        date: "March 18, 2024",
+        message: <ul>
+            <li>Test match fixes</li>
+            <li>System wide notifications in Settings page</li>
+            <li>Restored all controls for OFFLINE match schedule loading/unloading</li>
+            <li>Better controls for managing overlapping team list loads</li>
+        </ul>
+    },{
         date: "March 15, 2024",
         message: <ul>
             <li>Enabled Offline Qual Schedule upload from Schedule Tab</li>

@@ -96,7 +96,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
                 { teamNumber: null, station: 'Blue1', surrogate: false, dq: false },
                 { teamNumber: null, station: 'Blue2', surrogate: false, dq: false },
                 { teamNumber: null, station: 'Blue3', surrogate: false, dq: false }
-              ]
+            ]
         }
         adHocMatchNew[_.findIndex(adHocMatchNew, { "station": station })].teamNumber = teamNumber;
         setAdHocMatch(adHocMatchNew);
@@ -104,9 +104,20 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
 
     var allianceMembers = alliances?.Lookup ? Object.keys(alliances?.Lookup) : null;
     var availableTeams = [];
-    rankings?.ranks.forEach((team) => {
-        if (_.indexOf(allianceMembers, String(team.teamNumber)) < 0) { availableTeams.push({ "label": team.teamNumber, "value": team }) }
-    })
+    if (selectedEvent?.value?.name.includes("OFFLINE")) {
+        teamList?.teams.forEach((team) => {
+            if (_.indexOf(allianceMembers, String(team.teamNumber)) < 0) {
+                availableTeams.push({ "label": team.teamNumber, "value": team })
+            }
+        })
+    } else {
+        rankings?.ranks.forEach((team) => {
+            if (_.indexOf(allianceMembers, String(team.teamNumber)) < 0) {
+                availableTeams.push({ "label": team.teamNumber, "value": team })
+            }
+        })
+    }
+    availableTeams=_.orderBy(availableTeams,["label"],"asc");
     const inPractice = matchDetails?.description.toLowerCase().includes("practice");
     const addBackupButton = inPlayoffs && selectedEvent?.value?.champLevel !== "CHAMPS" && selectedEvent?.value?.champLevel !== "CMPDIV" && selectedEvent?.value?.champLevel !== "CMPSUB";
 
@@ -143,7 +154,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
                 {addBackupButton && <Col className="promoteBackup" xs={1} onClick={handleShow}>+<ArrowUpSquareFill />+<br />backup</Col>}
                 {(adHocMode || inPractice) && <Col className="promoteBackup" xs={1} onClick={handleAdHoc}>Change<br />Teams</Col>}
                 <Col xs={"2"} lg={"3"}>
-                    {!adHocMode && <Button size="lg" variant="outline-success" className={"gatool-button buttonNoWrap"} onClick={nextMatch}>{inPractice ? <span><CaretRightFill /> <CaretRightFill /></span> :<><span className={"d-none d-lg-block"}>Next Match <CaretRightFill /></span><span className={"d-block d-lg-none"}><CaretRightFill /> <CaretRightFill /></span></>}</Button>}
+                    {!adHocMode && <Button size="lg" variant="outline-success" className={"gatool-button buttonNoWrap"} onClick={nextMatch}>{inPractice ? <span><CaretRightFill /> <CaretRightFill /></span> : <><span className={"d-none d-lg-block"}>Next Match <CaretRightFill /></span><span className={"d-block d-lg-none"}><CaretRightFill /> <CaretRightFill /></span></>}</Button>}
                 </Col>
                 <Modal centered={true} show={show} onHide={handleClose}>
                     <Modal.Header className={"promoteBackup"} closeButton closeVariant="white">
@@ -154,9 +165,9 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
                             {!teamSelected && <><Row>
                                 <Col>Select a team to replace:</Col></Row>
                                 <Row>
-                                    {matchDetails?.teams.map((team) => {
+                                    {matchDetails?.teams.map((team, index) => {
                                         var allianceColor = team?.station.slice(0, team.station?.length - 1);
-                                        return (<div className={`btn ${allianceColor}Replace`} key={`Replace${team.teamNumber}`} onClick={() => { teamToReplace(team) }}>{team.teamNumber}</div>)
+                                        return (<div className={`btn ${allianceColor}Replace`} key={`Replace${team?.teamNumber || index}`} onClick={() => { teamToReplace(team) }}>{team?.teamNumber}</div>)
                                     })}
                                 </Row></>}
 
