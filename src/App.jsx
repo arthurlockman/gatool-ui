@@ -399,7 +399,9 @@ function App() {
       practiceschedule.schedule.schedule = practiceschedule?.schedule?.Schedule;
       delete practiceschedule.schedule.Schedule;
     }
-    if (practiceSchedule?.schedule) {
+
+    if (practiceschedule?.schedule?.length>0 && practiceFileUploaded) {
+      setPracticeFileUploaded(false);
       practiceschedule.lastUpdate = moment();
       setPracticeSchedule(practiceschedule);
     }
@@ -1326,11 +1328,13 @@ function App() {
     if (httpClient && selectedEvent?.value?.name && selectedYear?.value) {
       console.log(`Conditions match to load ${selectedEvent?.value?.name}...`)
       await setPracticeSchedule(null);
+      setPracticeFileUploaded(false);
       await setQualSchedule(null);
       await setPlayoffSchedule(null);
       await setOfflinePlayoffSchedule(null);
       await setTeamList(null);
       await setCommunityUpdates(null);
+      setLoadingCommunityUpdates(false);
       await setRobotImages(null);
       await setRankings(null);
       await setEventHighScores(null);
@@ -1351,7 +1355,6 @@ function App() {
         { teamNumber: null, station: 'Blue2', surrogate: false, dq: false },
         { teamNumber: null, station: 'Blue3', surrogate: false, dq: false }
       ]);
-      setLoadingCommunityUpdates(false);
       setTeamListLoading("");
       setHaveChampsTeams(false);
       getTeamList();

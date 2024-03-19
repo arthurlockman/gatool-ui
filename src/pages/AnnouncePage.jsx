@@ -20,10 +20,14 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
 
         if (station.slice(-1) !== "4") {
             team = matchDetails?.teams[_.findIndex(matchDetails?.teams, { "station": station })];
-            team = _.merge(team,
+            team = communityUpdates ? _.merge(team,
                 teamList?.teams[_.findIndex(teamList?.teams, { "teamNumber": team?.teamNumber })],
                 rankings?.ranks[_.findIndex(rankings?.ranks, { "teamNumber": team?.teamNumber })],
                 communityUpdates[_.findIndex(communityUpdates, { "teamNumber": team?.teamNumber })]
+            ) : 
+            _.merge(team,
+                teamList?.teams[_.findIndex(teamList?.teams, { "teamNumber": team?.teamNumber })],
+                rankings?.ranks[_.findIndex(rankings?.ranks, { "teamNumber": team?.teamNumber })]
             );
             team.rankStyle = rankHighlight(team?.rank, allianceCount || { "count": 8 });
             team.alliance = alliances?.Lookup[`${team?.teamNumber}`]?.alliance || null;
@@ -144,7 +148,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
 
     var displayOrder = ["Red1", "Red2", "Red3", "Red4", "Blue1", "Blue2", "Blue3", "Blue4"];
     var teamDetails = [];
-    if (teamList && matchDetails && communityUpdates) {
+    if (teamList && matchDetails) {
         //fill in the team details
         displayOrder.forEach((station) => {
             teamDetails[station] = updateTeamDetails(station, matchDetails)
@@ -197,9 +201,9 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
                             </tr>
                         </thead>
                         <tbody>
-                            {displayOrder.map((station) => {
+                            {displayOrder.map((station,index) => {
                                 if (!_.isEmpty(teamDetails[station]) && !_.isUndefined(teamDetails[station].teamNumber) && !_.isNull(teamDetails[station].teamNumber) && teamDetails[station].teamNumber > 0) {
-                                    return <Announce station={station} team={teamDetails[station]} inPlayoffs={inPlayoffs} key={station} awardsMenu={awardsMenu} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotesAnnounce={showNotesAnnounce} autoHideSponsors={autoHideSponsors} showAwards={showAwards} showSponsors={showSponsors} showMottoes={showMottoes} showChampsStats={showChampsStats} eventNamesCY={eventNamesCY} showDistrictChampsStats={showDistrictChampsStats} />
+                                    return <Announce station={station} team={teamDetails[station]} inPlayoffs={inPlayoffs} key={`${station}${index}`} awardsMenu={awardsMenu} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotesAnnounce={showNotesAnnounce} autoHideSponsors={autoHideSponsors} showAwards={showAwards} showSponsors={showSponsors} showMottoes={showMottoes} showChampsStats={showChampsStats} eventNamesCY={eventNamesCY} showDistrictChampsStats={showDistrictChampsStats} />
                                 } else {
                                     if (station.slice(-1) !== "4") {
                                         var allianceColor = _.toLower(station.slice(0, -1));
