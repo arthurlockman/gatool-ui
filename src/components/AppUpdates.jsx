@@ -1,6 +1,12 @@
 
 export const appUpdates = [
     {
+        date: "March 21, 2024",
+        message: <ul>
+            <li>Hotfix for Team Excel downloads</li>
+            <li>Added OFFLINE Playoff advancement via Playoff Tab</li>
+        </ul>
+    },{
         date: "March 19, 2024",
         message: <ul>
             <li>Practice Match upload fix</li>

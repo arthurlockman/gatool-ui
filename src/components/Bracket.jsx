@@ -20,7 +20,7 @@ function Bracket({ selectedEvent, playoffSchedule, offlinePlayoffSchedule, setOf
 	const semibold = "600";
 	//const normal = "400";
 
-	var matches = offlinePlayoffSchedule?.schedule || playoffSchedule?.schedule;
+	var matches = offlinePlayoffSchedule?.schedule || playoffSchedule?.schedule?.schedule || playoffSchedule?.schedule;
 
 	var overtimeOffset = 0;
 	var tournamentWinner = {
@@ -46,7 +46,10 @@ function Bracket({ selectedEvent, playoffSchedule, offlinePlayoffSchedule, setOf
 		{ "matchNumber": 13, "description": "Match 13 (R5) (#13)", "winnerTo": { "matchNumber": 14, "station": "blue" }, "loserTo": null, },
 		{ "matchNumber": 14, "description": "Final 1 (#14)", "winnerTo": { "matchNumber": 15, "station": "blue" }, "loserTo": { "matchNumber": 15, "station": "red" }, },
 		{ "matchNumber": 15, "description": "Final 2 (#15)", "winnerTo": { "matchNumber": 16, "station": "blue" }, "loserTo": { "matchNumber": 16, "station": "red" }, },
-		{ "matchNumber": 16, "description": "Final 3 (#16)", "winnerTo": { "matchNumber": 16, "station": "blue" }, "loserTo": { "matchNumber": 16, "station": "red" }, }
+		{ "matchNumber": 16, "description": "Final 3 (#16)", "winnerTo": { "matchNumber": 17, "station": "blue" }, "loserTo": { "matchNumber": 17, "station": "red" }, },
+		{ "matchNumber": 17, "description": "Overtime 1 (#17)", "winnerTo": { "matchNumber": 18, "station": "blue" }, "loserTo": { "matchNumber": 18, "station": "red" }, },
+		{ "matchNumber": 18, "description": "Overtime 2 (#18)", "winnerTo": { "matchNumber": 19, "station": "blue" }, "loserTo": { "matchNumber": 19, "station": "red" }, },
+		{ "matchNumber": 19, "description": "Overtime 3 (#19)", "winnerTo": { "matchNumber": null, "station": null }, "loserTo": { "matchNumber": null, "station": null }, }
 	]
 
 	//returns the three members of an alliance based on the match data.
@@ -154,8 +157,11 @@ function Bracket({ selectedEvent, playoffSchedule, offlinePlayoffSchedule, setOf
 	const setMatchWinner = (matchNumber) => {
 		if (offlinePlayoffSchedule?.schedule) {
 			console.log(matches[matchNumber - 1] || "no teams yet");
-			console.log(!matches[matchNumber - 1]?.teams[5]?.teamNumber ? "no blue team yet":"select team");
+			console.log(!matches[matchNumber - 1]?.teams[5]?.teamNumber ? "no blue team yet" : "select team");
 			if (matches[matchNumber - 1]?.teams[5]?.teamNumber) {
+				if (matches.length > 14) {
+					matchNumber = matches.length;
+				}
 				setWinnerMatch(matchNumber);
 				setShowSelectWinner(true);
 			}
@@ -171,22 +177,26 @@ function Bracket({ selectedEvent, playoffSchedule, offlinePlayoffSchedule, setOf
 		if (winningAlliance === "blue") {
 			tempMatches.schedule[winnerMatch - 1].scoreBlueFinal = 20;
 			tempMatches.schedule[winnerMatch - 1].scoreRedFinal = 10;
-		} else {
+		} else if (winningAlliance === "red") {
 			tempMatches.schedule[winnerMatch - 1].scoreBlueFinal = 10;
 			tempMatches.schedule[winnerMatch - 1].scoreRedFinal = 20;
+		} else {
+			tempMatches.schedule[winnerMatch - 1].scoreBlueFinal = 10;
+			tempMatches.schedule[winnerMatch - 1].scoreRedFinal = 10;
 		}
+
 		tempTeams.red = [tempMatches.schedule[winnerMatch - 1].teams[0].teamNumber, tempMatches.schedule[winnerMatch - 1].teams[1].teamNumber, tempMatches.schedule[winnerMatch - 1].teams[2].teamNumber];
 		tempTeams.blue = [tempMatches.schedule[winnerMatch - 1].teams[3].teamNumber, tempMatches.schedule[winnerMatch - 1].teams[4].teamNumber, tempMatches.schedule[winnerMatch - 1].teams[5].teamNumber];
 
 		tempMatches.schedule[winnerMatch - 1].actualStartTime = moment().format();
 		tempMatches.schedule[winnerMatch - 1].winner.winner = winningAlliance;
-		var winnerTo = _.find(matchClasses, { "matchNumber": winnerMatch }).winnerTo.matchNumber;
+		var winnerTo = _.find(matchClasses, { "matchNumber": winnerMatch }).winnerTo?.matchNumber;
 		var loserTo = _.find(matchClasses, { "matchNumber": winnerMatch }).loserTo?.matchNumber;
 		var winnerStation = _.startCase(_.find(matchClasses, { "matchNumber": winnerMatch }).winnerTo.station);
 		var loserStation = loserTo ? _.startCase(_.find(matchClasses, { "matchNumber": winnerMatch }).loserTo.station) : null;
-		if (typeof tempMatches.schedule[winnerTo - 1] === "undefined") {
+		if (typeof tempMatches.schedule[winnerTo - 1] === "undefined" && winnerTo) {
 			tempMatches.schedule[winnerTo - 1] = {
-				"description": _.find(matchClasses, { "matchNumber": winnerTo }).description,
+				"description": _.find(matchClasses, { "matchNumber": winnerTo })?.description,
 				"tournamentLevel": "Playoff",
 				"matchNumber": winnerTo,
 				"startTime": null,
@@ -280,14 +290,27 @@ function Bracket({ selectedEvent, playoffSchedule, offlinePlayoffSchedule, setOf
 				"winner": { "winner": "", "tieWinner": "", "level": 0 }
 			};
 		}
+		if (winningAlliance !== "tie") {
+			if (winnerTo) {
+				tempMatches.schedule[winnerTo - 1].teams[_.findIndex(tempMatches.schedule[winnerTo - 1].teams, { "station": `${winnerStation}1` })].teamNumber = tempTeams[winningAlliance][0];
+				tempMatches.schedule[winnerTo - 1].teams[_.findIndex(tempMatches.schedule[winnerTo - 1].teams, { "station": `${winnerStation}2` })].teamNumber = tempTeams[winningAlliance][1];
+				tempMatches.schedule[winnerTo - 1].teams[_.findIndex(tempMatches.schedule[winnerTo - 1].teams, { "station": `${winnerStation}3` })].teamNumber = tempTeams[winningAlliance][2];
+			}
 
-		tempMatches.schedule[winnerTo - 1].teams[_.findIndex(tempMatches.schedule[winnerTo - 1].teams, { "station": `${winnerStation}1` })].teamNumber = tempTeams[winningAlliance][0];
-		tempMatches.schedule[winnerTo - 1].teams[_.findIndex(tempMatches.schedule[winnerTo - 1].teams, { "station": `${winnerStation}2` })].teamNumber = tempTeams[winningAlliance][1];
-		tempMatches.schedule[winnerTo - 1].teams[_.findIndex(tempMatches.schedule[winnerTo - 1].teams, { "station": `${winnerStation}3` })].teamNumber = tempTeams[winningAlliance][2];
-		if (loserTo) {
-			tempMatches.schedule[loserTo - 1].teams[_.findIndex(tempMatches.schedule[loserTo - 1].teams, { "station": `${loserStation}1` })].teamNumber = tempTeams[losingAlliance][0];
-			tempMatches.schedule[loserTo - 1].teams[_.findIndex(tempMatches.schedule[loserTo - 1].teams, { "station": `${loserStation}2` })].teamNumber = tempTeams[losingAlliance][1];
-			tempMatches.schedule[loserTo - 1].teams[_.findIndex(tempMatches.schedule[loserTo - 1].teams, { "station": `${loserStation}3` })].teamNumber = tempTeams[losingAlliance][2];
+			if (loserTo) {
+				tempMatches.schedule[loserTo - 1].teams[_.findIndex(tempMatches.schedule[loserTo - 1].teams, { "station": `${loserStation}1` })].teamNumber = tempTeams[losingAlliance][0];
+				tempMatches.schedule[loserTo - 1].teams[_.findIndex(tempMatches.schedule[loserTo - 1].teams, { "station": `${loserStation}2` })].teamNumber = tempTeams[losingAlliance][1];
+				tempMatches.schedule[loserTo - 1].teams[_.findIndex(tempMatches.schedule[loserTo - 1].teams, { "station": `${loserStation}3` })].teamNumber = tempTeams[losingAlliance][2];
+			}
+		} else {
+			if (winnerTo) {
+				tempMatches.schedule[winnerTo - 1].teams[_.findIndex(tempMatches.schedule[winnerTo - 1].teams, { "station": `Red1` })].teamNumber = tempTeams["red"][0];
+				tempMatches.schedule[winnerTo - 1].teams[_.findIndex(tempMatches.schedule[winnerTo - 1].teams, { "station": `Red2` })].teamNumber = tempTeams["red"][1];
+				tempMatches.schedule[winnerTo - 1].teams[_.findIndex(tempMatches.schedule[winnerTo - 1].teams, { "station": `Red3` })].teamNumber = tempTeams["red"][2];
+				tempMatches.schedule[loserTo - 1].teams[_.findIndex(tempMatches.schedule[loserTo - 1].teams, { "station": `Blue1` })].teamNumber = tempTeams["blue"][0];
+				tempMatches.schedule[loserTo - 1].teams[_.findIndex(tempMatches.schedule[loserTo - 1].teams, { "station": `Blue2` })].teamNumber = tempTeams["blue"][1];
+				tempMatches.schedule[loserTo - 1].teams[_.findIndex(tempMatches.schedule[loserTo - 1].teams, { "station": `Blue3` })].teamNumber = tempTeams["blue"][2];
+			}
 		}
 
 		await setOfflinePlayoffSchedule(tempMatches);
@@ -343,7 +366,7 @@ function Bracket({ selectedEvent, playoffSchedule, offlinePlayoffSchedule, setOf
 						<text transform="matrix(1 0 0 1 1106.0776 84.2646)" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="16px">FINALS</text>
 						<text id="playoffBracket" transform="matrix(1 0 0 1 620 47.6909)" dominantBaseline="middle" textAnchor="middle" fontFamily={selectedEvent?.label.length > 50 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={black} fontStyle={"normal"} fontSize="38px">{selectedEvent?.label}</text>
 					</g>
-					<g id="finals">
+					<g id="finals" onClick={() => { setMatchWinner(14) }}>
 						<g id="finalsContainer">
 							<path id="finalsBackground" fill="#C1C1C1" stroke="#000000" strokeWidth="2" strokeMiterlimit="10" d="M1254.5,511.6H1024c-5.5,0-10-4.5-10-10V343.4c0-5.5,4.5-10,10-10h230.5
 		c5.5,0,10,4.5,10,10v158.1C1264.5,507.1,1260,511.6,1254.5,511.6z"/>
@@ -748,14 +771,21 @@ function Bracket({ selectedEvent, playoffSchedule, offlinePlayoffSchedule, setOf
 			</>}
 			<Modal centered={true} show={showSelectWinner} size="lg" onHide={handleClose}>
 				<Modal.Header className={"allianceAccept"} closeVariant={"white"} closeButton>
-					<Modal.Title ><b>Select a winner for {matches[winnerMatch-1]?.description}</b></Modal.Title>
+					<Modal.Title ><b>Select a winner for {matches[winnerMatch - 1]?.description}</b></Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
 					<Container fluid>
 						<Row>
-							<Col style={{backgroundColor:"red",color:"white",fontWeight:"bold",fontSize:"40px",textAlign:"center",padding:"50px 0"}} xs={5} onClick={() => { handleChooseWinner("red") }} variant="danger">{allianceName(winnerMatch, "red")}</Col>
-							<Col xs={2}></Col>
-							<Col style={{backgroundColor:"blue",color:"white",fontWeight:"bold",fontSize:"40px",textAlign:"center",padding:"50px 0"}} xs={5} onClick={() => { handleChooseWinner("blue") }}>{allianceName(winnerMatch, "blue")}</Col>
+							<Col style={{ backgroundColor: "red", color: "white", fontWeight: "bold", fontSize: "40px", textAlign: "center", padding: "50px 0" }} xs={offlinePlayoffSchedule?.schedule?.length <= 14 && winnerMatch < 14 ? 5 : 4} onClick={() => { handleChooseWinner("red") }} variant="danger">{allianceName(winnerMatch, "red")}</Col>
+							{offlinePlayoffSchedule?.schedule?.length <= 14 && winnerMatch < 14 ?
+								<Col xs={2}></Col> :
+								<>
+									<Col xs={1}></Col>
+									<Col style={{ backgroundColor: "green", color: "white", fontWeight: "bold", fontSize: "40px", textAlign: "center", padding: "50px 0" }} xs={2} onClick={() => { handleChooseWinner("tie") }}>It's a Tie!</Col>
+									<Col xs={1}></Col>
+								</>
+							}
+							<Col style={{ backgroundColor: "blue", color: "white", fontWeight: "bold", fontSize: "40px", textAlign: "center", padding: "50px 0" }} xs={offlinePlayoffSchedule?.schedule?.length <= 14 && winnerMatch < 14 ? 5 : 4} onClick={() => { handleChooseWinner("blue") }}>{allianceName(winnerMatch, "blue")}</Col>
 						</Row>
 					</Container>
 				</Modal.Body>
