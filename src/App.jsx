@@ -550,7 +550,7 @@ function App() {
 
       // If we are in World Champs, we need to determine the team list from the schedule
       var tempChampsTeamList = [];
-      if (playoffSchedule?.schedule?.length > 0 && selectedEvent?.value?.type === "Championship") {
+      if (playoffSchedule?.schedule?.schedule?.length > 0 && selectedEvent?.value?.type === "Championship") {
         if (!haveChampsTeams) {
           playoffSchedule?.schedule.forEach((match) => {
             match?.teams.forEach((team) => {
