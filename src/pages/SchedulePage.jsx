@@ -94,8 +94,8 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
             var errorMessage = "";
             var innerSchedule = [];
             const basicMatch = {
-                Time: "",
-                Description: "",
+                "Time": "",
+                "Description": "",
                 "Blue 1": "",
                 "Blue 2": "",
                 "Blue 3": "",
@@ -177,87 +177,88 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                                 "station": "Blue3",
                                 "surrogate": (match["Blue 3"].toString().includes("*")) ? !0 : !1,
                                 "dq": !1
-                            }]
+                            }],
+                            "winner": { "winner": "", "tieWinner": "", "level": 0 }
                         };
                     }
                     return (tempRow);
                 })
 
                 if (forPlayoffs) {
-                    
-                        alliancesTemp.Alliances = [{
-                            "number": 1,
-                            "captain": innerSchedule[0].teams[0].teamNumber,
-                            "round1": innerSchedule[0].teams[1].teamNumber,
-                            "round2": innerSchedule[0].teams[2].teamNumber,
-                            "round3": null,
-                            "backup": null,
-                            "backupReplaced": null,
-                            "name": `Alliance 1`
-                        },{
-                            "number": 8,
-                            "captain": innerSchedule[0].teams[3].teamNumber,
-                            "round1": innerSchedule[0].teams[4].teamNumber,
-                            "round2": innerSchedule[0].teams[5].teamNumber,
-                            "round3": null,
-                            "backup": null,
-                            "backupReplaced": null,
-                            "name": `Alliance 8`
-                        },{
-                            "number": 4,
-                            "captain": innerSchedule[1].teams[0].teamNumber,
-                            "round1": innerSchedule[1].teams[1].teamNumber,
-                            "round2": innerSchedule[1].teams[2].teamNumber,
-                            "round3": null,
-                            "backup": null,
-                            "backupReplaced": null,
-                            "name": `Alliance 4`
-                        },{
-                            "number": 5,
-                            "captain": innerSchedule[1].teams[3].teamNumber,
-                            "round1": innerSchedule[1].teams[4].teamNumber,
-                            "round2": innerSchedule[1].teams[5].teamNumber,
-                            "round3": null,
-                            "backup": null,
-                            "backupReplaced": null,
-                            "name": `Alliance 5`
-                        },{
-                            "number": 2,
-                            "captain": innerSchedule[2].teams[0].teamNumber,
-                            "round1": innerSchedule[2].teams[1].teamNumber,
-                            "round2": innerSchedule[2].teams[2].teamNumber,
-                            "round3": null,
-                            "backup": null,
-                            "backupReplaced": null,
-                            "name": `Alliance 2`
-                        },{
-                            "number": 7,
-                            "captain": innerSchedule[2].teams[3].teamNumber,
-                            "round1": innerSchedule[2].teams[4].teamNumber,
-                            "round2": innerSchedule[2].teams[5].teamNumber,
-                            "round3": null,
-                            "backup": null,
-                            "backupReplaced": null,
-                            "name": `Alliance 7`
-                        },{
-                            "number": 3,
-                            "captain": innerSchedule[3].teams[0].teamNumber,
-                            "round1": innerSchedule[3].teams[1].teamNumber,
-                            "round2": innerSchedule[3].teams[2].teamNumber,
-                            "round3": null,
-                            "backup": null,
-                            "backupReplaced": null,
-                            "name": `Alliance 3`
-                        },{
-                            "number": 6,
-                            "captain": innerSchedule[3].teams[3].teamNumber,
-                            "round1": innerSchedule[3].teams[4].teamNumber,
-                            "round2": innerSchedule[3].teams[5].teamNumber,
-                            "round3": null,
-                            "backup": null,
-                            "backupReplaced": null,
-                            "name": `Alliance 6`
-                        }
+
+                    alliancesTemp.Alliances = [{
+                        "number": 1,
+                        "captain": innerSchedule[0].teams[0].teamNumber,
+                        "round1": innerSchedule[0].teams[1].teamNumber,
+                        "round2": innerSchedule[0].teams[2].teamNumber,
+                        "round3": null,
+                        "backup": null,
+                        "backupReplaced": null,
+                        "name": `Alliance 1`
+                    }, {
+                        "number": 8,
+                        "captain": innerSchedule[0].teams[3].teamNumber,
+                        "round1": innerSchedule[0].teams[4].teamNumber,
+                        "round2": innerSchedule[0].teams[5].teamNumber,
+                        "round3": null,
+                        "backup": null,
+                        "backupReplaced": null,
+                        "name": `Alliance 8`
+                    }, {
+                        "number": 4,
+                        "captain": innerSchedule[1].teams[0].teamNumber,
+                        "round1": innerSchedule[1].teams[1].teamNumber,
+                        "round2": innerSchedule[1].teams[2].teamNumber,
+                        "round3": null,
+                        "backup": null,
+                        "backupReplaced": null,
+                        "name": `Alliance 4`
+                    }, {
+                        "number": 5,
+                        "captain": innerSchedule[1].teams[3].teamNumber,
+                        "round1": innerSchedule[1].teams[4].teamNumber,
+                        "round2": innerSchedule[1].teams[5].teamNumber,
+                        "round3": null,
+                        "backup": null,
+                        "backupReplaced": null,
+                        "name": `Alliance 5`
+                    }, {
+                        "number": 2,
+                        "captain": innerSchedule[2].teams[0].teamNumber,
+                        "round1": innerSchedule[2].teams[1].teamNumber,
+                        "round2": innerSchedule[2].teams[2].teamNumber,
+                        "round3": null,
+                        "backup": null,
+                        "backupReplaced": null,
+                        "name": `Alliance 2`
+                    }, {
+                        "number": 7,
+                        "captain": innerSchedule[2].teams[3].teamNumber,
+                        "round1": innerSchedule[2].teams[4].teamNumber,
+                        "round2": innerSchedule[2].teams[5].teamNumber,
+                        "round3": null,
+                        "backup": null,
+                        "backupReplaced": null,
+                        "name": `Alliance 7`
+                    }, {
+                        "number": 3,
+                        "captain": innerSchedule[3].teams[0].teamNumber,
+                        "round1": innerSchedule[3].teams[1].teamNumber,
+                        "round2": innerSchedule[3].teams[2].teamNumber,
+                        "round3": null,
+                        "backup": null,
+                        "backupReplaced": null,
+                        "name": `Alliance 3`
+                    }, {
+                        "number": 6,
+                        "captain": innerSchedule[3].teams[3].teamNumber,
+                        "round1": innerSchedule[3].teams[4].teamNumber,
+                        "round2": innerSchedule[3].teams[5].teamNumber,
+                        "round3": null,
+                        "backup": null,
+                        "backupReplaced": null,
+                        "name": `Alliance 6`
+                    }
                     ]
                     getAlliances(alliancesTemp);
                 }
