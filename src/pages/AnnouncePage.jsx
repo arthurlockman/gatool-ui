@@ -185,10 +185,10 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
             {selectedEvent && (!teamList || teamList?.teams.length === 0) && <div>
                 <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div>Awaiting team data for {selectedEvent.label}</Alert>
             </div>}
-            {selectedEvent && teamList && (!schedule || schedule?.length === 0) && <div>
+            {selectedEvent && teamList && (!schedule || schedule?.length === 0) && !adHocMode && <div>
                 <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div>Awaiting schedule data for {selectedEvent.label}</Alert>
             </div>}
-            {selectedEvent && teamList?.teams.length > 0 && (schedule?.length > 0 || practiceSchedule?.schedule.length > 0) &&
+            {selectedEvent && teamList?.teams.length > 0 && (schedule?.length > 0 || practiceSchedule?.schedule.length > 0 || adHocMode) &&
                 <Container fluid {...swipeHandlers}>
                     <TopButtons previousMatch={previousMatch} nextMatch={nextMatch} currentMatch={currentMatch} matchMenu={matchMenu} setMatchFromMenu={setMatchFromMenu} selectedEvent={selectedEvent} matchDetails={matchDetails} timeFormat={timeFormat} inPlayoffs={inPlayoffs} alliances={alliances} setAlliances={setAlliances} rankings={rankings} backupTeam={backupTeam} setBackupTeam={setBackupTeam} teamList={teamList} adHocMatch={adHocMatch} setAdHocMatch={setAdHocMatch} adHocMode={adHocMode} swapScreen={swapScreen} />
                     <table className={"table table-responsive"}>
