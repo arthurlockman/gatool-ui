@@ -3,6 +3,7 @@ export const appUpdates = [
     {
         date: "March 21, 2024",
         message: <ul>
+            <li>Restore Test Match when no schedule is loaded</li>
             <li>Hotfix for Team Excel downloads</li>
             <li>Added OFFLINE Playoff advancement via Playoff Tab</li>
         </ul>
