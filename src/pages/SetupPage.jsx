@@ -245,10 +245,10 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                             <tbody>
                                 <tr>
                                     <td><Switch checked={showSponsors === null ? false : showSponsors} onChange={setShowSponsors} /></td>
-                                    <td><b>Show Sponsors on Announce </b></td>
+                                    <td><b>Always show Sponsors on Announce </b></td>
                                 </tr>
                                 <tr>
-                                    <td><Switch checked={autoHideSponsors === null ? true : autoHideSponsors} onChange={setAutoHideSponsors} /></td>
+                                    <td><Switch checked={autoHideSponsors === null ? true : autoHideSponsors} onChange={setAutoHideSponsors} disabled={showSponsors}/></td>
                                     <td><b>Hide Sponsors on Announce after first appearance</b></td>
                                 </tr>
                                 <tr>
