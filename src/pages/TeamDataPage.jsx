@@ -70,7 +70,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
             [{ header: '1' }, { header: '2' }],
             [{ size: [] }],
             ['bold', 'italic', 'underline'],
-            [ { 'color': [] } ],
+            [{ 'color': [] }],
             [
                 { list: 'ordered' },
                 { list: 'bullet' },
@@ -146,10 +146,10 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         enableScope('tabNavigation');
     }
 
-    const handleTrack = () => {
+    const handleTrack = async () => {
         var visits = _.cloneDeep(lastVisit);
         visits[`${updateTeam.teamNumber}`] = moment();
-        setLastVisit(visits);
+        await setLastVisit(visits);
         setUpdateTeam(null);
         setShow(false);
         enableScope('tabNavigation');
@@ -167,7 +167,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
      * @param {string} mode - determines whether to send the update to gatool Cloud. "update" = send to cloud 
      * @param {*} e - the inbound event from clicking the button. 
      */
-    const handleSubmit = (mode, e) => {
+    const handleSubmit = async (mode, e) => {
         var visits = _.cloneDeep(lastVisit);
         visits[`${updateTeam.teamNumber}`] = moment();
         var communityUpdatesTemp = _.cloneDeep(communityUpdates);
@@ -185,23 +185,23 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         setCommunityUpdates(communityUpdatesTemp);
 
         var localUpdatesTemp = _.cloneDeep(localUpdates);
-        var itemExists = _.findIndex(localUpdatesTemp, { "teamNumber": updateTeam.teamNumber });
-        if (itemExists >= 0) {
-            localUpdatesTemp.splice(itemExists, 1);
-        }
+
         if (mode === "update") {
             var resp = []
             resp.push(putTeamData(updateTeam.teamNumber, update.updates));
-            Promise.all(resp).then((response) => {
+            Promise.all(resp).then(async (response) => {
                 if (response[0].status !== 204) {
-                    localUpdatesTemp.push({ "teamNumber": updateTeam.teamNumber, "update": update.updates });
                     var errorText = `Your update for team ${updateTeam.teamNumber} was not successful. We have saved the change locally, and you can send it later from here or the Settings page.`;
                     toast.error(errorText);
                     throw new Error(errorText);
                 } else {
+                    var itemExists = _.findIndex(localUpdatesTemp, { "teamNumber": updateTeam.teamNumber });
+                    if (itemExists >= 0) {
+                        localUpdatesTemp.splice(itemExists, 1);
+                    }
                     toast.success(`Your update for team ${updateTeam.teamNumber} was successful. Thank you for helping keep the team data current.`)
                 }
-                setLocalUpdates(localUpdatesTemp);
+                await setLocalUpdates(localUpdatesTemp);
             })
 
         } else {
@@ -210,9 +210,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
             setLocalUpdates(localUpdatesTemp);
         }
 
-        setLastVisit(visits);
-
-
+        await setLastVisit(visits);
         setUpdateTeam(null);
         setShow(false);
         enableScope('tabNavigation');
@@ -496,7 +494,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
             f = files[i];
             var reader = new FileReader();
             // eslint-disable-next-line
-            reader.onload = function (e) {
+            reader.onload = async function (e) {
                 var communityUpdatesTemp = _.cloneDeep(communityUpdates);
                 // @ts-ignore
                 var data = new Uint8Array(e.target.result);
@@ -554,9 +552,9 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
 
                     })
                     if (localUpdatesTemp?.length > 0) {
-                        setLocalUpdates(localUpdatesTemp);
+                        await setLocalUpdates(localUpdatesTemp);
                     }
-                    setCommunityUpdates(communityUpdatesTemp);
+                    await setCommunityUpdates(communityUpdatesTemp);
                     toast.success(`Your have successfully loaded updates for this event from Excel. Please check each team's details to ensure your changes were recorded properly. ${localUpdatesTemp?.length > 0 ? "Any inbound changes are stored as Local Updates, which you can push to gatool Cloud on the Setup page." : ""}`)
                     clearFileInput("BackupFiles");
                     document.getElementById("BackupFiles").addEventListener('change', handleRestoreBackup);
@@ -630,7 +628,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                         </tr>
                     </thead>
                     <tbody>
-                        {teamList && teamList.teams && teamListExtended.map((team) => {
+                        {teamList && teamList?.teams && teamListExtended.map((team) => {
                             var cityState = `${team?.city}, ${team?.stateProv}${(team?.country !== "USA") ? ", " + team?.country : ""}`;
                             var avatar = `<img src='https://api.gatool.org/v3/${selectedYear.value}/avatars/team/${team?.teamNumber}/avatar.png' onerror="this.style.display='none'">&nbsp`;
                             var teamNameWithAvatar = team?.nameShortLocal ? team?.nameShortLocal : team?.nameShort;
@@ -668,8 +666,8 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
             </Modal>
 
             {updateTeam && <Modal centered={true} fullscreen={true} show={show} size="lg" onHide={handleClose}>
-                <Modal.Header className={"allianceChoice"} closeVariant={"white"} closeButton>
-                    <Modal.Title >Editing Team {updateTeam.teamNumber}'s Details</Modal.Title>
+                <Modal.Header className={_.find(localUpdates, { "teamNumber": updateTeam.teamNumber }) ? "redAlliance" : "allianceChoice"} closeVariant={"white"} closeButton>
+                    <Modal.Title >{_.find(localUpdates, { "teamNumber": updateTeam.teamNumber }) ? <i> You have a locally saved update for Team {updateTeam.teamNumber}. Please upload to gatool Cloud{!isOnline ? <> when you are online again.</> : <>.</>}</i> : `Editing Team ${updateTeam.teamNumber}'s Details`}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <p>Use this form to update team information for <b>Team {updateTeam.teamNumber}.</b> Editable fields are shown below. Your changes will be stored locally on your machine and should not be erased if you close your browser. We do recommend using the Save to Home Screen feature on Android and iOS, and the Save App feature from Chrome on desktop, if you are offline.</p>
@@ -738,7 +736,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                         </Form.Group>
                         <Form.Group controlId="sponsors">
                             <Form.Label className={"formLabel"}><b>Full list of Sponsors (For reference only. This field is not editable, does not appear in the UI, and any changes here will not be saved.)</b></Form.Label>
-                            <Form.Control type="text" placeholder={updateTeam?.sponsors} defaultValue={updateTeam?.sponsors} disabled/>
+                            <Form.Control type="text" placeholder={updateTeam?.sponsors} defaultValue={updateTeam?.sponsors} disabled />
                         </Form.Group>
                         <br />
                     </Form>

@@ -972,11 +972,12 @@ function App() {
    * @function getCommunityUpdates
    * @param notify boolean set to Toast if the request is successful
    * @param selectedYear The currently selected year, which is a persistent state variable
+   * @param ignoreLocalUpdates don't load the community updates
    * @param selectedEvent The currently selected event, which is a persistent state variable
    * @param adHocTeamList A list of team numbers to support offline events
    * @return sets the communityUpdates persistent state
    */
-  async function getCommunityUpdates(notify, adHocTeamList) {
+  async function getCommunityUpdates(notify, adHocTeamList, ignoreLocalUpdates) {
     if (!loadingCommunityUpdates) {
       setLoadingCommunityUpdates(true);
       console.log(`Fetching community updates for ${selectedEvent?.value?.name}...`)
@@ -1021,8 +1022,10 @@ function App() {
             teams = values;
             teams = teams.map((team) => {
               team.updates = _.merge(_.cloneDeep(communityUpdateTemplate), team?.updates);
-              if (_.findIndex(localUpdates, { "teamNumber": team?.teamNumber }) >= 0) {
-                team.updates = _.merge(team.updates, _.cloneDeep(localUpdates[_.findIndex(localUpdates, { "teamNumber": team?.teamNumber })].update))
+              if (!ignoreLocalUpdates) {
+                if (_.findIndex(localUpdates, { "teamNumber": team?.teamNumber }) >= 0) {
+                  team.updates = _.merge(team.updates, _.cloneDeep(localUpdates[_.findIndex(localUpdates, { "teamNumber": team?.teamNumber })].update))
+                }
               }
               return team;
             })
@@ -1635,7 +1638,7 @@ function App() {
 
               <Route path='/playbyplay' element={<PlayByPlayPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} communityUpdates={communityUpdates} currentMatch={currentMatch} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} alliances={alliances} setAlliances={setAlliances} showMottoes={showMottoes} showNotes={showNotes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} swapScreen={swapScreen} timeFormat={timeFormat} eventHighScores={eventHighScores} backupTeam={backupTeam} setBackupTeam={setBackupTeam} allianceCount={allianceCount} nextMatch={nextMatch} previousMatch={previousMatch} setMatchFromMenu={setMatchFromMenu} practiceSchedule={practiceSchedule} districtRankings={districtRankings} adHocMatch={adHocMatch} setAdHocMatch={setAdHocMatch} adHocMode={adHocMode} offlinePlayoffSchedule={offlinePlayoffSchedule} />} />
 
-              <Route path='/allianceselection' element={<AllianceSelectionPage selectedYear={selectedYear} selectedEvent={selectedEvent} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} offlinePlayoffSchedule={offlinePlayoffSchedule} alliances={alliances} rankings={rankings} timeFormat={timeFormat} getRanks={getRanks} allianceSelection={allianceSelection} playoffs={playoffs} teamList={teamList} allianceCount={allianceCount} communityUpdates={communityUpdates} allianceSelectionArrays={allianceSelectionArrays} setAllianceSelectionArrays={setAllianceSelectionArrays} rankingsOverride={rankingsOverride} loadEvent={loadEvent} practiceSchedule={practiceSchedule} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule}/>} />
+              <Route path='/allianceselection' element={<AllianceSelectionPage selectedYear={selectedYear} selectedEvent={selectedEvent} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} offlinePlayoffSchedule={offlinePlayoffSchedule} alliances={alliances} rankings={rankings} timeFormat={timeFormat} getRanks={getRanks} allianceSelection={allianceSelection} playoffs={playoffs} teamList={teamList} allianceCount={allianceCount} communityUpdates={communityUpdates} allianceSelectionArrays={allianceSelectionArrays} setAllianceSelectionArrays={setAllianceSelectionArrays} rankingsOverride={rankingsOverride} loadEvent={loadEvent} practiceSchedule={practiceSchedule} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} />} />
 
               <Route path='/awards' element={<AwardsPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} communityUpdates={communityUpdates} />} />
 

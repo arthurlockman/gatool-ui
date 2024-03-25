@@ -7,6 +7,8 @@ import moment from "moment";
 
 function Bracket({ selectedEvent, playoffSchedule, offlinePlayoffSchedule, setOfflinePlayoffSchedule, alliances }) {
 	const [showSelectWinner, setShowSelectWinner] = useState(false);
+	const [showConfirmWinner, setShowConfirmWinner] = useState(false);
+	const [winningAlliance, setWinningAlliance] = useState(null);
 	const [winnerMatch, setWinnerMatch] = useState(-1);
 
 	//Ball colors
@@ -58,7 +60,7 @@ function Bracket({ selectedEvent, playoffSchedule, offlinePlayoffSchedule, setOf
 		var allianceMembers = [];
 		var targetAlliance = {};
 		var match = matches[_.findIndex(matches, { "matchNumber": matchNumber })];
-		if (match?.teams[0]?.teamNumber) {
+		if (match?.teams[0]?.teamNumber || match?.teams[3]?.teamNumber) {
 			targetAlliance = alliances?.Lookup[`${match?.teams[0]?.teamNumber}`];
 			allianceMembers = _.compact([targetAlliance?.captain, targetAlliance?.round1, targetAlliance?.round2, targetAlliance?.round3, targetAlliance?.backup]);
 			alliance = allianceMembers.join("  ");
@@ -75,7 +77,7 @@ function Bracket({ selectedEvent, playoffSchedule, offlinePlayoffSchedule, setOf
 	// returns the name of the alliance
 	function allianceName(matchNumber, allianceColor) {
 		var allianceName = "";
-		if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[0]?.teamNumber) {
+		if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[0]?.teamNumber || matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[3]?.teamNumber) {
 			allianceName = alliances?.Lookup[`${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[0]?.teamNumber}`]?.alliance;
 			if (matchNumber <= 13 || matchNumber === 19) {
 				if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner?.tieWinner === "red") {
@@ -168,7 +170,12 @@ function Bracket({ selectedEvent, playoffSchedule, offlinePlayoffSchedule, setOf
 		}
 	}
 
-	const handleChooseWinner = async (winningAlliance) => {
+	const handleChooseWinner = (winner) => {
+		setWinningAlliance(winner);
+		setShowSelectWinner(false);
+		setShowConfirmWinner(true);
+	}
+	const handleConfirmWinner = async () => {
 		console.log(winningAlliance);
 		const losingAlliance = winningAlliance === "red" ? "blue" : "red";
 		// do something with the winning alliance
@@ -316,6 +323,7 @@ function Bracket({ selectedEvent, playoffSchedule, offlinePlayoffSchedule, setOf
 		await setOfflinePlayoffSchedule(tempMatches);
 		setWinnerMatch(-1)
 		setShowSelectWinner(false);
+		setShowConfirmWinner(false);
 
 	}
 
@@ -323,6 +331,7 @@ function Bracket({ selectedEvent, playoffSchedule, offlinePlayoffSchedule, setOf
 	const handleClose = () => {
 		setWinnerMatch(-1);
 		setShowSelectWinner(false);
+		setShowConfirmWinner(false);
 	}
 
 	return (
@@ -786,6 +795,23 @@ function Bracket({ selectedEvent, playoffSchedule, offlinePlayoffSchedule, setOf
 								</>
 							}
 							<Col style={{ backgroundColor: "blue", color: "white", fontWeight: "bold", fontSize: "40px", textAlign: "center", padding: "50px 0" }} xs={offlinePlayoffSchedule?.schedule?.length <= 14 && winnerMatch < 14 ? 5 : 4} onClick={() => { handleChooseWinner("blue") }}>{allianceName(winnerMatch, "blue")}</Col>
+						</Row>
+					</Container>
+				</Modal.Body>
+				<Modal.Footer>
+					<Button variant="secondary" onClick={handleClose}>Close without selecting a winner</Button>
+				</Modal.Footer>
+			</Modal>
+			<Modal centered={true} show={showConfirmWinner} size="lg" onHide={handleClose}>
+				<Modal.Header className={"allianceAccept"} closeVariant={"white"} closeButton>
+					<Modal.Title ><b>Confirm winner for {matches[winnerMatch - 1]?.description}</b></Modal.Title>
+				</Modal.Header>
+				<Modal.Body>
+					<Container fluid>
+						<Row>
+							<Col xs={4}></Col>
+							<Col style={{ backgroundColor: winningAlliance === "blue" ? "blue" : winningAlliance === "red" ? "red" : "green", color: "white", fontWeight: "bold", fontSize: "40px", textAlign: "center", padding: "50px 0" }} xs={4} onClick={handleConfirmWinner}>{winningAlliance === "tie" ? "It's a tie!" : allianceName(winnerMatch, winningAlliance)}</Col>
+							<Col xs={4}></Col>
 						</Row>
 					</Container>
 				</Modal.Body>
