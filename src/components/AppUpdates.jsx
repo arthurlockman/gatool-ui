@@ -1,6 +1,12 @@
 
 export const appUpdates = [
     {
+        date: "March 24, 2024",
+        message: <ul>
+            <li>Updated language and functionalit of Show Sponsors switches</li>
+            <li>Added confirm dialog when choosing teams during OFFLINE Playoff advancement via Playoff Tab</li>
+        </ul>
+    },{
         date: "March 21, 2024",
         message: <ul>
             <li>Restore Test Match when no schedule is loaded</li>
