@@ -7,7 +7,7 @@ import Switch from "react-switch";
 import { useOnlineStatus } from "../contextProviders/OnlineContext";
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { isSafari, isChrome, fullBrowserVersion, browserVersion, isIOS } from "react-device-detect";
+import { isSafari, isChrome, fullBrowserVersion, browserVersion, isIOS, browserName, isDesktop, isTablet, isMobile } from "react-device-detect";
 
 import { ArrowClockwise } from 'react-bootstrap-icons';
 
@@ -83,11 +83,11 @@ const monthsWarningMenu = [
 
 function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showNotesAnnounce, setShowNotesAnnounce, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, autoUpdate, setAutoUpdate, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, showQualsStatsQuals, setShowQualsStatsQuals, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee, showDistrictChampsStats, setShowDistrictChampsStats, monthsWarning, setMonthsWarning, user, adHocMode, setAdHocMode, supportedYears, reloadPage, autoHideSponsors, setAutoHideSponsors, setLoadingCommunityUpdates }) {
     const isOnline = useOnlineStatus();
-    const PWASupported = (isChrome && Number(browserVersion) >= 76) || (isSafari && Number(browserVersion) >= 15 && Number(fullBrowserVersion.split(",")[1]) >= 4 );
-    console.log(isSafari);
-    console.log(isChrome);
-    console.log(browserVersion);
-    console.log(fullBrowserVersion);
+    const PWASupported = (isChrome && Number(browserVersion) >= 76) || (isSafari && Number(browserVersion) >= 15 && Number(fullBrowserVersion.split(".")[1]) >= 4);
+    console.log("Safari: " + isSafari);
+    console.log("Chrome: " + isChrome);
+    console.log("BrowserVersion: " + browserVersion);
+    console.log("FullBrowserVersion: " + fullBrowserVersion);
 
     const [deleteSavedModal, setDeleteSavedModal] = useState(null);
 
@@ -379,8 +379,10 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                 </tr>
                                 <tr>
                                     <td colSpan={2}>
-                                        <Alert variant={"warning"}><p><b>Reload cached gatool code</b><br />If you know that there are updates to gatool, but you are not seeing them here, you can reload the code. This will not remove any stored settings or team data. {!PWASupported ? <><br /><b><i>Note: Your browser may not support this. Please delete and restore your Home Screen {isIOS ? "icon" : "tile"}.</i></b></>: <></>}</p>
-                                            <Button variant={"warning"} disabled={!isOnline} onClick={reloadPage}>Clear page cache</Button></Alert>
+                                        <Alert variant={"warning"}><p><b>Reload cached gatool code</b><br />If you know that there are updates to gatool, but you are not seeing them here, you can reload the code. This will not remove any stored settings or team data. Your browser is {browserName} version {fullBrowserVersion} on {isDesktop ? <>desktop</> : isTablet ? <>tablet</> : isMobile ? <>mobile</> : <>unknown surface</>}.{!PWASupported ? <><br /><b><i>Note: Your browser may not support clearing cache this way. Please delete and restore your Home Screen {isIOS ? "icon" : "tile"}.</i></b></> : <></>}</p>
+                                            <Button variant={"warning"} disabled={!isOnline} onClick={reloadPage}>Clear page cache</Button>
+                                        </Alert>
+
                                     </td>
                                 </tr>
                                 <tr>
