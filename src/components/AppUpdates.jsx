@@ -1,9 +1,10 @@
 
 export const appUpdates = [
     {
-        date: "March 24, 2024",
+        date: "March 25, 2024",
         message: <ul>
-            <li>Updated language and functionalit of Show Sponsors switches</li>
+            <li>Added contextual warning to Reload cached gatool code if browser doesn't support PWA</li>
+            <li>Updated language and functionality of Show Sponsors switches</li>
             <li>Added confirm dialog when choosing teams during OFFLINE Playoff advancement via Playoff Tab</li>
         </ul>
     },{
