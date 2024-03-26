@@ -49,8 +49,8 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
     }
 
     useHotkeys('return', () => document.getElementById("resetAllianceSelection").click(), { scopes: 'resetAllianceSelection' });
-
-    return (
+    console.log(allianceSelection);
+        return (
         < >
             {!selectedEvent && <div>
                 <Alert variant="warning" ><div>You need to select an event before you can see anything here.</div></Alert>
@@ -81,13 +81,16 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
                         </Alert>}
                     {allianceSelection && !rankingsOverride && !selectedEvent?.value?.code.includes("OFFLINE") &&
                         <Alert variant="success" >
-                            <div onClick={loadEvent}><b>We believe your event is ready for Alliance Selection, but you must confirm that the rank order below agrees with the rank order in FMS before proceeding with Alliance Selection. If you see a discrepancy, tap this alert to see if we can get a more current rankings. <i>This will reload your event.</i></b><br />
+                            <div onClick={loadEvent}><b>We believe your event is ready for Alliance Selection, but you must confirm that the rank order below agrees with the rank order in FMS before proceeding with Alliance Selection. If you see a discrepancy, take these steps:
+                                <div>Tap the RESTART ALLIANCE SELECTION button below to reset using current data</div>
+                                <div>Tap this alert to see if we can get a more current rankings. <i>This will reload your event.</i></div>
+                                </b><br />
                                 We last had a ranking update at {moment(rankings?.lastModified).format("ddd, MMM Do YYYY, " + timeFormat.value)}
                             </div>
                         </Alert>}
                     {allianceSelection && rankingsOverride &&
                         <Alert variant="danger" >
-                            <div><b>You have imported a Rankings Report from your Scorekeeper. Please review the table below to ensure that it matches the report.<br /> If you see TBD in place of the Captains' numbers, please click Restart Alliance Selection.</b>
+                            <div><b>You have imported a Rankings Report from your Scorekeeper. Please review the table below to ensure that it matches the report.<br /> <span style={{fontSize:"20px"}}>If you see TBD in place of the Captains' numbers, or if the teams are out of order, tap Restart Alliance Selection.</span></b>
                             </div>
                             {selectedEvent && rankings?.ranks?.length > 0 && teamList?.teams?.length > 0 && allianceCount && allianceCount?.count <= 0 &&
                                 <h4>
