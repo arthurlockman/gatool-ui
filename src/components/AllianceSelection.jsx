@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Col, Container, Form, InputGroup, Modal, Row } from "react-bootstrap";
+import { Alert, Button, Col, Container, Form, InputGroup, Modal, Row } from "react-bootstrap";
 import _ from "lodash";
 import { HandThumbsDownFill, HandThumbsUpFill, TrophyFill, XSquare } from "react-bootstrap-icons";
 import { useHotkeysContext, useHotkeys } from "react-hotkeys-hook";
@@ -342,6 +342,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
     return (
         <>
             <Container fluid>
+            {selectedEvent && rankings?.ranks?.length > 0 && teamList?.teams?.length > 0 && allianceCount && allianceCount?.count === -1 && <Alert style={{fontSize:"24px"}}>Please set an alliance count on the Setup Screen.</Alert>}
                 {selectedEvent && rankings?.ranks?.length > 0 && teamList?.teams?.length > 0 && allianceCount && allianceCount?.count > 0 &&
                     <>
                         <Row><br />
