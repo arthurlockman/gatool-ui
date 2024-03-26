@@ -789,6 +789,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                             <td>How to pronounce #</td>
                             {(user["https://gatool.org/roles"].indexOf("admin") >= 0) && <td>
                                 Source</td>}
+                            <td></td>
                         </tr>
                         </thead>
                         <tbody>
