@@ -23,7 +23,7 @@ import { usePersistentState } from './hooks/UsePersistentState';
 import _ from 'lodash';
 import moment from 'moment';
 import Developer from './pages/Developer';
-import { eventNames, specialAwards, hallOfFame, originalAndSustaining, refreshRate } from './components/Constants';
+import { eventNames, specialAwards, hallOfFame, originalAndSustaining, refreshRate, communityUpdateTemplate } from './components/Constants';
 import { appUpdates } from './components/AppUpdates';
 import { useOnlineStatus } from './contextProviders/OnlineContext';
 import { toast } from 'react-toastify';
@@ -180,6 +180,7 @@ function App() {
   const [teamListLoading, setTeamListLoading] = useState("");
   const [loadingCommunityUpdates, setLoadingCommunityUpdates] = useState(false);
   const [haveChampsTeams, setHaveChampsTeams] = useState(false);
+  const [EITeams, setEITeams] = useState([]);
 
   // Handle update notifications from the service worker
   const { waitingWorker, showReload, reloadPage } = useServiceWorker();
@@ -689,9 +690,13 @@ function App() {
             });
 
             await Promise.all(EITeamData).then((values) => {
+
               // merge with teams.teams
               if (values.length > 0) {
+                //prepare to get community updates for these teams
+                setEITeams(values);
                 values.forEach((value) => {
+
                   teams.teams.push(value);
                 })
                 teams.teams = _.sortBy(teams.teams, ["teamNumber"]);
@@ -983,30 +988,13 @@ function App() {
       console.log(`Fetching community updates for ${selectedEvent?.value?.name}...`)
       var result = null;
       var teams = [];
-      var communityUpdateTemplate = {
-        "nameShortLocal": "",
-        "cityStateLocal": "",
-        "topSponsorsLocal": "",
-        "sponsorsLocal": "",
-        "organizationLocal": "",
-        "robotNameLocal": "",
-        "awardsLocal": "",
-        "teamMottoLocal": "",
-        "teamNotesLocal": "",
-        "teamYearsNoCompeteLocal": "",
-        "showRobotName": "",
-        "teamNotes": "",
-        "sayNumber": "",
-        "lastUpdate": "",
-        "source": ""
-      }
 
       if (selectedEvent?.value?.code.includes("OFFLINE")) {
         //Do something with the team list
         if (adHocTeamList) {
           // https://api.gatool.org/v3/team/172/updates
           console.log("Teams List loaded. Update from the Community")
-          var adHocTeams = adHocTeamList.map(async team => {
+          var adHocTeams = adHocTeamList.map(async (team) => {
             var request = await httpClient.get(`/team/${team?.teamNumber}/updates`);
             var teamDetails = { "teamNumber": team?.teamNumber };
             var teamUpdate = _.cloneDeep(communityUpdateTemplate);
@@ -1052,13 +1040,39 @@ function App() {
           }
           return team;
         })
+        //handle EI teams
+        if (EITeams?.length > 0) {
+          console.log("EI Teams present. Fetching updates from the Community");
+          //get updates for these teams
+          var EIUpdates = EITeams.map(async (EITeam) => {
+            var request = await httpClient.get(`/team/${EITeam?.teamNumber}/updates`);
+            var teamDetails = { "teamNumber": EITeam?.teamNumber };
+            var teamUpdate = _.cloneDeep(communityUpdateTemplate);
+            if (request?.status === 200) {
+              teamUpdate = await request.json();
+            }
+            teamDetails.updates = teamUpdate;
+            teamDetails.teamNumber = EITeam?.teamNumber
+            return teamDetails;
+          })
 
-        teams.lastUpdate = moment();
-        if (notify) {
-          toast.success(`Your team data is now up to date.`)
+          await Promise.all(EIUpdates).then((values) => {
+            teams = _.concat(teams, values);
+          })
+          teams.lastUpdate = moment();
+          if (notify) {
+            toast.success(`Your team data is now up to date.`)
+          }
+          setCommunityUpdates(teams);
+          setLoadingCommunityUpdates(false);
+        } else {
+          teams.lastUpdate = moment();
+          if (notify) {
+            toast.success(`Your team data is now up to date.`)
+          }
+          setCommunityUpdates(teams);
+          setLoadingCommunityUpdates(false);
         }
-        setCommunityUpdates(teams);
-        setLoadingCommunityUpdates(false);
       }
     }
   }
@@ -1341,6 +1355,7 @@ function App() {
       await setTeamList(null);
       await setCommunityUpdates(null);
       setLoadingCommunityUpdates(false);
+      setEITeams([]);
       await setRobotImages(null);
       await setRankings(null);
       await setEventHighScores(null);
@@ -1630,7 +1645,7 @@ function App() {
 
               <Route path="/schedule" element={<SchedulePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} practiceSchedule={practiceSchedule} setPracticeSchedule={setPracticeSchedule} getTeamList={getTeamList} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} offlinePlayoffSchedule={offlinePlayoffSchedule} loadEvent={loadEvent} practiceFileUploaded={practiceFileUploaded} setPracticeFileUploaded={setPracticeFileUploaded} setTeamListLoading={setTeamListLoading} getAlliances={getAlliances} />} />
 
-              <Route path="/teamdata" element={<TeamDataPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} teamSort={teamSort} setTeamSort={setTeamSort} communityUpdates={communityUpdates} setCommunityUpdates={setCommunityUpdates} allianceCount={allianceCount} lastVisit={lastVisit} setLastVisit={setLastVisit} putTeamData={putTeamData} localUpdates={localUpdates} setLocalUpdates={setLocalUpdates} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} originalAndSustaining={originalAndSustaining} monthsWarning={monthsWarning} user={user} getTeamHistory={getTeamHistory} timeFormat={timeFormat} />} />
+              <Route path="/teamdata" element={<TeamDataPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} teamSort={teamSort} setTeamSort={setTeamSort} communityUpdates={communityUpdates} setCommunityUpdates={setCommunityUpdates} allianceCount={allianceCount} lastVisit={lastVisit} setLastVisit={setLastVisit} putTeamData={putTeamData} localUpdates={localUpdates} setLocalUpdates={setLocalUpdates} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} originalAndSustaining={originalAndSustaining} monthsWarning={monthsWarning} user={user} getTeamHistory={getTeamHistory} timeFormat={timeFormat} getCommunityUpdates={getCommunityUpdates} />} />
 
               <Route path='/ranks' element={<RanksPage selectedEvent={selectedEvent} teamList={teamList} rankings={rankings} rankSort={rankSort} setRankSort={setRankSort} allianceCount={allianceCount} rankingsOverride={rankingsOverride} setRankingsOverride={setRankingsOverride} allianceSelection={allianceSelection} getRanks={getRanks} setRankings={setRankings} setAllianceSelectionArrays={setAllianceSelectionArrays} playoffs={playoffs} districtRankings={districtRankings} />} />
 

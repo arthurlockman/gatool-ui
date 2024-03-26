@@ -1079,6 +1079,26 @@ export const specialAwards = [
     }]
 }
 ]
+
+export const communityUpdateTemplate = {
+    "nameShortLocal": "",
+    "cityStateLocal": "",
+    "topSponsorsLocal": "",
+    "sponsorsLocal": "",
+    "organizationLocal": "",
+    "robotNameLocal": "",
+    "awardsLocal": "",
+    "teamMottoLocal": "",
+    "teamNotesLocal": "",
+    "teamYearsNoCompeteLocal": "",
+    "showRobotName": "",
+    "teamNotes": "",
+    "sayNumber": "",
+    "awardsTextLocal":"",
+    "lastUpdate": "",
+    "source": ""
+  }
+
 export const originalAndSustaining = ["20", "45", "126", "148", "151", "157", "190", "191", "250"];
 
 //Championship events receive special treatment. We define the Championship events here, including Michigan.

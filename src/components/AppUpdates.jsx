@@ -1,6 +1,12 @@
 
 export const appUpdates = [
     {
+        date: "March 26, 2024",
+        message: <ul>
+            <li>Fixed bug that prevented District Champs EI teams' community updates from loading</li>
+            <li>Added Restore option to Team update History</li>
+        </ul>
+    },{
         date: "March 25, 2024",
         message: <ul>
             <li>Added contextual warning to Reload cached gatool code if browser doesn't support PWA</li>
