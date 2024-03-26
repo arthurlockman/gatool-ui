@@ -17,7 +17,7 @@ import ReactQuill from "react-quill";
 import 'react-quill/dist/quill.snow.css';
 import { useInterval } from 'react-interval-hook';
 
-function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSort, setTeamSort, communityUpdates, setCommunityUpdates, allianceCount, lastVisit, setLastVisit, putTeamData, localUpdates, setLocalUpdates, qualSchedule, playoffSchedule, originalAndSustaining, monthsWarning, user, getTeamHistory, timeFormat }) {
+function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSort, setTeamSort, communityUpdates, setCommunityUpdates, allianceCount, lastVisit, setLastVisit, putTeamData, localUpdates, setLocalUpdates, qualSchedule, playoffSchedule, originalAndSustaining, monthsWarning, user, getTeamHistory, timeFormat, getCommunityUpdates }) {
     const [currentTime, setCurrentTime] = useState(moment());
     const { disableScope, enableScope } = useHotkeysContext();
 
@@ -215,6 +215,23 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         setShow(false);
         enableScope('tabNavigation');
     }
+
+    const handleRestoreData = async (data) => {
+        console.log(data);
+        var resp = await putTeamData(data.team.teamNumber, data.update);
+        if (resp.status !== 204) {
+            var errorText = `Your update for team ${data.team.teamNumber} was not successful.`;
+            toast.error(errorText);
+            throw new Error(errorText);
+        } else {
+            toast.success(`You restored data for team ${data.team.teamNumber}.`);
+        }
+        handleCloseHistory();
+        handleClose();
+        await getCommunityUpdates(false, null);
+    }
+
+
 
     /**
      * Opens the team data screen so that a user can view and edit the team details 
@@ -569,7 +586,6 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         }
     }
 
-
     return (
         <Container fluid>
             {!selectedEvent && !teamList && <div>
@@ -769,6 +785,8 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                             <td>Awards text</td>
                             <td>Team Table Notes</td>
                             <td>Announce Screen Notes</td>
+                            <td>Sponsors</td>
+                            <td>How to pronounce #</td>
                             {(user["https://gatool.org/roles"].indexOf("admin") >= 0) && <td>
                                 Source</td>}
                         </tr>
@@ -785,11 +803,14 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                                 <td>{updateTeam?.awardsTextLocal}</td>
                                 <td>{updateTeam?.teamNotes}</td>
                                 <td>{updateTeam?.teamNotesLocal}</td>
+                                <td>{updateTeam?.sponsorsLocal}</td>
+                                <td><td>{updateTeam?.sayNumber}</td></td>
                                 {(user["https://gatool.org/roles"].indexOf("admin") >= 0) && <td>
                                     {updateTeam?.source}</td>}
+                                <td>Current Value</td>
                             </tr>
-                            {teamHistory && teamHistory.map((team) => {
-                                return <tr key={team?.lastUpdate}>
+                            {teamHistory && teamHistory.map((team, index) => {
+                                return <tr key={`history${index}`}>
                                     <td>{moment(team?.lastUpdate).format("MMM Do YYYY, " + timeFormat.value)}</td>
                                     <td>{team?.nameShortLocal}</td>
                                     <td>{team?.organizationLocal}</td>
@@ -800,8 +821,11 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                                     <td>{team?.awardsTextLocal}</td>
                                     <td>{team?.teamNotes}</td>
                                     <td>{team?.teamNotesLocal}</td>
+                                    <td>{team?.sponsordLocal}</td>
+                                    <td>{team?.sayNumber}</td>
                                     {(user["https://gatool.org/roles"].indexOf("admin") >= 0) && <td>
                                         {team?.source}</td>}
+                                    <td><Button onClick={() => { handleRestoreData({ "team": updateTeam, "update": team }) }}>Restore</Button></td>
                                 </tr>
                             })}</tbody>
                     </Table>
