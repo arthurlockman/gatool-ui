@@ -161,8 +161,9 @@ function Bracket({ selectedEvent, playoffSchedule, offlinePlayoffSchedule, setOf
 			console.log(matches[matchNumber - 1] || "no teams yet");
 			console.log(!matches[matchNumber - 1]?.teams[5]?.teamNumber ? "no blue team yet" : "select team");
 			if (matches[matchNumber - 1]?.teams[5]?.teamNumber) {
-				if (matches.length > 14) {
-					matchNumber = matches.length;
+				if (matchNumber>=14) {
+					var finalsMatches = _.filter(matches,(value)=>{return value.matchNumber > 13});
+					matchNumber = 14+_.findIndex(finalsMatches,(value)=>{return value.scoreRedFinal<10});
 				}
 				setWinnerMatch(matchNumber);
 				setShowSelectWinner(true);
@@ -297,7 +298,8 @@ function Bracket({ selectedEvent, playoffSchedule, offlinePlayoffSchedule, setOf
 				"winner": { "winner": "", "tieWinner": "", "level": 0 }
 			};
 		}
-		if (winningAlliance !== "tie") {
+
+		if (winnerTo<=14) {
 			if (winnerTo) {
 				tempMatches.schedule[winnerTo - 1].teams[_.findIndex(tempMatches.schedule[winnerTo - 1].teams, { "station": `${winnerStation}1` })].teamNumber = tempTeams[winningAlliance][0];
 				tempMatches.schedule[winnerTo - 1].teams[_.findIndex(tempMatches.schedule[winnerTo - 1].teams, { "station": `${winnerStation}2` })].teamNumber = tempTeams[winningAlliance][1];
