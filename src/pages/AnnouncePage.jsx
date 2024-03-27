@@ -6,11 +6,15 @@ import BottomButtons from "../components/BottomButtons";
 import TopButtons from "../components/TopButtons";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useSwipeable } from "react-swipeable";
+import moment from "moment";
+import NotificationBanner from "components/NotificationBanner";
 
 
 const paleGreen = "rgba(144, 238, 144, 0.5)"
 
 function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, awardsMenu, showNotesAnnounce, showAwards, showSponsors, showMottoes, showChampsStats, timeFormat, eventHighScores, backupTeam, setBackupTeam, nextMatch, previousMatch, setMatchFromMenu, practiceSchedule, eventNamesCY, districtRankings, showDistrictChampsStats, adHocMatch, setAdHocMatch, adHocMode, offlinePlayoffSchedule, swapScreen, autoHideSponsors }) {
+
+    const notification = (currentMatch >= ((qualSchedule?.schedule?.schedule?.length || qualSchedule?.schedule?.length) - 4) && currentMatch <= (qualSchedule?.schedule?.schedule?.length || qualSchedule?.schedule?.length)) ? {"expiry":moment().add(1,"hour"),"onTime":moment(),"message":"Please remind teams to have their robots reinspected before Playoffs and to send one team rep for Alliance Selection."} :{};
 
     function updateTeamDetails(station, matchDetails) {
         var team = {}
@@ -191,6 +195,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
             {selectedEvent && teamList?.teams.length > 0 && (schedule?.length > 0 || practiceSchedule?.schedule.length > 0 || adHocMode) &&
                 <Container fluid {...swipeHandlers}>
                     <TopButtons previousMatch={previousMatch} nextMatch={nextMatch} currentMatch={currentMatch} matchMenu={matchMenu} setMatchFromMenu={setMatchFromMenu} selectedEvent={selectedEvent} matchDetails={matchDetails} timeFormat={timeFormat} inPlayoffs={inPlayoffs} alliances={alliances} setAlliances={setAlliances} rankings={rankings} backupTeam={backupTeam} setBackupTeam={setBackupTeam} teamList={teamList} adHocMatch={adHocMatch} setAdHocMatch={setAdHocMatch} adHocMode={adHocMode} swapScreen={swapScreen} />
+                    <NotificationBanner notification={notification}></NotificationBanner>
                     <table className={"table table-responsive"}>
                         <thead>
                             <tr>
