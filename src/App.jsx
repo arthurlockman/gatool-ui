@@ -401,8 +401,8 @@ function App() {
       delete practiceschedule.schedule.Schedule;
     }
 
-    if (practiceschedule?.schedule?.length > 0 && practiceFileUploaded) {
-      setPracticeFileUploaded(false);
+    if (practiceschedule?.schedule?.length > 0) {
+      if (practiceFileUploaded) { setPracticeFileUploaded(false); }
       practiceschedule.lastUpdate = moment();
       setPracticeSchedule(practiceschedule);
     }
@@ -1556,23 +1556,23 @@ function App() {
 
   }, [rankings, qualSchedule, teamList, teamReduction, playoffSchedule, setAllianceSelection])
 
-    // check to see if Alliance Selection is ready when in Offline and we have uploaded Ranks
-    useEffect(() => {
-      if (rankings?.ranks.length > 0 && practiceSchedule?.schedule.length > 0 && teamList?.teams.length > 0 ) {
-        var asReady = false;
-        // In order to start Alliance Selection, we need the following conditions to be true:
-        // All matches must have been completed
-        // All teams must have completed their scheduled matches
-        // We test these in different places: the schedule and the rankings. This ensures that
-        // we have both API results, and that they are both current and complete.
-        if (selectedEvent?.value.name.includes("OFFLINE")) {
-          asReady = true;
-        }
-  
-        setAllianceSelection(asReady);
+  // check to see if Alliance Selection is ready when in Offline and we have uploaded Ranks
+  useEffect(() => {
+    if (rankings?.ranks.length > 0 && practiceSchedule?.schedule.length > 0 && teamList?.teams.length > 0) {
+      var asReady = false;
+      // In order to start Alliance Selection, we need the following conditions to be true:
+      // All matches must have been completed
+      // All teams must have completed their scheduled matches
+      // We test these in different places: the schedule and the rankings. This ensures that
+      // we have both API results, and that they are both current and complete.
+      if (selectedEvent?.value.name.includes("OFFLINE")) {
+        asReady = true;
       }
-  
-    }, [rankings, teamList, setAllianceSelection, practiceSchedule?.schedule.length, offlinePlayoffSchedule?.schedule.length, selectedEvent?.value.name])
+
+      setAllianceSelection(asReady);
+    }
+
+  }, [rankings, teamList, setAllianceSelection, practiceSchedule?.schedule.length, offlinePlayoffSchedule?.schedule.length, selectedEvent?.value.name])
 
   // Retrieve schedule, team list, community updates, high scores and rankings when event selection changes
   useEffect(() => {
