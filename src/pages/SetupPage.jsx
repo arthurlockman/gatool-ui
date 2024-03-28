@@ -81,7 +81,7 @@ const monthsWarningMenu = [
 
 
 
-function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showNotesAnnounce, setShowNotesAnnounce, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, autoUpdate, setAutoUpdate, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, showQualsStatsQuals, setShowQualsStatsQuals, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee, showDistrictChampsStats, setShowDistrictChampsStats, monthsWarning, setMonthsWarning, user, adHocMode, setAdHocMode, supportedYears, reloadPage, autoHideSponsors, setAutoHideSponsors, setLoadingCommunityUpdates }) {
+function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showNotesAnnounce, setShowNotesAnnounce, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, autoUpdate, setAutoUpdate, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, showQualsStatsQuals, setShowQualsStatsQuals, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee, showDistrictChampsStats, setShowDistrictChampsStats, monthsWarning, setMonthsWarning, user, adHocMode, setAdHocMode, supportedYears, reloadPage, autoHideSponsors, setAutoHideSponsors, setLoadingCommunityUpdates, showPracticeSchedule, setShowPracticeSchedule }) {
     const isOnline = useOnlineStatus();
     const PWASupported = (isChrome && Number(browserVersion) >= 76) || (isSafari && Number(browserVersion) >= 15 && Number(fullBrowserVersion.split(".")[1]) >= 4);
 
@@ -148,6 +148,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
     const confirmDeleteLocalUpdates = async () => {
         setLocalUpdates([]);
         await setLoadingCommunityUpdates(false);
+        handleClose();
         getCommunityUpdates(false, null);
     }
 
@@ -348,6 +349,14 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                     </td>
                                     <td>
                                         <b>Automatically track event progress, refreshing every 15 seconds <i style={{ "color": "red" }}>(will advance matches on all screens)</i></b>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <Switch checked={showPracticeSchedule === null ? false : showPracticeSchedule} onChange={setShowPracticeSchedule} />
+                                    </td>
+                                    <td>
+                                        <b>Show Practice Schedule, if available, before Quals start</b>
                                     </td>
                                 </tr>
                                 <tr>

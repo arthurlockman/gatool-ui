@@ -20,6 +20,7 @@ import { useInterval } from 'react-interval-hook';
 function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSort, setTeamSort, communityUpdates, setCommunityUpdates, allianceCount, lastVisit, setLastVisit, putTeamData, localUpdates, setLocalUpdates, qualSchedule, playoffSchedule, originalAndSustaining, monthsWarning, user, getTeamHistory, timeFormat, getCommunityUpdates }) {
     const [currentTime, setCurrentTime] = useState(moment());
     const { disableScope, enableScope } = useHotkeysContext();
+    const isOnline = useOnlineStatus();
 
     /**
      * Display the delay on the Announce Screen if we have a schedule
@@ -205,6 +206,10 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
             })
 
         } else {
+            var itemExists = _.findIndex(localUpdatesTemp, { "teamNumber": updateTeam.teamNumber });
+                    if (itemExists >= 0) {
+                        localUpdatesTemp.splice(itemExists, 1);
+                    }
             localUpdatesTemp.push({ "teamNumber": updateTeam.teamNumber, "update": update.updates });
             toast.success(`We have stored your update for team ${updateTeam.teamNumber}. Remember that this update is only visible to you until you save it to gatool Cloud.`)
             setLocalUpdates(localUpdatesTemp);
@@ -303,21 +308,6 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         return style;
     }
 
-    var teamListExtended = teamList?.teams?.map((teamRow) => {
-        teamRow.rank = getTeamRank(teamRow?.teamNumber);
-        teamRow.citySort = teamRow?.country + teamRow?.stateProv + teamRow?.city;
-        var update = find(communityUpdates, { "teamNumber": teamRow.teamNumber });
-        teamRow = merge(teamRow, update?.updates);
-        return teamRow;
-    })
-
-    if (teamSort.charAt(0) === "-") {
-        teamListExtended = orderBy(teamListExtended, teamSort.slice(1), 'desc');
-    } else {
-        teamListExtended = orderBy(teamListExtended, teamSort, 'asc');
-    }
-
-    const isOnline = useOnlineStatus();
 
     // The following section emits an Excel doc with two sheets:
     //   Team Table contains details about the teams at the event, including community updates;
@@ -586,6 +576,24 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         }
     }
 
+
+    var teamListExtended = teamList?.teams?.map((teamRow) => {
+        teamRow.rank = getTeamRank(teamRow?.teamNumber);
+        teamRow.citySort = teamRow?.country + teamRow?.stateProv + teamRow?.city;
+        var update = find(communityUpdates, { "teamNumber": teamRow.teamNumber });
+        var localUpdate = _.find(localUpdates, { "teamNumber": teamRow?.teamNumber });
+        teamRow = merge(teamRow, (localUpdate ? localUpdate.update : update?.updates));
+        return teamRow;
+    })
+
+    if (teamSort.charAt(0) === "-") {
+        teamListExtended = orderBy(teamListExtended, teamSort.slice(1), 'desc');
+    } else {
+        teamListExtended = orderBy(teamListExtended, teamSort, 'asc');
+    }
+
+
+
     return (
         <Container fluid>
             {!selectedEvent && !teamList && <div>
@@ -708,12 +716,13 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                             <Form.Label className={"formLabel"}><b>How to pronounce the team number (some teams are particular)</b></Form.Label>
                             <Form.Control className={updateTeam.sayNumber ? "formHighlight" : formValue.sayNumber ? "formHighlight" : ""} type="text" placeholder={updateTeam.sayNumber} defaultValue={updateTeam.sayNumber} onChange={(e) => updateForm("sayNumber", e.target.value)} />
                         </Form.Group>
-                        <Form.Group controlId="robotName">
-                            <InputGroup>
+                        <Form.Group >
                                 <Form.Label className={"formLabel"}><b>Robot Name ({updateTeam.robotName ? updateTeam.robotName : "No robot name"}) in TIMS</b> </Form.Label>
-                                <Form.Text><Form.Check className={"robotNameCheckbox"} type="switch" id="showRobotName" label="Show robot name" defaultChecked={updateTeam?.showRobotName ? updateTeam?.showRobotName : true} onChange={(e) => updateForm("showRobotName", e.target.checked)} /></Form.Text>
-                            </InputGroup>
+                            
+                            <InputGroup>
                             <Form.Control className={updateTeam.robotNameLocal ? "formHighlight" : formValue.robotNameLocal ? "formHighlight" : ""} type="text" placeholder={updateTeam.robotName} defaultValue={updateTeam.robotNameLocal ? updateTeam.robotNameLocal : updateTeam.robotName} onChange={(e) => updateForm("robotNameLocal", e.target.value)} />
+                            <Form.Check className={"robotNameCheckbox"} type="switch" id="showRobotName" label="Show robot name" defaultChecked={updateTeam?.showRobotName===null ? true:updateTeam?.showRobotName} onChange={(e) => updateForm("showRobotName", e.target.checked)} />
+                            </InputGroup>
                         </Form.Group>
                         <Form.Group controlId="teamMotto">
                             <Form.Label className={"formLabel"}><b>Team Motto (Team Mottoes do not come from <i>FIRST</i>)</b></Form.Label>
