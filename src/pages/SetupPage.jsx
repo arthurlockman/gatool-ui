@@ -356,7 +356,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                         <Switch checked={showPracticeSchedule === null ? false : showPracticeSchedule} onChange={setShowPracticeSchedule} />
                                     </td>
                                     <td>
-                                        <b>Show Practice Schedule, if available, before Quals start</b>
+                                        <b>Show Practice Schedule instead of Quals before Quals start</b>
                                     </td>
                                 </tr>
                                 <tr>
