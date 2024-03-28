@@ -3,6 +3,7 @@ export const appUpdates = [
     {
         date: "March 28, 2024",
         message: <ul>
+            <li>Fixed a big that prevented replacing teams in Practice matches</li>
             <li>Fixed bug that prevented locally stored updates from working properly</li>
             <li>Added control for Practice Match schedule visibility</li>
             <li>Adds framework for notifications, starting with alert for Inspection & Alliance Selection</li>

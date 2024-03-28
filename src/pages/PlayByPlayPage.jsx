@@ -154,7 +154,7 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
             },
         });
 
-    if (practiceSchedule?.schedule.length > 0 && adHocMatch && (!qualSchedule || qualSchedule?.schedule.length === 0)) {
+    if ((practiceSchedule?.schedule?.schedule?.length > 0 || practiceSchedule?.schedule?.length > 0) && adHocMatch && (!qualSchedule || (qualSchedule?.schedule?.length === 0 || qualSchedule?.schedule?.schedule?.length === 0))) {
         matchDetails.teams = adHocMatch
     };
 
