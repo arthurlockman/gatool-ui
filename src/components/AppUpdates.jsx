@@ -1,6 +1,12 @@
 
 export const appUpdates = [
     {
+        date: "March 28, 2024",
+        message: <ul>
+            <li>Fixed bug that prevented locally stored updates from working properly</li>
+            <li>Added control for Practice Match schedule visibility</li>
+        </ul>
+    },{
         date: "March 26, 2024",
         message: <ul>
             <li>Fixed bug that prevented District Champs EI teams' community updates from loading</li>
