@@ -5,6 +5,7 @@ export const appUpdates = [
         message: <ul>
             <li>Fixed bug that prevented locally stored updates from working properly</li>
             <li>Added control for Practice Match schedule visibility</li>
+            <li>Adds framework for notifications, starting with alert for Inspection & Alliance Selection</li>
         </ul>
     },{
         date: "March 26, 2024",
