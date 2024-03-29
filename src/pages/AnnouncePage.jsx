@@ -12,7 +12,7 @@ import NotificationBanner from "components/NotificationBanner";
 
 const paleGreen = "rgba(144, 238, 144, 0.5)"
 
-function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, awardsMenu, showNotesAnnounce, showAwards, showSponsors, showMottoes, showChampsStats, timeFormat, eventHighScores, backupTeam, setBackupTeam, nextMatch, previousMatch, setMatchFromMenu, practiceSchedule, eventNamesCY, districtRankings, showDistrictChampsStats, adHocMatch, setAdHocMatch, adHocMode, offlinePlayoffSchedule, swapScreen, autoHideSponsors }) {
+function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, awardsMenu, showNotesAnnounce, showAwards, showSponsors, showMottoes, showChampsStats, timeFormat, eventHighScores, backupTeam, setBackupTeam, nextMatch, previousMatch, setMatchFromMenu, practiceSchedule, eventNamesCY, districtRankings, showDistrictChampsStats, adHocMatch, setAdHocMatch, adHocMode, offlinePlayoffSchedule, swapScreen, autoHideSponsors, hidePracticeSchedule }) {
 
     const notification = (currentMatch >= ((qualSchedule?.schedule?.schedule?.length || qualSchedule?.schedule?.length) - 4) && currentMatch <= (qualSchedule?.schedule?.schedule?.length || qualSchedule?.schedule?.length)) ? {"expiry":moment().add(1,"hour"),"onTime":moment(),"message":"Please remind teams to have their robots reinspected before Playoffs and to send one team rep for Alliance Selection."} :{};
 
@@ -88,8 +88,14 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
     }
 
     var schedule = [];
-    if (practiceSchedule?.schedule?.length > 0 && (qualSchedule?.schedule?.length === 0 || qualSchedule?.schedule?.schedule?.length === 0)) {
-        schedule = practiceSchedule?.schedule;
+    if ((practiceSchedule?.schedule?.schedule?.length > 0 || practiceSchedule?.schedule?.length > 0) && (qualSchedule?.schedule?.length === 0 || qualSchedule?.schedule?.schedule?.length === 0)) {
+        schedule = practiceSchedule?.schedule?.schedule || practiceSchedule?.schedule;
+    }
+    if ((practiceSchedule?.schedule?.schedule?.length > 0 || practiceSchedule?.schedule?.length > 0) && (qualSchedule?.schedule?.length > 0 || qualSchedule?.schedule?.schedule?.length > 0)) {
+        var firstMatch = typeof qualSchedule.schedule?.schedule !== "undefined" ? qualSchedule.schedule?.schedule[0] : qualSchedule?.schedule[0]
+        if (moment().isBefore(firstMatch.startTime) && !hidePracticeSchedule) {
+            schedule = practiceSchedule?.schedule?.schedule || practiceSchedule?.schedule;
+        }
     }
     if (offlinePlayoffSchedule?.schedule?.length > 0) {
         schedule = _.concat(schedule, offlinePlayoffSchedule?.schedule);
