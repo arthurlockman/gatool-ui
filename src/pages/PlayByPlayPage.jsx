@@ -88,7 +88,7 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
     }
     if ((practiceSchedule?.schedule?.schedule?.length > 0 || practiceSchedule?.schedule?.length > 0) && (qualSchedule?.schedule?.length > 0 || qualSchedule?.schedule?.schedule?.length > 0)) {
         var firstMatch = typeof qualSchedule.schedule?.schedule !== "undefined" ? qualSchedule.schedule?.schedule[0] : qualSchedule?.schedule[0]
-        if (moment().isBefore(firstMatch.startTime) && !hidePracticeSchedule) {
+        if (moment().isBefore(moment(firstMatch.startTime).subtract(20,"minutes")) && !hidePracticeSchedule) {
             schedule = practiceSchedule?.schedule?.schedule || practiceSchedule?.schedule;
         }
     }
