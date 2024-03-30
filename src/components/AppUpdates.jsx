@@ -1,6 +1,11 @@
 
 export const appUpdates = [
     {
+        date: "March 30, 2024",
+        message: <ul>
+            <li>Finished work on Practice Match controls</li>
+        </ul>
+    },{
         date: "March 28, 2024",
         message: <ul>
             <li>Fixed a big that prevented replacing teams in Practice matches</li>
