@@ -1,15 +1,23 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect, useState } from "react";
 import { utils, read } from "xlsx";
-import { Alert, Button, Container, Form } from "react-bootstrap";
+import { Alert, Button, Container, Form, InputGroup } from "react-bootstrap";
 import moment from "moment";
+import _ from "lodash";
 
-function Developer() {
+function Developer({ putNotifications, getNotifications }) {
     const { user, getAccessTokenSilently } = useAuth0();
 
-    var [token, setToken] = useState(null);
-    var [formattedUsers, setFormattedUsers] = useState(null);
-    var [loadedUsers, setLoadedUsers] = useState(null);
+    const [token, setToken] = useState(null);
+    const [formattedUsers, setFormattedUsers] = useState(null);
+    const [loadedUsers, setLoadedUsers] = useState(null);
+    const [formValue, setFormValue] = useState({
+        "onTime": null,
+        "offTime": null,
+        "onDate": null,
+        "offDate": null,
+        "message": null
+    });
 
     useEffect(() => {
         async function getToken() {
@@ -114,6 +122,41 @@ function Developer() {
         downloadAnchorNode.remove();
     }
 
+    /** 
+     * This function handles setting parts of the form value
+     * @function handleFormValue
+     * @param {string} key - The property you want to set
+     * @param {string} value - The value of the property you want to set
+    */
+    const handleFormValue = (key, value) => {
+        var tempFormValue = _.cloneDeep(formValue);
+        tempFormValue[key] = value;
+        setFormValue(tempFormValue);
+    }
+
+    const handleMessage = async () => {
+        console.log(formValue);
+        const submission = {
+            "message": formValue.message,
+            "onTime": formValue.onTime,
+            "offTime": formValue.offTime,
+            "onDate": formValue.onDate,
+            "offDate": formValue.offDate,
+        }
+        var result = await putNotifications(submission);
+        if (result.status === 204) {
+            console.log("message set.");
+        } else {
+            console.log("message not set.");
+        }
+    }
+
+    const handleGetMessage = async () => {
+        var message = await getNotifications();
+        console.log(message);
+        setFormValue(message);
+    }
+
     return (
         <Container>
             {(user["https://gatool.org/roles"].indexOf("admin") >= 0) ?
@@ -133,6 +176,43 @@ function Developer() {
                                 setLoadedUsers("info");
                             }
                         }} >{loadedUsers === "info" ? <>Users have been downloaded</> : loadedUsers === "danger" ? <>Error in file</> : <>Download users to JSON file</>}</Button>}</div>
+                    <Form>
+
+                        <Form.Group className="mb-3" controlId="systemNotification">
+                            <Form.Label>Notification</Form.Label>
+                            <Form.Control type="text" value={formValue.message} placeholder="Enter message" defaultValue={formValue.message} onChange={(e) => handleFormValue("message", e.target.value)} />
+                        </Form.Group>
+
+                        <InputGroup>
+                            <Form.Group className="mb-3" controlId="onDate">
+                                <Form.Label>On Date</Form.Label>
+                                <Form.Control type="date" value={formValue.onDate} defaultValue={formValue.onDate} onChange={(e) => handleFormValue("onDate", e.target.value)} />
+                            </Form.Group>
+                            <Form.Group className="mb-3" controlId="onTime">
+                                <Form.Label>On Time</Form.Label>
+                                <Form.Control type="time" value={formValue.onTime} defaultValue={formValue.onTime} onChange={(e) => handleFormValue("onTime", e.target.value)} />
+                            </Form.Group>
+                        </InputGroup>
+
+                        <InputGroup>
+                            <Form.Group className="mb-3" controlId="offDate">
+                                <Form.Label>Off Date</Form.Label>
+                                <Form.Control type="date" placeholder="" value={formValue.offDate} defaultValue={formValue.offDate} onChange={(e) => handleFormValue("offDate", e.target.value)} />
+                            </Form.Group>
+                            <Form.Group className="mb-3" controlId="offTime">
+                                <Form.Label>Off Time</Form.Label>
+                                <Form.Control type="time" placeholder="" value={formValue.offTime}defaultValue={formValue.offTime} onChange={(e) => handleFormValue("offTime", e.target.value)} />
+                            </Form.Group>
+                        </InputGroup>
+
+                        <Button variant="secondary" onClick={handleGetMessage}>
+                            Get Message
+                        </Button>
+                        <Button variant="primary" onClick={handleMessage}>
+                            Submit
+                        </Button>
+
+                    </Form>
                 </> : <Alert>You're not authorized to use this page.</Alert>}
 
         </Container>

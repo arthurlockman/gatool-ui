@@ -1264,6 +1264,30 @@ function App() {
     return result;
   }
 
+   /**
+   * This function writes updated system alerts data back to gatool Cloud.
+   * @async
+   * @function putNotifications
+   * @param {object} data the data to be put to gatool Cloud
+   * @returns {Promise<object>} result
+   */
+   async function putNotifications(data) {
+    var result = await httpClient.put(`system/announcements`, data);
+    return result;
+  }
+
+  /**
+   * This function fetches systemwide notifications from gatool Cloud.
+   * @async
+   * @function getNotifications
+   * @returns {Promise<object>} The team's update history array
+   */
+  async function getNotifications() {
+    var result = await httpClient.get(`system/announcements/`);
+    var notifications = await result.json();
+    return notifications;
+  }
+
   /**
    * This function reads the team data update history gatool Cloud.
    * @async
@@ -1682,7 +1706,7 @@ function App() {
               <Route path='/stats' element={<StatsPage worldStats={worldStats} selectedEvent={selectedEvent} eventHighScores={eventHighScores} eventNamesCY={eventNamesCY} />} />
               <Route path='/cheatsheet' element={<CheatsheetPage teamList={teamList} communityUpdates={communityUpdates} selectedEvent={selectedEvent} selectedYear={selectedYear} robotImages={robotImages} />} />
               <Route path='/emcee' element={<EmceePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} alliances={alliances} currentMatch={currentMatch} nextMatch={nextMatch} previousMatch={previousMatch} reverseEmcee={reverseEmcee} timeFormat={timeFormat} />} />
-              <Route path='/dev' element={<Developer />} />
+              <Route path='/dev' element={<Developer putNotifications={putNotifications} getNotifications={getNotifications}/>} />
             </Route>
           </Routes>
         </BrowserRouter> : <AnonymousUserPage />}
