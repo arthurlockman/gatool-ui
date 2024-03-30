@@ -1,7 +1,7 @@
 
 export const appUpdates = [
     {
-        date: "March 29, 2024",
+        date: "March 30, 2024",
         message: <ul>
             <li>Finished work on Practice Match controls</li>
         </ul>
