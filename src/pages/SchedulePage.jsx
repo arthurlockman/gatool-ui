@@ -81,7 +81,7 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
             "count": 8
         }
 
-        reader.onload = function (e) {
+        reader.onload = async function (e) {
             // @ts-ignore
             var data = new Uint8Array(e.target.result);
             var workbook;
@@ -264,7 +264,11 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                 }
 
                 formattedSchedule.schedule = _.filter(innerSchedule, "description");
-                !forPlayoffs ? setPracticeSchedule(formattedSchedule) : setOfflinePlayoffSchedule(formattedSchedule);
+                if (!forPlayoffs) {
+                    await setPracticeSchedule(formattedSchedule)
+                } else {
+                    await setOfflinePlayoffSchedule(formattedSchedule);
+                }
                 addTeamsToTeamList(formattedSchedule);
                 toast.success(`Your have successfully loaded your ${selectedEvent?.value?.code.includes("OFFLINE") ? "Offline" : "Practice"} Schedule.`)
                 if (!selectedEvent?.value?.code.includes("OFFLINE")) {

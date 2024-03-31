@@ -161,7 +161,7 @@ function App() {
   const [reverseEmcee, setReverseEmcee] = usePersistentState("cache:reverseEmcee", null)
   const [eventNamesCY, setEventNamesCY] = usePersistentState("cache:eventNamesCY", []);
   const [districtRankings, setDistrictRankings] = usePersistentState("cache:districtRankings", null);
-  const [adHocMatch, setAdHocMatch] = usePersistentState("cache:adHocMatch", [
+  const [adHocMatch, setAdHocMatch] = useState([
     { teamNumber: null, station: 'Red1', surrogate: false, dq: false },
     { teamNumber: null, station: 'Red2', surrogate: false, dq: false },
     { teamNumber: null, station: 'Red3', surrogate: false, dq: false },
@@ -169,7 +169,7 @@ function App() {
     { teamNumber: null, station: 'Blue2', surrogate: false, dq: false },
     { teamNumber: null, station: 'Blue3', surrogate: false, dq: false }
   ]);
-  const [adHocMode, setAdHocMode] = usePersistentState("cache:adHocMode", null);
+  const [adHocMode, setAdHocMode] = useState(null);
   const [backupTeam, setBackupTeam] = useState(null);
   const [showReloaded, setShowReloaded] = usePersistentState("cache:showReloaded", false);
 
