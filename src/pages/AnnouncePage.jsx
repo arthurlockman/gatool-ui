@@ -12,9 +12,9 @@ import NotificationBanner from "components/NotificationBanner";
 
 const paleGreen = "rgba(144, 238, 144, 0.5)"
 
-function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, awardsMenu, showNotesAnnounce, showAwards, showSponsors, showMottoes, showChampsStats, timeFormat, eventHighScores, backupTeam, setBackupTeam, nextMatch, previousMatch, setMatchFromMenu, practiceSchedule, eventNamesCY, districtRankings, showDistrictChampsStats, adHocMatch, setAdHocMatch, adHocMode, offlinePlayoffSchedule, swapScreen, autoHideSponsors, hidePracticeSchedule }) {
-
-    const notification = (currentMatch >= ((qualSchedule?.schedule?.schedule?.length || qualSchedule?.schedule?.length) - 4) && currentMatch <= (qualSchedule?.schedule?.schedule?.length || qualSchedule?.schedule?.length)) ? {"expiry":moment().add(1,"hour"),"onTime":moment(),"message":"Please remind teams to have their robots reinspected before Playoffs and to send one team rep for Alliance Selection."} :{};
+function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, awardsMenu, showNotesAnnounce, showAwards, showSponsors, showMottoes, showChampsStats, timeFormat, eventHighScores, backupTeam, setBackupTeam, nextMatch, previousMatch, setMatchFromMenu, practiceSchedule, eventNamesCY, districtRankings, showDistrictChampsStats, adHocMatch, setAdHocMatch, adHocMode, offlinePlayoffSchedule, swapScreen, autoHideSponsors, hidePracticeSchedule, teamReduction }) {
+    const matchesToNotify = _.toInteger((teamList?.teamCountTotal - teamReduction) / 6);
+    const notification = (currentMatch >= ((qualSchedule?.schedule?.schedule?.length || qualSchedule?.schedule?.length) - matchesToNotify) && currentMatch <= (qualSchedule?.schedule?.schedule?.length || qualSchedule?.schedule?.length)) ? { "expiry": moment().add(1, "hour"), "onTime": moment(), "message": "Please remind teams to have their robots reinspected before Playoffs and to send one team rep for Alliance Selection." } : {};
 
     function updateTeamDetails(station, matchDetails) {
         var team = {}
@@ -28,11 +28,11 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
                 teamList?.teams[_.findIndex(teamList?.teams, { "teamNumber": team?.teamNumber })],
                 rankings?.ranks[_.findIndex(rankings?.ranks, { "teamNumber": team?.teamNumber })],
                 communityUpdates[_.findIndex(communityUpdates, { "teamNumber": team?.teamNumber })]
-            ) : 
-            _.merge(team,
-                teamList?.teams[_.findIndex(teamList?.teams, { "teamNumber": team?.teamNumber })],
-                rankings?.ranks[_.findIndex(rankings?.ranks, { "teamNumber": team?.teamNumber })]
-            );
+            ) :
+                _.merge(team,
+                    teamList?.teams[_.findIndex(teamList?.teams, { "teamNumber": team?.teamNumber })],
+                    rankings?.ranks[_.findIndex(rankings?.ranks, { "teamNumber": team?.teamNumber })]
+                );
             team.rankStyle = rankHighlight(team?.rank, allianceCount || { "count": 8 });
             team.alliance = alliances?.Lookup[`${team?.teamNumber}`]?.alliance || null;
             team.allianceRole = alliances?.Lookup[`${team?.teamNumber}`]?.role || null;
@@ -93,7 +93,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
     }
     if ((practiceSchedule?.schedule?.schedule?.length > 0 || practiceSchedule?.schedule?.length > 0) && (qualSchedule?.schedule?.length > 0 || qualSchedule?.schedule?.schedule?.length > 0)) {
         var firstMatch = typeof qualSchedule.schedule?.schedule !== "undefined" ? qualSchedule.schedule?.schedule[0] : qualSchedule?.schedule[0]
-        if (moment().isBefore(moment(firstMatch.startTime).subtract(20,"minutes")) && !hidePracticeSchedule) {
+        if (moment().isBefore(moment(firstMatch.startTime).subtract(20, "minutes")) && !hidePracticeSchedule) {
             schedule = practiceSchedule?.schedule?.schedule || practiceSchedule?.schedule;
         }
     }
@@ -212,7 +212,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
                             </tr>
                         </thead>
                         <tbody>
-                            {displayOrder.map((station,index) => {
+                            {displayOrder.map((station, index) => {
                                 if (!_.isEmpty(teamDetails[station]) && !_.isUndefined(teamDetails[station].teamNumber) && !_.isNull(teamDetails[station].teamNumber) && teamDetails[station].teamNumber > 0) {
                                     return <Announce station={station} team={teamDetails[station]} inPlayoffs={inPlayoffs} key={`${station}${index}`} awardsMenu={awardsMenu} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotesAnnounce={showNotesAnnounce} autoHideSponsors={autoHideSponsors} showAwards={showAwards} showSponsors={showSponsors} showMottoes={showMottoes} showChampsStats={showChampsStats} eventNamesCY={eventNamesCY} showDistrictChampsStats={showDistrictChampsStats} />
                                 } else {
