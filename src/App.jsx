@@ -1705,7 +1705,7 @@ function App() {
 
               <Route path='/stats' element={<StatsPage worldStats={worldStats} selectedEvent={selectedEvent} eventHighScores={eventHighScores} eventNamesCY={eventNamesCY} />} />
               <Route path='/cheatsheet' element={<CheatsheetPage teamList={teamList} communityUpdates={communityUpdates} selectedEvent={selectedEvent} selectedYear={selectedYear} robotImages={robotImages} />} />
-              <Route path='/emcee' element={<EmceePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} alliances={alliances} currentMatch={currentMatch} nextMatch={nextMatch} previousMatch={previousMatch} reverseEmcee={reverseEmcee} timeFormat={timeFormat} />} />
+              <Route path='/emcee' element={<EmceePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} alliances={alliances} currentMatch={currentMatch} nextMatch={nextMatch} previousMatch={previousMatch} reverseEmcee={reverseEmcee} timeFormat={timeFormat} practiceSchedule={practiceSchedule} offlinePlayoffSchedule={offlinePlayoffSchedule} hidePracticeSchedule={hidePracticeSchedule} />} />
               <Route path='/dev' element={<Developer putNotifications={putNotifications} getNotifications={getNotifications} />} />
             </Route>
           </Routes>

@@ -101,7 +101,7 @@ function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates })
 
     return (
         <Container fluid>
-            {!selectedEvent && !teamList && <div>
+            {!selectedEvent && <div>
                 <Alert variant="warning" >You need to select an event before you can see anything here.</Alert>
             </div>}
             {selectedEvent && (!teamList || teamList?.teams.length === 0) && <div>
