@@ -5,8 +5,9 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { useSwipeable } from "react-swipeable";
 import useWindowDimensions from "hooks/UseWindowDimensions";
 import EmceeClock from "components/EmceeClock";
+import moment from "moment";
 
-function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, currentMatch, nextMatch, previousMatch, reverseEmcee, timeFormat }) {
+function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSchedule, offlinePlayoffSchedule, alliances, currentMatch, nextMatch, previousMatch, reverseEmcee, timeFormat, hidePracticeSchedule }) {
     const { height, width } = useWindowDimensions();
     const matchClasses = [
         { "matchNumber": 1, "red": { "class": "success", "from": null }, "blue": { "class": "success", "from": null }, "winnerTo": 7, "loserTo": 5, "winnerVs": "blue", "loserVs": "blue" },
@@ -23,13 +24,37 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
         { "matchNumber": 12, "red": { "class": "davidPriceWarning", "from": "Won M10" }, "blue": { "class": "davidPriceWarning", "from": "Won M9" }, "winnerTo": 13, "loserTo": null, "winnerVs": "red", "loserVs": null },
         { "matchNumber": 13, "red": { "class": "davidPriceWarning", "from": "Lost M11" }, "blue": { "class": "davidPriceWarning", "from": "Won M12" }, "winnerTo": 14, "loserTo": null, "winnerVs": "red", "loserVs": null }
     ]
-    var schedule = qualSchedule?.schedule?.schedule || qualSchedule?.schedule || [];
+    var schedule = [];
+    var qualMatchLength = 0;
+    if ((practiceSchedule?.schedule?.schedule?.length > 0 || practiceSchedule?.schedule?.length > 0) && (qualSchedule?.schedule?.length === 0 || qualSchedule?.schedule?.schedule?.length === 0)) {
+        schedule = practiceSchedule?.schedule?.schedule || practiceSchedule?.schedule;
+    }
+    if ((practiceSchedule?.schedule?.schedule?.length > 0 || practiceSchedule?.schedule?.length > 0) && (qualSchedule?.schedule?.length > 0 || qualSchedule?.schedule?.schedule?.length > 0)) {
+        var firstMatch = typeof qualSchedule.schedule?.schedule !== "undefined" ? qualSchedule.schedule?.schedule[0] : qualSchedule?.schedule[0]
+        if (moment().isBefore(moment(firstMatch.startTime).subtract(20, "minutes")) && !hidePracticeSchedule) {
+            schedule = practiceSchedule?.schedule?.schedule || practiceSchedule?.schedule;
+        }
+    }
+    qualMatchLength = schedule.length;
+    if (offlinePlayoffSchedule?.schedule?.length > 0) {
+        schedule = _.concat(schedule, offlinePlayoffSchedule?.schedule);
+    }
+
+    if (qualSchedule?.schedule.length > 0) {
+        schedule = _.concat(schedule, qualSchedule?.schedule);
+        qualMatchLength = schedule.length;
+    }
+
+    if (playoffSchedule?.schedule?.length > 0) {
+        schedule = _.concat(schedule, playoffSchedule?.schedule);
+    }
     var inPlayoffs = false;
     var playoffMatchNumber = -1;
     var scores = [];
-    var matches = playoffSchedule?.schedule;
+    var matches = offlinePlayoffSchedule?.schedule || playoffSchedule?.schedule?.schedule || playoffSchedule?.schedule || [];
+
     if (selectedEvent?.value?.type === "Championship" || selectedEvent?.value?.type === "DistrictChampionshipWithLevels") {
-        inPlayoffs=true;
+        inPlayoffs = true;
     }
 
     // returns the name of the alliance
@@ -37,16 +62,16 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
         var allianceName = "";
         var captain = ";"
         if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[0]?.teamNumber) {
-            allianceName = alliances?.Lookup[`${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[0]?.teamNumber}`]?.alliance;
-            captain = alliances?.Lookup[`${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[0]?.teamNumber}`]?.captain;
+            allianceName = alliances?.Lookup[`${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[0]?.teamNumber}`]?.alliance || alliances?.Lookup[`${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[1]?.teamNumber}`]?.alliance || alliances?.Lookup[`${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[2]?.teamNumber}`]?.alliance;
+            captain = alliances?.Lookup[`${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[0]?.teamNumber}`]?.captain || alliances?.Lookup[`${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[1]?.teamNumber}`]?.captain || alliances?.Lookup[`${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[2]?.teamNumber}`]?.captain;
             if (matchNumber < 14) {
                 if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner?.tieWinner === "red") {
                     allianceName += ` (L${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner.level})`;
                 }
             }
             if (allianceColor === "blue") {
-                allianceName = alliances?.Lookup[`${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[3]?.teamNumber}`]?.alliance;
-                captain = alliances?.Lookup[`${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[3]?.teamNumber}`]?.captain;
+                allianceName = alliances?.Lookup[`${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[3]?.teamNumber}`]?.alliance || alliances?.Lookup[`${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[4]?.teamNumber}`]?.alliance || alliances?.Lookup[`${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[5]?.teamNumber}`]?.alliance;
+                captain = alliances?.Lookup[`${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[3]?.teamNumber}`]?.captain || alliances?.Lookup[`${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[4]?.teamNumber}`]?.captain || alliances?.Lookup[`${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[5]?.teamNumber}`]?.captain;
                 if (matchNumber < 14) {
                     if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner?.tieWinner === "blue") {
                         allianceName += ` (L${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner.level} WIN)`;
@@ -54,11 +79,11 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
                 }
             }
         }
-        return {"allianceName": allianceName, "captain":captain};
-    }
-
-    if (playoffSchedule?.schedule?.length > 0) {
-        schedule = _.concat((qualSchedule?.schedule?.schedule || qualSchedule?.schedule), playoffSchedule?.schedule);
+        if (!allianceName) {
+            return { "allianceName": "?", "captain": "TBD" };
+        } else {
+            return { "allianceName": allianceName, "captain": captain };
+        }
     }
 
     var advantage = {};
@@ -66,9 +91,9 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
     advantage.blue = 0;
     var opponent = { "winner": null, "loser": null };
 
-    if (currentMatch > (qualSchedule?.schedule?.schedule?.length || qualSchedule?.schedule?.length)) {
+    if (currentMatch > qualMatchLength) {
         inPlayoffs = true;
-        playoffMatchNumber = playoffSchedule?.schedule[currentMatch - (qualSchedule?.schedule?.schedule?.length || qualSchedule?.schedule?.length) - 1]?.matchNumber;
+        playoffMatchNumber = playoffSchedule?.schedule[currentMatch - qualMatchLength - 1]?.matchNumber || offlinePlayoffSchedule?.schedule[currentMatch - qualMatchLength - 1]?.matchNumber;
         if (playoffMatchNumber > 14) {
             for (var finalsMatches = 14; finalsMatches < playoffMatchNumber; finalsMatches++) {
                 if (matches[_.findIndex(matches, { "matchNumber": finalsMatches })]?.winner.winner === "red") {
@@ -125,7 +150,7 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
         })
     })
 
-    var matchDetails = _.filter(matches, { "matchNumber": playoffMatchNumber })[0] || _.filter(schedule,{ "matchNumber": currentMatch })[0];
+    var matchDetails = _.filter(matches, { "matchNumber": playoffMatchNumber })[0] || _.filter(schedule, { "matchNumber": currentMatch })[0];
 
     const swipeHandlers = useSwipeable(
         {
@@ -155,28 +180,28 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
                 <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div>Awaiting schedule data for {selectedEvent.label}</Alert>
             </div>}
             {selectedEvent && (schedule?.length > 0) && !inPlayoffs &&
-                <Container fluid {...swipeHandlers} style={{textAlign: "center",padding:"7px"}}>
-                    <EmceeClock matchDetails={matchDetails} timeFormat={timeFormat}/>
+                <Container fluid {...swipeHandlers} style={{ textAlign: "center", padding: "7px" }}>
+                    <EmceeClock matchDetails={matchDetails} timeFormat={timeFormat} />
                     <div className={`davidPriceQuals`}>{schedule[currentMatch - 1]?.matchNumber}</div>
                 </Container>
             }
             {selectedEvent && (schedule?.length > 0) && inPlayoffs &&
                 <>
                     <Container fluid {...swipeHandlers}>
-                    <EmceeClock matchDetails={matchDetails} timeFormat={timeFormat}/>
-                    <Row>
-                            <Col className={`davidPriceDetail${smallScreen}${portrait}`} xs={12}>{_.replace(schedule[currentMatch - 1]?.description, "(R", "(Round ")}</Col>
+                        <EmceeClock matchDetails={matchDetails} timeFormat={timeFormat} />
+                        <Row>
+                            <Col className={`davidPriceDetail${smallScreen}${portrait}`} xs={12}>{_.replace(schedule[currentMatch - 1]?.description, "(R", "(Round ") || ""}</Col>
                         </Row>
                         {!reverseEmcee && <Row>
                             {(playoffMatchNumber <= 13) && <Col xs={2} className={`davidPriceDetail${smallScreen}${portrait} redAllianceTeam`}>
                                 {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.red.from ? _.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.red.from : ""}
                             </Col>}
                             <Col xs={(playoffMatchNumber > 13) ? 6 : 4} className={`redAllianceTeam`}>
-                                <div className={`davidPrice${smallScreen}`}>{allianceName(schedule[currentMatch - 1]?.matchNumber, "red")?.allianceName.replace("Alliance ", "").slice(0,1)}</div>
+                                <div className={`davidPrice${smallScreen}`}>{allianceName(schedule[currentMatch - 1]?.matchNumber, "red")?.allianceName.replace("Alliance ", "").slice(0, 1) || ""}</div>
                                 <div className={`davidPriceDetail${smallScreen}${portrait} davidPriceCaptain`}>C: {allianceName(schedule[currentMatch - 1]?.matchNumber, "red")?.captain}</div>
                             </Col>
                             <Col xs={(playoffMatchNumber > 13) ? 6 : 4} className={`blueAllianceTeam`}>
-                                <div className={`davidPrice${smallScreen}`}>{allianceName(schedule[currentMatch - 1]?.matchNumber, "blue")?.allianceName.replace("Alliance ", "").slice(0,1)}</div>
+                                <div className={`davidPrice${smallScreen}`}>{allianceName(schedule[currentMatch - 1]?.matchNumber, "blue")?.allianceName.replace("Alliance ", "").slice(0, 1) || ""}</div>
                                 <div className={`davidPriceDetail${smallScreen}${portrait} davidPriceCaptain`}>C: {allianceName(schedule[currentMatch - 1]?.matchNumber, "blue")?.captain}</div>
                             </Col>
                             {(playoffMatchNumber <= 13) && <Col xs={2} className={`davidPriceDetail${smallScreen}${portrait} blueAllianceTeam`}>
@@ -189,11 +214,11 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, alliances, cu
                                 {_.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.blue.from ? _.filter(matchClasses, { "matchNumber": playoffMatchNumber })[0]?.blue.from : ""}
                             </Col>}
                             <Col xs={(playoffMatchNumber > 13) ? 6 : 4} className={`blueAllianceTeam`}>
-                                <div className={`davidPrice${smallScreen}`}>{allianceName(schedule[currentMatch - 1]?.matchNumber, "blue")?.allianceName.replace("Alliance ", "").slice(0,1)}</div>
+                                <div className={`davidPrice${smallScreen}`}>{allianceName(schedule[currentMatch - 1]?.matchNumber, "blue")?.allianceName.replace("Alliance ", "").slice(0, 1) || ""}</div>
                                 <div className={`davidPriceDetail${smallScreen}${portrait} davidPriceCaptain`}>C: {allianceName(schedule[currentMatch - 1]?.matchNumber, "blue")?.captain}</div>
                             </Col>
                             <Col xs={(playoffMatchNumber > 13) ? 6 : 4} className={`redAllianceTeam`}>
-                                <div className={`davidPrice${smallScreen}`}>{allianceName(schedule[currentMatch - 1]?.matchNumber, "red")?.allianceName.replace("Alliance ", "").slice(0,1)}</div>
+                                <div className={`davidPrice${smallScreen}`}>{allianceName(schedule[currentMatch - 1]?.matchNumber, "red")?.allianceName.replace("Alliance ", "").slice(0, 1) || ""}</div>
                                 <div className={`davidPriceDetail${smallScreen}${portrait} davidPriceCaptain`}>C: {allianceName(schedule[currentMatch - 1]?.matchNumber, "red")?.captain}</div>
                             </Col>
                             {(playoffMatchNumber <= 13) && <Col xs={2} className={`davidPriceDetail${smallScreen}${portrait} redAllianceTeam`}>

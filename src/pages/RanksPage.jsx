@@ -159,7 +159,7 @@ function RanksPage({ selectedEvent, teamList, rankings, rankSort, setRankSort, a
 
     return (
         <Container fluid>
-            {!selectedEvent && !teamList && <div>
+            {!selectedEvent &&<div>
                 <Alert variant="warning" >You need to select an event before you can see anything here.</Alert>
             </div>}
 

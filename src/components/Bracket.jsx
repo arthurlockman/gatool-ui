@@ -161,9 +161,9 @@ function Bracket({ selectedEvent, playoffSchedule, offlinePlayoffSchedule, setOf
 			console.log(matches[matchNumber - 1] || "no teams yet");
 			console.log(!matches[matchNumber - 1]?.teams[5]?.teamNumber ? "no blue team yet" : "select team");
 			if (matches[matchNumber - 1]?.teams[5]?.teamNumber) {
-				if (matchNumber>=14) {
-					var finalsMatches = _.filter(matches,(value)=>{return value.matchNumber > 13});
-					matchNumber = 14+_.findIndex(finalsMatches,(value)=>{return value.scoreRedFinal<10});
+				if (matchNumber >= 14) {
+					var finalsMatches = _.filter(matches, (value) => { return value.matchNumber > 13 });
+					matchNumber = 14 + _.findIndex(finalsMatches, (value) => { return value.scoreRedFinal < 10 });
 				}
 				setWinnerMatch(matchNumber);
 				setShowSelectWinner(true);
@@ -299,7 +299,7 @@ function Bracket({ selectedEvent, playoffSchedule, offlinePlayoffSchedule, setOf
 			};
 		}
 
-		if (winnerTo<=14) {
+		if (winnerTo <= 14) {
 			if (winnerTo) {
 				tempMatches.schedule[winnerTo - 1].teams[_.findIndex(tempMatches.schedule[winnerTo - 1].teams, { "station": `${winnerStation}1` })].teamNumber = tempTeams[winningAlliance][0];
 				tempMatches.schedule[winnerTo - 1].teams[_.findIndex(tempMatches.schedule[winnerTo - 1].teams, { "station": `${winnerStation}2` })].teamNumber = tempTeams[winningAlliance][1];
@@ -787,16 +787,17 @@ function Bracket({ selectedEvent, playoffSchedule, offlinePlayoffSchedule, setOf
 				<Modal.Body>
 					<Container fluid>
 						<Row>
-							<Col style={{ backgroundColor: "red", color: "white", fontWeight: "bold", fontSize: "40px", textAlign: "center", padding: "50px 0" }} xs={offlinePlayoffSchedule?.schedule?.length <= 14 && winnerMatch < 14 ? 5 : 4} onClick={() => { handleChooseWinner("red") }} variant="danger">{allianceName(winnerMatch, "red")}</Col>
-							{offlinePlayoffSchedule?.schedule?.length <= 14 && winnerMatch < 14 ?
-								<Col xs={2}></Col> :
+							<Col style={{ backgroundColor: "red", color: "white", fontWeight: "bold", fontSize: "40px", textAlign: "center", padding: "50px 0" }} xs={(winnerMatch < 14) ? 5 : 4} onClick={() => { handleChooseWinner("red") }} variant="danger">{allianceName(winnerMatch, "red")}</Col>
+							{(winnerMatch < 14) &&
+								<Col xs={2}></Col>}
+							{((offlinePlayoffSchedule?.schedule?.length > 14) && (winnerMatch >= 14)) &&
 								<>
 									<Col xs={1}></Col>
 									<Col style={{ backgroundColor: "green", color: "white", fontWeight: "bold", fontSize: "40px", textAlign: "center", padding: "50px 0" }} xs={2} onClick={() => { handleChooseWinner("tie") }}>It's a Tie!</Col>
 									<Col xs={1}></Col>
 								</>
 							}
-							<Col style={{ backgroundColor: "blue", color: "white", fontWeight: "bold", fontSize: "40px", textAlign: "center", padding: "50px 0" }} xs={offlinePlayoffSchedule?.schedule?.length <= 14 && winnerMatch < 14 ? 5 : 4} onClick={() => { handleChooseWinner("blue") }}>{allianceName(winnerMatch, "blue")}</Col>
+							<Col style={{ backgroundColor: "blue", color: "white", fontWeight: "bold", fontSize: "40px", textAlign: "center", padding: "50px 0" }} xs={(winnerMatch < 14) ? 5 : 4} onClick={() => { handleChooseWinner("blue") }}>{allianceName(winnerMatch, "blue")}</Col>
 						</Row>
 					</Container>
 				</Modal.Body>
