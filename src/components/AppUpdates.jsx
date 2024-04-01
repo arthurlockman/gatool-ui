@@ -1,6 +1,13 @@
 
 export const appUpdates = [
     {
+        date: "April 1, 2024",
+        message: <ul>
+            <li>Fixed a bug in OFFLINE playoffs that prevented the first match from rendering properly</li>
+            <li>Added OFFLINE support for Emcee page</li>
+            <li>Fixed bug in manual Playoff advancement that incorrectly displayed Tie as a choice</li>
+        </ul>
+    }, {
         date: "March 31, 2024",
         message: <ul>
             <li>Fixed a bug in OFFLINE playoffs that prevented the first match from rendering properly</li>
