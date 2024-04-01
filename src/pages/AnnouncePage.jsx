@@ -13,8 +13,9 @@ import NotificationBanner from "components/NotificationBanner";
 const paleGreen = "rgba(144, 238, 144, 0.5)"
 
 function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, awardsMenu, showNotesAnnounce, showAwards, showSponsors, showMottoes, showChampsStats, timeFormat, eventHighScores, backupTeam, setBackupTeam, nextMatch, previousMatch, setMatchFromMenu, practiceSchedule, eventNamesCY, districtRankings, showDistrictChampsStats, adHocMatch, setAdHocMatch, adHocMode, offlinePlayoffSchedule, swapScreen, autoHideSponsors, hidePracticeSchedule, teamReduction }) {
-    const matchesToNotify = _.toInteger((teamList?.teamCountTotal - teamReduction) / 6);
-    const notification = (currentMatch >= ((qualSchedule?.schedule?.schedule?.length || qualSchedule?.schedule?.length) - matchesToNotify) && currentMatch <= (qualSchedule?.schedule?.schedule?.length || qualSchedule?.schedule?.length)) ? { "expiry": moment().add(1, "hour"), "onTime": moment(), "message": "Please remind teams to have their robots reinspected before Playoffs and to send one team rep for Alliance Selection." } : {};
+    const matchesToNotify = _.toInteger((teamList?.teams?.length - teamReduction) / 6);
+    const qualsLength = practiceSchedule?.schedule?.schedule?.length || practiceSchedule?.schedule?.length || qualSchedule?.schedule?.schedule?.length || qualSchedule?.schedule?.length;
+    const notification = (currentMatch >= (qualsLength - matchesToNotify) && currentMatch <= (qualsLength)) ? { "expiry": moment().add(1, "hour"), "onTime": moment(), "message": "Please remind teams to have their robots reinspected before Playoffs and to send one team rep for Alliance Selection." } : {};
 
     function updateTeamDetails(station, matchDetails) {
         var team = {}
@@ -143,7 +144,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
         } : null);
 
     if (practiceSchedule?.schedule.length > 0 && adHocMatch && (!qualSchedule || qualSchedule?.schedule.length === 0)) {
-        if (typeof matchDetails.teams !== "undefined") { matchDetails.teams = adHocMatch }
+        if (typeof matchDetails.teams === "undefined") { matchDetails.teams = adHocMatch }
     };
 
     var inPlayoffs = (matchDetails?.tournamentLevel === "Playoff" ? true : false);
