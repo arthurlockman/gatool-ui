@@ -143,7 +143,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
         } : null);
 
     if (practiceSchedule?.schedule.length > 0 && adHocMatch && (!qualSchedule || qualSchedule?.schedule.length === 0)) {
-        if (typeof matchDetails.teams !== "undefined") { matchDetails.teams = adHocMatch }
+        if (typeof matchDetails.teams === "undefined") { matchDetails.teams = adHocMatch }
     };
 
     var inPlayoffs = (matchDetails?.tournamentLevel === "Playoff" ? true : false);

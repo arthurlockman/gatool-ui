@@ -458,7 +458,7 @@ function App() {
     qualschedule.completedMatchCount = completedMatchCount;
 
     qualschedule.lastUpdate = moment();
-    setQualSchedule(qualschedule);
+    await setQualSchedule(qualschedule);
 
     console.log(`Fetching Playoff Schedule for ${selectedEvent?.value?.name}...`)
     //get the playoff schedule
