@@ -2,7 +2,7 @@ import { Alert, Button, Container, Form, InputGroup, Modal, Table } from "react-
 import { CalendarPlusFill, SortAlphaDown, SortAlphaUp, SortNumericDown, SortNumericUp } from 'react-bootstrap-icons';
 import { merge, orderBy, find } from "lodash";
 import { rankHighlight } from "../components/HelperFunctions";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import moment from "moment";
 import _ from "lodash";
 import { toast } from "react-toastify";
@@ -15,7 +15,7 @@ import { saveAs } from "file-saver";
 import { useHotkeysContext } from "react-hotkeys-hook";
 import ReactQuill from "react-quill";
 import 'react-quill/dist/quill.snow.css';
-import { useInterval } from 'react-interval-hook';
+import TeamTimer from "components/TeamTimer";
 
 function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSort, setTeamSort, communityUpdates, setCommunityUpdates, allianceCount, lastVisit, setLastVisit, putTeamData, localUpdates, setLocalUpdates, qualSchedule, playoffSchedule, originalAndSustaining, monthsWarning, user, getTeamHistory, timeFormat, getCommunityUpdates }) {
     const [currentTime, setCurrentTime] = useState(moment());
@@ -30,30 +30,15 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         var timeDifference = 0;
         var updateDelay = "";
         timeDifference = moment(currentTime).diff(updateTime, "hours");
-        if (timeDifference < 24) {
+        if (timeDifference < 48) {
             updateDelay = "alert-success";
-        } else if ((timeDifference >= 24) && (timeDifference < 72)) {
+        } else if ((timeDifference >= 48) && (timeDifference < 72)) {
             updateDelay = "alert-warning";
         } else if (timeDifference >= 72) {
             updateDelay = "alert-danger";
         }
         return updateDelay
     }
-
-    /**
-     * /Display a warning on the Team Data screen if the data is over 6 months old
-     * @param {moment.Moment} updateTime 
-     */
-    function updateWarning(updateTime) {
-        var timeDifference = 0;
-        var updateDelay = false;
-        timeDifference = moment(currentTime).diff(updateTime, "months");
-        if (timeDifference >= monthsWarning?.value) {
-            updateDelay = true;
-        }
-        return updateDelay
-    }
-
 
     const [show, setShow] = useState(false);
     const [showDownload, setShowDownload] = useState(false);
@@ -118,28 +103,6 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         'italic',
         'underline',
     ]
-
-    const { start, stop } = useInterval(
-        () => {
-            setCurrentTime(moment());
-        },
-        1000,
-        {
-            autoStart: true,
-            immediate: false,
-            selfCorrecting: true,
-            onFinish: () => {
-                console.log('Clock Stopped in TeamUpdate Page.');
-            },
-        }
-    )
-
-    // Automatically updates the curent time. Checks every second if active.
-    useEffect(() => {
-        if (teamList && !updateTeam) {
-            start()
-        } else { stop() }
-    }, [teamList, updateTeam, start, stop]);
 
     const handleClose = () => {
         setUpdateTeam(null);
@@ -659,7 +622,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                             teamNameWithAvatar = avatar + "<br />" + teamNameWithAvatar;
 
                             return <tr key={`teamDataRow${team?.teamNumber}`}>
-                                <td className={`teamNumberButton ${lastVisit[`${team?.teamNumber}`] ? "teamTableButtonHighlight" : ""}${updateWarning(team.lastUpdate) ? " staleTeam" : ""}`} onClick={(e) => handleShow(team, e)} key={"teamData" + team?.teamNumber}><span className={"teamDataNumber"}>{team?.teamNumber}</span><br />{lastVisit[`${team?.teamNumber}`] ? moment(lastVisit[`${team?.teamNumber}`]).fromNow() : updateWarning(team.lastUpdate) ? <b><i>Needs review!</i></b> : "No recent visit."}</td>
+                               <TeamTimer team={team} lastVisit={lastVisit} monthsWarning={monthsWarning} handleShow={handleShow} currentTime={currentTime} setCurrentTime={setCurrentTime} />
                                 <td style={rankHighlight(team?.rank ? team?.rank : 100, allianceCount || { "count": 8 })}>{team?.rank}</td>
                                 <td dangerouslySetInnerHTML={{ __html: teamNameWithAvatar }} style={updateHighlight(team?.nameShortLocal)}></td>
                                 <td style={updateHighlight(team?.cityStateLocal)}>{team?.cityStateLocal ? team?.cityStateLocal : cityState} </td>

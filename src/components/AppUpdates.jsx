@@ -1,6 +1,12 @@
 
 export const appUpdates = [
     {
+        date: "April 2, 2024",
+        message: <ul>
+            <li>Fixed a bug in the match clock</li>
+            <li>Added OFFLINE support for Emcee page</li>
+        </ul>
+    },{
         date: "April 1, 2024",
         message: <ul>
             <li>Fixed a bug in OFFLINE playoffs that prevented the first match from rendering properly</li>
