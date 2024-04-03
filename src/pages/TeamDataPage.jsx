@@ -2,7 +2,7 @@ import { Alert, Button, Container, Form, InputGroup, Modal, Table } from "react-
 import { CalendarPlusFill, SortAlphaDown, SortAlphaUp, SortNumericDown, SortNumericUp } from 'react-bootstrap-icons';
 import { merge, orderBy, find } from "lodash";
 import { rankHighlight } from "../components/HelperFunctions";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import moment from "moment";
 import _ from "lodash";
 import { toast } from "react-toastify";
@@ -16,9 +16,11 @@ import { useHotkeysContext } from "react-hotkeys-hook";
 import ReactQuill from "react-quill";
 import 'react-quill/dist/quill.snow.css';
 import TeamTimer from "components/TeamTimer";
+import { useInterval } from "react-interval-hook";
 
 function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSort, setTeamSort, communityUpdates, setCommunityUpdates, allianceCount, lastVisit, setLastVisit, putTeamData, localUpdates, setLocalUpdates, qualSchedule, playoffSchedule, originalAndSustaining, monthsWarning, user, getTeamHistory, timeFormat, getCommunityUpdates, getTeamList }) {
     const [currentTime, setCurrentTime] = useState(moment());
+    const [clockRunning, setClockRunning] = useState(true);
     const { disableScope, enableScope } = useHotkeysContext();
     const isOnline = useOnlineStatus();
 
@@ -47,6 +49,29 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
     const [gaName, setGaName] = useState("");
     const [showHistory, setShowHistory] = useState(false);
     const [teamHistory, setTeamHistory] = useState(null);
+
+    const { start, stop } = useInterval(
+        () => {
+            console.log("clock tick...")
+            setCurrentTime(moment());
+        },
+        1000,
+        {
+            autoStart: true,
+            immediate: false,
+            selfCorrecting: true,
+            onFinish: () => {
+                console.log('Event refresh stopped at Match Clock level.');
+            },
+        }
+    )
+
+    // Automatically updates the curent time. Checks every second if active.
+    useEffect(() => {
+        if (teamList?.teams?.length>0 && clockRunning) {
+            start()
+        } else { stop() }
+    }, [teamList?.teams, start, stop]);
 
     /**
      * Quill Modules
@@ -182,6 +207,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         setUpdateTeam(null);
         setShow(false);
         enableScope('tabNavigation');
+        setClockRunning(true);
     }
 
     const handleRestoreData = async (data) => {
@@ -212,6 +238,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
             setFormValue({});
             setShow(true);
             disableScope('tabNavigation');
+            setClockRunning(false);
         }
     }
 
@@ -632,7 +659,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                             teamNameWithAvatar = avatar + "<br />" + teamNameWithAvatar;
 
                             return <tr key={`teamDataRow${team?.teamNumber}`}>
-                                <TeamTimer team={team} lastVisit={lastVisit} monthsWarning={monthsWarning} handleShow={handleShow} currentTime={currentTime} setCurrentTime={setCurrentTime} />
+                                <TeamTimer team={team} lastVisit={lastVisit} monthsWarning={monthsWarning} handleShow={handleShow} currentTime={currentTime} />
                                 <td style={rankHighlight(team?.rank ? team?.rank : 100, allianceCount || { "count": 8 })}>{team?.rank}</td>
                                 <td dangerouslySetInnerHTML={{ __html: teamNameWithAvatar }} style={updateHighlight(team?.nameShortLocal)}></td>
                                 <td style={updateHighlight(team?.cityStateLocal)}>{team?.cityStateLocal ? team?.cityStateLocal : cityState} </td>

@@ -1,30 +1,8 @@
-import { useEffect } from 'react';
+
 import moment from 'moment/moment';
-import { useInterval } from 'react-interval-hook';
 
-const TeamTimer = ({ team, lastVisit, monthsWarning, handleShow, currentTime, setCurrentTime }) => {
 
-    const { start, stop } = useInterval(
-        () => {
-            setCurrentTime(moment());
-        },
-        1000,
-        {
-            autoStart: true,
-            immediate: false,
-            selfCorrecting: true,
-            onFinish: () => {
-                console.log('Event refresh stopped at Match Clock level.');
-            },
-        }
-    )
-
-    // Automatically updates the curent time. Checks every second if active.
-    useEffect(() => {
-        if (team) {
-            start()
-        } else { stop() }
-    }, [team, start, stop]);
+const TeamTimer = ({ team, lastVisit, monthsWarning, handleShow, currentTime }) => {
 
     /**
      * /Display a warning on the Team Data screen if the data is over 6 months old
