@@ -71,7 +71,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         if (teamList?.teams?.length>0 && clockRunning) {
             start()
         } else { stop() }
-    }, [teamList?.teams, start, stop]);
+    }, [teamList?.teams, clockRunning, start, stop]);
 
     /**
      * Quill Modules
