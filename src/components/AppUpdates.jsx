@@ -5,6 +5,7 @@ export const appUpdates = [
         message: <ul>
             <li>Fixed a bug in the match clock</li>
             <li>Added OFFLINE support for Emcee page</li>
+            <li>Added support to load Team List from Teams Table page when it doesn't load</li>
         </ul>
     },{
         date: "April 1, 2024",

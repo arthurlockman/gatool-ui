@@ -17,7 +17,7 @@ import ReactQuill from "react-quill";
 import 'react-quill/dist/quill.snow.css';
 import TeamTimer from "components/TeamTimer";
 
-function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSort, setTeamSort, communityUpdates, setCommunityUpdates, allianceCount, lastVisit, setLastVisit, putTeamData, localUpdates, setLocalUpdates, qualSchedule, playoffSchedule, originalAndSustaining, monthsWarning, user, getTeamHistory, timeFormat, getCommunityUpdates }) {
+function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSort, setTeamSort, communityUpdates, setCommunityUpdates, allianceCount, lastVisit, setLastVisit, putTeamData, localUpdates, setLocalUpdates, qualSchedule, playoffSchedule, originalAndSustaining, monthsWarning, user, getTeamHistory, timeFormat, getCommunityUpdates, getTeamList }) {
     const [currentTime, setCurrentTime] = useState(moment());
     const { disableScope, enableScope } = useHotkeysContext();
     const isOnline = useOnlineStatus();
@@ -170,9 +170,9 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
 
         } else {
             var itemExists = _.findIndex(localUpdatesTemp, { "teamNumber": updateTeam.teamNumber });
-                    if (itemExists >= 0) {
-                        localUpdatesTemp.splice(itemExists, 1);
-                    }
+            if (itemExists >= 0) {
+                localUpdatesTemp.splice(itemExists, 1);
+            }
             localUpdatesTemp.push({ "teamNumber": updateTeam.teamNumber, "update": update.updates });
             toast.success(`We have stored your update for team ${updateTeam.teamNumber}. Remember that this update is only visible to you until you save it to gatool Cloud.`)
             setLocalUpdates(localUpdatesTemp);
@@ -539,6 +539,10 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         }
     }
 
+    const handleGetTeamList = () => {
+        getTeamList();
+    }
+
 
     var teamListExtended = teamList?.teams?.map((teamRow) => {
         teamRow.rank = getTeamRank(teamRow?.teamNumber);
@@ -563,14 +567,20 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                 <Alert variant="warning" >You need to select an event before you can see anything here.</Alert>
             </div>}
             {selectedEvent && !teamList && <div>
-                <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div><div>Awaiting team data for {selectedEvent.label}</div></Alert>
+                <Alert variant="warning" onClick={(e) => { handleGetTeamList() }}><div><img src="loadingIcon.gif" alt="Loading data..." /></div>
+                    <div>Awaiting team data for {selectedEvent.label}</div>
+                    <div>If your event has finished loading and you don't see a Team List, tap here to try loading your teams again.</div>
+                </Alert>
             </div>}
             {selectedEvent && teamList?.teams.length === 0 && <div>
-                <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div><div>Awaiting team data for {selectedEvent.label}</div></Alert>
+                <Alert variant="warning" onClick={(e) => { handleGetTeamList() }}><div><img src="loadingIcon.gif" alt="Loading data..." /></div>
+                    <div>Awaiting team data for {selectedEvent.label}</div>
+                    <div>If your event has finished loading and you don't see a Team List, tap here to try loading your teams again.</div>
+                </Alert>
             </div>}
             {selectedEvent && teamList?.teams.length > 0 && <><div>
                 <h4>{selectedEvent?.label}</h4>
-                <p className={"leftTable"}>This table is editable and sortable. Tap on a team number to change data for a specific team. Edits you make are local to this browser, and they will persist here if you do not clear your browser cache. You can save your changes to the gatool Cloud on the team details page or on the Setup Screen. Cells <span className={"teamTableHighlight"}>highlighted in green</span> have been modified, either by you or by other gatool users.</p>
+                <p className={"leftTable"}>This table is {(user["https://gatool.org/roles"].indexOf("user") >= 0) ? <>editable and sortable. Tap on a team number to change data for a specific team. Edits you make are local to this browser, and they will persist here if you do not clear your browser cache. You can save your changes to the gatool Cloud on the team details page or on the Setup Screen. </> : <>sortable. </>}Cells <span className={"teamTableHighlight"}>highlighted in green</span> have been modified, either by you or by other gatool users.</p>
                 <Table responsive className={"leftTable topBorderLine"}>
                     <thead>
                         <tr>
@@ -622,7 +632,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                             teamNameWithAvatar = avatar + "<br />" + teamNameWithAvatar;
 
                             return <tr key={`teamDataRow${team?.teamNumber}`}>
-                               <TeamTimer team={team} lastVisit={lastVisit} monthsWarning={monthsWarning} handleShow={handleShow} currentTime={currentTime} setCurrentTime={setCurrentTime} />
+                                <TeamTimer team={team} lastVisit={lastVisit} monthsWarning={monthsWarning} handleShow={handleShow} currentTime={currentTime} setCurrentTime={setCurrentTime} />
                                 <td style={rankHighlight(team?.rank ? team?.rank : 100, allianceCount || { "count": 8 })}>{team?.rank}</td>
                                 <td dangerouslySetInnerHTML={{ __html: teamNameWithAvatar }} style={updateHighlight(team?.nameShortLocal)}></td>
                                 <td style={updateHighlight(team?.cityStateLocal)}>{team?.cityStateLocal ? team?.cityStateLocal : cityState} </td>
@@ -680,11 +690,11 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                             <Form.Control className={updateTeam.sayNumber ? "formHighlight" : formValue.sayNumber ? "formHighlight" : ""} type="text" placeholder={updateTeam.sayNumber} defaultValue={updateTeam.sayNumber} onChange={(e) => updateForm("sayNumber", e.target.value)} />
                         </Form.Group>
                         <Form.Group >
-                                <Form.Label className={"formLabel"}><b>Robot Name ({updateTeam.robotName ? updateTeam.robotName : "No robot name"}) in TIMS</b> </Form.Label>
-                            
+                            <Form.Label className={"formLabel"}><b>Robot Name ({updateTeam.robotName ? updateTeam.robotName : "No robot name"}) in TIMS</b> </Form.Label>
+
                             <InputGroup>
-                            <Form.Control className={updateTeam.robotNameLocal ? "formHighlight" : formValue.robotNameLocal ? "formHighlight" : ""} type="text" placeholder={updateTeam.robotName} defaultValue={updateTeam.robotNameLocal ? updateTeam.robotNameLocal : updateTeam.robotName} onChange={(e) => updateForm("robotNameLocal", e.target.value)} />
-                            <Form.Check className={"robotNameCheckbox"} type="switch" id="showRobotName" label="Show robot name" defaultChecked={updateTeam?.showRobotName===null ? true:updateTeam?.showRobotName} onChange={(e) => updateForm("showRobotName", e.target.checked)} />
+                                <Form.Control className={updateTeam.robotNameLocal ? "formHighlight" : formValue.robotNameLocal ? "formHighlight" : ""} type="text" placeholder={updateTeam.robotName} defaultValue={updateTeam.robotNameLocal ? updateTeam.robotNameLocal : updateTeam.robotName} onChange={(e) => updateForm("robotNameLocal", e.target.value)} />
+                                <Form.Check className={"robotNameCheckbox"} type="switch" id="showRobotName" label="Show robot name" defaultChecked={updateTeam?.showRobotName === null ? true : updateTeam?.showRobotName} onChange={(e) => updateForm("showRobotName", e.target.checked)} />
                             </InputGroup>
                         </Form.Group>
                         <Form.Group controlId="teamMotto">
