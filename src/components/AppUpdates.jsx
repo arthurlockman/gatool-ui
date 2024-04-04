@@ -1,6 +1,11 @@
 
 export const appUpdates = [
     {
+        date: "April 3, 2024",
+        message: <ul>
+            <li>System-wide messaging</li>
+        </ul>
+    },{
         date: "April 2, 2024",
         message: <ul>
             <li>Fixed a bug in the match clock</li>

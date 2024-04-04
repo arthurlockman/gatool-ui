@@ -4,6 +4,7 @@ import { utils, read } from "xlsx";
 import { Alert, Button, Container, Form, InputGroup } from "react-bootstrap";
 import moment from "moment";
 import _ from "lodash";
+import NotificationBanner from "components/NotificationBanner";
 
 function Developer({ putNotifications, getNotifications }) {
     const { user, getAccessTokenSilently } = useAuth0();
@@ -11,12 +12,19 @@ function Developer({ putNotifications, getNotifications }) {
     const [token, setToken] = useState(null);
     const [formattedUsers, setFormattedUsers] = useState(null);
     const [loadedUsers, setLoadedUsers] = useState(null);
+    const [formattedMessage, setFormattedMessage] = useState({
+        "message": null,
+        "expiry": null,
+        "onTime": null,
+        "variant": null,
+    });
     const [formValue, setFormValue] = useState({
         "onTime": null,
         "offTime": null,
         "onDate": null,
         "offDate": null,
-        "message": null
+        "message": null,
+        "variant": null,
     });
 
     useEffect(() => {
@@ -142,9 +150,10 @@ function Developer({ putNotifications, getNotifications }) {
             "offTime": formValue.offTime,
             "onDate": formValue.onDate,
             "offDate": formValue.offDate,
+            "variant": formValue.variant
         }
         var result = await putNotifications(submission);
-        if (result.status === 204) {
+        if (result.status === 200) {
             console.log("message set.");
         } else {
             console.log("message not set.");
@@ -155,6 +164,12 @@ function Developer({ putNotifications, getNotifications }) {
         var message = await getNotifications();
         console.log(message);
         setFormValue(message);
+        setFormattedMessage({
+            "message": formValue?.message,
+            "expiry": moment(`${formValue?.offDate} ${formValue?.offTime}`),
+            "onTime": moment(`${formValue?.onDate} ${formValue?.onTime}`),
+            "variant": formValue?.variant || "",
+        });
     }
 
     return (
@@ -177,11 +192,21 @@ function Developer({ putNotifications, getNotifications }) {
                             }
                         }} >{loadedUsers === "info" ? <>Users have been downloaded</> : loadedUsers === "danger" ? <>Error in file</> : <>Download users to JSON file</>}</Button>}</div>
                     <Form>
-
+                        <NotificationBanner notification={formattedMessage }></NotificationBanner>
                         <Form.Group className="mb-3" controlId="systemNotification">
                             <Form.Label>Notification</Form.Label>
                             <Form.Control type="text" value={formValue.message} placeholder="Enter message" defaultValue={formValue.message} onChange={(e) => handleFormValue("message", e.target.value)} />
                         </Form.Group>
+                        <Form.Group controlId="variant">
+                            <Form.Label>Variant</Form.Label>
+                            <Form.Select value={formValue.variant} onChange={(e) => handleFormValue("variant", e.target.value)}>
+                                <option value={"info"}>Info</option>
+                                <option value={"success"}>All OK</option>
+                                <option value={"warning"}>Warning</option>
+                                <option value={"danger"}>Urgent</option>
+                            </Form.Select>
+                        </Form.Group>
+
 
                         <InputGroup>
                             <Form.Group className="mb-3" controlId="onDate">
@@ -201,7 +226,7 @@ function Developer({ putNotifications, getNotifications }) {
                             </Form.Group>
                             <Form.Group className="mb-3" controlId="offTime">
                                 <Form.Label>Off Time</Form.Label>
-                                <Form.Control type="time" placeholder="" value={formValue.offTime}defaultValue={formValue.offTime} onChange={(e) => handleFormValue("offTime", e.target.value)} />
+                                <Form.Control type="time" placeholder="" value={formValue.offTime} defaultValue={formValue.offTime} onChange={(e) => handleFormValue("offTime", e.target.value)} />
                             </Form.Group>
                         </InputGroup>
 
@@ -213,7 +238,7 @@ function Developer({ putNotifications, getNotifications }) {
                         </Button>
 
                     </Form>
-                </> : <Alert>You're not authorized to use this page.</Alert>}
+                </> : <Alert variant={"warning"}>You're not authorized to use this page.</Alert>}
 
         </Container>
     )
