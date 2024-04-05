@@ -1423,7 +1423,7 @@ function App() {
       await setRankingsOverride(null);
       await setCurrentMatch(1);
       await setDistrictRankings(null);
-      await setAdHocMatch([
+      setAdHocMatch([
         { teamNumber: null, station: 'Red1', surrogate: false, dq: false },
         { teamNumber: null, station: 'Red2', surrogate: false, dq: false },
         { teamNumber: null, station: 'Red3', surrogate: false, dq: false },
