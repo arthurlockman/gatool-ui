@@ -17,7 +17,9 @@ function Developer({ putNotifications, getNotifications }) {
         "expiry": null,
         "onTime": null,
         "variant": null,
+        "link": null
     });
+
     const [formValue, setFormValue] = useState({
         "onTime": null,
         "offTime": null,
@@ -25,6 +27,7 @@ function Developer({ putNotifications, getNotifications }) {
         "offDate": null,
         "message": null,
         "variant": null,
+        "link": null
     });
 
     useEffect(() => {
@@ -38,6 +41,16 @@ function Developer({ putNotifications, getNotifications }) {
         }
         getToken()
     }, [getAccessTokenSilently, user])
+
+    useEffect(() => {
+        setFormattedMessage({
+            "message": formValue?.message,
+            "expiry": moment(`${formValue?.offDate} ${formValue?.offTime}`),
+            "onTime": moment(`${formValue?.onDate} ${formValue?.onTime}`),
+            "variant": formValue?.variant || "",
+            "link": formValue?.link
+        });
+    }, [formValue])
 
     /**
      * This function clicks the hidden file upload button
@@ -150,7 +163,8 @@ function Developer({ putNotifications, getNotifications }) {
             "offTime": formValue.offTime,
             "onDate": formValue.onDate,
             "offDate": formValue.offDate,
-            "variant": formValue.variant
+            "variant": formValue.variant,
+            "link": formValue.link
         }
         var result = await putNotifications(submission);
         if (result.status === 200) {
@@ -169,6 +183,7 @@ function Developer({ putNotifications, getNotifications }) {
             "expiry": moment(`${formValue?.offDate} ${formValue?.offTime}`),
             "onTime": moment(`${formValue?.onDate} ${formValue?.onTime}`),
             "variant": formValue?.variant || "",
+            "link": formValue?.link
         });
     }
 
@@ -183,19 +198,25 @@ function Developer({ putNotifications, getNotifications }) {
                     <div><input type="file" id="userUpload" onChange={handleUserUpload} className={"hiddenInput"} /></div>
 
                     <Button style={{ cursor: "pointer" }} onClick={clickLoadUsers}><img style={{ float: "left" }} width="50" src="images/excelicon.png" alt="Excel Logo" />{loadedUsers ? <>Load new user list</> : <>Load user list from Mailchimp</>}</Button>
-                    <div><Form.Control as="textarea" rows={3} value={formattedUsers ? formattedUsers : ""} readOnly />
+                    <div>
+                        <Form.Control as="textarea" rows={3} value={formattedUsers ? formattedUsers : ""} readOnly />
                         {loadedUsers && <Button variant={loadedUsers ? loadedUsers : "primary"} onClick={() => {
                             if (loadedUsers !== "danger") {
                                 navigator.clipboard.writeText(formattedUsers);
                                 downloadObjectAsJson(JSON.parse(formattedUsers), "Auth0JSON" + moment().format('MMDDYYYY_HHmmss'));
                                 setLoadedUsers("info");
                             }
-                        }} >{loadedUsers === "info" ? <>Users have been downloaded</> : loadedUsers === "danger" ? <>Error in file</> : <>Download users to JSON file</>}</Button>}</div>
+                        }} >{loadedUsers === "info" ? <>Users have been downloaded</> : loadedUsers === "danger" ? <>Error in file</> : <>Download users to JSON file</>}</Button>}
+                    </div>
                     <Form>
-                        <NotificationBanner notification={formattedMessage }></NotificationBanner>
+                        <NotificationBanner notification={formattedMessage}></NotificationBanner>
                         <Form.Group className="mb-3" controlId="systemNotification">
                             <Form.Label>Notification</Form.Label>
                             <Form.Control type="text" value={formValue.message} placeholder="Enter message" defaultValue={formValue.message} onChange={(e) => handleFormValue("message", e.target.value)} />
+                        </Form.Group>
+                        <Form.Group className="mb-3" controlId="notificationLink">
+                            <Form.Label>Link for Notfication</Form.Label>
+                            <Form.Control type="text" value={formValue.link} placeholder="Enter URL" defaultValue={formValue.link} onChange={(e) => handleFormValue("link", e.target.value)} />
                         </Form.Group>
                         <Form.Group controlId="variant">
                             <Form.Label>Variant</Form.Label>
