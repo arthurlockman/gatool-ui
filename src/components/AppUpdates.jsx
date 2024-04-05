@@ -1,6 +1,12 @@
 
 export const appUpdates = [
     {
+        date: "April 4, 2024",
+        message: <ul>
+            <li>Updating behavior of Update Team Data button</li>
+            <li>Fixing a flashing re-inspection banner</li>
+        </ul>
+    },{
         date: "April 3, 2024",
         message: <ul>
             <li>System-wide messaging</li>

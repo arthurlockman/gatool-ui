@@ -75,9 +75,9 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
                         {team?.qualifiedFirstCmp && (selectedEvent?.value?.champLevel !== "CMPDIV" && selectedEvent?.value?.champLevel !== "CMPSUB" && selectedEvent?.value?.champLevel !== "CMPSUB") && <>Qualified for World Champs</>}
                     </p>}
                 {awards && (showAwards || _.isNull(showAwards)) && <p className={"awards"}>
-                    {awards.map((award) => {
+                    {awards.map((award,index) => {
                         if (award.year > selectedYear.value - (awardsMenu?.value || 3)) {
-                            return <span key={award.year + award.eventName + award.name + award.person + team.teamNumber} className={award.highlight ? "awardHilight" : ""}>{award.year} {_.findIndex(eventNamesCY[award.eventName]) >= 0 ? eventNamesCY[award.eventName] : award.eventName} : {award.name}{award.person ? ` : ${award.person}` : ""}<br /></span>
+                            return <span key={award?.year + award?.eventName + award?.name + award?.person + team?.teamNumber+index} className={award.highlight ? "awardHilight" : ""}>{award.year} {_.findIndex(eventNamesCY[award.eventName]) >= 0 ? eventNamesCY[award.eventName] : award.eventName} : {award.name}{award.person ? ` : ${award.person}` : ""}<br /></span>
                         } else {
                             return ""
                         }
