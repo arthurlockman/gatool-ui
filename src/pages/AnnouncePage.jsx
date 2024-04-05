@@ -14,7 +14,10 @@ const paleGreen = "rgba(144, 238, 144, 0.5)"
 
 function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, awardsMenu, showNotesAnnounce, showAwards, showSponsors, showMottoes, showChampsStats, timeFormat, eventHighScores, backupTeam, setBackupTeam, nextMatch, previousMatch, setMatchFromMenu, practiceSchedule, eventNamesCY, districtRankings, showDistrictChampsStats, adHocMatch, setAdHocMatch, adHocMode, offlinePlayoffSchedule, swapScreen, autoHideSponsors, hidePracticeSchedule, teamReduction }) {
     const matchesToNotify = _.toInteger((teamList?.teams?.length - teamReduction) / 6);
-    const qualsLength = practiceSchedule?.schedule?.schedule?.length || practiceSchedule?.schedule?.length || qualSchedule?.schedule?.schedule?.length || qualSchedule?.schedule?.length;
+    var qualsLength = practiceSchedule?.schedule?.schedule?.length || practiceSchedule?.schedule?.length;
+    if (qualSchedule?.schedule?.schedule?.length || qualSchedule?.schedule?.length) {
+        qualsLength = qualSchedule?.schedule?.schedule?.length || qualSchedule?.schedule?.length;
+    };
     const notification = (currentMatch >= (qualsLength - matchesToNotify) && currentMatch <= (qualsLength)) ? { "expiry": moment().add(1, "hour"), "onTime": moment(), "message": "Please remind teams to have their robots reinspected before Playoffs and to send one team rep for Alliance Selection." } : {};
 
     function updateTeamDetails(station, matchDetails) {
