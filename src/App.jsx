@@ -1703,6 +1703,7 @@ function App() {
   useHotkeys('shift+left', () => tabNavLeft(), { scopes: 'tabNavigation' });
   useHotkeys('comma', () => tabNavLeft(), { scopes: 'tabNavigation' });
   useHotkeys('j', () => tabNavLeft(), { scopes: 'tabNavigation' });
+  useHotkeys('s,F5', () => getSchedule(), { scopes: 'tabNavigation' });
 
   return (
     <div className="App">

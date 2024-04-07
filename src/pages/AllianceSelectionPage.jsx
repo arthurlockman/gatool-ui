@@ -49,7 +49,6 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
     }
 
     useHotkeys('return', () => document.getElementById("resetAllianceSelection").click(), { scopes: 'resetAllianceSelection' });
-    console.log(allianceSelection);
     return (
         < >
             {!selectedEvent && <div>

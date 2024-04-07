@@ -188,8 +188,8 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
         }
     )
 
-    useHotkeys('right', () => nextMatch(), { scopes: 'matchNavigation' })
-    useHotkeys('left', () => previousMatch(), { scopes: 'matchNavigation' })
+    useHotkeys('right', () => nextMatch(), { scopes: 'matchNavigation' });
+    useHotkeys('left', () => previousMatch(), { scopes: 'matchNavigation' });
 
     return (
         <  >
