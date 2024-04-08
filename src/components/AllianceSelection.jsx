@@ -198,8 +198,6 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
     };
 
     if (selectedEvent && rankings && teamList && allianceCount && communityUpdates) {
-
-
         sortedTeams = sortedTeams.map((team) => {
             team = _.merge(team, communityUpdates[_.findIndex(communityUpdates, { "teamNumber": team?.teamNumber })], teamList?.teams[_.findIndex(teamList?.teams, { "teamNumber": team?.teamNumber })])
             var years = 1 + Number(selectedYear?.value) - Number(team?.rookieYear);
