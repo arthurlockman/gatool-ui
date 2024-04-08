@@ -10,7 +10,7 @@ import { useHotkeysContext, useHotkeys } from "react-hotkeys-hook";
 import './AllianceSelectionPage.css';
 import TwoAllianceBracket from "components/TwollianceBracket";
 
-function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, playoffSchedule, offlinePlayoffSchedule, alliances, rankings, timeFormat, getRanks, allianceSelection, playoffs, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays, rankingsOverride, loadEvent, practiceSchedule, setOfflinePlayoffSchedule }) {
+function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, playoffSchedule, offlinePlayoffSchedule, alliances, rankings, timeFormat, getRanks, allianceSelection, playoffs, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays, rankingsOverride, loadEvent, practiceSchedule, setOfflinePlayoffSchedule, currentMatch, qualsLength, nextMatch, previousMatch }) {
     const [overrideAllianceSelection, setOverrideAllianceSelection] = useState(false);
     const [resetAllianceSelection, setResetAllianceSelection] = useState(false);
     const [teamFilter, setTeamFilter] = useState("");
@@ -49,7 +49,7 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
     }
 
     useHotkeys('return', () => document.getElementById("resetAllianceSelection").click(), { scopes: 'resetAllianceSelection' });
-    console.log(allianceSelection);
+
     return (
         < >
             {!selectedEvent && <div>
@@ -106,9 +106,9 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
                 </div>}
 
             {selectedEvent?.value?.allianceCount === "EightAlliance" && playoffs &&
-                <Bracket selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} offlinePlayoffSchedule={offlinePlayoffSchedule} alliances={alliances} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} />}
+                <Bracket selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} offlinePlayoffSchedule={offlinePlayoffSchedule} alliances={alliances} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} currentMatch={currentMatch} qualsLength={qualsLength} nextMatch={nextMatch} previousMatch={previousMatch} />}
             {selectedEvent?.value?.allianceCount === "FourAlliance" && playoffs &&
-                <FourAllianceBracket selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} alliances={alliances} />}
+                <FourAllianceBracket selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} alliances={alliances} currentMatch={currentMatch} qualsLength={qualsLength} nextMatch={nextMatch} previousMatch={previousMatch} />}
             {selectedEvent?.value?.allianceCount === "TwoAlliance" && playoffs &&
                 <TwoAllianceBracket selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} alliances={alliances} />}
             <Modal centered={true} show={resetAllianceSelection} onHide={handleClose}>

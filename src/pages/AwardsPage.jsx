@@ -18,7 +18,7 @@ function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates })
     var sortedTeams = _.orderBy(teamList?.teams, "teamNumber", "asc");
     if (communityUpdates) (
         sortedTeams = sortedTeams.map((team) => {
-            team = _.merge(team, communityUpdates[_.findIndex(communityUpdates, { "teamNumber": team?.teamNumber })])
+            team.updates = team?.updates ? _.merge(team.updates, communityUpdates[_.findIndex(communityUpdates, { "teamNumber": team?.teamNumber })]?.updates) : communityUpdates[_.findIndex(communityUpdates, { "teamNumber": team?.teamNumber })]?.updates;
             var years = 1 + Number(selectedYear?.value) - Number(team?.rookieYear);
             if (typeof team?.updates?.teamYearsNoCompeteLocal !== "undefined") { years -= team?.updates?.teamYearsNoCompeteLocal };
             var yearsDisplay = "th";
@@ -135,7 +135,7 @@ function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates })
                         </Modal.Header>
                         <Modal.Body>
                             <span className={"allianceAnnounceDialog"}>Team {awardTeam?.teamNumber} {awardTeam?.updates?.nameShortLocal ? awardTeam.updates.nameShortLocal : awardTeam?.nameShort}<br />
-                                is {awardTeam?.awardsTextLocal ? awardTeam?.awardsTextLocal : <>{originalAndSustaining.includes(String(awardTeam?.teamNumber)) ? "an Original and Sustaining Team " : ""}from<br />
+                                is {awardTeam?.updates?.awardsTextLocal ? awardTeam?.updates?.awardsTextLocal : <>{originalAndSustaining.includes(String(awardTeam?.teamNumber)) ? "an Original and Sustaining Team " : ""}from<br />
                                     {awardTeam?.updates?.organizationLocal ? awardTeam?.updates?.organizationLocal : awardTeam?.organization}<br />
                                     in</>} {awardTeam?.updates?.cityStateLocal ? awardTeam?.updates?.cityStateLocal : `${awardTeam?.city}, ${awardTeam?.stateProv}`}{awardTeam?.country !== "USA" ? `, ${awardTeam?.country}` : ""}<br />
                                 <br />
