@@ -172,6 +172,7 @@ function App() {
   const [adHocMode, setAdHocMode] = useState(null);
   const [backupTeam, setBackupTeam] = useState(null);
   const [showReloaded, setShowReloaded] = usePersistentState("cache:showReloaded", false);
+  const [qualsLength,setQualsLength]=useState(-1);
 
   // Controllers for table sort order at render time
   const [teamSort, setTeamSort] = useState("");
@@ -385,6 +386,7 @@ function App() {
     var practiceschedule = null;
     var qualschedule = null;
     var playoffschedule = null;
+    var qualslength = 0;
 
     console.log(`Fetching Practice Schedule for ${selectedEvent?.value?.name}...`)
     if (selectedEvent?.value?.code.includes("OFFLINE") || selectedEvent?.value?.code.includes("PRACTICE")) {
@@ -432,6 +434,8 @@ function App() {
       qualschedule.schedule.schedule = qualschedule?.schedule?.Schedule;
       delete qualschedule.schedule.Schedule;
     }
+    
+
     var matches = qualschedule?.schedule?.schedule.map((match) => {
       match.winner = winner(match);
       return match;
@@ -460,6 +464,12 @@ function App() {
 
     qualschedule.lastUpdate = moment();
     await setQualSchedule(qualschedule);
+    if (practiceschedule?.schedule?.length > 0 && qualschedule?.schedule?.length === 0) {
+      qualslength = practiceschedule?.schedule?.length;
+    } else if (qualschedule?.schedule?.length > 0) {
+      qualslength = qualschedule?.schedule?.length;
+    }
+    setQualsLength(qualslength);
 
     console.log(`Fetching Playoff Schedule for ${selectedEvent?.value?.name}...`)
     //get the playoff schedule
@@ -1295,7 +1305,7 @@ function App() {
         "offTime": null,
         "onDate": null,
         "offDate": null,
-        "variant":"danger"
+        "variant": "danger"
       }
     }
 
@@ -1716,7 +1726,7 @@ function App() {
           <Routes>
             <Route path="/" element={<LayoutsWithNavbar selectedEvent={selectedEvent} qualSchedule={qualSchedule} playoffs={playoffs} teamList={teamList} communityUpdates={communityUpdates} rankings={rankings} eventHighScores={eventHighScores} worldHighScores={worldStats} allianceSelection={allianceSelection} practiceSchedule={practiceSchedule} />}>
 
-              <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} teamList={teamList} eventFilters={eventFilters} setEventFilters={setEventFilters} timeFilter={timeFilter} setTimeFilter={setTimeFilter} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} rankings={rankings} timeFormat={timeFormat} setTimeFormat={setTimeFormat} showSponsors={showSponsors} setShowSponsors={setShowSponsors} showAwards={showAwards} setShowAwards={setShowAwards} showNotes={showNotes} setShowNotes={setShowNotes} showNotesAnnounce={showNotesAnnounce} setShowNotesAnnounce={setShowNotesAnnounce} showMottoes={showMottoes} setShowMottoes={setShowMottoes} showChampsStats={showChampsStats} setShowChampsStats={setShowChampsStats} swapScreen={swapScreen} setSwapScreen={setSwapScreen} autoAdvance={autoAdvance} setAutoAdvance={setAutoAdvance} autoUpdate={autoUpdate} setAutoUpdate={setAutoUpdate} getSchedule={getSchedule} awardsMenu={awardsMenu} setAwardsMenu={setAwardsMenu} showQualsStats={showQualsStats} setShowQualsStats={setShowQualsStats} showQualsStatsQuals={showQualsStatsQuals} setShowQualsStatsQuals={setShowQualsStatsQuals} teamReduction={teamReduction} setTeamReduction={setTeamReduction} playoffCountOverride={playoffCountOverride} setPlayoffCountOverride={setPlayoffCountOverride} allianceCount={allianceCount} localUpdates={localUpdates} setLocalUpdates={setLocalUpdates} putTeamData={putTeamData} getCommunityUpdates={getCommunityUpdates} reverseEmcee={reverseEmcee} setReverseEmcee={setReverseEmcee} showDistrictChampsStats={showDistrictChampsStats} setShowDistrictChampsStats={setShowDistrictChampsStats} monthsWarning={monthsWarning} setMonthsWarning={setMonthsWarning} user={user} adHocMode={adHocMode} setAdHocMode={setAdHocMode} supportedYears={supportedYears} reloadPage={reloadPage} autoHideSponsors={autoHideSponsors} setAutoHideSponsors={setAutoHideSponsors} setLoadingCommunityUpdates={setLoadingCommunityUpdates} hidePracticeSchedule={hidePracticeSchedule} setHidePracticeSchedule={setHidePracticeSchedule} systemMessage={systemMessage} setTeamListLoading={setTeamListLoading} getTeamList={getTeamList}/>} />
+              <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} teamList={teamList} eventFilters={eventFilters} setEventFilters={setEventFilters} timeFilter={timeFilter} setTimeFilter={setTimeFilter} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} rankings={rankings} timeFormat={timeFormat} setTimeFormat={setTimeFormat} showSponsors={showSponsors} setShowSponsors={setShowSponsors} showAwards={showAwards} setShowAwards={setShowAwards} showNotes={showNotes} setShowNotes={setShowNotes} showNotesAnnounce={showNotesAnnounce} setShowNotesAnnounce={setShowNotesAnnounce} showMottoes={showMottoes} setShowMottoes={setShowMottoes} showChampsStats={showChampsStats} setShowChampsStats={setShowChampsStats} swapScreen={swapScreen} setSwapScreen={setSwapScreen} autoAdvance={autoAdvance} setAutoAdvance={setAutoAdvance} autoUpdate={autoUpdate} setAutoUpdate={setAutoUpdate} getSchedule={getSchedule} awardsMenu={awardsMenu} setAwardsMenu={setAwardsMenu} showQualsStats={showQualsStats} setShowQualsStats={setShowQualsStats} showQualsStatsQuals={showQualsStatsQuals} setShowQualsStatsQuals={setShowQualsStatsQuals} teamReduction={teamReduction} setTeamReduction={setTeamReduction} playoffCountOverride={playoffCountOverride} setPlayoffCountOverride={setPlayoffCountOverride} allianceCount={allianceCount} localUpdates={localUpdates} setLocalUpdates={setLocalUpdates} putTeamData={putTeamData} getCommunityUpdates={getCommunityUpdates} reverseEmcee={reverseEmcee} setReverseEmcee={setReverseEmcee} showDistrictChampsStats={showDistrictChampsStats} setShowDistrictChampsStats={setShowDistrictChampsStats} monthsWarning={monthsWarning} setMonthsWarning={setMonthsWarning} user={user} adHocMode={adHocMode} setAdHocMode={setAdHocMode} supportedYears={supportedYears} reloadPage={reloadPage} autoHideSponsors={autoHideSponsors} setAutoHideSponsors={setAutoHideSponsors} setLoadingCommunityUpdates={setLoadingCommunityUpdates} hidePracticeSchedule={hidePracticeSchedule} setHidePracticeSchedule={setHidePracticeSchedule} systemMessage={systemMessage} setTeamListLoading={setTeamListLoading} getTeamList={getTeamList} />} />
 
               <Route path="/schedule" element={<SchedulePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} practiceSchedule={practiceSchedule} setPracticeSchedule={setPracticeSchedule} getTeamList={getTeamList} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} offlinePlayoffSchedule={offlinePlayoffSchedule} loadEvent={loadEvent} practiceFileUploaded={practiceFileUploaded} setPracticeFileUploaded={setPracticeFileUploaded} setTeamListLoading={setTeamListLoading} getAlliances={getAlliances} />} />
 
@@ -1724,11 +1734,11 @@ function App() {
 
               <Route path='/ranks' element={<RanksPage selectedEvent={selectedEvent} teamList={teamList} rankings={rankings} rankSort={rankSort} setRankSort={setRankSort} allianceCount={allianceCount} rankingsOverride={rankingsOverride} setRankingsOverride={setRankingsOverride} allianceSelection={allianceSelection} getRanks={getRanks} setRankings={setRankings} setAllianceSelectionArrays={setAllianceSelectionArrays} playoffs={playoffs} districtRankings={districtRankings} />} />
 
-              <Route path='/announce' element={<AnnouncePage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} communityUpdates={communityUpdates} currentMatch={currentMatch} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} alliances={alliances} setAlliances={setAlliances} awardsMenu={awardsMenu} showNotesAnnounce={showNotesAnnounce} showAwards={showAwards} showSponsors={showSponsors} showMottoes={showMottoes} showChampsStats={showChampsStats} timeFormat={timeFormat} eventHighScores={eventHighScores} backupTeam={backupTeam} setBackupTeam={setBackupTeam} allianceCount={allianceCount} nextMatch={nextMatch} previousMatch={previousMatch} setMatchFromMenu={setMatchFromMenu} practiceSchedule={practiceSchedule} eventNamesCY={eventNamesCY} districtRankings={districtRankings} showDistrictChampsStats={showDistrictChampsStats} adHocMatch={adHocMatch} setAdHocMatch={setAdHocMatch} adHocMode={adHocMode} offlinePlayoffSchedule={offlinePlayoffSchedule} swapScreen={swapScreen} autoHideSponsors={autoHideSponsors} hidePracticeSchedule={hidePracticeSchedule} teamReduction={teamReduction} />} />
+              <Route path='/announce' element={<AnnouncePage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} communityUpdates={communityUpdates} currentMatch={currentMatch} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} alliances={alliances} setAlliances={setAlliances} awardsMenu={awardsMenu} showNotesAnnounce={showNotesAnnounce} showAwards={showAwards} showSponsors={showSponsors} showMottoes={showMottoes} showChampsStats={showChampsStats} timeFormat={timeFormat} eventHighScores={eventHighScores} backupTeam={backupTeam} setBackupTeam={setBackupTeam} allianceCount={allianceCount} nextMatch={nextMatch} previousMatch={previousMatch} setMatchFromMenu={setMatchFromMenu} practiceSchedule={practiceSchedule} eventNamesCY={eventNamesCY} districtRankings={districtRankings} showDistrictChampsStats={showDistrictChampsStats} adHocMatch={adHocMatch} setAdHocMatch={setAdHocMatch} adHocMode={adHocMode} offlinePlayoffSchedule={offlinePlayoffSchedule} swapScreen={swapScreen} autoHideSponsors={autoHideSponsors} hidePracticeSchedule={hidePracticeSchedule} teamReduction={teamReduction} qualsLength={qualsLength} />} />
 
-              <Route path='/playbyplay' element={<PlayByPlayPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} communityUpdates={communityUpdates} currentMatch={currentMatch} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} alliances={alliances} setAlliances={setAlliances} showMottoes={showMottoes} showNotes={showNotes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} swapScreen={swapScreen} timeFormat={timeFormat} eventHighScores={eventHighScores} backupTeam={backupTeam} setBackupTeam={setBackupTeam} allianceCount={allianceCount} nextMatch={nextMatch} previousMatch={previousMatch} setMatchFromMenu={setMatchFromMenu} practiceSchedule={practiceSchedule} districtRankings={districtRankings} adHocMatch={adHocMatch} setAdHocMatch={setAdHocMatch} adHocMode={adHocMode} offlinePlayoffSchedule={offlinePlayoffSchedule} hidePracticeSchedule={hidePracticeSchedule} teamReduction={teamReduction} />} />
+              <Route path='/playbyplay' element={<PlayByPlayPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} communityUpdates={communityUpdates} currentMatch={currentMatch} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} alliances={alliances} setAlliances={setAlliances} showMottoes={showMottoes} showNotes={showNotes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} swapScreen={swapScreen} timeFormat={timeFormat} eventHighScores={eventHighScores} backupTeam={backupTeam} setBackupTeam={setBackupTeam} allianceCount={allianceCount} nextMatch={nextMatch} previousMatch={previousMatch} setMatchFromMenu={setMatchFromMenu} practiceSchedule={practiceSchedule} districtRankings={districtRankings} adHocMatch={adHocMatch} setAdHocMatch={setAdHocMatch} adHocMode={adHocMode} offlinePlayoffSchedule={offlinePlayoffSchedule} hidePracticeSchedule={hidePracticeSchedule} teamReduction={teamReduction} qualsLength={qualsLength} />} />
 
-              <Route path='/allianceselection' element={<AllianceSelectionPage selectedYear={selectedYear} selectedEvent={selectedEvent} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} offlinePlayoffSchedule={offlinePlayoffSchedule} alliances={alliances} rankings={rankings} timeFormat={timeFormat} getRanks={getRanks} allianceSelection={allianceSelection} playoffs={playoffs} teamList={teamList} allianceCount={allianceCount} communityUpdates={communityUpdates} allianceSelectionArrays={allianceSelectionArrays} setAllianceSelectionArrays={setAllianceSelectionArrays} rankingsOverride={rankingsOverride} loadEvent={loadEvent} practiceSchedule={practiceSchedule} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} />} />
+              <Route path='/allianceselection' element={<AllianceSelectionPage selectedYear={selectedYear} selectedEvent={selectedEvent} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} offlinePlayoffSchedule={offlinePlayoffSchedule} alliances={alliances} rankings={rankings} timeFormat={timeFormat} getRanks={getRanks} allianceSelection={allianceSelection} playoffs={playoffs} teamList={teamList} allianceCount={allianceCount} communityUpdates={communityUpdates} allianceSelectionArrays={allianceSelectionArrays} setAllianceSelectionArrays={setAllianceSelectionArrays} rankingsOverride={rankingsOverride} loadEvent={loadEvent} practiceSchedule={practiceSchedule} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} currentMatch={currentMatch} qualsLength={qualsLength} nextMatch={nextMatch} previousMatch={previousMatch}/>} />
 
               <Route path='/awards' element={<AwardsPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} communityUpdates={communityUpdates} />} />
 
