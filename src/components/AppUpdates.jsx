@@ -1,6 +1,14 @@
 
 export const appUpdates = [
     {
+        date: "April 8, 2024",
+        message: <ul>
+            <li>Fixed a bug that hid custom Awards Text on Awards</li>
+            <li>Added current match highlighting to Playoff brackets for 8 and 4 Alliance events</li>
+            <li>Added 's' and 'F5' keyboard shortcut to refresh schedules/scores</li>
+            <li>Update team data on Setup screen now reloads all team data</li>
+        </ul>
+    },{
         date: "April 4, 2024",
         message: <ul>
             <li>Updating behavior of Update Team Data button</li>

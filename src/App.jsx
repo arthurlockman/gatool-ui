@@ -151,13 +151,13 @@ function App() {
   const [worldStats, setWorldStats] = usePersistentState("cache:stats", null);
   const [eventHighScores, setEventHighScores] = usePersistentState("cache:eventHighScores", null);
   const [teamReduction, setTeamReduction] = usePersistentState("cache:teamReduction", 0);
-  const [allianceSelection, setAllianceSelection] = usePersistentState("cache:allianceSelection", null);
+  const [allianceSelection, setAllianceSelection] = useState(null);
   const [playoffs, setPlayoffs] = usePersistentState("cache:playoffs", null);
   const [playoffCountOverride, setPlayoffCountOverride] = usePersistentState("cache:playoffCountOverride", null);
   const [allianceCount, setAllianceCount] = usePersistentState("cache:allianceCount", null);
   const [lastVisit, setLastVisit] = usePersistentState("cache:lastVisit", {});
   const [localUpdates, setLocalUpdates] = usePersistentState("cache:localUpdates", []);
-  const [allianceSelectionArrays, setAllianceSelectionArrays] = usePersistentState("cache:allianceSelectionArrays", {});
+  const [allianceSelectionArrays, setAllianceSelectionArrays] = useState({});
   const [reverseEmcee, setReverseEmcee] = usePersistentState("cache:reverseEmcee", null)
   const [eventNamesCY, setEventNamesCY] = usePersistentState("cache:eventNamesCY", []);
   const [districtRankings, setDistrictRankings] = usePersistentState("cache:districtRankings", null);
@@ -1428,8 +1428,8 @@ function App() {
       await setAllianceCount(null);
       await setTeamReduction(null);
       await setPlayoffCountOverride(null);
-      await setAllianceSelectionArrays({});
-      await setAllianceSelection(false);
+      setAllianceSelectionArrays({});
+      setAllianceSelection(false);
       await setRankingsOverride(null);
       await setCurrentMatch(1);
       await setDistrictRankings(null);
