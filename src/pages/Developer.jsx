@@ -13,21 +13,21 @@ function Developer({ putNotifications, getNotifications }) {
     const [formattedUsers, setFormattedUsers] = useState(null);
     const [loadedUsers, setLoadedUsers] = useState(null);
     const [formattedMessage, setFormattedMessage] = useState({
-        "message": null,
-        "expiry": null,
-        "onTime": null,
-        "variant": null,
-        "link": null
+        "message": "",
+        "expiry": moment(),
+        "onTime": moment(),
+        "variant": "",
+        "link": ""
     });
 
     const [formValue, setFormValue] = useState({
-        "onTime": null,
-        "offTime": null,
-        "onDate": null,
-        "offDate": null,
-        "message": null,
-        "variant": null,
-        "link": null
+        "onTime": "",
+        "offTime": "",
+        "onDate": "",
+        "offDate": "",
+        "message": "",
+        "variant": "",
+        "link": ""
     });
 
     useEffect(() => {
@@ -212,11 +212,11 @@ function Developer({ putNotifications, getNotifications }) {
                         <NotificationBanner notification={formattedMessage}></NotificationBanner>
                         <Form.Group className="mb-3" controlId="systemNotification">
                             <Form.Label>Notification</Form.Label>
-                            <Form.Control type="text" value={formValue.message} placeholder="Enter message" defaultValue={formValue.message} onChange={(e) => handleFormValue("message", e.target.value)} />
+                            <Form.Control type="text" value={formValue.message} placeholder="Enter message" onChange={(e) => handleFormValue("message", e.target.value)} />
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="notificationLink">
                             <Form.Label>Link for Notfication</Form.Label>
-                            <Form.Control type="text" value={formValue.link} placeholder="Enter URL" defaultValue={formValue.link} onChange={(e) => handleFormValue("link", e.target.value)} />
+                            <Form.Control type="text" value={formValue.link} placeholder="Enter URL" onChange={(e) => handleFormValue("link", e.target.value)} />
                         </Form.Group>
                         <Form.Group controlId="variant">
                             <Form.Label>Variant</Form.Label>
@@ -232,22 +232,22 @@ function Developer({ putNotifications, getNotifications }) {
                         <InputGroup>
                             <Form.Group className="mb-3" controlId="onDate">
                                 <Form.Label>On Date</Form.Label>
-                                <Form.Control type="date" value={formValue.onDate} defaultValue={formValue.onDate} onChange={(e) => handleFormValue("onDate", e.target.value)} />
+                                <Form.Control type="date" value={formValue.onDate} onChange={(e) => handleFormValue("onDate", e.target.value)} />
                             </Form.Group>
                             <Form.Group className="mb-3" controlId="onTime">
                                 <Form.Label>On Time</Form.Label>
-                                <Form.Control type="time" value={formValue.onTime} defaultValue={formValue.onTime} onChange={(e) => handleFormValue("onTime", e.target.value)} />
+                                <Form.Control type="time" value={formValue.onTime} onChange={(e) => handleFormValue("onTime", e.target.value)} />
                             </Form.Group>
                         </InputGroup>
 
                         <InputGroup>
                             <Form.Group className="mb-3" controlId="offDate">
                                 <Form.Label>Off Date</Form.Label>
-                                <Form.Control type="date" placeholder="" value={formValue.offDate} defaultValue={formValue.offDate} onChange={(e) => handleFormValue("offDate", e.target.value)} />
+                                <Form.Control type="date" placeholder="" value={formValue.offDate} onChange={(e) => handleFormValue("offDate", e.target.value)} />
                             </Form.Group>
                             <Form.Group className="mb-3" controlId="offTime">
                                 <Form.Label>Off Time</Form.Label>
-                                <Form.Control type="time" placeholder="" value={formValue.offTime} defaultValue={formValue.offTime} onChange={(e) => handleFormValue("offTime", e.target.value)} />
+                                <Form.Control type="time" placeholder="" value={formValue.offTime} onChange={(e) => handleFormValue("offTime", e.target.value)} />
                             </Form.Group>
                         </InputGroup>
 

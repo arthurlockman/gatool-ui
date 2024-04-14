@@ -197,9 +197,9 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         "declined": []
     };
 
-    if (selectedEvent && rankings && teamList && allianceCount && communityUpdates) {
+    if (selectedEvent && rankings && teamList && allianceCount?.count>0 && communityUpdates) {
         sortedTeams = sortedTeams.map((team) => {
-            team = _.merge(team, communityUpdates[_.findIndex(communityUpdates, { "teamNumber": team?.teamNumber })], teamList?.teams[_.findIndex(teamList?.teams, { "teamNumber": team?.teamNumber })])
+            team = _.merge(team,  teamList?.teams[_.findIndex(teamList?.teams, { "teamNumber": team?.teamNumber })]);
             var years = 1 + Number(selectedYear?.value) - Number(team?.rookieYear);
             if (typeof team?.updates?.teamYearsNoCompeteLocal !== "undefined") { years -= team?.updates?.teamYearsNoCompeteLocal };
             var yearsDisplay = "th";

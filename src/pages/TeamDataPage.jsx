@@ -1,6 +1,6 @@
 import { Alert, Button, Container, Form, InputGroup, Modal, Table } from "react-bootstrap";
 import { CalendarPlusFill, SortAlphaDown, SortAlphaUp, SortNumericDown, SortNumericUp } from 'react-bootstrap-icons';
-import { merge, orderBy, find } from "lodash";
+import { orderBy, find } from "lodash";
 import { rankHighlight } from "../components/HelperFunctions";
 import { useState, useEffect } from "react";
 import moment from "moment";
@@ -45,10 +45,21 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
     const [show, setShow] = useState(false);
     const [showDownload, setShowDownload] = useState(false);
     const [updateTeam, setUpdateTeam] = useState(null);
-    const [formValue, setFormValue] = useState(null);
     const [gaName, setGaName] = useState("");
     const [showHistory, setShowHistory] = useState(false);
-    const [teamHistory, setTeamHistory] = useState(null);
+    const [teamHistory, setTeamHistory] = useState([]);
+    const [nameShortLocal, setNameShortLocal] = useState("");
+    const [organizationLocal, setOrganizationLocal] = useState("");
+    const [cityStateLocal, setCityStateLocal] = useState("");
+    const [sayNumber, setSayNumber] = useState("");
+    const [robotNameLocal,setRobotNameLocal] = useState("");
+    const [showRobotName,setShowRobotName] = useState(true);
+    const [teamMottoLocal,setTeamMottoLocal] = useState("");
+    const [teamYearsNoCompeteLocal, setTeamYearsNoCompeteLocal] = useState("");
+    const [awardsTextLocal, setAwardsTextLocal] = useState("");
+    const [teamNotesLocal, setTeamNotesLocal] = useState("");
+    const [teamNotes, setTeamNotes] = useState("");
+    const [topSponsorsLocal,setTopSponsorsLocal] = useState("");
 
     const { start, stop } = useInterval(
         () => {
@@ -68,7 +79,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
 
     // Automatically updates the curent time. Checks every second if active.
     useEffect(() => {
-        if (teamList?.teams?.length>0 && clockRunning) {
+        if (teamList?.teams?.length > 0 && clockRunning) {
             start()
         } else { stop() }
     }, [teamList?.teams, clockRunning, start, stop]);
@@ -161,15 +172,25 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         visits[`${updateTeam.teamNumber}`] = moment();
         var communityUpdatesTemp = _.cloneDeep(communityUpdates);
         var update = _.filter(communityUpdatesTemp, { "teamNumber": updateTeam.teamNumber })[0];
-        var keys = Object.keys(formValue);
-        keys.forEach((key) => {
-            if (formValue[key] !== "") {
-                update.updates[key] = formValue[key];
-            } else if (update.updates[key] !== "") {
-                update.updates[key] = formValue[key];
-            }
-        })
-        update.updates.lastUpdate = moment().format();
+        var formValue = {
+            "nameShortLocal": nameShortLocal,
+            "cityStateLocal": cityStateLocal,
+            "topSponsorsLocal": topSponsorsLocal,
+            "sponsorsLocal": "",
+            "organizationLocal": organizationLocal,
+            "robotNameLocal": robotNameLocal,
+            "awardsLocal": "",
+            "teamMottoLocal": teamMottoLocal,
+            "teamNotesLocal": teamNotesLocal,
+            "teamYearsNoCompeteLocal": teamYearsNoCompeteLocal,
+            "showRobotName": showRobotName,
+            "teamNotes": teamNotes,
+            "sayNumber": sayNumber,
+            "awardsTextLocal": awardsTextLocal,
+            "lastUpdate": moment().format(),
+        }
+        
+        update.updates = formValue;
         communityUpdatesTemp[_.findIndex(communityUpdatesTemp, { "teamNumber": updateTeam.teamNumber })] = update;
         setCommunityUpdates(communityUpdatesTemp);
 
@@ -229,13 +250,25 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
 
     /**
      * Opens the team data screen so that a user can view and edit the team details 
-     * @param {number} team - The number of the team to display
+     * @param {object} team - The team to display
      * @param {*} e  - the inbound event from clicking the button. 
      */
     const handleShow = (team, e) => {
         if (user["https://gatool.org/roles"].indexOf("user") >= 0) {
             setUpdateTeam(team);
-            setFormValue({});
+            setNameShortLocal(team?.updates?.nameShortLocal);
+            setOrganizationLocal(team?.updates?.organizationLocal);
+            setCityStateLocal(team?.updates?.cityStateLocal);
+            setSayNumber(team?.updates?.sayNumber);
+            setRobotNameLocal(team?.updates?.robotNameLocal);
+            setShowRobotName(team?.updates?.showRobotName);
+            setTeamMottoLocal(team?.updates?.teamMottoLocal);
+            setTeamYearsNoCompeteLocal(team?.updates?.teamYearsNoCompeteLocal);
+            setAwardsTextLocal(team?.updates?.awardsTextLocal);
+            setTeamNotesLocal(team?.updates?.teamNotesLocal);
+            setTeamNotes(team?.updates?.teamNotes);
+            setTopSponsorsLocal(team?.updates?.topSponsorsLocal);
+
             setShow(true);
             disableScope('tabNavigation');
             setClockRunning(false);
@@ -269,12 +302,6 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         setUpdateTeam(null);
         setShow(false);
         enableScope('tabNavigation');
-    }
-
-    const updateForm = (prop, value) => {
-        var update = formValue;
-        update[prop] = value;
-        setFormValue(update);
     }
 
     const updateGaForm = (value) => {
@@ -324,6 +351,9 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                 })
             })
             record.awardList = _.join(record.awards, "; ");
+            record=_.merge(record,record.updates);
+            delete record.updates;
+            delete record.topSponsorsArray;
             delete record.awards;
             delete record.source;
             return (record);
@@ -576,7 +606,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         teamRow.citySort = teamRow?.country + teamRow?.stateProv + teamRow?.city;
         var update = find(communityUpdates, { "teamNumber": teamRow.teamNumber });
         var localUpdate = _.find(localUpdates, { "teamNumber": teamRow?.teamNumber });
-        teamRow = merge(teamRow, (localUpdate ? localUpdate.update : update?.updates));
+        teamRow.updates = localUpdate ? localUpdate.update : update?.updates;
         return teamRow;
     })
 
@@ -655,19 +685,19 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                         {teamList && teamList?.teams && teamListExtended.map((team) => {
                             var cityState = `${team?.city}, ${team?.stateProv}${(team?.country !== "USA") ? ", " + team?.country : ""}`;
                             var avatar = `<img src='https://api.gatool.org/v3/${selectedYear.value}/avatars/team/${team?.teamNumber}/avatar.png' onerror="this.style.display='none'">&nbsp`;
-                            var teamNameWithAvatar = team?.nameShortLocal ? team?.nameShortLocal : team?.nameShort;
+                            var teamNameWithAvatar = team?.updates?.nameShortLocal ? team?.updates?.nameShortLocal : team?.nameShort;
                             teamNameWithAvatar = avatar + "<br />" + teamNameWithAvatar;
 
                             return <tr key={`teamDataRow${team?.teamNumber}`}>
                                 <TeamTimer team={team} lastVisit={lastVisit} monthsWarning={monthsWarning} handleShow={handleShow} currentTime={currentTime} />
                                 <td style={rankHighlight(team?.rank ? team?.rank : 100, allianceCount || { "count": 8 })}>{team?.rank}</td>
-                                <td dangerouslySetInnerHTML={{ __html: teamNameWithAvatar }} style={updateHighlight(team?.nameShortLocal)}></td>
-                                <td style={updateHighlight(team?.cityStateLocal)}>{team?.cityStateLocal ? team?.cityStateLocal : cityState} </td>
-                                <td style={updateHighlight(team?.topSponsorsLocal)}>{team?.topSponsorsLocal ? team?.topSponsorsLocal : team?.topSponsors}</td>
-                                <td style={updateHighlight(team?.organizationLocal)}>{team?.organizationLocal ? team?.organizationLocal : team?.schoolName}</td>
+                                <td dangerouslySetInnerHTML={{ __html: teamNameWithAvatar }} style={updateHighlight(team?.updates?.nameShortLocal)}></td>
+                                <td style={updateHighlight(team?.updates?.cityStateLocal)}>{team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : cityState} </td>
+                                <td style={updateHighlight(team?.updates?.topSponsorsLocal)}>{team?.updates?.topSponsorsLocal ? team?.updates?.topSponsorsLocal : team?.topSponsors}</td>
+                                <td style={updateHighlight(team?.updates?.organizationLocal)}>{team?.updates?.organizationLocal ? team?.updates?.organizationLocal : team?.schoolName}</td>
                                 <td>{team?.rookieYear}</td>
-                                <td style={updateHighlight(team?.robotNameLocal)}>{team?.robotNameLocal}</td>
-                                <td align="left" style={updateHighlight(!_.isEmpty(team?.teamNotes))} className="teamNotes" dangerouslySetInnerHTML={{ __html: team?.teamNotes }}></td>
+                                <td style={updateHighlight(team?.updates?.robotNameLocal)}>{team?.updates?.robotNameLocal}</td>
+                                <td align="left" style={updateHighlight(!_.isEmpty(team?.updates?.teamNotes))} className="teamNotes" dangerouslySetInnerHTML={{ __html: team?.updates?.teamNotes }}></td>
                             </tr>
                         })}
                     </tbody>
@@ -702,65 +732,66 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                     <Form>
                         <Form.Group controlId="teamName">
                             <Form.Label className={"formLabel"}><b>Team Name ({updateTeam.nameShort ? updateTeam.nameShort : "No team name"} in TIMS)</b></Form.Label>
-                            <Form.Control className={updateTeam.nameShortLocal ? "formHighlight" : formValue.nameShortLocal ? "formHighlight" : ""} type="text" placeholder={updateTeam.nameShort} defaultValue={updateTeam.nameShortLocal ? updateTeam.nameShortLocal : updateTeam.nameShort} onChange={(e) => updateForm("nameShortLocal", e.target.value)} />
+                            <Form.Control className={nameShortLocal ? "formHighlight" : ""} type="text" placeholder={updateTeam.nameShort} value={nameShortLocal} onChange={(e) => setNameShortLocal(e.target.value)} />
                         </Form.Group>
                         <Form.Group controlId="organization">
                             <Form.Label className={"formLabel"}><b>Organization/School ({updateTeam.organization ? updateTeam.organization : "No organization in TIMS"} in TIMS)</b></Form.Label>
-                            <Form.Control className={updateTeam.organizationLocal ? "formHighlight" : formValue.organizationLocal ? "formHighlight" : ""} type="text" placeholder={updateTeam.organization} defaultValue={updateTeam.organizationLocal ? updateTeam.organizationLocal : updateTeam.organization} onChange={(e) => updateForm("organizationLocal", e.target.value)} />
+                            <Form.Control className={organizationLocal ? "formHighlight" : ""} type="text" placeholder={updateTeam.organization} value={organizationLocal} onChange={(e) => setOrganizationLocal(e.target.value)} />
                         </Form.Group>
                         <Form.Group controlId="cityState">
                             <Form.Label className={"formLabel"}><b>City/State ({`${updateTeam?.city}, ${updateTeam?.stateProv}${(updateTeam?.country !== "USA") ? ", " + updateTeam?.country : ""}`}) in TIMS)</b></Form.Label>
-                            <Form.Control className={updateTeam.cityStateLocal ? "formHighlight" : formValue.cityStateLocal ? "formHighlight" : ""} type="text" placeholder={`${updateTeam?.city}, ${updateTeam?.stateProv} ${(updateTeam?.country !== "USA") ? " " + updateTeam?.country : ""}`} defaultValue={updateTeam.cityStateLocal ? updateTeam.cityStateLocal : `${updateTeam?.city}, ${updateTeam?.stateProv}${(updateTeam?.country !== "USA") ? ", " + updateTeam?.country : ""}`} onChange={(e) => updateForm("cityStateLocal", e.target.value)} />
+                            <Form.Control className={cityStateLocal ? "formHighlight" : ""} type="text" placeholder={`${updateTeam?.city}, ${updateTeam?.stateProv} ${(updateTeam?.country !== "USA") ? " " + updateTeam?.country : ""}`} value={cityStateLocal} onChange={(e) => setCityStateLocal(e.target.value)} />
                         </Form.Group>
                         <Form.Group controlId="sayNumber">
                             <Form.Label className={"formLabel"}><b>How to pronounce the team number (some teams are particular)</b></Form.Label>
-                            <Form.Control className={updateTeam.sayNumber ? "formHighlight" : formValue.sayNumber ? "formHighlight" : ""} type="text" placeholder={updateTeam.sayNumber} defaultValue={updateTeam.sayNumber} onChange={(e) => updateForm("sayNumber", e.target.value)} />
+                            <Form.Control className={sayNumber ? "formHighlight" : ""} type="text" value={sayNumber} onChange={(e) => setSayNumber(e.target.value)} />
                         </Form.Group>
                         <Form.Group >
                             <Form.Label className={"formLabel"}><b>Robot Name ({updateTeam.robotName ? updateTeam.robotName : "No robot name"}) in TIMS</b> </Form.Label>
 
                             <InputGroup>
-                                <Form.Control className={updateTeam.robotNameLocal ? "formHighlight" : formValue.robotNameLocal ? "formHighlight" : ""} type="text" placeholder={updateTeam.robotName} defaultValue={updateTeam.robotNameLocal ? updateTeam.robotNameLocal : updateTeam.robotName} onChange={(e) => updateForm("robotNameLocal", e.target.value)} />
-                                <Form.Check className={"robotNameCheckbox"} type="switch" id="showRobotName" label="Show robot name" defaultChecked={updateTeam?.showRobotName === null ? true : updateTeam?.showRobotName} onChange={(e) => updateForm("showRobotName", e.target.checked)} />
+                                <Form.Control className={robotNameLocal ? "formHighlight" : ""} type="text" placeholder={updateTeam.robotName} value={robotNameLocal} onChange={(e) => setRobotNameLocal(e.target.value)} />
+                                <Form.Check className={"robotNameCheckbox"} type="switch" id="showRobotName" label="Show robot name" defaultChecked={showRobotName} onChange={(e) => setShowRobotName(e.target.checked)} />
                             </InputGroup>
                         </Form.Group>
                         <Form.Group controlId="teamMotto">
                             <Form.Label className={"formLabel"}><b>Team Motto (Team Mottoes do not come from <i>FIRST</i>)</b></Form.Label>
-                            <Form.Control className={updateTeam.teamMottoLocal ? "formHighlight" : formValue.teamMottoLocal ? "formHighlight" : ""} type="text" placeholder={updateTeam.teamMottoLocal} defaultValue={updateTeam.teamMottoLocal} onChange={(e) => updateForm("teamMottoLocal", e.target.value)} />
+                            <Form.Control className={teamMottoLocal ? "formHighlight" :  ""} type="text" placeholder={updateTeam.updates?.teamMottoLocal} value={teamMottoLocal} onChange={(e) => setTeamMottoLocal(e.target.value)} />
                         </Form.Group>
                         <Form.Group controlId="teamYearsNoCompete">
                             <Form.Label className={"formLabel"}><b>Number of seasons NOT competing with FIRST (will be used in calculating Nth season)</b></Form.Label>
-                            <Form.Control className={updateTeam.teamYearsNoCompeteLocal ? "formHighlight" : formValue.teamYearsNoCompeteLocal ? "formHighlight" : ""} type="number" placeholder={"Enter the count of years rather than the actual years: i.e. 5, not 2004-2007"} defaultValue={updateTeam.teamYearsNoCompeteLocal} onChange={(e) => updateForm("teamYearsNoCompeteLocal", e.target.value)} />
+                            <Form.Control className={teamYearsNoCompeteLocal ? "formHighlight" : ""} type="number" placeholder={"Enter the count of years rather than the actual years: i.e. 5, not 2004-2007"} value={teamYearsNoCompeteLocal} onChange={(e) => setTeamYearsNoCompeteLocal(e.target.value)} />
                         </Form.Group>
                         <Form.Group controlId="awardsText">
                             <Form.Label className={"formLabel"}>
                                 <b>Award/Alliance Selection text</b> (editable portion in <b><i>bold and italic</i></b> below):<br />
-                                Team {updateTeam?.teamNumber} {updateTeam?.updates?.nameShortLocal ? updateTeam.updates.nameShortLocal : updateTeam?.nameShort}<br />
-                                is <b><i>{formValue?.awardsTextLocal ? formValue?.awardsTextLocal : updateTeam?.awardsTextLocal ? updateTeam?.awardsTextLocal : <>{originalAndSustaining.includes(String(updateTeam?.teamNumber)) ? "an Original and Sustaining Team " : ""}from<br />
-                                    {updateTeam?.updates?.organizationLocal ? updateTeam?.updates?.organizationLocal : updateTeam?.organization}<br />
-                                    in</>}</i></b> {updateTeam?.updates?.cityStateLocal ? updateTeam?.updates?.cityStateLocal : `${updateTeam?.city}, ${updateTeam?.stateProv}`}{updateTeam?.country !== "USA" ? `, ${updateTeam?.country}` : ""}<br />
+                                Team {updateTeam?.teamNumber} {nameShortLocal ? nameShortLocal : updateTeam?.nameShort}<br />
+                                is <b><i>{awardsTextLocal ? awardsTextLocal : <>{originalAndSustaining.includes(String(updateTeam?.teamNumber)) ? "an Original and Sustaining Team " : ""}from<br />
+                                    {organizationLocal ? organizationLocal : updateTeam?.organization}<br />
+                                    in</>}</i></b> {cityStateLocal ? cityStateLocal : `${updateTeam?.city}, ${updateTeam?.stateProv}`}{updateTeam?.country !== "USA" ? `, ${updateTeam?.country}` : ""}<br />
                             </Form.Label>
                             <Form.Control
-                                className={updateTeam?.awardsTextLocal ? "formHighlight" : ""}
+                                className={awardsTextLocal ? "formHighlight" : ""}
                                 type="text"
-                                placeholder={`${originalAndSustaining.includes(String(updateTeam?.teamNumber)) ? "an Original and Sustaining Team " : ""}from ${updateTeam?.updates?.organizationLocal ? updateTeam?.updates?.organizationLocal : updateTeam?.organization} in`}
-                                defaultValue={updateTeam?.awardsTextLocal ? updateTeam?.awardsTextLocal : `${originalAndSustaining.includes(String(updateTeam?.teamNumber)) ? "an Original and Sustaining Team " : ""}from ${updateTeam?.updates?.organizationLocal ? updateTeam?.updates?.organizationLocal : updateTeam?.organization} in`}
-                                onChange={(e) => updateForm("awardsTextLocal", e.target.value)} />
+                                placeholder={`${originalAndSustaining.includes(String(updateTeam?.teamNumber)) ? "an Original and Sustaining Team " : ""}from ${organizationLocal ? organizationLocal : updateTeam?.organization} in`}
+                                value={awardsTextLocal}
+                                onChange={(e) => setAwardsTextLocal(e.target.value)} />
                         </Form.Group>
                         <Form.Group controlId="teamNotesLocal">
                             <Form.Label className={"formLabel"}><b>Team Notes for Announce and Play-by-Play Screens (These notes are local notes and do not come from <i>FIRST</i>)</b></Form.Label>
-                            <ReactQuill theme="snow" modules={modules2} formats={formats2} value={updateTeam.teamNotesLocal} placeholder={"Enter some new notes you would like to appear on the Announce Screen"} onChange={(e) => updateForm("teamNotesLocal", e)} ></ReactQuill>
+                            <ReactQuill theme="snow" modules={modules2} formats={formats2} value={teamNotesLocal} placeholder={"Enter some new notes you would like to appear on the Announce Screen"} onChange={(e) => setTeamNotesLocal(e)} ></ReactQuill>
                         </Form.Group>
                         <Form.Group controlId="teamNotes">
                             <Form.Label className={"formLabel"}><b>Team Notes for the Team Data Screen (These notes are local notes and do not come from <i>FIRST</i>)</b></Form.Label>
-                            <ReactQuill theme="snow" modules={modules} formats={formats} value={updateTeam.teamNotes} placeholder={"Enter some new notes you would like to appear on the Team Data Screen"} onChange={(e) => updateForm("teamNotes", e)}></ReactQuill>
+                            <ReactQuill theme="snow" modules={modules} formats={formats} value={teamNotes} placeholder={"Enter some new notes you would like to appear on the Team Data Screen"} onChange={(e) => setTeamNotes(e)}></ReactQuill>
                         </Form.Group>
                         <Form.Group controlId="topSponsors">
-                            <Form.Label className={"formLabel"}><b>Top Sponsors (Enter no more than 5 top sponsors from the full sponsor list below). These will appear under the team name on the Announce Screen. Delete the text to reset to TIMS value.</b></Form.Label>
-                            <Form.Control className={updateTeam.topSponsorsLocal ? "formHighlight" : formValue.topSponsorsLocal ? "formHighlight" : ""} type="text" placeholder={updateTeam?.topSponsors} defaultValue={updateTeam.topSponsorsLocal ? updateTeam.topSponsorsLocal : updateTeam?.topSponsors} onChange={(e) => updateForm("topSponsorsLocal", e.target.value)} />
+                            <Form.Label className={"formLabel"} onClick={()=>setTopSponsorsLocal(updateTeam?.topSponsors)}><b>Top Sponsors (Enter no more than 5 top sponsors from the full sponsor list below). These will appear under the team name on the Announce Screen.<br />
+                                Tap to reset to TIMS value.</b></Form.Label>
+                            <Form.Control className={topSponsorsLocal ? "formHighlight" : ""} type="text" placeholder={updateTeam?.topSponsors} value={topSponsorsLocal} onChange={(e) => setTopSponsorsLocal(e.target.value)} />
                         </Form.Group>
                         <Form.Group controlId="sponsors">
-                            <Form.Label className={"formLabel"}><b>Full list of Sponsors (For reference only. This field is not editable, does not appear in the UI, and any changes here will not be saved.)</b></Form.Label>
+                            <Form.Label className={"formLabel"}><b>Full list of Sponsors <i>(For reference only. This field is not editable, does not appear in the UI, and any changes here will not be saved.)</i></b></Form.Label>
                             <Form.Control type="text" placeholder={updateTeam?.sponsors} defaultValue={updateTeam?.sponsors} disabled />
                         </Form.Group>
                         <br />
@@ -804,19 +835,19 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                         <tbody>
                             <tr key={updateTeam?.lastUpdate}>
                                 <td>{moment(updateTeam?.lastUpdate).format("MMM Do YYYY, " + timeFormat.value)}</td>
-                                <td>{updateTeam?.nameShortLocal}</td>
-                                <td>{updateTeam?.organizationLocal}</td>
-                                <td>{updateTeam?.robotNameLocal}</td>
-                                <td>{updateTeam?.teamMottoLocal}</td>
-                                <td>{updateTeam?.cityStateLocal}</td>
-                                <td>{updateTeam?.topSponsorsLocal}</td>
-                                <td>{updateTeam?.awardsTextLocal}</td>
-                                <td>{updateTeam?.teamNotes}</td>
-                                <td>{updateTeam?.teamNotesLocal}</td>
-                                <td>{updateTeam?.sponsorsLocal}</td>
-                                <td><td>{updateTeam?.sayNumber}</td></td>
+                                <td>{updateTeam?.updates?.nameShortLocal}</td>
+                                <td>{updateTeam?.updates?.organizationLocal}</td>
+                                <td>{updateTeam?.updates?.robotNameLocal}</td>
+                                <td>{updateTeam?.updates?.teamMottoLocal}</td>
+                                <td>{updateTeam?.updates?.cityStateLocal}</td>
+                                <td>{updateTeam?.updates?.topSponsorsLocal}</td>
+                                <td>{updateTeam?.updates?.awardsTextLocal}</td>
+                                <td>{updateTeam?.updates?.teamNotes}</td>
+                                <td>{updateTeam?.updates?.teamNotesLocal}</td>
+                                <td>{updateTeam?.updates?.topSponsorsLocal}</td>
+                                <td><td>{updateTeam?.updates?.sayNumber}</td></td>
                                 {(user["https://gatool.org/roles"].indexOf("admin") >= 0) && <td>
-                                    {updateTeam?.source}</td>}
+                                    {updateTeam?.updates?.source}</td>}
                                 <td>Current Value</td>
                             </tr>
                             {teamHistory && teamHistory.map((team, index) => {
