@@ -1,6 +1,12 @@
 
 export const appUpdates = [
     {
+        date: "April 3, 2024",
+        message: <ul>
+            <li>We made how we store team updates consistent on every page</li>
+            <li>Added new top sponsor option for World Champs Divisions and Champs</li>
+        </ul>
+    }, {
         date: "April 8, 2024",
         message: <ul>
             <li>Fixed a bug that hid custom Awards Text on Awards</li>

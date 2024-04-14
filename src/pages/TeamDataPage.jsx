@@ -52,14 +52,15 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
     const [organizationLocal, setOrganizationLocal] = useState("");
     const [cityStateLocal, setCityStateLocal] = useState("");
     const [sayNumber, setSayNumber] = useState("");
-    const [robotNameLocal,setRobotNameLocal] = useState("");
-    const [showRobotName,setShowRobotName] = useState(true);
-    const [teamMottoLocal,setTeamMottoLocal] = useState("");
+    const [robotNameLocal, setRobotNameLocal] = useState("");
+    const [showRobotName, setShowRobotName] = useState(true);
+    const [teamMottoLocal, setTeamMottoLocal] = useState("");
     const [teamYearsNoCompeteLocal, setTeamYearsNoCompeteLocal] = useState("");
     const [awardsTextLocal, setAwardsTextLocal] = useState("");
     const [teamNotesLocal, setTeamNotesLocal] = useState("");
     const [teamNotes, setTeamNotes] = useState("");
-    const [topSponsorsLocal,setTopSponsorsLocal] = useState("");
+    const [topSponsorsLocal, setTopSponsorsLocal] = useState("");
+    const [topSponsorLocal, setTopSponsorLocal] = useState("")
 
     const { start, stop } = useInterval(
         () => {
@@ -176,6 +177,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
             "nameShortLocal": nameShortLocal,
             "cityStateLocal": cityStateLocal,
             "topSponsorsLocal": topSponsorsLocal,
+            "topSponsorLocal": topSponsorLocal,
             "sponsorsLocal": "",
             "organizationLocal": organizationLocal,
             "robotNameLocal": robotNameLocal,
@@ -189,7 +191,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
             "awardsTextLocal": awardsTextLocal,
             "lastUpdate": moment().format(),
         }
-        
+
         update.updates = formValue;
         communityUpdatesTemp[_.findIndex(communityUpdatesTemp, { "teamNumber": updateTeam.teamNumber })] = update;
         setCommunityUpdates(communityUpdatesTemp);
@@ -268,6 +270,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
             setTeamNotesLocal(team?.updates?.teamNotesLocal);
             setTeamNotes(team?.updates?.teamNotes);
             setTopSponsorsLocal(team?.updates?.topSponsorsLocal);
+            setTopSponsorsLocal(team?.updates?.topSponsorLocal);
 
             setShow(true);
             disableScope('tabNavigation');
@@ -351,7 +354,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                 })
             })
             record.awardList = _.join(record.awards, "; ");
-            record=_.merge(record,record.updates);
+            record = _.merge(record, record.updates);
             delete record.updates;
             delete record.topSponsorsArray;
             delete record.awards;
@@ -453,6 +456,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                     record.robotName = team.robotNameLocal || team.robotName;
                     record.cityState = team.cityStateLocal || `${team.city}, ${team.stateProv}${team.country !== "USA" ? `, ${team.country}` : ""}`;
                     record.topSponsors = team.topSponsorsLocal || team.topSponsors;
+                    record.topSponsor = team.topSponsorLocal || team.topSponsor;
                     record.teamYearsNoCompete = team.teamYearsNoCompeteLocal || "";
                     record.teamMotto = team.teamMottoLocal || "";
                     record.rookieYear = team.rookieYear || "";
@@ -674,7 +678,10 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                             <th onClick={() => (teamSort === "rank") ? setTeamSort("-rank") : setTeamSort("rank")}> <b>Rank{teamSort === "rank" ? <SortNumericDown /> : ""}{teamSort === "-rank" ? <SortNumericUp /> : ""}</b></th>
                             <th onClick={() => (teamSort === "nameShort") ? setTeamSort("-nameShort") : setTeamSort("nameShort")}><b>Team Name{teamSort === "nameShort" ? <SortAlphaDown /> : ""}{teamSort === "-nameShort" ? <SortAlphaUp /> : ""}</b></th>
                             <th onClick={() => (teamSort === "citySort") ? setTeamSort("-citySort") : setTeamSort("citySort")}><b>City{teamSort === "citySort" ? <SortAlphaDown /> : ""}{teamSort === "-citySort" ? <SortAlphaUp /> : ""}</b></th>
-                            <th  ><b>Top Sponsors</b></th>
+                            {(selectedEvent?.value?.type === "Championship" || selectedEvent?.value?.type === "ChampionshipDivision") ?
+                                <th><b>Top Sponsor</b></th> :
+                                <th><b>Top Sponsors</b></th>
+                            }
                             <th onClick={() => (teamSort === "organization") ? setTeamSort("-organization") : setTeamSort("organization")}><b>Organization{teamSort === "organization" ? <SortAlphaDown /> : ""}{teamSort === "-organization" ? <SortAlphaUp /> : ""}</b></th>
                             <th onClick={() => (teamSort === "rookieYear") ? setTeamSort("-rookieYear") : setTeamSort("rookieYear")}><b>Rookie Year{teamSort === "rookieYear" ? <SortNumericDown /> : ""}{teamSort === "-rookieYear" ? <SortNumericUp /> : ""}</b></th>
                             <th onClick={() => (teamSort === "robotNameLocal") ? setTeamSort("-robotNameLocal") : setTeamSort("robotNameLocal")}><b>Robot Name{teamSort === "robotNameLocal" ? <SortAlphaDown /> : ""}{teamSort === "-robotNameLocal" ? <SortAlphaUp /> : ""}</b></th>
@@ -693,7 +700,11 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                                 <td style={rankHighlight(team?.rank ? team?.rank : 100, allianceCount || { "count": 8 })}>{team?.rank}</td>
                                 <td dangerouslySetInnerHTML={{ __html: teamNameWithAvatar }} style={updateHighlight(team?.updates?.nameShortLocal)}></td>
                                 <td style={updateHighlight(team?.updates?.cityStateLocal)}>{team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : cityState} </td>
-                                <td style={updateHighlight(team?.updates?.topSponsorsLocal)}>{team?.updates?.topSponsorsLocal ? team?.updates?.topSponsorsLocal : team?.topSponsors}</td>
+                                {(selectedEvent?.value?.type === "Championship" || selectedEvent?.value?.type === "ChampionshipDivision") ?
+                                    <td style={updateHighlight(team?.updates?.topSponsorLocal)}>{team?.updates?.topSponsorLocal ? team?.updates?.topSponsorLocal : team?.topSponsor}</td> :
+                                    <td style={updateHighlight(team?.updates?.topSponsorsLocal)}>{team?.updates?.topSponsorsLocal ? team?.updates?.topSponsorsLocal : team?.topSponsors}</td>
+                                }
+                                {(selectedEvent?.value?.type === "Championship" || selectedEvent?.value?.type === "ChampionshipDivision") && <td style={updateHighlight(team?.updates?.topSponsorsLocal)}>{team?.updates?.topSponsorsLocal ? team?.updates?.topSponsorsLocal : team?.topSponsors}</td>}
                                 <td style={updateHighlight(team?.updates?.organizationLocal)}>{team?.updates?.organizationLocal ? team?.updates?.organizationLocal : team?.schoolName}</td>
                                 <td>{team?.rookieYear}</td>
                                 <td style={updateHighlight(team?.updates?.robotNameLocal)}>{team?.updates?.robotNameLocal}</td>
@@ -756,7 +767,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                         </Form.Group>
                         <Form.Group controlId="teamMotto">
                             <Form.Label className={"formLabel"}><b>Team Motto (Team Mottoes do not come from <i>FIRST</i>)</b></Form.Label>
-                            <Form.Control className={teamMottoLocal ? "formHighlight" :  ""} type="text" placeholder={updateTeam.updates?.teamMottoLocal} value={teamMottoLocal} onChange={(e) => setTeamMottoLocal(e.target.value)} />
+                            <Form.Control className={teamMottoLocal ? "formHighlight" : ""} type="text" placeholder={updateTeam.updates?.teamMottoLocal} value={teamMottoLocal} onChange={(e) => setTeamMottoLocal(e.target.value)} />
                         </Form.Group>
                         <Form.Group controlId="teamYearsNoCompete">
                             <Form.Label className={"formLabel"}><b>Number of seasons NOT competing with FIRST (will be used in calculating Nth season)</b></Form.Label>
@@ -785,11 +796,17 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                             <Form.Label className={"formLabel"}><b>Team Notes for the Team Data Screen (These notes are local notes and do not come from <i>FIRST</i>)</b></Form.Label>
                             <ReactQuill theme="snow" modules={modules} formats={formats} value={teamNotes} placeholder={"Enter some new notes you would like to appear on the Team Data Screen"} onChange={(e) => setTeamNotes(e)}></ReactQuill>
                         </Form.Group>
+                        {(selectedEvent?.value?.type === "Championship" || selectedEvent?.value?.type === "ChampionshipDivision") ? 
                         <Form.Group controlId="topSponsors">
-                            <Form.Label className={"formLabel"} onClick={()=>setTopSponsorsLocal(updateTeam?.topSponsors)}><b>Top Sponsors (Enter no more than 5 top sponsors from the full sponsor list below). These will appear under the team name on the Announce Screen.<br />
+                        <Form.Label className={"formLabel"} onClick={() => setTopSponsorLocal(updateTeam?.topSponsor)}><b>Top Sponsor (Enter <i>one top sponsor</i> from the full sponsor list below). This will appear under the team name on the Announce Screen.<br />
+                            Tap to reset to TIMS value.</b></Form.Label>
+                        <Form.Control className={topSponsorLocal ? "formHighlight" : ""} type="text" placeholder={updateTeam?.topSponsor} value={topSponsorLocal} onChange={(e) => setTopSponsorLocal(e.target.value)} />
+                    </Form.Group>:
+                        <Form.Group controlId="topSponsors">
+                            <Form.Label className={"formLabel"} onClick={() => setTopSponsorsLocal(updateTeam?.topSponsors)}><b>Top Sponsors (Enter no more than 5 top sponsors from the full sponsor list below). These will appear under the team name on the Announce Screen.<br />
                                 Tap to reset to TIMS value.</b></Form.Label>
                             <Form.Control className={topSponsorsLocal ? "formHighlight" : ""} type="text" placeholder={updateTeam?.topSponsors} value={topSponsorsLocal} onChange={(e) => setTopSponsorsLocal(e.target.value)} />
-                        </Form.Group>
+                        </Form.Group>}
                         <Form.Group controlId="sponsors">
                             <Form.Label className={"formLabel"}><b>Full list of Sponsors <i>(For reference only. This field is not editable, does not appear in the UI, and any changes here will not be saved.)</i></b></Form.Label>
                             <Form.Control type="text" placeholder={updateTeam?.sponsors} defaultValue={updateTeam?.sponsors} disabled />

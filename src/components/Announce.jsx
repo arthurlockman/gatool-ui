@@ -1,7 +1,7 @@
 
 import _ from "lodash";
 
-const announceBackground = {"red":"#F7B3B4","blue":"#98B4F4"}
+const announceBackground = { "red": "#F7B3B4", "blue": "#98B4F4" }
 
 function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selectedEvent, showNotesAnnounce, showAwards, showSponsors, autoHideSponsors, showMottoes, showChampsStats, eventNamesCY, showDistrictChampsStats }) {
     const originalAndSustaining = ["20", "45", "126", "148", "151", "157", "190", "191", "250"];
@@ -25,13 +25,13 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
 
     return (
         <><tr key={station} className={`gatool-announce ${_.toLower(allianceColor)}Alliance`} >
-            <td className={'col1'} style={{backgroundColor:_.toLower(allianceColor)==="red"?announceBackground.red:announceBackground.blue}}>
+            <td className={'col1'} style={{ backgroundColor: _.toLower(allianceColor) === "red" ? announceBackground.red : announceBackground.blue }}>
                 <span className={"announceTeamNumber"} ><b>{team.teamNumber}</b></span><br />
                 {team?.updates?.sayNumber && <span className={"playByPlaysayNumber"}>{team.updates?.sayNumber}<br /></span>}
                 <span >{team?.rookieYear}<br />({years === 1 ? "" : years}{yearsDisplay} season)</span>
-                {inPlayoffs && <p className={"announceAlliance"}>{team.alliance}{selectedEvent?.value?.name.includes("OFFLINE")?<></>:<><br />{team.allianceRole}</>}</p>}
+                {inPlayoffs && <p className={"announceAlliance"}>{team.alliance}{selectedEvent?.value?.name.includes("OFFLINE") ? <></> : <><br />{team.allianceRole}</>}</p>}
             </td>
-            <td className={'col2'} style={{backgroundColor:_.toLower(allianceColor)==="red"?announceBackground.red:announceBackground.blue}}>
+            <td className={'col2'} style={{ backgroundColor: _.toLower(allianceColor) === "red" ? announceBackground.red : announceBackground.blue }}>
                 <span className={"teamName"}>{team?.updates?.nameShortLocal ? team?.updates?.nameShortLocal : team?.nameShort}</span><br />
                 <span>{team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : `${team?.city}, ${team?.stateProv}${team?.country !== "USA" ? `, ${team?.country}` : ""}`}</span><br />
                 {team?.updates?.robotNameLocal && <span className={"robotName"}>{team?.updates?.robotNameLocal}<br /></span>}
@@ -58,9 +58,13 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
                         <br /></span>}
                 </span>}
             </td>
-            <td className={'col7'} style={{backgroundColor:_.toLower(allianceColor)==="red"?announceBackground.red:announceBackground.blue}}>
+            <td className={'col7'} style={{ backgroundColor: _.toLower(allianceColor) === "red" ? announceBackground.red : announceBackground.blue }}>
                 <p className={"announceOrganization"}>{team?.updates?.organizationLocal ? team?.updates?.organizationLocal : team?.schoolName}</p>
-                {(showSponsors || ((autoHideSponsors || _.isNull(autoHideSponsors)) && !team?.rank)) && <p className={"sponsors"} >{team?.updates?.topSponsorsLocal ? team?.updates?.topSponsorsLocal : team?.topSponsors}</p>}
+                {(showSponsors || ((autoHideSponsors || _.isNull(autoHideSponsors)) && !team?.rank)) &&
+                    (selectedEvent?.value?.type === "Championship" || selectedEvent?.value?.type === "ChampionshipDivision") ?
+                    <p className={"sponsors"} >{team?.updates?.topSponsorLocal ? team?.updates?.topSponsorLocal : team?.topSponsor}</p> :
+                    <p className={"sponsors"} >{team?.updates?.topSponsorsLocal ? team?.updates?.topSponsorsLocal : team?.topSponsors}</p>
+                }
                 <p className={`HOF${allianceColor}`}>
                     {originalAndSustaining.includes(String(team?.teamNumber)) && <span>Original and Sustaining Team<br /></span>}
                     {team?.hallOfFame ? team?.hallOfFame.map((award) => {
@@ -75,9 +79,9 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
                         {team?.qualifiedFirstCmp && (selectedEvent?.value?.champLevel !== "CMPDIV" && selectedEvent?.value?.champLevel !== "CMPSUB" && selectedEvent?.value?.champLevel !== "CMPSUB") && <>Qualified for World Champs</>}
                     </p>}
                 {awards && (showAwards || _.isNull(showAwards)) && <p className={"awards"}>
-                    {awards.map((award,index) => {
+                    {awards.map((award, index) => {
                         if (award.year > selectedYear.value - (awardsMenu?.value || 3)) {
-                            return <span key={award?.year + award?.eventName + award?.name + award?.person + team?.teamNumber+index} className={award.highlight ? "awardHilight" : ""}>{award.year} {_.findIndex(eventNamesCY[award.eventName]) >= 0 ? eventNamesCY[award.eventName] : award.eventName} : {award.name}{award.person ? ` : ${award.person}` : ""}<br /></span>
+                            return <span key={award?.year + award?.eventName + award?.name + award?.person + team?.teamNumber + index} className={award.highlight ? "awardHilight" : ""}>{award.year} {_.findIndex(eventNamesCY[award.eventName]) >= 0 ? eventNamesCY[award.eventName] : award.eventName} : {award.name}{award.person ? ` : ${award.person}` : ""}<br /></span>
                         } else {
                             return ""
                         }
@@ -88,7 +92,7 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
                 </p>}
                 {(showNotesAnnounce || _.isNull(showNotesAnnounce)) && <p className="teamNotes" dangerouslySetInnerHTML={{ __html: team?.updates?.teamNotesLocal }} />}
             </td>
-            <td className={"col1 ranking"} style={team?.rankStyle.backgroundColor === "" ? {backgroundColor:_.toLower(allianceColor)==="red"?announceBackground.red:announceBackground.blue} : team?.rankStyle }>
+            <td className={"col1 ranking"} style={team?.rankStyle.backgroundColor === "" ? { backgroundColor: _.toLower(allianceColor) === "red" ? announceBackground.red : announceBackground.blue } : team?.rankStyle}>
                 {team?.rank ? team?.rank : ""}
             </td>
         </tr>

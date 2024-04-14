@@ -732,6 +732,7 @@ function App() {
           organization: "",
           sponsors: "",
           topSponsors: "",
+          topSponsor: "",
           sponsorsRaw: teamRow.nameFull,
           sponsorArray: [],
           topSponsorsArray: [],
@@ -786,10 +787,11 @@ function App() {
           }
         }
 
-        teamRow.sponsors = sponsors.sponsors;
-        teamRow.topSponsors = sponsors.topSponsors;
-        teamRow.topSponsorsArray = sponsors.topSponsorsArrayUnchanged;
-        teamRow.organization = sponsors.organization;
+        teamRow.sponsors = sponsors?.sponsors;
+        teamRow.topSponsors = sponsors?.topSponsors;
+        teamRow.topSponsorsArray = sponsors?.topSponsorsArrayUnchanged;
+        teamRow.topSponsor = sponsors?.topSponsorsArrayUnchanged ? sponsors?.topSponsorsArrayUnchanged[0] : "";
+        teamRow.organization = sponsors?.organization;
         return teamRow;
       })
 
@@ -1556,13 +1558,6 @@ function App() {
           }
 
           e.champLevel = "";
-
-          // old lookup method
-          //if (champsEvents.indexOf(e?.code) >= 0) { e.champLevel = "CHAMPS" } else
-          //  if (divisions.indexOf(e?.code) >= 0) { e.champLevel = "CMPDIV" } else
-          //    if (subdivisions.indexOf(e?.code) >= 0) { } else
-          //      if (michamps.indexOf(e?.code) >= 0) { e.champLevel = "DISTCHAMPS" } else
-          //        if (midivisions.indexOf(e?.code) >= 0) { e.champLevel = "DISTDIV" }
 
           // new method using event type data
           if (e.type === "DistrictChampionship" || e.type === "DistrictChampionshipWithLevels") {
