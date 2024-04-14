@@ -4,6 +4,7 @@ import _ from "lodash";
 import { HandThumbsDownFill, HandThumbsUpFill, TrophyFill, XSquare } from "react-bootstrap-icons";
 import { useHotkeysContext, useHotkeys } from "react-hotkeys-hook";
 import { useEffect } from "react";
+import { originalAndSustaining, allianceSelectionOrderBase } from "./Constants";
 
 
 function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays, handleReset, teamFilter, setTeamFilter }) {
@@ -13,40 +14,20 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
     const [allianceMode, setAllianceMode] = useState(null);
     const { disableScope, enableScope } = useHotkeysContext();
 
-    const allianceSelectionOrderBase = [
-        { "number": 1, "round": 1 },
-        { "number": 2, "round": 1 },
-        { "number": 3, "round": 1 },
-        { "number": 4, "round": 1 },
-        { "number": 5, "round": 1 },
-        { "number": 6, "round": 1 },
-        { "number": 7, "round": 1 },
-        { "number": 8, "round": 1 },
-        { "number": 8, "round": 2 },
-        { "number": 7, "round": 2 },
-        { "number": 6, "round": 2 },
-        { "number": 5, "round": 2 },
-        { "number": 4, "round": 2 },
-        { "number": 3, "round": 2 },
-        { "number": 2, "round": 2 },
-        { "number": 1, "round": 2 },
-        { "number": 1, "round": 3 },
-        { "number": 2, "round": 3 },
-        { "number": 3, "round": 3 },
-        { "number": 4, "round": 3 },
-        { "number": 5, "round": 3 },
-        { "number": 6, "round": 3 },
-        { "number": 7, "round": 3 },
-        { "number": 8, "round": 3 }];
 
-    const originalAndSustaining = ["20", "45", "126", "148", "151", "157", "190", "191", "250"];
-
-    var allianceSelectionOrder = [];
-    allianceSelectionOrderBase.forEach((alliance) => {
-        if (alliance.number <= allianceCount?.count) {
-            allianceSelectionOrder.push(alliance);
-        }
-    })
+    var availColumns = [[], [], [], [], []];
+    var backupTeams = [];
+    var alliances = null;
+    var allianceDisplayOrder = [];
+    var asArrays = {
+        "alliances": [],
+        "allianceCount":-1,
+        "rankedReams": [],
+        "availableTeams": [],
+        "nextChoice": 0,
+        "undo": [],
+        "declined": []
+    };
 
     const inChamps =
         selectedEvent?.value?.champLevel === "CHAMPS" ||
@@ -55,7 +36,15 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
             ? true
             : false;
 
-    var allianceDisplayOrder = [];
+    var allianceSelectionOrder = [];
+    allianceSelectionOrderBase.forEach((alliance) => {
+        if (alliance.number <= allianceCount?.count) {
+            allianceSelectionOrder.push(alliance);
+        }
+    })
+
+    var sortedTeams = _.orderBy(rankings?.ranks, "teamNumber", "asc");
+
     if (allianceCount?.count <= 4) {
         allianceDisplayOrder = [[1, 4], [2, 3]]
     } else if (allianceCount?.count <= 6) {
@@ -181,25 +170,11 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         }
     }, [teamFilter, enableScope, disableScope])
 
-    var availColumns = [[], [], [], [], []];
-    var backupTeams = [];
-    var alliances = null;
-
     allianceSelectionOrder = allianceSelectionOrder.slice(0, allianceCount?.allianceSelectionLength + 1);
 
-    var sortedTeams = _.orderBy(rankings?.ranks, "teamNumber", "asc");
-    var asArrays = {
-        "alliances": [],
-        "rankedReams": [],
-        "availableTeams": [],
-        "nextChoice": 0,
-        "undo": [],
-        "declined": []
-    };
-
-    if (selectedEvent && rankings && teamList && allianceCount?.count>0 && communityUpdates) {
+    if (selectedEvent && rankings && teamList && allianceCount?.count > 0 && communityUpdates) {
         sortedTeams = sortedTeams.map((team) => {
-            team = _.merge(team,  teamList?.teams[_.findIndex(teamList?.teams, { "teamNumber": team?.teamNumber })]);
+            team = _.merge(team, teamList?.teams[_.findIndex(teamList?.teams, { "teamNumber": team?.teamNumber })]);
             var years = 1 + Number(selectedYear?.value) - Number(team?.rookieYear);
             if (typeof team?.updates?.teamYearsNoCompeteLocal !== "undefined") { years -= team?.updates?.teamYearsNoCompeteLocal };
             var yearsDisplay = "th";
@@ -213,7 +188,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         })
 
         //initialize allianceSelectionArrays
-        if (!allianceSelectionArrays || _.isEmpty(allianceSelectionArrays)) {
+        if (!allianceSelectionArrays || _.isEmpty(allianceSelectionArrays) || allianceSelectionArrays?.allianceCount !== allianceCount?.count) {
             sortedTeams = _.orderBy(sortedTeams, ["rank"], ["asc"]);
             asArrays.alliances = [
                 {
@@ -297,6 +272,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                     "name": "Alliance 8"
                 }
             ];
+            asArrays.allianceCount = allianceCount?.count;
             asArrays.rankedTeams = _.orderBy(sortedTeams, ["rank", "asc"]);
             asArrays.availableTeams = _.orderBy(sortedTeams, ["teamNumber", "asc"]);
             asArrays.nextChoice = 0;
@@ -340,7 +316,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
     return (
         <>
             <Container fluid>
-            {selectedEvent && rankings?.ranks?.length > 0 && teamList?.teams?.length > 0 && allianceCount && allianceCount?.count === -1 && <Alert style={{fontSize:"24px"}}>Please set an alliance count on the Setup Screen.</Alert>}
+                {selectedEvent && rankings?.ranks?.length > 0 && teamList?.teams?.length > 0 && allianceCount && allianceCount?.count === -1 && <Alert style={{ fontSize: "24px" }}>Please set an alliance count on the Setup Screen.</Alert>}
                 {selectedEvent && rankings?.ranks?.length > 0 && teamList?.teams?.length > 0 && allianceCount && allianceCount?.count > 0 &&
                     <>
                         <Row><br />

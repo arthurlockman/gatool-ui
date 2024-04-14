@@ -1,10 +1,11 @@
 
 export const appUpdates = [
     {
-        date: "April 3, 2024",
+        date: "April 14, 2024",
         message: <ul>
-            <li>We made how we store team updates consistent on every page</li>
+            <li>Making how we store team updates consistent on every page</li>
             <li>Added new top sponsor option for World Champs Divisions and Champs</li>
+            <li>Added additional checks in Alliance Selection to ensure reset when conditions change</li>
         </ul>
     }, {
         date: "April 8, 2024",
