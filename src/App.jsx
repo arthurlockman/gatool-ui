@@ -762,7 +762,8 @@ function App() {
 
         if (sponsors.sponsorArray.length === 1) {
           sponsors.sponsors = sponsors.sponsorArray[0];
-          sponsors.topSponsors = sponsors.sponsors
+          sponsors.topSponsors = sponsors.sponsors;
+          sponsors.topSponsor = sponsors.sponsors;
         } else {
           if (sponsors.organizationArray.length > 1 && !sponsors.organization) {
             sponsors.sponsorArray.pop();
@@ -776,6 +777,7 @@ function App() {
           sponsors.lastSponsor = sponsors.topSponsorsArray.pop();
           sponsors.topSponsors = sponsors.topSponsorsArray.join(", ");
           sponsors.topSponsors += " & " + sponsors.lastSponsor;
+          sponsors.topSponsor = sponsors.topSponsorsArrayUnchanged[0];
         }
 
         if (sponsors.organizationArray.length === 1 && !sponsors.organization) {
@@ -790,7 +792,7 @@ function App() {
         teamRow.sponsors = sponsors?.sponsors;
         teamRow.topSponsors = sponsors?.topSponsors;
         teamRow.topSponsorsArray = sponsors?.topSponsorsArrayUnchanged;
-        teamRow.topSponsor = sponsors?.topSponsorsArrayUnchanged ? sponsors?.topSponsorsArrayUnchanged[0] : "";
+        teamRow.topSponsor = sponsors.topSponsor;
         teamRow.organization = sponsors?.organization;
         return teamRow;
       })

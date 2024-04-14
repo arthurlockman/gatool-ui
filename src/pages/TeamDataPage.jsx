@@ -270,7 +270,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
             setTeamNotesLocal(team?.updates?.teamNotesLocal);
             setTeamNotes(team?.updates?.teamNotes);
             setTopSponsorsLocal(team?.updates?.topSponsorsLocal);
-            setTopSponsorsLocal(team?.updates?.topSponsorLocal);
+            setTopSponsorLocal(team?.updates?.topSponsorLocal);
 
             setShow(true);
             disableScope('tabNavigation');
