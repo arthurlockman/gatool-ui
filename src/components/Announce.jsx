@@ -61,9 +61,9 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
             <td className={'col7'} style={{ backgroundColor: _.toLower(allianceColor) === "red" ? announceBackground.red : announceBackground.blue }}>
                 <p className={"announceOrganization"}>{team?.updates?.organizationLocal ? team?.updates?.organizationLocal : team?.schoolName}</p>
                 {(showSponsors || ((autoHideSponsors || _.isNull(autoHideSponsors)) && !team?.rank)) &&
-                    (selectedEvent?.value?.type === "Championship" || selectedEvent?.value?.type === "ChampionshipDivision") ?
+                    ((selectedEvent?.value?.type === "Championship" || selectedEvent?.value?.type === "ChampionshipDivision") ?
                     <p className={"sponsors"} >{team?.updates?.topSponsorLocal ? team?.updates?.topSponsorLocal : team?.topSponsor}</p> :
-                    <p className={"sponsors"} >{team?.updates?.topSponsorsLocal ? team?.updates?.topSponsorsLocal : team?.topSponsors}</p>
+                    <p className={"sponsors"} >{team?.updates?.topSponsorsLocal ? team?.updates?.topSponsorsLocal : team?.topSponsors}</p>)
                 }
                 <p className={`HOF${allianceColor}`}>
                     {originalAndSustaining.includes(String(team?.teamNumber)) && <span>Original and Sustaining Team<br /></span>}
