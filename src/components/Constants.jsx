@@ -851,5 +851,30 @@ export const communityUpdateTemplate = {
 }
 
 export const originalAndSustaining = ["20", "45", "126", "148", "151", "157", "190", "191", "250"];
+export const allianceSelectionOrderBase = [
+    { "number": 1, "round": 1 },
+    { "number": 2, "round": 1 },
+    { "number": 3, "round": 1 },
+    { "number": 4, "round": 1 },
+    { "number": 5, "round": 1 },
+    { "number": 6, "round": 1 },
+    { "number": 7, "round": 1 },
+    { "number": 8, "round": 1 },
+    { "number": 8, "round": 2 },
+    { "number": 7, "round": 2 },
+    { "number": 6, "round": 2 },
+    { "number": 5, "round": 2 },
+    { "number": 4, "round": 2 },
+    { "number": 3, "round": 2 },
+    { "number": 2, "round": 2 },
+    { "number": 1, "round": 2 },
+    { "number": 1, "round": 3 },
+    { "number": 2, "round": 3 },
+    { "number": 3, "round": 3 },
+    { "number": 4, "round": 3 },
+    { "number": 5, "round": 3 },
+    { "number": 6, "round": 3 },
+    { "number": 7, "round": 3 },
+    { "number": 8, "round": 3 }];
 
 export const refreshRate = 15; //Refresh rate in seconds for auto update
