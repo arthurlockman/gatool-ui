@@ -172,7 +172,7 @@ function App() {
   const [adHocMode, setAdHocMode] = useState(null);
   const [backupTeam, setBackupTeam] = useState(null);
   const [showReloaded, setShowReloaded] = usePersistentState("cache:showReloaded", false);
-  const [qualsLength,setQualsLength]=useState(-1);
+  const [qualsLength, setQualsLength] = useState(-1);
 
   // Controllers for table sort order at render time
   const [teamSort, setTeamSort] = useState("");
@@ -434,7 +434,7 @@ function App() {
       qualschedule.schedule.schedule = qualschedule?.schedule?.Schedule;
       delete qualschedule.schedule.Schedule;
     }
-    
+
 
     var matches = qualschedule?.schedule?.schedule.map((match) => {
       match.winner = winner(match);
@@ -482,7 +482,7 @@ function App() {
     } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
       result = await httpClient.get(`${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/playoff`);
       playoffschedule = await result.json();
-      
+
     } else {
       if (selectedEvent?.value?.code === "PRACTICE1" || selectedEvent?.value?.code === "PRACTICE2") {
         playoffschedule = { schedule: training.schedule.playoff.pending };
@@ -1065,7 +1065,7 @@ function App() {
           })
           teams.lastUpdate = moment();
           if (notify) {
-            toast.success(`Your team data is now up to date.`)
+            toast.success(`Your team data is now up to date including EI teams.`)
           }
           setCommunityUpdates(teams);
           setLoadingCommunityUpdates(false);
@@ -1217,6 +1217,7 @@ function App() {
    * @returns sets alliances
    */
   async function getAlliances(allianceTemp) {
+    console.log("Getting Alliances");
     var result = null;
     var alliances = allianceTemp || null;
     if (!selectedEvent?.value?.code.includes("PRACTICE") && !selectedEvent?.value?.code.includes("OFFLINE")) {
@@ -1248,17 +1249,19 @@ function App() {
     setAlliances(alliances);
     if (alliances?.alliances?.length > 0) {
       setPlayoffs(true);
+
       // If we are in World Champs, we need to determine the team list from the schedule
-      var tempChampsTeamList = [];
       if (selectedEvent?.value?.type === "Championship") {
+        console.log("Getting Champs teams from Alliances");
+        var tempChampsTeamList = [];
         if (!haveChampsTeams) {
           alliances?.alliances.forEach((alliance) => {
             tempChampsTeamList.push(alliance?.captain);
             tempChampsTeamList.push(alliance?.round1);
             tempChampsTeamList.push(alliance?.round2);
             tempChampsTeamList.push(alliance?.round3);
-            })
-          
+          })
+
           // We have bypassed getting the team list and details in the normal loading cycle,
           // so we need to get the details now from this array of competing teams
           setHaveChampsTeams(true);
@@ -1267,7 +1270,7 @@ function App() {
       }
     }
 
-    
+
   }
 
   /**
@@ -1461,6 +1464,7 @@ function App() {
   // Retrieve Community Updates when the team list changes
   useEffect(() => {
     if (teamList?.teams?.length > 0 && !loadingCommunityUpdates) {
+      console.log("Team list changed. Fetching Community Updates.")
       getCommunityUpdates();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1727,7 +1731,7 @@ function App() {
           <Routes>
             <Route path="/" element={<LayoutsWithNavbar selectedEvent={selectedEvent} qualSchedule={qualSchedule} playoffs={playoffs} teamList={teamList} communityUpdates={communityUpdates} rankings={rankings} eventHighScores={eventHighScores} worldHighScores={worldStats} allianceSelection={allianceSelection} practiceSchedule={practiceSchedule} />}>
 
-              <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} teamList={teamList} eventFilters={eventFilters} setEventFilters={setEventFilters} timeFilter={timeFilter} setTimeFilter={setTimeFilter} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} rankings={rankings} timeFormat={timeFormat} setTimeFormat={setTimeFormat} showSponsors={showSponsors} setShowSponsors={setShowSponsors} showAwards={showAwards} setShowAwards={setShowAwards} showNotes={showNotes} setShowNotes={setShowNotes} showNotesAnnounce={showNotesAnnounce} setShowNotesAnnounce={setShowNotesAnnounce} showMottoes={showMottoes} setShowMottoes={setShowMottoes} showChampsStats={showChampsStats} setShowChampsStats={setShowChampsStats} swapScreen={swapScreen} setSwapScreen={setSwapScreen} autoAdvance={autoAdvance} setAutoAdvance={setAutoAdvance} autoUpdate={autoUpdate} setAutoUpdate={setAutoUpdate} getSchedule={getSchedule} awardsMenu={awardsMenu} setAwardsMenu={setAwardsMenu} showQualsStats={showQualsStats} setShowQualsStats={setShowQualsStats} showQualsStatsQuals={showQualsStatsQuals} setShowQualsStatsQuals={setShowQualsStatsQuals} teamReduction={teamReduction} setTeamReduction={setTeamReduction} playoffCountOverride={playoffCountOverride} setPlayoffCountOverride={setPlayoffCountOverride} allianceCount={allianceCount} localUpdates={localUpdates} setLocalUpdates={setLocalUpdates} putTeamData={putTeamData} getCommunityUpdates={getCommunityUpdates} reverseEmcee={reverseEmcee} setReverseEmcee={setReverseEmcee} showDistrictChampsStats={showDistrictChampsStats} setShowDistrictChampsStats={setShowDistrictChampsStats} monthsWarning={monthsWarning} setMonthsWarning={setMonthsWarning} user={user} adHocMode={adHocMode} setAdHocMode={setAdHocMode} supportedYears={supportedYears} reloadPage={reloadPage} autoHideSponsors={autoHideSponsors} setAutoHideSponsors={setAutoHideSponsors} setLoadingCommunityUpdates={setLoadingCommunityUpdates} hidePracticeSchedule={hidePracticeSchedule} setHidePracticeSchedule={setHidePracticeSchedule} systemMessage={systemMessage} setTeamListLoading={setTeamListLoading} getTeamList={getTeamList} />} />
+              <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} teamList={teamList} eventFilters={eventFilters} setEventFilters={setEventFilters} timeFilter={timeFilter} setTimeFilter={setTimeFilter} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} rankings={rankings} timeFormat={timeFormat} setTimeFormat={setTimeFormat} showSponsors={showSponsors} setShowSponsors={setShowSponsors} showAwards={showAwards} setShowAwards={setShowAwards} showNotes={showNotes} setShowNotes={setShowNotes} showNotesAnnounce={showNotesAnnounce} setShowNotesAnnounce={setShowNotesAnnounce} showMottoes={showMottoes} setShowMottoes={setShowMottoes} showChampsStats={showChampsStats} setShowChampsStats={setShowChampsStats} swapScreen={swapScreen} setSwapScreen={setSwapScreen} autoAdvance={autoAdvance} setAutoAdvance={setAutoAdvance} autoUpdate={autoUpdate} setAutoUpdate={setAutoUpdate} getSchedule={getSchedule} awardsMenu={awardsMenu} setAwardsMenu={setAwardsMenu} showQualsStats={showQualsStats} setShowQualsStats={setShowQualsStats} showQualsStatsQuals={showQualsStatsQuals} setShowQualsStatsQuals={setShowQualsStatsQuals} teamReduction={teamReduction} setTeamReduction={setTeamReduction} playoffCountOverride={playoffCountOverride} setPlayoffCountOverride={setPlayoffCountOverride} allianceCount={allianceCount} localUpdates={localUpdates} setLocalUpdates={setLocalUpdates} putTeamData={putTeamData} getCommunityUpdates={getCommunityUpdates} reverseEmcee={reverseEmcee} setReverseEmcee={setReverseEmcee} showDistrictChampsStats={showDistrictChampsStats} setShowDistrictChampsStats={setShowDistrictChampsStats} monthsWarning={monthsWarning} setMonthsWarning={setMonthsWarning} user={user} adHocMode={adHocMode} setAdHocMode={setAdHocMode} supportedYears={supportedYears} reloadPage={reloadPage} autoHideSponsors={autoHideSponsors} setAutoHideSponsors={setAutoHideSponsors} setLoadingCommunityUpdates={setLoadingCommunityUpdates} hidePracticeSchedule={hidePracticeSchedule} setHidePracticeSchedule={setHidePracticeSchedule} systemMessage={systemMessage} setTeamListLoading={setTeamListLoading} getTeamList={getTeamList} getAlliances={getAlliances} setHaveChampsTeams={setHaveChampsTeams} />} />
 
               <Route path="/schedule" element={<SchedulePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} practiceSchedule={practiceSchedule} setPracticeSchedule={setPracticeSchedule} getTeamList={getTeamList} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} offlinePlayoffSchedule={offlinePlayoffSchedule} loadEvent={loadEvent} practiceFileUploaded={practiceFileUploaded} setPracticeFileUploaded={setPracticeFileUploaded} setTeamListLoading={setTeamListLoading} getAlliances={getAlliances} />} />
 
@@ -1739,7 +1743,7 @@ function App() {
 
               <Route path='/playbyplay' element={<PlayByPlayPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} communityUpdates={communityUpdates} currentMatch={currentMatch} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} alliances={alliances} setAlliances={setAlliances} showMottoes={showMottoes} showNotes={showNotes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} swapScreen={swapScreen} timeFormat={timeFormat} eventHighScores={eventHighScores} backupTeam={backupTeam} setBackupTeam={setBackupTeam} allianceCount={allianceCount} nextMatch={nextMatch} previousMatch={previousMatch} setMatchFromMenu={setMatchFromMenu} practiceSchedule={practiceSchedule} districtRankings={districtRankings} adHocMatch={adHocMatch} setAdHocMatch={setAdHocMatch} adHocMode={adHocMode} offlinePlayoffSchedule={offlinePlayoffSchedule} hidePracticeSchedule={hidePracticeSchedule} teamReduction={teamReduction} qualsLength={qualsLength} />} />
 
-              <Route path='/allianceselection' element={<AllianceSelectionPage selectedYear={selectedYear} selectedEvent={selectedEvent} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} offlinePlayoffSchedule={offlinePlayoffSchedule} alliances={alliances} rankings={rankings} timeFormat={timeFormat} getRanks={getRanks} allianceSelection={allianceSelection} playoffs={playoffs} teamList={teamList} allianceCount={allianceCount} communityUpdates={communityUpdates} allianceSelectionArrays={allianceSelectionArrays} setAllianceSelectionArrays={setAllianceSelectionArrays} rankingsOverride={rankingsOverride} loadEvent={loadEvent} practiceSchedule={practiceSchedule} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} currentMatch={currentMatch} qualsLength={qualsLength} nextMatch={nextMatch} previousMatch={previousMatch}/>} />
+              <Route path='/allianceselection' element={<AllianceSelectionPage selectedYear={selectedYear} selectedEvent={selectedEvent} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} offlinePlayoffSchedule={offlinePlayoffSchedule} alliances={alliances} rankings={rankings} timeFormat={timeFormat} getRanks={getRanks} allianceSelection={allianceSelection} playoffs={playoffs} teamList={teamList} allianceCount={allianceCount} communityUpdates={communityUpdates} allianceSelectionArrays={allianceSelectionArrays} setAllianceSelectionArrays={setAllianceSelectionArrays} rankingsOverride={rankingsOverride} loadEvent={loadEvent} practiceSchedule={practiceSchedule} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} currentMatch={currentMatch} qualsLength={qualsLength} nextMatch={nextMatch} previousMatch={previousMatch} />} />
 
               <Route path='/awards' element={<AwardsPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} communityUpdates={communityUpdates} />} />
 

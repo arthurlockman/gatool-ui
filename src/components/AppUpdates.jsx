@@ -1,6 +1,12 @@
 
 export const appUpdates = [
     {
+        date: "April 15, 2024",
+        message: <ul>
+            <li>Fixing bug in Update Team Data flow for Einstein</li>
+            <li>Fixing tab highlighting for Announce and Play By Play</li>
+        </ul>
+    },{
         date: "April 14, 2024",
         message: <ul>
             <li>Making how we store team updates consistent on every page</li>
