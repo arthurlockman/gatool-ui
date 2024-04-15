@@ -452,21 +452,21 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                     record.tn = team.teamNumber;
                     record.year = selectedYear.value;
                     record.nameShort = team.nameShortLocal || team.nameShort;
-                    record.organization = team.organizationLocal || team.organization;
-                    record.robotName = team.robotNameLocal || team.robotName;
-                    record.cityState = team.cityStateLocal || `${team.city}, ${team.stateProv}${team.country !== "USA" ? `, ${team.country}` : ""}`;
-                    record.topSponsors = team.topSponsorsLocal || team.topSponsors;
-                    record.topSponsor = team.topSponsorLocal || team.topSponsor;
-                    record.teamYearsNoCompete = team.teamYearsNoCompeteLocal || "";
-                    record.teamMotto = team.teamMottoLocal || "";
+                    record.organization = team.updates.organizationLocal || team.organization;
+                    record.robotName = team.updates.robotNameLocal || team.robotName;
+                    record.cityState = team.updates.cityStateLocal || `${team.city}, ${team.stateProv}${team.country !== "USA" ? `, ${team.country}` : ""}`;
+                    record.topSponsors = team.updates.topSponsorsLocal || team.topSponsors;
+                    record.topSponsor = team.updates.topSponsorLocal || team.topSponsor;
+                    record.teamYearsNoCompete = team.updates.teamYearsNoCompeteLocal || "";
+                    record.teamMotto = team.updates.teamMottoLocal || "";
                     record.rookieYear = team.rookieYear || "";
                     record.eventName = selectedEvent.label;
-                    record.sayNumber = team.sayNumber || "";
+                    record.sayNumber = team.updates.sayNumber || "";
                     //let tmp = document.createElement("DIV");
                     //tmp.innerHTML = team.teamNotes;
                     //record.teamNotes = tmp.textContent || tmp.innerText || "";
                     // eslint-disable-next-line
-                    record.teamNotes = team.teamNotes.replace("<br>", "\n").replace("<\div>", "<\div>\n").replace(/&amp;/g, "&").replace(/&nbsp;/g, ' ').replace(/(<([^>]+)>)/gi, "") || "";
+                    record.teamNotes = team.updates.teamNotes.replace("<br>", "\n").replace("<\div>", "<\div>\n").replace(/&amp;/g, "&").replace(/&nbsp;/g, ' ').replace(/(<([^>]+)>)/gi, "") || "";
                     record.gaName = gameAnnouncerFixed || false;
                     record.gaNames = gameAnnouncer.split(",").length > 1 || false;
                     if (index < teamListExtended.length - 1) {
