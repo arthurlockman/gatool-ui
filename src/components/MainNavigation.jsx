@@ -62,6 +62,7 @@ function MainNavigation({ selectedEvent, practiceSchedule, qualSchedule, playoff
   const [scheduleTabReady, setScheduleTabReady] = useState(TabStates.NotReady);
   const [teamDataTabReady, setTeamDataTabReady] = useState(TabStates.NotReady);
   const [ranksTabReady, setRanksTabReady] = useState(TabStates.NotReady);
+  const [announceTabReady, setAnnounceTabReady] = useState(TabStates.NotReady);
   const [statsTabReady, setStatsTabReady] = useState(TabStates.NotReady);
   const [allianceSelectionTabReady, setAllianceSelectionTabReady] = useState(TabStates.NotReady);
   const isOnline = useOnlineStatus();
@@ -89,6 +90,21 @@ function MainNavigation({ selectedEvent, practiceSchedule, qualSchedule, playoff
 
   // Handle ready state for schedule tab
   useEffect(() => {
+    // GREEN: Event Selected, Teams loaded, Schedule loaded
+    // YELLOW: Event Selected, Schedule stale or Teams Data stale
+    // RED: Event Selected, Schedule and Teams not loaded
+
+    if (selectedEvent && scheduleTabReady === TabStates.Ready && teamDataTabReady === TabStates.Ready) {
+      setAnnounceTabReady(TabStates.Ready)
+    } else if (selectedEvent && (scheduleTabReady === TabStates.Stale || teamDataTabReady === TabStates.Stale)) {
+      setAnnounceTabReady(TabStates.Stale)
+    } else {
+      setAnnounceTabReady(TabStates.NotReady)
+    }
+  }, [selectedEvent, scheduleTabReady, teamDataTabReady])
+
+   // Handle ready state for Announce/Play By Play tab
+   useEffect(() => {
     // GREEN: Event Selected, Qual Schedule loaded, has >0 matches in the array
     // GREEN: Event Selected, Practice Schedule loaded, has >0 matches in the array
     // YELLOW: Event Selected, Qual Schedule loaded, has 0 matches in the array
@@ -171,8 +187,8 @@ function MainNavigation({ selectedEvent, practiceSchedule, qualSchedule, playoff
           <Nav.Link id={"schedulePage"} as={NavLink} style={({ isActive }) => getTabStyle(isActive, scheduleTabReady)} to="/schedule"><Calendar3 /><div className='d-none d-md-block navBarText'>Schedule</div></Nav.Link>
           <Nav.Link id={"teamsPage"} as={NavLink} style={({ isActive }) => getTabStyle(isActive, teamDataTabReady)} to="/teamdata"><CardList /><div className='d-none d-md-block navBarText'>Teams</div></Nav.Link>
           <Nav.Link id={"ranksPage"} as={NavLink} style={({ isActive }) => getTabStyle(isActive, ranksTabReady)} to="/ranks"><SortNumericDown /><div className='d-none d-md-block navBarText'>Ranks</div></Nav.Link>
-          <Nav.Link id={"announcePage"} as={NavLink} style={({ isActive }) => getTabStyle(isActive, scheduleTabReady)} to="/announce"><Megaphone /><div className='d-none d-md-block navBarText'>Announce</div></Nav.Link>
-          <Nav.Link id={"playByPlayPage"} as={NavLink} style={({ isActive }) => getTabStyle(isActive, scheduleTabReady)} to="/playbyplay"><Speedometer /><div className='d-none d-md-block navBarText'>Play-by-Play</div></Nav.Link>
+          <Nav.Link id={"announcePage"} as={NavLink} style={({ isActive }) => getTabStyle(isActive, announceTabReady)} to="/announce"><Megaphone /><div className='d-none d-md-block navBarText'>Announce</div></Nav.Link>
+          <Nav.Link id={"playByPlayPage"} as={NavLink} style={({ isActive }) => getTabStyle(isActive, announceTabReady)} to="/playbyplay"><Speedometer /><div className='d-none d-md-block navBarText'>Play-by-Play</div></Nav.Link>
           <Nav.Link id={"allianceSelectionPage"} as={NavLink} style={({ isActive }) => getTabStyle(isActive, allianceSelectionTabReady)} to="/allianceselection"><HandThumbsUp /><div className='d-none d-md-block navBarText'>{playoffs ? "Playoffs" : "Alliance Selection"}</div></Nav.Link>
           <Nav.Link id={"awardsPage"} as={NavLink} style={({ isActive }) => getTabStyle(isActive, teamDataTabReady)} to="/awards"><Trophy /><div className='d-none d-md-block navBarText'>Awards</div></Nav.Link>
           <Nav.Link id={"statsPage"} as={NavLink} style={({ isActive }) => getTabStyle(isActive, statsTabReady)} to="/stats"><Flag /><div className='d-none d-md-block navBarText'>Stats</div></Nav.Link>
