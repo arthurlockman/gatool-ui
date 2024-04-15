@@ -477,11 +477,12 @@ function App() {
     result = null;
     completedMatchCount = 0;
     if (selectedEvent?.value?.code.includes("OFFLINE")) {
-      //do something
+      //set playoffschedule to be empty
       playoffschedule = { "schedule": { "schedule": [] } };
     } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
       result = await httpClient.get(`${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/playoff`);
       playoffschedule = await result.json();
+      
     } else {
       if (selectedEvent?.value?.code === "PRACTICE1" || selectedEvent?.value?.code === "PRACTICE2") {
         playoffschedule = { schedule: training.schedule.playoff.pending };
@@ -563,22 +564,6 @@ function App() {
 
         }
       }))
-
-      // If we are in World Champs, we need to determine the team list from the schedule
-      var tempChampsTeamList = [];
-      if (playoffSchedule?.schedule?.schedule?.length > 0 && selectedEvent?.value?.type === "Championship") {
-        if (!haveChampsTeams) {
-          playoffSchedule?.schedule.forEach((match) => {
-            match?.teams.forEach((team) => {
-              tempChampsTeamList.push(team.teamNumber);
-            })
-          })
-          // We have bypassed getting the team list and details in the normal loading cycle,
-          // so we need to get the details now from this array of competing teams
-          setHaveChampsTeams(true);
-          await getTeamList(_.uniq(tempChampsTeamList));
-        }
-      }
 
     } else { playoffschedule.schedule = playoffschedule.schedule.schedule }
 
@@ -1263,7 +1248,26 @@ function App() {
     setAlliances(alliances);
     if (alliances?.alliances?.length > 0) {
       setPlayoffs(true);
+      // If we are in World Champs, we need to determine the team list from the schedule
+      var tempChampsTeamList = [];
+      if (selectedEvent?.value?.type === "Championship") {
+        if (!haveChampsTeams) {
+          alliances?.alliances.forEach((alliance) => {
+            tempChampsTeamList.push(alliance?.captain);
+            tempChampsTeamList.push(alliance?.round1);
+            tempChampsTeamList.push(alliance?.round2);
+            tempChampsTeamList.push(alliance?.round3);
+            })
+          
+          // We have bypassed getting the team list and details in the normal loading cycle,
+          // so we need to get the details now from this array of competing teams
+          setHaveChampsTeams(true);
+          await getTeamList(_.uniq(tempChampsTeamList));
+        }
+      }
     }
+
+    
   }
 
   /**
