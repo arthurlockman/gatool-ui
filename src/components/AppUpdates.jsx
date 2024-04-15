@@ -5,6 +5,7 @@ export const appUpdates = [
         message: <ul>
             <li>Fixing bug in Update Team Data flow for Einstein</li>
             <li>Fixing tab highlighting for Announce and Play By Play</li>
+            <li>Fixed Team Table headers</li>
         </ul>
     },{
         date: "April 14, 2024",
