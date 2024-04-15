@@ -6,6 +6,8 @@ export const appUpdates = [
             <li>Making how we store team updates consistent on every page</li>
             <li>Added new top sponsor option for World Champs Divisions and Champs</li>
             <li>Added additional checks in Alliance Selection to ensure reset when conditions change</li>
+            <li>Restoring team info sheet downloads from Teams tab</li>
+            <li>Adding highlighting when Team Notes are present on Team Data form</li>
         </ul>
     }, {
         date: "April 8, 2024",
