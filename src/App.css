@@ -707,6 +707,20 @@ td {
 	font-weight: bold;
 }
 
+.quill {
+	border-radius: 6px;
+}
+
+.ql-container {
+	border-bottom-left-radius: 6px;
+	border-bottom-right-radius: 6px;
+}
+
+.ql-toolbar {
+	border-top-left-radius: 6px;
+	border-top-right-radius: 6px;
+}
+
 .ql-editor {
 	font-size:1rem
 }
