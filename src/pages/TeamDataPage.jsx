@@ -704,7 +704,6 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                                     <td style={updateHighlight(team?.updates?.topSponsorLocal)}>{team?.updates?.topSponsorLocal ? team?.updates?.topSponsorLocal : team?.topSponsor}</td> :
                                     <td style={updateHighlight(team?.updates?.topSponsorsLocal)}>{team?.updates?.topSponsorsLocal ? team?.updates?.topSponsorsLocal : team?.topSponsors}</td>
                                 }
-                                {(selectedEvent?.value?.type === "Championship" || selectedEvent?.value?.type === "ChampionshipDivision") && <td style={updateHighlight(team?.updates?.topSponsorsLocal)}>{team?.updates?.topSponsorsLocal ? team?.updates?.topSponsorsLocal : team?.topSponsors}</td>}
                                 <td style={updateHighlight(team?.updates?.organizationLocal)}>{team?.updates?.organizationLocal ? team?.updates?.organizationLocal : team?.schoolName}</td>
                                 <td>{team?.rookieYear}</td>
                                 <td style={updateHighlight(team?.updates?.robotNameLocal)}>{team?.updates?.robotNameLocal}</td>
