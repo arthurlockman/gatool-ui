@@ -1,6 +1,6 @@
 import _ from "lodash";
 
-function PlayByPlay({ station, team, inPlayoffs, selectedYear, selectedEvent, showNotes, showMottoes, showQualsStats, showQualsStatsQuals, adHocMode }) {
+function PlayByPlay({ station, team, inPlayoffs, selectedYear, selectedEvent, showNotes, showMottoes, showQualsStats, showQualsStatsQuals, adHocMode, playoffOnly }) {
     var allianceColor = station.slice(0, -1);
 
     return (
@@ -13,7 +13,7 @@ function PlayByPlay({ station, team, inPlayoffs, selectedYear, selectedEvent, sh
                         <p className={team?.updates?.organizationLocal ? (team?.updates?.organizationLocal?.length > 60 ? "playByPlayOrganization narrowFont" : "playByPlayOrganization") : (team?.schoolName?.length > 60 ? "playByPlayOrganization narrowFont" : "playByPlayOrganization")}>{team?.updates?.organizationLocal ? team?.updates?.organizationLocal : team?.schoolName}</p>
                         <p className={"playByPlayCity"}>{team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : `${team?.city}, ${team?.stateProv}${team?.country !== "USA" ? `, ${team?.country}` : ""}`}</p>
                         {(showMottoes || _.isNull(showMottoes)) && <p className={"playByPlayCity mottoes"}>{team?.updates?.teamMottoLocal}</p>}
-                        {inPlayoffs && <p className={"playByPlayAlliance hideLandscape"}>{team?.alliance}{selectedEvent?.value?.name.includes("OFFLINE")?<></>:<><br />{team.allianceRole}</>}</p>}
+                        {inPlayoffs && <p className={"playByPlayAlliance hideLandscape"}>{team?.alliance}{(selectedEvent?.value?.name.includes("OFFLINE") && !playoffOnly)?<></>:<><br />{team.allianceRole}</>}</p>}
                     </>
                 }
                 {!team?.teamNumber && <>

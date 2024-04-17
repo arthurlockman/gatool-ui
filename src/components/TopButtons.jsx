@@ -6,7 +6,7 @@ import MatchClock from "../components/MatchClock";
 import _ from "lodash";
 import { useHotkeysContext } from "react-hotkeys-hook";
 
-function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatchFromMenu, selectedEvent, matchDetails, timeFormat, alliances, setAlliances, rankings, inPlayoffs, backupTeam, setBackupTeam, teamList, adHocMatch, setAdHocMatch, adHocMode, swapScreen }) {
+function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatchFromMenu, selectedEvent, matchDetails, timeFormat, alliances, setAlliances, rankings, inPlayoffs, backupTeam, setBackupTeam, teamList, adHocMatch, setAdHocMatch, adHocMode, swapScreen, playoffOnly}) {
 
     const [show, setShow] = useState(null);
     const [showAdHoc, setAdHoc] = useState(null);
@@ -119,7 +119,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
     }
     availableTeams=_.orderBy(availableTeams,["label"],"asc");
     const inPractice = matchDetails?.description.toLowerCase().includes("practice");
-    const addBackupButton = inPlayoffs && selectedEvent?.value?.champLevel !== "CHAMPS" && selectedEvent?.value?.champLevel !== "CMPDIV" && selectedEvent?.value?.champLevel !== "CMPSUB";
+    const addBackupButton = inPlayoffs && selectedEvent?.value?.champLevel !== "CHAMPS" && selectedEvent?.value?.champLevel !== "CMPDIV" && selectedEvent?.value?.champLevel !== "CMPSUB" && (selectedEvent?.value?.code==="OFFLINE" && !playoffOnly);
 
     let eventTeams = teamList?.teams.map((team) => {
         return ({ "label": team.teamNumber, "value": team.teamNumber })

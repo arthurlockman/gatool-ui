@@ -3,7 +3,7 @@ import _ from "lodash";
 
 const announceBackground = { "red": "#F7B3B4", "blue": "#98B4F4" }
 
-function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selectedEvent, showNotesAnnounce, showAwards, showSponsors, autoHideSponsors, showMottoes, showChampsStats, eventNamesCY, showDistrictChampsStats }) {
+function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selectedEvent, showNotesAnnounce, showAwards, showSponsors, autoHideSponsors, showMottoes, showChampsStats, eventNamesCY, showDistrictChampsStats, playoffOnly }) {
     const originalAndSustaining = ["20", "45", "126", "148", "151", "157", "190", "191", "250"];
     var allianceColor = station.slice(0, -1);
     var awardsYears = team?.awards ? Object.keys(team.awards) : []
@@ -29,14 +29,15 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
                 <span className={"announceTeamNumber"} ><b>{team.teamNumber}</b></span><br />
                 {team?.updates?.sayNumber && <span className={"playByPlaysayNumber"}>{team.updates?.sayNumber}<br /></span>}
                 <span >{team?.rookieYear}<br />({years === 1 ? "" : years}{yearsDisplay} season)</span>
-                {inPlayoffs && <p className={"announceAlliance"}>{team.alliance}{selectedEvent?.value?.name.includes("OFFLINE") ? <></> : <><br />{team.allianceRole}</>}</p>}
+                {inPlayoffs && <p className={"announceAlliance"}>{team.alliance}{(selectedEvent?.value?.name.includes("OFFLINE") && !playoffOnly) ? <></> : <><br />{team.allianceRole}</>}</p>}
             </td>
             <td className={'col2'} style={{ backgroundColor: _.toLower(allianceColor) === "red" ? announceBackground.red : announceBackground.blue }}>
                 <span className={"teamName"}>{team?.updates?.nameShortLocal ? team?.updates?.nameShortLocal : team?.nameShort}</span><br />
                 <span>{team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : `${team?.city}, ${team?.stateProv}${team?.country !== "USA" ? `, ${team?.country}` : ""}`}</span><br />
                 {team?.updates?.robotNameLocal && <span className={"robotName"}>{team?.updates?.robotNameLocal}<br /></span>}
                 {team?.updates?.teamMottoLocal && (showMottoes || _.isNull(showMottoes)) && <span className={"mottoes"}>{team?.updates?.teamMottoLocal}<br /></span>}
-                {(selectedEvent?.value?.champLevel === "CHAMPS" || selectedEvent?.value?.champLevel === "CMPDIV" || selectedEvent?.value?.champLevel === "CMPSUB") && showChampsStats && <span className={"champs"}>
+                {(selectedEvent?.value?.champLevel === "CHAMPS" || selectedEvent?.value?.champLevel === "CMPDIV" || selectedEvent?.value?.champLevel === "CMPSUB") && showChampsStats && 
+                <span className={"champs"}>
                     {team?.champsAppearances?.champsAppearances > 0 && <span><b>{team?.champsAppearances?.champsAppearances} Champs Appearance{team?.champsAppearances?.champsAppearances > 1 ? "s" : ""}</b><br /></span>}
                     {team?.champsAppearances?.champsAppearances > 0 && <span>
                         {team?.champsAppearances?.champsAppearancesYears?.join(", ")}

@@ -12,7 +12,7 @@ import NotificationBanner from "components/NotificationBanner";
 
 const paleGreen = "rgba(144, 238, 144, 0.5)"
 
-function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, awardsMenu, showNotesAnnounce, showAwards, showSponsors, showMottoes, showChampsStats, timeFormat, eventHighScores, backupTeam, setBackupTeam, nextMatch, previousMatch, setMatchFromMenu, practiceSchedule, eventNamesCY, districtRankings, showDistrictChampsStats, adHocMatch, setAdHocMatch, adHocMode, offlinePlayoffSchedule, swapScreen, autoHideSponsors, hidePracticeSchedule, teamReduction, qualsLength }) {
+function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, awardsMenu, showNotesAnnounce, showAwards, showSponsors, showMottoes, showChampsStats, timeFormat, eventHighScores, backupTeam, setBackupTeam, nextMatch, previousMatch, setMatchFromMenu, practiceSchedule, eventNamesCY, districtRankings, showDistrictChampsStats, adHocMatch, setAdHocMatch, adHocMode, offlinePlayoffSchedule, swapScreen, autoHideSponsors, hidePracticeSchedule, teamReduction, qualsLength, playoffOnly }) {
     const matchesToNotify = _.toInteger((teamList?.teams?.length - teamReduction) / 6);
     if (qualSchedule?.schedule?.schedule?.length || qualSchedule?.schedule?.length) {
     };
@@ -202,11 +202,11 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
             </div>}
             {selectedEvent && teamList?.teams.length > 0 && (schedule?.length > 0 || practiceSchedule?.schedule.length > 0 || adHocMode) &&
                 <Container fluid {...swipeHandlers}>
-                    <TopButtons previousMatch={previousMatch} nextMatch={nextMatch} currentMatch={currentMatch} matchMenu={matchMenu} setMatchFromMenu={setMatchFromMenu} selectedEvent={selectedEvent} matchDetails={matchDetails} timeFormat={timeFormat} inPlayoffs={inPlayoffs} alliances={alliances} setAlliances={setAlliances} rankings={rankings} backupTeam={backupTeam} setBackupTeam={setBackupTeam} teamList={teamList} adHocMatch={adHocMatch} setAdHocMatch={setAdHocMatch} adHocMode={adHocMode} swapScreen={swapScreen} />
+                    <TopButtons previousMatch={previousMatch} nextMatch={nextMatch} currentMatch={currentMatch} matchMenu={matchMenu} setMatchFromMenu={setMatchFromMenu} selectedEvent={selectedEvent} matchDetails={matchDetails} timeFormat={timeFormat} inPlayoffs={inPlayoffs} alliances={alliances} setAlliances={setAlliances} rankings={rankings} backupTeam={backupTeam} setBackupTeam={setBackupTeam} teamList={teamList} adHocMatch={adHocMatch} setAdHocMatch={setAdHocMatch} adHocMode={adHocMode} swapScreen={swapScreen} playoffOnly={playoffOnly} />
                     <NotificationBanner notification={notification}></NotificationBanner>
                     <table className={"table table-responsive"}>
                         <thead>
-                            <tr>
+                            <tr key={"header"}>
                                 <td>Team #</td>
                                 <td>Team Name</td>
                                 <td>Organization, Sponsors & Awards</td>
@@ -216,7 +216,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
                         <tbody>
                             {displayOrder.map((station, index) => {
                                 if (!_.isEmpty(teamDetails[station]) && !_.isUndefined(teamDetails[station].teamNumber) && !_.isNull(teamDetails[station].teamNumber) && teamDetails[station].teamNumber > 0) {
-                                    return <Announce station={station} team={teamDetails[station]} inPlayoffs={inPlayoffs} key={`${station}${index}`} awardsMenu={awardsMenu} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotesAnnounce={showNotesAnnounce} autoHideSponsors={autoHideSponsors} showAwards={showAwards} showSponsors={showSponsors} showMottoes={showMottoes} showChampsStats={showChampsStats} eventNamesCY={eventNamesCY} showDistrictChampsStats={showDistrictChampsStats} />
+                                    return <Announce station={station} team={teamDetails[station]} inPlayoffs={inPlayoffs} key={`${station}${index}`} awardsMenu={awardsMenu} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotesAnnounce={showNotesAnnounce} autoHideSponsors={autoHideSponsors} showAwards={showAwards} showSponsors={showSponsors} showMottoes={showMottoes} showChampsStats={showChampsStats} eventNamesCY={eventNamesCY} showDistrictChampsStats={showDistrictChampsStats} playoffOnly={playoffOnly}/>
                                 } else {
                                     if (station.slice(-1) !== "4") {
                                         var allianceColor = _.toLower(station.slice(0, -1));
