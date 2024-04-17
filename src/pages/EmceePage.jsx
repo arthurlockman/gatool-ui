@@ -84,7 +84,7 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSched
         allianceShortName = allianceName.replace("Alliance ", "").length === 1 ? allianceName.replace("Alliance ", "").slice(0, 1) : allianceName.slice(0, 2);
 
         if (!allianceName) {
-            return { "allianceName": "?", "captain": "TBD" , "shortName": "?" };
+            return { "allianceName": "?", "captain": "TBD", "shortName": "?" };
         } else {
             return { "allianceName": allianceName, "captain": captain, "shortName": allianceShortName };
         }

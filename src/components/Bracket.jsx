@@ -211,7 +211,7 @@ function Bracket({ selectedEvent, playoffSchedule, offlinePlayoffSchedule, setOf
 				"description": _.find(matchClasses, { "matchNumber": winnerTo })?.description,
 				"tournamentLevel": "Playoff",
 				"matchNumber": winnerTo,
-				"startTime": moment().add(20,"minutes").format(),
+				"startTime": moment().add(20, "minutes").format(),
 				"actualStartTime": null,
 				"postResultTime": null,
 				"scoreRedFinal": null,
@@ -259,7 +259,7 @@ function Bracket({ selectedEvent, playoffSchedule, offlinePlayoffSchedule, setOf
 				"description": _.find(matchClasses, { "matchNumber": loserTo })?.description,
 				"tournamentLevel": "Playoff",
 				"matchNumber": loserTo,
-				"startTime": moment().add(20,"minutes").format(),
+				"startTime": moment().add(20, "minutes").format(),
 				"actualStartTime": null,
 				"postResultTime": null,
 				"scoreRedFinal": null,
@@ -341,7 +341,7 @@ function Bracket({ selectedEvent, playoffSchedule, offlinePlayoffSchedule, setOf
 	}
 
 	useHotkeys('right', () => nextMatch(), { scopes: 'matchNavigation' });
-    useHotkeys('left', () => previousMatch(), { scopes: 'matchNavigation' });
+	useHotkeys('left', () => previousMatch(), { scopes: 'matchNavigation' });
 
 	return (
 		<div>
@@ -391,7 +391,7 @@ function Bracket({ selectedEvent, playoffSchedule, offlinePlayoffSchedule, setOf
 							<polygon fill={RED} points="1164.7,389.6 1048.4,389.6 1048.4,353.5 1164.7,353.5 1177.6,371.6" stroke={(tournamentWinner?.winner === "red") ? GOLD : "none"} strokeWidth="5" />
 							<polygon fill={BLUE} points="1164.7,426 1048.4,426 1048.4,390 1164.7,390 1177.6,408" stroke={(tournamentWinner?.winner === "blue") ? GOLD : "none"} strokeWidth="5" />
 							<line fill="none" stroke="#FFFFFF" strokeMiterlimit="10" x1="1164.7" y1="389.7" x2="1026" y2="389.7" />
-							<rect x="1026" y="353.5" width="22.4" height="72.5" fill={currentPlayoffMatch >= 14 ? GOLD : BLACK}/>
+							<rect x="1026" y="353.5" width="22.4" height="72.5" fill={currentPlayoffMatch >= 14 ? GOLD : BLACK} />
 							<text transform="matrix(0 -1.0059 1 0 1041.7773 418.6328)" fill={currentPlayoffMatch >= 14 ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">BEST 2 of 3</text>
 							<text transform="matrix(0.9941 0 0 1 1106 367)" textAnchor="middle">
 								<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(14, "red") ? allianceName(14, "red") : "Winner of M11"}</tspan>

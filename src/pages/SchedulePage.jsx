@@ -336,7 +336,7 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                     }
                 }
             })
-            
+
             return ({
                 "number": Number(alliance.number),
                 "captain": Number(alliance.captain),

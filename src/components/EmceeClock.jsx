@@ -55,10 +55,10 @@ const EmceeClock = ({ matchDetails, timeFormat }) => {
 
     }
     return (
-        <div className={matchDelay} style={{marginBottom:"10px"}}>
+        <div className={matchDelay} style={{ marginBottom: "10px" }}>
             <div><b>{moment(currentTime).format(timeFormat.value)}</b></div>
             {matchDetails?.actualStartTime && <div>Actual match time: {moment(matchDetails?.actualStartTime).format("MMM Do, " + timeFormat.value)}</div>}
-            {!matchDetails?.actualStartTime && matchDetails?.startTime && <div><h5><b>{Math.abs(timeDifference)} minutes {timeDifference <=0 ? "ahead" : "behind"}</b></h5></div>}
+            {!matchDetails?.actualStartTime && matchDetails?.startTime && <div><h5><b>{Math.abs(timeDifference)} minutes {timeDifference <= 0 ? "ahead" : "behind"}</b></h5></div>}
             {!matchDetails?.actualStartTime && !matchDetails?.startTime && <div><h5><b>Unscheduled</b></h5></div>}
         </div>
     );

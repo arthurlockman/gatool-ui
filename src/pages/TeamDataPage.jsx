@@ -789,17 +789,17 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                             <Form.Label className={"formLabel"}><b>Team Notes for the Team Data Screen (These notes are local notes and do not come from <i>FIRST</i>)</b></Form.Label>
                             <ReactQuill className={teamNotes.replace(/<(.|\n)*?>/g, '').trim().length === 0 ? "" : "formHighlight"} theme="snow" modules={modules} formats={formats} value={teamNotes} placeholder={"Enter some new notes you would like to appear on the Team Data Screen"} onChange={(e) => setTeamNotes(e)}></ReactQuill>
                         </Form.Group>
-                        {(selectedEvent?.value?.type === "Championship" || selectedEvent?.value?.type === "ChampionshipDivision") ? 
-                        <Form.Group controlId="topSponsors">
-                        <Form.Label className={"formLabel"} onClick={() => setTopSponsorLocal(updateTeam?.topSponsor)}><b>Top Sponsor (Enter <i>one top sponsor</i> from the full sponsor list below). This will appear under the team name on the Announce Screen.<br />
-                            Tap to reset to TIMS value.</b></Form.Label>
-                        <Form.Control className={topSponsorLocal ? "formHighlight" : ""} type="text" placeholder={updateTeam?.topSponsor} value={topSponsorLocal} onChange={(e) => setTopSponsorLocal(e.target.value)} />
-                    </Form.Group>:
-                        <Form.Group controlId="topSponsors">
-                            <Form.Label className={"formLabel"} onClick={() => setTopSponsorsLocal(updateTeam?.topSponsors)}><b>Top Sponsors (Enter no more than 5 top sponsors from the full sponsor list below). These will appear under the team name on the Announce Screen.<br />
-                                Tap to reset to TIMS value.</b></Form.Label>
-                            <Form.Control className={topSponsorsLocal ? "formHighlight" : ""} type="text" placeholder={updateTeam?.topSponsors} value={topSponsorsLocal} onChange={(e) => setTopSponsorsLocal(e.target.value)} />
-                        </Form.Group>}
+                        {(selectedEvent?.value?.type === "Championship" || selectedEvent?.value?.type === "ChampionshipDivision") ?
+                            <Form.Group controlId="topSponsors">
+                                <Form.Label className={"formLabel"} onClick={() => setTopSponsorLocal(updateTeam?.topSponsor)}><b>Top Sponsor (Enter <i>one top sponsor</i> from the full sponsor list below). This will appear under the team name on the Announce Screen.<br />
+                                    Tap to reset to TIMS value.</b></Form.Label>
+                                <Form.Control className={topSponsorLocal ? "formHighlight" : ""} type="text" placeholder={updateTeam?.topSponsor} value={topSponsorLocal} onChange={(e) => setTopSponsorLocal(e.target.value)} />
+                            </Form.Group> :
+                            <Form.Group controlId="topSponsors">
+                                <Form.Label className={"formLabel"} onClick={() => setTopSponsorsLocal(updateTeam?.topSponsors)}><b>Top Sponsors (Enter no more than 5 top sponsors from the full sponsor list below). These will appear under the team name on the Announce Screen.<br />
+                                    Tap to reset to TIMS value.</b></Form.Label>
+                                <Form.Control className={topSponsorsLocal ? "formHighlight" : ""} type="text" placeholder={updateTeam?.topSponsors} value={topSponsorsLocal} onChange={(e) => setTopSponsorsLocal(e.target.value)} />
+                            </Form.Group>}
                         <Form.Group controlId="sponsors">
                             <Form.Label className={"formLabel"}><b>Full list of Sponsors <i>(For reference only. This field is not editable, does not appear in the UI, and any changes here will not be saved.)</i></b></Form.Label>
                             <Form.Control type="text" placeholder={updateTeam?.sponsors} defaultValue={updateTeam?.sponsors} disabled />

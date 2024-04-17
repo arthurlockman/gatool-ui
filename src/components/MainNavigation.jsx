@@ -103,8 +103,8 @@ function MainNavigation({ selectedEvent, practiceSchedule, qualSchedule, playoff
     }
   }, [selectedEvent, scheduleTabReady, teamDataTabReady])
 
-   // Handle ready state for Announce/Play By Play tab
-   useEffect(() => {
+  // Handle ready state for Announce/Play By Play tab
+  useEffect(() => {
     // GREEN: Event Selected, Qual Schedule loaded, has >0 matches in the array
     // GREEN: Event Selected, Practice Schedule loaded, has >0 matches in the array
     // YELLOW: Event Selected, Qual Schedule loaded, has 0 matches in the array
