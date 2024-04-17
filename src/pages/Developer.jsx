@@ -212,7 +212,7 @@ function Developer({ putNotifications, getNotifications }) {
                         <NotificationBanner notification={formattedMessage}></NotificationBanner>
                         <Form.Group className="mb-3" controlId="systemNotification">
                             <Form.Label>Notification</Form.Label>
-                            <Form.Control type="text" value={formValue.message} placeholder="Enter message" onChange={(e) => handleFormValue("message", e.target.value)} />
+                            <Form.Control as="textarea" rows={3} value={formValue.message} placeholder="Enter message" onChange={(e) => handleFormValue("message", e.target.value)} />
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="notificationLink">
                             <Form.Label>Link for Notfication</Form.Label>

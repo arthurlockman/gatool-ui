@@ -1,6 +1,12 @@
 
 export const appUpdates = [
     {
+        date: "April 16, 2024",
+        message: <ul>
+            <li>Adding button to show update history on Setup</li>
+            <li>Added support for Playoff-only OFFLINE events, such as Einstein.</li>
+        </ul>
+    },{
         date: "April 15, 2024",
         message: <ul>
             <li>Fixing bug in Update Team Data flow for Einstein</li>

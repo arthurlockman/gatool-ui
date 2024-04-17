@@ -82,11 +82,12 @@ const monthsWarningMenu = [
 
 
 
-function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showNotesAnnounce, setShowNotesAnnounce, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, autoUpdate, setAutoUpdate, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, showQualsStatsQuals, setShowQualsStatsQuals, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee, showDistrictChampsStats, setShowDistrictChampsStats, monthsWarning, setMonthsWarning, user, adHocMode, setAdHocMode, supportedYears, reloadPage, autoHideSponsors, setAutoHideSponsors, setLoadingCommunityUpdates, hidePracticeSchedule, setHidePracticeSchedule, systemMessage, setTeamListLoading, getTeamList, getAlliances, setHaveChampsTeams }) {
+function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showNotesAnnounce, setShowNotesAnnounce, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, autoUpdate, setAutoUpdate, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, showQualsStatsQuals, setShowQualsStatsQuals, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee, showDistrictChampsStats, setShowDistrictChampsStats, monthsWarning, setMonthsWarning, user, adHocMode, setAdHocMode, supportedYears, reloadPage, autoHideSponsors, setAutoHideSponsors, setLoadingCommunityUpdates, hidePracticeSchedule, setHidePracticeSchedule, systemMessage, setTeamListLoading, getTeamList, getAlliances, setHaveChampsTeams, appUpdates }) {
     const isOnline = useOnlineStatus();
     const PWASupported = (isChrome && Number(browserVersion) >= 76) || (isSafari && Number(browserVersion) >= 15 && Number(fullBrowserVersion.split(".")[1]) >= 4);
 
-    const [deleteSavedModal, setDeleteSavedModal] = useState(null);
+    const [deleteSavedModal, setDeleteSavedModal] = useState(false);
+    const [showUpdateHistory, setShowUpdateHistory] = useState(false);
 
     function filterEvents(events) {
         //filter the array
@@ -157,6 +158,10 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
         setDeleteSavedModal(false);
     }
 
+    const handleHistory = () => {
+        setShowUpdateHistory(!showUpdateHistory);
+    }
+
     const handleGetTeamUpdates = () => {
         if (selectedEvent.value.type === "Championship") {
             setHaveChampsTeams(false);
@@ -165,7 +170,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
             setTeamListLoading("");
             getTeamList();
         }
-        
+
     }
 
 
@@ -211,7 +216,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
 
             </div>}
             {selectedEvent && <div>
-                <Row><NotificationBanner notification={systemMessage}/></Row>
+                <Row><NotificationBanner notification={systemMessage} /></Row>
                 <Row><Button size="lg" onClick={getSchedule} variant="outline-success" disabled={!isOnline}><b><ArrowClockwise /> Tap to refresh Schedule.</b> <br />Use after Alliance Selection to load Playoffs.</Button></Row>
                 <br />
                 <h4>{selectedEvent.label}</h4>
@@ -393,7 +398,9 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                 <tr>
                                     <td colSpan={2}>
                                         <Alert variant={"warning"}><p><b>Reload cached gatool code</b><br />If you know that there are updates to gatool, but you are not seeing them here, you can reload the code. This will not remove any stored settings or team data. Your browser is {browserName} version {fullBrowserVersion} on {isDesktop ? <>desktop</> : isTablet ? <>tablet</> : isMobile ? <>mobile</> : <>unknown surface</>}.{!PWASupported ? <><br /><b><i>Note: Your browser may not support clearing cache this way. Please delete and restore your Home Screen {isIOS ? "icon" : "tile"}.</i></b></> : <></>}</p>
-                                            <Button variant={"warning"} disabled={!isOnline} onClick={reloadPage}>Clear page cache</Button>
+                                            <Row><Col><Button variant={"warning"} onClick={handleHistory}>Show update history</Button></Col>
+                                                <Col><Button variant={"warning"} disabled={!isOnline} onClick={reloadPage}>Clear page cache</Button></Col>
+                                            </Row>
                                         </Alert>
 
                                     </td>
@@ -422,6 +429,22 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                     <Modal.Footer>
                         <Button variant="secondary" onClick={handleClose}>Close without deleting updates</Button>
                         <Button variant="danger" onClick={confirmDeleteLocalUpdates}>Delete stored updates</Button>
+                    </Modal.Footer>
+                </Modal>
+                <Modal centered={true} show={showUpdateHistory} size="lg" onHide={handleHistory}>
+                    <Modal.Header className={"allianceDecline"} closeVariant={"white"} closeButton>
+                        <Modal.Title >Update History</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Container>
+                            {appUpdates.map((appUpdate) => {
+                                return <Row><Col xs={3}><b>{appUpdate.date}</b></Col>
+                                <Col xs={9}>{appUpdate.message}</Col></Row>
+                            })}
+                        </Container>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={handleHistory}>Done</Button>
                     </Modal.Footer>
                 </Modal>
             </div>

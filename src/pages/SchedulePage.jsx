@@ -1,10 +1,15 @@
-import { Alert, Col, Container, Row, Table } from "react-bootstrap";
+import { Alert, Button, Col, Container, Row, Table, Modal, Form } from "react-bootstrap";
 import moment from 'moment';
 import { utils, read } from "xlsx";
 import { toast } from "react-toastify";
 import _ from "lodash";
+import Switch from "react-switch";
+import { useState } from "react";
 
-function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSchedule, setPracticeSchedule, offlinePlayoffSchedule, setOfflinePlayoffSchedule, getTeamList, loadEvent, practiceFileUploaded, setPracticeFileUploaded, setTeamListLoading, getAlliances }) {
+function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSchedule, practiceSchedule, setPracticeSchedule, offlinePlayoffSchedule, setOfflinePlayoffSchedule, getTeamList, loadEvent, practiceFileUploaded, setPracticeFileUploaded, setTeamListLoading, getAlliances, playoffOnly, setPlayoffOnly, alliances, champsStyle, setChampsStyle }) {
+
+    const [showAdjustAlliances, setShowAdjustAlliances] = useState(false);
+    const [formData, setFormData] = useState(null);
 
     // This function clicks the hidden file upload button
     function clickLoadPractice() {
@@ -196,14 +201,23 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                         "backupReplaced": null,
                         "name": `Alliance 1`
                     }, {
-                        "number": 8,
-                        "captain": innerSchedule[0].teams[3].teamNumber,
-                        "round1": innerSchedule[0].teams[4].teamNumber,
-                        "round2": innerSchedule[0].teams[5].teamNumber,
+                        "number": 2,
+                        "captain": innerSchedule[2].teams[0].teamNumber,
+                        "round1": innerSchedule[2].teams[1].teamNumber,
+                        "round2": innerSchedule[2].teams[2].teamNumber,
                         "round3": null,
                         "backup": null,
                         "backupReplaced": null,
-                        "name": `Alliance 8`
+                        "name": `Alliance 2`
+                    }, {
+                        "number": 3,
+                        "captain": innerSchedule[3].teams[0].teamNumber,
+                        "round1": innerSchedule[3].teams[1].teamNumber,
+                        "round2": innerSchedule[3].teams[2].teamNumber,
+                        "round3": null,
+                        "backup": null,
+                        "backupReplaced": null,
+                        "name": `Alliance 3`
                     }, {
                         "number": 4,
                         "captain": innerSchedule[1].teams[0].teamNumber,
@@ -223,14 +237,14 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                         "backupReplaced": null,
                         "name": `Alliance 5`
                     }, {
-                        "number": 2,
-                        "captain": innerSchedule[2].teams[0].teamNumber,
-                        "round1": innerSchedule[2].teams[1].teamNumber,
-                        "round2": innerSchedule[2].teams[2].teamNumber,
+                        "number": 6,
+                        "captain": innerSchedule[3].teams[3].teamNumber,
+                        "round1": innerSchedule[3].teams[4].teamNumber,
+                        "round2": innerSchedule[3].teams[5].teamNumber,
                         "round3": null,
                         "backup": null,
                         "backupReplaced": null,
-                        "name": `Alliance 2`
+                        "name": `Alliance 6`
                     }, {
                         "number": 7,
                         "captain": innerSchedule[2].teams[3].teamNumber,
@@ -241,23 +255,14 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                         "backupReplaced": null,
                         "name": `Alliance 7`
                     }, {
-                        "number": 3,
-                        "captain": innerSchedule[3].teams[0].teamNumber,
-                        "round1": innerSchedule[3].teams[1].teamNumber,
-                        "round2": innerSchedule[3].teams[2].teamNumber,
+                        "number": 8,
+                        "captain": innerSchedule[0].teams[3].teamNumber,
+                        "round1": innerSchedule[0].teams[4].teamNumber,
+                        "round2": innerSchedule[0].teams[5].teamNumber,
                         "round3": null,
                         "backup": null,
                         "backupReplaced": null,
-                        "name": `Alliance 3`
-                    }, {
-                        "number": 6,
-                        "captain": innerSchedule[3].teams[3].teamNumber,
-                        "round1": innerSchedule[3].teams[4].teamNumber,
-                        "round2": innerSchedule[3].teams[5].teamNumber,
-                        "round3": null,
-                        "backup": null,
-                        "backupReplaced": null,
-                        "name": `Alliance 6`
+                        "name": `Alliance 8`
                     }
                     ]
                     getAlliances(alliancesTemp);
@@ -294,6 +299,64 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
         return teamNumber;
     }
 
+    const handleOpen = () => {
+        setFormData(_.cloneDeep(alliances));
+        setShowAdjustAlliances(true);
+    }
+
+    const handleClose = () => {
+        setShowAdjustAlliances(false);
+    }
+
+    const handleFormValue = (allianceNumber, property, value) => {
+        var formDataTemp = _.cloneDeep(formData);
+        formDataTemp.alliances[allianceNumber - 1][property] = value;
+        setFormData(formDataTemp);
+    }
+
+    const handleChampsStyle = (e) => {
+        var eventTemp = _.cloneDeep(selectedEvent);
+        eventTemp.value.type = "Championship";
+        eventTemp.value.champLevel = "CHAMPS"
+        setSelectedEvent(eventTemp);
+        setChampsStyle(e)
+    }
+
+    const handleAdjustAlliances = () => {
+        console.log("Adjusting Alliances");
+        var alliancesTemp = {};
+        var teamNumbers = [];
+        alliancesTemp.Alliances = formData.alliances.map((alliance) => {
+            // Add the Alliance members to the team list
+            var keys = Object.keys(alliance);
+            keys.forEach((key) => {
+                if (key.includes("captain") || key.includes("round")) {
+                    if (alliance[key]) {
+                        teamNumbers.push(Number(alliance[key]));
+                    }
+                }
+            })
+            
+            return ({
+                "number": Number(alliance.number),
+                "captain": Number(alliance.captain),
+                "round1": Number(alliance.round1),
+                "round2": Number(alliance.round2),
+                "round3": Number(alliance.round3),
+                "backup": null,
+                "backupReplaced": null,
+                "name": alliance.name
+            })
+        })
+
+        getAlliances(alliancesTemp);
+
+        // Reset the team list based on changes to the Alliances
+        getTeamList(teamNumbers);
+
+        handleClose();
+    }
+
     return (
         <Container fluid>
             {!selectedEvent && <div>
@@ -302,19 +365,40 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
             {selectedEvent && (!qualSchedule || qualSchedule?.schedule?.length === 0 || qualSchedule?.schedule?.schedule?.length === 0) && (!playoffSchedule || playoffSchedule?.schedule?.length === 0 || playoffSchedule?.schedule?.schedule?.length === 0) && <div>
                 <Alert variant="warning" >
                     {(!practiceSchedule || practiceSchedule?.schedule?.length === 0 || practiceSchedule?.schedule?.schedule?.length === 0) && !practiceFileUploaded && <>
-                        <div><img src="loadingIcon.gif" alt="Loading data..." /></div>
-                        <div>Awaiting schedule for {selectedEvent.label}<br /><br /></div>
+                        {!(playoffOnly && (offlinePlayoffSchedule?.schedule?.length >= 0 || offlinePlayoffSchedule?.schedule?.schedule?.length >= 0)) && <>
+                            <div><img src="loadingIcon.gif" alt="Loading data..." /></div>
+                            <div>Awaiting schedule for {selectedEvent.label}<br /><br /></div>
+                        </>}
                         <Container fluid>
                             <Row>
-                                <Col xs={2}></Col>
-                                <Col xs={1}>
+                                <Col xs={1}></Col>
+                                {!playoffOnly && <Col xs={1}>
                                     <input type="file" id="BackupFiles" onChange={handlePracticeFiles} className={"hiddenInput"} /><img style={{ float: "left" }} width="50" src="images/excelicon.png" alt="Excel Logo" />
-                                </Col>
-                                <Col xs={7} className={"leftTable"} style={{ cursor: "pointer", color: "darkblue" }} onClick={clickLoadPractice}>
-                                    {selectedEvent?.value?.code.includes("OFFLINE") && <b>You can upload a Qualification Match Schedule for your Offline event. You will need to ask your Scorekeeper to export a Schedule Report in Excel format, which you can upload here. We will determine the team list from the Qualification Schedule.<br />Tap here to upload a Qualification Schedule.</b>}
-                                    {!selectedEvent?.value?.code.includes("OFFLINE") && <b>You can upload a Practice Schedule while you wait for the Quals Schedule to post. You will need to ask your Scorekeeper to export a Schedule Report in Excel format, which you can upload here.<br />Tap here to upload a Practice Schedule.</b>}
-                                </Col>
-                                <Col xs={2}></Col>
+                                </Col>}
+                                {playoffOnly && <Col xs={1}>
+                                    <input type="file" id="LoadOfflinePlayoffs" onChange={handlePracticeFiles} className={"hiddenInput"} /><img style={{ float: "left" }} width="50" src="images/excelicon.png" alt="Excel Logo" />
+                                </Col>}
+
+                                {selectedEvent?.value?.code.includes("OFFLINE") && <>
+                                    {!playoffOnly && <Col xs={5} className={"leftTable"} style={{ cursor: "pointer", color: "darkblue" }} onClick={clickLoadPractice}><b>You can upload a Qualification Match Schedule for your Offline event. You will need to ask your Scorekeeper to export a Schedule Report in Excel format, which you can upload here. We will determine the team list from the Qualification Schedule.<br />Tap here to upload a Qualification Schedule.</b></Col>}
+                                    {playoffOnly && <Col xs={5} className={"leftTable"} style={{ cursor: "pointer", color: "darkblue" }} onClick={clickLoadOfflinePlayoffs}>
+                                        <b>You can now load your Offline Playoff Schedule. You can advance the Playoff using the Playoff Tab, or you can reload the schedule after each Round in the playoffs.<br />Tap here to remove it and replace it, as necessary.</b>
+                                    </Col>}
+                                    <Col xs={1}></Col>
+                                    <Col xs={3}>
+                                        <Row><Col xs={2}><Switch checked={playoffOnly} onChange={setPlayoffOnly} /></Col>
+                                            <Col>Playoff-Only OFFLINE Event</Col>
+                                        </Row>
+                                        {playoffOnly && <Row><Col xs={2}><Switch checked={champsStyle} onChange={handleChampsStyle} /></Col>
+                                            <Col>Is World Champs</Col>
+                                        </Row>}
+                                        {playoffOnly && offlinePlayoffSchedule && <Row>
+                                            <Col><Button onClick={() => handleOpen()}>Adjust Alliances</Button></Col></Row>}
+                                    </Col>
+                                </>}
+                                {!selectedEvent?.value?.code.includes("OFFLINE") && <Col xs={6} className={"leftTable"} style={{ cursor: "pointer", color: "darkblue" }} onClick={clickLoadPractice}><b>You can upload a Practice Schedule while you wait for the Quals Schedule to post. You will need to ask your Scorekeeper to export a Schedule Report in Excel format, which you can upload here.<br />Tap here to upload a Practice Schedule.</b></Col>}
+
+                                <Col xs={1}></Col>
                             </Row>
                         </Container>
                     </>}
@@ -359,7 +443,13 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                     }
                 </Alert>
             </div>}
-            {selectedEvent && (practiceSchedule?.schedule?.length > 0 || qualSchedule?.schedule?.length > 0 || (qualSchedule?.schedule?.length === 0 && playoffSchedule?.schedule?.length > 0) || (qualSchedule?.schedule?.schedule?.length === 0 && playoffSchedule?.schedule?.length > 0)) &&
+            {selectedEvent &&
+                (
+                    practiceSchedule?.schedule?.length > 0 || qualSchedule?.schedule?.length > 0 ||
+                    (qualSchedule?.schedule?.length === 0 && playoffSchedule?.schedule?.length > 0) ||
+                    (qualSchedule?.schedule?.schedule?.length === 0 && playoffSchedule?.schedule?.length > 0) ||
+                    (qualSchedule?.schedule?.schedule?.length === 0 && playoffSchedule?.schedule?.length === 0 && offlinePlayoffSchedule)
+                ) &&
                 <div>
                     <h4>{selectedEvent.label}</h4>
                     <Table responsive striped bordered size="sm">
@@ -451,7 +541,7 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                                 </tr>
                                 )
                             })}
-                            {(!qualSchedule || qualSchedule?.schedule?.length === 0 || qualSchedule?.schedule?.schedule?.length === 0) &&
+                            {(!qualSchedule || qualSchedule?.schedule?.length === 0 || qualSchedule?.schedule?.schedule?.length === 0 || (selectedEvent?.value?.code.includes("OFFLINE") && !playoffOnly)) &&
                                 <tr>
                                     <td colSpan={7}>No Qualification match schedule available yet.</td>
                                 </tr>}
@@ -462,6 +552,33 @@ function SchedulePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSc
                         </tbody>
                     </Table>
                 </div>}
+            <Modal centered={true} show={showAdjustAlliances} size="lg" onHide={handleClose}>
+                <Modal.Header className={"promoteBackup"} closeVariant={"white"} closeButton>
+                    <Modal.Title >Adjust Alliances</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Container>
+                        <Row>Use this form to adjust the Alliance members. If you add Alliance members, gatool will add the teams to the Team List. This is especially useful when planning 4-team Alliance events.</Row>
+                        <Form>
+                            <Table>
+                                <Row><Col>Number</Col><Col>Name</Col><Col>Captain</Col><Col>Round 1</Col><Col>Round 2</Col><Col>Round 3</Col></Row>
+                                {formData?.alliances.map((alliance) => {
+                                    return <Row>
+                                        <Col>{alliance.number}</Col>
+                                        <Col><Form.Control type="text" value={alliance.name} placeholder="Name" onChange={(e) => handleFormValue(alliance.number, "name", e.target.value)} /></Col>
+                                        <Col><Form.Control type="text" value={alliance.captain} placeholder="Captain" onChange={(e) => handleFormValue(alliance.number, "captain", e.target.value)} /></Col>
+                                        <Col><Form.Control type="text" value={alliance.round1} placeholder="Round 1" onChange={(e) => handleFormValue(alliance.number, "round1", e.target.value)} /></Col>
+                                        <Col><Form.Control type="text" value={alliance.round2} placeholder="Round 2" onChange={(e) => handleFormValue(alliance.number, "round2", e.target.value)} /></Col>
+                                        <Col><Form.Control type="text" value={alliance.round3} placeholder="Round 3" onChange={(e) => handleFormValue(alliance.number, "round3", e.target.value)} /></Col>
+                                    </Row>
+                                })}
+                            </Table></Form>
+                    </Container>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleAdjustAlliances}>Save Alliances</Button>
+                </Modal.Footer>
+            </Modal>
         </Container>
     )
 }

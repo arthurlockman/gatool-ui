@@ -258,19 +258,19 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
     const handleShow = (team, e) => {
         if (user["https://gatool.org/roles"].indexOf("user") >= 0) {
             setUpdateTeam(team);
-            setNameShortLocal(team?.updates?.nameShortLocal);
-            setOrganizationLocal(team?.updates?.organizationLocal);
-            setCityStateLocal(team?.updates?.cityStateLocal);
-            setSayNumber(team?.updates?.sayNumber);
-            setRobotNameLocal(team?.updates?.robotNameLocal);
-            setShowRobotName(team?.updates?.showRobotName);
-            setTeamMottoLocal(team?.updates?.teamMottoLocal);
-            setTeamYearsNoCompeteLocal(team?.updates?.teamYearsNoCompeteLocal);
-            setAwardsTextLocal(team?.updates?.awardsTextLocal);
-            setTeamNotesLocal(team?.updates?.teamNotesLocal);
-            setTeamNotes(team?.updates?.teamNotes);
-            setTopSponsorsLocal(team?.updates?.topSponsorsLocal);
-            setTopSponsorLocal(team?.updates?.topSponsorLocal);
+            setNameShortLocal(team?.updates?.nameShortLocal || "");
+            setOrganizationLocal(team?.updates?.organizationLocal || "");
+            setCityStateLocal(team?.updates?.cityStateLocal || "");
+            setSayNumber(team?.updates?.sayNumber || "");
+            setRobotNameLocal(team?.updates?.robotNameLocal || "");
+            setShowRobotName(team?.updates?.showRobotName || true);
+            setTeamMottoLocal(team?.updates?.teamMottoLocal || "");
+            setTeamYearsNoCompeteLocal(team?.updates?.teamYearsNoCompeteLocal || "");
+            setAwardsTextLocal(team?.updates?.awardsTextLocal || "");
+            setTeamNotesLocal(team?.updates?.teamNotesLocal || "");
+            setTeamNotes(team?.updates?.teamNotes || "");
+            setTopSponsorsLocal(team?.updates?.topSponsorsLocal || "");
+            setTopSponsorLocal(team?.updates?.topSponsorLocal || "");
 
             setShow(true);
             disableScope('tabNavigation');
@@ -627,16 +627,11 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
             {!selectedEvent && <div>
                 <Alert variant="warning" >You need to select an event before you can see anything here.</Alert>
             </div>}
-            {selectedEvent && !teamList && <div>
+            {selectedEvent && (!teamList || teamList?.teams.length === 0) && <div>
                 <Alert variant="warning" onClick={(e) => { handleGetTeamList() }}><div><img src="loadingIcon.gif" alt="Loading data..." /></div>
                     <div>Awaiting team data for {selectedEvent.label}</div>
-                    <div>If your event has finished loading and you don't see a Team List, tap here to try loading your teams again.</div>
-                </Alert>
-            </div>}
-            {selectedEvent && teamList?.teams.length === 0 && <div>
-                <Alert variant="warning" onClick={(e) => { handleGetTeamList() }}><div><img src="loadingIcon.gif" alt="Loading data..." /></div>
-                    <div>Awaiting team data for {selectedEvent.label}</div>
-                    <div>If your event has finished loading and you don't see a Team List, tap here to try loading your teams again.</div>
+                    {selectedEvent?.value?.code === "OFFLINE" && <div>Your OFFLINE Event team list is determined by the schedule. Upload a schedule on the Schedule tab to load teams.</div>}
+                    {selectedEvent?.value?.code !== "OFFLINE" && <div>If your event has finished loading and you don't see a Team List, tap here to try loading your teams again.</div>}
                 </Alert>
             </div>}
             {selectedEvent && teamList?.teams.length > 0 && <><div>
@@ -758,7 +753,6 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                         </Form.Group>
                         <Form.Group >
                             <Form.Label className={"formLabel"}><b>Robot Name ({updateTeam.robotName ? updateTeam.robotName : "No robot name"}) in TIMS</b> </Form.Label>
-
                             <InputGroup>
                                 <Form.Control className={robotNameLocal ? "formHighlight" : ""} type="text" placeholder={updateTeam.robotName} value={robotNameLocal} onChange={(e) => setRobotNameLocal(e.target.value)} />
                                 <Form.Check className={"robotNameCheckbox"} type="switch" id="showRobotName" label="Show robot name" defaultChecked={showRobotName} onChange={(e) => setShowRobotName(e.target.checked)} />
