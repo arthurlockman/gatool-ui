@@ -222,7 +222,7 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
                     <table className={"playByPlayTable"}>
                         <tbody>
                             <tr className={"gatool-playbyplay"}>
-                                <PlayByPlay station={displayOrder[0]} team={teamDetails[displayOrder[0]]} inPlayoffs={inPlayoffs} key={displayOrder[0]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} adHocMode={adHocMode} playoffOnly={playoffOnly}/>
+                                <PlayByPlay station={displayOrder[0]} team={teamDetails[displayOrder[0]]} inPlayoffs={inPlayoffs} key={displayOrder[0]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} adHocMode={adHocMode} playoffOnly={playoffOnly} />
                                 <PlayByPlay station={displayOrder[1]} team={teamDetails[displayOrder[1]]} inPlayoffs={inPlayoffs} key={displayOrder[1]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} adHocMode={adHocMode} playoffOnly={playoffOnly} />
                             </tr>
                             <tr className={"gatool-playbyplay"}>

@@ -422,7 +422,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                     <Modal.Header className={"allianceDecline"} closeVariant={"white"} closeButton>
                         <Modal.Title >Delete Stored Team Details</Modal.Title>
                     </Modal.Header>
-                    <Modal.Body>
+                    <Modal.Body key={"storedUpdatesModal"}>
                         <p><b>Are you sure you want to delete the stored {localUpdates.length === 1 ? "update for team" : "updates for teams"} {_.sortBy(updatedTeamList).join(", ")}?</b></p>
                         <p>Know that {localUpdates.length === 1 ? "this update is" : "these updates are"} still loaded and visible in all team displays. If you reload this event, however, {localUpdates.length === 1 ? "this update" : "these updates"} will be lost unless you upload {localUpdates.length === 1 ? "it" : "them"} now from the Team Info screen.</p>
                     </Modal.Body>
@@ -435,11 +435,11 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                     <Modal.Header className={"allianceDecline"} closeVariant={"white"} closeButton>
                         <Modal.Title >Update History</Modal.Title>
                     </Modal.Header>
-                    <Modal.Body>
+                    <Modal.Body key={"updatesHistory"}>
                         <Container>
                             {appUpdates.map((appUpdate) => {
                                 return <Row><Col xs={3}><b>{appUpdate.date}</b></Col>
-                                <Col xs={9}>{appUpdate.message}</Col></Row>
+                                    <Col xs={9}>{appUpdate.message}</Col></Row>
                             })}
                         </Container>
                     </Modal.Body>

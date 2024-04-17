@@ -1,7 +1,7 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect, useState } from "react";
 import { utils, read } from "xlsx";
-import { Alert, Button, Container, Form, InputGroup } from "react-bootstrap";
+import { Alert, Button, Container, Form, InputGroup, Row } from "react-bootstrap";
 import moment from "moment";
 import _ from "lodash";
 import NotificationBanner from "components/NotificationBanner";
@@ -257,7 +257,7 @@ function Developer({ putNotifications, getNotifications }) {
                         <Button variant="primary" onClick={handleMessage}>
                             Submit
                         </Button>
-
+                        <Row><br /><br /></Row>
                     </Form>
                 </> : <Alert variant={"warning"}>You're not authorized to use this page.</Alert>}
 

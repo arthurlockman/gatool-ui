@@ -6,14 +6,14 @@ export const appUpdates = [
             <li>Adding button to show update history on Setup</li>
             <li>Added support for Playoff-only OFFLINE events, such as Einstein.</li>
         </ul>
-    },{
+    }, {
         date: "April 15, 2024",
         message: <ul>
             <li>Fixing bug in Update Team Data flow for Einstein</li>
             <li>Fixing tab highlighting for Announce and Play By Play</li>
             <li>Fixed Team Table headers</li>
         </ul>
-    },{
+    }, {
         date: "April 14, 2024",
         message: <ul>
             <li>Making how we store team updates consistent on every page</li>
@@ -30,25 +30,25 @@ export const appUpdates = [
             <li>Added 's' and 'F5' keyboard shortcut to refresh schedules/scores</li>
             <li>Update team data on Setup screen now reloads all team data</li>
         </ul>
-    },{
+    }, {
         date: "April 4, 2024",
         message: <ul>
             <li>Updating behavior of Update Team Data button</li>
             <li>Fixing a flashing re-inspection banner</li>
         </ul>
-    },{
+    }, {
         date: "April 3, 2024",
         message: <ul>
             <li>System-wide messaging</li>
         </ul>
-    },{
+    }, {
         date: "April 2, 2024",
         message: <ul>
             <li>Fixed a bug in the match clock</li>
             <li>Added OFFLINE support for Emcee page</li>
             <li>Added support to load Team List from Teams Table page when it doesn't load</li>
         </ul>
-    },{
+    }, {
         date: "April 1, 2024",
         message: <ul>
             <li>Fixed a bug in OFFLINE playoffs that prevented the first match from rendering properly</li>

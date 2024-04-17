@@ -834,7 +834,7 @@ export const communityUpdateTemplate = {
     "nameShortLocal": "",
     "cityStateLocal": "",
     "topSponsorsLocal": "",
-    "topSponsorLocal":"",
+    "topSponsorLocal": "",
     "sponsorsLocal": "",
     "organizationLocal": "",
     "robotNameLocal": "",

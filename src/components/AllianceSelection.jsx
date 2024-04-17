@@ -21,7 +21,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
     var allianceDisplayOrder = [];
     var asArrays = {
         "alliances": [],
-        "allianceCount":-1,
+        "allianceCount": -1,
         "rankedReams": [],
         "availableTeams": [],
         "nextChoice": 0,

@@ -216,7 +216,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
                         <tbody>
                             {displayOrder.map((station, index) => {
                                 if (!_.isEmpty(teamDetails[station]) && !_.isUndefined(teamDetails[station].teamNumber) && !_.isNull(teamDetails[station].teamNumber) && teamDetails[station].teamNumber > 0) {
-                                    return <Announce station={station} team={teamDetails[station]} inPlayoffs={inPlayoffs} key={`${station}${index}`} awardsMenu={awardsMenu} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotesAnnounce={showNotesAnnounce} autoHideSponsors={autoHideSponsors} showAwards={showAwards} showSponsors={showSponsors} showMottoes={showMottoes} showChampsStats={showChampsStats} eventNamesCY={eventNamesCY} showDistrictChampsStats={showDistrictChampsStats} playoffOnly={playoffOnly}/>
+                                    return <Announce station={station} team={teamDetails[station]} inPlayoffs={inPlayoffs} key={`${station}${index}`} awardsMenu={awardsMenu} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotesAnnounce={showNotesAnnounce} autoHideSponsors={autoHideSponsors} showAwards={showAwards} showSponsors={showSponsors} showMottoes={showMottoes} showChampsStats={showChampsStats} eventNamesCY={eventNamesCY} showDistrictChampsStats={showDistrictChampsStats} playoffOnly={playoffOnly} />
                                 } else {
                                     if (station.slice(-1) !== "4") {
                                         var allianceColor = _.toLower(station.slice(0, -1));

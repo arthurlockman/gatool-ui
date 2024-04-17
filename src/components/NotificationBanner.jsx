@@ -6,7 +6,7 @@ const NotificationBanner = ({ notification }) => {
     return (
         <>
         {visible ? 
-        <Alert onClick={()=>{if (notification?.link !== ""){window.open(notification?.link);}}} variant={notification?.variant ? notification?.variant : "primary"} style={{padding:"6px",marginBottom:"2px"}}><b>{notification?.message}</b></Alert> : <></>}
+        <Alert onClick={()=>{if (notification?.link){window.open(notification?.link);}}} variant={notification?.variant ? notification?.variant : "primary"} style={{padding:"6px",marginBottom:"2px"}}><b>{notification?.message}</b></Alert> : <></>}
         </>
     )
 
