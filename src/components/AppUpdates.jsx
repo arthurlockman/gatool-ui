@@ -1,6 +1,11 @@
 
 export const appUpdates = [
     {
+        date: "April 18, 2024",
+        message: <ul>
+            <li>Restored highlighting for Regional IMPACT Winners</li>
+        </ul>
+    }, {
         date: "April 16, 2024",
         message: <ul>
             <li>Adding button to show update history on Setup</li>
