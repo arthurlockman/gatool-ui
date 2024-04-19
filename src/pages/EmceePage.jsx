@@ -7,7 +7,7 @@ import useWindowDimensions from "hooks/UseWindowDimensions";
 import EmceeClock from "components/EmceeClock";
 import moment from "moment";
 
-function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSchedule, offlinePlayoffSchedule, alliances, currentMatch, nextMatch, previousMatch, reverseEmcee, timeFormat, hidePracticeSchedule }) {
+function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSchedule, offlinePlayoffSchedule, alliances, currentMatch, nextMatch, previousMatch, reverseEmcee, timeFormat, hidePracticeSchedule, getSchedule }) {
     const { height, width } = useWindowDimensions();
     const matchClasses = [
         { "matchNumber": 1, "red": { "class": "success", "from": null }, "blue": { "class": "success", "from": null }, "winnerTo": 7, "loserTo": 5, "winnerVs": "blue", "loserVs": "blue" },
@@ -163,6 +163,9 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSched
             },
             onSwipedRight: () => {
                 previousMatch();
+            },
+            onSwipedDown: () => {
+                getSchedule();
             },
             preventScrollOnSwipe: true,
         }

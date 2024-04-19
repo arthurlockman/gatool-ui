@@ -1,7 +1,8 @@
 import _ from "lodash";
 import { useHotkeys } from "react-hotkeys-hook";
+import { useSwipeable } from "react-swipeable";
 
-function FourAllianceBracket({ selectedEvent, playoffSchedule, alliances, currentMatch, qualsLength, nextMatch, previousMatch }) {
+function FourAllianceBracket({ selectedEvent, playoffSchedule, alliances, currentMatch, qualsLength, nextMatch, previousMatch, getSchedule }) {
 	//Ball colors
 	const GOLD = "#FFCA10";
 	const RED = "#FF0000";
@@ -125,13 +126,29 @@ function FourAllianceBracket({ selectedEvent, playoffSchedule, alliances, curren
 		tournamentWinner.level = matchWinner(11)?.level;
 	}
 
+	const swipeHandlers = useSwipeable(
+        {
+            onSwipedLeft: () => {
+                nextMatch();
+            },
+            onSwipedRight: () => {
+                previousMatch();
+            },
+            onSwipedDown: () => {
+                getSchedule();
+            },
+            preventScrollOnSwipe: true,
+        }
+    )
+
 	useHotkeys('right', () => nextMatch(), { scopes: 'matchNavigation' });
     useHotkeys('left', () => previousMatch(), { scopes: 'matchNavigation' });
+	
 
 	return (
 		<div style={{
 			"width": "100%"
-		}}>
+		}} {...swipeHandlers}>
 			{/* <?xml version="1.0" encoding="utf-8"?> */}
 			<svg id="FourAllianceBracket" data-name="FourAllianceBracket" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1076 686">
 				<g id="background">

@@ -1,5 +1,8 @@
 import _ from "lodash";
-function TwoAllianceBracket({ selectedEvent, playoffSchedule, alliances }) {
+import { useHotkeys } from "react-hotkeys-hook";
+import { useSwipeable } from "react-swipeable";
+
+function TwoAllianceBracket({ selectedEvent, playoffSchedule, alliances, nextMatch, previousMatch, getSchedule }) {
 	//Ball colors
 	const GOLD = "#FFCA10";
 	const RED = "#FF0000";
@@ -122,10 +125,28 @@ function TwoAllianceBracket({ selectedEvent, playoffSchedule, alliances }) {
 
 	const dotStart = 541;
 
+	const swipeHandlers = useSwipeable(
+        {
+            onSwipedLeft: () => {
+                nextMatch();
+            },
+            onSwipedRight: () => {
+                previousMatch();
+            },
+            onSwipedDown: () => {
+                getSchedule();
+            },
+            preventScrollOnSwipe: true,
+        }
+    )
+
+	useHotkeys('right', () => nextMatch(), { scopes: 'matchNavigation' });
+	useHotkeys('left', () => previousMatch(), { scopes: 'matchNavigation' });
+
 	return (
 		<div style={{
 			"width": "100%"
-		}}>
+		}} {...swipeHandlers}>
 			{/* <?xml version="1.0" encoding="utf-8"?> */}
 			<svg id="TwoAllianceBracket" data-name="2AllianceBracket" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1076 568">
 

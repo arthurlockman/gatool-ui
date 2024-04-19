@@ -3,10 +3,11 @@ import { Alert, Button, Col, Container, Modal, Row } from "react-bootstrap";
 import { useState } from "react";
 import moment from "moment";
 import { useHotkeys } from "react-hotkeys-hook";
+import { useSwipeable } from "react-swipeable";
 
 
 
-function Bracket({ selectedEvent, playoffSchedule, offlinePlayoffSchedule, setOfflinePlayoffSchedule, alliances, currentMatch, qualsLength, nextMatch, previousMatch }) {
+function Bracket({ selectedEvent, playoffSchedule, offlinePlayoffSchedule, setOfflinePlayoffSchedule, alliances, currentMatch, qualsLength, nextMatch, previousMatch, getSchedule }) {
 	const [showSelectWinner, setShowSelectWinner] = useState(false);
 	const [showConfirmWinner, setShowConfirmWinner] = useState(false);
 	const [winningAlliance, setWinningAlliance] = useState(null);
@@ -340,11 +341,28 @@ function Bracket({ selectedEvent, playoffSchedule, offlinePlayoffSchedule, setOf
 		setShowConfirmWinner(false);
 	}
 
+	const swipeHandlers = useSwipeable(
+        {
+            onSwipedLeft: () => {
+                nextMatch();
+            },
+            onSwipedRight: () => {
+                previousMatch();
+            },
+            onSwipedDown: () => {
+                getSchedule();
+            },
+            preventScrollOnSwipe: true,
+        }
+    )
+
 	useHotkeys('right', () => nextMatch(), { scopes: 'matchNavigation' });
 	useHotkeys('left', () => previousMatch(), { scopes: 'matchNavigation' });
 
 	return (
-		<div>
+		<div {...swipeHandlers} style={{
+			"width": "100%"
+		}}>
 			{!matches && <div>
 				<Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div><div>Waiting for Playoff Match Schedule</div></Alert>
 			</div>}

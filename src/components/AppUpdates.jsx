@@ -1,9 +1,14 @@
 
 export const appUpdates = [
     {
+        date: "April 19, 2024",
+        message: <ul>
+            <li>Added pull down to refresh scores/schedule/ranks to Announce, Play By Play, Emcee and Bracket</li>
+        </ul>
+    },{
         date: "April 18, 2024",
         message: <ul>
-            <li>Restored highlighting for Regional IMPACT Winners</li>
+            <li>{`Restored highlighting for Regional IMPACT Winners (requires event reload)`}</li>
         </ul>
     }, {
         date: "April 16, 2024",
