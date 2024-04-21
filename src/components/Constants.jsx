@@ -245,6 +245,15 @@ export const allianceShortNames = {
 };
 
 export const hallOfFame = [{
+    "Year": 2024,
+    "Impact": 2486,
+    "Challenge": "Crescendo Houston",
+    "Winner1": 1690,
+    "Winner2": 4522,
+    "Winner3": 9432,
+    "Winner4": 321,
+    "Winner5": null
+}, {
     "Year": 2023,
     "Impact": 321,
     "Challenge": "Charged Up Houston",

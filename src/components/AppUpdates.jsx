@@ -1,9 +1,10 @@
 
 export const appUpdates = [
     {
-        date: "April 19, 2024",
+        date: "April 20, 2024",
         message: <ul>
             <li>Added pull down to refresh scores/schedule/ranks to Announce, Play By Play, Emcee and Bracket</li>
+            <li>Fixed a bug that prevented updated team data from displaying in the Alliance Selection flow</li>
         </ul>
     },{
         date: "April 18, 2024",
