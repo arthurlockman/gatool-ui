@@ -7,7 +7,7 @@ import useWindowDimensions from "hooks/UseWindowDimensions";
 import EmceeClock from "components/EmceeClock";
 import moment from "moment";
 
-function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSchedule, offlinePlayoffSchedule, alliances, currentMatch, nextMatch, previousMatch, reverseEmcee, timeFormat, hidePracticeSchedule, getSchedule }) {
+function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSchedule, offlinePlayoffSchedule, alliances, currentMatch, nextMatch, previousMatch, reverseEmcee, timeFormat, hidePracticeSchedule, getSchedule, usePullDownToUpdate, useSwipe }) {
     const { height, width } = useWindowDimensions();
     const matchClasses = [
         { "matchNumber": 1, "red": { "class": "success", "from": null }, "blue": { "class": "success", "from": null }, "winnerTo": 7, "loserTo": 5, "winnerVs": "blue", "loserVs": "blue" },
@@ -156,7 +156,8 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSched
 
     var matchDetails = _.filter(matches, { "matchNumber": playoffMatchNumber })[0] || _.filter(schedule, { "matchNumber": currentMatch })[0];
 
-    const swipeHandlers = useSwipeable(
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const swipeHandlers = useSwipe ? useSwipeable(
         {
             onSwipedLeft: () => {
                 nextMatch();
@@ -165,11 +166,14 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSched
                 previousMatch();
             },
             onSwipedDown: () => {
-                getSchedule();
+                if (usePullDownToUpdate) {
+                    getSchedule();
+                }
+                
             },
             preventScrollOnSwipe: true,
         }
-    )
+    ) : {}
 
     useHotkeys('right', () => nextMatch(), { scopes: 'matchNavigation' });
     useHotkeys('left', () => previousMatch(), { scopes: 'matchNavigation' });

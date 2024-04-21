@@ -12,7 +12,7 @@ import NotificationBanner from "components/NotificationBanner";
 
 const paleGreen = "rgba(144, 238, 144, 0.5)"
 
-function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, awardsMenu, showNotesAnnounce, showAwards, showSponsors, showMottoes, showChampsStats, timeFormat, eventHighScores, backupTeam, setBackupTeam, nextMatch, previousMatch, setMatchFromMenu, practiceSchedule, eventNamesCY, districtRankings, showDistrictChampsStats, adHocMatch, setAdHocMatch, adHocMode, offlinePlayoffSchedule, swapScreen, autoHideSponsors, hidePracticeSchedule, teamReduction, qualsLength, playoffOnly, getSchedule }) {
+function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, awardsMenu, showNotesAnnounce, showAwards, showSponsors, showMottoes, showChampsStats, timeFormat, eventHighScores, backupTeam, setBackupTeam, nextMatch, previousMatch, setMatchFromMenu, practiceSchedule, eventNamesCY, districtRankings, showDistrictChampsStats, adHocMatch, setAdHocMatch, adHocMode, offlinePlayoffSchedule, swapScreen, autoHideSponsors, hidePracticeSchedule, teamReduction, qualsLength, playoffOnly, getSchedule, usePullDownToUpdate, useSwipe }) {
     const matchesToNotify = _.toInteger((teamList?.teams?.length - teamReduction) / 6);
     if (qualSchedule?.schedule?.schedule?.length || qualSchedule?.schedule?.length) {
     };
@@ -174,7 +174,8 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
     }
 
 
-    const swipeHandlers = useSwipeable(
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const swipeHandlers = useSwipe ? useSwipeable(
         {
             onSwipedLeft: () => {
                 nextMatch();
@@ -183,11 +184,14 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
                 previousMatch();
             },
             onSwipedDown: () => {
-                getSchedule();
+                if (usePullDownToUpdate) {
+                    getSchedule();
+                }
+                
             },
             preventScrollOnSwipe: true,
         }
-    )
+    ) : {}
 
     useHotkeys('right', () => nextMatch(), { scopes: 'matchNavigation' });
     useHotkeys('left', () => previousMatch(), { scopes: 'matchNavigation' });

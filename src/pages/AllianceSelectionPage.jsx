@@ -1,6 +1,7 @@
 import { Alert, Col, Row, Container, Modal, Button } from "react-bootstrap";
 import Bracket from "../components/Bracket";
 import FourAllianceBracket from "components/FourAllianceBracket";
+import TwoAllianceBracket from "components/TwollianceBracket";
 import moment from "moment/moment";
 import AllianceSelection from "../components/AllianceSelection";
 import { useState } from "react";
@@ -8,9 +9,9 @@ import Switch from "react-switch";
 import { useHotkeysContext, useHotkeys } from "react-hotkeys-hook";
 
 import './AllianceSelectionPage.css';
-import TwoAllianceBracket from "components/TwollianceBracket";
 
-function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, playoffSchedule, offlinePlayoffSchedule, alliances, rankings, timeFormat, getRanks, allianceSelection, playoffs, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays, rankingsOverride, loadEvent, practiceSchedule, setOfflinePlayoffSchedule, currentMatch, qualsLength, nextMatch, previousMatch, getSchedule }) {
+
+function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, playoffSchedule, offlinePlayoffSchedule, alliances, rankings, timeFormat, getRanks, allianceSelection, playoffs, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays, rankingsOverride, loadEvent, practiceSchedule, setOfflinePlayoffSchedule, currentMatch, qualsLength, nextMatch, previousMatch, getSchedule, useSwipe, usePullDownToUpdate }) {
     const [overrideAllianceSelection, setOverrideAllianceSelection] = useState(false);
     const [resetAllianceSelection, setResetAllianceSelection] = useState(false);
     const [teamFilter, setTeamFilter] = useState("");
@@ -106,11 +107,11 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
                 </div>}
 
             {selectedEvent?.value?.allianceCount === "EightAlliance" && playoffs &&
-                <Bracket selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} offlinePlayoffSchedule={offlinePlayoffSchedule} alliances={alliances} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} currentMatch={currentMatch} qualsLength={qualsLength} nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule}/>}
+                <Bracket selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} offlinePlayoffSchedule={offlinePlayoffSchedule} alliances={alliances} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} currentMatch={currentMatch} qualsLength={qualsLength} nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} usePullDownToUpdate={usePullDownToUpdate} useSwipe={useSwipe}/>}
             {selectedEvent?.value?.allianceCount === "FourAlliance" && playoffs &&
-                <FourAllianceBracket selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} alliances={alliances} currentMatch={currentMatch} qualsLength={qualsLength} nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} />}
+                <FourAllianceBracket selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} alliances={alliances} currentMatch={currentMatch} qualsLength={qualsLength} nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} useSwipe={useSwipe} usePullDownToUpdate={usePullDownToUpdate} />}
             {selectedEvent?.value?.allianceCount === "TwoAlliance" && playoffs &&
-                <TwoAllianceBracket selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} alliances={alliances} nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} />}
+                <TwoAllianceBracket selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} alliances={alliances} nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} useSwipe={useSwipe} usePullDownToUpdate={usePullDownToUpdate} />}
             <Modal centered={true} show={resetAllianceSelection} onHide={handleClose}>
                 <Modal.Header className={"allianceSelectionDecline"} closeVariant={"white"} closeButton>
                     <Modal.Title>

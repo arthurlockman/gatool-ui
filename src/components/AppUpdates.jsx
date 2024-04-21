@@ -1,10 +1,13 @@
 
 export const appUpdates = [
     {
-        date: "April 20, 2024",
+        date: "April 21, 2024",
         message: <ul>
+            <li>Added switch to stop swipe action</li>
             <li>Added pull down to refresh scores/schedule/ranks to Announce, Play By Play, Emcee and Bracket</li>
             <li>Fixed a bug that prevented updated team data from displaying in the Alliance Selection flow</li>
+            <li>Added 2024 Championship Impact and event winners</li>
+            <li>Fixed Hall of Fame text sizing for Impact winners</li>
         </ul>
     },{
         date: "April 18, 2024",

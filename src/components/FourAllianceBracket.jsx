@@ -2,7 +2,7 @@ import _ from "lodash";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useSwipeable } from "react-swipeable";
 
-function FourAllianceBracket({ selectedEvent, playoffSchedule, alliances, currentMatch, qualsLength, nextMatch, previousMatch, getSchedule }) {
+function FourAllianceBracket({ selectedEvent, playoffSchedule, alliances, currentMatch, qualsLength, nextMatch, previousMatch, getSchedule, useSwipe, usePullDownToUpdate }) {
 	//Ball colors
 	const GOLD = "#FFCA10";
 	const RED = "#FF0000";
@@ -126,7 +126,8 @@ function FourAllianceBracket({ selectedEvent, playoffSchedule, alliances, curren
 		tournamentWinner.level = matchWinner(11)?.level;
 	}
 
-	const swipeHandlers = useSwipeable(
+	// eslint-disable-next-line react-hooks/rules-of-hooks
+    const swipeHandlers = useSwipe ? useSwipeable(
         {
             onSwipedLeft: () => {
                 nextMatch();
@@ -135,11 +136,14 @@ function FourAllianceBracket({ selectedEvent, playoffSchedule, alliances, curren
                 previousMatch();
             },
             onSwipedDown: () => {
-                getSchedule();
+                if (usePullDownToUpdate) {
+                    getSchedule();
+                }
+                
             },
             preventScrollOnSwipe: true,
         }
-    )
+    ) : {}
 
 	useHotkeys('right', () => nextMatch(), { scopes: 'matchNavigation' });
     useHotkeys('left', () => previousMatch(), { scopes: 'matchNavigation' });

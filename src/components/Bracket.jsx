@@ -7,7 +7,7 @@ import { useSwipeable } from "react-swipeable";
 
 
 
-function Bracket({ selectedEvent, playoffSchedule, offlinePlayoffSchedule, setOfflinePlayoffSchedule, alliances, currentMatch, qualsLength, nextMatch, previousMatch, getSchedule }) {
+function Bracket({ selectedEvent, playoffSchedule, offlinePlayoffSchedule, setOfflinePlayoffSchedule, alliances, currentMatch, qualsLength, nextMatch, previousMatch, getSchedule, usePullDownToUpdate, useSwipe }) {
 	const [showSelectWinner, setShowSelectWinner] = useState(false);
 	const [showConfirmWinner, setShowConfirmWinner] = useState(false);
 	const [winningAlliance, setWinningAlliance] = useState(null);
@@ -341,7 +341,8 @@ function Bracket({ selectedEvent, playoffSchedule, offlinePlayoffSchedule, setOf
 		setShowConfirmWinner(false);
 	}
 
-	const swipeHandlers = useSwipeable(
+	// eslint-disable-next-line react-hooks/rules-of-hooks
+    const swipeHandlers = useSwipe ? useSwipeable(
         {
             onSwipedLeft: () => {
                 nextMatch();
@@ -350,11 +351,14 @@ function Bracket({ selectedEvent, playoffSchedule, offlinePlayoffSchedule, setOf
                 previousMatch();
             },
             onSwipedDown: () => {
-                getSchedule();
+                if (usePullDownToUpdate) {
+                    getSchedule();
+                }
+                
             },
             preventScrollOnSwipe: true,
         }
-    )
+    ) : {}
 
 	useHotkeys('right', () => nextMatch(), { scopes: 'matchNavigation' });
 	useHotkeys('left', () => previousMatch(), { scopes: 'matchNavigation' });
