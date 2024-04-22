@@ -67,13 +67,6 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
         alliancesTemp.alliances[_.findIndex(alliancesTemp?.alliances, { "name": allianceToPatch?.alliance })].backupReplaced = backupTeam?.replacing;
         setAlliances(alliancesTemp);
 
-        // patch schedule
-        // var playoffScheduleTemp = _.cloneDeep(playoffSchedule);
-        // var matchToPatch = playoffScheduleTemp?.schedule[_.findIndex(playoffScheduleTemp?.schedule,{"description":matchDetails?.description})];
-        // matchToPatch.teams[_.findIndex(matchToPatch?.teams,{"teamNumber":backupTeam?.replacing})].teamNumber = backupTeam?.backup?.teamNumber;
-        // playoffScheduleTemp.schedule[_.findIndex(playoffScheduleTemp?.schedule,{"description":matchDetails?.description})]=matchToPatch;
-        // setPlayoffSchedule(playoffScheduleTemp);
-
         setShow(false);
         setBackupTeam(null);
         setTeamSelected(null);
@@ -151,7 +144,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
                     }} ref={selectRef} />}
                     {adHocMode && <span className="announceOrganization">TEST MATCH</span>}
                 </Col>
-                {addBackupButton && <Col className="promoteBackup" xs={1} onClick={handleShow}>+<ArrowUpSquareFill />+<br />backup</Col>}
+                {addBackupButton && <Col className="promoteBackup" xs={1} onClick={handleShow}>+<ArrowUpSquareFill />+<br />Add Team</Col>}
                 {(adHocMode || inPractice) && <Col className="promoteBackup" xs={1} onClick={handleAdHoc}>Change<br />Teams</Col>}
                 <Col xs={"2"} lg={"3"}>
                     {!adHocMode && <Button size="lg" variant="outline-success" className={"gatool-button buttonNoWrap"} onClick={nextMatch}>{inPractice ? <span><CaretRightFill /> <CaretRightFill /></span> : <><span className={"d-none d-lg-block"}>Next Match <CaretRightFill /></span><span className={"d-block d-lg-none"}><CaretRightFill /> <CaretRightFill /></span></>}</Button>}
@@ -163,7 +156,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
                     <Modal.Body className={"backupDialog"}>
                         <Container fluid>
                             {!teamSelected && <><Row>
-                                <Col>Select a team to replace:</Col></Row>
+                                <Col>Select the team(s) not playing in this match. The new team will become a permanent member of the Alliance.</Col></Row>
                                 <Row>
                                     {matchDetails?.teams.map((team, index) => {
                                         var allianceColor = team?.station.slice(0, team.station?.length - 1);
@@ -171,7 +164,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
                                     })}
                                 </Row></>}
 
-                            {teamSelected && !confirmSelection && <><Row><Col>Select a team from the backup teams to replace team {teamSelected?.teamNumber}</Col></Row>
+                            {teamSelected && !confirmSelection && <><Row><Col>Select a team to replace {teamSelected?.teamNumber} in this match:</Col></Row>
                                 <Row> <Col><Select options={availableTeams} onChange={handleBackupSelect} /></Col>
                                 </Row></>}
 
