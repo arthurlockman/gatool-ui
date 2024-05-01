@@ -6,7 +6,7 @@ import _ from "lodash";
 import Switch from "react-switch";
 import { useState } from "react";
 
-function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSchedule, practiceSchedule, setPracticeSchedule, offlinePlayoffSchedule, setOfflinePlayoffSchedule, getTeamList, loadEvent, practiceFileUploaded, setPracticeFileUploaded, setTeamListLoading, getAlliances, playoffOnly, setPlayoffOnly, alliances, champsStyle, setChampsStyle }) {
+function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSchedule, practiceSchedule, setPracticeSchedule, offlinePlayoffSchedule, setOfflinePlayoffSchedule, getTeamList, loadEvent, practiceFileUploaded, setPracticeFileUploaded, setTeamListLoading, getAlliances, playoffOnly, setPlayoffOnly, alliances, champsStyle, setChampsStyle, setQualsLength }) {
 
     const [showAdjustAlliances, setShowAdjustAlliances] = useState(false);
     const [formData, setFormData] = useState(null);
@@ -270,7 +270,8 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
 
                 formattedSchedule.schedule = _.filter(innerSchedule, "description");
                 if (!forPlayoffs) {
-                    await setPracticeSchedule(formattedSchedule)
+                    await setPracticeSchedule(formattedSchedule);
+                    setQualsLength(formattedSchedule?.schedule?.length);
                 } else {
                     await setOfflinePlayoffSchedule(formattedSchedule);
                 }
