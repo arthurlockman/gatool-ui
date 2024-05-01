@@ -1,6 +1,11 @@
 
 export const appUpdates = [
     {
+        date: "May 1, 2024",
+        message: <ul>
+            <li>Fixed Bracket match highlighting for OFFLINE Event</li>
+        </ul>
+    }, {
         date: "April 21, 2024",
         message: <ul>
             <li>Added switch to enable/disable swipe action</li>
@@ -10,7 +15,7 @@ export const appUpdates = [
             <li>Fixed Hall of Fame text sizing for Impact winners</li>
             <li>Replaced "Backup" with "Add Team" in Playoffs</li>
         </ul>
-    },{
+    }, {
         date: "April 18, 2024",
         message: <ul>
             <li>{`Restored highlighting for Regional IMPACT Winners (requires event reload)`}</li>
