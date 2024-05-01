@@ -4,6 +4,7 @@ export const appUpdates = [
         date: "May 1, 2024",
         message: <ul>
             <li>Fixed Bracket match highlighting for OFFLINE Event</li>
+            <li>Fixed auto-advance issue affecting first Playoff match</li>
         </ul>
     }, {
         date: "April 21, 2024",
