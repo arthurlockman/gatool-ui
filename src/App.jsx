@@ -582,7 +582,7 @@ function App() {
 
     }
     if ((loadingEvent && autoAdvance) || autoUpdate) {
-      if ((lastMatchPlayed === qualschedule?.schedule.length) || (lastMatchPlayed === qualschedule?.schedule.length + playoffschedule?.schedule.length)) {
+      if ((lastMatchPlayed === qualschedule?.schedule.length + 1) || (lastMatchPlayed === qualschedule?.schedule.length + playoffschedule?.schedule.length + 2)) {
         lastMatchPlayed -= 1;
       }
       setCurrentMatch(lastMatchPlayed + 1)
