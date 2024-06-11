@@ -6,7 +6,7 @@ import _ from "lodash";
 import moment from "moment";
 
 
-function RanksPage({ selectedEvent, teamList, rankings, rankSort, setRankSort, allianceCount, rankingsOverride, setRankingsOverride, setRankings, allianceSelection, getRanks, setAllianceSelectionArrays, playoffs, districtRankings }) {
+function RanksPage({ selectedEvent, teamList, rankings, rankSort, setRankSort, allianceCount, rankingsOverride, setRankingsOverride, setRankings, allianceSelection, getRanks, setAllianceSelectionArrays, playoffs, districtRankings, eventLabel }) {
     // This function clicks the hidden file upload button
     function clickLoadRanks() {
         document.getElementById("RankingsFiles").click();
@@ -189,7 +189,7 @@ function RanksPage({ selectedEvent, teamList, rankings, rankSort, setRankSort, a
 
             {selectedEvent && teamList?.teams.length > 0 && rankings?.ranks.length > 0 &&
                 <div>
-                    <h4>{selectedEvent?.label}</h4>
+                    <h4>{eventLabel}</h4>
                     {(rankings?.ranks.length > 0) && !rankingsOverride && !playoffs && allianceSelection &&
                         <>
                             <Container fluid>

@@ -7,7 +7,7 @@ import useWindowDimensions from "hooks/UseWindowDimensions";
 import EmceeClock from "components/EmceeClock";
 import moment from "moment";
 
-function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSchedule, offlinePlayoffSchedule, alliances, currentMatch, nextMatch, previousMatch, reverseEmcee, timeFormat, hidePracticeSchedule, getSchedule, usePullDownToUpdate, useSwipe }) {
+function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSchedule, offlinePlayoffSchedule, alliances, currentMatch, nextMatch, previousMatch, reverseEmcee, timeFormat, hidePracticeSchedule, getSchedule, usePullDownToUpdate, useSwipe, eventLabel, playoffCountOverride }) {
     const { height, width } = useWindowDimensions();
     const matchClasses = [
         { "matchNumber": 1, "red": { "class": "success", "from": null }, "blue": { "class": "success", "from": null }, "winnerTo": 7, "loserTo": 5, "winnerVs": "blue", "loserVs": "blue" },
@@ -81,7 +81,7 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSched
             }
         }
 
-        allianceShortName = allianceName.replace("Alliance ", "").length === 1 ? allianceName.replace("Alliance ", "").slice(0, 1) : allianceName.slice(0, 2);
+        allianceShortName = allianceName?.replace("Alliance ", "").length === 1 ? allianceName.replace("Alliance ", "")?.slice(0, 1) : allianceName?.slice(0, 2);
 
         if (!allianceName) {
             return { "allianceName": "?", "captain": "TBD", "shortName": "?" };
@@ -188,7 +188,7 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSched
                 <Alert variant="warning" >You need to select an event before you can see anything here.</Alert>
             </div>}
             {selectedEvent && (!schedule || schedule?.length === 0) && <div>
-                <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div>Awaiting schedule data for {selectedEvent.label}</Alert>
+                <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div>Awaiting schedule data for {eventLabel}</Alert>
             </div>}
             {selectedEvent && (schedule?.length > 0) && !inPlayoffs &&
                 <Container fluid {...swipeHandlers} style={{ textAlign: "center", padding: "7px" }}>
@@ -239,7 +239,7 @@ function EmceePage({ selectedEvent, playoffSchedule, qualSchedule, practiceSched
 
                         <Row>
                             <Col xs={12} className={`davidPriceDetail${smallScreen}${portrait}`}>
-                                <PlayoffDetails matchDetails={matchDetails} alliances={alliances} matches={matches} selectedEvent={selectedEvent} />
+                                <PlayoffDetails matchDetails={matchDetails} alliances={alliances} matches={matches} selectedEvent={selectedEvent} playoffCountOverride={playoffCountOverride} />
                             </Col>
                         </Row>
                     </Container>

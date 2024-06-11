@@ -18,7 +18,7 @@ import 'react-quill/dist/quill.snow.css';
 import TeamTimer from "components/TeamTimer";
 import { useInterval } from "react-interval-hook";
 
-function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSort, setTeamSort, communityUpdates, setCommunityUpdates, allianceCount, lastVisit, setLastVisit, putTeamData, localUpdates, setLocalUpdates, qualSchedule, playoffSchedule, originalAndSustaining, monthsWarning, user, getTeamHistory, timeFormat, getCommunityUpdates, getTeamList }) {
+function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSort, setTeamSort, communityUpdates, setCommunityUpdates, allianceCount, lastVisit, setLastVisit, putTeamData, localUpdates, setLocalUpdates, qualSchedule, playoffSchedule, originalAndSustaining, monthsWarning, user, getTeamHistory, timeFormat, getCommunityUpdates, getTeamList, eventLabel }) {
     const [currentTime, setCurrentTime] = useState(moment());
     const [clockRunning, setClockRunning] = useState(true);
     const { disableScope, enableScope } = useHotkeysContext();
@@ -396,7 +396,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         utils.book_append_sheet(workbook, ws, "Schedule");
 
         write(workbook, { bookType: "xlsx", bookSST: true, type: 'base64' });
-        writeFile(workbook, "gatoolExport_" + selectedYear.value + selectedEvent.label + moment().format('MMDDYYYY_HHmmss') + ".xlsx");
+        writeFile(workbook, "gatoolExport_" + selectedYear.value + eventLabel + moment().format('MMDDYYYY_HHmmss') + ".xlsx");
 
     }
 
@@ -460,7 +460,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                     record.teamYearsNoCompete = team.updates.teamYearsNoCompeteLocal || "";
                     record.teamMotto = team.updates.teamMottoLocal || "";
                     record.rookieYear = team.rookieYear || "";
-                    record.eventName = selectedEvent.label;
+                    record.eventName = eventLabel;
                     record.sayNumber = team.updates.sayNumber || "";
                     //let tmp = document.createElement("DIV");
                     //tmp.innerHTML = team.teamNotes;
@@ -492,7 +492,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                     compression: "DEFLATE",
                 });
                 // Output the document using Data-URI
-                saveAs(out, selectedEvent.label + " " + selectedYear.value + " Team Info Sheets.docx");
+                saveAs(out, `${eventLabel} ${selectedYear.value} Team Info Sheets.docx`);
             }
         );
     }
@@ -629,13 +629,13 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
             </div>}
             {selectedEvent && (!teamList || teamList?.teams.length === 0) && <div>
                 <Alert variant="warning" onClick={(e) => { handleGetTeamList() }}><div><img src="loadingIcon.gif" alt="Loading data..." /></div>
-                    <div>Awaiting team data for {selectedEvent.label}</div>
+                    <div>Awaiting team data for {eventLabel}</div>
                     {selectedEvent?.value?.code === "OFFLINE" && <div>Your OFFLINE Event team list is determined by the schedule. Upload a schedule on the Schedule tab to load teams.</div>}
                     {selectedEvent?.value?.code !== "OFFLINE" && <div>If your event has finished loading and you don't see a Team List, tap here to try loading your teams again.</div>}
                 </Alert>
             </div>}
             {selectedEvent && teamList?.teams.length > 0 && <><div>
-                <h4>{selectedEvent?.label}</h4>
+                <h4>{eventLabel}</h4>
                 <p className={"leftTable"}>This table is {(user["https://gatool.org/roles"].indexOf("user") >= 0) ? <>editable and sortable. Tap on a team number to change data for a specific team. Edits you make are local to this browser, and they will persist here if you do not clear your browser cache. You can save your changes to the gatool Cloud on the team details page or on the Setup Screen. </> : <>sortable. </>}Cells <span className={"teamTableHighlight"}>highlighted in green</span> have been modified, either by you or by other gatool users.</p>
                 <Table responsive className={"leftTable topBorderLine"}>
                     <thead>

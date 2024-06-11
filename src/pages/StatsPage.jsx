@@ -2,7 +2,7 @@
 import { Alert, Container, Row, Col } from "react-bootstrap";
 import StatsMatch from "../components/StatsMatch";
 
-function StatsPage({ worldStats, selectedEvent, eventHighScores, eventNamesCY }) {
+function StatsPage({ worldStats, selectedEvent, eventHighScores, eventNamesCY, eventLabel }) {
 
     return (
         <Container fluid>
@@ -10,7 +10,7 @@ function StatsPage({ worldStats, selectedEvent, eventHighScores, eventNamesCY })
                 <Alert variant="warning" >You need to select an event before you can see anything here.</Alert>
             </div>}
             {selectedEvent && !worldStats && <div>
-                <Alert variant="warning" ><Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div>Awaiting stats data for {selectedEvent.label}</Alert></Alert>
+                <Alert variant="warning" ><Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div>Awaiting stats data for {eventLabel}</Alert></Alert>
             </div>}
             {selectedEvent && worldStats &&
                 <Container fluid>
@@ -42,7 +42,7 @@ function StatsPage({ worldStats, selectedEvent, eventHighScores, eventNamesCY })
                             <table className="table table-condensed gatool-eventHighScores">
                                 <thead>
                                     <tr>
-                                        <td colSpan={2} style={{backgroundColor: "#d9edf7"}}>Event High Scores: {selectedEvent.label}</td>
+                                        <td colSpan={2} style={{backgroundColor: "#d9edf7"}}>Event High Scores: {eventLabel}</td>
                                     </tr>
                                 </thead>
                                 <tbody>

@@ -6,7 +6,7 @@ import { useHotkeysContext, useHotkeys } from "react-hotkeys-hook";
 
 
 
-function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates }) {
+function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates, eventLabel }) {
     const originalAndSustaining = ["20", "45", "126", "148", "151", "157", "190", "191", "250"];
     const { disableScope, enableScope } = useHotkeysContext();
 
@@ -105,12 +105,12 @@ function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates })
                 <Alert variant="warning" >You need to select an event before you can see anything here.</Alert>
             </div>}
             {selectedEvent && (!teamList || teamList?.teams.length === 0) && <div>
-                <h4>{selectedEvent?.label}</h4>
-                <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div><div>Awaiting team data for {selectedEvent.label}</div></Alert>
+                <h4>{eventLabel}</h4>
+                <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div><div>Awaiting team data for {eventLabel}</div></Alert>
             </div>}
             {selectedEvent && teamList?.teams.length > 0 &&
                 <Container fluid>
-                    <h4>{selectedEvent?.label}</h4>
+                    <h4>{eventLabel}</h4>
                     <p>When it's time for Awards, simply tap a team when their number is called, announce the team, and click <b>Congratulations.</b></p>
                     <div>
                         <Form onSubmit={handleFilterSelect}>
@@ -121,7 +121,7 @@ function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates })
                             </InputGroup>
                         </Form>
                     </div>
-                    <Row key={selectedEvent.label}>{columns.map((column, index) => {
+                    <Row key={eventLabel}>{columns.map((column, index) => {
                         return (<Col xs="2" key={index}>
                             {column.map((team) => {
                                 return ((String(team?.teamNumber).startsWith(teamFilter) || teamFilter === "") && <Row className={"awardsButton"} key={team.teamNumber} ><Button value={JSON.stringify(team)} onClick={handleShow} size="sm" variant={(team?.teamNumber === Number(teamFilter) || (_.filter(sortedTeams, (team) => { return String(team?.teamNumber).startsWith(teamFilter) }).length === 1)) ? "success" : "outline-success"}>{team?.teamNumber}</Button></Row>)

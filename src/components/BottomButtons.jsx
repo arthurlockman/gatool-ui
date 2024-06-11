@@ -3,7 +3,7 @@ import { CaretLeftFill, CaretRightFill } from "react-bootstrap-icons";
 import PlayoffDetails from "../components/PlayoffDetails";
 
 
-function BottomButtons({ previousMatch, nextMatch, matchDetails, playoffSchedule, eventHighScores, alliances, selectedEvent, adHocMode }) {
+function BottomButtons({ previousMatch, nextMatch, matchDetails, playoffSchedule, eventHighScores, alliances, selectedEvent, adHocMode, playoffCountOverride }) {
     var matches = playoffSchedule?.schedule;
     var eventHighScore = eventHighScores?.overallqual;
     if (eventHighScores?.overallqual?.score < eventHighScores?.overallplayoff?.score) {
@@ -17,8 +17,8 @@ function BottomButtons({ previousMatch, nextMatch, matchDetails, playoffSchedule
                 <Col xs={"2"} lg={"3"}>
                     {!adHocMode && <Button size="lg" variant="outline-success" className={"gatool-button buttonNoWrap"} onClick={previousMatch}><span className={"d-none d-lg-block"}><CaretLeftFill /> Previous Match</span><span className={"d-block d-lg-none"}><CaretLeftFill /> <CaretLeftFill /></span></Button>}
                 </Col>
-                {matchDetails?.tournamentLevel === "Playoff" && <Col xs={"5"} lg={"4"} className={"playoffDetails"}>
-                    <PlayoffDetails matchDetails={matchDetails} alliances={alliances} matches={matches} selectedEvent={selectedEvent} />
+                {matchDetails?.tournamentLevel === "Playoff" && <Col xs={eventHighScore?.score? "5" : "8"} lg={eventHighScore?.score ? "4" : "6"} className={"playoffDetails"}>
+                    <PlayoffDetails matchDetails={matchDetails} alliances={alliances} matches={matches} selectedEvent={selectedEvent} playoffCountOverride={playoffCountOverride} />
                 </Col>}
 
                 {matchDetails?.tournamentLevel !== "Playoff" && eventHighScore?.score && <Col xs={"8"} lg={"6"}><p><b>Event High Score: {eventHighScore?.score}<br />

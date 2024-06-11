@@ -6,7 +6,7 @@ import MatchClock from "../components/MatchClock";
 import _ from "lodash";
 import { useHotkeysContext } from "react-hotkeys-hook";
 
-function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatchFromMenu, selectedEvent, matchDetails, timeFormat, alliances, setAlliances, rankings, inPlayoffs, backupTeam, setBackupTeam, teamList, adHocMatch, setAdHocMatch, adHocMode, swapScreen, playoffOnly }) {
+function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatchFromMenu, selectedEvent, matchDetails, timeFormat, alliances, setAlliances, rankings, inPlayoffs, backupTeam, setBackupTeam, teamList, adHocMatch, setAdHocMatch, adHocMode, swapScreen, playoffOnly, eventLabel }) {
 
     const [show, setShow] = useState(null);
     const [showAdHoc, setAdHoc] = useState(null);
@@ -132,7 +132,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
                     {!adHocMode && <Button size="lg" variant="outline-success" className={"gatool-button buttonNoWrap"} onClick={previousMatch}>{inPractice ? <span><CaretLeftFill /> <CaretLeftFill /></span> : <><span className={"d-none d-lg-block"}><CaretLeftFill /> Previous Match</span><span className={"d-block d-lg-none"}><CaretLeftFill /> <CaretLeftFill /></span></>}</Button>}
                 </Col>
                 {!adHocMode && <MatchClock matchDetails={matchDetails} timeFormat={timeFormat} />}
-                <Col xs={addBackupButton || inPractice ? "4" : "5"} lg={inPlayoffs || inPractice ? "3" : "4"}><b>{selectedEvent?.label.replace("FIRST Championship - ", "").replace("FIRST In Texas District Championship - ", "").replace("FIRST Ontario Provincial Championship - ", "").replace("New England FIRST District Championship - ", "")}</b><br />
+                <Col xs={addBackupButton || inPractice ? "4" : "5"} lg={inPlayoffs || inPractice ? "3" : "4"}><b>{eventLabel?.replace("FIRST Championship - ", "").replace("FIRST In Texas District Championship - ", "").replace("FIRST Ontario Provincial Championship - ", "").replace("New England FIRST District Championship - ", "")}</b><br />
                     {!adHocMode && <Select options={matchMenu} value={currentMatch ? matchMenu[currentMatch - 1] : matchMenu[0]} onChange={handleMatchSelection} styles={{
                         option: (styles, { data }) => {
                             return {
