@@ -211,7 +211,7 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
                 <Container fluid {...swipeHandlers}>
                     <TopButtons previousMatch={previousMatch} nextMatch={nextMatch} currentMatch={currentMatch} matchMenu={matchMenu} setMatchFromMenu={setMatchFromMenu} selectedEvent={selectedEvent} matchDetails={matchDetails} timeFormat={timeFormat} inPlayoffs={inPlayoffs} alliances={alliances} setAlliances={setAlliances} rankings={rankings} backupTeam={backupTeam} setBackupTeam={setBackupTeam} teamList={teamList} adHocMatch={adHocMatch} setAdHocMatch={setAdHocMatch} adHocMode={adHocMode} swapScreen={swapScreen} playoffOnly={playoffOnly} eventLabel={eventLabel} />
                     <NotificationBanner notification={notification}></NotificationBanner>
-                    <table className={"table table-responsive"}>
+                    {!matchDetails?.description.includes("Bye Match") && <table className={"table table-responsive"}>
                         <thead>
                             <tr key={"header"}>
                                 <td>Team #</td>
@@ -237,7 +237,9 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
                             }
                             )}
                         </tbody>
-                    </table>
+                    </table>}
+                    {matchDetails?.description?.includes("Bye Match") && <Alert><h1><b>BYE MATCH</b></h1></Alert>
+                    }
                     <BottomButtons previousMatch={previousMatch} nextMatch={nextMatch} matchDetails={matchDetails} playoffSchedule={playoffSchedule} eventHighScores={eventHighScores} alliances={alliances} selectedEvent={selectedEvent} adHocMode={adHocMode} playoffCountOverride={playoffCountOverride} />
                 </Container>
             }

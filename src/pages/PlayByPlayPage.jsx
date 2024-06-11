@@ -226,7 +226,7 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
                 <Container fluid {...swipeHandlers}>
                     <TopButtons previousMatch={previousMatch} nextMatch={nextMatch} currentMatch={currentMatch} matchMenu={matchMenu} setMatchFromMenu={setMatchFromMenu} selectedEvent={selectedEvent} matchDetails={matchDetails} timeFormat={timeFormat} inPlayoffs={inPlayoffs} alliances={alliances} setAlliances={setAlliances} rankings={rankings} backupTeam={backupTeam} setBackupTeam={setBackupTeam} teamList={teamList} adHocMatch={adHocMatch} setAdHocMatch={setAdHocMatch} adHocMode={adHocMode} swapScreen={swapScreen} playoffOnly={playoffOnly} eventLabel={eventLabel} />
                     <NotificationBanner notification={notification}></NotificationBanner>
-                    <table className={"playByPlayTable"}>
+                    {!matchDetails?.description?.includes("Bye Match") && <table className={"playByPlayTable"}>
                         <tbody>
                             <tr className={"gatool-playbyplay"}>
                                 <PlayByPlay station={displayOrder[0]} team={teamDetails[displayOrder[0]]} inPlayoffs={inPlayoffs} key={displayOrder[0]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} adHocMode={adHocMode} playoffOnly={playoffOnly} />
@@ -246,7 +246,9 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
                                     <PlayByPlay station={displayOrder[7]} team={teamDetails[displayOrder[7]]} inPlayoffs={inPlayoffs} key={displayOrder[7]} selectedYear={selectedYear} selectedEvent={selectedEvent} showNotes={showNotes} showMottoes={showMottoes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} adHocMode={adHocMode} playoffOnly={playoffOnly} />
                                 </tr>}
                         </tbody>
-                    </table>
+                    </table>}
+                    {matchDetails?.description?.includes("Bye Match") && <Alert><h1><b>BYE MATCH</b></h1></Alert>
+                    }
                     <BottomButtons previousMatch={previousMatch} nextMatch={nextMatch} matchDetails={matchDetails} playoffSchedule={playoffSchedule} eventHighScores={eventHighScores} alliances={alliances} selectedEvent={selectedEvent} adHocMode={adHocMode} playoffCountOverride={playoffCountOverride} />
                 </Container>}
         </>
