@@ -1,3 +1,4 @@
+import Select from "react-select";
 import { Alert, Button, Col, Container, Row, Table, Modal, Form } from "react-bootstrap";
 import moment from 'moment';
 import { utils, read } from "xlsx";
@@ -5,11 +6,79 @@ import { toast } from "react-toastify";
 import _ from "lodash";
 import Switch from "react-switch";
 import { useState } from "react";
+import { playoffOverrideMenu } from "components/Constants";
 
-function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSchedule, practiceSchedule, setPracticeSchedule, offlinePlayoffSchedule, setOfflinePlayoffSchedule, getTeamList, loadEvent, practiceFileUploaded, setPracticeFileUploaded, setTeamListLoading, getAlliances, playoffOnly, setPlayoffOnly, alliances, champsStyle, setChampsStyle, setQualsLength }) {
+function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSchedule, practiceSchedule, setPracticeSchedule, offlinePlayoffSchedule, setOfflinePlayoffSchedule, getTeamList, loadEvent, practiceFileUploaded, setPracticeFileUploaded, setTeamListLoading, getAlliances, playoffOnly, setPlayoffOnly, alliances, champsStyle, setChampsStyle, setQualsLength, playoffCountOverride, setPlayoffCountOverride, eventLabel, setEventLabel, allianceCount }) {
 
     const [showAdjustAlliances, setShowAdjustAlliances] = useState(false);
     const [formData, setFormData] = useState(null);
+
+    const byeCount = [
+        { "bye": 0, "allianceOrder": [{ "match": null, "station": null }], "insertionOrder": [] },
+        { "bye": 0, "allianceOrder": [{ "match": 1, "station": "red" }], "insertionOrder": [] },
+        { "bye": 0, "allianceOrder": [{ "match": 1, "station": "red" }, { "match": 1, "station": "blue" }], "insertionOrder": [] },
+
+        { "bye": 1, "allianceOrder": [{ "match": 3, "station": "red" }, { "match": 2, "station": "red" }, { "match": 2, "station": "blue" }], "insertionOrder": [{"number":0,"description":"Bye Match #1"}] },
+
+        { "bye": 0, "allianceOrder": [{ "match": 1, "station": "red" }, { "match": 2, "station": "red" }, { "match": 2, "station": "blue" }, { "match": 1, "station": "blue" }], "insertionOrder": [] },
+
+        { "bye": 3, "allianceOrder": [{ "match": 7, "station": "red" }, { "match": 8, "station": "red" }, { "match": 8, "station": "blue" }, { "match": 2, "station": "red" }, { "match": 2, "station": "blue" }], "insertionOrder": [{"number":0,"description":"Bye Match #1"}, {"number":2,"description":"Bye Match #2"}, {"number":3,"description":"Bye Match #3"}, {"number":4,"description":"Bye Match #4"}, {"number":5,"description":"Bye Match #5"}] },
+
+        { "bye": 2, "allianceOrder": [{ "match": 7, "station": "red" }, { "match": 8, "station": "red" }, { "match": 4, "station": "red" }, { "match": 2, "station": "red" }, { "match": 2, "station": "blue" }, { "match": 4, "station": "blue" }], "insertionOrder": [{"number":0,"description":"Bye Match #1"}, {"number":2,"description":"Bye Match #2"}, {"number":4,"description": "Bye Match #3"}, {"number":5,"description": "Bye Match #4"}] },
+
+        { "bye": 1, "allianceOrder": [{ "match": 7, "station": "red" }, { "match": 3, "station": "red" }, { "match": 4, "station": "red" }, { "match": 2, "station": "red" }, { "match": 2, "station": "blue" }, { "match": 4, "station": "blue" }, { "match": 3, "station": "blue" }], "insertionOrder": [{"number":0,"description":"Bye Match #1"}, {"number":4,"description": "Bye Match #2"}, {"number":5,"description": "Match 6 (R2) (#6)"}] },
+
+        { "bye": 0, "allianceOrder": [{ "match": 1, "station": "red" }, { "match": 3, "station": "red" }, { "match": 4, "station": "red" }, { "match": 2, "station": "red" }, { "match": 2, "station": "blue" }, { "match": 4, "station": "blue" }, { "match": 3, "station": "blue" }, { "match": 1, "station": "blue" }], "insertionOrder": [] }
+    ]
+
+    const byeMatch = (bye, matchTime, description) => {
+        return {
+            "description": description,
+            "tournamentLevel": "Playoff",
+            "matchNumber": bye,
+            "startTime": matchTime,
+            "actualStartTime": null,
+            "postResultTime": null,
+            "scoreRedFinal": null,
+            "scoreRedFoul": null,
+            "scoreRedAuto": null,
+            "scoreBlueFinal": null,
+            "scoreBlueFoul": null,
+            "scoreBlueAuto": null,
+            "teams": [{
+                "teamNumber": null,
+                "station": "Red1",
+                "surrogate": !1,
+                "dq": !1
+            }, {
+                "teamNumber": null,
+                "station": "Red2",
+                "surrogate": !1,
+                "dq": !1
+            }, {
+                "teamNumber": null,
+                "station": "Red3",
+                "surrogate": !1,
+                "dq": !1
+            }, {
+                "teamNumber": null,
+                "station": "Blue1",
+                "surrogate": !1,
+                "dq": !1
+            }, {
+                "teamNumber": null,
+                "station": "Blue2",
+                "surrogate": !1,
+                "dq": !1
+            }, {
+                "teamNumber": null,
+                "station": "Blue3",
+                "surrogate": !1,
+                "dq": !1
+            }],
+            "winner": { "winner": "", "tieWinner": "", "level": 0 }
+        }
+    }
 
     // This function clicks the hidden file upload button
     function clickLoadPractice() {
@@ -54,6 +123,7 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
      * @param formattedSchedule the schedule to parse
     */
     function addTeamsToTeamList(formattedSchedule) {
+        //generate the team list from the schedule
         var tempTeamList = [];
         _.forEach(formattedSchedule.schedule, function (row) {
             //do something
@@ -76,6 +146,7 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
      */
 
     function handlePracticeFiles(e) {
+        const playoffOffset = byeCount[playoffCountOverride?.value || 8];
         var forPlayoffs = e.target.id === "BackupFiles" ? false : true;
         var files = e.target.files;
         var f = files[0];
@@ -83,7 +154,7 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
         setTeamListLoading(false);
         var alliancesTemp = {
             "Alliances": [],
-            "count": 8
+            "count": playoffCountOverride?.value > 0 ? playoffCountOverride?.value : 8
         }
 
         reader.onload = async function (e) {
@@ -92,7 +163,8 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
             var workbook;
             workbook = read(data, { type: 'array' });
             var worksheet = workbook.Sheets[workbook.SheetNames[0]];
-            var schedule = utils.sheet_to_json(worksheet, { range: 4 });;
+            var schedule = utils.sheet_to_json(worksheet, { range: 4 });
+            var eventnameTemp = worksheet.B3.v || selectedEvent.label;
             var formattedSchedule = {};
             var matchNumber = 0;
             var errorMatches = [];
@@ -142,7 +214,7 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                         var tempRow = {
                             "description": match?.Description,
                             "tournamentLevel": forPlayoffs ? "Playoff" : "Practice",
-                            "matchNumber": matchNumber,
+                            "matchNumber": forPlayoffs ? matchNumber + playoffOffset?.bye : matchNumber,
                             "startTime": matchTime,
                             "actualStartTime": null,
                             "postResultTime": null,
@@ -188,83 +260,46 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                     }
                     return (tempRow);
                 })
+                // remove non-match rows
+                innerSchedule = _.filter(innerSchedule, "description");
 
                 if (forPlayoffs) {
+                    // inject bye matches into schedule for playoff display
+                    if (playoffOffset?.bye > 0) {
+                        var matchTime = innerSchedule[0].startTime;
+                        _.forEach(playoffOffset.insertionOrder, (item, index) => {
+                            innerSchedule.splice(item.number, 0, byeMatch(index + 1, matchTime, item.description))
+                        }
+                        )
+                        innerSchedule.map((item, index) => {
+                            item.matchNumber = index + 1;
+                            return item;
+                        }
+                        )
 
-                    alliancesTemp.Alliances = [{
-                        "number": 1,
-                        "captain": innerSchedule[0].teams[0].teamNumber,
-                        "round1": innerSchedule[0].teams[1].teamNumber,
-                        "round2": innerSchedule[0].teams[2].teamNumber,
-                        "round3": null,
-                        "backup": null,
-                        "backupReplaced": null,
-                        "name": `Alliance 1`
-                    }, {
-                        "number": 2,
-                        "captain": innerSchedule[2].teams[0].teamNumber,
-                        "round1": innerSchedule[2].teams[1].teamNumber,
-                        "round2": innerSchedule[2].teams[2].teamNumber,
-                        "round3": null,
-                        "backup": null,
-                        "backupReplaced": null,
-                        "name": `Alliance 2`
-                    }, {
-                        "number": 3,
-                        "captain": innerSchedule[3].teams[0].teamNumber,
-                        "round1": innerSchedule[3].teams[1].teamNumber,
-                        "round2": innerSchedule[3].teams[2].teamNumber,
-                        "round3": null,
-                        "backup": null,
-                        "backupReplaced": null,
-                        "name": `Alliance 3`
-                    }, {
-                        "number": 4,
-                        "captain": innerSchedule[1].teams[0].teamNumber,
-                        "round1": innerSchedule[1].teams[1].teamNumber,
-                        "round2": innerSchedule[1].teams[2].teamNumber,
-                        "round3": null,
-                        "backup": null,
-                        "backupReplaced": null,
-                        "name": `Alliance 4`
-                    }, {
-                        "number": 5,
-                        "captain": innerSchedule[1].teams[3].teamNumber,
-                        "round1": innerSchedule[1].teams[4].teamNumber,
-                        "round2": innerSchedule[1].teams[5].teamNumber,
-                        "round3": null,
-                        "backup": null,
-                        "backupReplaced": null,
-                        "name": `Alliance 5`
-                    }, {
-                        "number": 6,
-                        "captain": innerSchedule[3].teams[3].teamNumber,
-                        "round1": innerSchedule[3].teams[4].teamNumber,
-                        "round2": innerSchedule[3].teams[5].teamNumber,
-                        "round3": null,
-                        "backup": null,
-                        "backupReplaced": null,
-                        "name": `Alliance 6`
-                    }, {
-                        "number": 7,
-                        "captain": innerSchedule[2].teams[3].teamNumber,
-                        "round1": innerSchedule[2].teams[4].teamNumber,
-                        "round2": innerSchedule[2].teams[5].teamNumber,
-                        "round3": null,
-                        "backup": null,
-                        "backupReplaced": null,
-                        "name": `Alliance 7`
-                    }, {
-                        "number": 8,
-                        "captain": innerSchedule[0].teams[3].teamNumber,
-                        "round1": innerSchedule[0].teams[4].teamNumber,
-                        "round2": innerSchedule[0].teams[5].teamNumber,
-                        "round3": null,
-                        "backup": null,
-                        "backupReplaced": null,
-                        "name": `Alliance 8`
                     }
-                    ]
+
+
+                    alliancesTemp.Alliances = playoffOffset.allianceOrder.map((allianceMember, index) => {
+                        try {
+                            var stationOffset = allianceMember.station === "red" ? 0 : 3;
+                            var tempAlliance = {
+                                "number": 1 + index,
+                                "captain": innerSchedule[allianceMember.match - 1].teams[0 + stationOffset].teamNumber,
+                                "round1": innerSchedule[allianceMember.match - 1].teams[1 + stationOffset].teamNumber,
+                                "round2": innerSchedule[allianceMember.match - 1].teams[2 + stationOffset].teamNumber,
+                                "round3": null,
+                                "backup": null,
+                                "backupReplaced": null,
+                                "name": `Alliance ${1 + index}`
+                            }
+                            return tempAlliance;
+                        } catch (e) {
+                            toast.error(`Please check the Alliance Count on the Setup Page before uploading your schedule.`)
+                            return null;
+                        }
+                    })
+
                     getAlliances(alliancesTemp);
                 }
 
@@ -287,6 +322,9 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                     clearFileInput("LoadOfflinePlayoffs");
                     document.getElementById("LoadOfflinePlayoffs").addEventListener('change', handlePracticeFiles);
                 }
+
+                setEventLabel(eventnameTemp);
+
 
             }
         };
@@ -358,6 +396,8 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
         handleClose();
     }
 
+    const showPlayoffMessage = selectedEvent?.value?.code.includes("OFFLINE") && !_.isNull(playoffCountOverride);
+
     return (
         <Container fluid>
             {!selectedEvent && <div>
@@ -368,7 +408,7 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                     {(!practiceSchedule || practiceSchedule?.schedule?.length === 0 || practiceSchedule?.schedule?.schedule?.length === 0) && !practiceFileUploaded && <>
                         {!(playoffOnly && (offlinePlayoffSchedule?.schedule?.length >= 0 || offlinePlayoffSchedule?.schedule?.schedule?.length >= 0)) && <>
                             <div><img src="loadingIcon.gif" alt="Loading data..." /></div>
-                            <div>Awaiting schedule for {selectedEvent.label}<br /><br /></div>
+                            <div>Awaiting schedule for {eventLabel}<br /><br /></div>
                         </>}
                         <Container fluid>
                             <Row>
@@ -382,8 +422,12 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
 
                                 {selectedEvent?.value?.code.includes("OFFLINE") && <>
                                     {!playoffOnly && <Col xs={5} className={"leftTable"} style={{ cursor: "pointer", color: "darkblue" }} onClick={clickLoadPractice}><b>You can upload a Qualification Match Schedule for your Offline event. You will need to ask your Scorekeeper to export a Schedule Report in Excel format, which you can upload here. We will determine the team list from the Qualification Schedule.<br />Tap here to upload a Qualification Schedule.</b></Col>}
-                                    {playoffOnly && <Col xs={5} className={"leftTable"} style={{ cursor: "pointer", color: "darkblue" }} onClick={clickLoadOfflinePlayoffs}>
+                                    {playoffOnly && showPlayoffMessage && <Col xs={5} className={"leftTable"} style={{ cursor: "pointer", color: "darkblue" }} onClick={clickLoadOfflinePlayoffs}>
                                         <b>You can now load your Offline Playoff Schedule. You can advance the Playoff using the Playoff Tab, or you can reload the schedule after each Round in the playoffs.<br />Tap here to remove it and replace it, as necessary.</b>
+                                    </Col>}
+                                    {playoffOnly && !showPlayoffMessage && <Col xs={5} className={"leftTable"} >
+                                        <b>Please set the Alliance Count before uploading a Playoff Schedule.</b>
+                                        <Select options={playoffOverrideMenu} value={playoffCountOverride ? playoffCountOverride : (allianceCount?.menu ? allianceCount.menu : playoffOverrideMenu[0])} onChange={setPlayoffCountOverride} />
                                     </Col>}
                                     <Col xs={1}></Col>
                                     <Col xs={3}>
@@ -435,9 +479,13 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                                     <Col xs={1}>
                                         <input type="file" id="LoadOfflinePlayoffs" onChange={handlePracticeFiles} className={"hiddenInput"} /><img style={{ float: "left" }} width="50" src="images/excelicon.png" alt="Excel Logo" />
                                     </Col>
-                                    <Col xs={3} className={"leftTable"} style={{ cursor: "pointer", color: "darkblue" }} onClick={clickLoadOfflinePlayoffs}>
+                                    {showPlayoffMessage && <Col xs={3} className={"leftTable"} style={{ cursor: "pointer", color: "darkblue" }} onClick={clickLoadOfflinePlayoffs}>
                                         <b>You can now load your Offline Playoff Schedule. You may need to do this after each phase of the playoffs.<br />Tap here to remove it and replace it, as necessary.</b>
-                                    </Col>
+                                    </Col>}
+                                    {!showPlayoffMessage && <Col xs={3} className={"leftTable"} style={{ color: "darkblue" }}>
+                                        <b>Please set the Alliance Count before uploading a Playoff Schedule.</b>
+                                        <Select options={playoffOverrideMenu} value={playoffCountOverride ? playoffCountOverride : (allianceCount?.menu ? allianceCount.menu : playoffOverrideMenu[0])} onChange={setPlayoffCountOverride} />
+                                    </Col>}
                                     <Col xs={1}></Col>
                                 </Row>}
                         </Container>
@@ -452,7 +500,7 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                     (qualSchedule?.schedule?.schedule?.length === 0 && playoffSchedule?.schedule?.length === 0 && offlinePlayoffSchedule)
                 ) &&
                 <div>
-                    <h4>{selectedEvent.label}</h4>
+                    <h4>{eventLabel}</h4>
                     <Table responsive striped bordered size="sm">
                         <thead className="thead-default">
                             <tr>

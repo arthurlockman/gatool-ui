@@ -887,3 +887,11 @@ export const allianceSelectionOrderBase = [
     { "number": 8, "round": 3 }];
 
 export const refreshRate = 15; //Refresh rate in seconds for auto update
+
+export const playoffOverrideMenu = [
+    { value: 8, label: 8 },
+    { value: 7, label: 7 },
+    { value: 6, label: 6 },
+    { value: 5, label: 5 },
+    { value: 4, label: 4 },
+]

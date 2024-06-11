@@ -11,7 +11,7 @@ import { useHotkeysContext, useHotkeys } from "react-hotkeys-hook";
 import './AllianceSelectionPage.css';
 
 
-function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, playoffSchedule, offlinePlayoffSchedule, alliances, rankings, timeFormat, getRanks, allianceSelection, playoffs, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays, rankingsOverride, loadEvent, practiceSchedule, setOfflinePlayoffSchedule, currentMatch, qualsLength, nextMatch, previousMatch, getSchedule, useSwipe, usePullDownToUpdate }) {
+function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, playoffSchedule, offlinePlayoffSchedule, alliances, rankings, timeFormat, getRanks, allianceSelection, playoffs, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays, rankingsOverride, loadEvent, practiceSchedule, setOfflinePlayoffSchedule, currentMatch, qualsLength, nextMatch, previousMatch, getSchedule, useSwipe, usePullDownToUpdate, eventLabel, playoffCountOverride }) {
     const [overrideAllianceSelection, setOverrideAllianceSelection] = useState(false);
     const [resetAllianceSelection, setResetAllianceSelection] = useState(false);
     const [teamFilter, setTeamFilter] = useState("");
@@ -62,7 +62,7 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
                 </div>}
             {selectedEvent && (qualSchedule?.schedule?.length > 0 || practiceSchedule?.schedule?.length > 0) && !playoffs &&
                 <div>
-                    <h5><b>{selectedEvent.label}</b><br />(Rankings last updated: {ranksLastUpdateDisplay})</h5>
+                    <h5><b>{eventLabel}</b><br />(Rankings last updated: {ranksLastUpdateDisplay})</h5>
                     <p>Before the selection begins and to help introduce the Alliance Captains with the MC, tap the Alliance Captains to see their team name, school/orgainzaiton, and home town.</p>
                     <p><b>IMPORTANT: Tap <i>Alliance Captain Announce</i> to continue announcing the Captains.</b></p>
                     <p>When it's time for Alliance Selection, simply tap a team when their number is called. If they accept, tap <b>Gratefully Accept.</b> If they decline, tap <b>Respectfully Decline.</b></p>
@@ -107,11 +107,11 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
                 </div>}
 
             {selectedEvent?.value?.allianceCount === "EightAlliance" && playoffs &&
-                <Bracket selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} offlinePlayoffSchedule={offlinePlayoffSchedule} alliances={alliances} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} currentMatch={currentMatch} qualsLength={qualsLength} nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} usePullDownToUpdate={usePullDownToUpdate} useSwipe={useSwipe}/>}
+                <Bracket playoffSchedule={playoffSchedule} offlinePlayoffSchedule={offlinePlayoffSchedule} alliances={alliances} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} currentMatch={currentMatch} qualsLength={qualsLength} nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} usePullDownToUpdate={usePullDownToUpdate} useSwipe={useSwipe} eventLabel={eventLabel} playoffCountOverride={playoffCountOverride} />}
             {selectedEvent?.value?.allianceCount === "FourAlliance" && playoffs &&
-                <FourAllianceBracket selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} alliances={alliances} currentMatch={currentMatch} qualsLength={qualsLength} nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} useSwipe={useSwipe} usePullDownToUpdate={usePullDownToUpdate} />}
+                <FourAllianceBracket selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} alliances={alliances} currentMatch={currentMatch} qualsLength={qualsLength} nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} useSwipe={useSwipe} usePullDownToUpdate={usePullDownToUpdate} offlinePlayoffSchedule={offlinePlayoffSchedule} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} eventLabel={eventLabel} />}
             {selectedEvent?.value?.allianceCount === "TwoAlliance" && playoffs &&
-                <TwoAllianceBracket selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} alliances={alliances} nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} useSwipe={useSwipe} usePullDownToUpdate={usePullDownToUpdate} />}
+                <TwoAllianceBracket selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} alliances={alliances} nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} useSwipe={useSwipe} usePullDownToUpdate={usePullDownToUpdate} eventLabel={eventLabel} />}
             <Modal centered={true} show={resetAllianceSelection} onHide={handleClose}>
                 <Modal.Header className={"allianceSelectionDecline"} closeVariant={"white"} closeButton>
                     <Modal.Title>

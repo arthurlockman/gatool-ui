@@ -116,6 +116,7 @@ function App() {
   const [selectedEvent, setSelectedEvent] = usePersistentState("setting:selectedEvent", null);
   const [selectedYear, setSelectedYear] = usePersistentState("setting:selectedYear", null);
   const [events, setEvents] = usePersistentState("cache:events", []);
+  const [eventLabel, setEventLabel] = useState(null);
   const [playoffSchedule, setPlayoffSchedule] = usePersistentState("cache:playoffSchedule", null);
   const [qualSchedule, setQualSchedule] = usePersistentState("cache:qualSchedule", null);
   const [practiceSchedule, setPracticeSchedule] = usePersistentState("cache:practiceSchedule", null);
@@ -253,10 +254,13 @@ function App() {
    * @return {array} the trimmed array
    */
   function trimArray(arr) {
-    for (var i = 0; i <= arr.length - 1; i++) {
-      arr[i] = arr[i].trim();
+    if (arr) {
+      for (var i = 0; i <= arr.length - 1; i++) {
+        arr[i] = arr[i].trim();
+      }
+      return arr;
     }
-    return arr;
+    return null;
   }
 
   //functions to retrieve API data
@@ -327,7 +331,7 @@ function App() {
     function isHighScore(match) {
       var tempMatch = {};
       if (!_.isNull(match.scoreRedFinal)) {
-        tempMatch.eventName = selectedEvent.label;
+        tempMatch.eventName = eventLabel;
         tempMatch.matchName = match?.description;
         if (match?.scoreRedFinal > match?.scoreBlueFinal) {
           tempMatch.alliance = "Red";
@@ -625,7 +629,7 @@ function App() {
 
       if (selectedEvent?.value?.code.includes("OFFLINE") || inWorldChamps()) {
         teams = {
-          "teamCountTotal": 0,
+          "teamCountTotal": adHocTeamList?.length || 0,
           "teamCountPage": 1,
           "pageCurrent": 1,
           "pageTotal": 1,
@@ -738,41 +742,47 @@ function App() {
             sponsors.sponsorArray.push(sponsors.sponsorArray.pop().split("&")[0]);
           }
         } else {
-          sponsors.sponsorArray = trimArray(teamRow.nameFull.split("/"))
+          sponsors.sponsorArray = trimArray(teamRow?.nameFull?.split("/"))
         }
 
-        sponsors.organizationArray = trimArray(teamRow.nameFull.split("/").pop().split("&"));
+        sponsors.organizationArray = trimArray(teamRow?.nameFull?.split("/").pop().split("&"));
 
-        if (!sponsors.sponsorArray && !sponsors.organizationArray && !sponsors.organization) {
+        if (!sponsors.sponsorArray && !sponsors?.organizationArray && !sponsors?.organization) {
           sponsors.organization = "No organization in TIMS";
           sponsors.sponsors = "No sponsors in TIMS";
           sponsors.topSponsorsArray[0] = sponsors.sponsors
         }
 
-        if (sponsors.sponsorArray.length === 1) {
+        if (sponsors?.sponsorArray?.length === 1) {
           sponsors.sponsors = sponsors.sponsorArray[0];
           sponsors.topSponsors = sponsors.sponsors;
           sponsors.topSponsor = sponsors.sponsors;
         } else {
-          if (sponsors.organizationArray.length > 1 && !sponsors.organization) {
+          if (sponsors?.organizationArray?.length > 1 && !sponsors?.organization) {
             sponsors.sponsorArray.pop();
             sponsors.sponsorArray.push(sponsors.organizationArray.slice(0).shift())
           }
-          sponsors.topSponsorsArray = sponsors.sponsorArray.slice(0, 5);
+          if (sponsors?.sponsorArray) {
+            sponsors.topSponsorsArray = sponsors.sponsorArray.slice(0, 5);
+          }
           sponsors.topSponsorsArrayUnchanged = sponsors.topSponsorsArray;
-          sponsors.lastSponsor = sponsors.sponsorArray.pop();
-          sponsors.sponsors = sponsors.sponsorArray.join(", ");
-          sponsors.sponsors += " & " + sponsors.lastSponsor;
-          sponsors.lastSponsor = sponsors.topSponsorsArray.pop();
-          sponsors.topSponsors = sponsors.topSponsorsArray.join(", ");
-          sponsors.topSponsors += " & " + sponsors.lastSponsor;
-          sponsors.topSponsor = sponsors.topSponsorsArrayUnchanged[0];
+          if (sponsors.sponsorArray) {
+            sponsors.lastSponsor = sponsors.sponsorArray.pop();
+            sponsors.sponsors = sponsors.sponsorArray.join(", ");
+            if (sponsors.lastSponso) {
+              sponsors.sponsors += " & " + sponsors.lastSponsor;
+            }
+            sponsors.lastSponsor = sponsors.topSponsorsArray.pop();
+            sponsors.topSponsors = sponsors.topSponsorsArray.join(", ");
+            sponsors.topSponsors += " & " + sponsors.lastSponsor;
+            sponsors.topSponsor = sponsors.topSponsorsArrayUnchanged[0];
+          }
         }
 
-        if (sponsors.organizationArray.length === 1 && !sponsors.organization) {
+        if (sponsors?.organizationArray?.length === 1 && !sponsors?.organization) {
           sponsors.organization = sponsors.organizationArray[0]
         } else {
-          if (!sponsors.organization) {
+          if (!sponsors?.organization) {
             sponsors.organizationArray.shift();
             sponsors.organization = sponsors.organizationArray.join(" & ")
           }
@@ -1744,26 +1754,27 @@ function App() {
           <Routes>
             <Route path="/" element={<LayoutsWithNavbar selectedEvent={selectedEvent} qualSchedule={qualSchedule} playoffs={playoffs} teamList={teamList} communityUpdates={communityUpdates} rankings={rankings} eventHighScores={eventHighScores} worldHighScores={worldStats} allianceSelection={allianceSelection} practiceSchedule={practiceSchedule} />}>
 
-              <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} teamList={teamList} eventFilters={eventFilters} setEventFilters={setEventFilters} timeFilter={timeFilter} setTimeFilter={setTimeFilter} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} rankings={rankings} timeFormat={timeFormat} setTimeFormat={setTimeFormat} showSponsors={showSponsors} setShowSponsors={setShowSponsors} showAwards={showAwards} setShowAwards={setShowAwards} showNotes={showNotes} setShowNotes={setShowNotes} showNotesAnnounce={showNotesAnnounce} setShowNotesAnnounce={setShowNotesAnnounce} showMottoes={showMottoes} setShowMottoes={setShowMottoes} showChampsStats={showChampsStats} setShowChampsStats={setShowChampsStats} swapScreen={swapScreen} setSwapScreen={setSwapScreen} autoAdvance={autoAdvance} setAutoAdvance={setAutoAdvance} autoUpdate={autoUpdate} setAutoUpdate={setAutoUpdate} getSchedule={getSchedule} awardsMenu={awardsMenu} setAwardsMenu={setAwardsMenu} showQualsStats={showQualsStats} setShowQualsStats={setShowQualsStats} showQualsStatsQuals={showQualsStatsQuals} setShowQualsStatsQuals={setShowQualsStatsQuals} teamReduction={teamReduction} setTeamReduction={setTeamReduction} playoffCountOverride={playoffCountOverride} setPlayoffCountOverride={setPlayoffCountOverride} allianceCount={allianceCount} localUpdates={localUpdates} setLocalUpdates={setLocalUpdates} putTeamData={putTeamData} getCommunityUpdates={getCommunityUpdates} reverseEmcee={reverseEmcee} setReverseEmcee={setReverseEmcee} showDistrictChampsStats={showDistrictChampsStats} setShowDistrictChampsStats={setShowDistrictChampsStats} monthsWarning={monthsWarning} setMonthsWarning={setMonthsWarning} user={user} adHocMode={adHocMode} setAdHocMode={setAdHocMode} supportedYears={supportedYears} reloadPage={reloadPage} autoHideSponsors={autoHideSponsors} setAutoHideSponsors={setAutoHideSponsors} setLoadingCommunityUpdates={setLoadingCommunityUpdates} hidePracticeSchedule={hidePracticeSchedule} setHidePracticeSchedule={setHidePracticeSchedule} systemMessage={systemMessage} setTeamListLoading={setTeamListLoading} getTeamList={getTeamList} getAlliances={getAlliances} setHaveChampsTeams={setHaveChampsTeams} appUpdates={appUpdates} usePullDownToUpdate={usePullDownToUpdate} setUsePullDownToUpdate={setUsePullDownToUpdate} useSwipe={useSwipe} setUseSwipe={setUseSwipe} />} />
+              <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} teamList={teamList} eventFilters={eventFilters} setEventFilters={setEventFilters} timeFilter={timeFilter} setTimeFilter={setTimeFilter} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} rankings={rankings} timeFormat={timeFormat} setTimeFormat={setTimeFormat} showSponsors={showSponsors} setShowSponsors={setShowSponsors} showAwards={showAwards} setShowAwards={setShowAwards} showNotes={showNotes} setShowNotes={setShowNotes} showNotesAnnounce={showNotesAnnounce} setShowNotesAnnounce={setShowNotesAnnounce} showMottoes={showMottoes} setShowMottoes={setShowMottoes} showChampsStats={showChampsStats} setShowChampsStats={setShowChampsStats} swapScreen={swapScreen} setSwapScreen={setSwapScreen} autoAdvance={autoAdvance} setAutoAdvance={setAutoAdvance} autoUpdate={autoUpdate} setAutoUpdate={setAutoUpdate} getSchedule={getSchedule} awardsMenu={awardsMenu} setAwardsMenu={setAwardsMenu} showQualsStats={showQualsStats} setShowQualsStats={setShowQualsStats} showQualsStatsQuals={showQualsStatsQuals} setShowQualsStatsQuals={setShowQualsStatsQuals} teamReduction={teamReduction} setTeamReduction={setTeamReduction} playoffCountOverride={playoffCountOverride} setPlayoffCountOverride={setPlayoffCountOverride} allianceCount={allianceCount} localUpdates={localUpdates} setLocalUpdates={setLocalUpdates} putTeamData={putTeamData} getCommunityUpdates={getCommunityUpdates} reverseEmcee={reverseEmcee} setReverseEmcee={setReverseEmcee} showDistrictChampsStats={showDistrictChampsStats} setShowDistrictChampsStats={setShowDistrictChampsStats} monthsWarning={monthsWarning} setMonthsWarning={setMonthsWarning} user={user} adHocMode={adHocMode} setAdHocMode={setAdHocMode} supportedYears={supportedYears} reloadPage={reloadPage} autoHideSponsors={autoHideSponsors} setAutoHideSponsors={setAutoHideSponsors} setLoadingCommunityUpdates={setLoadingCommunityUpdates} hidePracticeSchedule={hidePracticeSchedule} setHidePracticeSchedule={setHidePracticeSchedule} systemMessage={systemMessage} setTeamListLoading={setTeamListLoading} getTeamList={getTeamList} getAlliances={getAlliances} setHaveChampsTeams={setHaveChampsTeams} appUpdates={appUpdates} usePullDownToUpdate={usePullDownToUpdate} setUsePullDownToUpdate={setUsePullDownToUpdate} useSwipe={useSwipe} setUseSwipe={setUseSwipe} eventLabel={eventLabel} setEventLabel={setEventLabel} />} />
 
-              <Route path="/schedule" element={<SchedulePage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} practiceSchedule={practiceSchedule} setPracticeSchedule={setPracticeSchedule} getTeamList={getTeamList} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} offlinePlayoffSchedule={offlinePlayoffSchedule} loadEvent={loadEvent} practiceFileUploaded={practiceFileUploaded} setPracticeFileUploaded={setPracticeFileUploaded} setTeamListLoading={setTeamListLoading} getAlliances={getAlliances} playoffOnly={playoffOnly} setPlayoffOnly={setPlayoffOnly} alliances={alliances} champsStyle={champsStyle} setChampsStyle={setChampsStyle} setQualsLength={setQualsLength} />} />
+              <Route path="/schedule" element={<SchedulePage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} practiceSchedule={practiceSchedule} setPracticeSchedule={setPracticeSchedule} getTeamList={getTeamList} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} offlinePlayoffSchedule={offlinePlayoffSchedule} loadEvent={loadEvent} practiceFileUploaded={practiceFileUploaded} setPracticeFileUploaded={setPracticeFileUploaded} setTeamListLoading={setTeamListLoading} getAlliances={getAlliances} playoffOnly={playoffOnly} setPlayoffOnly={setPlayoffOnly} alliances={alliances} champsStyle={champsStyle} setChampsStyle={setChampsStyle} setQualsLength={setQualsLength} playoffCountOverride={playoffCountOverride} eventLabel={eventLabel} setEventLabel={setEventLabel} allianceCount={allianceCount} setPlayoffCountOverride={setPlayoffCountOverride} />} />
 
-              <Route path="/teamdata" element={<TeamDataPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} teamSort={teamSort} setTeamSort={setTeamSort} communityUpdates={communityUpdates} setCommunityUpdates={setCommunityUpdates} allianceCount={allianceCount} lastVisit={lastVisit} setLastVisit={setLastVisit} putTeamData={putTeamData} localUpdates={localUpdates} setLocalUpdates={setLocalUpdates} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} originalAndSustaining={originalAndSustaining} monthsWarning={monthsWarning} user={user} getTeamHistory={getTeamHistory} timeFormat={timeFormat} getCommunityUpdates={getCommunityUpdates} getTeamList={getTeamList} />} />
+              <Route path="/teamdata" element={<TeamDataPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} teamSort={teamSort} setTeamSort={setTeamSort} communityUpdates={communityUpdates} setCommunityUpdates={setCommunityUpdates} allianceCount={allianceCount} lastVisit={lastVisit} setLastVisit={setLastVisit} putTeamData={putTeamData} localUpdates={localUpdates} setLocalUpdates={setLocalUpdates} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} originalAndSustaining={originalAndSustaining} monthsWarning={monthsWarning} user={user} getTeamHistory={getTeamHistory} timeFormat={timeFormat} getCommunityUpdates={getCommunityUpdates} getTeamList={getTeamList} eventLabel={eventLabel} />} />
 
-              <Route path='/ranks' element={<RanksPage selectedEvent={selectedEvent} teamList={teamList} rankings={rankings} rankSort={rankSort} setRankSort={setRankSort} allianceCount={allianceCount} rankingsOverride={rankingsOverride} setRankingsOverride={setRankingsOverride} allianceSelection={allianceSelection} getRanks={getRanks} setRankings={setRankings} setAllianceSelectionArrays={setAllianceSelectionArrays} playoffs={playoffs} districtRankings={districtRankings} />} />
+              <Route path='/ranks' element={<RanksPage selectedEvent={selectedEvent} teamList={teamList} rankings={rankings} rankSort={rankSort} setRankSort={setRankSort} allianceCount={allianceCount} rankingsOverride={rankingsOverride} setRankingsOverride={setRankingsOverride} allianceSelection={allianceSelection} getRanks={getRanks} setRankings={setRankings} setAllianceSelectionArrays={setAllianceSelectionArrays} playoffs={playoffs} districtRankings={districtRankings} eventLabel={eventLabel} />} />
 
-              <Route path='/announce' element={<AnnouncePage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} communityUpdates={communityUpdates} currentMatch={currentMatch} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} alliances={alliances} setAlliances={setAlliances} awardsMenu={awardsMenu} showNotesAnnounce={showNotesAnnounce} showAwards={showAwards} showSponsors={showSponsors} showMottoes={showMottoes} showChampsStats={showChampsStats} timeFormat={timeFormat} eventHighScores={eventHighScores} backupTeam={backupTeam} setBackupTeam={setBackupTeam} allianceCount={allianceCount} nextMatch={nextMatch} previousMatch={previousMatch} setMatchFromMenu={setMatchFromMenu} practiceSchedule={practiceSchedule} eventNamesCY={eventNamesCY} districtRankings={districtRankings} showDistrictChampsStats={showDistrictChampsStats} adHocMatch={adHocMatch} setAdHocMatch={setAdHocMatch} adHocMode={adHocMode} offlinePlayoffSchedule={offlinePlayoffSchedule} swapScreen={swapScreen} autoHideSponsors={autoHideSponsors} hidePracticeSchedule={hidePracticeSchedule} teamReduction={teamReduction} qualsLength={qualsLength} playoffOnly={playoffOnly} getSchedule={getSchedule} usePullDownToUpdate={usePullDownToUpdate} useSwipe={useSwipe} />} />
+              <Route path='/announce' element={<AnnouncePage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} communityUpdates={communityUpdates} currentMatch={currentMatch} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} alliances={alliances} setAlliances={setAlliances} awardsMenu={awardsMenu} showNotesAnnounce={showNotesAnnounce} showAwards={showAwards} showSponsors={showSponsors} showMottoes={showMottoes} showChampsStats={showChampsStats} timeFormat={timeFormat} eventHighScores={eventHighScores} backupTeam={backupTeam} setBackupTeam={setBackupTeam} allianceCount={allianceCount} nextMatch={nextMatch} previousMatch={previousMatch} setMatchFromMenu={setMatchFromMenu} practiceSchedule={practiceSchedule} eventNamesCY={eventNamesCY} districtRankings={districtRankings} showDistrictChampsStats={showDistrictChampsStats} adHocMatch={adHocMatch} setAdHocMatch={setAdHocMatch} adHocMode={adHocMode} offlinePlayoffSchedule={offlinePlayoffSchedule} swapScreen={swapScreen} autoHideSponsors={autoHideSponsors} hidePracticeSchedule={hidePracticeSchedule} teamReduction={teamReduction} qualsLength={qualsLength} playoffOnly={playoffOnly} getSchedule={getSchedule} usePullDownToUpdate={usePullDownToUpdate} useSwipe={useSwipe} eventLabel={eventLabel} playoffCountOverride={playoffCountOverride} />} />
 
-              <Route path='/playbyplay' element={<PlayByPlayPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} communityUpdates={communityUpdates} currentMatch={currentMatch} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} alliances={alliances} setAlliances={setAlliances} showMottoes={showMottoes} showNotes={showNotes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} swapScreen={swapScreen} timeFormat={timeFormat} eventHighScores={eventHighScores} backupTeam={backupTeam} setBackupTeam={setBackupTeam} allianceCount={allianceCount} nextMatch={nextMatch} previousMatch={previousMatch} setMatchFromMenu={setMatchFromMenu} practiceSchedule={practiceSchedule} districtRankings={districtRankings} adHocMatch={adHocMatch} setAdHocMatch={setAdHocMatch} adHocMode={adHocMode} offlinePlayoffSchedule={offlinePlayoffSchedule} hidePracticeSchedule={hidePracticeSchedule} teamReduction={teamReduction} qualsLength={qualsLength} playoffOnly={playoffOnly} getSchedule={getSchedule} usePullDownToUpdate={usePullDownToUpdate} useSwipe={useSwipe} />} />
+              <Route path='/playbyplay' element={<PlayByPlayPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} rankings={rankings} communityUpdates={communityUpdates} currentMatch={currentMatch} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} alliances={alliances} setAlliances={setAlliances} showMottoes={showMottoes} showNotes={showNotes} showQualsStats={showQualsStats} showQualsStatsQuals={showQualsStatsQuals} swapScreen={swapScreen} timeFormat={timeFormat} eventHighScores={eventHighScores} backupTeam={backupTeam} setBackupTeam={setBackupTeam} allianceCount={allianceCount} nextMatch={nextMatch} previousMatch={previousMatch} setMatchFromMenu={setMatchFromMenu} practiceSchedule={practiceSchedule} districtRankings={districtRankings} adHocMatch={adHocMatch} setAdHocMatch={setAdHocMatch} adHocMode={adHocMode} offlinePlayoffSchedule={offlinePlayoffSchedule} hidePracticeSchedule={hidePracticeSchedule} teamReduction={teamReduction} qualsLength={qualsLength} playoffOnly={playoffOnly} getSchedule={getSchedule} usePullDownToUpdate={usePullDownToUpdate} useSwipe={useSwipe} eventLabel={eventLabel} playoffCountOverride={playoffCountOverride} />} />
 
-              <Route path='/allianceselection' element={<AllianceSelectionPage selectedYear={selectedYear} selectedEvent={selectedEvent} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} offlinePlayoffSchedule={offlinePlayoffSchedule} alliances={alliances} rankings={rankings} timeFormat={timeFormat} getRanks={getRanks} allianceSelection={allianceSelection} playoffs={playoffs} teamList={teamList} allianceCount={allianceCount} communityUpdates={communityUpdates} allianceSelectionArrays={allianceSelectionArrays} setAllianceSelectionArrays={setAllianceSelectionArrays} rankingsOverride={rankingsOverride} loadEvent={loadEvent} practiceSchedule={practiceSchedule} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} currentMatch={currentMatch} qualsLength={qualsLength} nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} useSwipe={useSwipe} usePullDownToUpdate={usePullDownToUpdate} />} />
+              <Route path='/allianceselection' element={<AllianceSelectionPage selectedYear={selectedYear} selectedEvent={selectedEvent} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} offlinePlayoffSchedule={offlinePlayoffSchedule} alliances={alliances} rankings={rankings} timeFormat={timeFormat} getRanks={getRanks} allianceSelection={allianceSelection} playoffs={playoffs} teamList={teamList} allianceCount={allianceCount} communityUpdates={communityUpdates} allianceSelectionArrays={allianceSelectionArrays} setAllianceSelectionArrays={setAllianceSelectionArrays} rankingsOverride={rankingsOverride} loadEvent={loadEvent} practiceSchedule={practiceSchedule} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} currentMatch={currentMatch} qualsLength={qualsLength} nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} useSwipe={useSwipe} usePullDownToUpdate={usePullDownToUpdate} eventLabel={eventLabel} playoffCountOverride={playoffCountOverride} />} />
 
-              <Route path='/awards' element={<AwardsPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} communityUpdates={communityUpdates} />} />
+              <Route path='/awards' element={<AwardsPage selectedEvent={selectedEvent} selectedYear={selectedYear} teamList={teamList} communityUpdates={communityUpdates} eventLabel={eventLabel} />} />
 
-              <Route path='/stats' element={<StatsPage worldStats={worldStats} selectedEvent={selectedEvent} eventHighScores={eventHighScores} eventNamesCY={eventNamesCY} />} />
-              <Route path='/cheatsheet' element={<CheatsheetPage teamList={teamList} communityUpdates={communityUpdates} selectedEvent={selectedEvent} selectedYear={selectedYear} robotImages={robotImages} />} />
+              <Route path='/stats' element={<StatsPage worldStats={worldStats} selectedEvent={selectedEvent} eventHighScores={eventHighScores} eventNamesCY={eventNamesCY} eventLabel={eventLabel} />} />
 
-              <Route path='/emcee' element={<EmceePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} alliances={alliances} currentMatch={currentMatch} nextMatch={nextMatch} previousMatch={previousMatch} reverseEmcee={reverseEmcee} timeFormat={timeFormat} practiceSchedule={practiceSchedule} offlinePlayoffSchedule={offlinePlayoffSchedule} hidePracticeSchedule={hidePracticeSchedule} getSchedule={getSchedule} usePullDownToUpdate={usePullDownToUpdate} useSwipe={useSwipe} />} />
+              <Route path='/cheatsheet' element={<CheatsheetPage teamList={teamList} communityUpdates={communityUpdates} selectedEvent={selectedEvent} selectedYear={selectedYear} robotImages={robotImages} eventLabel={eventLabel} />} />
+
+              <Route path='/emcee' element={<EmceePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} alliances={alliances} currentMatch={currentMatch} nextMatch={nextMatch} previousMatch={previousMatch} reverseEmcee={reverseEmcee} timeFormat={timeFormat} practiceSchedule={practiceSchedule} offlinePlayoffSchedule={offlinePlayoffSchedule} hidePracticeSchedule={hidePracticeSchedule} getSchedule={getSchedule} usePullDownToUpdate={usePullDownToUpdate} useSwipe={useSwipe} eventLabel={eventLabel} playoffCountOverride={playoffCountOverride} />} />
               <Route path='/dev' element={<Developer putNotifications={putNotifications} getNotifications={getNotifications} />} />
             </Route>
           </Routes>

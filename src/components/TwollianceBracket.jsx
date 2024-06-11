@@ -2,7 +2,7 @@ import _ from "lodash";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useSwipeable } from "react-swipeable";
 
-function TwoAllianceBracket({ selectedEvent, playoffSchedule, alliances, nextMatch, previousMatch, getSchedule, useSwipe, usePullDownToUpdate }) {
+function TwoAllianceBracket({ selectedEvent, playoffSchedule, alliances, nextMatch, previousMatch, getSchedule, useSwipe, usePullDownToUpdate, eventLabel }) {
 	//Ball colors
 	const GOLD = "#FFCA10";
 	const RED = "#FF0000";
@@ -158,7 +158,7 @@ function TwoAllianceBracket({ selectedEvent, playoffSchedule, alliances, nextMat
 					<rect width="1076" height="568" fill="#fff" />
 					<rect x="500.51" y="128" width="75" height="344.61" fill="#d9d8d7" />
 					<text transform="translate(505.92 123.26)" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"}  fontSize="20px" ><tspan x="0" y="0">FINALS</tspan></text>
-					<text id="playoffBracketTitle" transform="translate(538 49.69)" dominantBaseline="middle" textAnchor="middle" fontFamily={selectedEvent?.label.length > 50 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={black} fontStyle={"normal"} fontSize="38px">{selectedEvent?.label}</text>
+					<text id="playoffBracketTitle" transform="translate(538 49.69)" dominantBaseline="middle" textAnchor="middle" fontFamily={eventLabel.length > 50 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={black} fontStyle={"normal"} fontSize="38px">{eventLabel}</text>
 				</g>
 
 				<g id="finals">

@@ -3,7 +3,7 @@ import { FlashcardArray } from "react-quizlet-flashcard";
 import { saveAs } from "file-saver";
 import _ from "lodash";
 
-function CheatsheetPage({ teamList, communityUpdates, selectedEvent, selectedYear, robotImages }) {
+function CheatsheetPage({ teamList, communityUpdates, selectedEvent, selectedYear, robotImages, eventLabel }) {
     const sortedTeams = _.orderBy(teamList?.teams, "teamNumber", "asc");
     const cardStyle = {
         display: "flex",
@@ -69,7 +69,7 @@ function CheatsheetPage({ teamList, communityUpdates, selectedEvent, selectedYea
                 <p><br /></p></div>
             {selectedEvent && teamList && communityUpdates && cards.length > 0 &&
                 <Container fluid className={"flashCards"}>
-                    <Row><h3>Here are some helpful flash cards you can use to learn the names of the teams at {selectedEvent?.label}.</h3></Row>
+                    <Row><h3>Here are some helpful flash cards you can use to learn the names of the teams at {eventLabel}.</h3></Row>
                     <Row><FlashcardArray cards={cards} /></Row>
                     <Row><br /><br /></Row>
                 </Container>}

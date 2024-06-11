@@ -1,10 +1,10 @@
 
 export const appUpdates = [
     {
-        date: "May 1, 2024",
+        date: "June 11, 2024",
         message: <ul>
-            <li>Fixed Bracket match highlighting for OFFLINE Event</li>
-            <li>Fixed auto-advance issue affecting first Playoff match</li>
+            <li>Implemented handling for offseason playoff variations, including 5, 6 and 7 Alliance playoffs using the double-elimination format</li>
+            <li>Implemented better handling for offseason demo teams</li>
         </ul>
     }, {
         date: "April 21, 2024",

@@ -8,6 +8,7 @@ import { useOnlineStatus } from "../contextProviders/OnlineContext";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { isSafari, isChrome, fullBrowserVersion, browserVersion, isIOS, browserName, isDesktop, isTablet, isMobile } from "react-device-detect";
+import { playoffOverrideMenu } from "components/Constants";
 
 import { ArrowClockwise } from 'react-bootstrap-icons';
 import NotificationBanner from "components/NotificationBanner";
@@ -54,14 +55,6 @@ const teamReducer = [
     { value: 4, label: 4 }
 ]
 
-const playoffOverrideMenu = [
-    { value: 8, label: 8 },
-    { value: 7, label: 7 },
-    { value: 6, label: 6 },
-    { value: 5, label: 5 },
-    { value: 4, label: 4 },
-]
-
 const timeFormatMenu = [
     { label: "12hr", value: "h:mm:ss a" },
     { label: "24hr", value: "HH:mm:ss" },
@@ -82,7 +75,8 @@ const monthsWarningMenu = [
 
 
 
-function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showNotesAnnounce, setShowNotesAnnounce, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, autoUpdate, setAutoUpdate, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, showQualsStatsQuals, setShowQualsStatsQuals, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee, showDistrictChampsStats, setShowDistrictChampsStats, monthsWarning, setMonthsWarning, user, adHocMode, setAdHocMode, supportedYears, reloadPage, autoHideSponsors, setAutoHideSponsors, setLoadingCommunityUpdates, hidePracticeSchedule, setHidePracticeSchedule, systemMessage, setTeamListLoading, getTeamList, getAlliances, setHaveChampsTeams, appUpdates, usePullDownToUpdate, setUsePullDownToUpdate, useSwipe, setUseSwipe }) {
+function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showNotesAnnounce, setShowNotesAnnounce, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, autoUpdate, setAutoUpdate, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, showQualsStatsQuals, setShowQualsStatsQuals, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee, showDistrictChampsStats, setShowDistrictChampsStats, monthsWarning, setMonthsWarning, user, adHocMode, setAdHocMode, supportedYears, reloadPage, autoHideSponsors, setAutoHideSponsors, setLoadingCommunityUpdates, hidePracticeSchedule, setHidePracticeSchedule, systemMessage, setTeamListLoading, getTeamList, getAlliances, setHaveChampsTeams, appUpdates, usePullDownToUpdate, setUsePullDownToUpdate, useSwipe, setUseSwipe, eventLabel,setEventLabel }) {
+
     const isOnline = useOnlineStatus();
     const PWASupported = (isChrome && Number(browserVersion) >= 76) || (isSafari && Number(browserVersion) >= 15 && Number(fullBrowserVersion.split(".")[1]) >= 4);
 
@@ -173,6 +167,11 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
 
     }
 
+    const handleEventSelection = (e) =>{
+        setSelectedEvent(e);
+        setEventLabel(e.label);
+    }
+
 
 
     var updatedTeamList = localUpdates.map((update) => {
@@ -191,7 +190,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                 <Col sm={4}><b>Choose a year...</b><br /><Select options={supportedYears} value={selectedYear ? selectedYear : supportedYears[0]} onChange={setSelectedYear} isDisabled={!isOnline} />
                 </Col>
                 <Col sm={8}>
-                    {eventList && <span><b>...then choose an event.</b><br /><Select options={filterEvents(eventList)} placeholder={eventList?.length > 0 ? "Select an event" : "Loading event list"} value={selectedEvent} onChange={setSelectedEvent}
+                    {eventList && <span><b>...then choose an event.</b><br /><Select options={filterEvents(eventList)} placeholder={eventList?.length > 0 ? "Select an event" : "Loading event list"} value={selectedEvent} onChange={handleEventSelection}
                         styles={{
                             option: (styles, { data }) => {
                                 return {
@@ -219,7 +218,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                 <Row><NotificationBanner notification={systemMessage} /></Row>
                 <Row><Button size="lg" onClick={getSchedule} variant="outline-success" disabled={!isOnline}><b><ArrowClockwise /> Tap to refresh Schedule.</b> <br />Use after Alliance Selection to load Playoffs.</Button></Row>
                 <br />
-                <h4>{selectedEvent.label}</h4>
+                <h4>{eventLabel}</h4>
                 <Row className="leftTable">
                     <Col sm={4}>
                         <p><b>Event Code: </b>{selectedEvent?.value.code}</p>
@@ -379,16 +378,16 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                     <td>
                                         <b>Enable swipe gestures to go to next/previous match<i><br />NOTE: You will need to use two fingers to scroll up/down when using this feature</i></b>
                                     </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <Switch checked={(_.isNull(usePullDownToUpdate) || _.isUndefined(usePullDownToUpdate)) ? false : usePullDownToUpdate} onChange={setUsePullDownToUpdate} disabled={!useSwipe}/>
-                                        </td>
-                                        <td>
-                                            <b>Enable pull down to update scores/ranks</b>
-                                        </td>
-                                    </tr>
-                                
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <Switch checked={(_.isNull(usePullDownToUpdate) || _.isUndefined(usePullDownToUpdate)) ? false : usePullDownToUpdate} onChange={setUsePullDownToUpdate} disabled={!useSwipe} />
+                                    </td>
+                                    <td>
+                                        <b>Enable pull down to update scores/ranks</b>
+                                    </td>
+                                </tr>
+
                                 <tr>
                                     <td colSpan={2}>
                                         <label><b>For how many years should we display awards on the Announce Screen?</b><Select options={awardsMenuOptions} value={awardsMenu ? awardsMenu : awardsMenuOptions[0]} onChange={setAwardsMenu} /></label>
