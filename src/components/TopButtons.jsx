@@ -112,7 +112,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
     }
     availableTeams = _.orderBy(availableTeams, ["label"], "asc");
     const inPractice = matchDetails?.description.toLowerCase().includes("practice");
-    const addBackupButton = inPlayoffs && selectedEvent?.value?.champLevel !== "CHAMPS" && selectedEvent?.value?.champLevel !== "CMPDIV" && selectedEvent?.value?.champLevel !== "CMPSUB" && (selectedEvent?.value?.code === "OFFLINE" && !playoffOnly);
+    const addBackupButton = inPlayoffs && ((selectedEvent?.value?.champLevel !== "CHAMPS" && selectedEvent?.value?.champLevel !== "CMPDIV" && selectedEvent?.value?.champLevel !== "CMPSUB") || (selectedEvent?.value?.code === "OFFLINE" && !playoffOnly));
 
     let eventTeams = teamList?.teams.map((team) => {
         return ({ "label": team.teamNumber, "value": team.teamNumber })
