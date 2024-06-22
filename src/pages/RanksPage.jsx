@@ -6,7 +6,7 @@ import _ from "lodash";
 import moment from "moment";
 
 
-function RanksPage({ selectedEvent, teamList, rankings, rankSort, setRankSort, allianceCount, rankingsOverride, setRankingsOverride, setRankings, allianceSelection, getRanks, setAllianceSelectionArrays, playoffs, districtRankings, eventLabel }) {
+function RanksPage({ selectedEvent, teamList, rankings, rankSort, setRankSort, allianceCount, rankingsOverride, setRankingsOverride, setRankings, allianceSelection, getRanks, setAllianceSelectionArrays, playoffs, districtRankings, eventLabel, communityUpdates }) {
     // This function clicks the hidden file upload button
     function clickLoadRanks() {
         document.getElementById("RankingsFiles").click();
@@ -268,10 +268,13 @@ function RanksPage({ selectedEvent, teamList, rankings, rankSort, setRankSort, a
                         </thead>
                         <tbody>
                             {rankings && rankings?.ranks && rankingsList.map((rankRow) => {
+                                rankRow = _.merge(rankRow,
+                                    communityUpdates[_.findIndex(communityUpdates, { "teamNumber": rankRow.teamNumber
+                                     })])
                                 return <tr key={"rankings" + rankRow.teamNumber}>
                                     <td>{rankRow.teamNumber}</td>
                                     <td style={rankHighlight(rankRow.rank)}>{rankRow.rank}</td>
-                                    <td dangerouslySetInnerHTML={{ __html: rankRow.teamName }}></td>
+                                    <td dangerouslySetInnerHTML={{ __html: rankRow?.updates?.nameShortLocal ? rankRow.updates.nameShortLocal : rankRow.teamName }}></td>
                                     <td>{rankRow.sortOrder1}</td>
                                     <td>{rankRow.wins}</td>
                                     <td>{rankRow.losses}</td>
