@@ -1,6 +1,12 @@
 
 export const appUpdates = [
     {
+        date: "June 22, 2024",
+        message: <ul>
+            <li>Fixed a bug in Rankings page that prevented updated team names from displaying</li>
+            <li>Fixed a bug that hid the "Add Team" button on Announce and Play-by-play during Playoffs</li>
+        </ul>
+    },{
         date: "June 11, 2024",
         message: <ul>
             <li>Implemented handling for offseason playoff variations, including 5, 6 and 7 Alliance playoffs using the double-elimination format</li>
