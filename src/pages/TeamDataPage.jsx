@@ -64,7 +64,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
 
     const { start, stop } = useInterval(
         () => {
-            console.log("clock tick...")
+            // console.log("clock tick...")
             setCurrentTime(moment());
         },
         1000,

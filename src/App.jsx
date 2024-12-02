@@ -54,7 +54,8 @@ export const TabStates = {
  * @default
  */
 const playoffTiebreakers = {
-  "2024": ["foulPoints", "autoPoints", "endGameTotalStagePoints"],// Update after rules release
+  "2025": ["foulPoints", "autoPoints", "endGameTotalStagePoints"],// Update after rules release
+  "2024": ["foulPoints", "autoPoints", "endGameTotalStagePoints"],
   "2023": ["foulPoints", "totalChargeStationPoints", "autoPoints"],
   "2022": ["foulPoints", "endgamePoints", "autoCargoTotal+autoTaxiPoints"],
   "2021": ["foulPoints", "autoPoints", "endgamePoints", "controlPanelPoints+teleopCellPoints"],
@@ -78,6 +79,7 @@ const navPages = [
 ]
 
 const supportedYears = [
+  { label: '2025 REEFSCAPE℠ presented by Haas', value: '2025' },
   { label: '2024 CRESCENDO℠', value: '2024' },
   { label: '2023 CHARGED UP℠ presented by Haas', value: '2023' },
   { label: '2022 RAPID REACT℠ presented by The Boeing Company', value: '2022' },
@@ -825,6 +827,9 @@ function App() {
 
 
           events.forEach((event) => {
+            if (!eventnames[selectedYear?.value]) {
+              eventnames[selectedYear?.value]={}
+            }
             eventnames[selectedYear?.value][event?.value?.code] = event?.value?.name;
           })
 
@@ -1623,7 +1628,7 @@ function App() {
       }
 
     }
-    if (httpClient && selectedYear) {
+    if (httpClient && selectedYear && isAuthenticated) {
       getEvents()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
