@@ -1,6 +1,13 @@
 
 export const appUpdates = [
     {
+        date: "January 10, 2025",
+        message: <ul>
+            <li>Updated branding for Reefscape </li>
+            <li>Added support for skipping Alliance choice during Alliance Selection</li>
+            <li>Updated playoff tiebreakers</li>
+        </ul>
+    },{
         date: "June 22, 2024",
         message: <ul>
             <li>Fixed a bug in Rankings page that prevented updated team names from displaying</li>
