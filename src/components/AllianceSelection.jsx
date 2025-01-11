@@ -400,7 +400,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                 </Row>
                                                 <Row key={"AvailableTeams"} className={"availableRow"}>
                                                     {asArrays.availableTeams?.map((team) => {
-                                                        const currentRound = asArrays.allianceSelectionOrder[asArrays.nextChoice].round;
+                                                        const currentRound = asArrays.allianceSelectionOrder[asArrays.nextChoice]?.round || -1;
                                                         const declined = asArrays?.declined.includes(team?.teamNumber);
                                                         const skipped = _.findIndex(_.filter(asArrays?.skipped,{round:currentRound}),{teamNumber:team?.teamNumber})>=0;
                                                         return (
@@ -451,7 +451,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                     <Col xs={12}>
                                                         <Row key={`allianceDisplay${row[0]}`} >
                                                             {row.map((allianceNumber) => {
-                                                                const currentRound = asArrays.allianceSelectionOrder[asArrays.nextChoice].round;
+                                                                const currentRound = asArrays.allianceSelectionOrder[asArrays.nextChoice]?.round || -1;
                                                                 var alliance = _.filter(alliances, { "number": allianceNumber })
                                                                 var allianceName = alliance[0]?.name;
                                                                 var captain = alliance[0]?.captain;
