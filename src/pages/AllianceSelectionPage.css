@@ -55,10 +55,6 @@
 	border-color: rgba(255, 0, 0, 1.00) !important;
 }
 
-.allianceDeclined {
-	background: rgba(255, 0, 0, 1.00)
-}
-
 .drop-active {
 	border-color: #3500FF;
 }
@@ -106,6 +102,8 @@
 	background: rgba(255, 0, 0, 1.00)
 }
 
+
+
 .alliancedrop {
 	word-break: break-all;
 	padding: 5px;
@@ -126,6 +124,10 @@
 
 .allianceTeam:hover {
 	background: rgb(191, 253, 247);
+}
+
+.allianceSkip {
+	background: rgb(255, 208, 0)
 }
 
 .allianceTeamChoice {

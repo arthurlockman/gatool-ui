@@ -1,4 +1,4 @@
-import { Alert, Button, Container, Form, InputGroup, Modal, Table } from "react-bootstrap";
+import { Alert, Button, Container, Form, InputGroup, Modal, Table, ButtonToolbar } from "react-bootstrap";
 import { CalendarPlusFill, SortAlphaDown, SortAlphaUp, SortNumericDown, SortNumericUp } from 'react-bootstrap-icons';
 import { orderBy, find } from "lodash";
 import { rankHighlight } from "../components/HelperFunctions";
@@ -787,7 +787,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                         </Form.Group>
                         <Form.Group controlId="teamNotes">
                             <Form.Label className={"formLabel"}><b>Team Notes for the Team Data Screen (These notes are local notes and do not come from <i>FIRST</i>)</b></Form.Label>
-                            <ReactQuill className={teamNotes.replace(/<(.|\n)*?>/g, '').trim().length === 0 ? "" : "formHighlight"} theme="snow" modules={modules} formats={formats} value={teamNotes} placeholder={"Enter some new notes you would like to appear on the Team Data Screen"} onChange={(e) => setTeamNotes(e)}/>
+                            <ReactQuill className={teamNotes.replace(/<(.|\n)*?>/g, '').trim().length === 0 ? "" : "formHighlight"} theme="snow" modules={modules} formats={formats} value={teamNotes} placeholder={"Enter some new notes you would like to appear on the Team Data Screen"} onChange={(e) => setTeamNotes(e)} />
                         </Form.Group>
                         {(selectedEvent?.value?.type === "Championship" || selectedEvent?.value?.type === "ChampionshipDivision") ?
                             <Form.Group controlId="topSponsors">
@@ -808,11 +808,13 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="warning" size="sm" onClick={(e) => { clearVisits(true, e) }}>Reset <br />visit times</Button>
-                    <Button variant="secondary" size="sm" onClick={handleClose}>Close without<br />saving changes</Button>
-                    <Button variant="info" size="sm" onClick={handleTrack}>Record visit without<br />saving changes</Button>
-                    <Button variant="primary" size="sm" onClick={(e) => { handleSubmit("save", e) }}>Submit changes<br />but only keep them locally</Button>
-                    <Button variant="success" size="sm" disabled={!isOnline} onClick={(e) => { handleSubmit("update", e) }}>Submit changes <br />and upload to gatool Cloud</Button>
+                    <ButtonToolbar className="justify-content-between">
+                        <Button variant="warning" size="sm" onClick={(e) => { clearVisits(true, e) }}>Reset <br />visit times</Button>
+                        <Button variant="secondary" size="sm" onClick={handleClose}>Close without<br />saving changes</Button>
+                        <Button variant="info" size="sm" onClick={handleTrack}>Record visit without<br />saving changes</Button>
+                        <Button variant="primary" size="sm" onClick={(e) => { handleSubmit("save", e) }}>Submit changes<br />but only keep them locally</Button>
+                        <Button variant="success" size="sm" disabled={!isOnline} onClick={(e) => { handleSubmit("update", e) }}>Submit changes <br />and upload to gatool Cloud</Button>
+                    </ButtonToolbar>
                     <br />
                 </Modal.Footer>
             </Modal>}

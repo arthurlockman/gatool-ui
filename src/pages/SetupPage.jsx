@@ -15,15 +15,16 @@ import NotificationBanner from "components/NotificationBanner";
 
 const filtersMenu = [
     { value: "CHS", label: "FIRST Chesapeake" },
-    { value: "FIM", label: "FIRST in Michigan" },
-    { value: "FMA", label: "FIRST Mid-Atlantic" },
-    { value: "FNC", label: "FIRST North Carolina" },
     { value: "FIN", label: "IndianaFIRST" },
     { value: "ISR", label: "FIRST Israel" },
+    { value: "FIM", label: "FIRST in Michigan" },
+    { value: "FMA", label: "FIRST Mid-Atlantic" },
     { value: "NE", label: "New England" },
+    { value: "FNC", label: "FIRST North Carolina" },
     { value: "ONT", label: "Ontario" },
-    { value: "PCH", label: "Peachtree" },
     { value: "PNW", label: "Pacific Northwest" },
+    { value: "PCH", label: "Peachtree" },
+    { value: "FSC", label: "FIRST South Carolina" },
     { value: "FIT", label: "FIRST in Texas" },
     { value: "regional", label: "Regional Events" },
     { value: "champs", label: "FIRST Championship" },
@@ -75,7 +76,7 @@ const monthsWarningMenu = [
 
 
 
-function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showNotesAnnounce, setShowNotesAnnounce, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, autoUpdate, setAutoUpdate, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, showQualsStatsQuals, setShowQualsStatsQuals, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee, showDistrictChampsStats, setShowDistrictChampsStats, monthsWarning, setMonthsWarning, user, adHocMode, setAdHocMode, supportedYears, reloadPage, autoHideSponsors, setAutoHideSponsors, setLoadingCommunityUpdates, hidePracticeSchedule, setHidePracticeSchedule, systemMessage, setTeamListLoading, getTeamList, getAlliances, setHaveChampsTeams, appUpdates, usePullDownToUpdate, setUsePullDownToUpdate, useSwipe, setUseSwipe, eventLabel,setEventLabel }) {
+function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showNotesAnnounce, setShowNotesAnnounce, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, autoUpdate, setAutoUpdate, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, showQualsStatsQuals, setShowQualsStatsQuals, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee, showDistrictChampsStats, setShowDistrictChampsStats, monthsWarning, setMonthsWarning, user, adHocMode, setAdHocMode, supportedYears, reloadPage, autoHideSponsors, setAutoHideSponsors, setLoadingCommunityUpdates, hidePracticeSchedule, setHidePracticeSchedule, systemMessage, setTeamListLoading, getTeamList, getAlliances, setHaveChampsTeams, appUpdates, usePullDownToUpdate, setUsePullDownToUpdate, useSwipe, setUseSwipe, eventLabel, setEventLabel }) {
 
     const isOnline = useOnlineStatus();
     const PWASupported = (isChrome && Number(browserVersion) >= 76) || (isSafari && Number(browserVersion) >= 15 && Number(fullBrowserVersion.split(".")[1]) >= 4);
@@ -167,7 +168,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
 
     }
 
-    const handleEventSelection = (e) =>{
+    const handleEventSelection = (e) => {
         setSelectedEvent(e);
         setEventLabel(e.label);
     }
