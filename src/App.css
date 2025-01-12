@@ -525,6 +525,11 @@ td {
   font-weight: bold;
 }
 
+.teamDataButtons {
+  margin-left: 5px;
+  font-size: 11px;
+}
+
 .formHighlight {
   outline: green;
   outline-style: solid;
