@@ -66,6 +66,7 @@ function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates, e
         setTeamFilter("");
         setAwardTeam(team);
         setShow(true);
+        enableScope('formEnter');
         disableScope('tabNavigation');
     }
 
@@ -97,7 +98,10 @@ function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates, e
 
     }
 
-    useHotkeys('return', () => handleClose(), { scopes: 'formEnter' });
+    useHotkeys('return', (e) => {
+        e.preventDefault();
+        document.getElementById("congratulationsButton").click()
+    }, { scopes: 'formEnter' });
 
     return (
         <Container fluid>
@@ -142,7 +146,7 @@ function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates, e
                                 Founded in {awardTeam?.rookieYear}, this is their {awardTeam?.yearsDisplay} season competing with <i><b>FIRST</b></i>. </span>
                         </Modal.Body>
                         <Modal.Footer>
-                            <Button variant="success" onClick={handleClose}>
+                            <Button variant="success" onClick={handleClose} id={"congratulationsButton"}>
                                 <Trophy /> Congratulations!
                             </Button>
                         </Modal.Footer>

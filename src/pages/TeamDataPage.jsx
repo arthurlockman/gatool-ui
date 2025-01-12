@@ -620,7 +620,21 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         teamListExtended = orderBy(teamListExtended, teamSort, 'asc');
     }
 
-
+    function resetToTIMS() {
+        setNameShortLocal("");
+        setOrganizationLocal("");
+        setCityStateLocal("");
+        setSayNumber("");
+        setRobotNameLocal("");
+        setShowRobotName(true);
+        setTeamMottoLocal("");
+        setTeamYearsNoCompeteLocal("");
+        setAwardsTextLocal("");
+        setTeamNotesLocal("");
+        setTeamNotes("");
+        setTopSponsorsLocal("");
+        setTopSponsorLocal("");
+    }
 
     return (
         <Container fluid>
@@ -787,6 +801,10 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                         </Form.Group>
                         <Form.Group controlId="teamNotes">
                             <Form.Label className={"formLabel"}><b>Team Notes for the Team Data Screen (These notes are local notes and do not come from <i>FIRST</i>)</b></Form.Label>
+                            <ButtonToolbar>
+                                <Button className={"TBAButton"} onClick={() => { window.open(`https://www.thebluealliance.com/team/${updateTeam.teamNumber}`) }}>{`TBA Page for ${updateTeam.teamNumber}`}</Button>
+                                <Button className={"TBAButton"} onClick={() => { window.open(`https://frc-events.firstinspires.org/${selectedYear.value}/team/${updateTeam.teamNumber}`) }}>{`FIRST Season details ${selectedYear.value}`}</Button>
+                                <Button className={"TBAButton"} onClick={() => { window.open(`https://frc-events.firstinspires.org/${selectedYear.value - 1}/team/${updateTeam.teamNumber}`) }}>{`FIRST Season details ${selectedYear.value - 1}`}</Button></ButtonToolbar>
                             <ReactQuill className={teamNotes.replace(/<(.|\n)*?>/g, '').trim().length === 0 ? "" : "formHighlight"} theme="snow" modules={modules} formats={formats} value={teamNotes} placeholder={"Enter some new notes you would like to appear on the Team Data Screen"} onChange={(e) => setTeamNotes(e)} />
                         </Form.Group>
                         {(selectedEvent?.value?.type === "Championship" || selectedEvent?.value?.type === "ChampionshipDivision") ?
@@ -809,11 +827,12 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                 </Modal.Body>
                 <Modal.Footer>
                     <ButtonToolbar className="justify-content-between">
-                        <Button variant="warning" size="sm" onClick={(e) => { clearVisits(true, e) }}>Reset <br />visit times</Button>
-                        <Button variant="secondary" size="sm" onClick={handleClose}>Close without<br />saving changes</Button>
-                        <Button variant="info" size="sm" onClick={handleTrack}>Record visit without<br />saving changes</Button>
-                        <Button variant="primary" size="sm" onClick={(e) => { handleSubmit("save", e) }}>Submit changes<br />but only keep them locally</Button>
-                        <Button variant="success" size="sm" disabled={!isOnline} onClick={(e) => { handleSubmit("update", e) }}>Submit changes <br />and upload to gatool Cloud</Button>
+                        <Button className={"teamDataButtons"} variant="warning" size="sm" onClick={(e) => { clearVisits(true, e) }}>Reset <br />visit times</Button>
+                        <Button className={"teamDataButtons"} variant="danger" size="sm" onClick={() => { resetToTIMS() }}>Reset team data<br />to TIMS values</Button>
+                        <Button className={"teamDataButtons"} variant="secondary" size="sm" onClick={handleClose}>Close without<br />saving changes</Button>
+                        <Button className={"teamDataButtons"} variant="info" size="sm" onClick={handleTrack}>Record visit without<br />saving changes</Button>
+                        <Button className={"teamDataButtons"} variant="primary" size="sm" onClick={(e) => { handleSubmit("save", e) }}>Submit changes<br />but only keep them locally</Button>
+                        <Button className={"teamDataButtons"} variant="success" size="sm" disabled={!isOnline} onClick={(e) => { handleSubmit("update", e) }}>Submit changes <br />and upload to gatool Cloud</Button>
                     </ButtonToolbar>
                     <br />
                 </Modal.Footer>
@@ -874,7 +893,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                                     <td>{team?.awardsTextLocal}</td>
                                     <td>{team?.teamNotes}</td>
                                     <td>{team?.teamNotesLocal}</td>
-                                    <td>{team?.sponsordLocal}</td>
+                                    <td>{team?.sponsorsLocal}</td>
                                     <td>{team?.sayNumber}</td>
                                     {(user["https://gatool.org/roles"].indexOf("admin") >= 0) && <td>
                                         {team?.source}</td>}

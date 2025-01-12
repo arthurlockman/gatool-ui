@@ -3,7 +3,14 @@ export const appUpdates = [
     {
         date: "January 10, 2025",
         message: <ul>
-            <li>Updated branding for Reefscape </li>
+            <li>Added buttons to view TBA and FIRST Team pages from Team Details page</li>
+            <li>Added support to close Awards Announce dialog via enter key</li>
+            <li>Added button to Team Details page to erase all locally entered data for a team, effectively resetting it to TIMS values.</li>
+        </ul>
+    },{
+        date: "January 10, 2025",
+        message: <ul>
+            <li>Updated branding for Reefscape</li>
             <li>Added support for skipping Alliance choice during Alliance Selection</li>
             <li>Updated playoff tiebreakers</li>
         </ul>
