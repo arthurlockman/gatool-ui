@@ -61,6 +61,11 @@ td {
   text-align: left;
 }
 
+.TBAButton {
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
+
 .setupPageMenus {
   background-color: rgb(227, 247, 255);
   padding: 10px;

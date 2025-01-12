@@ -787,6 +787,10 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                         </Form.Group>
                         <Form.Group controlId="teamNotes">
                             <Form.Label className={"formLabel"}><b>Team Notes for the Team Data Screen (These notes are local notes and do not come from <i>FIRST</i>)</b></Form.Label>
+                            <ButtonToolbar>
+                                <Button className={"TBAButton"} onClick={() => { window.open(`https://www.thebluealliance.com/team/${updateTeam.teamNumber}`) }}>{`TBA Page for ${updateTeam.teamNumber}`}</Button>
+                                <Button className={"TBAButton"} onClick={() => { window.open(`https://frc-events.firstinspires.org/${selectedYear.value}/team/${updateTeam.teamNumber}`) }}>{`FIRST Season details ${selectedYear.value}`}</Button>
+                                <Button className={"TBAButton"} onClick={() => { window.open(`https://frc-events.firstinspires.org/${selectedYear.value - 1}/team/${updateTeam.teamNumber}`) }}>{`FIRST Season details ${selectedYear.value - 1}`}</Button></ButtonToolbar>
                             <ReactQuill className={teamNotes.replace(/<(.|\n)*?>/g, '').trim().length === 0 ? "" : "formHighlight"} theme="snow" modules={modules} formats={formats} value={teamNotes} placeholder={"Enter some new notes you would like to appear on the Team Data Screen"} onChange={(e) => setTeamNotes(e)} />
                         </Form.Group>
                         {(selectedEvent?.value?.type === "Championship" || selectedEvent?.value?.type === "ChampionshipDivision") ?
