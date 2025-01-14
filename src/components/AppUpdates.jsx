@@ -1,6 +1,12 @@
 
 export const appUpdates = [
     {
+        date: "January 11, 2025",
+        message: <ul>
+            <li>Fixed stale data highlighting on Team Data page</li>
+            <li>Added Foul lookup on Play-by-Play page</li>
+        </ul>
+    },{
         date: "January 10, 2025",
         message: <ul>
             <li>Added buttons to view TBA and FIRST Team pages from Team Details page</li>
