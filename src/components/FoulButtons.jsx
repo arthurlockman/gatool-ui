@@ -557,12 +557,12 @@ const commonFouls = [
 ];
 
 function FoulButtons({ currentYear }) {
-  const [show, setShow] = useState(false);
+  const [showFoul, setShowFoul] = useState(false);
   const [foul, setFoul] = useState(null);
   const { disableScope, enableScope } = useHotkeysContext();
 
   const handleShow = (foul) => {
-    setShow(true);
+    setShowFoul(true);
     setFoul(foul);
     disableScope("matchNavigation");
     disableScope("tabNavigation");
@@ -570,7 +570,7 @@ function FoulButtons({ currentYear }) {
   };
 
   const handleClose = () => {
-    setShow(false);
+    setShowFoul(false);
     enableScope("matchNavigation");
     enableScope("tabNavigation");
     disableScope("foulDialog");
@@ -582,13 +582,14 @@ function FoulButtons({ currentYear }) {
 
   return (
     <>
-      <ButtonToolbar>
+      <ButtonToolbar style={{alignContent:"center"}}>
         {_.filter(_.sortBy(commonFouls, ["card","code"]), (foul) => {
           return foul.card === "red" || foul.card === "yellow";
         }).map((foul) => {
           return (
             <Button
               onClick={() => handleShow(foul)}
+              className={"foulButtons"}
               variant={
                 foul?.card === "yellow"
                   ? "warning"
@@ -602,6 +603,7 @@ function FoulButtons({ currentYear }) {
           );
         })}
         <Button
+          className={"foulButtons"}
           onClick={() => {
             window.open(`https://frctools.com/${currentYear}`);
           }}
@@ -609,7 +611,7 @@ function FoulButtons({ currentYear }) {
           Lookup Foul...
         </Button>
       </ButtonToolbar>
-      <Modal centered={true} show={show} onHide={handleClose}>
+      <Modal centered={true} show={showFoul} onHide={handleClose}>
         <ModalHeader
           className={
             foul?.card === "red" ? "btn btn-danger" : "btn btn-warning"
