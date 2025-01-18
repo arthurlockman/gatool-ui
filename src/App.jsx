@@ -119,6 +119,7 @@ function App() {
   const [selectedEvent, setSelectedEvent] = usePersistentState("setting:selectedEvent", null);
   const [selectedYear, setSelectedYear] = usePersistentState("setting:selectedYear", null);
   const [events, setEvents] = usePersistentState("cache:events", []);
+  const [districts, setDistricts] = usePersistentState("cache:districts", []);
   const [eventLabel, setEventLabel] = useState(null);
   const [playoffSchedule, setPlayoffSchedule] = usePersistentState("cache:playoffSchedule", null);
   const [qualSchedule, setQualSchedule] = usePersistentState("cache:qualSchedule", null);
@@ -829,7 +830,7 @@ function App() {
 
           events.forEach((event) => {
             if (!eventnames[selectedYear?.value]) {
-              eventnames[selectedYear?.value]={}
+              eventnames[selectedYear?.value] = {}
             }
             eventnames[selectedYear?.value][event?.value?.code] = event?.value?.name;
           })
@@ -1490,6 +1491,124 @@ function App() {
     }
   }
 
+  const getEvents = async () => {
+    try {
+      const val = await httpClient.get(`${selectedYear?.value}/events`);
+      const json = await val.json();
+      if (typeof json.Events !== "undefined") {
+        json.events = json.Events;
+        delete json.Events;
+      }
+      var timeNow = moment();
+
+      if (selectedYear?.value === supportedYears[0].value) {
+        json.events = json?.events.concat(training.events.events)
+      }
+
+      const events = json?.events.map((e) => {
+        var color = "";
+        var optionPrefix = "";
+        var optionPostfix = "";
+        var filters = [];
+
+        // We have four formats available in timezones: abbreviation, description, Livemeeting and Windows. We lookup the Windows
+        // format and convert it to a more standard format. Consider moving off of Moment on to Luxor?
+
+        e.timeZoneAbbreviation = timezones[_.findIndex(timezones, { "Windows": e.timezone })]?.Abbreviation;
+
+        var eventTime = moment(e.dateEnd);
+        e.name = e.name.trim();
+        e.name = _.replace(e.name, `- FIRST Robotics Competition -`, `-`);
+        if (e.code === "week0" || e.code === "WEEK0") {
+          filters.push("week0")
+        }
+        if (e.type === "OffSeasonWithAzureSync") {
+          color = paleBlue;
+          optionPrefix = "•• ";
+          optionPostfix = " ••";
+          filters.push("offseason");
+        }
+        if (e.type === "OffSeason") {
+          color = paleYellow;
+          optionPrefix = "•• ";
+          optionPostfix = " ••";
+          filters.push("offseason");
+        }
+        if (e.type === "Regional") {
+          filters.push("regional");
+        } else if (e.type.startsWith("Champion")) {
+          filters.push("champs");
+        } else if (e.districtCode) {
+          filters.push("district");
+          filters.push(e.districtCode);
+        }
+        if (timeNow.diff(eventTime) < 0) {
+          filters.push("future")
+        } else {
+          filters.push("past")
+        }
+        if (eventTime.diff(timeNow, 'days') <= 7 && eventTime.diff(timeNow, 'days') >= -0) {
+          filters.push("thisWeek")
+        }
+        if (eventTime.diff(timeNow, 'weeks') <= 4 && eventTime.diff(timeNow, 'weeks') >= 0) {
+          filters.push("thisMonth")
+        }
+        if (e.type !== "OffSeason" && e.type !== "OffSeasonWithAzureSync") {
+          filters.push("week" + e.weekNumber);
+        }
+
+        e.champLevel = "";
+
+        // new method using event type data
+        if (e.type === "DistrictChampionship" || e.type === "DistrictChampionshipWithLevels") {
+          e.champLevel = "DISTCHAMPS";
+        } else if (e.type === "DistrictChampionshipDivision") {
+          e.champLevel = "DISTDIV";
+        } else if (e.type === "ChampionshipDivision") {
+          e.champLevel = "CMPDIV";
+        } else if (e.type === "ChampionshipSubdivision") {
+          e.champLevel = "CMPSUB";
+        } else if (e.type === "Championship") {
+          e.champLevel = "CHAMPS";
+        }
+
+        return {
+          value: e,
+          label: `${optionPrefix}${e.name}${optionPostfix}`,
+          color: color,
+          filters: filters
+        };
+      });
+
+      setEvents(events);
+      if (!_.some(events, selectedEvent)) {
+        setSelectedEvent(null);
+      }
+
+    } catch (e) {
+      console.error(e)
+    }
+
+  }
+
+  const getDistricts = async () => {
+    try {
+      const val = await httpClient.get(`${selectedYear?.value}/districts`);
+      const json = await val.json();
+      if (typeof json.Districts !== "undefined") {
+        json.districts = json.Districts;
+        delete json.Districts;
+      }
+      const districts = json.districts.map((district)=>{return {"label":district.name,"value":district.code}});
+
+      setDistricts(districts)
+
+    } catch (e) {
+      console.error(e)
+    }
+
+  }
+
   // Retrieve Community Updates when the team list changes
   useEffect(() => {
     if (teamList?.teams?.length > 0 && !loadingCommunityUpdates && !selectedEvent?.value?.code.includes("OFFLINE")) {
@@ -1530,107 +1649,10 @@ function App() {
 
   // Retrieve event list when year selection changes
   useEffect(() => {
-    async function getEvents() {
-      try {
-        const val = await httpClient.get(`${selectedYear?.value}/events`);
-        const json = await val.json();
-        if (typeof json.Events !== "undefined") {
-          json.events = json.Events;
-          delete json.Events;
-        }
-        var timeNow = moment();
 
-        if (selectedYear?.value === supportedYears[0].value) {
-          json.events = json?.events.concat(training.events.events)
-        }
-
-        const events = json?.events.map((e) => {
-          var color = "";
-          var optionPrefix = "";
-          var optionPostfix = "";
-          var filters = [];
-
-          // We have four formats available in timezones: abbreviation, description, Livemeeting and Windows. We lookup the Windows
-          // format and convert it to a more standard format. Consider moving off of Moment on to Luxor?
-
-          e.timeZoneAbbreviation = timezones[_.findIndex(timezones, { "Windows": e.timezone })]?.Abbreviation;
-
-          var eventTime = moment(e.dateEnd);
-          e.name = e.name.trim();
-          e.name = _.replace(e.name, `- FIRST Robotics Competition -`, `-`);
-          if (e.code === "week0" || e.code === "WEEK0") {
-            filters.push("week0")
-          }
-          if (e.type === "OffSeasonWithAzureSync") {
-            color = paleBlue;
-            optionPrefix = "•• ";
-            optionPostfix = " ••";
-            filters.push("offseason");
-          }
-          if (e.type === "OffSeason") {
-            color = paleYellow;
-            optionPrefix = "•• ";
-            optionPostfix = " ••";
-            filters.push("offseason");
-          }
-          if (e.type === "Regional") {
-            filters.push("regional");
-          } else if (e.type.startsWith("Champion")) {
-            filters.push("champs");
-          } else if (e.districtCode) {
-            filters.push("district");
-            filters.push(e.districtCode);
-          }
-          if (timeNow.diff(eventTime) < 0) {
-            filters.push("future")
-          } else {
-            filters.push("past")
-          }
-          if (eventTime.diff(timeNow, 'days') <= 7 && eventTime.diff(timeNow, 'days') >= -0) {
-            filters.push("thisWeek")
-          }
-          if (eventTime.diff(timeNow, 'weeks') <= 4 && eventTime.diff(timeNow, 'weeks') >= 0) {
-            filters.push("thisMonth")
-          }
-          if (e.type !== "OffSeason" && e.type !== "OffSeasonWithAzureSync") {
-            filters.push("week" + e.weekNumber);
-          }
-
-          e.champLevel = "";
-
-          // new method using event type data
-          if (e.type === "DistrictChampionship" || e.type === "DistrictChampionshipWithLevels") {
-            e.champLevel = "DISTCHAMPS";
-          } else if (e.type === "DistrictChampionshipDivision") {
-            e.champLevel = "DISTDIV";
-          } else if (e.type === "ChampionshipDivision") {
-            e.champLevel = "CMPDIV";
-          } else if (e.type === "ChampionshipSubdivision") {
-            e.champLevel = "CMPSUB";
-          } else if (e.type === "Championship") {
-            e.champLevel = "CHAMPS";
-          }
-
-          return {
-            value: e,
-            label: `${optionPrefix}${e.name}${optionPostfix}`,
-            color: color,
-            filters: filters
-          };
-        });
-
-        setEvents(events);
-        if (!_.some(events, selectedEvent)) {
-          setSelectedEvent(null);
-        }
-
-      } catch (e) {
-        console.error(e)
-      }
-
-    }
     if (httpClient && selectedYear && isAuthenticated) {
-      getEvents()
+      getDistricts();
+      getEvents();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedYear, httpClient, setSelectedEvent, setEvents])
@@ -1760,7 +1782,7 @@ function App() {
           <Routes>
             <Route path="/" element={<LayoutsWithNavbar selectedEvent={selectedEvent} qualSchedule={qualSchedule} playoffs={playoffs} teamList={teamList} communityUpdates={communityUpdates} rankings={rankings} eventHighScores={eventHighScores} worldHighScores={worldStats} allianceSelection={allianceSelection} practiceSchedule={practiceSchedule} />}>
 
-              <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} teamList={teamList} eventFilters={eventFilters} setEventFilters={setEventFilters} timeFilter={timeFilter} setTimeFilter={setTimeFilter} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} rankings={rankings} timeFormat={timeFormat} setTimeFormat={setTimeFormat} showSponsors={showSponsors} setShowSponsors={setShowSponsors} showAwards={showAwards} setShowAwards={setShowAwards} showNotes={showNotes} setShowNotes={setShowNotes} showNotesAnnounce={showNotesAnnounce} setShowNotesAnnounce={setShowNotesAnnounce} showMottoes={showMottoes} setShowMottoes={setShowMottoes} showChampsStats={showChampsStats} setShowChampsStats={setShowChampsStats} swapScreen={swapScreen} setSwapScreen={setSwapScreen} autoAdvance={autoAdvance} setAutoAdvance={setAutoAdvance} autoUpdate={autoUpdate} setAutoUpdate={setAutoUpdate} getSchedule={getSchedule} awardsMenu={awardsMenu} setAwardsMenu={setAwardsMenu} showQualsStats={showQualsStats} setShowQualsStats={setShowQualsStats} showQualsStatsQuals={showQualsStatsQuals} setShowQualsStatsQuals={setShowQualsStatsQuals} teamReduction={teamReduction} setTeamReduction={setTeamReduction} playoffCountOverride={playoffCountOverride} setPlayoffCountOverride={setPlayoffCountOverride} allianceCount={allianceCount} localUpdates={localUpdates} setLocalUpdates={setLocalUpdates} putTeamData={putTeamData} getCommunityUpdates={getCommunityUpdates} reverseEmcee={reverseEmcee} setReverseEmcee={setReverseEmcee} showDistrictChampsStats={showDistrictChampsStats} setShowDistrictChampsStats={setShowDistrictChampsStats} monthsWarning={monthsWarning} setMonthsWarning={setMonthsWarning} user={user} adHocMode={adHocMode} setAdHocMode={setAdHocMode} supportedYears={supportedYears} reloadPage={reloadPage} autoHideSponsors={autoHideSponsors} setAutoHideSponsors={setAutoHideSponsors} setLoadingCommunityUpdates={setLoadingCommunityUpdates} hidePracticeSchedule={hidePracticeSchedule} setHidePracticeSchedule={setHidePracticeSchedule} systemMessage={systemMessage} setTeamListLoading={setTeamListLoading} getTeamList={getTeamList} getAlliances={getAlliances} setHaveChampsTeams={setHaveChampsTeams} appUpdates={appUpdates} usePullDownToUpdate={usePullDownToUpdate} setUsePullDownToUpdate={setUsePullDownToUpdate} useSwipe={useSwipe} setUseSwipe={setUseSwipe} eventLabel={eventLabel} setEventLabel={setEventLabel} />} />
+              <Route path="/" element={<SetupPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} setSelectedYear={setSelectedYear} selectedYear={selectedYear} eventList={events} teamList={teamList} eventFilters={eventFilters} setEventFilters={setEventFilters} districts={districts} timeFilter={timeFilter} setTimeFilter={setTimeFilter} qualSchedule={qualSchedule} playoffSchedule={playoffSchedule} rankings={rankings} timeFormat={timeFormat} setTimeFormat={setTimeFormat} showSponsors={showSponsors} setShowSponsors={setShowSponsors} showAwards={showAwards} setShowAwards={setShowAwards} showNotes={showNotes} setShowNotes={setShowNotes} showNotesAnnounce={showNotesAnnounce} setShowNotesAnnounce={setShowNotesAnnounce} showMottoes={showMottoes} setShowMottoes={setShowMottoes} showChampsStats={showChampsStats} setShowChampsStats={setShowChampsStats} swapScreen={swapScreen} setSwapScreen={setSwapScreen} autoAdvance={autoAdvance} setAutoAdvance={setAutoAdvance} autoUpdate={autoUpdate} setAutoUpdate={setAutoUpdate} getSchedule={getSchedule} awardsMenu={awardsMenu} setAwardsMenu={setAwardsMenu} showQualsStats={showQualsStats} setShowQualsStats={setShowQualsStats} showQualsStatsQuals={showQualsStatsQuals} setShowQualsStatsQuals={setShowQualsStatsQuals} teamReduction={teamReduction} setTeamReduction={setTeamReduction} playoffCountOverride={playoffCountOverride} setPlayoffCountOverride={setPlayoffCountOverride} allianceCount={allianceCount} localUpdates={localUpdates} setLocalUpdates={setLocalUpdates} putTeamData={putTeamData} getCommunityUpdates={getCommunityUpdates} reverseEmcee={reverseEmcee} setReverseEmcee={setReverseEmcee} showDistrictChampsStats={showDistrictChampsStats} setShowDistrictChampsStats={setShowDistrictChampsStats} monthsWarning={monthsWarning} setMonthsWarning={setMonthsWarning} user={user} adHocMode={adHocMode} setAdHocMode={setAdHocMode} supportedYears={supportedYears} reloadPage={reloadPage} autoHideSponsors={autoHideSponsors} setAutoHideSponsors={setAutoHideSponsors} setLoadingCommunityUpdates={setLoadingCommunityUpdates} hidePracticeSchedule={hidePracticeSchedule} setHidePracticeSchedule={setHidePracticeSchedule} systemMessage={systemMessage} setTeamListLoading={setTeamListLoading} getTeamList={getTeamList} getAlliances={getAlliances} setHaveChampsTeams={setHaveChampsTeams} appUpdates={appUpdates} usePullDownToUpdate={usePullDownToUpdate} setUsePullDownToUpdate={setUsePullDownToUpdate} useSwipe={useSwipe} setUseSwipe={setUseSwipe} eventLabel={eventLabel} setEventLabel={setEventLabel} />} />
 
               <Route path="/schedule" element={<SchedulePage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} practiceSchedule={practiceSchedule} setPracticeSchedule={setPracticeSchedule} getTeamList={getTeamList} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} offlinePlayoffSchedule={offlinePlayoffSchedule} loadEvent={loadEvent} practiceFileUploaded={practiceFileUploaded} setPracticeFileUploaded={setPracticeFileUploaded} setTeamListLoading={setTeamListLoading} getAlliances={getAlliances} playoffOnly={playoffOnly} setPlayoffOnly={setPlayoffOnly} alliances={alliances} champsStyle={champsStyle} setChampsStyle={setChampsStyle} setQualsLength={setQualsLength} playoffCountOverride={playoffCountOverride} eventLabel={eventLabel} setEventLabel={setEventLabel} allianceCount={allianceCount} setPlayoffCountOverride={setPlayoffCountOverride} />} />
 

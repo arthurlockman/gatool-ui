@@ -1,4 +1,5 @@
 import { Row, Col, Button } from "react-bootstrap";
+import FoulButtons from "./FoulButtons";
 import { CaretLeftFill, CaretRightFill } from "react-bootstrap-icons";
 import PlayoffDetails from "../components/PlayoffDetails";
 
@@ -35,6 +36,7 @@ function BottomButtons({ previousMatch, nextMatch, matchDetails, playoffSchedule
                     {!adHocMode && <Button size="lg" variant="outline-success" className={"gatool-button buttonNoWrap"} onClick={nextMatch}><span className={"d-none d-lg-block"}>Next Match <CaretRightFill /></span><span className={"d-block d-lg-none"}><CaretRightFill /> <CaretRightFill /></span></Button>}
                 </Col>
             </Row>
+            <Row><FoulButtons currentYear={selectedEvent.year}/></Row>
             <Row> <br /><br /><br /></Row>
         </>
     )
