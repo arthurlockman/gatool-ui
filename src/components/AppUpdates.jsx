@@ -1,6 +1,12 @@
 
 export const appUpdates = [
     {
+        date: "January 19, 2025",
+        message: <ul>
+            <li>Updated Cheat Sheet for names of Fouls and extended Alliance Area</li>
+            <li>Ensured that you can't have the same team on both Alliances as a replacement in Playoffs</li>
+        </ul>
+    },{
         date: "January 11, 2025",
         message: <ul>
             <li>Fixed stale data highlighting on Team Data page</li>

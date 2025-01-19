@@ -110,6 +110,18 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
             }
         })
     }
+    
+    if (inPlayoffs && alliances.alliances.length > 0) {
+        let availableTeamsTemp = [];
+        availableTeams.forEach(team => {
+            if (_.findIndex(alliances.alliances, { backup: team?.label }) < 0) {
+                availableTeamsTemp.push(team);
+            }
+        })
+        availableTeams = availableTeamsTemp;
+
+    }
+
     availableTeams = _.orderBy(availableTeams, ["label"], "asc");
     const inPractice = matchDetails?.description.toLowerCase().includes("practice");
     const addBackupButton = inPlayoffs && ((selectedEvent?.value?.champLevel !== "CHAMPS" && selectedEvent?.value?.champLevel !== "CMPDIV" && selectedEvent?.value?.champLevel !== "CMPSUB") || (selectedEvent?.value?.code === "OFFLINE" && !playoffOnly));
