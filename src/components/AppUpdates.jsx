@@ -1,6 +1,12 @@
 
 export const appUpdates = [
     {
+        date: "February 8, 2025",
+        message: <ul>
+            <li>Fixed issues with skipped Alliances in Alliance Selection</li>
+            <li>Updated Alliance Selection page to include more relevant visual information about teams and Alliances</li>
+        </ul>
+    },{
         date: "January 19, 2025",
         message: <ul>
             <li>Updated Cheat Sheet for names of Fouls and extended Alliance Area</li>

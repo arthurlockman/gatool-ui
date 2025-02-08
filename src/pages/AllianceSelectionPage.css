@@ -1,167 +1,210 @@
 .allianceContainer {
-	display: flex;
-	justify-content: center;
-	vertical-align: middle;
-	text-align: center;
-	background: rgba(255, 187, 248, 1.00);
+  display: flex;
+  justify-content: center;
+  vertical-align: middle;
+  text-align: center;
+  background: rgba(255, 187, 248, 1);
 }
 
 .alliance {
-	flex-flow: column wrap;
-	justify-content: center;
-	vertical-align: middle;
-	text-align: center;
-	
-	padding: 6px;
-	
+  flex-flow: column wrap;
+  justify-content: center;
+  vertical-align: middle;
+  text-align: center;
+
+  padding: 6px;
 }
 
 .availableTeam {
-	max-width: 60px;
-	margin: 5px
+  max-width: 60px;
+  margin: 5px;
 }
 .availableRow {
-	display: flex;
-	flex-flow: row wrap ;
-	justify-content: center;
-	height:fit-content;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  height: fit-content;
 }
 
 .backupAlliancesTable {
-	text-align: center;
-	background: rgba(192, 252, 188, 1.00)
+  text-align: center;
+  background: rgba(192, 252, 188, 1);
 }
 
 .alliancesTeamsTable {
-	display: flex;
-	min-width: 0;
-	justify-content: center;
-	flex-flow: column wrap;
-	word-break: break-word;
-	text-align: center;
-	background: rgba(157, 203, 250, 1.00);
+  display: flex;
+  min-width: 0;
+  justify-content: center;
+  flex-flow: column wrap;
+  word-break: break-word;
+  text-align: center;
+  background: rgba(157, 203, 250, 1);
+}
+
+.alliancesTeamsTableHeader {
+  margin: 0px;
+  font-size: large;
+  font-weight: 700;
 }
 
 .dropzone {
-	border: 4px solid rgba(255, 0, 0, 1.00);
-	padding-left: 15px;
-	padding-right: 15px;
-	transition: background-color 0.3s;
+  border: 4px solid rgba(255, 0, 0, 1);
+  padding-left: 15px;
+  padding-right: 15px;
+  transition: background-color 0.3s;
 }
 
 .nextAllianceChoice {
-	background: rgba(202, 184, 184, 1.00) !important;
-	border: 4px solid !important;
-	border-color: rgba(255, 0, 0, 1.00) !important;
+  background: rgba(202, 184, 184, 1) !important;
+  border: 4px solid !important;
+  border-color: rgba(255, 0, 0, 1) !important;
 }
 
 .drop-active {
-	border-color: #3500FF;
+  border-color: #3500ff;
 }
 
 .drop-target {
-	background-color: #29e;
-	border-color: #fff;
-	border-style: solid;
+  background-color: #29e;
+  border-color: #fff;
+  border-style: solid;
 }
 
 .drag-drop {
-	display: inline-block;
-	min-width: 40px;
-	padding: 2em 0.5em;
-	color: #fff;
-	background-color: #29e;
-	border: solid 2px #fff;
-	-webkit-transform: translate(0px, 0px);
-	transform: translate(0px, 0px);
-	transition: background-color 0.3s;
+  display: inline-block;
+  min-width: 40px;
+  padding: 2em 0.5em;
+  color: #fff;
+  background-color: #29e;
+  border: solid 2px #fff;
+  -webkit-transform: translate(0px, 0px);
+  transform: translate(0px, 0px);
+  transition: background-color 0.3s;
 }
 
 .drag-drop.can-drop {
-	color: #000;
-	background-color: #4e4;
+  color: #000;
+  background-color: #4e4;
 }
 
 .allianceAnnounce {
-	font-size: 18px;
-	align-content: center;
-	text-align: center
+  font-size: 18px;
+  align-content: center;
+  text-align: center;
 }
 
 .allianceAnnounceDialog {
-	font-size: 30px;
-	align-content: center;
-	text-align: center
+  font-size: 30px;
+  align-content: center;
+  text-align: center;
 }
 
 .allianceCaptain {
-	background: rgba(251, 255, 135, 1.00) !important
+  background: rgba(251, 255, 135, 1) !important;
 }
 
 .allianceDeclined {
-	background: rgba(255, 0, 0, 1.00)
+  background: rgba(255, 0, 0, 1);
 }
 
-
-
 .alliancedrop {
-	word-break: break-all;
-	padding: 5px;
-	margin-bottom: 5px;
-	border: 1px solid;
-	border-radius: 5px;
-	background: rgba(221, 221, 221, 1.00)
+  word-break: break-all;
+  padding: 5px;
+  margin-bottom: 5px;
+  border: 1px solid;
+  border-radius: 5px;
+  background: rgba(221, 221, 221, 1);
 }
 
 .allianceTeam {
-	font-size: medium;
-	padding: 5px;
-	border: 1px solid;
-	border-radius: 5px;
-	background: rgba(255, 255, 255, 1.00);
-	margin-bottom: 10px;
+  font-size: medium;
+  padding: 5px;
+  border: 1px solid;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 1);
+  margin-bottom: 10px;
 }
 
 .allianceTeam:hover {
-	background: rgb(191, 253, 247);
+  background: rgb(191, 253, 247);
 }
 
 .allianceSkip {
-	background: rgb(255, 208, 0)
+  background: rgb(255, 208, 0);
 }
 
 .allianceTeamChoice {
-	margin-bottom: 0px;
+  margin-bottom: 0px;
 }
 
+.allianceTeamChosen {
+  margin-bottom: 0px;
+  background-color: rgb(25, 135, 84);
+  color: white;
+}
+
+.allianceTeamChosen:hover {
+	background-color: rgb(185, 228, 208);;
+	color: black;
+  }
+
 .allianceChoice {
-	background-color: rgb(25, 135, 84);
-	color: white
+  background-color: rgb(25, 135, 84);
+  color: white;
+}
+
+.unfullAlliance {
+    border: 4px solid;
+    border-color: #9dcbfa;
+    border-radius: 8px;
+}
+
+.fullAlliance {
+    background-color: #c4f4c6;
+    border-radius: 8px;
+    border-color: #fece39;
+    border: 4px solid;
 }
 
 .allianceDecline {
+  font-size: 18px;
+  padding: 5px;
+  border: 1px solid;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 1);
+  margin-bottom: 10px;
+  background-color: rgb(207, 50, 65);
+  color: white;
+}
+
+.captainDecline {
 	font-size: 18px;
 	padding: 5px;
 	border: 1px solid;
 	border-radius: 5px;
-	background: rgba(255, 255, 255, 1.00);
-	margin-bottom: 10px;
+	background: rgba(255, 255, 255, 1);
+	margin-bottom: 0px;
 	background-color: rgb(207, 50, 65);
-	color: white
-}
+	color: white;
+  }
 
 .allianceDecline:hover {
-	background-color: plum;
-	color: black
+  background-color: plum;
+  color: black;
 }
 
+.captainDecline:hover {
+	background-color: plum;
+	color: black;
+  }
+
 .allianceSelectionDecline {
-	font-size: 18px;
-	padding: 5px;
-	border: 1px solid;
-	border-radius: 5px;
-	background: rgba(255, 255, 255, 1.00);
-	margin-bottom: 10px;
-	background-color: rgb(207, 50, 65);
-	color: white
+  font-size: 18px;
+  padding: 5px;
+  border: 1px solid;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 1);
+  margin-bottom: 10px;
+  background-color: rgb(207, 50, 65);
+  color: white;
 }
