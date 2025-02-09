@@ -353,7 +353,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
             ];
             asArrays.allianceCount = allianceCount?.count;
             asArrays.rankedTeams = _.orderBy(sortedTeams, ["rank", "asc"]);
-            asArrays.availableTeams = _.orderBy(sortedTeams, ["teamNumber", "asc"]);
+            asArrays.availableTeams = _.orderBy(sortedTeams.slice(1), ["teamNumber", "asc"]);
             asArrays.nextChoice = 0;
             asArrays.undo = [];
             asArrays.declined = [];

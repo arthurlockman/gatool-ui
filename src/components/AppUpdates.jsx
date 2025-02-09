@@ -1,6 +1,11 @@
 
 export const appUpdates = [
     {
+        date: "February 9, 2025",
+        message: <ul>
+            <li>Removed top ranked team from Available teams in Alliance Selection</li>
+        </ul>
+    },{
         date: "February 8, 2025",
         message: <ul>
             <li>Fixed issues with skipped Alliances in Alliance Selection</li>
