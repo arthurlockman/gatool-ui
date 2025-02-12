@@ -353,7 +353,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
             ];
             asArrays.allianceCount = allianceCount?.count;
             asArrays.rankedTeams = _.orderBy(sortedTeams, ["rank", "asc"]);
-            asArrays.availableTeams = _.orderBy(sortedTeams, ["teamNumber", "asc"]);
+            asArrays.availableTeams = _.orderBy(sortedTeams.slice(1), ["teamNumber", "asc"]);
             asArrays.nextChoice = 0;
             asArrays.undo = [];
             asArrays.declined = [];
@@ -505,7 +505,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                                 }
                                                                 return (
                                                                     (allianceNumber <= allianceCount?.count) ?
-                                                                        <Col xs={6} className={fullAlliance ? "fullAlliance" :"undullAlliance"}>
+                                                                        <Col xs={6} className={fullAlliance ? "fullAlliance" : "undullAlliance"}>
                                                                             <Container fluid className={asArrays.allianceSelectionOrder[asArrays?.nextChoice]?.number === allianceNumber ? "alliance dropzone" : "alliance"} key={`AllianceTable${allianceName}`}>
                                                                                 <Row>
                                                                                     <Col xs={12}><b>{allianceName}</b></Col>
