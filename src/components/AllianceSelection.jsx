@@ -505,7 +505,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                                 }
                                                                 return (
                                                                     (allianceNumber <= allianceCount?.count) ?
-                                                                        <Col xs={6} className={fullAlliance ? "fullAlliance" :"undullAlliance"}>
+                                                                        <Col xs={6} className={fullAlliance ? "fullAlliance" : "undullAlliance"}>
                                                                             <Container fluid className={asArrays.allianceSelectionOrder[asArrays?.nextChoice]?.number === allianceNumber ? "alliance dropzone" : "alliance"} key={`AllianceTable${allianceName}`}>
                                                                                 <Row>
                                                                                     <Col xs={12}><b>{allianceName}</b></Col>
