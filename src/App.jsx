@@ -1009,100 +1009,105 @@ function App() {
    * @return sets the communityUpdates persistent state
    */
   async function getCommunityUpdates(notify, adHocTeamList, ignoreLocalUpdates) {
-    if (!loadingCommunityUpdates) {
-      setLoadingCommunityUpdates(true);
-      console.log(`Fetching community updates for ${selectedEvent?.value?.name}...`)
-      var result = null;
-      var teams = [];
-
-      if (selectedEvent?.value?.code.includes("OFFLINE")) {
-        //Do something with the team list
-        if (adHocTeamList) {
-          // https://api.gatool.org/v3/team/172/updates
-          console.log("Teams List loaded. Update from the Community")
-          var adHocTeams = adHocTeamList.map(async (team) => {
-            var request = await httpClient.get(`/team/${team?.teamNumber}/updates`);
-            var teamDetails = { "teamNumber": team?.teamNumber };
-            var teamUpdate = _.cloneDeep(communityUpdateTemplate);
-            if (request.status === 200) {
-              teamUpdate = await request?.json();
-            }
-            teamDetails.updates = teamUpdate;
-            teamDetails.teamNumber = team?.teamNumber
-            return teamDetails;
-          });
-
-          await Promise.all(adHocTeams).then(function (values) {
-            teams = values;
-            teams = teams.map((team) => {
-              team.updates = _.merge(_.cloneDeep(communityUpdateTemplate), team?.updates);
-              if (!ignoreLocalUpdates) {
-                if (_.findIndex(localUpdates, { "teamNumber": team?.teamNumber }) >= 0) {
-                  team.updates = _.merge(team.updates, _.cloneDeep(localUpdates[_.findIndex(localUpdates, { "teamNumber": team?.teamNumber })].update))
-                }
+    if (selectedEvent) {
+      if (!loadingCommunityUpdates) {
+        setLoadingCommunityUpdates(true);
+        console.log(`Fetching community updates for ${selectedEvent?.value?.name}...`)
+        var result = null;
+        var teams = [];
+  
+        if (selectedEvent?.value?.code.includes("OFFLINE")) {
+          //Do something with the team list
+          if (adHocTeamList) {
+            // https://api.gatool.org/v3/team/172/updates
+            console.log("Teams List loaded. Update from the Community")
+            var adHocTeams = adHocTeamList.map(async (team) => {
+              var request = await httpClient.get(`/team/${team?.teamNumber}/updates`);
+              var teamDetails = { "teamNumber": team?.teamNumber };
+              var teamUpdate = _.cloneDeep(communityUpdateTemplate);
+              if (request.status === 200) {
+                teamUpdate = await request?.json();
               }
-              return team;
-            })
-
-          });
-
-        } else {
-          console.log("no teams loaded yet")
-          teams = [];
-        }
-
-      } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
-        result = await httpClient.get(`${selectedYear?.value}/communityUpdates/${selectedEvent?.value.code}`);
-        teams = await result.json();
-      } else {
-        teams = training.teams.communityUpdates;
-      }
-
-      if (teams?.length > 0) {
-        teams = teams.map((team) => {
-          team.updates = _.merge(_.cloneDeep(communityUpdateTemplate), team?.updates);
-          if (_.findIndex(localUpdates, { "teamNumber": team?.teamNumber }) >= 0) {
-            team.updates = _.merge(team.updates, _.cloneDeep(localUpdates[_.findIndex(localUpdates, { "teamNumber": team?.teamNumber })].update))
+              teamDetails.updates = teamUpdate;
+              teamDetails.teamNumber = team?.teamNumber
+              return teamDetails;
+            });
+  
+            await Promise.all(adHocTeams).then(function (values) {
+              teams = values;
+              teams = teams.map((team) => {
+                team.updates = _.merge(_.cloneDeep(communityUpdateTemplate), team?.updates);
+                if (!ignoreLocalUpdates) {
+                  if (_.findIndex(localUpdates, { "teamNumber": team?.teamNumber }) >= 0) {
+                    team.updates = _.merge(team.updates, _.cloneDeep(localUpdates[_.findIndex(localUpdates, { "teamNumber": team?.teamNumber })].update))
+                  }
+                }
+                return team;
+              })
+  
+            });
+  
+          } else {
+            console.log("no teams loaded yet")
+            teams = [];
           }
-          return team;
-        })
-        //handle EI teams
-        if (EITeams?.length > 0) {
-          console.log("EI Teams present. Fetching updates from the Community");
-          //get updates for these teams
-          var EIUpdates = EITeams.map(async (EITeam) => {
-            var request = await httpClient.get(`/team/${EITeam?.teamNumber}/updates`);
-            var teamDetails = { "teamNumber": EITeam?.teamNumber };
-            var teamUpdate = _.cloneDeep(communityUpdateTemplate);
-            if (request?.status === 200) {
-              teamUpdate = await request.json();
+  
+        } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
+          result = await httpClient.get(`${selectedYear?.value}/communityUpdates/${selectedEvent?.value.code}`);
+          teams = await result.json();
+        } else {
+          teams = training.teams.communityUpdates;
+        }
+  
+        if (teams?.length > 0) {
+          teams = teams.map((team) => {
+            team.updates = _.merge(_.cloneDeep(communityUpdateTemplate), team?.updates);
+            if (_.findIndex(localUpdates, { "teamNumber": team?.teamNumber }) >= 0) {
+              team.updates = _.merge(team.updates, _.cloneDeep(localUpdates[_.findIndex(localUpdates, { "teamNumber": team?.teamNumber })].update))
             }
-            teamDetails.updates = teamUpdate;
-            teamDetails.teamNumber = EITeam?.teamNumber
-            return teamDetails;
+            return team;
           })
-
-          await Promise.all(EIUpdates).then((values) => {
-            teams = _.concat(teams, values);
-          })
-          teams.lastUpdate = moment();
-          if (notify) {
-            toast.success(`Your team data is now up to date including EI teams.`)
+          //handle EI teams
+          if (EITeams?.length > 0) {
+            console.log("EI Teams present. Fetching updates from the Community");
+            //get updates for these teams
+            var EIUpdates = EITeams.map(async (EITeam) => {
+              var request = await httpClient.get(`/team/${EITeam?.teamNumber}/updates`);
+              var teamDetails = { "teamNumber": EITeam?.teamNumber };
+              var teamUpdate = _.cloneDeep(communityUpdateTemplate);
+              if (request?.status === 200) {
+                teamUpdate = await request.json();
+              }
+              teamDetails.updates = teamUpdate;
+              teamDetails.teamNumber = EITeam?.teamNumber
+              return teamDetails;
+            })
+  
+            await Promise.all(EIUpdates).then((values) => {
+              teams = _.concat(teams, values);
+            })
+            teams.lastUpdate = moment();
+            if (notify) {
+              toast.success(`Your team data is now up to date including EI teams.`)
+            }
+            setCommunityUpdates(teams);
+            setLoadingCommunityUpdates(false);
+          } else {
+            teams.lastUpdate = moment();
+            if (notify) {
+              toast.success(`Your team data is now up to date.`)
+            }
+            setCommunityUpdates(teams);
+            setLoadingCommunityUpdates(false);
           }
-          setCommunityUpdates(teams);
-          setLoadingCommunityUpdates(false);
         } else {
-          teams.lastUpdate = moment();
-          if (notify) {
-            toast.success(`Your team data is now up to date.`)
-          }
-          setCommunityUpdates(teams);
           setLoadingCommunityUpdates(false);
         }
       } else {
-        setLoadingCommunityUpdates(false);
+        console.log(`No event loaded. Skipping...`);
       }
     }
+    
   }
 
   /**
@@ -1612,8 +1617,13 @@ function App() {
   // Retrieve Community Updates when the team list changes
   useEffect(() => {
     if (teamList?.teams?.length > 0 && !loadingCommunityUpdates && !selectedEvent?.value?.code.includes("OFFLINE")) {
-      console.log("Team list changed. Fetching Community Updates.")
-      getCommunityUpdates();
+      if (selectedEvent) {
+        console.log("Team list changed. Fetching Community Updates.")
+        getCommunityUpdates();
+      } else {
+        console.log(`No event loaded. Skipping...`);
+      }
+      
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [httpClient, teamList])

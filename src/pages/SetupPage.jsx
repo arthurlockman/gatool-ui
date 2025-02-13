@@ -245,7 +245,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                         {playoffSchedule?.matchesLastModified && <p><b>Playoff Results last updated: </b><br />{moment(playoffSchedule?.matchesLastModified).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
                         {teamList?.lastUpdate && <p><b>Team List last updated: </b><br />{moment(teamList?.lastUpdate).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
                         {rankings?.lastModified && <p><b>Rankings last updated: </b><br />{moment(rankings?.lastModified).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
-                        {((user["https://gatool.org/roles"].indexOf("user") >= 0) && localUpdates.length > 0) && <Alert><p><b>You have {localUpdates.length === 1 ? "an update for team" : "updates for teams"} {_.sortBy(updatedTeamList).join(", ")} that can be uploaded to gatool Cloud.</b></p><span><Button disabled={!isOnline} style={{ width: "45%" }} onClick={uploadLocalUpdates}>Upload to gatool Cloud now</Button>  <Button disabled={!isOnline} variant={"warning"} style={{ width: "50%" }} onClick={deleteLocalUpdates}>Delete stored updates</Button></span></Alert>}
+                        {((user["https://gatool.org/roles"] && (user["https://gatool.org/roles"].indexOf("user") >= 0)) && localUpdates.length > 0) && <Alert><p><b>You have {localUpdates.length === 1 ? "an update for team" : "updates for teams"} {_.sortBy(updatedTeamList).join(", ")} that can be uploaded to gatool Cloud.</b></p><span><Button disabled={!isOnline} style={{ width: "45%" }} onClick={uploadLocalUpdates}>Upload to gatool Cloud now</Button>  <Button disabled={!isOnline} variant={"warning"} style={{ width: "50%" }} onClick={deleteLocalUpdates}>Delete stored updates</Button></span></Alert>}
                         <Alert variant={"warning"}><p><b>Update Team Data</b><br />You can refresh your community-sourced team data if it has changed on another device. <i><b>Know that we fetch all team data automatically when you load an event</b></i>, so you should not need this very often.</p><Button variant={"warning"} disabled={!isOnline} onClick={() => { handleGetTeamUpdates() }}>Update now</Button></Alert>
                     </Col>
                     <Col sm={4}>
@@ -445,8 +445,8 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                     </Modal.Header>
                     <Modal.Body key={"updatesHistory"}>
                         <Container>
-                            {appUpdates.map((appUpdate) => {
-                                return <Row><Col xs={3}><b>{appUpdate.date}</b></Col>
+                            {appUpdates.map((appUpdate,index) => {
+                                return <Row key={`appUpdate-${index}`}><Col xs={3}><b>{appUpdate.date}</b></Col>
                                     <Col xs={9}>{appUpdate.message}</Col></Row>
                             })}
                         </Container>

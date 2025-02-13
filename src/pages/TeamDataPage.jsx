@@ -256,7 +256,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
      * @param {*} e  - the inbound event from clicking the button. 
      */
     const handleShow = (team, e) => {
-        if (user["https://gatool.org/roles"].indexOf("user") >= 0) {
+        if (user["https://gatool.org/roles"] && user["https://gatool.org/roles"].indexOf("user") >= 0) {
             setUpdateTeam(team);
             setNameShortLocal(team?.updates?.nameShortLocal || "");
             setOrganizationLocal(team?.updates?.organizationLocal || "");
@@ -279,7 +279,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
     }
 
     const handleHistory = async (team, e) => {
-        if (user["https://gatool.org/roles"].indexOf("user") >= 0) {
+        if (user["https://gatool.org/roles"] && user["https://gatool.org/roles"].indexOf("user") >= 0) {
             var history = await getTeamHistory(team.teamNumber);
             setShowHistory(true);
             setTeamHistory(_.orderBy(history, ['modifiedDate'], ['desc']));
@@ -650,7 +650,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
             </div>}
             {selectedEvent && teamList?.teams.length > 0 && <><div>
                 <h4>{eventLabel}</h4>
-                <p className={"leftTable"}>This table is {(user["https://gatool.org/roles"].indexOf("user") >= 0) ? <>editable and sortable. Tap on a team number to change data for a specific team. Edits you make are local to this browser, and they will persist here if you do not clear your browser cache. You can save your changes to the gatool Cloud on the team details page or on the Setup Screen. </> : <>sortable. </>}Cells <span className={"teamTableHighlight"}>highlighted in green</span> have been modified, either by you or by other gatool users.</p>
+                <p className={"leftTable"}>This table is {(user["https://gatool.org/roles"] && user["https://gatool.org/roles"].indexOf("user") >= 0) ? <>editable and sortable. Tap on a team number to change data for a specific team. Edits you make are local to this browser, and they will persist here if you do not clear your browser cache. You can save your changes to the gatool Cloud on the team details page or on the Setup Screen. </> : <>sortable. </>}Cells <span className={"teamTableHighlight"}>highlighted in green</span> have been modified, either by you or by other gatool users.</p>
                 <Table responsive className={"leftTable topBorderLine"}>
                     <thead>
                         <tr>
@@ -660,7 +660,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                             <td>
                                 <span style={{ cursor: "pointer", color: "darkblue" }} onClick={downloadTeamInfoSheets}><img style={{ float: "left" }} width="30" src="images/wordicon.png" alt="Word Logo" /> <b>Tap here to download a merged document (docx).</b></span>
                             </td>
-                            {(user["https://gatool.org/roles"].indexOf("user") >= 0) && <td>
+                            {(user["https://gatool.org/roles"] && user["https://gatool.org/roles"].indexOf("user") >= 0) && <td>
                                 <span style={{ cursor: "pointer", color: "darkblue" }} onClick={clickRestoreBackup}><input type="file" id="BackupFiles" onChange={handleRestoreBackup} className={"hiddenInput"} /><b><img style={{ float: "left" }} width="30" src="images/excelicon.png" alt="Excel Logo" /> Tap here to restore team data from Excel</b></span>
                             </td>}
                         </tr>
@@ -674,7 +674,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                             <td>
                                 <p>This merged doc contains all of the information in your Teams List, merged onto a template you can print and distribute to teams. <i>Note: this will save to Files on iOS 13+</i></p>
                             </td>
-                            {(user["https://gatool.org/roles"].indexOf("user") >= 0) && <td>
+                            {(user["https://gatool.org/roles"] && user["https://gatool.org/roles"].indexOf("user") >= 0) && <td>
                                 <p>You can export your teams data to Excel using the button on the left, and then restore it from backup here. This is handy in low or no network situations, where you may be unable to update changes to gatool Cloud. <i>Note: Be careful if you modify the Excel file and then import it here.</i></p>
                             </td>}
                         </tr>
@@ -858,7 +858,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                             <td>Announce Screen Notes</td>
                             <td>Sponsors</td>
                             <td>How to pronounce #</td>
-                            {(user["https://gatool.org/roles"].indexOf("admin") >= 0) && <td>
+                            {(user["https://gatool.org/roles"] && user["https://gatool.org/roles"].indexOf("admin") >= 0) && <td>
                                 Source</td>}
                             <td></td>
                         </tr>
@@ -877,7 +877,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                                 <td>{updateTeam?.updates?.teamNotesLocal}</td>
                                 <td>{updateTeam?.updates?.topSponsorsLocal}</td>
                                 <td><td>{updateTeam?.updates?.sayNumber}</td></td>
-                                {(user["https://gatool.org/roles"].indexOf("admin") >= 0) && <td>
+                                {(user["https://gatool.org/roles"] && user["https://gatool.org/roles"].indexOf("admin") >= 0) && <td>
                                     {updateTeam?.updates?.source}</td>}
                                 <td>Current Value</td>
                             </tr>
@@ -895,7 +895,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                                     <td>{team?.teamNotesLocal}</td>
                                     <td>{team?.sponsorsLocal}</td>
                                     <td>{team?.sayNumber}</td>
-                                    {(user["https://gatool.org/roles"].indexOf("admin") >= 0) && <td>
+                                    {(user["https://gatool.org/roles"] && user["https://gatool.org/roles"].indexOf("admin") >= 0) && <td>
                                         {team?.source}</td>}
                                     <td><Button onClick={() => { handleRestoreData({ "team": updateTeam, "update": team }) }}>Restore</Button></td>
                                 </tr>

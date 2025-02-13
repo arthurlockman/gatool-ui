@@ -189,7 +189,7 @@ function Developer({ putNotifications, getNotifications }) {
 
     return (
         <Container>
-            {(user["https://gatool.org/roles"].indexOf("admin") >= 0) ?
+            {(user["https://gatool.org/roles"] && user["https://gatool.org/roles"].indexOf("admin") >= 0) ?
                 <>
                     <div><Form.Control as="textarea" rows={3} value={token ? token : ""} readOnly />
                         <Button onClick={() => {
