@@ -80,6 +80,38 @@ class AuthClient {
         throw new Error(errorText);
     }
 
+    async post(path, body) {
+        if (!this.online) {
+            throw new Error('You are offline.')
+        }
+
+        this.operationStart();
+        var token = await this.getToken();
+        var response = await fetch(`${apiBaseUrl}${path}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            method: 'POST',
+            body: body == null ? null : JSON.stringify(body)
+        }).finally(() => {
+            this.operationDone();
+        });
+        if (response.ok) return response;
+        var errorText = `Received a ${response.status} error from backend: "${response.statusText}"`;
+        if (response.status === 400) {
+            errorText += " This is an error with the FIRST APIs, not one caused by gatool. These usually clear in a few minutes, so please try again soon."
+        }
+        if (response.status === 401) {
+            errorText += " Your session may have expired. Please log out and log in again."
+        }
+        if (response.status === 500) {
+            errorText += " Something happened in the backend that we don't understand. We have logged the request and will investigate soon."
+        }
+        toast.error(errorText);
+        throw new Error(errorText);
+    }
+
     setOnlineStatus(online) {
         this.online = online
     }
