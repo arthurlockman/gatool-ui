@@ -6,7 +6,7 @@ import moment from "moment";
 import _ from "lodash";
 import NotificationBanner from "components/NotificationBanner";
 
-function Developer({putNotifications, getNotifications, forceUserSync}) {
+function Developer({putNotifications, getNotifications, forceUserSync, getSyncStatus}) {
     const {user, getAccessTokenSilently} = useAuth0();
 
     const [token, setToken] = useState(null);
@@ -30,6 +30,8 @@ function Developer({putNotifications, getNotifications, forceUserSync}) {
         "link": ""
     });
 
+    const [lastSyncData, setLastSyncData] = useState({});
+
     useEffect(() => {
         async function getToken() {
             const tokenResponse = await getAccessTokenSilently({
@@ -52,6 +54,14 @@ function Developer({putNotifications, getNotifications, forceUserSync}) {
             "link": formValue?.link
         });
     }, [formValue])
+
+    useEffect(() => {
+        async function f() {
+            const status = await getSyncStatus()
+            setLastSyncData(status)
+        }
+        f()
+    }, [user])
 
     /**
      * This function clicks the hidden file upload button
@@ -210,6 +220,12 @@ function Developer({putNotifications, getNotifications, forceUserSync}) {
                     <Tab eventKey="users" title="User Management">
                         <Container>
                             <Button onClick={forceUserSync} type="button" variant="primary">Sync users with Mailchimp</Button>
+                            <div>
+                                <h3>Last Sync time: {lastSyncData && lastSyncData.timestamp}</h3>
+                                <p>Full users: {lastSyncData && lastSyncData.fullUsers}</p>
+                                <p>Read only users: {lastSyncData && lastSyncData.readOnlyUsers}</p>
+                                <p>Deleted users: {lastSyncData && lastSyncData.deletedUsers}</p>
+                            </div>
                             <br/>
                             <div><input type="file" id="userUpload" onChange={handleUserUpload}
                                         className={"hiddenInput"}/>
