@@ -20,6 +20,7 @@
     "react-bootstrap-icons": "^1.10.3",
     "react-device-detect": "^2.2.3",
     "react-dom": "^18.2.0",
+    "react-drag-drop-files": "^2.4.0",
     "react-hotkeys-hook": "^4.4.1",
     "react-interval-hook": "^1.1.4",
     "react-loader-spinner": "^5.4.5",

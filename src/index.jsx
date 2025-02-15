@@ -26,6 +26,7 @@ root.render(
           redirectUri={window.location.origin}
           useRefreshTokens={true}
           cacheLocation='localstorage'
+          connection='email'
         >
           <AuthClientContextProvider>
             <SnackbarProvider>
