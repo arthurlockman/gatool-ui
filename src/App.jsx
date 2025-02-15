@@ -1358,7 +1358,7 @@ function App() {
     }
   }
 
-  async function getSyncStatus() {
+  const getSyncStatus = async () => {
     const result = await httpClient.get(`system/admin/syncUsers`);
     const syncResult = await result.json();
     if (result.status === 200) {

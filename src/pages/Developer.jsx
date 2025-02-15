@@ -56,12 +56,11 @@ function Developer({putNotifications, getNotifications, forceUserSync, getSyncSt
     }, [formValue])
 
     useEffect(() => {
-        async function f() {
-            const status = await getSyncStatus()
+        getSyncStatus().then(status => {
             setLastSyncData(status)
-        }
-        f()
-    }, [user])
+        })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     /**
      * This function clicks the hidden file upload button
