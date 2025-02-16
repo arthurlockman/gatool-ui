@@ -220,7 +220,7 @@ function Developer({putNotifications, getNotifications, forceUserSync, getSyncSt
                         <Container>
                             <Button onClick={forceUserSync} type="button" variant="primary">Sync users with Mailchimp</Button>
                             <div>
-                                <h3>Last Sync time: {lastSyncData && lastSyncData.timestamp}</h3>
+                                <h3>Last Sync time: {lastSyncData && moment(lastSyncData.timestamp).format("ddd, MMM Do YYYY, h:mm:ss a")}</h3>
                                 <p>Full users: {lastSyncData && lastSyncData.fullUsers}</p>
                                 <p>Read only users: {lastSyncData && lastSyncData.readOnlyUsers}</p>
                                 <p>Deleted users: {lastSyncData && lastSyncData.deletedUsers}</p>
