@@ -254,6 +254,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
     if (selectedEvent && rankings && teamList && allianceCount?.count > 0 && communityUpdates) {
         sortedTeams = sortedTeams.map((team) => {
             team = _.merge(team, teamList?.teams[_.findIndex(teamList?.teams, { "teamNumber": team?.teamNumber })]);
+            team.updates=communityUpdates[_.findIndex(communityUpdates, { "teamNumber": team?.teamNumber })]?.updates || team?.updates || {}
             var years = 1 + Number(selectedYear?.value) - Number(team?.rookieYear);
             if (typeof team?.updates?.teamYearsNoCompeteLocal !== "undefined") { years -= team?.updates?.teamYearsNoCompeteLocal };
             var yearsDisplay = "th";
@@ -587,7 +588,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                         <Modal.Title >{allianceMode === "decline" ? "Team declines the offer" : allianceMode === "skip" ? "Skip Alliance" : allianceMode === "accept" ? "Are you sure they want to accept?" : allianceMode === "a1captain" ? "Top Seeded Alliance" : "Alliance Choice"}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        {(allianceMode === "show" || allianceMode === "a1captain") && <span className={"allianceAnnounceDialog"}>Team {allianceTeam?.teamNumber} {allianceTeam?.updates?.nameShortLocal ? allianceTeam?.updates.nameShortLocal : allianceTeam?.nameShort}<br />
+                        {(allianceMode === "show" || allianceMode === "a1captain" || allianceMode === "captain") && <span className={"allianceAnnounceDialog"}>Team {allianceTeam?.teamNumber} {allianceTeam?.updates?.nameShortLocal ? allianceTeam?.updates.nameShortLocal : allianceTeam?.nameShort}<br />
                             is {allianceTeam?.updates?.awardsTextLocal ? allianceTeam?.updates?.awardsTextLocal : <>{(OriginalAndSustaining.indexOf(String(allianceTeam?.teamNumber)) >= 0) ? "an Original and Sustaining Team " : ""}from<br />
                                 {allianceTeam?.updates?.organizationLocal ? allianceTeam?.updates?.organizationLocal : allianceTeam?.organization}<br />
                                 in</>} {allianceTeam?.updates?.cityStateLocal ? allianceTeam?.updates?.cityStateLocal : `${allianceTeam?.city}, ${allianceTeam?.stateProv}`}{allianceTeam?.country !== "USA" ? `, ${allianceTeam?.country}` : ""}<br /></span>}
@@ -598,8 +599,8 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                         {allianceMode === "declined" && <span className={"allianceAnnounceDialog"}>Team {allianceTeam?.teamNumber} {allianceTeam?.updates?.nameShortLocal ? allianceTeam?.updates?.nameShortLocal : allianceTeam?.nameShort}<br />
                             has previously declined an offer. They are inelegible to be selected by another alliance.</span>}
                         {allianceMode === "a1captain" && <span className={"allianceAnnounceDialog"}><br />Team {allianceTeam?.teamNumber} is our top seeded Alliance. They are inelegible to be selected by another alliance.</span>}
-                        {allianceMode === "captain" && <span className={"allianceAnnounceDialog"}>Team {allianceTeam?.teamNumber} {allianceTeam?.updates?.nameShortLocal ? allianceTeam?.updates?.nameShortLocal : allianceTeam?.nameShort}<br />
-                            is an Alliance Captain. They are inelegible to be selected by another alliance.</span>}
+                        {/* {allianceMode === "captain" && <span className={"allianceAnnounceDialog"}>Team {allianceTeam?.teamNumber} {allianceTeam?.updates?.nameShortLocal ? allianceTeam?.updates?.nameShortLocal : allianceTeam?.nameShort}<br />
+                            is an Alliance Captain. They are inelegible to be selected by another alliance.</span>} */}
                         {allianceMode === "skip" && <span className={"allianceAnnounceDialog"}>Team {allianceTeam?.teamNumber} {allianceTeam?.updates?.nameShortLocal ? allianceTeam?.updates?.nameShortLocal : allianceTeam?.nameShort}<br />
                             has missed their time window for selecting an Alliance partner.</span>}
 
