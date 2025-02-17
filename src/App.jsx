@@ -1328,6 +1328,14 @@ function App() {
   }
 
   /**
+   * This function forces a user sync with mailchimp. This wil take a long time.
+   * @returns {Promise<{ok}|void|undefined>}
+   */
+  async function forceUserSync() {
+    return await httpClient.post(`system/syncUsers`);
+  }
+
+  /**
    * This function fetches systemwide notifications from gatool Cloud.
    * @async
    * @function getNotifications
@@ -1348,7 +1356,14 @@ function App() {
         "variant": "danger"
       }
     }
+  }
 
+  const getSyncStatus = async () => {
+    const result = await httpClient.get(`system/admin/syncUsers`);
+    const syncResult = await result.json();
+    if (result.status === 200) {
+      return syncResult;
+    }
   }
 
   const getSystemMessages = async () => {
@@ -1813,7 +1828,7 @@ function App() {
               <Route path='/cheatsheet' element={<CheatsheetPage teamList={teamList} communityUpdates={communityUpdates} selectedEvent={selectedEvent} selectedYear={selectedYear} robotImages={robotImages} eventLabel={eventLabel} />} />
 
               <Route path='/emcee' element={<EmceePage selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} qualSchedule={qualSchedule} alliances={alliances} currentMatch={currentMatch} nextMatch={nextMatch} previousMatch={previousMatch} reverseEmcee={reverseEmcee} timeFormat={timeFormat} practiceSchedule={practiceSchedule} offlinePlayoffSchedule={offlinePlayoffSchedule} hidePracticeSchedule={hidePracticeSchedule} getSchedule={getSchedule} usePullDownToUpdate={usePullDownToUpdate} useSwipe={useSwipe} eventLabel={eventLabel} playoffCountOverride={playoffCountOverride} />} />
-              <Route path='/dev' element={<Developer putNotifications={putNotifications} getNotifications={getNotifications} />} />
+              <Route path='/dev' element={<Developer putNotifications={putNotifications} getNotifications={getNotifications} forceUserSync={forceUserSync} getSyncStatus={getSyncStatus} />} />
             </Route>
           </Routes>
         </BrowserRouter> : <AnonymousUserPage />}

@@ -1,13 +1,13 @@
-import { useAuth0 } from "@auth0/auth0-react";
-import { useEffect, useState } from "react";
-import { utils, read } from "xlsx";
-import { Alert, Button, Container, Form, InputGroup, Row } from "react-bootstrap";
+import {useAuth0} from "@auth0/auth0-react";
+import {useEffect, useState} from "react";
+import {read, utils} from "xlsx";
+import {Alert, Button, Container, Form, InputGroup, Row, Tab, Tabs} from "react-bootstrap";
 import moment from "moment";
 import _ from "lodash";
 import NotificationBanner from "components/NotificationBanner";
 
-function Developer({ putNotifications, getNotifications }) {
-    const { user, getAccessTokenSilently } = useAuth0();
+function Developer({putNotifications, getNotifications, forceUserSync, getSyncStatus}) {
+    const {user, getAccessTokenSilently} = useAuth0();
 
     const [token, setToken] = useState(null);
     const [formattedUsers, setFormattedUsers] = useState(null);
@@ -30,15 +30,18 @@ function Developer({ putNotifications, getNotifications }) {
         "link": ""
     });
 
+    const [lastSyncData, setLastSyncData] = useState({});
+
     useEffect(() => {
         async function getToken() {
-            var tokenResponse = await getAccessTokenSilently({
+            const tokenResponse = await getAccessTokenSilently({
                 audience: 'https://gatool.auth0.com/userinfo',
                 scope: 'openid email profile',
                 detailedResponse: true
             });
             setToken(tokenResponse.id_token)
         }
+
         getToken()
     }, [getAccessTokenSilently, user])
 
@@ -52,23 +55,30 @@ function Developer({ putNotifications, getNotifications }) {
         });
     }, [formValue])
 
+    useEffect(() => {
+        getSyncStatus().then(status => {
+            setLastSyncData(status)
+        })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
     /**
      * This function clicks the hidden file upload button
      * @function  clickLoadUsers
-    */
+     */
     function clickLoadUsers() {
         document.getElementById("userUpload").click();
     }
 
-    /** 
+    /**
      * This function clears the file input by removing and recreating the file input button
      *
      * @function clearFileInput
      * @param {string} id - The ID to delete and recreate
-    */
+     */
     function clearFileInput(id) {
-        var oldInput = document.getElementById(id);
-        var newInput = document.createElement("input");
+        const oldInput = document.getElementById(id);
+        const newInput = document.createElement("input");
         newInput.type = "file";
         newInput.id = oldInput.id;
         // @ts-ignore
@@ -78,31 +88,35 @@ function Developer({ putNotifications, getNotifications }) {
         oldInput.parentNode.replaceChild(newInput, oldInput)
     }
 
-    /** 
+    /**
      * This function receives a file from the upload button and parses the user list from the CSV.
      * It then returns Auth0 formatted JSON, which is displays to the user in a Text Area on screen.
      * It also destroys and recreates the button, and then re-attaches the proper event listener.
      *
      * @function handleUserUpload
      * @param {*} e - The file upload event, which contains a pointer to the file.
-    */
+     */
     function handleUserUpload(e) {
-        var files = e.target.files;
-        var f = files[0];
-        var reader = new FileReader();
+        let files = e.target.files;
+        let f = files[0];
+        let reader = new FileReader();
         reader.onload = function (e) {
             //@ts-ignore
-            var data = new Uint8Array(e.target.result);
-            var workbook;
+            const data = new Uint8Array(e.target.result);
+            let workbook;
             try {
-                workbook = read(data, { type: 'array' });
-                var worksheet = workbook.Sheets[workbook.SheetNames[0]];
-                var users = utils.sheet_to_json(worksheet);
-                var auth0Users = [];
+                workbook = read(data, {type: 'array'});
+                const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                const users = utils.sheet_to_json(worksheet);
+                let auth0Users = [];
                 try {
                     if (users.length > 0) {
                         auth0Users = users.map((user => {
-                            return { "user_id": user["Email Address"].toLowerCase(), "email": user["Email Address"], "email_verified": false }
+                            return {
+                                "user_id": user["Email Address"].toLowerCase(),
+                                "email": user["Email Address"],
+                                "email_verified": false
+                            }
                         }))
                         setFormattedUsers(JSON.stringify(auth0Users));
                         setLoadedUsers("success");
@@ -111,8 +125,7 @@ function Developer({ putNotifications, getNotifications }) {
                         setLoadedUsers("danger");
                     }
 
-                }
-                catch (err) {
+                } catch (err) {
                     setFormattedUsers(err.message)
                     setLoadedUsers("danger");
                 }
@@ -127,15 +140,15 @@ function Developer({ putNotifications, getNotifications }) {
         reader.readAsArrayBuffer(f);
     }
 
-    /** 
+    /**
      * This function creates a downloadable file from an object
      * @function downloadObjectAsJson
      * @param {string} exportName - The name of the file
      * @param {Object} exportObj - The object you want to include in the file
-    */
+     */
     function downloadObjectAsJson(exportObj, exportName) {
-        var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj));
-        var downloadAnchorNode = document.createElement('a');
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj));
+        const downloadAnchorNode = document.createElement('a');
         downloadAnchorNode.setAttribute("href", dataStr);
         downloadAnchorNode.setAttribute("download", exportName + ".json");
         document.body.appendChild(downloadAnchorNode); // required for firefox
@@ -143,14 +156,14 @@ function Developer({ putNotifications, getNotifications }) {
         downloadAnchorNode.remove();
     }
 
-    /** 
+    /**
      * This function handles setting parts of the form value
      * @function handleFormValue
      * @param {string} key - The property you want to set
      * @param {string} value - The value of the property you want to set
-    */
+     */
     const handleFormValue = (key, value) => {
-        var tempFormValue = _.cloneDeep(formValue);
+        const tempFormValue = _.cloneDeep(formValue);
         tempFormValue[key] = value;
         setFormValue(tempFormValue);
     }
@@ -166,7 +179,7 @@ function Developer({ putNotifications, getNotifications }) {
             "variant": formValue.variant,
             "link": formValue.link
         }
-        var result = await putNotifications(submission);
+        const result = await putNotifications(submission);
         if (result.status === 200) {
             console.log("message set.");
         } else {
@@ -175,7 +188,7 @@ function Developer({ putNotifications, getNotifications }) {
     }
 
     const handleGetMessage = async () => {
-        var message = await getNotifications();
+        const message = await getNotifications();
         console.log(message);
         setFormValue(message);
         setFormattedMessage({
@@ -188,80 +201,122 @@ function Developer({ putNotifications, getNotifications }) {
     }
 
     return (
-        <Container>
-            {(user["https://gatool.org/roles"] && user["https://gatool.org/roles"].indexOf("admin") >= 0) ?
-                <>
-                    <div><Form.Control as="textarea" rows={3} value={token ? token : ""} readOnly />
-                        <Button onClick={() => {
-                            navigator.clipboard.writeText(token)
-                        }} >Copy token to Clipboard</Button></div>
-                    <div><input type="file" id="userUpload" onChange={handleUserUpload} className={"hiddenInput"} /></div>
+        <>
+            <br/>
+            {(user["https://gatool.org/roles"].indexOf("admin") >= 0) ?
+                <Tabs
+                    defaultActiveKey="tools"
+                    id="dev-tools-tabs"
+                    className="mb-3"
+                >
+                    <Tab eventKey="tools" title="Dev Tools">
+                        <Container><Form.Control as="textarea" rows={3} value={token ? token : ""} readOnly/>
+                            <Button onClick={() => {
+                                navigator.clipboard.writeText(token)
+                            }}>Copy token to Clipboard</Button>
+                        </Container>
+                    </Tab>
+                    <Tab eventKey="users" title="User Management">
+                        <Container>
+                            <Button onClick={forceUserSync} type="button" variant="primary">Sync users with Mailchimp</Button>
+                            <div>
+                                <h3>Last Sync time: {lastSyncData && moment(lastSyncData.timestamp).format("ddd, MMM Do YYYY, h:mm:ss a")}</h3>
+                                <p>Full users: {lastSyncData && lastSyncData.fullUsers}</p>
+                                <p>Read only users: {lastSyncData && lastSyncData.readOnlyUsers}</p>
+                                <p>Deleted users: {lastSyncData && lastSyncData.deletedUsers}</p>
+                            </div>
+                            <br/>
+                            <div><input type="file" id="userUpload" onChange={handleUserUpload}
+                                        className={"hiddenInput"}/>
+                            </div>
 
-                    <Button style={{ cursor: "pointer" }} onClick={clickLoadUsers}><img style={{ float: "left" }} width="50" src="images/excelicon.png" alt="Excel Logo" />{loadedUsers ? <>Load new user list</> : <>Load user list from Mailchimp</>}</Button>
-                    <div>
-                        <Form.Control as="textarea" rows={3} value={formattedUsers ? formattedUsers : ""} readOnly />
-                        {loadedUsers && <Button variant={loadedUsers ? loadedUsers : "primary"} onClick={() => {
-                            if (loadedUsers !== "danger") {
-                                navigator.clipboard.writeText(formattedUsers);
-                                downloadObjectAsJson(JSON.parse(formattedUsers), "Auth0JSON" + moment().format('MMDDYYYY_HHmmss'));
-                                setLoadedUsers("info");
-                            }
-                        }} >{loadedUsers === "info" ? <>Users have been downloaded</> : loadedUsers === "danger" ? <>Error in file</> : <>Download users to JSON file</>}</Button>}
-                    </div>
-                    <Form>
-                        <NotificationBanner notification={formattedMessage}></NotificationBanner>
-                        <Form.Group className="mb-3" controlId="systemNotification">
-                            <Form.Label>Notification</Form.Label>
-                            <Form.Control as="textarea" rows={3} value={formValue.message} placeholder="Enter message" onChange={(e) => handleFormValue("message", e.target.value)} />
-                        </Form.Group>
-                        <Form.Group className="mb-3" controlId="notificationLink">
-                            <Form.Label>Link for Notfication</Form.Label>
-                            <Form.Control type="text" value={formValue.link} placeholder="Enter URL" onChange={(e) => handleFormValue("link", e.target.value)} />
-                        </Form.Group>
-                        <Form.Group controlId="variant">
-                            <Form.Label>Variant</Form.Label>
-                            <Form.Select value={formValue.variant} onChange={(e) => handleFormValue("variant", e.target.value)}>
-                                <option value={"info"}>Info</option>
-                                <option value={"success"}>All OK</option>
-                                <option value={"warning"}>Warning</option>
-                                <option value={"danger"}>Urgent</option>
-                            </Form.Select>
-                        </Form.Group>
+                            <Button style={{cursor: "pointer"}} onClick={clickLoadUsers}><img style={{float: "left"}}
+                                                                                              width="50"
+                                                                                              src="images/excelicon.png"
+                                                                                              alt="Excel Logo"/>{loadedUsers ? <>Load
+                                new user list</> : <>Load user list from Mailchimp</>}</Button>
+                            <div>
+                                <Form.Control as="textarea" rows={3} value={formattedUsers ? formattedUsers : ""}
+                                              readOnly/>
+                                {loadedUsers && <Button variant={loadedUsers ? loadedUsers : "primary"} onClick={() => {
+                                    if (loadedUsers !== "danger") {
+                                        navigator.clipboard.writeText(formattedUsers);
+                                        downloadObjectAsJson(JSON.parse(formattedUsers), "Auth0JSON" + moment().format('MMDDYYYY_HHmmss'));
+                                        setLoadedUsers("info");
+                                    }
+                                }}>{loadedUsers === "info" ? <>Users have been
+                                    downloaded</> : loadedUsers === "danger" ? <>Error in file</> : <>Download users to
+                                    JSON
+                                    file</>}</Button>}
+                            </div>
+                        </Container>
+                    </Tab>
+                    <Tab eventKey="notifications" title="Notifications">
+                        <Container>
+                            <Form>
+                                <NotificationBanner notification={formattedMessage}></NotificationBanner>
+                                <Form.Group className="mb-3" controlId="systemNotification">
+                                    <Form.Label>Notification</Form.Label>
+                                    <Form.Control as="textarea" rows={3} value={formValue.message}
+                                                  placeholder="Enter message"
+                                                  onChange={(e) => handleFormValue("message", e.target.value)}/>
+                                </Form.Group>
+                                <Form.Group className="mb-3" controlId="notificationLink">
+                                    <Form.Label>Link for Notfication</Form.Label>
+                                    <Form.Control type="text" value={formValue.link} placeholder="Enter URL"
+                                                  onChange={(e) => handleFormValue("link", e.target.value)}/>
+                                </Form.Group>
+                                <Form.Group controlId="variant">
+                                    <Form.Label>Variant</Form.Label>
+                                    <Form.Select value={formValue.variant}
+                                                 onChange={(e) => handleFormValue("variant", e.target.value)}>
+                                        <option value={"info"}>Info</option>
+                                        <option value={"success"}>All OK</option>
+                                        <option value={"warning"}>Warning</option>
+                                        <option value={"danger"}>Urgent</option>
+                                    </Form.Select>
+                                </Form.Group>
 
 
-                        <InputGroup>
-                            <Form.Group className="mb-3" controlId="onDate">
-                                <Form.Label>On Date</Form.Label>
-                                <Form.Control type="date" value={formValue.onDate} onChange={(e) => handleFormValue("onDate", e.target.value)} />
-                            </Form.Group>
-                            <Form.Group className="mb-3" controlId="onTime">
-                                <Form.Label>On Time</Form.Label>
-                                <Form.Control type="time" value={formValue.onTime} onChange={(e) => handleFormValue("onTime", e.target.value)} />
-                            </Form.Group>
-                        </InputGroup>
+                                <InputGroup>
+                                    <Form.Group className="mb-3" controlId="onDate">
+                                        <Form.Label>On Date</Form.Label>
+                                        <Form.Control type="date" value={formValue.onDate}
+                                                      onChange={(e) => handleFormValue("onDate", e.target.value)}/>
+                                    </Form.Group>
+                                    <Form.Group className="mb-3" controlId="onTime">
+                                        <Form.Label>On Time</Form.Label>
+                                        <Form.Control type="time" value={formValue.onTime}
+                                                      onChange={(e) => handleFormValue("onTime", e.target.value)}/>
+                                    </Form.Group>
+                                </InputGroup>
 
-                        <InputGroup>
-                            <Form.Group className="mb-3" controlId="offDate">
-                                <Form.Label>Off Date</Form.Label>
-                                <Form.Control type="date" placeholder="" value={formValue.offDate} onChange={(e) => handleFormValue("offDate", e.target.value)} />
-                            </Form.Group>
-                            <Form.Group className="mb-3" controlId="offTime">
-                                <Form.Label>Off Time</Form.Label>
-                                <Form.Control type="time" placeholder="" value={formValue.offTime} onChange={(e) => handleFormValue("offTime", e.target.value)} />
-                            </Form.Group>
-                        </InputGroup>
+                                <InputGroup>
+                                    <Form.Group className="mb-3" controlId="offDate">
+                                        <Form.Label>Off Date</Form.Label>
+                                        <Form.Control type="date" placeholder="" value={formValue.offDate}
+                                                      onChange={(e) => handleFormValue("offDate", e.target.value)}/>
+                                    </Form.Group>
+                                    <Form.Group className="mb-3" controlId="offTime">
+                                        <Form.Label>Off Time</Form.Label>
+                                        <Form.Control type="time" placeholder="" value={formValue.offTime}
+                                                      onChange={(e) => handleFormValue("offTime", e.target.value)}/>
+                                    </Form.Group>
+                                </InputGroup>
 
-                        <Button variant="secondary" onClick={handleGetMessage}>
-                            Get Message
-                        </Button>
-                        <Button variant="primary" onClick={handleMessage}>
-                            Submit
-                        </Button>
-                        <Row><br /><br /></Row>
-                    </Form>
-                </> : <Alert variant={"warning"}>You're not authorized to use this page.</Alert>}
+                                <Button variant="secondary" onClick={handleGetMessage}>
+                                    Get Message
+                                </Button>
+                                <Button variant="primary" onClick={handleMessage}>
+                                    Submit
+                                </Button>
+                                <Row><br/><br/></Row>
+                            </Form>
+                        </Container>
+                    </Tab>
+                </Tabs> : <Alert variant={"warning"}>You're not authorized to use this page.</Alert>}
 
-        </Container>
+        </>
     )
 }
 
