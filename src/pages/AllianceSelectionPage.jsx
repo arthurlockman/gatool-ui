@@ -63,10 +63,10 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
             {selectedEvent && (qualSchedule?.schedule?.length > 0 || practiceSchedule?.schedule?.length > 0) && !playoffs &&
                 <div>
                     <h5><b>{eventLabel}</b><br />(Rankings last updated: {ranksLastUpdateDisplay})</h5>
-                    <p>Before the selection begins and to help introduce the Alliance Captains with the MC, tap the Alliance Captains to see their team name, school/orgainzaiton, and home town.</p>
-                    <p><b>IMPORTANT: Tap <i>Alliance Captain Announce</i> to dismiss the dialog and continue announcing the Captains.</b></p>
+                    <p>When the selection begins and the emcee introduces each Alliance Captain, tap the Alliance Captain's number to see their team name, school/organization, and home town.</p>
+                    <p><b>IMPORTANT: Tap <i>Alliance Captain Announce</i> or the X in the upper right hand corner to dismiss the dialog and continue announcing the Captains.</b></p>
                     <p>When it's time for Alliance Selection, simply tap a team when their number is called. If they accept, tap <b>Gratefully Accept.</b> If they decline, tap <b>Respectfully Decline.</b></p>
-                    <p>If an Alliance Captain misses their time window to select a partner, tap the Captain's number and choose <b>Skip Alliance.</b> Skipped Alliances will have a chance to choose a partner after the next Alliance's choice or after the next Alliance is skipped. If an Alliance misses their time window during their second chance, they receive the next highest ranked team from the pool of remaining teams in the selection process.</p>
+                    <p>If an Alliance Captain misses their time window to select a partner, tap the Captain's number and choose <b>Skip Alliance.</b> Skipped Alliances will have a chance to choose a partner after the next Alliance's choice or after the next Alliance is skipped. If an Alliance misses their time window during their second chance, they will go back to the skipped pool until the end of the round, when they may receive the next highest ranked team from the pool of remaining teams in the selection process.</p>
                     {!allianceSelection &&
                         <Alert variant="danger" ><div onClick={updateRanks}><b>Do not proceed with Alliance Selection until you confirm that the rank order below agrees with the rank order in FMS. Check the Alliance leaders and the teams in the Backup Teams box. Tap this alert to see if we can get a more current schedule and rankings.</b></div>
                             <Container fluid>
@@ -85,7 +85,7 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
                         <Alert variant="success" >
                             <div onClick={loadEvent}><b>We believe your event is ready for Alliance Selection, but you must confirm that the rank order below agrees with the rank order in FMS before proceeding with Alliance Selection. If you see a discrepancy, take these steps:
                                 <div>Tap the RESTART ALLIANCE SELECTION button below to reset using current data</div>
-                                <div>Tap this alert to see if we can get a more current rankings. <i>This will reload your event.</i></div>
+                                <div>Tap this alert to see if we can get a more current rankings. <i>This will reload your event and may take a minute or two.</i></div>
                             </b><br />
                                 We last had a ranking update at {moment(rankings?.lastModified).format("ddd, MMM Do YYYY, " + timeFormat.value)}
                             </div>

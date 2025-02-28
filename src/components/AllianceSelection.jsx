@@ -118,7 +118,14 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
             asArrays.rankedTeams.splice(_.findIndex(asArrays.rankedTeams, { "teamNumber": team.teamNumber }), 1);
 
             // Add the team to the alliance
-            asArrays.alliances[_.findIndex(asArrays.alliances, { "number": asArrays.allianceSelectionOrder[asArrays.nextChoice].number })][`round${round}`] = team;
+            const choosingAlliance = asArrays.alliances[_.findIndex(asArrays.alliances, { "number": asArrays.allianceSelectionOrder[asArrays.nextChoice].number })];
+            choosingAlliance[`round${round}`] = team;
+
+            // remove the captain from the skipped teams list
+            const teamSkipped = _.findIndex(asArrays.skipped,{teamNumber: choosingAlliance.captain.teamNumber});
+            if (teamSkipped >= 0) {
+                asArrays.skipped.splice(teamSkipped,1);
+            }
 
             // check to see if they are an alliance captain. If so, remove them from their prior alliance and do the promotions from the backup list
             if (asArrays.nextChoice < asArrays.rounds["round1"].length) {
@@ -133,7 +140,6 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
             }
 
             if (asArrays.nextChoice < asArrays.allianceSelectionOrder.length) { asArrays.nextChoice += 1; }
-
 
             setAllianceSelectionArrays(asArrays);
             enableScope("undo");
@@ -175,7 +181,12 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
 
             delete undo.undo;
             asArrays.undo.push(undo);
-            asArrays.skipped.push({ teamNumber: team.teamNumber, round: round });
+            //if team is on the list, move them to the bottom of the list.
+            const teamSkipped = _.findIndex(asArrays.skipped,{teamNumber: team.teamNumber});
+            if (teamSkipped >= 0) {
+                asArrays.skipped.splice(teamSkipped,1);
+            }
+            asArrays.skipped.push({ ...team, round: round });
             //skip the team and rebuild allianceSelectionOrder
             // asArrays.rounds[`round${asArrays.allianceSelectionOrder[asArrays.nextChoice].round}`].push(asArrays.allianceSelectionOrder[asArrays.nextChoice]);
 
@@ -254,7 +265,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
     if (selectedEvent && rankings && teamList && allianceCount?.count > 0 && communityUpdates) {
         sortedTeams = sortedTeams.map((team) => {
             team = _.merge(team, teamList?.teams[_.findIndex(teamList?.teams, { "teamNumber": team?.teamNumber })]);
-            team.updates=communityUpdates[_.findIndex(communityUpdates, { "teamNumber": team?.teamNumber })]?.updates || team?.updates || {}
+            team.updates = communityUpdates[_.findIndex(communityUpdates, { "teamNumber": team?.teamNumber })]?.updates || team?.updates || {}
             var years = 1 + Number(selectedYear?.value) - Number(team?.rookieYear);
             if (typeof team?.updates?.teamYearsNoCompeteLocal !== "undefined") { years -= team?.updates?.teamYearsNoCompeteLocal };
             var yearsDisplay = "th";
@@ -470,6 +481,27 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                 </Col>
                                             </Row>
                                         </Container>
+
+                                        {asArrays?.skipped && asArrays.skipped.length > 0 &&
+                                            <Container fluid className={"skippedAlliancesTable"}>
+                                                <Row>
+                                                    <Col>
+                                                        <p><strong>Skipped Teams</strong><br />(Skipped Alliance Captains will have the opportunity to select a partner after the next successful selection or skip.)</p>
+                                                    </Col>
+                                                </Row>
+                                                <Row>
+                                                    <Col id="skippedTeamsDisplay">
+                                                        {asArrays?.skipped.map((team) => {
+                                                            var declined = asArrays.declined.includes(team.teamNumber);
+                                                            return (
+                                                                <>{(asArrays?.nextChoice < asArrays.allianceSelectionOrder?.length) &&
+                                                                    <div key={"skipButton" + team?.teamNumber} className={declined ? "allianceDecline" : "allianceTeam allianceSkip allianceTeamChoice"} ><b>{team?.teamNumber}</b></div>}
+                                                                </>
+                                                            )
+                                                        })}
+                                                    </Col>
+                                                </Row>
+                                            </Container>}
                                     </Col>
                                     <Col xs={inChamps ? 6 : 5}>
                                         <Row className={"alliancesTeamsTable alliancesTeamsTableHeader"}>{currentRound >= 0 ? `Round ${currentRound} of ${inChamps ? "3" : "2"}` : asArrays?.nextChoice > 0 ? "Alliance Selection Complete" : "Alliance Selection not started"}</Row>
@@ -506,7 +538,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                                 }
                                                                 return (
                                                                     (allianceNumber <= allianceCount?.count) ?
-                                                                        <Col xs={6} className={fullAlliance ? "fullAlliance" : "undullAlliance"}>
+                                                                        <Col xs={6} className={fullAlliance ? "fullAlliance" : "unfullAlliance"}>
                                                                             <Container fluid className={asArrays.allianceSelectionOrder[asArrays?.nextChoice]?.number === allianceNumber ? "alliance dropzone" : "alliance"} key={`AllianceTable${allianceName}`}>
                                                                                 <Row>
                                                                                     <Col xs={12}><b>{allianceName}</b></Col>

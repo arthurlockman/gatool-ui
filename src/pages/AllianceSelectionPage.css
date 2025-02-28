@@ -31,6 +31,12 @@
   background: rgba(192, 252, 188, 1);
 }
 
+.skippedAlliancesTable {
+  margin-top:10px;
+  text-align: center;
+  background: rgb(255, 248, 176);
+}
+
 .alliancesTeamsTable {
   display: flex;
   min-width: 0;
