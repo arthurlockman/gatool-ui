@@ -1,6 +1,11 @@
 
 export const appUpdates = [
     {
+        date: "February 28, 2025",
+        message: <ul>
+            <li>Updating definition of Playoff tiebreaker to include "endGameBargePoints" as the level three tiebreaker</li>
+        </ul>
+    },{
         date: "February 27, 2025",
         message: <ul>
             <li>Redesigned Alliance Selection skipping process</li>
