@@ -580,6 +580,8 @@ function FoulButtons({ currentYear }) {
     scopes: "foulDialog",
   });
 
+  const fullScreen = foul?.code === "LOOKUP"?true:""
+
   return (
     <>
       <ButtonToolbar style={{ alignContent: "center" }}>
@@ -629,7 +631,7 @@ function FoulButtons({ currentYear }) {
           Lookup Foul...
         </Button>
       </ButtonToolbar>
-      <Modal centered={true} show={showFoul} onHide={handleClose} fullscreen={foul.code === "LOOKUP"}>
+      <Modal centered={true} show={showFoul} onHide={handleClose} fullscreen={fullScreen}>
         <ModalHeader
           className={
             foul?.card === "red" ? "btn btn-danger" : "btn btn-warning"
