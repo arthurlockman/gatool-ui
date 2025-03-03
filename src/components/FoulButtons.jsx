@@ -57,7 +57,7 @@ const commonFouls = [
     name: "Don’t expect to gain by doing others harm",
     level: "major",
     card: "yellow",
-    rp:null,
+    rp: null,
     text: (
       <>
         <p>
@@ -77,7 +77,7 @@ const commonFouls = [
     name: "Egregious or exceptional violations",
     level: null,
     card: "yellow",
-    rp:null,
+    rp: null,
     text: (
       <>
         <p>
@@ -100,7 +100,7 @@ const commonFouls = [
     name: "You can’t bring/use anything you want",
     level: null,
     card: "yellow",
-    rp:null,
+    rp: null,
     text: (
       <>
         <p>
@@ -126,7 +126,7 @@ const commonFouls = [
     name: "Start your robots",
     level: null,
     card: "red",
-    rp:null,
+    rp: null,
     text: (
       <>
         <p>
@@ -177,7 +177,7 @@ const commonFouls = [
     name: "Let the ROBOT do its thing",
     level: "minor",
     card: "yellow",
-    rp:null,
+    rp: null,
     text: (
       <>
         <p>
@@ -196,7 +196,7 @@ const commonFouls = [
     name: "1 of each at a time",
     level: "minor",
     card: "yellow",
-    rp:null,
+    rp: null,
     text: (
       <>
         <p>
@@ -228,7 +228,7 @@ const commonFouls = [
     name: "Don’t put ALGAE on their REEF",
     level: "major",
     card: "yellow",
-    rp:null,
+    rp: null,
     text: (
       <>
         <p>A ROBOT may not deliberately put ALGAE on their opponent’s REEF.</p>
@@ -242,7 +242,7 @@ const commonFouls = [
     name: "Expansion limits",
     level: "minor",
     card: null,
-    rp:null,
+    rp: null,
     text: (
       <>
         <p>
@@ -268,7 +268,7 @@ const commonFouls = [
     name: "Don’t damage the FIELD",
     level: "verbal",
     card: "yellow",
-    rp:null,
+    rp: null,
     text: (
       <>
         <p>A ROBOT may not damage FIELD elements.</p>
@@ -290,7 +290,7 @@ const commonFouls = [
     name: "Watch your FIELD interaction",
     level: "major",
     card: "yellow",
-    rp:null,
+    rp: null,
     text: (
       <>
         <p>
@@ -373,7 +373,7 @@ const commonFouls = [
     name: "NET and contents are off-limits",
     level: "major",
     card: null,
-    rp:null,
+    rp: null,
     text: (
       <>
         <p>A ROBOT may not contact either NET or any ALGAE scored in a NET.</p>
@@ -391,7 +391,7 @@ const commonFouls = [
     ),
     level: "minor",
     card: null,
-    rp:null,
+    rp: null,
     text: (
       <>
         <p>
@@ -413,7 +413,7 @@ const commonFouls = [
     ),
     level: "major",
     card: "yellow",
-    rp:null,
+    rp: null,
     text: (
       <>
         <p>
@@ -448,7 +448,7 @@ const commonFouls = [
     name: "Don’t tip or entangle",
     level: "major",
     card: "yellow",
-    rp:null,
+    rp: null,
     text: (
       <>
         <p>
@@ -470,7 +470,7 @@ const commonFouls = [
     name: "COACHES and other teams: hands off the controls",
     level: "major",
     card: "red",
-    rp:null,
+    rp: null,
     text: (
       <>
         <p>
@@ -488,7 +488,7 @@ const commonFouls = [
     name: "Leave promptly",
     level: "verbal",
     card: "red",
-    rp:null,
+    rp: null,
     text: (
       <>
         <p>
@@ -511,7 +511,7 @@ const commonFouls = [
     name: "Get inspected before playing a Qualification/Playoff MATCH",
     level: null,
     card: "red",
-    rp:null,
+    rp: null,
     text: (
       <>
         <p>
@@ -535,7 +535,7 @@ const commonFouls = [
     name: "Freeze, ROBOT",
     level: "verbal",
     card: "yellow",
-    rp:null,
+    rp: null,
     text: (
       <>
         <p>
@@ -580,10 +580,14 @@ function FoulButtons({ currentYear }) {
     scopes: "foulDialog",
   });
 
+  const fullScreen = foul?.code === "LOOKUP" ? true : "";
+
   return (
     <>
-      <ButtonToolbar style={{alignContent:"center"}}>
-        {_.filter(_.sortBy(commonFouls, ["card","code"]), (foul) => {
+      <ButtonToolbar
+        style={{ alignContent: "center", width: "100%", display: "block" }}
+      >
+        {_.filter(_.sortBy(commonFouls, ["card", "code"]), (foul) => {
           return foul.card === "red" || foul.card === "yellow";
         }).map((foul) => {
           return (
@@ -605,13 +609,37 @@ function FoulButtons({ currentYear }) {
         <Button
           className={"foulButtons"}
           onClick={() => {
-            window.open(`https://frctools.com/${currentYear}`);
+            // window.open(`https://frctools.com/${currentYear}`);
+            handleShow({
+              year: currentYear,
+              code: "LOOKUP",
+              name: "Lookup Foul",
+              level: null,
+              card: null,
+              rp: null,
+              text: (
+                <div style={{ height: "calc(100vh - 200px)" }}>
+                  <iframe
+                    width="100%"
+                    height="100%"
+                    src={`https://frctools.com/${currentYear}`}
+                    title="Foul Lookup"
+                  />
+                </div>
+              ),
+              violation: <></>,
+            });
           }}
         >
           Lookup Foul...
         </Button>
       </ButtonToolbar>
-      <Modal centered={true} show={showFoul} onHide={handleClose}>
+      <Modal
+        centered={true}
+        show={showFoul}
+        onHide={handleClose}
+        fullscreen={fullScreen}
+      >
         <ModalHeader
           className={
             foul?.card === "red" ? "btn btn-danger" : "btn btn-warning"
