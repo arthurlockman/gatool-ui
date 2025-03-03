@@ -8,7 +8,7 @@ export const appUpdates = [
           image. The link is now below the image.
         </li>
         <li>
-          Foul Lookup and other URL links now appear in modal dialogs rather than new windows.
+          Foul Lookup and other URL links now appear in modal dialogs rather than new windows. We also centered the foul lookup buttons where they appear.
         </li>
       </ul>
     ),
