@@ -1,6 +1,6 @@
 export const appUpdates = [
   {
-    date: "March 2, 2025",
+    date: "March 3, 2025",
     message: (
       <ul>
         <li>
