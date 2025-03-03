@@ -553,7 +553,7 @@ const commonFouls = [
         during the event or egregious.
       </>
     ),
-  }
+  },
 ];
 
 function FoulButtons({ currentYear }) {
@@ -580,11 +580,13 @@ function FoulButtons({ currentYear }) {
     scopes: "foulDialog",
   });
 
-  const fullScreen = foul?.code === "LOOKUP"?true:""
+  const fullScreen = foul?.code === "LOOKUP" ? true : "";
 
   return (
     <>
-      <ButtonToolbar style={{ alignContent: "center" }}>
+      <ButtonToolbar
+        style={{ alignContent: "center", width: "100%", display: "block" }}
+      >
         {_.filter(_.sortBy(commonFouls, ["card", "code"]), (foul) => {
           return foul.card === "red" || foul.card === "yellow";
         }).map((foul) => {
@@ -617,12 +619,13 @@ function FoulButtons({ currentYear }) {
               rp: null,
               text: (
                 <div style={{ height: "calc(100vh - 200px)" }}>
-                  <iframe width="100%"
-                        height="100%"
-                        src={`https://frctools.com/${currentYear}`} 
-                        title="Foul Lookup"/>
+                  <iframe
+                    width="100%"
+                    height="100%"
+                    src={`https://frctools.com/${currentYear}`}
+                    title="Foul Lookup"
+                  />
                 </div>
-                
               ),
               violation: <></>,
             });
@@ -631,7 +634,12 @@ function FoulButtons({ currentYear }) {
           Lookup Foul...
         </Button>
       </ButtonToolbar>
-      <Modal centered={true} show={showFoul} onHide={handleClose} fullscreen={fullScreen}>
+      <Modal
+        centered={true}
+        show={showFoul}
+        onHide={handleClose}
+        fullscreen={fullScreen}
+      >
         <ModalHeader
           className={
             foul?.card === "red" ? "btn btn-danger" : "btn btn-warning"
