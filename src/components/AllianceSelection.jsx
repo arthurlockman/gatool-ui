@@ -107,24 +107,26 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
             setShow(true);
         }
         if (mode === "confirm") {
-            const round = asArrays.allianceSelectionOrder[asArrays.nextChoice].round;
+            const round = asArrays.allianceSelectionOrder[asArrays.nextChoice]?.round;
             var undo = _.cloneDeep(asArrays);
             delete undo.undo;
             // Save the prior state
             asArrays.undo.push(undo);
 
             // Remove the selected team from the available and ranked teams
-            asArrays.availableTeams.splice(_.findIndex(asArrays.availableTeams, { "teamNumber": team.teamNumber }), 1);
-            asArrays.rankedTeams.splice(_.findIndex(asArrays.rankedTeams, { "teamNumber": team.teamNumber }), 1);
+            const availableIndex = _.findIndex(asArrays.availableTeams, { "teamNumber": team.teamNumber });
+            if (availableIndex>=0) { asArrays.availableTeams.splice(availableIndex, 1); }
+            const rankedIndex = _.findIndex(asArrays.rankedTeams, { "teamNumber": team.teamNumber });
+            if (rankedIndex>=0) { asArrays.rankedTeams.splice(rankedIndex, 1); }
 
             // Add the team to the alliance
-            const choosingAlliance = asArrays.alliances[_.findIndex(asArrays.alliances, { "number": asArrays.allianceSelectionOrder[asArrays.nextChoice].number })];
-            choosingAlliance[`round${round}`] = team;
+            const choosingAlliance = asArrays.alliances[_.findIndex(asArrays.alliances, { "number": asArrays.allianceSelectionOrder[asArrays.nextChoice]?.number })];
+            if (round) { choosingAlliance[`round${round}`] = team; }
 
             // remove the captain from the skipped teams list
-            const teamSkipped = _.findIndex(asArrays.skipped,{teamNumber: choosingAlliance.captain.teamNumber});
+            const teamSkipped = _.findIndex(asArrays.skipped, { teamNumber: choosingAlliance?.captain?.teamNumber });
             if (teamSkipped >= 0) {
-                asArrays.skipped.splice(teamSkipped,1);
+                asArrays.skipped.splice(teamSkipped, 1);
             }
 
             // check to see if they are an alliance captain. If so, remove them from their prior alliance and do the promotions from the backup list
@@ -139,7 +141,13 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                 }
             }
 
-            if (asArrays.nextChoice < asArrays.allianceSelectionOrder.length) { asArrays.nextChoice += 1; }
+            if (asArrays.nextChoice < asArrays.allianceSelectionOrder.length) {
+                asArrays.nextChoice += 1;
+                const nextCaptain = asArrays.alliances[_.findIndex(asArrays.alliances, { "number": asArrays.allianceSelectionOrder[asArrays.nextChoice]?.number })]?.captain.teamNumber;
+                const captainIndex = _.findIndex(asArrays.availableTeams, { "teamNumber": nextCaptain })
+                if (captainIndex >= 0) { asArrays.availableTeams.splice(captainIndex, 1); }
+
+            }
 
             setAllianceSelectionArrays(asArrays);
             enableScope("undo");
@@ -182,9 +190,9 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
             delete undo.undo;
             asArrays.undo.push(undo);
             //if team is on the list, move them to the bottom of the list.
-            const teamSkipped = _.findIndex(asArrays.skipped,{teamNumber: team.teamNumber});
+            const teamSkipped = _.findIndex(asArrays.skipped, { teamNumber: team.teamNumber });
             if (teamSkipped >= 0) {
-                asArrays.skipped.splice(teamSkipped,1);
+                asArrays.skipped.splice(teamSkipped, 1);
             }
             asArrays.skipped.push({ ...team, round: round });
             //skip the team and rebuild allianceSelectionOrder
@@ -209,7 +217,8 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                 asArrays.allianceSelectionOrder = _.concat(asArrays.allianceSelectionOrder, asArrays.rounds[_round]);
             })
             if (asArrays.nextChoice < asArrays.allianceSelectionOrder.length) { asArrays.nextChoice += 1; }
-            asArrays.availableTeams.splice(_.findIndex(asArrays.availableTeams, { "teamNumber": team.teamNumber }), 1);
+            const availableIndex = _.findIndex(asArrays.availableTeams, { "teamNumber": team.teamNumber });
+            if (availableIndex >= 0) { asArrays.availableTeams.splice(availableIndex, 1); }
             setAllianceSelectionArrays(asArrays);
 
             handleClose();

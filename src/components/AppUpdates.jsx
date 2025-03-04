@@ -1,14 +1,10 @@
 export const appUpdates = [
   {
-    date: "March 3, 2025",
+    date: "March 4, 2025",
     message: (
       <ul>
         <li>
-          Updating Cheat Sheet so that it no longer downloads a PDF when you click the
-          image. The link is now below the image.
-        </li>
-        <li>
-          Foul Lookup and other URL links now appear in modal dialogs rather than new windows. We also centered the foul lookup buttons where they appear.
+          Alliance Captains are now removed from the list of available teams during Alliance Selection.
         </li>
       </ul>
     ),
