@@ -6,6 +6,9 @@ export const appUpdates = [
         <li>
           Alliance Captains are now removed from the list of available teams during Alliance Selection.
         </li>
+        <li>
+          Declined teams who become Alliance Captains can now be skipped.
+        </li>
       </ul>
     ),
   },
