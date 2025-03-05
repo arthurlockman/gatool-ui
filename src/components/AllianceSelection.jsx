@@ -115,9 +115,9 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
 
             // Remove the selected team from the available and ranked teams
             const availableIndex = _.findIndex(asArrays.availableTeams, { "teamNumber": team.teamNumber });
-            if (availableIndex>=0) { asArrays.availableTeams.splice(availableIndex, 1); }
+            if (availableIndex >= 0) { asArrays.availableTeams.splice(availableIndex, 1); }
             const rankedIndex = _.findIndex(asArrays.rankedTeams, { "teamNumber": team.teamNumber });
-            if (rankedIndex>=0) { asArrays.rankedTeams.splice(rankedIndex, 1); }
+            if (rankedIndex >= 0) { asArrays.rankedTeams.splice(rankedIndex, 1); }
 
             // Add the team to the alliance
             const choosingAlliance = asArrays.alliances[_.findIndex(asArrays.alliances, { "number": asArrays.allianceSelectionOrder[asArrays.nextChoice]?.number })];
@@ -531,7 +531,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                                     captain.declined = asArrays?.declined?.includes(captain?.teamNumber);
                                                                     captain.skipped = _.findIndex(_.filter(asArrays?.skipped, { round: currentRound }), { teamNumber: captain?.teamNumber }) >= 0;
                                                                     captain.hasFirstPick = alliance[0]?.round1 ? true : false;
-                                                                    captain.mode = allianceNumber === 1 ? "a1captain" : captain?.declined ? "declined" : captain?.skipped ? "skip" : allianceNumber === asArrays.allianceSelectionOrder[asArrays.nextChoice]?.number ? "captain" : "show"
+                                                                    captain.mode = allianceNumber === 1 ? "a1captain" : allianceNumber === asArrays.allianceSelectionOrder[asArrays.nextChoice]?.number ? "captain" : captain?.declined ? "declined" : captain?.skipped ? "skip" : "show"
                                                                 }
                                                                 var round1 = alliance[0]?.round1;
                                                                 if (round1) {
