@@ -12,9 +12,9 @@ import moment from "moment";
 const paleGreen = "rgba(144, 238, 144, 0.5)"
 
 
-function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, showNotes, showMottoes, showQualsStats, showQualsStatsQuals, swapScreen, timeFormat, eventHighScores, backupTeam, setBackupTeam, nextMatch, previousMatch, setMatchFromMenu, practiceSchedule, offlinePlayoffSchedule, districtRankings, adHocMatch, setAdHocMatch, adHocMode, hidePracticeSchedule, teamReduction, qualsLength, playoffOnly, getSchedule, usePullDownToUpdate, useSwipe, eventLabel, playoffCountOverride }) {
+function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, showNotes, showMottoes, showQualsStats, showQualsStatsQuals, swapScreen, timeFormat, eventHighScores, backupTeam, setBackupTeam, nextMatch, previousMatch, setMatchFromMenu, practiceSchedule, offlinePlayoffSchedule, districtRankings, adHocMatch, setAdHocMatch, adHocMode, hidePracticeSchedule, teamReduction, qualsLength, playoffOnly, getSchedule, usePullDownToUpdate, useSwipe, eventLabel, playoffCountOverride, showInspection }) {
     const matchesToNotify = _.toInteger((teamList?.teams?.length - teamReduction) / 6);
-    const notification = (currentMatch >= (qualsLength - matchesToNotify) && currentMatch <= (qualsLength)) ? { "expiry": moment().add(1, "hour"), "onTime": moment(), "message": "Please remind teams to have their robots reinspected before Playoffs and to send one team rep for Alliance Selection." } : {};
+    const notification = (currentMatch >= (qualsLength - matchesToNotify) && currentMatch <= (qualsLength) && showInspection) ? { "expiry": moment().add(1, "hour"), "onTime": moment(), "message": "Please remind teams to have their robots reinspected before Playoffs and to send their team rep(s) for Alliance Selection." } : {};
 
     var displayOrder = ["Blue1", "Red3", "Blue2", "Red2", "Blue3", "Red1", "Blue4", "Red4"];
     if (swapScreen === true) { displayOrder = ["Red3", "Blue1", "Red2", "Blue2", "Red1", "Blue3", "Red4", "Blue4"] }
