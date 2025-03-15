@@ -397,7 +397,11 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
     }
 
     const showPlayoffMessage = selectedEvent?.value?.code.includes("OFFLINE") && !_.isNull(playoffCountOverride);
-
+    if (typeof practiceSchedule?.schedule?.schedule !== "undefined") {
+        practiceSchedule.schedule = practiceSchedule?.schedule?.schedule;
+      }
+  
+  
     return (
         <Container fluid>
             {!selectedEvent && <div>

@@ -627,7 +627,11 @@ function App() {
       delete practiceschedule.schedule.Schedule;
     }
 
-    if (practiceschedule?.schedule?.length > 0) {
+    if (practiceschedule?.schedule?.length > 0 || practiceschedule?.schedule?.schedule.length > 0) {
+      if (typeof practiceSchedule?.schedule?.schedule !== "undefined") {
+        practiceSchedule.schedule = practiceSchedule?.schedule?.schedule;
+      }
+
       if (practiceFileUploaded) {
         setPracticeFileUploaded(false);
       }
@@ -844,7 +848,7 @@ function App() {
       if (
         lastMatchPlayed === qualschedule?.schedule.length + 1 ||
         lastMatchPlayed ===
-          qualschedule?.schedule.length + playoffschedule?.schedule.length + 2
+        qualschedule?.schedule.length + playoffschedule?.schedule.length + 2
       ) {
         lastMatchPlayed -= 1;
       }
@@ -1914,16 +1918,16 @@ function App() {
           offlinePlayoffSchedule?.schedule?.length > 0 ||
           offlinePlayoffSchedule?.schedule?.schedule?.length > 0) &&
           currentMatch <
-            (practiceSchedule?.schedule?.length ||
-              practiceSchedule?.schedule?.schedule?.length ||
-              0) +
-              (offlinePlayoffSchedule?.schedule?.length ||
-                offlinePlayoffSchedule?.schedule?.schedule?.length ||
-                0))
+          (practiceSchedule?.schedule?.length ||
+            practiceSchedule?.schedule?.schedule?.length ||
+            0) +
+          (offlinePlayoffSchedule?.schedule?.length ||
+            offlinePlayoffSchedule?.schedule?.schedule?.length ||
+            0))
       ) {
         setAdHocMatch(
           practiceSchedule?.schedule[currentMatch]?.teams ||
-            practiceSchedule?.schedule[currentMatch]?.schedule?.teams
+          practiceSchedule?.schedule[currentMatch]?.schedule?.teams
         );
         setCurrentMatch(currentMatch + 1);
         if (!selectedEvent?.value?.code.includes("OFFLINE")) {
@@ -1935,7 +1939,7 @@ function App() {
         currentMatch <
         (qualSchedule?.schedule?.length ||
           qualSchedule?.schedule?.schedule.length) +
-          playoffSchedule?.schedule?.length
+        playoffSchedule?.schedule?.length
       ) {
         setCurrentMatch(currentMatch + 1);
         if (!selectedEvent?.value?.code.includes("OFFLINE")) {
@@ -1957,7 +1961,7 @@ function App() {
         if (practiceSchedule?.schedule?.length > 0) {
           setAdHocMatch(
             practiceSchedule?.schedule[currentMatch - 2]?.teams ||
-              practiceSchedule?.schedule?.schedule?.teams
+            practiceSchedule?.schedule?.schedule?.teams
           );
         }
         setCurrentMatch(currentMatch - 1);
@@ -2240,7 +2244,7 @@ function App() {
       var matchesPerTeam = 0;
       matchesPerTeam = _.toInteger(
         (6 * qualSchedule?.schedule?.length) /
-          (teamList?.teamCountTotal - teamReduction)
+        (teamList?.teamCountTotal - teamReduction)
       );
       // In order to start Alliance Selection, we need the following conditions to be true:
       // All matches must have been completed
@@ -2251,7 +2255,7 @@ function App() {
       if (
         qualSchedule?.schedule?.length === qualSchedule?.completedMatchCount &&
         _.filter(rankings?.ranks, { matchesPlayed: matchesPerTeam }).length ===
-          teamList?.teamCountTotal - teamReduction
+        teamList?.teamCountTotal - teamReduction
       ) {
         asReady = true;
       }
