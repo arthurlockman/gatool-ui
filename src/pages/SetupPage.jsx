@@ -178,7 +178,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                 <Alert variant="danger"><b>Awaiting event list</b></Alert>
             </Row>}
             <Row className="setupPageMenus">
-                <Col sm={4}><b>Choose a year...</b><br /><Select options={supportedYears} value={selectedYear ? selectedYear : supportedYears[0]} onChange={setSelectedYear} isDisabled={!isOnline} />
+                <Col sm={4}><b>Choose a year...</b><br /><Select options={supportedYears} value={selectedYear} onChange={setSelectedYear} isDisabled={!isOnline} />
                 </Col>
                 <Col sm={8}>
                     {eventList && <span><b>...then choose an event.</b><br /><Select options={filterEvents(eventList)} placeholder={eventList?.length > 0 ? "Select an event" : "Loading event list"} value={selectedEvent} onChange={handleEventSelection}

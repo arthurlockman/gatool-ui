@@ -370,10 +370,6 @@ function App() {
   const { waitingWorker, showReload, reloadPage } = useServiceWorker();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
-  if (!selectedYear) {
-    setSelectedYear(supportedYears[0]);
-  }
-
   // Display an alert when there are updates to the app. This allows the user to update the cached code.
   useEffect(() => {
     const reload = () => {
