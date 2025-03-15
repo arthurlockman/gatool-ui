@@ -8,7 +8,7 @@ import Switch from "react-switch";
 import { useState } from "react";
 import { playoffOverrideMenu } from "components/Constants";
 
-function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSchedule, practiceSchedule, setPracticeSchedule, offlinePlayoffSchedule, setOfflinePlayoffSchedule, getTeamList, loadEvent, practiceFileUploaded, setPracticeFileUploaded, setTeamListLoading, getAlliances, playoffOnly, setPlayoffOnly, alliances, champsStyle, setChampsStyle, setQualsLength, playoffCountOverride, setPlayoffCountOverride, eventLabel, setEventLabel, allianceCount }) {
+function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSchedule, practiceSchedule, setPracticeSchedule, offlinePlayoffSchedule, setOfflinePlayoffSchedule, getTeamList, loadEvent, practiceFileUploaded, setPracticeFileUploaded, setTeamListLoading, getAlliances, playoffOnly, setPlayoffOnly, alliances, champsStyle, setChampsStyle, setQualsLength, playoffCountOverride, setPlayoffCountOverride, eventLabel, setEventLabel, allianceCount, hidePracticeSchedule }) {
 
     const [showAdjustAlliances, setShowAdjustAlliances] = useState(false);
     const [formData, setFormData] = useState(null);
@@ -18,15 +18,15 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
         { "bye": 0, "allianceOrder": [{ "match": 1, "station": "red" }], "insertionOrder": [] },
         { "bye": 0, "allianceOrder": [{ "match": 1, "station": "red" }, { "match": 1, "station": "blue" }], "insertionOrder": [] },
 
-        { "bye": 1, "allianceOrder": [{ "match": 3, "station": "red" }, { "match": 2, "station": "red" }, { "match": 2, "station": "blue" }], "insertionOrder": [{"number":0,"description":"Bye Match #1"}] },
+        { "bye": 1, "allianceOrder": [{ "match": 3, "station": "red" }, { "match": 2, "station": "red" }, { "match": 2, "station": "blue" }], "insertionOrder": [{ "number": 0, "description": "Bye Match #1" }] },
 
         { "bye": 0, "allianceOrder": [{ "match": 1, "station": "red" }, { "match": 2, "station": "red" }, { "match": 2, "station": "blue" }, { "match": 1, "station": "blue" }], "insertionOrder": [] },
 
-        { "bye": 3, "allianceOrder": [{ "match": 7, "station": "red" }, { "match": 8, "station": "red" }, { "match": 8, "station": "blue" }, { "match": 2, "station": "red" }, { "match": 2, "station": "blue" }], "insertionOrder": [{"number":0,"description":"Bye Match #1"}, {"number":2,"description":"Bye Match #2"}, {"number":3,"description":"Bye Match #3"}, {"number":4,"description":"Bye Match #4"}, {"number":5,"description":"Bye Match #5"}] },
+        { "bye": 3, "allianceOrder": [{ "match": 7, "station": "red" }, { "match": 8, "station": "red" }, { "match": 8, "station": "blue" }, { "match": 2, "station": "red" }, { "match": 2, "station": "blue" }], "insertionOrder": [{ "number": 0, "description": "Bye Match #1" }, { "number": 2, "description": "Bye Match #2" }, { "number": 3, "description": "Bye Match #3" }, { "number": 4, "description": "Bye Match #4" }, { "number": 5, "description": "Bye Match #5" }] },
 
-        { "bye": 2, "allianceOrder": [{ "match": 7, "station": "red" }, { "match": 8, "station": "red" }, { "match": 4, "station": "red" }, { "match": 2, "station": "red" }, { "match": 2, "station": "blue" }, { "match": 4, "station": "blue" }], "insertionOrder": [{"number":0,"description":"Bye Match #1"}, {"number":2,"description":"Bye Match #2"}, {"number":4,"description": "Bye Match #3"}, {"number":5,"description": "Bye Match #4"}] },
+        { "bye": 2, "allianceOrder": [{ "match": 7, "station": "red" }, { "match": 8, "station": "red" }, { "match": 4, "station": "red" }, { "match": 2, "station": "red" }, { "match": 2, "station": "blue" }, { "match": 4, "station": "blue" }], "insertionOrder": [{ "number": 0, "description": "Bye Match #1" }, { "number": 2, "description": "Bye Match #2" }, { "number": 4, "description": "Bye Match #3" }, { "number": 5, "description": "Bye Match #4" }] },
 
-        { "bye": 1, "allianceOrder": [{ "match": 7, "station": "red" }, { "match": 3, "station": "red" }, { "match": 4, "station": "red" }, { "match": 2, "station": "red" }, { "match": 2, "station": "blue" }, { "match": 4, "station": "blue" }, { "match": 3, "station": "blue" }], "insertionOrder": [{"number":0,"description":"Bye Match #1"}, {"number":4,"description": "Bye Match #2"}, {"number":5,"description": "Match 6 (R2) (#6)"}] },
+        { "bye": 1, "allianceOrder": [{ "match": 7, "station": "red" }, { "match": 3, "station": "red" }, { "match": 4, "station": "red" }, { "match": 2, "station": "red" }, { "match": 2, "station": "blue" }, { "match": 4, "station": "blue" }, { "match": 3, "station": "blue" }], "insertionOrder": [{ "number": 0, "description": "Bye Match #1" }, { "number": 4, "description": "Bye Match #2" }, { "number": 5, "description": "Match 6 (R2) (#6)" }] },
 
         { "bye": 0, "allianceOrder": [{ "match": 1, "station": "red" }, { "match": 3, "station": "red" }, { "match": 4, "station": "red" }, { "match": 2, "station": "red" }, { "match": 2, "station": "blue" }, { "match": 4, "station": "blue" }, { "match": 3, "station": "blue" }, { "match": 1, "station": "blue" }], "insertionOrder": [] }
     ]
@@ -399,9 +399,13 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
     const showPlayoffMessage = selectedEvent?.value?.code.includes("OFFLINE") && !_.isNull(playoffCountOverride);
     if (typeof practiceSchedule?.schedule?.schedule !== "undefined") {
         practiceSchedule.schedule = practiceSchedule?.schedule?.schedule;
-      }
-  
-  
+    }
+    var firstMatch = typeof qualSchedule?.schedule?.schedule !== "undefined" ? qualSchedule?.schedule?.schedule[0] : qualSchedule?.schedule[0]
+    if (moment().isBefore(moment(firstMatch?.startTime).subtract(20, "minutes")))  {
+
+            }
+
+
     return (
         <Container fluid>
             {!selectedEvent && <div>
@@ -518,7 +522,7 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                             </tr>
                         </thead>
                         <tbody>
-                            {practiceSchedule && practiceSchedule?.schedule?.length > 0 && practiceSchedule?.schedule.map((match) => {
+                            {practiceSchedule && !hidePracticeSchedule && practiceSchedule?.schedule?.length > 0 && practiceSchedule?.schedule.map((match) => {
                                 let redStyle = "red";
                                 let blueStyle = "blue";
                                 return (<tr key={"practiceSchedule" + match?.matchNumber} className="centerTable">

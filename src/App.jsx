@@ -2522,6 +2522,7 @@ function App() {
                     setEventLabel={setEventLabel}
                     allianceCount={allianceCount}
                     setPlayoffCountOverride={setPlayoffCountOverride}
+                    hidePracticeSchedule={hidePracticeSchedule}
                   />
                 }
               />
