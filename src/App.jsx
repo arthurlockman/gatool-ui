@@ -160,7 +160,18 @@ var halloffame = _.cloneDeep(hallOfFame);
 const timezones = _.cloneDeep(timeZones);
 
 function App() {
-  const { isAuthenticated, isLoading, user } = useAuth0();
+  const { isAuthenticated, isLoading, user, getAccessTokenSilently, loginWithRedirect} = useAuth0();
+
+  useEffect(() => {
+    const checkLogin = async () => {
+      try {
+        await getAccessTokenSilently();
+      } catch (error) {
+        console.log('Error refreshing access token:', error);
+      }
+    }
+    checkLogin();
+  }, [getAccessTokenSilently, isAuthenticated, loginWithRedirect]);
 
   // eslint-disable-next-line no-unused-vars
   const [httpClient] = UseAuthClient();
