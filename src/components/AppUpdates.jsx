@@ -1,5 +1,17 @@
 export const appUpdates = [
   {
+    date: "March 16, 2025",
+    message: (
+      <ul>
+        <li>
+          Restored Practice Matches to Schedule, Announce and Play by Play pages
+        </li>
+        <li>
+          Added switch to control Inspection/Alliance Selection alert on Setup screen
+        </li>
+      </ul>
+    ),
+  },{
     date: "March 4, 2025",
     message: (
       <ul>
