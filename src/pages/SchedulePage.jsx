@@ -1,5 +1,5 @@
 import Select from "react-select";
-import { Alert, Button, Col, Container, Row, Table, Modal, Form } from "react-bootstrap";
+import { Alert, Button, Col, Container, Row, Table, Modal, Form, Tooltip, OverlayTrigger } from "react-bootstrap";
 import moment from 'moment';
 import { utils, read } from "xlsx";
 import { toast } from "react-toastify";
@@ -401,9 +401,20 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
         practiceSchedule.schedule = practiceSchedule?.schedule?.schedule;
     }
     var firstMatch = typeof qualSchedule?.schedule?.schedule !== "undefined" ? qualSchedule?.schedule?.schedule[0] : qualSchedule?.schedule[0]
-    if (moment().isBefore(moment(firstMatch?.startTime).subtract(20, "minutes")))  {
+    if (moment().isBefore(moment(firstMatch?.startTime).subtract(20, "minutes"))) {
 
-            }
+    }
+    const rankPointDisplay = (rankPoints) => {
+        var pointsDisplay = [];
+        _.forEach(rankPoints, (value, key) => {
+            pointsDisplay.push({ bonus: _.startCase(key.replace("BonusAchieved", "")), earned: value })
+        })
+        return pointsDisplay.map((point) => { return <><OverlayTrigger delay={500} overlay={
+            <Tooltip id={`tooltip-${point.bonus}`}>
+              {point.bonus} {point.earned ? " Achieved" : " Not Achieved"}
+            </Tooltip>
+          }><span className={"rankPoints"}>{point.earned ? point.bonus.slice(0, 1) : " "}</span></OverlayTrigger></> })
+    }
 
 
     return (
@@ -515,7 +526,7 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                                 <th className="col2"><b>Time</b></th>
                                 <th className="col2"><b>Description</b></th>
                                 <th className="col1"><b>Match Number</b></th>
-                                <th className="col1"><b>Score</b></th>
+                                <th className="col1" colSpan={2}><b>Score</b></th>
                                 <th className="col1"><b>Station 1</b></th>
                                 <th className="col1"><b>Station 2</b></th>
                                 <th className="col1"><b>Station 3</b></th>
@@ -529,7 +540,10 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                                     <td>{match?.actualStartTime ? "Actual:" : "Scheduled:"}<br /> {match?.actualStartTime ? moment(match.actualStartTime).format('dd hh:mm A') : moment(match?.startTime).format('dd hh:mm A')}</td>
                                     <td>{match?.description}</td>
                                     <td>{match?.matchNumber}</td>
-                                    <td><span className={redStyle}>{match?.scoreRedFinal}</span><br /><span className={blueStyle}>{match?.scoreBlueFinal}</span></td>
+                                    <td colSpan={2}>
+                                        <tr className={`centerTable ${redStyle} block`} ><span>{match?.scoreRedFinal}</span></tr>
+                                        <tr className={`centerTable ${blueStyle} block`}><span>{match?.scoreBlueFinal}</span></tr>
+                                    </td>
                                     <td><span className={redStyle}>{match?.teams[0]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[3]?.teamNumber}</span></td>
                                     <td><span className={redStyle}>{match?.teams[1]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[4]?.teamNumber}</span></td>
                                     <td><span className={redStyle}>{match?.teams[2]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[5]?.teamNumber}</span></td>
@@ -566,7 +580,14 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                                     <td>{match?.actualStartTime ? "Actual:" : "Scheduled:"}<br /> {match?.actualStartTime ? moment(match?.actualStartTime).format('dd hh:mm A') : moment(match?.startTime).format('dd hh:mm A')}</td>
                                     <td>{match?.description}</td>
                                     <td>{match?.matchNumber}</td>
-                                    <td className={match?.scoreRedFinal ? `scheduleTable${winnerStyle}` : ""}><span className={redStyle}>{match?.scoreRedFinal}</span><br /><span className={blueStyle}>{match?.scoreBlueFinal}</span></td>
+                                    <td className={match?.scoreRedFinal ? `scheduleTable${winnerStyle}` : ""}>
+                                        <tr className={`centerTable ${redStyle} block`}><span>{match?.scoreRedFinal}</span></tr>
+                                        <tr className={`centerTable ${blueStyle} block`}><span>{match?.scoreBlueFinal}</span></tr>
+                                    </td>
+                                    <td className={match?.scoreRedFinal ? `scheduleTable${winnerStyle}` : ""}>
+                                        <tr className={`centerTable ${redStyle} block`}><span style={{whiteSpace:'nowrap'}}>{match?.redRP ? rankPointDisplay(match?.redRP) : " "}</span></tr>
+                                        <tr className={`centerTable ${blueStyle} block`}><span style={{whiteSpace:'nowrap'}}>{match?.blueRP ? rankPointDisplay(match?.blueRP) : " "}</span></tr>
+                                    </td>
                                     <td><span className={redStyle}>{match?.teams[0]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[3]?.teamNumber}</span></td>
                                     <td><span className={redStyle}>{match?.teams[1]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[4]?.teamNumber}</span></td>
                                     <td><span className={redStyle}>{match?.teams[2]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[5]?.teamNumber}</span></td>
@@ -591,7 +612,10 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                                     <td>{match?.actualStartTime ? "Actual:" : "Scheduled:"}<br /> {match?.actualStartTime ? moment(match?.actualStartTime).format('dd hh:mm A') : moment(match?.startTime).format('dd hh:mm A')}</td>
                                     <td>{match?.description}</td>
                                     <td>{match?.matchNumber + (qualMatchCount || 0)}</td>
-                                    <td className={match?.scoreRedFinal ? `scheduleTable${winnerStyle}` : ""}><span className={redStyle}>{match?.scoreRedFinal}</span><br /><span className={blueStyle}>{match?.scoreBlueFinal}</span></td>
+                                    <td className={match?.scoreRedFinal ? `scheduleTable${winnerStyle}` : " "} colSpan={2}>
+                                        <tr className={`centerTable ${redStyle} block`} ><span>{match?.scoreRedFinal}</span></tr>
+                                        <tr className={`centerTable ${blueStyle} block`}><span>{match?.scoreBlueFinal}</span></tr>
+                                    </td>
                                     <td><span className={redStyle}>{match?.teams[0]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[3]?.teamNumber}</span></td>
                                     <td><span className={redStyle}>{match?.teams[1]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[4]?.teamNumber}</span></td>
                                     <td><span className={redStyle}>{match?.teams[2]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[5]?.teamNumber}</span></td>

@@ -648,6 +648,11 @@ function App() {
         `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/qual`
       );
       qualschedule = await result.json();
+
+      result = await httpClient.get(
+        `${selectedYear?.value}/scores/${selectedEvent?.value.code}/qual`)
+
+      var qualScores = await result.json();
     } else {
       if (selectedEvent?.value?.code === "PRACTICE1") {
         qualschedule = { schedule: training.schedule.qual.partial };
@@ -667,8 +672,22 @@ function App() {
 
     var matches = qualschedule?.schedule?.schedule.map((match) => {
       match.winner = winner(match);
+      if (qualScores?.MatchScores) {
+        const matchResults = qualScores.MatchScores.filter((scoreMatch) => { return scoreMatch.matchNumber === match.matchNumber })[0];
+        if (matchResults) {
+          match.scores = matchResults;
+          match.redRP = _.pickBy(matchResults.alliances[1], (value, key) => {
+            return key.endsWith("BonusAchieved");
+          })
+          match.blueRP = _.pickBy(matchResults.alliances[0], (value, key) => {
+            return key.endsWith("BonusAchieved");
+          })
+        }
+
+      }
       return match;
-    });
+    })
+      ;
     if (matches?.length > 0) {
       qualschedule.scheduleLastModified = qualschedule.schedule?.headers
         ? moment(qualschedule.schedule?.headers.schedule["last-modified"])

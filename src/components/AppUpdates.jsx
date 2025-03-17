@@ -9,6 +9,12 @@ export const appUpdates = [
         <li>
           Added switch to control Inspection/Alliance Selection alert on Setup screen
         </li>
+        <li>
+          Changed Top Sponsors form field to text area for easier editing
+        </li>
+        <li>
+          Added Ranking Points Achieved to match results on Schedule page
+        </li>
       </ul>
     ),
   },{
