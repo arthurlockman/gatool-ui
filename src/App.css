@@ -56,6 +56,15 @@ td {
   vertical-align: middle;
 }
 
+.block {
+  display: block;
+}
+
+.rankPoints {
+  display: inline-block;
+  width: 1em;
+}
+
 .leftTable {
   vertical-align: middle;
   text-align: left;

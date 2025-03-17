@@ -37,6 +37,7 @@ function StatsPage({ worldStats, selectedEvent, eventHighScores, eventNamesCY, e
                                     </tr>
                                 </tbody>
                             </table>
+                            NOTE: The penalty free calculation considers the penalties for <b><i>both Alliance members in the match</i></b>. This is not how The Blue Alliance calculates high score, as they consider only the high scoring Alliance member. We are aware of this discrepancy and will consider adding additional results here.
                         </Col>
                         <Col xs={"12"} sm={"6"}>
                             <table className="table table-condensed gatool-eventHighScores">

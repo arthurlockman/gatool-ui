@@ -816,11 +816,13 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                             <Form.Group controlId="topSponsors">
                                 <Form.Label className={"formLabel"} onClick={() => setTopSponsorsLocal(updateTeam?.topSponsors)}><b>Top Sponsors (Enter no more than 5 top sponsors from the full sponsor list below). These will appear under the team name on the Announce Screen.<br />
                                     Tap to reset to TIMS value.</b></Form.Label>
-                                <Form.Control className={topSponsorsLocal ? "formHighlight" : ""} type="text" placeholder={updateTeam?.topSponsors} value={topSponsorsLocal} onChange={(e) => setTopSponsorsLocal(e.target.value)} />
+                                <Form.Control className={topSponsorsLocal ? "formHighlight" : ""} as="textarea"
+                                    placeholder={updateTeam?.topSponsors} value={topSponsorsLocal} onChange={(e) => setTopSponsorsLocal(e.target.value)} />
                             </Form.Group>}
                         <Form.Group controlId="sponsors">
                             <Form.Label className={"formLabel"}><b>Full list of Sponsors <i>(For reference only. This field is not editable, does not appear in the UI, and any changes here will not be saved.)</i></b></Form.Label>
-                            <Form.Control type="text" placeholder={updateTeam?.sponsors} defaultValue={updateTeam?.sponsors} disabled />
+                            <Form.Control as="textarea"
+                                placeholder={updateTeam?.sponsors} defaultValue={updateTeam?.sponsors} disabled />
                         </Form.Group>
                         <br />
                     </Form>
