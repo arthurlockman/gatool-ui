@@ -413,7 +413,7 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
             <Tooltip id={`tooltip-${point.bonus}`}>
               {point.bonus} {point.earned ? " Achieved" : " Not Achieved"}
             </Tooltip>
-          }><span className={"rankPoints"}>{point.earned ? point.bonus.slice(0, 1) : " "}</span></OverlayTrigger></> })
+          }><span className={`rankPoints${point.earned ? "":" unearned"}`}>{point.bonus.slice(0, 1)}</span></OverlayTrigger></> })
     }
 
 

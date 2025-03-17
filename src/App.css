@@ -65,6 +65,10 @@ td {
   width: 1em;
 }
 
+.unearned {
+  color:#aaa
+}
+
 .leftTable {
   vertical-align: middle;
   text-align: left;

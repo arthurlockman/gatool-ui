@@ -1747,43 +1747,10 @@ function App() {
       delete alliances.Alliances;
     }
     var allianceLookup = {};
-    alliances?.alliances.forEach((alliance) => {
-      allianceLookup[`${alliance.captain}`] = {
-        role: `Captain`,
-        alliance: alliance.name,
-        number: alliance.number,
-        captain: alliance.captain,
-        round1: alliance.round1,
-        round2: alliance.round2,
-        round3: alliance.round3,
-        backup: alliance.backup,
-        backupReplaced: alliance.backupReplaced,
-      };
-      allianceLookup[`${alliance.round1}`] = {
-        role: `Round 1 Selection`,
-        alliance: alliance.name,
-        number: alliance.number,
-        captain: alliance.captain,
-        round1: alliance.round1,
-        round2: alliance.round2,
-        round3: alliance.round3,
-        backup: alliance.backup,
-        backupReplaced: alliance.backupReplaced,
-      };
-      allianceLookup[`${alliance.round2}`] = {
-        role: `Round 2 Selection`,
-        alliance: alliance.name,
-        number: alliance.number,
-        captain: alliance.captain,
-        round1: alliance.round1,
-        round2: alliance.round2,
-        round3: alliance.round3,
-        backup: alliance.backup,
-        backupReplaced: alliance.backupReplaced,
-      };
-      if (alliance.round3) {
-        allianceLookup[`${alliance.round3}`] = {
-          role: `Round 3 Selection`,
+    if (alliances?.alliances) {
+      alliances?.alliances.forEach((alliance) => {
+        allianceLookup[`${alliance.captain}`] = {
+          role: `Captain`,
           alliance: alliance.name,
           number: alliance.number,
           captain: alliance.captain,
@@ -1793,10 +1760,8 @@ function App() {
           backup: alliance.backup,
           backupReplaced: alliance.backupReplaced,
         };
-      }
-      if (alliance.backup) {
-        allianceLookup[`${alliance.backup}`] = {
-          role: `Backup for ${alliance.backupReplaced}`,
+        allianceLookup[`${alliance.round1}`] = {
+          role: `Round 1 Selection`,
           alliance: alliance.name,
           number: alliance.number,
           captain: alliance.captain,
@@ -1806,9 +1771,46 @@ function App() {
           backup: alliance.backup,
           backupReplaced: alliance.backupReplaced,
         };
-      }
-    });
-    alliances.Lookup = allianceLookup;
+        allianceLookup[`${alliance.round2}`] = {
+          role: `Round 2 Selection`,
+          alliance: alliance.name,
+          number: alliance.number,
+          captain: alliance.captain,
+          round1: alliance.round1,
+          round2: alliance.round2,
+          round3: alliance.round3,
+          backup: alliance.backup,
+          backupReplaced: alliance.backupReplaced,
+        };
+        if (alliance.round3) {
+          allianceLookup[`${alliance.round3}`] = {
+            role: `Round 3 Selection`,
+            alliance: alliance.name,
+            number: alliance.number,
+            captain: alliance.captain,
+            round1: alliance.round1,
+            round2: alliance.round2,
+            round3: alliance.round3,
+            backup: alliance.backup,
+            backupReplaced: alliance.backupReplaced,
+          };
+        }
+        if (alliance.backup) {
+          allianceLookup[`${alliance.backup}`] = {
+            role: `Backup for ${alliance.backupReplaced}`,
+            alliance: alliance.name,
+            number: alliance.number,
+            captain: alliance.captain,
+            round1: alliance.round1,
+            round2: alliance.round2,
+            round3: alliance.round3,
+            backup: alliance.backup,
+            backupReplaced: alliance.backupReplaced,
+          };
+        }
+      });
+      alliances.Lookup = allianceLookup;
+    }
 
     alliances.lastUpdate = moment();
     setAlliances(alliances);
