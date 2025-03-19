@@ -6,9 +6,9 @@ import PlayoffDetails from "../components/PlayoffDetails";
 
 function BottomButtons({ previousMatch, nextMatch, matchDetails, playoffSchedule, eventHighScores, alliances, selectedEvent, adHocMode, playoffCountOverride }) {
     var matches = playoffSchedule?.schedule;
-    var eventHighScore = eventHighScores?.overallqual;
-    if (eventHighScores?.overallqual?.score < eventHighScores?.overallplayoff?.score) {
-        eventHighScore = eventHighScores?.overallplayoff;
+    var eventHighScore = eventHighScores?.highscores?.overallqual;
+    if (eventHighScores?.highscores?.overallqual?.score < eventHighScores?.highscores?.overallplayoff?.score) {
+        eventHighScore = eventHighScores?.highscores?.overallplayoff;
     }
 
 

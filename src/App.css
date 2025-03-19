@@ -450,21 +450,23 @@ td {
   text-align: center;
   padding: 0px;
   margin: 0px;
-  background-image: -webkit-linear-gradient(top, #f2dede 0, #e7c3c3 100%);
-  background-image: -o-linear-gradient(top, #f2dede 0, #e7c3c3 100%);
-  background-image: -webkit-gradient(
-    linear,
-    left top,
-    left bottom,
-    from(#f2dede),
-    to(#e7c3c3)
-  );
-  background-image: linear-gradient(to bottom, #f2dede 0, #e7c3c3 100%);
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fff2dede', endColorstr='#ffe7c3c3', GradientType=0);
-  background-repeat: repeat-x;
   border-color: #dca7a7;
   color: #a94442;
   background-color: #f2dede;
+  border: 3px solid;
+  border-collapse: collapse;
+  margin-bottom: 10px;
+}
+
+.gatool-districtHighScores {
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+  padding: 0px;
+  margin: 0px;
+  border-color: #bc9b15;
+  color: #ad8b03;
+  background-color: #fff5ce;
   border: 3px solid;
   border-collapse: collapse;
   margin-bottom: 10px;
@@ -476,18 +478,7 @@ td {
   text-align: center;
   padding: 0px;
   margin: 0px;
-  background-image: -webkit-linear-gradient(top, #d9edf7 0, #b9def0 100%);
-  background-image: -o-linear-gradient(top, #d9edf7 0, #b9def0 100%);
-  background-image: -webkit-gradient(
-    linear,
-    left top,
-    left bottom,
-    from(#d9edf7),
-    to(#b9def0)
-  );
-  background-image: linear-gradient(to bottom, #d9edf7 0, #b9def0 100%);
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffd9edf7', endColorstr='#ffb9def0', GradientType=0);
-  background-repeat: repeat-x;
+ background-repeat: repeat-x;
   border-color: #9acfea;
   color: #31708f;
   background-color: #d9edf7;

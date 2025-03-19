@@ -1,7 +1,7 @@
 import _ from "lodash";
 
 function StatsMatch({ highScores, matchType, matchName, eventNamesCY, tableType }) {
-    const style = tableType === "world" ? {backgroundColor: "#f2dede"} : {backgroundColor: "#d9edf7"}
+    const style = tableType === "world" ? {backgroundColor: "#f2dede"} : tableType === "event"? {backgroundColor: "#d9edf7"} : {backgroundColor: "#fff5ce"} 
     return (
         <>
             {highScores && (_.keys(highScores[matchType])?.length > 0) && <td style={style}>{matchName}<br />
