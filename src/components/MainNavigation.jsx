@@ -170,7 +170,7 @@ function MainNavigation({ selectedEvent, practiceSchedule, qualSchedule, playoff
     // YELLOW: Event Selected, World High Scores Available, no matches complete for selected event
     // RED: Event Selected, no world high scores available
 
-    if (selectedEvent && (eventHighScores?.overallqual || eventHighScores?.overallplayoff) && worldHighScores) {
+    if (selectedEvent && (eventHighScores?.highscores?.overallqual || eventHighScores?.highscores?.overallplayoff) && worldHighScores) {
       setStatsTabReady(TabStates.Ready)
     } else if (selectedEvent && worldHighScores) {
       setStatsTabReady(TabStates.Stale)

@@ -478,7 +478,6 @@ function App() {
    */
   async function getSchedule(loadingEvent) {
     console.log(`Fetching schedule for ${selectedEvent?.value?.name}...`);
-    var highScores = [];
 
     /**
      * Returns the winner of the match
@@ -501,100 +500,6 @@ function App() {
       }
 
       return winner;
-    }
-
-    /**
-     * Checks to see if the match is an event high score
-     * @function isHighScore
-     * @param {object} match - The match to test
-     * @return Adds the match to the highScores object if it is a high scoring match
-     */
-    function isHighScore(match) {
-      var tempMatch = {};
-      if (!_.isNull(match.scoreRedFinal)) {
-        tempMatch.eventName = eventLabel;
-        tempMatch.matchName = match?.description;
-        if (match?.scoreRedFinal > match?.scoreBlueFinal) {
-          tempMatch.alliance = "Red";
-          tempMatch.allianceMembers = _.filter(match?.teams, function (o) {
-            return _.startsWith(o.station, tempMatch.alliance);
-          })
-            .map((team) => {
-              return team.teamNumber;
-            })
-            .join(" ");
-          tempMatch.score = match[`score${tempMatch.alliance}Final`];
-        } else if (match?.scoreRedFinal < match?.scoreBlueFinal) {
-          tempMatch.alliance = "Blue";
-          tempMatch.allianceMembers = _.filter(match?.teams, function (o) {
-            return _.startsWith(o.station, tempMatch.alliance);
-          })
-            .map((team) => {
-              return team.teamNumber;
-            })
-            .join(" ");
-          tempMatch.score = match[`score${tempMatch.alliance}Final`];
-        } else {
-          tempMatch.alliance = "Tie";
-          tempMatch.allianceMembers = match?.teams
-            .map((team) => {
-              return team.teamNumber;
-            })
-            .join(" ");
-          tempMatch.score = match.scoreRedFinal;
-        }
-
-        if (
-          match.tournamentLevel === "Qualification" ||
-          match.level === "Qualification"
-        ) {
-          tempMatch.matchLevel = "qual";
-        } else if (match.tournamentLevel === "Playoff") {
-          tempMatch.matchLevel = "playoff";
-        }
-
-        if (match.scoreRedFoul === match.scoreBlueFoul) {
-          if (match.scoreRedFoul > 0) {
-            tempMatch.scoreType = "offsetting" + tempMatch.matchLevel;
-          } else if (match.scoreRedFoul === 0) {
-            tempMatch.scoreType = "penaltyFree" + tempMatch.matchLevel;
-          }
-        } else {
-          tempMatch.scoreType = "overall" + tempMatch.matchLevel;
-        }
-        // test to see if the match is penalty free and a high score
-        if (tempMatch.scoreType.includes("penaltyFree")) {
-          if (_.isEmpty(highScores[`penaltyFree${tempMatch.matchLevel}`])) {
-            highScores[`penaltyFree${tempMatch.matchLevel}`] = tempMatch;
-          } else if (
-            highScores[`penaltyFree${tempMatch.matchLevel}`].score <
-            tempMatch.score
-          ) {
-            highScores[`penaltyFree${tempMatch.matchLevel}`] = tempMatch;
-          }
-        }
-
-        //test to see if the match has offsetting penalties and is a high score
-        if (tempMatch.scoreType.includes("offsetting")) {
-          if (_.isEmpty(highScores[`offsetting${tempMatch.matchLevel}`])) {
-            highScores[`offsetting${tempMatch.matchLevel}`] = tempMatch;
-          } else if (
-            highScores[`offsetting${tempMatch.matchLevel}`].score <
-            tempMatch.score
-          ) {
-            highScores[`offsetting${tempMatch.matchLevel}`] = tempMatch;
-          }
-        }
-
-        //now test against overall high score
-        if (_.isEmpty(highScores[`overall${tempMatch.matchLevel}`])) {
-          highScores[`overall${tempMatch.matchLevel}`] = tempMatch;
-        } else if (
-          highScores[`overall${tempMatch.matchLevel}`].score < tempMatch.score
-        ) {
-          highScores[`overall${tempMatch.matchLevel}`] = tempMatch;
-        }
-      }
     }
 
     var result = null;
@@ -696,9 +601,6 @@ function App() {
         ? moment(qualschedule.schedule?.headers.matches["last-modified"])
         : moment();
       qualschedule.schedule = matches;
-      matches.forEach((match) => {
-        isHighScore(match);
-      });
     }
 
     var completedMatchCount = 0;
@@ -785,9 +687,6 @@ function App() {
 
       playoffschedule.completedMatchCount = completedMatchCount;
       playoffschedule.schedule = matches;
-      matches.forEach((match) => {
-        isHighScore(match);
-      });
 
       // determine the tiebreaker
       // var lastMatchNumber = playoffschedule?.schedule[_.findLastIndex(playoffschedule?.schedule, function (match) {
@@ -874,7 +773,7 @@ function App() {
       setCurrentMatch(lastMatchPlayed + 1);
     }
 
-    setEventHighScores(highScores);
+    //setEventHighScores(highScores);
     playoffschedule.lastUpdate = moment();
     setPlayoffSchedule(playoffschedule);
     getRanks();
@@ -1651,7 +1550,7 @@ function App() {
   }
 
   /**
-   * This function retrieves the rworld high scores for the selected year from FIRST.
+   * This function retrieves the world high scores for the selected year from FIRST.
    * @async
    * @function getWorldStats
    * @param selectedYear The currently selected year, which is a persistent state variable
@@ -1704,6 +1603,55 @@ function App() {
     setWorldStats(scores);
   }
 
+  /**
+   * This function retrieves the event high scores for the selected event from FIRST.
+   * @async
+   * @function getEventStats
+   * @param year The currently selected year
+   * @param code The currently selected event code
+  * @returns sets the world high scores
+   */
+  async function getEventStats(year,code) {
+    var result = await httpClient.get(`${year}/highscores/${code}`);
+    var highscores = await result.json();
+    var scores = {};
+    var reducedScores = {};
+
+    scores.year = year;
+    scores.lastUpdate = moment();
+
+    highscores.forEach((score) => {
+      if (score?.matchData?.match) {
+        var details = {};
+        if (!_.isEmpty(eventnames[worldStats?.year])) {
+          details.eventName =
+            eventnames[year][code] ||
+            code;
+        } else {
+          details.eventName = code;
+        }
+
+        details.alliance = _.upperFirst(score?.matchData?.highScoreAlliance);
+        details.scoreType = score?.type + score?.level;
+        details.matchName = score?.matchData?.match?.description;
+        details.allianceMembers = _.filter(
+          score?.matchData?.match?.teams,
+          function (o) {
+            return _.startsWith(o.station, details.alliance);
+          }
+        )
+          .map((team) => {
+            return team.teamNumber;
+          })
+          .join(" ");
+        details.score = score.matchData.match[`score${details.alliance}Final`];
+        reducedScores[details.scoreType] = details;
+      }
+    });
+    scores.highscores = reducedScores;
+
+    setEventHighScores(scores);
+  }
   /**
    * This function retrieves the Playoff Alliance data for a specified event from FIRST. It also formats the Alliance data to better support lookups in the playoff Bracket and on Announce and Play By Play.
    * @async
@@ -1968,6 +1916,7 @@ function App() {
         }
       }
       getWorldStats();
+      getEventStats(selectedYear?.value, selectedEvent?.value?.code);
     }
   };
 
@@ -1990,6 +1939,7 @@ function App() {
           getSchedule();
         }
         getWorldStats();
+        getEventStats(selectedYear?.value, selectedEvent?.value?.code);
       }
     }
   };
@@ -2059,6 +2009,7 @@ function App() {
       getSchedule(true);
       getSystemMessages();
       getWorldStats();
+      getEventStats(selectedYear?.value, selectedEvent?.value?.code);
     }
   };
 
@@ -2349,6 +2300,7 @@ function App() {
         console.log("Offline event. Just get the world stats if you can");
       }
       getWorldStats();
+      getEventStats(selectedYear?.value, selectedEvent?.value?.code);
     },
     refreshRate * 1000,
     {
@@ -2762,6 +2714,7 @@ function App() {
                     eventHighScores={eventHighScores}
                     eventNamesCY={eventNamesCY}
                     eventLabel={eventLabel}
+                    districts={districts}
                   />
                 }
               />
