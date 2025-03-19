@@ -1,5 +1,14 @@
 export const appUpdates = [
   {
+    date: "March 19, 2025",
+    message: (
+      <ul>
+        <li>Added District High Scores to Stats Page</li>
+        <li>Added new high score to Stats page to align with TBA</li>
+      </ul>
+    ),
+  },
+  {
     date: "March 16, 2025",
     message: (
       <ul>
@@ -7,26 +16,23 @@ export const appUpdates = [
           Restored Practice Matches to Schedule, Announce and Play by Play pages
         </li>
         <li>
-          Added switch to control Inspection/Alliance Selection alert on Setup screen
+          Added switch to control Inspection/Alliance Selection alert on Setup
+          screen
         </li>
-        <li>
-          Changed Top Sponsors form field to text area for easier editing
-        </li>
-        <li>
-          Added Ranking Points Achieved to match results on Schedule page
-        </li>
+        <li>Changed Top Sponsors form field to text area for easier editing</li>
+        <li>Added Ranking Points Achieved to match results on Schedule page</li>
       </ul>
     ),
-  },{
+  },
+  {
     date: "March 4, 2025",
     message: (
       <ul>
         <li>
-          Alliance Captains are now removed from the list of available teams during Alliance Selection.
+          Alliance Captains are now removed from the list of available teams
+          during Alliance Selection.
         </li>
-        <li>
-          Declined teams who become Alliance Captains can now be skipped.
-        </li>
+        <li>Declined teams who become Alliance Captains can now be skipped.</li>
       </ul>
     ),
   },
