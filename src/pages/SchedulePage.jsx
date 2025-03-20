@@ -471,7 +471,7 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                             {practiceFileUploaded &&
                                 <Row>
                                     <Col xs={2}></Col>
-                                    <Col xs={1}><input type="file" id="RemoveOfflinePractive" onChange={handlePracticeFiles} className={"hiddenInput"} /><img style={{ float: "left" }} width="50" src="images/excelicon.png" alt="Excel Logo" /></Col>
+                                    <Col xs={1}><input type="file" id="RemoveOfflinePractice" onChange={handlePracticeFiles} className={"hiddenInput"} /><img style={{ float: "left" }} width="50" src="images/excelicon.png" alt="Excel Logo" /></Col>
                                     <Col xs={selectedEvent?.value?.code.includes("OFFLINE") ? 4 : 7} className={"leftTable"} style={{ cursor: "pointer", color: "darkblue" }} onClick={clickRemovePractice}>
                                         {selectedEvent?.value?.code.includes("OFFLINE") && <b>You have uploaded an Offline Schedule.<br />Tap here to remove it. You can add a playoff schedule, when one becomes available.</b>}
                                         {!selectedEvent?.value?.code.includes("OFFLINE") && <b>You have uploaded a Practice Schedule.<br />Tap here to remove it. Know that we will automatically remove it when we get a Qualification Matches Schedule.</b>}
@@ -568,12 +568,17 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                                 let redStyle = "red";
                                 let blueStyle = "blue";
                                 let winnerStyle = "tie";
+                                let scoreStyle = "";
                                 if (Number(match.scoreRedFinal) > Number(match.scoreBlueFinal)) {
                                     redStyle += " bold";
                                     winnerStyle = "red";
                                 } else if (Number(match.scoreBlueFinal) > Number(match.scoreRedFinal)) {
                                     blueStyle += " bold";
                                     winnerStyle = "blue";
+                                }
+
+                                if (match?.scores?.coopertitionBonusAchieved) {
+                                    scoreStyle = " coopertition"
                                 }
 
                                 return (<tr key={"qualSchedule" + match?.matchNumber} className="centerTable">
@@ -584,7 +589,7 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                                         <tr className={`centerTable ${redStyle} block`}><span>{match?.scoreRedFinal}</span></tr>
                                         <tr className={`centerTable ${blueStyle} block`}><span>{match?.scoreBlueFinal}</span></tr>
                                     </td>
-                                    <td className={match?.scoreRedFinal ? `scheduleTable${winnerStyle}` : ""}>
+                                    <td className={(match?.scoreRedFinal>=0 || match?.scoreBlueFinal>=0) ? `scheduleTable${winnerStyle} ${scoreStyle}` : ""}>
                                         <tr className={`centerTable ${redStyle} block`}><span style={{whiteSpace:'nowrap'}}>{match?.redRP ? rankPointDisplay(match?.redRP) : " "}</span></tr>
                                         <tr className={`centerTable ${blueStyle} block`}><span style={{whiteSpace:'nowrap'}}>{match?.blueRP ? rankPointDisplay(match?.blueRP) : " "}</span></tr>
                                     </td>
@@ -612,7 +617,7 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                                     <td>{match?.actualStartTime ? "Actual:" : "Scheduled:"}<br /> {match?.actualStartTime ? moment(match?.actualStartTime).format('dd hh:mm A') : moment(match?.startTime).format('dd hh:mm A')}</td>
                                     <td>{match?.description}</td>
                                     <td>{match?.matchNumber + (qualMatchCount || 0)}</td>
-                                    <td className={match?.scoreRedFinal ? `scheduleTable${winnerStyle}` : " "} colSpan={2}>
+                                    <td className={(match?.scoreRedFinal>=0 || match?.scoreBlueFinal>=0) ? `scheduleTable${winnerStyle}` : " "} colSpan={2}>
                                         <tr className={`centerTable ${redStyle} block`} ><span>{match?.scoreRedFinal}</span></tr>
                                         <tr className={`centerTable ${blueStyle} block`}><span>{match?.scoreBlueFinal}</span></tr>
                                     </td>
