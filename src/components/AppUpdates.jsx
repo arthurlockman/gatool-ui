@@ -1,5 +1,13 @@
 export const appUpdates = [
   {
+    date: "March 20, 2025",
+    message: (
+      <ul>
+        <li>Added Ranking Point highlighting to the Schedule page</li>
+        <li>Fixed a bug that suppressed highlighting the winning Alliance on the Schedule page when Red's score was zero</li>
+      </ul>
+    ),
+  },{
     date: "March 19, 2025",
     message: (
       <ul>
