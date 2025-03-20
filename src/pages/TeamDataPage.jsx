@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import moment from "moment";
 import _ from "lodash";
 import { toast } from "react-toastify";
+import { apiBaseUrl } from "../contextProviders/AuthClientContext";
 import { useOnlineStatus } from "../contextProviders/OnlineContext";
 import { utils, read, write, writeFile } from "xlsx";
 import Docxtemplater from "docxtemplater";
@@ -724,7 +725,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                     <tbody>
                         {teamList && teamList?.teams && teamListExtended.map((team) => {
                             var cityState = `${team?.city}, ${team?.stateProv}${(team?.country !== "USA") ? ", " + team?.country : ""}`;
-                            var avatar = `<img src='https://api.gatool.org/v3/${selectedYear.value}/avatars/team/${team?.teamNumber}/avatar.png' onerror="this.style.display='none'">&nbsp`;
+                            var avatar = `<img src='${apiBaseUrl}${selectedYear.value}/avatars/team/${team?.teamNumber}/avatar.png' onerror="this.style.display='none'">&nbsp`;
                             var teamNameWithAvatar = team?.updates?.nameShortLocal ? team?.updates?.nameShortLocal : team?.nameShort;
                             teamNameWithAvatar = avatar + "<br />" + teamNameWithAvatar;
 
