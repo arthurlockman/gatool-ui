@@ -568,12 +568,17 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                                 let redStyle = "red";
                                 let blueStyle = "blue";
                                 let winnerStyle = "tie";
+                                let scoreStyle = "";
                                 if (Number(match.scoreRedFinal) > Number(match.scoreBlueFinal)) {
                                     redStyle += " bold";
                                     winnerStyle = "red";
                                 } else if (Number(match.scoreBlueFinal) > Number(match.scoreRedFinal)) {
                                     blueStyle += " bold";
                                     winnerStyle = "blue";
+                                }
+
+                                if (match?.scores?.coopertitionBonusAchieved) {
+                                    scoreStyle = " coopertition"
                                 }
 
                                 return (<tr key={"qualSchedule" + match?.matchNumber} className="centerTable">
@@ -584,7 +589,7 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                                         <tr className={`centerTable ${redStyle} block`}><span>{match?.scoreRedFinal}</span></tr>
                                         <tr className={`centerTable ${blueStyle} block`}><span>{match?.scoreBlueFinal}</span></tr>
                                     </td>
-                                    <td className={(match?.scoreRedFinal>=0 || match?.scoreBlueFinal>=0) ? `scheduleTable${winnerStyle}` : ""}>
+                                    <td className={(match?.scoreRedFinal>=0 || match?.scoreBlueFinal>=0) ? `scheduleTable${winnerStyle} ${scoreStyle}` : ""}>
                                         <tr className={`centerTable ${redStyle} block`}><span style={{whiteSpace:'nowrap'}}>{match?.redRP ? rankPointDisplay(match?.redRP) : " "}</span></tr>
                                         <tr className={`centerTable ${blueStyle} block`}><span style={{whiteSpace:'nowrap'}}>{match?.blueRP ? rankPointDisplay(match?.blueRP) : " "}</span></tr>
                                     </td>

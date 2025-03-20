@@ -776,6 +776,10 @@ td {
   font-size: 14px;
 }
 
+.coopertition {
+    background-color: rgb(243, 235, 154) !important;
+}
+
 @media only screen and (max-width: 820px) and (orientation: portrait) {
   /* For Portrait iPad: */
   .wltCol {
