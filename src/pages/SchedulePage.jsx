@@ -585,11 +585,11 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                                     <td>{match?.actualStartTime ? "Actual:" : "Scheduled:"}<br /> {match?.actualStartTime ? moment(match?.actualStartTime).format('dd hh:mm A') : moment(match?.startTime).format('dd hh:mm A')}</td>
                                     <td>{match?.description}</td>
                                     <td>{match?.matchNumber}</td>
-                                    <td className={match?.scoreRedFinal ? `scheduleTable${winnerStyle}` : ""}>
+                                    <td className={(match?.actualStartTime ) ? `scheduleTable${winnerStyle}` : ""}>
                                         <tr className={`centerTable ${redStyle} block`}><span>{match?.scoreRedFinal}</span></tr>
                                         <tr className={`centerTable ${blueStyle} block`}><span>{match?.scoreBlueFinal}</span></tr>
                                     </td>
-                                    <td className={(match?.scoreRedFinal>=0 || match?.scoreBlueFinal>=0) ? `scheduleTable${winnerStyle} ${scoreStyle}` : ""}>
+                                    <td className={(match?.actualStartTime ) ? `scheduleTable${winnerStyle} ${scoreStyle}` : ""}>
                                         <tr className={`centerTable ${redStyle} block`}><span style={{whiteSpace:'nowrap'}}>{match?.redRP ? rankPointDisplay(match?.redRP) : " "}</span></tr>
                                         <tr className={`centerTable ${blueStyle} block`}><span style={{whiteSpace:'nowrap'}}>{match?.blueRP ? rankPointDisplay(match?.blueRP) : " "}</span></tr>
                                     </td>
@@ -617,7 +617,7 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                                     <td>{match?.actualStartTime ? "Actual:" : "Scheduled:"}<br /> {match?.actualStartTime ? moment(match?.actualStartTime).format('dd hh:mm A') : moment(match?.startTime).format('dd hh:mm A')}</td>
                                     <td>{match?.description}</td>
                                     <td>{match?.matchNumber + (qualMatchCount || 0)}</td>
-                                    <td className={(match?.scoreRedFinal>=0 || match?.scoreBlueFinal>=0) ? `scheduleTable${winnerStyle}` : " "} colSpan={2}>
+                                    <td className={(match?.actualStartTime ) ? `scheduleTable${winnerStyle}` : " "} colSpan={2}>
                                         <tr className={`centerTable ${redStyle} block`} ><span>{match?.scoreRedFinal}</span></tr>
                                         <tr className={`centerTable ${blueStyle} block`}><span>{match?.scoreBlueFinal}</span></tr>
                                     </td>
