@@ -66,7 +66,7 @@ td {
 }
 
 .unearned {
-  color:#aaa
+  color: #aaa;
 }
 
 .leftTable {
@@ -355,6 +355,8 @@ td {
   justify-content: center;
 }
 
+
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
@@ -444,47 +446,47 @@ td {
   font-weight: bold;
 }
 
-.gatool-worldHighScores {
-  font-size: 14px;
+.gatool-highScores-Table {
+  font-size: 12px;
   font-weight: bold;
   text-align: center;
   padding: 0px;
   margin: 0px;
+  border: 3px solid;
+  border-collapse: collapse;
+  margin-bottom: 10px;
+}
+.gatool-worldHighScores {
   border-color: #dca7a7;
   color: #a94442;
   background-color: #f2dede;
-  border: 3px solid;
-  border-collapse: collapse;
-  margin-bottom: 10px;
 }
 
 .gatool-districtHighScores {
-  font-size: 14px;
-  font-weight: bold;
-  text-align: center;
-  padding: 0px;
-  margin: 0px;
   border-color: #bc9b15;
   color: #ad8b03;
   background-color: #fff5ce;
-  border: 3px solid;
-  border-collapse: collapse;
-  margin-bottom: 10px;
 }
 
 .gatool-eventHighScores {
-  font-size: 14px;
-  font-weight: bold;
-  text-align: center;
-  padding: 0px;
-  margin: 0px;
- background-repeat: repeat-x;
   border-color: #9acfea;
   color: #31708f;
   background-color: #d9edf7;
-  border: 3px solid;
-  border-collapse: collapse;
-  margin-bottom: 10px;
+}
+
+.statsMatchHeader {
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+.statsMatchName {
+  font-weight: bold;
+  font-style: italic;
+}
+
+.statsScore {
+  font-weight: bolder;
+  font-size: 1.2em;
 }
 
 .alert-warning {
@@ -777,7 +779,7 @@ td {
 }
 
 .coopertition {
-    background-color: rgb(243, 235, 154) !important;
+  background-color: rgb(243, 235, 154) !important;
 }
 
 @media only screen and (max-width: 820px) and (orientation: portrait) {
