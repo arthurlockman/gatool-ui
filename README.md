@@ -35,6 +35,33 @@ npm run build && serve -s build
 
 Note that when running as a PWA, debugging will not be available.
 
+#### Testing with a local `gatool-api` and custom Auth0:
+
+Create a new Auth0 Application, selecting the "Single Page Web Application" option
+On the settings tab set the "Allowed Callback URLs", "Allowed Logout URLs" and "Allowed Web Origins" to `http://localhost:3000` and save. If you Record the Client ID and domain. The Client Secret is not needed for GATool.
+
+In Auth0, go to Actions -> Triggers. Select "Post Login". On the post-login page, add a custom trigger named "Add Roles". Replace the content with
+```
+exports.onExecutePostLogin = async (event, api) => {
+  if (event.authorization) {
+    api.idToken.setCustomClaim("https://gatool.org/roles", event.authorization.roles);
+  }
+};
+```
+After creating the action, go back to the trigger and drag the newly created "Add Roles" action into the flow, and apply.
+
+In Auth0, go to User Management -> Roles, and create two roles, one with an name of "admin" and the other with the name of "user". After a user has first logged in with oauth, you can assign either/both roles to the user from the User Mangement -> Users page. Any updates to roles may require a log out and back in to the app.
+
+Copy `.env.example` to `.env`
+Fill in the following variables:
+- `REACT_APP_AUTH0_DOMAIN` and `REACT_APP_AUTH0_LOGIN_DOMAIN`: the domain recorded above (they could be different if you were using a custom login domain)
+- `REACT_APP_AUTH0_CLIENTID`: the client ID recorded above
+- `REACT_APP_AUTH0_CONNECTION`: Can be left on `google-oauth2` or changed to a different connection if you have configured one
+
+Configure `gatool-api` according to the local development instructions in that repository.
+
+Start the app using the directions above
+
 ### Deploying
 
 GATool has two main active deployments: [beta](https://beta.gatool.org) and [production](https://gatool.org). Both are hosted on Azure web services and deployed automatically from GitHub.
