@@ -2,6 +2,7 @@ import { Container, Row } from "react-bootstrap";
 import { FlashcardArray } from "react-quizlet-flashcard";
 import { saveAs } from "file-saver";
 import _ from "lodash";
+import { apiBaseUrl } from "../contextProviders/AuthClientContext";
 
 function CheatsheetPage({
   teamList,
@@ -25,7 +26,7 @@ function CheatsheetPage({
       backHTML: "",
       style: { width: "500px", height: "300px" },
     };
-    var avatar = `<img src="https://api.gatool.org/v3/${selectedYear.value}/avatars/team/${team?.teamNumber}/avatar.png" onerror="this.style.display='none'">&nbsp`;
+    var avatar = `<img src="${apiBaseUrl}${selectedYear.value}/avatars/team/${team?.teamNumber}/avatar.png" onerror="this.style.display='none'">&nbsp`;
     var robotImage = _.filter(robotImages, { teamNumber: team?.teamNumber })[0]
       ?.imageURL
       ? `<img height="225px" src="${
