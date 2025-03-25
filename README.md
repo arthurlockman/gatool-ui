@@ -38,7 +38,7 @@ Note that when running as a PWA, debugging will not be available.
 #### Testing with a local `gatool-api` and custom Auth0:
 
 Create a new Auth0 Application, selecting the "Single Page Web Application" option
-On the settings tab set the "Allowed Callback URLs", "Allowed Logout URLs" and "Allowed Web Origins" to `http://localhost:3000` and save. If you Record the Client ID and domain. The Client Secret is not needed for GATool.
+On the settings tab set the "Allowed Callback URLs", "Allowed Logout URLs" and "Allowed Web Origins" to `http://localhost:3000` and save. Record the Client ID and domain. The Client Secret is not needed for GATool.
 
 In Auth0, go to Actions -> Triggers. Select "Post Login". On the post-login page, add a custom trigger named "Add Roles". Replace the content with
 ```
