@@ -54,7 +54,7 @@ export const TabStates = {
  * Tiebreakers constant defines the sort order for breaking ties during playoffs.
  * Criteria 2025 has been updated.
  * 1st Cumulative TECH FOUL points due to opponent rule violations
- * 2nd ALLIANCE AUTO points
+ * 2nd ALLIANCE LEAVE + AUTO CORAL points
  * 3rd ALLIANCE BARGE points
  * 4th MATCH is replayed
  * @constant {object}
@@ -62,7 +62,7 @@ export const TabStates = {
  */
 const playoffTiebreakers = {
   2026: ["foulPoints", "autoPoints", "endGameBargePoints"], // Update after rules release
-  2025: ["foulPoints", "autoPoints", "endGameBargePoints"],
+  2025: ["foulPoints", "autoMobilityPoints+autoCoralPoints", "endGameBargePoints"],
   2024: ["foulPoints", "autoPoints", "endGameTotalStagePoints"],
   2023: ["foulPoints", "totalChargeStationPoints", "autoPoints"],
   2022: ["foulPoints", "endgamePoints", "autoCargoTotal+autoTaxiPoints"],

@@ -1,5 +1,12 @@
 export const appUpdates = [
   {
+    date: "March 25, 2025",
+    message: (
+      <ul>
+        <li>Per Team Update 19, changed the calculation for Playoff Tiebreakers</li>
+      </ul>
+    ),
+  },{
     date: "March 20, 2025",
     message: (
       <ul>
