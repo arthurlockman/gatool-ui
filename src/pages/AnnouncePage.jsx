@@ -36,8 +36,8 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
                     rankings?.ranks[_.findIndex(rankings?.ranks, { "teamNumber": team?.teamNumber })]
                 );
             team.rankStyle = rankHighlight(team?.rank, allianceCount || { "count": 8 });
-            team.alliance = alliances?.Lookup[`${team?.teamNumber}`]?.alliance || null;
-            team.allianceRole = alliances?.Lookup[`${team?.teamNumber}`]?.role || null;
+            team.alliance = alliances?.Lookup[`${team?.teamNumber}`] ? alliances?.Lookup[`${team?.teamNumber}`]?.alliance || null : null;
+            team.allianceRole = alliances?.Lookup[`${team?.teamNumber}`] ? alliances?.Lookup[`${team?.teamNumber}`]?.role || null : null;
 
             var teamDistrictRanks = _.filter(districtRankings?.districtRanks, { "teamNumber": team.teamNumber })[0] || null;
             team.districtRanking = teamDistrictRanks?.rank;
