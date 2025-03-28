@@ -1,5 +1,12 @@
 export const appUpdates = [
   {
+    date: "March 28, 2025",
+    message: (
+      <ul>
+        <li>Fixing a bug that could cause a white screen while loading an event</li>
+      </ul>
+    ),
+  },{
     date: "March 25, 2025",
     message: (
       <ul>
