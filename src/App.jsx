@@ -509,7 +509,6 @@ function App() {
       return winner;
     }
 
-    var result = null;
     var practiceschedule = null;
     var qualschedule = null;
     var playoffschedule = null;
@@ -525,10 +524,10 @@ function App() {
       //do something
       practiceschedule = { schedule: { schedule: [] } };
     } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
-      result = await httpClient.get(
+      const practiceResult = await httpClient.get(
         `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/practice`
       );
-      practiceschedule = await result.json();
+      practiceschedule = await practiceResult.json();
     }
     if (typeof practiceschedule?.Schedule !== "undefined") {
       practiceschedule.schedule = practiceschedule?.Schedule;
@@ -556,15 +555,15 @@ function App() {
       //do something
       qualschedule = { schedule: { schedule: [] } };
     } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
-      result = await httpClient.get(
+      const qualsResult = await httpClient.get(
         `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/qual`
       );
-      qualschedule = await result.json();
+      qualschedule = await qualsResult.json();
 
-      result = await httpClient.get(
+      const qualsScoresResult = await httpClient.get(
         `${selectedYear?.value}/scores/${selectedEvent?.value.code}/qual`)
 
-      var qualScores = await result.json();
+      var qualScores = await qualsScoresResult.json();
     } else {
       if (selectedEvent?.value?.code === "PRACTICE1") {
         qualschedule = { schedule: training.schedule.qual.partial };
@@ -582,7 +581,7 @@ function App() {
       delete qualschedule.schedule.Schedule;
     }
 
-    var matches = qualschedule?.schedule?.schedule.map((match) => {
+    const qualMatches = qualschedule?.schedule?.schedule.map((match) => {
       match.winner = winner(match);
       if (qualScores?.MatchScores) {
         const matchResults = qualScores.MatchScores.filter((scoreMatch) => { return scoreMatch.matchNumber === match.matchNumber })[0];
@@ -600,14 +599,14 @@ function App() {
       return match;
     })
       ;
-    if (matches?.length > 0) {
+    if (qualMatches?.length > 0) {
       qualschedule.scheduleLastModified = qualschedule.schedule?.headers
         ? moment(qualschedule.schedule?.headers.schedule["last-modified"])
         : moment();
       qualschedule.matchesLastModified = qualschedule.schedule?.headers
         ? moment(qualschedule.schedule?.headers.matches["last-modified"])
         : moment();
-      qualschedule.schedule = matches;
+      qualschedule.schedule = qualMatches;
     }
 
     var completedMatchCount = 0;
@@ -641,17 +640,15 @@ function App() {
       `Fetching Playoff Schedule for ${selectedEvent?.value?.name}...`
     );
     //get the playoff schedule
-    matches = [];
-    result = null;
     completedMatchCount = 0;
     if (selectedEvent?.value?.code.includes("OFFLINE")) {
       //set playoffschedule to be empty
       playoffschedule = { schedule: { schedule: [] } };
     } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
-      result = await httpClient.get(
+      const playoffResult = await httpClient.get(
         `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/playoff`
       );
-      playoffschedule = await result.json();
+      playoffschedule = await playoffResult.json();
     } else {
       if (
         selectedEvent?.value?.code === "PRACTICE1" ||
@@ -672,51 +669,64 @@ function App() {
       playoffschedule.schedule.schedule = playoffschedule.schedule.Schedule;
       delete playoffschedule.schedule.Schedule;
     }
+
+    if (playoffschedule?.schedule?.schedule) {
+      playoffschedule.schedule = playoffschedule.schedule.schedule;
+    }
+
     playoffschedule.scheduleLastModified = playoffschedule.schedule?.headers
       ? moment(playoffschedule.schedule?.headers.schedule["last-modified"])
       : moment();
     playoffschedule.matchesLastModified = playoffschedule.schedule?.headers
       ? moment(playoffschedule.schedule?.headers.matches["last-modified"])
       : moment();
-    if (playoffschedule?.schedule?.schedule?.length > 0) {
+
+    if (playoffschedule?.schedule?.length > 0) {
+      completedMatchCount =
+        playoffschedule?.schedule?.length -
+        _.filter(playoffschedule.schedule, { actualStartTime: null })
+          .length;
+    }
+
+    playoffschedule.completedMatchCount = completedMatchCount;
+
+
+    // determine the tiebreaker
+    // var lastMatchNumber = playoffschedule?.schedule[_.findLastIndex(playoffschedule?.schedule, function (match) {
+    //   return (match?.scoreRedFinal !== null) || (match?.scoreBlueFinal !== null)
+    // })]?.matchNumber;
+
+    if (!selectedEvent?.value?.code.includes("PRACTICE")) {
+      const playoffScoresResult = await httpClient.get(
+        `${selectedYear?.value}/scores/${selectedEvent?.value.code}/playoff`
+      );
+      var playoffScores = await playoffScoresResult.json();
+    } else if (
+      selectedEvent?.value?.code === "PRACTICE1" ||
+      selectedEvent?.value?.code === "PRACTICE2"
+    ) {
+      playoffScores = training.scores.playoff.initial;
+    } else if (selectedEvent?.value?.code === "PRACTICE3") {
+      playoffScores = training.scores.playoff.partial;
+    } else {
+      playoffScores = training.scores.playoff.final;
+    }
+
+    if (playoffschedule?.schedule?.length > 0) {
       // adds the winner to the schedule.
-      matches = playoffschedule.schedule.schedule.map((match) => {
+      playoffschedule.schedule = playoffschedule.schedule.map((match) => {
         match.winner = winner(match);
+        //figure out how to match scores to match
+        if (playoffScores?.MatchScores) {
+          const matchResults = playoffScores.MatchScores.filter((scoreMatch) => { return scoreMatch.matchNumber === match.matchNumber })[0];
+          if (matchResults) {
+            match.scores = matchResults;
+          }
+        }
         return match;
       });
 
-      if (playoffschedule?.schedule?.schedule?.length > 0) {
-        completedMatchCount =
-          playoffschedule?.schedule?.schedule?.length -
-          _.filter(playoffschedule.schedule.schedule, { actualStartTime: null })
-            .length;
-      }
-
-      playoffschedule.completedMatchCount = completedMatchCount;
-      playoffschedule.schedule = matches;
-
-      // determine the tiebreaker
-      // var lastMatchNumber = playoffschedule?.schedule[_.findLastIndex(playoffschedule?.schedule, function (match) {
-      //   return (match?.scoreRedFinal !== null) || (match?.scoreBlueFinal !== null)
-      // })]?.matchNumber;
-
-      if (!selectedEvent?.value?.code.includes("PRACTICE")) {
-        result = await httpClient.get(
-          `${selectedYear?.value}/scores/${selectedEvent?.value.code}/playoff`
-        );
-        var scores = await result.json();
-      } else if (
-        selectedEvent?.value?.code === "PRACTICE1" ||
-        selectedEvent?.value?.code === "PRACTICE2"
-      ) {
-        scores = training.scores.playoff.initial;
-      } else if (selectedEvent?.value?.code === "PRACTICE3") {
-        scores = training.scores.playoff.partial;
-      } else {
-        scores = training.scores.playoff.final;
-      }
-
-      _.forEach(scores.MatchScores, (score) => {
+      _.forEach(playoffScores.MatchScores, (score) => {
         if (score.alliances[0].totalPoints === score.alliances[1].totalPoints) {
           var tiebreaker = {
             level: 0,
@@ -756,9 +766,7 @@ function App() {
           ].winner.level = tiebreaker?.level;
         }
       });
-    } else {
-      playoffschedule.schedule = playoffschedule.schedule.schedule;
-    }
+    } 
 
     var lastMatchPlayed = 0;
 
@@ -1081,10 +1089,11 @@ function App() {
           }
           var awardYears = Object.keys(team?.awards);
 
+          //Ensure that current year event names change when Division or sponsor names change
           events.forEach((event) => {
-            if (!eventnames[selectedYear?.value]) {
-              eventnames[selectedYear?.value] = {};
-            }
+            // if (!eventnames[selectedYear?.value]) {
+            //   eventnames[selectedYear?.value] = {};
+            // }
             eventnames[selectedYear?.value][event?.value?.code] =
               event?.value?.name;
           });
@@ -1618,7 +1627,7 @@ function App() {
    * @param code The currently selected event code
   * @returns sets the world high scores
    */
-  async function getEventStats(year,code) {
+  async function getEventStats(year, code) {
     var result = await httpClient.get(`${year}/highscores/${code}`);
     var highscores = await result.json();
     var scores = {};
@@ -2167,7 +2176,7 @@ function App() {
 
   // Retrieve Alliances when we have a playoff schedule
   useEffect(() => {
-    if (playoffSchedule?.schedule.length > 0) {
+    if (playoffSchedule?.schedule?.length > 0) {
       getAlliances();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -2214,10 +2223,10 @@ function App() {
   // check to see if Alliance Selection is ready when QualSchedule and Ranks changes
   useEffect(() => {
     if (
-      rankings?.ranks.length > 0 &&
-      qualSchedule?.schedule.length > 0 &&
-      teamList?.teams.length > 0 &&
-      playoffSchedule?.schedule.length === 0
+      rankings?.ranks?.length > 0 &&
+      qualSchedule?.schedule?.length > 0 &&
+      teamList?.teams?.length > 0 &&
+      playoffSchedule?.schedule?.length === 0
     ) {
       var asReady = false;
       var matchesPerTeam = 0;

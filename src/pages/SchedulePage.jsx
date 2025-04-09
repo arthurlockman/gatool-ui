@@ -7,10 +7,16 @@ import _ from "lodash";
 import Switch from "react-switch";
 import { useState } from "react";
 import { playoffOverrideMenu } from "components/Constants";
+import { CheckCircleFill, XCircleFill } from "react-bootstrap-icons";
+import Handshake from "components/Handshake";
+
 
 function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSchedule, practiceSchedule, setPracticeSchedule, offlinePlayoffSchedule, setOfflinePlayoffSchedule, getTeamList, loadEvent, practiceFileUploaded, setPracticeFileUploaded, setTeamListLoading, getAlliances, playoffOnly, setPlayoffOnly, alliances, champsStyle, setChampsStyle, setQualsLength, playoffCountOverride, setPlayoffCountOverride, eventLabel, setEventLabel, allianceCount, hidePracticeSchedule }) {
 
     const [showAdjustAlliances, setShowAdjustAlliances] = useState(false);
+    const [showScores, setShowScores] = useState(false);
+    const [scoresMatch, setScoresMatch] = useState(null);
+
     const [formData, setFormData] = useState(null);
 
     const byeCount = [
@@ -164,7 +170,7 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
             workbook = read(data, { type: 'array' });
             var worksheet = workbook.Sheets[workbook.SheetNames[0]];
             var schedule = utils.sheet_to_json(worksheet, { range: 4 });
-            var eventnameTemp = worksheet.B3.v || selectedEvent.label;
+            var eventnameTemp = worksheet.B3?.v || selectedEvent.label;
             var formattedSchedule = {};
             var matchNumber = 0;
             var errorMatches = [];
@@ -347,6 +353,15 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
         setShowAdjustAlliances(false);
     }
 
+    const handleOpenScores = (match) => {
+        setScoresMatch(match);
+        setShowScores(true);
+    }
+
+    const handleCloseScores = () => {
+        setShowScores(false);
+    }
+
     const handleFormValue = (allianceNumber, property, value) => {
         var formDataTemp = _.cloneDeep(formData);
         formDataTemp.alliances[allianceNumber - 1][property] = value;
@@ -409,20 +424,97 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
         _.forEach(rankPoints, (value, key) => {
             pointsDisplay.push({ bonus: _.startCase(key.replace("BonusAchieved", "")), earned: value })
         })
-        return pointsDisplay.map((point) => { return <><OverlayTrigger delay={500} overlay={
-            <Tooltip id={`tooltip-${point.bonus}`}>
-              {point.bonus} {point.earned ? " Achieved" : " Not Achieved"}
-            </Tooltip>
-          }><span className={`rankPoints${point.earned ? "":" unearned"}`}>{point.bonus.slice(0, 1)}</span></OverlayTrigger></> })
+        return pointsDisplay.map((point) => {
+            return <><OverlayTrigger delay={500} overlay={
+                <Tooltip id={`tooltip-${point.bonus}`}>
+                    {point.bonus} {point.earned ? " Achieved" : " Not Achieved"}
+                </Tooltip>
+            }><span className={`rankPoints${point.earned ? "" : " unearned"}`}>{point.bonus.slice(0, 1)}</span></OverlayTrigger></>
+        })
+    }
+    const scoreAchieved = (result) => {
+        return result ? <CheckCircleFill style={{ color: "green" }} /> : <XCircleFill style={{ color: "red" }} />
     }
 
+    const addScoreType = (scores) => {
+        return Object.keys(scores).map((key) => {
+            if (key.toLowerCase().includes("alliance")) return { "type": "alliance", "key": key }
+            else if (key.toLowerCase().includes("bonus") || key.toLowerCase() === "rp") return { "type": "bonus", "key": key }
+            else if (key.toLowerCase().includes("auto")) return { "type": "auto", "key": key }
+            else if (key.toLowerCase().includes("teleop")) return { "type": "teleop", "key": key }
+            else if (key.toLowerCase().includes("endgame")) return { "type": "endgame", "key": key }
+            else if (key.toLowerCase().includes("foul")) return { "type": "foul", "key": key }
+            else if (key.toLowerCase().includes("total")) return { "type": "total", "key": key }
+            else if (key.toLowerCase().includes("algae")) return { "type": "algae", "key": key }
+            else return { "type": "other", "key": key }
+        })
+    }
+
+    const scoresRow = (key) => {
+        return (
+            <tr>
+                <td >{key.key}</td>
+                <td className="scheduleTablered">
+                    {key.key.includes("Achieved") || key.key.includes("CriteriaMet") || key.key.includes("Penalty")
+                        ? scoreAchieved(
+                            scoresMatch?.scores
+                                .alliances[1][key.key]
+                        )
+                        : scoresMatch?.scores
+                            .alliances[1][key.key]}
+                </td>
+                
+                <td className="scheduleTableblue">
+                    {key.key.includes("Achieved") || key.key.includes("CriteriaMet") || key.key.includes("Penalty")
+                        ? scoreAchieved(
+                            scoresMatch?.scores
+                                .alliances[0][key.key]
+                        )
+                        : scoresMatch?.scores
+                            .alliances[0][key.key]}
+                </td>
+            </tr>
+        );
+    }
+    // const expandScoresRow = (key) => {
+    //     return (
+    //         <tr>
+    //             <td >{key.key}</td>
+    //             <td className="scheduleTablered">
+    //                 <tr></tr>
+    //                 {scoresMatch?.scores.alliances[1][key.key].map((item)=>{
+    //                     return (
+    //                         <tr>
+    //                             <td>{Object.keys(item)[0]}</td>
+    //                             <td>{scoresMatch?.scores.alliances[0][key.key][Object.keys(item)[0]].map((val)=>{
+    //                                 return 
+    //                             })}</td>
+    //                             <td>Red Alliance Stuff</td>
+                                
+    //                         </tr>
+    //                     )
+    //                 })}
+    //             </td>
+                
+    //             <td className="scheduleTableblue">
+    //                 {key.key.includes("Achieved") || key.key.includes("CriteriaMet") || key.key.includes("Penalty")
+    //                     ? scoreAchieved(
+    //                         scoresMatch?.scores
+    //                             .alliances[0][key.key]
+    //                     )
+    //                     : scoresMatch?.scores
+    //                         .alliances[0][key.key]}
+    //             </td>
+    //         </tr>
+    //     );
+    // }
 
     return (
         <Container fluid>
             {!selectedEvent && <div>
                 <Alert variant="warning" >You need to select an event before you can see anything here.</Alert>
             </div>}
-            {selectedEvent && (!qualSchedule || qualSchedule?.schedule?.length === 0 || qualSchedule?.schedule?.schedule?.length === 0) && (!playoffSchedule || playoffSchedule?.schedule?.length === 0 || playoffSchedule?.schedule?.schedule?.length === 0) && <div>
+            {selectedEvent && (!qualSchedule || qualSchedule?.schedule?.length === 0 || qualSchedule?.schedule?.schedule?.length === 0) && (!playoffSchedule || playoffSchedule?.schedule?.length === 0) && <div>
                 <Alert variant="warning" >
                     {(!practiceSchedule || practiceSchedule?.schedule?.length === 0 || practiceSchedule?.schedule?.schedule?.length === 0) && !practiceFileUploaded && <>
                         {!(playoffOnly && (offlinePlayoffSchedule?.schedule?.length >= 0 || offlinePlayoffSchedule?.schedule?.schedule?.length >= 0)) && <>
@@ -557,7 +649,7 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                                     <td>{match?.actualStartTime ? "Actual:" : "Scheduled:"}<br /> {match?.actualStartTime ? moment(match.actualStartTime).format('dd hh:mm A') : moment(match?.startTime).format('dd hh:mm A')}</td>
                                     <td>{match?.description}</td>
                                     <td>{match?.matchNumber}</td>
-                                    <td><span className={redStyle}>{match?.scoreRedFinal}</span><br /><span className={blueStyle}>{match?.scoreBlueFinal}</span></td>
+                                    <td colSpan={2}><span className={redStyle}>{match?.scoreRedFinal}</span><br /><span className={blueStyle}>{match?.scoreBlueFinal}</span></td>
                                     <td><span className={redStyle}>{match?.teams[0]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[3]?.teamNumber}</span></td>
                                     <td><span className={redStyle}>{match?.teams[1]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[4]?.teamNumber}</span></td>
                                     <td><span className={redStyle}>{match?.teams[2]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[5]?.teamNumber}</span></td>
@@ -585,13 +677,13 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                                     <td>{match?.actualStartTime ? "Actual:" : "Scheduled:"}<br /> {match?.actualStartTime ? moment(match?.actualStartTime).format('dd hh:mm A') : moment(match?.startTime).format('dd hh:mm A')}</td>
                                     <td>{match?.description}</td>
                                     <td>{match?.matchNumber}</td>
-                                    <td className={(match?.actualStartTime ) ? `scheduleTable${winnerStyle}` : ""}>
+                                    <td className={(match?.actualStartTime) ? `scheduleTable${winnerStyle}` : ""} onClick={() => { if (match.scores) { handleOpenScores(match) } }}>
                                         <tr className={`centerTable ${redStyle} block`}><span>{match?.scoreRedFinal}</span></tr>
                                         <tr className={`centerTable ${blueStyle} block`}><span>{match?.scoreBlueFinal}</span></tr>
                                     </td>
-                                    <td className={(match?.actualStartTime ) ? `scheduleTable${winnerStyle} ${scoreStyle}` : ""}>
-                                        <tr className={`centerTable ${redStyle} block`}><span style={{whiteSpace:'nowrap'}}>{match?.redRP ? rankPointDisplay(match?.redRP) : " "}</span></tr>
-                                        <tr className={`centerTable ${blueStyle} block`}><span style={{whiteSpace:'nowrap'}}>{match?.blueRP ? rankPointDisplay(match?.blueRP) : " "}</span></tr>
+                                    <td className={(match?.actualStartTime) ? `scheduleTable${winnerStyle} ${scoreStyle}` : ""}>
+                                        <tr className={`centerTable ${redStyle} block`}><span style={{ whiteSpace: 'nowrap' }}>{match?.redRP ? rankPointDisplay(match?.redRP) : " "}</span></tr>
+                                        <tr className={`centerTable ${blueStyle} block`}><span style={{ whiteSpace: 'nowrap' }}>{match?.blueRP ? rankPointDisplay(match?.blueRP) : " "}</span></tr>
                                     </td>
                                     <td><span className={redStyle}>{match?.teams[0]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[3]?.teamNumber}</span></td>
                                     <td><span className={redStyle}>{match?.teams[1]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[4]?.teamNumber}</span></td>
@@ -617,7 +709,7 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                                     <td>{match?.actualStartTime ? "Actual:" : "Scheduled:"}<br /> {match?.actualStartTime ? moment(match?.actualStartTime).format('dd hh:mm A') : moment(match?.startTime).format('dd hh:mm A')}</td>
                                     <td>{match?.description}</td>
                                     <td>{match?.matchNumber + (qualMatchCount || 0)}</td>
-                                    <td className={(match?.actualStartTime ) ? `scheduleTable${winnerStyle}` : " "} colSpan={2}>
+                                    <td className={(match?.actualStartTime) ? `scheduleTable${winnerStyle}` : " "} onClick={() => { if (match?.scores) { handleOpenScores(match) } }} colSpan={2}>
                                         <tr className={`centerTable ${redStyle} block`} ><span>{match?.scoreRedFinal}</span></tr>
                                         <tr className={`centerTable ${blueStyle} block`}><span>{match?.scoreBlueFinal}</span></tr>
                                     </td>
@@ -631,7 +723,7 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                                 <tr>
                                     <td colSpan={7}>No Qualification match schedule available yet.</td>
                                 </tr>}
-                            {!offlinePlayoffSchedule && (playoffSchedule?.schedule?.length === 0 || playoffSchedule?.schedule?.schedule?.length === 0) &&
+                            {!offlinePlayoffSchedule && (playoffSchedule?.schedule?.length === 0) &&
                                 <tr>
                                     <td colSpan={7}>No Playoff match schedule available yet.</td>
                                 </tr>}
@@ -663,6 +755,46 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleAdjustAlliances}>Save Alliances</Button>
+                </Modal.Footer>
+            </Modal>
+            <Modal centered={true} show={showScores} size="lg" onHide={handleCloseScores}>
+                <Modal.Header className={"promoteBackup"} closeVariant={"white"} closeButton>
+                    <Modal.Title >Score Details for {scoresMatch?.description}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Container>
+                        <Table>
+                            <tbody>
+                                <tr>
+                                    <td >Start Time:</td><td colSpan={2}>{moment(scoresMatch?.actualStartTime).format('dd hh:mm A')}</td>
+                                </tr>
+                                <tr>
+                                    <td >Post Time:</td><td colSpan={2}>{moment(scoresMatch?.postResultTime).format('dd hh:mm A')}</td>
+                                </tr>
+                                <tr>
+                                    <td >Winner:</td><td colSpan={2}>{scoresMatch?.winner.winner === "red" ? <span style={{ color: "red" }}><b>Red Alliance</b></span> : scoresMatch?.winner.winner === "blue" ? <span style={{ color: "blue" }}><b>Blue Alliance</b></span> : scoresMatch?.winner.winner === "tie" ? "Tie" : ""}</td>
+                                </tr>
+                                <tr>
+                                    <td >Coopertition:</td><td colSpan={2}><Handshake result={scoresMatch?.scores.coopertitionBonusAchieved} /></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Criterion</b></td><td className="scheduleTablered"><b>Red Alliance Results</b></td><td  className="scheduleTableblue"><b>Blue Alliance Results</b></td>
+                                </tr>
+                                {scoresMatch?.scores.alliances[0] ? _.orderBy(addScoreType(scoresMatch?.scores.alliances[0]), ["type", "key"], ["asc", "asc"]).map((key) => {
+                                    if (typeof scoresMatch?.scores.alliances[0][key.key] === "object") {
+                                        // return expandScoresRow(key);
+                                        return null
+                                    } else {
+                                        return scoresRow(key)
+                                    }
+                                }) : <></>}
+                            </tbody>
+                        </Table>
+
+                    </Container>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseScores}>Done</Button>
                 </Modal.Footer>
             </Modal>
         </Container>
