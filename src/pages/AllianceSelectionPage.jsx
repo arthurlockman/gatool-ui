@@ -56,7 +56,7 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
             {!selectedEvent && <div>
                 <Alert variant="warning" ><div>You need to select an event before you can see anything here.</div></Alert>
             </div>}
-            {selectedEvent && (!qualSchedule || qualSchedule?.schedule?.length === 0 || qualSchedule?.schedule?.schedule?.length === 0) && (!practiceSchedule || practiceSchedule?.schedule?.length === 0 || practiceSchedule?.schedule?.schedule?.length === 0) && (!playoffSchedule || playoffSchedule?.schedule?.length === 0 || playoffSchedule?.schedule?.schedule?.length === 0) &&
+            {selectedEvent && (!qualSchedule || qualSchedule?.schedule?.length === 0 || qualSchedule?.schedule?.schedule?.length === 0) && (!practiceSchedule || practiceSchedule?.schedule?.length === 0 || practiceSchedule?.schedule?.schedule?.length === 0) && (!playoffSchedule || playoffSchedule?.schedule?.length === 0 ) &&
                 <div>
                     <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div><div>Waiting for Qualification Match Schedule</div></Alert>
                 </div>}

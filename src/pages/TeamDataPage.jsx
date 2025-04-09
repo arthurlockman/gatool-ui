@@ -368,7 +368,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
 
         //Add the Schedule to the worksheet
         var schedule = qualSchedule?.schedule?.schedule || qualSchedule?.schedule || [];
-        if (playoffSchedule?.schedule?.length > 0 || playoffSchedule?.schedule?.schedule?.length > 0) {
+        if (playoffSchedule?.schedule?.length > 0 || playoffSchedule?.schedule?.length > 0) {
             schedule = _.concat(qualSchedule?.schedule || qualSchedule?.schedule?.schedule, playoffSchedule?.schedule?.schedule || playoffSchedule?.schedule);
         }
 

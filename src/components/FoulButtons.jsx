@@ -12,6 +12,25 @@ import { useHotkeysContext, useHotkeys } from "react-hotkeys-hook";
 
 const commonFouls = [
   {
+    year: 2025,
+    code: "G206",
+    name: "Don’t violate rules for RP",
+    level: "verbal",
+    card: "yellow",
+    rp: true,
+    text: (
+      <>
+        <p>
+          A team or ALLIANCE may not collude with another team to each
+          purposefully violate a rule in an attempt to influence Ranking Points.
+        </p>
+      </>
+    ),
+    violation: (
+      <>YELLOW CARD and the ALLIANCE is ineligible for CORAL and BARGE RPs</>
+    ),
+  },
+  {
     year: 3000,
     code: "G207",
     name: "Don’t abuse ARENA access",
@@ -224,6 +243,25 @@ const commonFouls = [
   },
   {
     year: 2025,
+    code: "G410",
+    name: "No de-scoring",
+    level: "major",
+    card: null,
+    rp: true,
+    text: (
+      <>
+        <p>A ROBOT may not de-score a CORAL scored on the opponent’s REEF.</p>
+      </>
+    ),
+    violation: (
+      <>
+        MAJOR FOUL per de-scored CORAL and the{" "}
+        <b>opposing ALLIANCE is awarded the CORAL RP.</b>
+      </>
+    ),
+  },
+  {
+    year: 2025,
     code: "G411",
     name: "Don’t put ALGAE on their REEF",
     level: "major",
@@ -325,7 +363,7 @@ const commonFouls = [
     name: "An Opponent’s CAGES are off-limits in TELEOP",
     level: "major",
     card: null,
-    rp: "barge",
+    rp: true,
     text: (
       <>
         <p>In TELEOP, A ROBOT may not contact an opponent’s CAGE.</p>
@@ -347,7 +385,7 @@ const commonFouls = [
     name: "ANCHORS are off-limits",
     level: "major",
     card: null,
-    rp: "barge",
+    rp: true,
     text: (
       <>
         <p>
@@ -461,6 +499,28 @@ const commonFouls = [
       <>
         MAJOR FOUL and YELLOW CARD, or if CONTINUOUS or opponent ROBOT is unable
         to drive, then MAJOR FOUL and RED CARD.
+      </>
+    ),
+  },
+  {
+    year: 2025,
+    code: "G428",
+    name: "CAGE protection.",
+    level: "major",
+    card: null,
+    rp: true,
+    text: (
+      <>
+        <p>
+          A ROBOT may not contact, directly or transitively through a SCORING
+          ELEMENT, an opponent ROBOT in contact with an opponent CAGE during the
+          last 20 seconds regardless of who initiates contact.
+        </p>
+      </>
+    ),
+    violation: (
+      <>
+        MAJOR FOUL and the <b>opponent ALLIANCE is awarded the BARGE RP</b>
       </>
     ),
   },
@@ -587,7 +647,7 @@ function FoulButtons({ currentYear }) {
       <ButtonToolbar
         style={{ alignContent: "center", width: "100%", display: "block" }}
       >
-        {_.filter(_.sortBy(commonFouls, ["card", "code"]), (foul) => {
+        {_.filter(_.sortBy(commonFouls, ["card", "code", "rp"]), (foul) => {
           return foul.card === "red" || foul.card === "yellow";
         }).map((foul) => {
           return (
@@ -602,7 +662,20 @@ function FoulButtons({ currentYear }) {
                   : ""
               }
             >
-              {foul.code}
+              {foul?.rp?<><b>RP</b> </>:""}{foul.code}
+            </Button>
+          );
+        })}
+        {_.filter(_.sortBy(commonFouls, ["card", "code","rp"]), (foul) => {
+          return foul.card !== "red" && foul.card !== "yellow";
+        }).map((foul) => {
+          return (
+            <Button
+              onClick={() => handleShow(foul)}
+              className={"foulButtons"}
+              variant={"info"}
+            >
+              {foul?.rp?<><b>RP</b> </>:""}{foul.code}
             </Button>
           );
         })}

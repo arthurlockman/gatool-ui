@@ -1,5 +1,13 @@
 export const appUpdates = [
   {
+    date: "April 8, 2025",
+    message: (
+      <ul>
+        <li>Adding verbose score details on Schedule page</li>
+        <li>Adding in additional fouls</li>
+      </ul>
+    ),
+  },{
     date: "March 28, 2025",
     message: (
       <ul>
