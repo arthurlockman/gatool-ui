@@ -91,7 +91,7 @@ function CheatsheetPage({
   return (
     <Container fluid>
       <img
-        src="/cheatsheet/reefscape-cheat-sheet-v3.png"
+        src="/cheatsheet/reefscape-cheat-sheet-v3_02.png"
         width="100%"
         alt="Cheatsheet"
       ></img>
