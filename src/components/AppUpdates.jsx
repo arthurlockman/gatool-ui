@@ -1,5 +1,14 @@
 export const appUpdates = [
   {
+    date: "April 10, 2025",
+    message: (
+      <ul>
+        <li>Formatting improvements for score details on Schedule page</li>
+        <li>Adding Rookie All Star teams to District Champs attendees</li>
+        <li>Updated major awards highlighting</li>
+      </ul>
+    ),
+  },{
     date: "April 8, 2025",
     message: (
       <ul>
