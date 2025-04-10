@@ -432,30 +432,31 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
             }><span className={`rankPoints${point.earned ? "" : " unearned"}`}>{point.bonus.slice(0, 1)}</span></OverlayTrigger></>
         })
     }
+
     const scoreAchieved = (result) => {
         return result ? <CheckCircleFill style={{ color: "green" }} /> : <XCircleFill style={{ color: "red" }} />
     }
 
     const addScoreType = (scores) => {
         return Object.keys(scores).map((key) => {
-            if (key.toLowerCase().includes("alliance")) return { "type": "alliance", "key": key }
-            else if (key.toLowerCase().includes("bonus") || key.toLowerCase() === "rp") return { "type": "bonus", "key": key }
-            else if (key.toLowerCase().includes("auto")) return { "type": "auto", "key": key }
-            else if (key.toLowerCase().includes("teleop")) return { "type": "teleop", "key": key }
-            else if (key.toLowerCase().includes("endgame")) return { "type": "endgame", "key": key }
-            else if (key.toLowerCase().includes("foul")) return { "type": "foul", "key": key }
-            else if (key.toLowerCase().includes("total")) return { "type": "total", "key": key }
-            else if (key.toLowerCase().includes("algae")) return { "type": "algae", "key": key }
-            else return { "type": "other", "key": key }
+            if (key.toLowerCase().includes("alliance")) return { "type": 1, "key": key }
+            else if (key.toLowerCase().includes("bonus") || key.toLowerCase() === "rp") return { "type": 2, "key": key }
+            else if (key.toLowerCase().includes("auto")) return { "type": 3, "key": key }
+            else if (key.toLowerCase().includes("teleop")) return { "type": 4, "key": key }
+            else if (key.toLowerCase().includes("endgame")) return { "type": 5, "key": key }
+            else if (key.toLowerCase().includes("algae")) return { "type": 6, "key": key }
+            else if (key.toLowerCase().includes("foul")) return { "type": 7, "key": key }
+            else if (key.toLowerCase().includes("total")) return { "type": 9, "key": key }
+            else return { "type": 10, "key": key }
         })
     }
 
     const scoresRow = (key) => {
         return (
             <tr>
-                <td >{key.key}</td>
+                <td ><b>{key.key}</b></td>
                 <td className="scheduleTablered">
-                    {key.key.includes("Achieved") || key.key.includes("CriteriaMet") || key.key.includes("Penalty")
+                    {typeof scoresMatch?.scores.alliances[1][key.key] === "boolean"
                         ? scoreAchieved(
                             scoresMatch?.scores
                                 .alliances[1][key.key]
@@ -463,9 +464,9 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                         : scoresMatch?.scores
                             .alliances[1][key.key]}
                 </td>
-                
+
                 <td className="scheduleTableblue">
-                    {key.key.includes("Achieved") || key.key.includes("CriteriaMet") || key.key.includes("Penalty")
+                    {typeof scoresMatch?.scores.alliances[1][key.key] === "boolean"
                         ? scoreAchieved(
                             scoresMatch?.scores
                                 .alliances[0][key.key]
@@ -476,38 +477,81 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
             </tr>
         );
     }
-    // const expandScoresRow = (key) => {
-    //     return (
-    //         <tr>
-    //             <td >{key.key}</td>
-    //             <td className="scheduleTablered">
-    //                 <tr></tr>
-    //                 {scoresMatch?.scores.alliances[1][key.key].map((item)=>{
-    //                     return (
-    //                         <tr>
-    //                             <td>{Object.keys(item)[0]}</td>
-    //                             <td>{scoresMatch?.scores.alliances[0][key.key][Object.keys(item)[0]].map((val)=>{
-    //                                 return 
-    //                             })}</td>
-    //                             <td>Red Alliance Stuff</td>
-                                
-    //                         </tr>
-    //                     )
-    //                 })}
-    //             </td>
-                
-    //             <td className="scheduleTableblue">
-    //                 {key.key.includes("Achieved") || key.key.includes("CriteriaMet") || key.key.includes("Penalty")
-    //                     ? scoreAchieved(
-    //                         scoresMatch?.scores
-    //                             .alliances[0][key.key]
-    //                     )
-    //                     : scoresMatch?.scores
-    //                         .alliances[0][key.key]}
-    //             </td>
-    //         </tr>
-    //     );
-    // }
+
+    const expandScoresRow = (key) => {
+        const redRow = scoresMatch?.scores.alliances[1][key.key];
+        const blueRow = scoresMatch?.scores.alliances[0][key.key];
+        return (
+            <>
+                <tr>
+                    <td ><b>{key.key}</b></td><td className="scheduleTablered"></td>
+                    <td className="scheduleTableblue"></td>
+                </tr>
+
+                {Object.keys(redRow).map((itemKey) => {
+                    if (typeof redRow[itemKey] === "object") {
+                        const redRowKeys = Object.keys(redRow[itemKey]);
+                        return (
+                            <><tr>
+                                <td><b>     {itemKey}</b></td>
+                                <td className="scheduleTablered">
+                                    <tr>
+                                        <tr>{redRowKeys.map((score) => {
+                                            return (
+                                                <td style={{ writingMode: "vertical-rl", padding: "5px 0px 0px 5px" }}><b>{score}</b></td>
+                                            )
+                                        })}
+                                        </tr>
+                                        <tr>
+                                            {redRowKeys.map((score) => {
+                                                const writingMode = typeof redRow[itemKey][score] === "string" ? "vertical-rl" : Array.isArray(redRow[itemKey][score]) ? "vertical-rl" : "horizontal-tb";
+                                                return (
+                                                    <td style={{ writingMode: writingMode, padding: "5px 0px 0px 5px" }}>{typeof redRow[itemKey][score] === "string" ? redRow[itemKey][score] : Array.isArray(redRow[itemKey][score]) ? redRow[itemKey][score].join(",") : scoreAchieved(redRow[itemKey][score])}</td>
+                                                )
+                                            })}
+                                        </tr>
+                                    </tr>
+                                </td>
+                                <td className="scheduleTableblue">
+                                    <tr>
+                                        <tr>{redRowKeys.map((score) => {
+                                            return (
+                                                <td style={{ writingMode: "vertical-rl", padding: "5px 0px 0px 5px" }}><b>{score}</b></td>
+                                            )
+                                        })}
+                                        </tr>
+                                        <tr>
+                                            {redRowKeys.map((score) => {
+                                                const writingMode = typeof redRow[itemKey][score] === "string" ? "vertical-rl" : Array.isArray(redRow[itemKey][score]) ? "vertical-rl" : "horizontal-tb";
+                                                return (
+                                                    <td style={{ writingMode: writingMode, padding: "5px 0px 0px 5px" }}>{
+                                                        typeof blueRow[itemKey][score] === "string" ? 
+                                                        blueRow[itemKey][score] : 
+                                                        Array.isArray(blueRow[itemKey][score]) ? 
+                                                        blueRow[itemKey][score].join(",") : 
+                                                        scoreAchieved(blueRow[itemKey][score])}</td>
+                                                )
+                                            })}
+                                        </tr>
+                                    </tr>
+                                </td>
+                            </tr>
+                            </>
+                        )
+                    } else {
+                        return (
+                            <tr>
+                                <td><b>     {itemKey}</b></td>
+                                <td className="scheduleTablered">{redRow[itemKey]}</td>
+                                <td className="scheduleTableblue">{blueRow[itemKey]}</td>
+                            </tr>
+                        )
+                    }
+                })}
+
+            </>
+        );
+    }
 
     return (
         <Container fluid>
@@ -669,7 +713,7 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                                     winnerStyle = "blue";
                                 }
 
-                                if (match?.scores?.coopertitionBonusAchieved) {
+                                if (match?.scores?.coopertitionBonusAchieved || match?.scores?.coopertitionCriteriaMet) {
                                     scoreStyle = " coopertition"
                                 }
 
@@ -757,13 +801,13 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                     <Button variant="secondary" onClick={handleAdjustAlliances}>Save Alliances</Button>
                 </Modal.Footer>
             </Modal>
-            <Modal centered={true} show={showScores} size="lg" onHide={handleCloseScores}>
+            <Modal fullscreen={true} show={showScores} onHide={handleCloseScores}>
                 <Modal.Header className={"promoteBackup"} closeVariant={"white"} closeButton>
                     <Modal.Title >Score Details for {scoresMatch?.description}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Container>
-                        <Table>
+                    <Container fluid  >
+                        <Table style={{margin: "0px auto", overflowY: "scroll" }} responsive striped bordered size="sm">
                             <tbody>
                                 <tr>
                                     <td >Start Time:</td><td colSpan={2}>{moment(scoresMatch?.actualStartTime).format('dd hh:mm A')}</td>
@@ -775,15 +819,15 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                                     <td >Winner:</td><td colSpan={2}>{scoresMatch?.winner.winner === "red" ? <span style={{ color: "red" }}><b>Red Alliance</b></span> : scoresMatch?.winner.winner === "blue" ? <span style={{ color: "blue" }}><b>Blue Alliance</b></span> : scoresMatch?.winner.winner === "tie" ? "Tie" : ""}</td>
                                 </tr>
                                 <tr>
-                                    <td >Coopertition:</td><td colSpan={2}><Handshake result={scoresMatch?.scores.coopertitionBonusAchieved} /></td>
+                                    <td >Coopertition:</td><td colSpan={2}><Handshake result={scoresMatch?.scores?.coopertitionBonusAchieved || scoresMatch?.scores.alliances[0]?.coopertitionCriteriaMet} /></td>
                                 </tr>
                                 <tr>
-                                    <td><b>Criterion</b></td><td className="scheduleTablered"><b>Red Alliance Results</b></td><td  className="scheduleTableblue"><b>Blue Alliance Results</b></td>
+                                    <td><b>Criterion</b></td><td className="scheduleTablered"><b>Red Alliance Results</b></td><td className="scheduleTableblue"><b>Blue Alliance Results</b></td>
                                 </tr>
                                 {scoresMatch?.scores.alliances[0] ? _.orderBy(addScoreType(scoresMatch?.scores.alliances[0]), ["type", "key"], ["asc", "asc"]).map((key) => {
                                     if (typeof scoresMatch?.scores.alliances[0][key.key] === "object") {
-                                        // return expandScoresRow(key);
-                                        return null
+                                        return expandScoresRow(key);
+                                        // return null
                                     } else {
                                         return scoresRow(key)
                                     }

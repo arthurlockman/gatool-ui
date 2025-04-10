@@ -841,11 +841,14 @@ function App() {
           awardName === "Chairman's Award Finalist" ||
           awardName === "FIRST Dean's List Award" ||
           awardName === "Woodie Flowers Award" ||
+          awardName === "Woodie Flowers Finalist Award" ||
           awardName === "Innovation Challenge Winner" ||
           awardName === "Innovation Challenge Finalist" ||
           awardName === "FIRST Impact Award" ||
+          awardName === "FIRST Impact Award Finalist" ||
           awardName === "District FIRST Impact Award" ||
-          awardName === "Regional FIRST Impact Award"
+          awardName === "Regional FIRST Impact Award" ||
+          awardName === "Rookie All Star Award"
         ) {
           return true;
         } else {
@@ -899,7 +902,7 @@ function App() {
         delete teams.Teams;
       }
 
-      // handle District EI teams
+      // handle District EI and RAS teams
       // if District Champs, filter list of events by district code
       var districtEvents = null;
       if (
@@ -916,8 +919,8 @@ function App() {
             `${selectedYear?.value}/awards/event/${event?.value?.code}`
           );
           var eventDetails = await request.json();
-          // filter that list by EI {awardId: "633"} {name: "District Engineering Inspiration Award"}
-          return _.filter(eventDetails?.Awards, { awardId: 633 });
+          // filter that list by EI {awardId: "633"} {name: "District Engineering Inspiration Award"} and {awardID: "417"} {name:"Rookie All Star Award"}
+          return _.filter(eventDetails?.Awards, (award)=>{ return award.awardId===633 || award.awardId===417 });
         });
 
         await Promise.all(districtEITeams).then(async function (values) {
