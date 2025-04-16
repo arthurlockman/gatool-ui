@@ -1,5 +1,12 @@
 export const appUpdates = [
   {
+    date: "April 15, 2025",
+    message: (
+      <ul>
+        <li>Fixed an issue with downloaded file names</li>
+      </ul>
+    ),
+  },{
     date: "April 10, 2025",
     message: (
       <ul>
