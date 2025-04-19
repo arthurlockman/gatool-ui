@@ -1,5 +1,12 @@
 export const appUpdates = [
   {
+    date: "April 18, 2025",
+    message: (
+      <ul>
+        <li>Expanded exported schedule (from Team Data page) to include additional score details</li>
+      </ul>
+    ),
+  },{
     date: "April 15, 2025",
     message: (
       <ul>

@@ -384,7 +384,30 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                     record.winner = match?.winner?.winner;
                     record.tieWinner = match?.winner?.tieWinner;
                     record.tieBreakerLevel = match?.winner?.level;
-                } else {
+                } else if (key === 'blueRP') {
+                    Object.keys(match?.blueRP).forEach((key) => {
+                        record[`blueRP_${key}`] = match?.blueRP[key];
+                    })
+                } else if (key === 'redRP') {
+                    Object.keys(match?.redRP).forEach((key) => {
+                        record[`redRP_${key}`] = match?.blueRP[key];
+                    })
+                } else if (key === 'scores') {
+                    Object.keys(match?.scores).forEach((key) => {
+                        if (key==="alliances") {
+                            match.scores.alliances.forEach((allianceScore) =>{
+                                Object.keys(allianceScore).forEach((allianceKey) =>{
+                                    if (allianceKey !== "alliance") {
+                                        if (typeof allianceScore[allianceKey] !== "object") {
+                                            record[`${allianceScore.alliance}_${allianceKey}`] = allianceScore[allianceKey];
+                                        }
+                                    }
+                                })
+                            })
+                        } else  {
+                        record[key] = match?.scores[key];}
+                    })
+                }else {
                     record[key] = match[key];
                 }
             })
