@@ -484,7 +484,8 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
         return (
             <>
                 <tr>
-                    <td ><b>{key.key}</b></td><td className="scheduleTablered"></td>
+                    <td ><b>{key.key}</b></td>
+                    <td className="scheduleTablered"></td>
                     <td className="scheduleTableblue"></td>
                 </tr>
 
@@ -496,43 +497,49 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                                 <td><b>     {itemKey}</b></td>
                                 <td className="scheduleTablered">
                                     <tr>
-                                        <tr>{redRowKeys.map((score) => {
-                                            return (
-                                                <td style={{ writingMode: "vertical-rl", padding: "5px 0px 0px 5px" }}><b>{score}</b></td>
-                                            )
-                                        })}
-                                        </tr>
-                                        <tr>
-                                            {redRowKeys.map((score) => {
-                                                const writingMode = typeof redRow[itemKey][score] === "string" ? "vertical-rl" : Array.isArray(redRow[itemKey][score]) ? "vertical-rl" : "horizontal-tb";
-                                                return (
-                                                    <td style={{ writingMode: writingMode, padding: "5px 0px 0px 5px" }}>{typeof redRow[itemKey][score] === "string" ? redRow[itemKey][score] : Array.isArray(redRow[itemKey][score]) ? redRow[itemKey][score].join(",") : scoreAchieved(redRow[itemKey][score])}</td>
-                                                )
-                                            })}
-                                        </tr>
+                                        <td>
+                                            <tr>
+                                                {redRowKeys.map((score) => {
+                                                    return (
+                                                        <td style={{ writingMode: "vertical-rl", padding: "5px 0px 0px 5px" }}><b>{score}</b></td>
+                                                    )
+                                                })}
+                                            </tr>
+                                            <tr>
+                                                {redRowKeys.map((score) => {
+                                                    const writingMode = typeof redRow[itemKey][score] === "string" ? "vertical-rl" : Array.isArray(redRow[itemKey][score]) ? "vertical-rl" : "horizontal-tb";
+                                                    return (
+                                                        <td style={{ writingMode: writingMode, padding: "5px 0px 0px 5px" }}>{typeof redRow[itemKey][score] === "string" ? redRow[itemKey][score] : Array.isArray(redRow[itemKey][score]) ? redRow[itemKey][score].join(",") : scoreAchieved(redRow[itemKey][score])}</td>
+                                                    )
+                                                })}
+                                            </tr>
+                                        </td>
                                     </tr>
                                 </td>
                                 <td className="scheduleTableblue">
                                     <tr>
-                                        <tr>{redRowKeys.map((score) => {
-                                            return (
-                                                <td style={{ writingMode: "vertical-rl", padding: "5px 0px 0px 5px" }}><b>{score}</b></td>
-                                            )
-                                        })}
-                                        </tr>
-                                        <tr>
-                                            {redRowKeys.map((score) => {
-                                                const writingMode = typeof redRow[itemKey][score] === "string" ? "vertical-rl" : Array.isArray(redRow[itemKey][score]) ? "vertical-rl" : "horizontal-tb";
-                                                return (
-                                                    <td style={{ writingMode: writingMode, padding: "5px 0px 0px 5px" }}>{
-                                                        typeof blueRow[itemKey][score] === "string" ? 
-                                                        blueRow[itemKey][score] : 
-                                                        Array.isArray(blueRow[itemKey][score]) ? 
-                                                        blueRow[itemKey][score].join(",") : 
-                                                        scoreAchieved(blueRow[itemKey][score])}</td>
-                                                )
-                                            })}
-                                        </tr>
+                                        <td>
+                                            <tr>
+                                                {redRowKeys.map((score) => {
+                                                    return (
+                                                        <td style={{ writingMode: "vertical-rl", padding: "5px 0px 0px 5px" }}><b>{score}</b></td>
+                                                    )
+                                                })}
+                                            </tr>
+                                            <tr>
+                                                {redRowKeys.map((score) => {
+                                                    const writingMode = typeof redRow[itemKey][score] === "string" ? "vertical-rl" : Array.isArray(redRow[itemKey][score]) ? "vertical-rl" : "horizontal-tb";
+                                                    return (
+                                                        <td style={{ writingMode: writingMode, padding: "5px 0px 0px 5px" }}>{
+                                                            typeof blueRow[itemKey][score] === "string" ?
+                                                                blueRow[itemKey][score] :
+                                                                Array.isArray(blueRow[itemKey][score]) ?
+                                                                    blueRow[itemKey][score].join(",") :
+                                                                    scoreAchieved(blueRow[itemKey][score])}</td>
+                                                    )
+                                                })}
+                                            </tr>
+                                        </td>
                                     </tr>
                                 </td>
                             </tr>
@@ -725,7 +732,7 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                                         <tr className={`centerTable ${redStyle} block`}><span>{match?.scoreRedFinal}</span></tr>
                                         <tr className={`centerTable ${blueStyle} block`}><span>{match?.scoreBlueFinal}</span></tr>
                                     </td>
-                                    <td className={(match?.actualStartTime) ? `scheduleTable${winnerStyle} ${scoreStyle}` : ""}>
+                                    <td className={(match?.actualStartTime) ? `scheduleTable${winnerStyle} ${scoreStyle}` : ""} onClick={() => { if (match.scores) { handleOpenScores(match) } }}>
                                         <tr className={`centerTable ${redStyle} block`}><span style={{ whiteSpace: 'nowrap' }}>{match?.redRP ? rankPointDisplay(match?.redRP) : " "}</span></tr>
                                         <tr className={`centerTable ${blueStyle} block`}><span style={{ whiteSpace: 'nowrap' }}>{match?.blueRP ? rankPointDisplay(match?.blueRP) : " "}</span></tr>
                                     </td>
@@ -807,7 +814,7 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                 </Modal.Header>
                 <Modal.Body>
                     <Container fluid  >
-                        <Table style={{margin: "0px auto", overflowY: "scroll" }} responsive striped bordered size="sm">
+                        <Table style={{ margin: "0px auto", overflowY: "scroll" }} responsive striped bordered size="sm">
                             <tbody>
                                 <tr>
                                     <td >Start Time:</td><td colSpan={2}>{moment(scoresMatch?.actualStartTime).format('dd hh:mm A')}</td>
