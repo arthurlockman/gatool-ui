@@ -2099,6 +2099,8 @@ export const allianceShortNames = {
   Carver: "Carv",
   Galileo: "Gal",
   Hopper: "Hop",
+  Milstein: "Mil",
+  Johnson: "John",
   Newton: "New",
   Roebling: "Roeb",
   Turing: "Tur",
@@ -2109,6 +2111,7 @@ export const allianceShortNames = {
   Consumers: "Cons",
 };
 
+// Update this after Champs each season
 export const hallOfFame = [
   {
     Year: 2025,

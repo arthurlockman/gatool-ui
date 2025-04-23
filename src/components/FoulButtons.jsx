@@ -869,6 +869,7 @@ function FoulButtons({ currentYear }) {
               onClick={() => handleShow(foul)}
               className={"foulButtons"}
               variant={"info"}
+              key={foul.code}
             >
               {foul?.rp ? (
                 <>
@@ -883,6 +884,7 @@ function FoulButtons({ currentYear }) {
         })}
         <Button
           className={"foulButtons"}
+          key={"foulLookup"}
           onClick={() => {
             // window.open(`https://frctools.com/${currentYear}`);
             handleShow({
