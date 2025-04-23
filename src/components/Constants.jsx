@@ -2111,6 +2111,15 @@ export const allianceShortNames = {
 
 export const hallOfFame = [
   {
+    Year: 2025,
+    Impact: 5985,
+    Challenge: "Reefscape Houston",
+    Winner1: 1323,
+    Winner2: 2910,
+    Winner3: 4272,
+    Winner4: 5026,
+    Winner5: null,
+  },{
     Year: 2024,
     Impact: 2486,
     Challenge: "Crescendo Houston",

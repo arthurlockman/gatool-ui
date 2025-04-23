@@ -202,7 +202,7 @@ function App() {
   );
   const [rankings, setRankings] = usePersistentState("cache:rankings", null);
   const [rankingsOverride, setRankingsOverride] = usePersistentState(
-    "cache:rankingsOverride",
+    "setting:rankingsOverride",
     null
   );
   const [alliances, setAlliances] = usePersistentState("cache:alliances", null);
@@ -211,78 +211,82 @@ function App() {
     null
   );
   const [eventFilters, setEventFilters] = usePersistentState(
-    "cache:eventFilters",
+    "setting:eventFilters",
     []
   );
   const [timeFilter, setTimeFilter] = usePersistentState(
-    "cache:timeFilter",
+    "setting:timeFilter",
     null
   );
-  const [timeFormat, setTimeFormat] = usePersistentState("cache:timeFormat", {
+  const [timeFormat, setTimeFormat] = usePersistentState("setting:timeFormat", {
     label: "12hr",
     value: "h:mm:ss a",
   });
   const [showSponsors, setShowSponsors] = usePersistentState(
-    "cache:showSponsors",
+    "setting:showSponsors",
     null
   );
   const [autoHideSponsors, setAutoHideSponsors] = usePersistentState(
-    "cache:autoHideSponsors",
+    "setting:autoHideSponsors",
     null
   );
   const [showAwards, setShowAwards] = usePersistentState(
-    "cache:showAwards",
+    "setting:showAwards",
     null
   );
-  const [showNotes, setShowNotes] = usePersistentState("cache:showNotes", null);
+  const [showMinorAwards, setShowMinorAwards] = usePersistentState(
+    "setting:showMinorAwards",
+    null
+  );
+  const [showNotes, setShowNotes] = usePersistentState("setting:showNotes", null);
   const [showNotesAnnounce, setShowNotesAnnounce] = usePersistentState(
-    "cache:showNotesAnnounce",
+    "setting:showNotesAnnounce",
     null
   );
   const [showMottoes, setShowMottoes] = usePersistentState(
-    "cache:showMottoes",
+    "setting:showMottoes",
     null
   );
   const [showChampsStats, setShowChampsStats] = usePersistentState(
-    "cache:showChampsStats",
+    "setting:showChampsStats",
     null
   );
   const [showDistrictChampsStats, setShowDistrictChampsStats] =
-    usePersistentState("cache:showDistrictChampsStats", null);
+    usePersistentState("setting:showDistrictChampsStats", null);
   const [hidePracticeSchedule, setHidePracticeSchedule] = usePersistentState(
-    "cache:hidePracticeSchedule"
+    "setting:hidePracticeSchedule"
   );
   const [monthsWarning, setMonthsWarning] = usePersistentState(
-    "cache:monthsWarning",
+    "setting:monthsWarning",
     { label: "6 months", value: "6" }
   );
   const [showInspection, setShowInspection] = usePersistentState(
-    "cache:showInspection",
+    "setting:showInspection",
     false
   );
 
   const [swapScreen, setSwapScreen] = usePersistentState(
-    "cache:swapScreen",
+    "setting:swapScreen",
     null
   );
   const [autoAdvance, setAutoAdvance] = usePersistentState(
-    "cache:autoAdvance",
+    "setting:autoAdvance",
     null
   );
   const [autoUpdate, setAutoUpdate] = usePersistentState(
-    "cache:autoUpdate",
+    "setting:autoUpdate",
     null
   );
   const [awardsMenu, setAwardsMenu] = usePersistentState(
-    "cache:awardsMenu",
+    "setting:awardsMenu",
     null
   );
   const [showQualsStats, setShowQualsStats] = usePersistentState(
-    "cache:showQualsStats",
+    "setting:showQualsStats",
     null
   );
   const [showQualsStatsQuals, setShowQualsStatsQuals] = usePersistentState(
-    "cache:showQualsStatsQuals",
+    "setting:showQualsStatsQuals",
     null
   );
   const [worldStats, setWorldStats] = usePersistentState("cache:stats", null);
@@ -291,17 +295,17 @@ function App() {
     null
   );
   const [teamReduction, setTeamReduction] = usePersistentState(
-    "cache:teamReduction",
+    "setting:teamReduction",
     0
   );
   const [allianceSelection, setAllianceSelection] = useState(null);
   const [playoffs, setPlayoffs] = usePersistentState("cache:playoffs", null);
   const [playoffCountOverride, setPlayoffCountOverride] = usePersistentState(
-    "cache:playoffCountOverride",
+    "setting:playoffCountOverride",
     null
   );
   const [allianceCount, setAllianceCount] = usePersistentState(
-    "cache:allianceCount",
+    "setting:allianceCount",
     null
   );
   const [lastVisit, setLastVisit] = usePersistentState("cache:lastVisit", {});
@@ -311,7 +315,7 @@ function App() {
   );
   const [allianceSelectionArrays, setAllianceSelectionArrays] = useState({});
   const [reverseEmcee, setReverseEmcee] = usePersistentState(
-    "cache:reverseEmcee",
+    "setting:reverseEmcee",
     null
   );
   const [eventNamesCY, setEventNamesCY] = usePersistentState(
@@ -340,7 +344,7 @@ function App() {
   const [currentMatch, setCurrentMatch] = useState(null);
   const [useSwipe, setUseSwipe] = usePersistentState("cache:useSwipe", false);
   const [usePullDownToUpdate, setUsePullDownToUpdate] = usePersistentState(
-    "cache:usePullDownToUpdate",
+    "setting:usePullDownToUpdate",
     false
   );
 
@@ -2474,6 +2478,8 @@ function App() {
                     setEventLabel={setEventLabel}
                     showInspection={showInspection}
                     setShowInspection={setShowInspection}
+                    showMinorAwards={showMinorAwards}
+                    setShowMinorAwards={setShowMinorAwards}
                   />
                 }
               />
@@ -2585,6 +2591,7 @@ function App() {
                     awardsMenu={awardsMenu}
                     showNotesAnnounce={showNotesAnnounce}
                     showAwards={showAwards}
+                    showMinorAwards={showMinorAwards}
                     showSponsors={showSponsors}
                     showMottoes={showMottoes}
                     showChampsStats={showChampsStats}
