@@ -198,7 +198,7 @@ function RanksPage({
             <div>
               <img src="loadingIcon.gif" alt="Loading data..." />
             </div>
-            <div>Awaiting team data for {selectedEvent.label}</div>
+            <div>Awaiting team data for {selectedEvent?.label}</div>
           </Alert>
         </div>
       )}

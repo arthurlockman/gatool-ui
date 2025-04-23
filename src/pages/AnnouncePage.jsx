@@ -66,11 +66,11 @@ function AnnouncePage({ selectedEvent, selectedYear, teamList, rankings, communi
                 }
 
                 var remainingTeam = _.difference(allianceArray, allianceTeams);
-                if (remainingTeam.length > 0) {
+                if (remainingTeam.length > 0 && teamList?.teams?.length > 0) {
                     team = _.merge(team,
                         teamList?.teams[_.findIndex(teamList?.teams, { "teamNumber": remainingTeam[0] })],
-                        rankings?.ranks[_.findIndex(rankings?.ranks, { "teamNumber": remainingTeam[0] })],
-                        communityUpdates[_.findIndex(communityUpdates, { "teamNumber": remainingTeam[0] })]
+                        rankings?.ranks?.length > 0 ? rankings?.ranks[_.findIndex(rankings?.ranks, { "teamNumber": remainingTeam[0] })] : null,
+                        communityUpdates?.length > 0 ? communityUpdates[_.findIndex(communityUpdates, { "teamNumber": remainingTeam[0] })] : null
                     );
                     team.rankStyle = rankHighlight(team?.rank, allianceCount || { "count": 8 });
                     team.alliance = alliances?.Lookup[`${remainingTeam[0]}`]?.alliance || null;

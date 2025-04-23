@@ -170,7 +170,7 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
             workbook = read(data, { type: 'array' });
             var worksheet = workbook.Sheets[workbook.SheetNames[0]];
             var schedule = utils.sheet_to_json(worksheet, { range: 4 });
-            var eventnameTemp = worksheet.B3?.v || selectedEvent.label;
+            var eventnameTemp = worksheet.B3?.v || selectedEvent?.label;
             var formattedSchedule = {};
             var matchNumber = 0;
             var errorMatches = [];
@@ -770,13 +770,13 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                                 </tr>
                                 )
                             })}
-                            {(!qualSchedule || qualSchedule?.schedule?.length === 0 || qualSchedule?.schedule?.schedule?.length === 0 || (selectedEvent?.value?.code.includes("OFFLINE") && !playoffOnly)) &&
+                            {(((!qualSchedule || qualSchedule?.schedule?.length === 0 || qualSchedule?.schedule?.schedule?.length === 0 || (selectedEvent?.value?.code.includes("OFFLINE") && !playoffOnly))) && !(selectedEvent?.value?.type === "Championship" || selectedEvent?.value?.type === "DistrictChampionshipWithLevels")) &&
                                 <tr>
-                                    <td colSpan={7}>No Qualification match schedule available yet.</td>
+                                    <td colSpan={8}>No Qualification match schedule available yet.</td>
                                 </tr>}
                             {!offlinePlayoffSchedule && (playoffSchedule?.schedule?.length === 0) &&
                                 <tr>
-                                    <td colSpan={7}>No Playoff match schedule available yet.</td>
+                                    <td colSpan={8}>No Playoff match schedule available yet.</td>
                                 </tr>}
                         </tbody>
                     </Table>

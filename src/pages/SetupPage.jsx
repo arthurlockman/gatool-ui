@@ -148,7 +148,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
     }
 
     const handleGetTeamUpdates = () => {
-        if (selectedEvent.value.type === "Championship") {
+        if (selectedEvent?.value.type === "Championship") {
             setHaveChampsTeams(false);
             getAlliances();
         } else {
@@ -227,8 +227,8 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                         {selectedEvent?.value.type === "DistrictChampionshipWithLevels" && <p><b>District Championship</b></p>}
                         {selectedEvent?.value.city && <p><b>Event Location: </b><br />{selectedEvent?.value.venue} in {selectedEvent?.value.city}, {selectedEvent?.value.stateprov} {selectedEvent?.value.country}</p>}
                         {teamList?.teams.length > 0 && <p><b>Number of Competing teams: </b>{teamList?.teams.length}</p>}
-                        {selectedEvent?.value.dateStart && <p><b>Event Start: </b>{moment(selectedEvent.value.dateStart, 'YYYY-MM-DDTHH:mm:ss').format('ddd, MMM Do YYYY')}</p>}
-                        {selectedEvent?.value.dateEnd && <p><b>Event End: </b>{moment(selectedEvent.value.dateEnd, 'YYYY-MM-DDTHH:mm:ss').format('ddd, MMM Do YYYY')}</p>}
+                        {selectedEvent?.value.dateStart && <p><b>Event Start: </b>{moment(selectedEvent?.value.dateStart, 'YYYY-MM-DDTHH:mm:ss').format('ddd, MMM Do YYYY')}</p>}
+                        {selectedEvent?.value.dateEnd && <p><b>Event End: </b>{moment(selectedEvent?.value.dateEnd, 'YYYY-MM-DDTHH:mm:ss').format('ddd, MMM Do YYYY')}</p>}
                         <Alert variant={"danger"}><b>ADVANCED EVENT SETTINGS:</b><br />If your event includes non-competing teams in the team list, indicate the number of non-competing teams here. <b>THIS IS A RARE CONDITION</b><Select options={teamReducer} value={teamReduction ? teamReduction : teamReducer[0]} onChange={setTeamReduction} isDisabled={!teamList?.teamCountTotal} /><br />
                             If your event requires a reduced Alliance Count, you can override the Alliance Count here. <b>THIS SHOULD ONLY APPLY TO EVENTS WITH LESS THAN 26 TEAMS. </b><Select options={playoffOverrideMenu} value={playoffCountOverride ? playoffCountOverride : (allianceCount?.menu ? allianceCount.menu : playoffOverrideMenu[0])} onChange={setPlayoffCountOverride} />
                         </Alert>

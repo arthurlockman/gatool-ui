@@ -62,7 +62,11 @@ export const TabStates = {
  */
 const playoffTiebreakers = {
   2026: ["foulPoints", "autoPoints", "endGameBargePoints"], // Update after rules release
-  2025: ["foulPoints", "autoMobilityPoints+autoCoralPoints", "endGameBargePoints"],
+  2025: [
+    "foulPoints",
+    "autoMobilityPoints+autoCoralPoints",
+    "endGameBargePoints",
+  ],
   2024: ["foulPoints", "autoPoints", "endGameTotalStagePoints"],
   2023: ["foulPoints", "totalChargeStationPoints", "autoPoints"],
   2022: ["foulPoints", "endgamePoints", "autoCargoTotal+autoTaxiPoints"],
@@ -174,7 +178,10 @@ function App() {
   );
   const [events, setEvents] = usePersistentState("cache:events", []);
   const [districts, setDistricts] = usePersistentState("cache:districts", []);
-  const [eventLabel, setEventLabel] = useState(null);
+  const [eventLabel, setEventLabel] = usePersistentState(
+    "cache:eventLabel",
+    null
+  );
   const [playoffSchedule, setPlayoffSchedule] = usePersistentState(
     "cache:playoffSchedule",
     null
@@ -238,7 +245,10 @@ function App() {
     "setting:showMinorAwards",
     null
   );
-  const [showNotes, setShowNotes] = usePersistentState("setting:showNotes", null);
+  const [showNotes, setShowNotes] = usePersistentState(
+    "setting:showNotes",
+    null
+  );
   const [showNotesAnnounce, setShowNotesAnnounce] = usePersistentState(
     "setting:showNotesAnnounce",
     null
@@ -535,7 +545,10 @@ function App() {
       delete practiceschedule.schedule.Schedule;
     }
 
-    if (practiceschedule?.schedule?.length > 0 || practiceschedule?.schedule?.schedule.length > 0) {
+    if (
+      practiceschedule?.schedule?.length > 0 ||
+      practiceschedule?.schedule?.schedule.length > 0
+    ) {
       if (typeof practiceSchedule?.schedule?.schedule !== "undefined") {
         practiceSchedule.schedule = practiceSchedule?.schedule?.schedule;
       }
@@ -558,7 +571,8 @@ function App() {
       qualschedule = await qualsResult.json();
 
       const qualsScoresResult = await httpClient.get(
-        `${selectedYear?.value}/scores/${selectedEvent?.value.code}/qual`)
+        `${selectedYear?.value}/scores/${selectedEvent?.value.code}/qual`
+      );
 
       var qualScores = await qualsScoresResult.json();
     } else {
@@ -581,21 +595,21 @@ function App() {
     const qualMatches = qualschedule?.schedule?.schedule.map((match) => {
       match.winner = winner(match);
       if (qualScores?.MatchScores) {
-        const matchResults = qualScores.MatchScores.filter((scoreMatch) => { return scoreMatch.matchNumber === match.matchNumber })[0];
+        const matchResults = qualScores.MatchScores.filter((scoreMatch) => {
+          return scoreMatch.matchNumber === match.matchNumber;
+        })[0];
         if (matchResults) {
           match.scores = matchResults;
           match.redRP = _.pickBy(matchResults.alliances[1], (value, key) => {
             return key.endsWith("BonusAchieved");
-          })
+          });
           match.blueRP = _.pickBy(matchResults.alliances[0], (value, key) => {
             return key.endsWith("BonusAchieved");
-          })
+          });
         }
-
       }
       return match;
-    })
-      ;
+    });
     if (qualMatches?.length > 0) {
       qualschedule.scheduleLastModified = qualschedule.schedule?.headers
         ? moment(qualschedule.schedule?.headers.schedule["last-modified"])
@@ -681,12 +695,10 @@ function App() {
     if (playoffschedule?.schedule?.length > 0) {
       completedMatchCount =
         playoffschedule?.schedule?.length -
-        _.filter(playoffschedule.schedule, { actualStartTime: null })
-          .length;
+        _.filter(playoffschedule.schedule, { actualStartTime: null }).length;
     }
 
     playoffschedule.completedMatchCount = completedMatchCount;
-
 
     // determine the tiebreaker
     // var lastMatchNumber = playoffschedule?.schedule[_.findLastIndex(playoffschedule?.schedule, function (match) {
@@ -715,7 +727,11 @@ function App() {
         match.winner = winner(match);
         //figure out how to match scores to match
         if (playoffScores?.MatchScores) {
-          const matchResults = playoffScores.MatchScores.filter((scoreMatch) => { return scoreMatch.matchNumber === match.matchNumber })[0];
+          const matchResults = playoffScores.MatchScores.filter(
+            (scoreMatch) => {
+              return scoreMatch.matchNumber === match.matchNumber;
+            }
+          )[0];
           if (matchResults) {
             match.scores = matchResults;
           }
@@ -763,7 +779,7 @@ function App() {
           ].winner.level = tiebreaker?.level;
         }
       });
-    } 
+    }
 
     var lastMatchPlayed = 0;
 
@@ -778,7 +794,7 @@ function App() {
       if (
         lastMatchPlayed === qualschedule?.schedule.length + 1 ||
         lastMatchPlayed ===
-        qualschedule?.schedule.length + playoffschedule?.schedule.length + 2
+          qualschedule?.schedule.length + playoffschedule?.schedule.length + 2
       ) {
         lastMatchPlayed -= 1;
       }
@@ -917,7 +933,9 @@ function App() {
           );
           var eventDetails = await request.json();
           // filter that list by EI {awardId: "633"} {name: "District Engineering Inspiration Award"} and {awardID: "417"} {name:"Rookie All Star Award"}
-          return _.filter(eventDetails?.Awards, (award)=>{ return award.awardId===633 || award.awardId===417 });
+          return _.filter(eventDetails?.Awards, (award) => {
+            return award.awardId === 633 || award.awardId === 417;
+          });
         });
 
         await Promise.all(districtEITeams).then(async function (values) {
@@ -1518,7 +1536,7 @@ function App() {
       : moment();
     ranks.lastUpdate = moment();
     setRankings(ranks);
-    if (selectedEvent.value.districtCode) {
+    if (selectedEvent?.value.districtCode) {
       getDistrictRanks();
     }
   }
@@ -1625,7 +1643,7 @@ function App() {
    * @function getEventStats
    * @param year The currently selected year
    * @param code The currently selected event code
-  * @returns sets the world high scores
+   * @returns sets the world high scores
    */
   async function getEventStats(year, code) {
     var result = await httpClient.get(`${year}/highscores/${code}`);
@@ -1640,9 +1658,7 @@ function App() {
       if (score?.matchData?.match) {
         var details = {};
         if (!_.isEmpty(eventnames[worldStats?.year])) {
-          details.eventName =
-            eventnames[year][code] ||
-            code;
+          details.eventName = eventnames[year][code] || code;
         } else {
           details.eventName = code;
         }
@@ -1903,16 +1919,16 @@ function App() {
           offlinePlayoffSchedule?.schedule?.length > 0 ||
           offlinePlayoffSchedule?.schedule?.schedule?.length > 0) &&
           currentMatch <
-          (practiceSchedule?.schedule?.length ||
-            practiceSchedule?.schedule?.schedule?.length ||
-            0) +
-          (offlinePlayoffSchedule?.schedule?.length ||
-            offlinePlayoffSchedule?.schedule?.schedule?.length ||
-            0))
+            (practiceSchedule?.schedule?.length ||
+              practiceSchedule?.schedule?.schedule?.length ||
+              0) +
+              (offlinePlayoffSchedule?.schedule?.length ||
+                offlinePlayoffSchedule?.schedule?.schedule?.length ||
+                0))
       ) {
         setAdHocMatch(
           practiceSchedule?.schedule[currentMatch]?.teams ||
-          practiceSchedule?.schedule[currentMatch]?.schedule?.teams
+            practiceSchedule?.schedule[currentMatch]?.schedule?.teams
         );
         setCurrentMatch(currentMatch + 1);
         if (!selectedEvent?.value?.code.includes("OFFLINE")) {
@@ -1924,7 +1940,7 @@ function App() {
         currentMatch <
         (qualSchedule?.schedule?.length ||
           qualSchedule?.schedule?.schedule.length) +
-        playoffSchedule?.schedule?.length
+          playoffSchedule?.schedule?.length
       ) {
         setCurrentMatch(currentMatch + 1);
         if (!selectedEvent?.value?.code.includes("OFFLINE")) {
@@ -1947,7 +1963,7 @@ function App() {
         if (practiceSchedule?.schedule?.length > 0) {
           setAdHocMatch(
             practiceSchedule?.schedule[currentMatch - 2]?.teams ||
-            practiceSchedule?.schedule?.schedule?.teams
+              practiceSchedule?.schedule?.schedule?.teams
           );
         }
         setCurrentMatch(currentMatch - 1);
@@ -2032,18 +2048,18 @@ function App() {
   const getEvents = async () => {
     try {
       const val = await httpClient.get(`${selectedYear?.value}/events`);
-      const json = await val.json();
-      if (typeof json.Events !== "undefined") {
-        json.events = json.Events;
-        delete json.Events;
+      const result = await val.json();
+      if (typeof result.Events !== "undefined") {
+        result.events = result.Events;
+        delete result.Events;
       }
       var timeNow = moment();
 
       if (selectedYear?.value === supportedYears[0].value) {
-        json.events = json?.events.concat(training.events.events);
+        result.events = result?.events.concat(training.events.events);
       }
 
-      const events = json?.events.map((e) => {
+      const events = result?.events.map((e) => {
         var color = "";
         var optionPrefix = "";
         var optionPostfix = "";
@@ -2060,6 +2076,7 @@ function App() {
         var eventTime = moment(e.dateEnd);
         e.name = e.name.trim();
         e.name = _.replace(e.name, `- FIRST Robotics Competition -`, `-`);
+        e.name = _.replace(e.name, `FIRST Championship - FIRST Robotics Competition`, `FIRST Championship - Einstein`);
         if (e.code === "week0" || e.code === "WEEK0") {
           filters.push("week0");
         }
@@ -2232,7 +2249,7 @@ function App() {
       var matchesPerTeam = 0;
       matchesPerTeam = _.toInteger(
         (6 * qualSchedule?.schedule?.length) /
-        (teamList?.teamCountTotal - teamReduction)
+          (teamList?.teamCountTotal - teamReduction)
       );
       // In order to start Alliance Selection, we need the following conditions to be true:
       // All matches must have been completed
@@ -2243,7 +2260,7 @@ function App() {
       if (
         qualSchedule?.schedule?.length === qualSchedule?.completedMatchCount &&
         _.filter(rankings?.ranks, { matchesPlayed: matchesPerTeam }).length ===
-        teamList?.teamCountTotal - teamReduction
+          teamList?.teamCountTotal - teamReduction
       ) {
         asReady = true;
       }
