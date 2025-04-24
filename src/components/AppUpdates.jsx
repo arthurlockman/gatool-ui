@@ -1,5 +1,18 @@
 export const appUpdates = [
   {
+    date: "April 23, 2025",
+    message: (
+      <ul>
+        <li>Updates content on Cheat Sheet page</li>
+        <li>Adds additional foul buttons</li>
+        <li>Adds District Points and District Point details to Ranks page</li>
+        <li>Adds button to reset Top Sponsors</li>
+        <li>Adds switch on Setup to suppress non-major awards</li>
+        <li>Adds button on Practice matches to substitute teams</li>
+        <li>Cosmetic updates and crash prevention</li>
+      </ul>
+    ),
+  },{
     date: "April 18, 2025",
     message: (
       <ul>
