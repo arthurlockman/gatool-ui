@@ -13,6 +13,142 @@ import { useHotkeysContext, useHotkeys } from "react-hotkeys-hook";
 const commonFouls = [
   {
     year: 2025,
+    code: "G101",
+    name: "Humans, stay off the FIELD until green",
+    level: "verbal",
+    card: "yellow",
+    rp: false,
+    text: (
+      <>
+        <p>
+          A team member may only enter the FIELD if FIELD lighting (FIELD facing
+          side of the team signs and timers) is green, unless explicitly
+          instructed by a REFEREE or an FTA.
+        </p>
+      </>
+    ),
+    violation: (
+      <>
+        VERBAL WARNING. YELLOW CARD if subsequent violations during the event.
+      </>
+    ),
+  },
+  {
+    year: 2025,
+    code: "G102",
+    name: "Never step over the guardrail",
+    level: "verbal",
+    card: "yellow",
+    rp: false,
+    text: (
+      <>
+        <p>
+          A team member may only enter or exit the FIELD through open gates.
+        </p>
+      </>
+    ),
+    violation: (
+      <>
+        VERBAL WARNING. YELLOW CARD if subsequent violations during the event.
+      </>
+    ),
+  },
+  {
+    year: 2025,
+    code: "G103",
+    name: "Be careful what you interact with",
+    level: "verbal",
+    card: "yellow",
+    rp: false,
+    text: (
+      <>
+        <p>
+          A team member is prohibited from the following actions with regards to
+          interaction with ARENA elements.{" "}
+        </p>
+        <ol type="A">
+          <li>climbing on or inside,</li>
+          <li>hanging from,</li>
+          <li>
+            manipulating such that it doesn’t return to its original shape
+            without human intervention, and
+          </li>
+          <li>damaging.</li>
+        </ol>
+      </>
+    ),
+    violation: (
+      <>
+        VERBAL WARNING. YELLOW CARD if subsequent violations during the event.
+      </>
+    ),
+  },
+  {
+    year: 2025,
+    code: "G104",
+    name: "Teams may not enable their ROBOTS on the FIELD",
+    level: "verbal",
+    card: "yellow",
+    rp: false,
+    text: (
+      <>
+        <p>
+          Teams may not tether to the ROBOT while on the FIELD except in special
+          circumstances (e.g. after Opening Ceremonies, before an immediate
+          MATCH replay, etc.) and with the express permission from the FTA or a
+          REFEREE.
+        </p>
+      </>
+    ),
+    violation: (
+      <>
+        VERBAL WARNING. YELLOW CARD if subsequent violations during the event.
+      </>
+    ),
+  },
+  {
+    year: 2025,
+    code: "G201",
+    name: "Be a good person",
+    level: "verbal",
+    card: "yellow",
+    rp: false,
+    text: (
+      <>
+        <p>
+          A team member may only enter or exit the FIELD through open gates.
+        </p>
+      </>
+    ),
+    violation: (
+      <>
+        VERBAL WARNING. YELLOW CARD if subsequent violations during the event.
+      </>
+    ),
+  },
+  {
+    year: 2025,
+    code: "G202",
+    name: "Don’t bang on the glass",
+    level: "verbal",
+    card: "yellow",
+    rp: false,
+    text: (
+      <>
+        <p>
+          A team member may never strike or hit the DRIVER STATION plastic
+          windows.
+        </p>
+      </>
+    ),
+    violation: (
+      <>
+        VERBAL WARNING. YELLOW CARD if subsequent violations during the event.
+      </>
+    ),
+  },
+  {
+    year: 2025,
     code: "G206",
     name: "Don’t violate rules for RP",
     level: "verbal",
@@ -115,6 +251,27 @@ const commonFouls = [
   },
   {
     year: 3000,
+    code: "G212",
+    name: "All teams can play",
+    level: null,
+    card: "yellow",
+    rp: null,
+    text: (
+      <>
+        <p>
+          A team may not encourage another team to exclude their ROBOT or be
+          BYPASSED from a qualification MATCH for any reason
+        </p>
+      </>
+    ),
+    violation: (
+      <>
+        YELLOW CARD or RED CARD if the ROBOT does not participate in the MATCH.
+      </>
+    ),
+  },
+  {
+    year: 3000,
     code: "G302",
     name: "You can’t bring/use anything you want",
     level: null,
@@ -208,6 +365,31 @@ const commonFouls = [
       </>
     ),
     violation: <>MINOR FOUL and YELLOW CARD.</>,
+  },
+  {
+    year: 2025,
+    code: "G403",
+    name: "Limited AUTO opponent interaction",
+    level: "major",
+    card: "yellow",
+    rp: null,
+    text: (
+      <>
+        <p>
+          In AUTO, a ROBOT whose BUMPERS are completely across the BARGE ZONE
+          (i.e. to the opposite side of the BARGE ZONE from its ROBOT STARTING
+          LINE) may not contact an opponent ROBOT (either directly or
+          transitively through a SCORING ELEMENT CONTROLLED by either ROBOT and
+          regardless of who initiates contact).
+        </p>
+      </>
+    ),
+    violation: (
+      <>
+        MAJOR FOUL and VERBAL WARNING. YELLOW CARD if subsequent violations
+        during the event.
+      </>
+    ),
   },
   {
     year: 2025,
@@ -334,17 +516,17 @@ const commonFouls = [
         <p>
           A ROBOT is prohibited from the following interactions with FIELD
           elements with the exception of CAGES.
-          <ol type="A">
-            <li>grabbing,</li>
-            <li>grasping,</li>
-            <li>
-              attaching to (including the use of a vacuum or hook fastener to
-              anchor to the FIELD carpet),
-            </li>
-            <li>becoming entangled with, and</li>
-            <li>suspending from.</li>
-          </ol>
         </p>
+        <ol type="A">
+          <li>grabbing,</li>
+          <li>grasping,</li>
+          <li>
+            attaching to (including the use of a vacuum or hook fastener to
+            anchor to the FIELD carpet),
+          </li>
+          <li>becoming entangled with, and</li>
+          <li>suspending from.</li>
+        </ol>
       </>
     ),
     violation: (
@@ -460,9 +642,14 @@ const commonFouls = [
           <ol type="A">
             <li>deliberately.</li>
             <li>
-              regardless of intent, by initiating contact, either directly or
-              transitively via a SCORING ELEMENT CONTROLLED by the ROBOT, inside
-              the vertical projection of an opponent’s ROBOT PERIMETER.
+              <u>
+                <b>
+                  regardless of intent, by initiating contact, either directly
+                  or transitively via a SCORING ELEMENT CONTROLLED by the ROBOT,
+                  inside the vertical projection of an opponent’s ROBOT
+                  PERIMETER.
+                </b>
+              </u>
             </li>
           </ol>
         </p>
@@ -661,12 +848,20 @@ function FoulButtons({ currentYear }) {
                   ? "danger"
                   : ""
               }
+              key={foul.code}
             >
-              {foul?.rp?<><b>RP</b> </>:""}{foul.code}
+              {foul?.rp ? (
+                <>
+                  <b>RP</b>{" "}
+                </>
+              ) : (
+                ""
+              )}
+              {foul.code}
             </Button>
           );
         })}
-        {_.filter(_.sortBy(commonFouls, ["card", "code","rp"]), (foul) => {
+        {_.filter(_.sortBy(commonFouls, ["card", "code", "rp"]), (foul) => {
           return foul.card !== "red" && foul.card !== "yellow";
         }).map((foul) => {
           return (
@@ -674,13 +869,22 @@ function FoulButtons({ currentYear }) {
               onClick={() => handleShow(foul)}
               className={"foulButtons"}
               variant={"info"}
+              key={foul.code}
             >
-              {foul?.rp?<><b>RP</b> </>:""}{foul.code}
+              {foul?.rp ? (
+                <>
+                  <b>RP</b>{" "}
+                </>
+              ) : (
+                ""
+              )}
+              {foul.code}
             </Button>
           );
         })}
         <Button
           className={"foulButtons"}
+          key={"foulLookup"}
           onClick={() => {
             // window.open(`https://frctools.com/${currentYear}`);
             handleShow({

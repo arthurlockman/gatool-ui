@@ -832,7 +832,7 @@ function Bracket({ playoffSchedule, offlinePlayoffSchedule, setOfflinePlayoffSch
 				</>}
 			<Modal centered={true} show={showSelectWinner} size="lg" onHide={handleClose}>
 				<Modal.Header className={"allianceAccept"} closeVariant={"white"} closeButton>
-					<Modal.Title ><b>Select a winner for {matches[winnerMatch - 1]?.description}</b></Modal.Title>
+					<Modal.Title >{winnerMatch>=0?<b>Select a winner for {matches[winnerMatch - 1]?.description}</b>:<b>Select a winner  </b>}</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
 					<Container fluid>

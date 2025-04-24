@@ -226,6 +226,7 @@ td {
   line-height: 100%;
   margin-top: 5px;
   display: block;
+  color: #f3f858;
 }
 
 .playByPlayChampsAlliance {
@@ -453,6 +454,7 @@ td {
   border: 3px solid;
   border-collapse: collapse;
   margin-bottom: 10px;
+  height: 100%
 }
 .gatool-worldHighScores {
   border-color: #dca7a7;

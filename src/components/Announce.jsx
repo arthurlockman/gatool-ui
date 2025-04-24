@@ -3,7 +3,7 @@ import _ from "lodash";
 
 const announceBackground = { "red": "#F7B3B4", "blue": "#98B4F4" }
 
-function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selectedEvent, showNotesAnnounce, showAwards, showSponsors, autoHideSponsors, showMottoes, showChampsStats, eventNamesCY, showDistrictChampsStats, playoffOnly }) {
+function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selectedEvent, showNotesAnnounce, showAwards, showMinorAwards, showSponsors, autoHideSponsors, showMottoes, showChampsStats, eventNamesCY, showDistrictChampsStats, playoffOnly }) {
     const originalAndSustaining = ["20", "45", "126", "148", "151", "157", "190", "191", "250"];
     var allianceColor = station.slice(0, -1);
     var awardsYears = team?.awards ? Object.keys(team.awards) : []
@@ -81,11 +81,17 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
                     </p>}
                 {awards && (showAwards || _.isNull(showAwards)) && <p className={"awards"}>
                     {awards.map((award, index) => {
+                        let formattedAward = <></>;
                         if (award.year > selectedYear.value - (awardsMenu?.value || 3)) {
-                            return <span key={award?.year + award?.eventName + award?.name + award?.person + team?.teamNumber + index} className={award.highlight ? "awardHilight" : ""}>{award.year} {_.findIndex(eventNamesCY[award.eventName]) >= 0 ? eventNamesCY[award.eventName] : award.eventName} : {award.name}{award.person ? ` : ${award.person}` : ""}<br /></span>
-                        } else {
-                            return ""
+                            if (!award.highlight && (showMinorAwards || _.isNull(showMinorAwards))) {
+                                formattedAward = <span key={award?.year + award?.eventName + award?.name + award?.person + team?.teamNumber + index} >{award.year} {_.findIndex(eventNamesCY[award.eventName]) >= 0 ? eventNamesCY[award.eventName] : award.eventName} : {award.name}{award.person ? ` : ${award.person}` : ""}<br /></span>
+                            } else {
+                                if (award.highlight) {
+                                    formattedAward = <span key={award?.year + award?.eventName + award?.name + award?.person + team?.teamNumber + index} className={"awardHilight"}>{award.year} {_.findIndex(eventNamesCY[award.eventName]) >= 0 ? eventNamesCY[award.eventName] : award.eventName} : {award.name}{award.person ? ` : ${award.person}` : ""}<br /></span>
+                                }
+                            }
                         }
+                        return formattedAward
 
                     })}
 

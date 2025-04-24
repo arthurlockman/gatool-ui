@@ -91,7 +91,7 @@ function CheatsheetPage({
   return (
     <Container fluid>
       <img
-        src="/cheatsheet/reefscape-cheat-sheet-v3_02.png"
+        src="/cheatsheet/reefscape-cheat-sheet-v4_02.png"
         width="100%"
         alt="Cheatsheet"
       ></img>
@@ -101,32 +101,12 @@ function CheatsheetPage({
           <span
             style={{ cursor: "pointer", color: "blue" }}
             onClick={() => {
-              downloadPDF("/cheatsheet/reefscape-cheat-sheet-v3.pdf");
+              downloadPDF("/cheatsheet/reefscape-cheat-sheet-v4.pdf");
             }}
           >
             Download the Cheat Sheet
           </span>{" "}
           here.
-        </h3>
-        <p>
-          <br />
-        </p>
-      </div>
-      <div>
-        <h3>
-          Here is a very useful summary for the playoffs, provided by Bill
-          Aucoin.
-          <br />
-          <span
-            style={{ cursor: "pointer", color: "blue" }}
-            onClick={() => {
-              downloadPDF(
-                "/cheatsheet/2024.Typical.Playoff.MATCH.Schedule.v2.pdf"
-              );
-            }}
-          >
-            Download PDF.
-          </span>
         </h3>
         <p>
           <br />

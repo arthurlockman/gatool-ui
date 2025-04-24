@@ -146,6 +146,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
                 {!adHocMode && <MatchClock matchDetails={matchDetails} timeFormat={timeFormat} />}
                 <Col xs={addBackupButton || inPractice ? "4" : "5"} lg={inPlayoffs || inPractice ? "3" : "4"}><b>{eventLabel?.replace("FIRST Championship - ", "").replace("FIRST In Texas District Championship - ", "").replace("FIRST Ontario Provincial Championship - ", "").replace("New England FIRST District Championship - ", "")}</b><br />
                     {!adHocMode && <Select options={matchMenu} value={currentMatch ? matchMenu[currentMatch - 1] : matchMenu[0]} onChange={handleMatchSelection} styles={{
+                        // @ts-ignore
                         option: (styles, { data }) => {
                             return {
                                 ...styles,
@@ -156,7 +157,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
                     }} ref={selectRef} />}
                     {adHocMode && <span className="announceOrganization">TEST MATCH</span>}
                 </Col>
-                {addBackupButton && <Col className="promoteBackup" xs={1} onClick={handleShow}>+<ArrowUpSquareFill />+<br />Add Team</Col>}
+                {(addBackupButton || inPractice ) && <Col className="promoteBackup" xs={1} onClick={handleShow}>+<ArrowUpSquareFill />+<br />Add Team</Col>}
                 {(adHocMode || inPractice) && <Col className="promoteBackup" xs={1} onClick={handleAdHoc}>Change<br />Teams</Col>}
                 <Col xs={"2"} lg={"3"}>
                     {!adHocMode && <Button size="lg" variant="outline-success" className={"gatool-button buttonNoWrap"} onClick={nextMatch}>{inPractice ? <span><CaretRightFill /> <CaretRightFill /></span> : <><span className={"d-none d-lg-block"}>Next Match <CaretRightFill /></span><span className={"d-block d-lg-none"}><CaretRightFill /> <CaretRightFill /></span></>}</Button>}
