@@ -1832,7 +1832,7 @@ function App() {
    * @returns {Promise<object>} result
    */
   async function putNotifications(data) {
-    var result = await httpClient.put(`system/announcements`, data);
+    var result = await httpClient.put(`announcements`, data);
     return result;
   }
 
@@ -1851,7 +1851,7 @@ function App() {
    * @returns {Promise<object>} The team's update history array
    */
   async function getNotifications() {
-    var result = await httpClient.get(`system/announcements/`);
+    var result = await httpClient.get(`announcements`);
     var notifications = await result.json();
     if (result.status === 200) {
       return notifications;
