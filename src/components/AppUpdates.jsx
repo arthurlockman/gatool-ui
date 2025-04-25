@@ -1,5 +1,12 @@
 export const appUpdates = [
   {
+    date: "April 25, 2025",
+    message: (
+      <ul>
+        <li>On Announce and Play-By-Play, gatool now shows the high score based on tournament phase. You can make it show the event high score instead via a switch on the Setup page</li>
+      </ul>
+    ),
+  },{
     date: "April 23, 2025",
     message: (
       <ul>

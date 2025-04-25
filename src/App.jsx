@@ -803,7 +803,8 @@ function App() {
       ) {
         lastMatchPlayed -= 1;
       }
-      setCurrentMatch(lastMatchPlayed + 1);
+      if (currentMatch <= lastMatchPlayed ){
+      setCurrentMatch(lastMatchPlayed + 1);}
     }
 
     //setEventHighScores(highScores);
