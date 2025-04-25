@@ -283,6 +283,11 @@ function App() {
     "setting:autoAdvance",
     null
   );
+  const [highScoreMode, setHighScoreMode] = usePersistentState(
+    "setting:highScoreMode",
+    null
+  );
+
   const [autoUpdate, setAutoUpdate] = usePersistentState(
     "setting:autoUpdate",
     null
@@ -2497,6 +2502,8 @@ function App() {
                     setShowInspection={setShowInspection}
                     showMinorAwards={showMinorAwards}
                     setShowMinorAwards={setShowMinorAwards}
+                    highScoreMode={highScoreMode}
+                    setHighScoreMode={setHighScoreMode}
                   />
                 }
               />
@@ -2640,6 +2647,7 @@ function App() {
                     eventLabel={eventLabel}
                     playoffCountOverride={playoffCountOverride}
                     showInspection={showInspection}
+                    highScoreMode={highScoreMode}
                   />
                 }
               />
@@ -2687,6 +2695,7 @@ function App() {
                     eventLabel={eventLabel}
                     playoffCountOverride={playoffCountOverride}
                     showInspection={showInspection}
+                    highScoreMode={highScoreMode}
                   />
                 }
               />
