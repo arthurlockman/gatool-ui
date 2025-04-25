@@ -4,6 +4,8 @@ export const appUpdates = [
     message: (
       <ul>
         <li>On Announce and Play-By-Play, gatool now shows the high score based on tournament phase. You can make it show the event high score instead via a switch on the Setup page</li>
+        <li>Auto Advance now allows you to advance beyond the last known completed match + 1.</li>
+        <li>Updated how we calculate Tiebreakers for Playoff matches</li>
       </ul>
     ),
   },{

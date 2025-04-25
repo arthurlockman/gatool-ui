@@ -746,42 +746,21 @@ function App() {
 
       _.forEach(playoffScores.MatchScores, (score) => {
         if (score.alliances[0].totalPoints === score.alliances[1].totalPoints) {
-          var tiebreaker = {
-            level: 0,
-            red: 0,
-            blue: 0,
-            winner: "TBD",
-          };
-          for (
-            var i = 0;
-            i < playoffTiebreakers[selectedYear?.value].length;
-            i++
-          ) {
-            tiebreaker.level = i + 1;
-            var criterion =
-              playoffTiebreakers[selectedYear?.value][i].split("+");
-            for (var a = 0; a < criterion.length; a++) {
-              tiebreaker.red += Number(score.alliances[1][criterion[a]]);
-              tiebreaker.blue += Number(score.alliances[0][criterion[a]]);
-            }
-            if (tiebreaker.red > tiebreaker.blue) {
-              tiebreaker.winner = "red";
-              break;
-            } else if (tiebreaker.red < tiebreaker.blue) {
-              tiebreaker.winner = "blue";
-              break;
-            }
-          }
           playoffschedule.schedule[
             _.findIndex(playoffschedule.schedule, {
               matchNumber: score.matchNumber,
             })
-          ].winner.tieWinner = tiebreaker?.winner;
+          ].winner.tieWinner = score?.winningAlliance === 2 ? "blue" : score?.winningAlliance === 1 ? "red" : "TBD";
           playoffschedule.schedule[
             _.findIndex(playoffschedule.schedule, {
               matchNumber: score.matchNumber,
             })
-          ].winner.level = tiebreaker?.level;
+          ].winner.level = score?.tiebreaker?.item1>=0 ? score?.tiebreaker?.item1 : 0;
+          playoffschedule.schedule[
+            _.findIndex(playoffschedule.schedule, {
+              matchNumber: score.matchNumber,
+            })
+          ].winner.tieDetail = score?.tiebreaker?.item2;
         }
       });
     }
