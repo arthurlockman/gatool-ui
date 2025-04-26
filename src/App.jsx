@@ -115,7 +115,19 @@ var halloffame = _.cloneDeep(hallOfFame);
 const timezones = _.cloneDeep(timeZones);
 
 function App() {
-  const { isLoading, user, isAuthenticated } = useAuth0();
+
+  const { isAuthenticated, isLoading, user, getAccessTokenSilently, loginWithRedirect} = useAuth0();
+
+  useEffect(() => {
+    const checkLogin = async () => {
+      try {
+        await getAccessTokenSilently();
+      } catch (error) {
+        console.log('Error refreshing access token:', error);
+      }
+    }
+    checkLogin();
+  }, [getAccessTokenSilently, isAuthenticated, loginWithRedirect]);
 
   // eslint-disable-next-line no-unused-vars
   const [httpClient] = UseAuthClient();
@@ -328,10 +340,6 @@ function App() {
   // Handle update notifications from the service worker
   const { waitingWorker, showReload, reloadPage } = useServiceWorker();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-
-  if (!selectedYear) {
-    setSelectedYear(supportedYears[0]);
-  }
 
   // Display an alert when there are updates to the app. This allows the user to update the cached code.
   useEffect(() => {

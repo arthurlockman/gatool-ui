@@ -27,6 +27,7 @@ root.render(
           useRefreshTokens={true}
           cacheLocation='localstorage'
           connection='email'
+          sessionCheckExpiryDays={7}
         >
           <AuthClientContextProvider>
             <SnackbarProvider>
