@@ -50,54 +50,6 @@ export const TabStates = {
   Ready: "ready",
 };
 
-/**
- * Tiebreakers constant defines the sort order for breaking ties during playoffs.
- * Criteria 2025 has been updated.
- * 1st Cumulative TECH FOUL points due to opponent rule violations
- * 2nd ALLIANCE LEAVE + AUTO CORAL points
- * 3rd ALLIANCE BARGE points
- * 4th MATCH is replayed
- * @constant {object}
- * @default
- */
-const playoffTiebreakers = {
-  2026: ["foulPoints", "autoPoints", "endGameBargePoints"], // Update after rules release
-  2025: [
-    "foulPoints",
-    "autoMobilityPoints+autoCoralPoints",
-    "endGameBargePoints",
-  ],
-  2024: ["foulPoints", "autoPoints", "endGameTotalStagePoints"],
-  2023: ["foulPoints", "totalChargeStationPoints", "autoPoints"],
-  2022: ["foulPoints", "endgamePoints", "autoCargoTotal+autoTaxiPoints"],
-  2021: [
-    "foulPoints",
-    "autoPoints",
-    "endgamePoints",
-    "controlPanelPoints+teleopCellPoints",
-  ],
-  2020: [
-    "foulPoints",
-    "autoPoints",
-    "endgamePoints",
-    "controlPanelPoints+teleopCellPoints",
-  ],
-  2019: [
-    "foulPoints",
-    "cargoPoints",
-    "hatchPanelPoints",
-    "habClimbPoints",
-    "sandStormBonusPoints",
-  ],
-  2018: [
-    "foulPoints",
-    "endgamePoints",
-    "autoPoints",
-    "autoOwnershipPoints+teleopOwnershipPoints",
-    "vaultPoints",
-  ],
-};
-
 const navPages = [
   { href: "", id: "setupPage" },
   { href: "schedule", id: "schedulePage" },
