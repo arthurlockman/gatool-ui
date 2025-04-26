@@ -273,7 +273,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                 </tr>
                                 <tr>
                                     <td>
-                                        <Switch checked={showMinorAwards === null ? true : showMinorAwards} onChange={setShowMinorAwards} disabled={!showAwards} />
+                                        <Switch checked={_.isNull(showMinorAwards) ? true : showMinorAwards} onChange={setShowMinorAwards} disabled={!(showAwards || _.isNull(showAwards))} />
                                     </td>
                                     <td>
                                         <b>Show Minor Awards on Announce</b>
