@@ -16,7 +16,6 @@ import EmceePage from "./pages/EmceePage";
 import { useEffect, useState } from "react";
 import { UseAuthClient } from "./contextProviders/AuthClientContext";
 import { useAuth0 } from "@auth0/auth0-react";
-import AnonymousUserPage from "./pages/AnonymousUserPage";
 import { Blocks } from "react-loader-spinner";
 import { Button, Container } from "react-bootstrap";
 import { usePersistentState } from "./hooks/UsePersistentState";
@@ -48,54 +47,6 @@ export const TabStates = {
   NotReady: "notready",
   Stale: "stale",
   Ready: "ready",
-};
-
-/**
- * Tiebreakers constant defines the sort order for breaking ties during playoffs.
- * Criteria 2025 has been updated.
- * 1st Cumulative TECH FOUL points due to opponent rule violations
- * 2nd ALLIANCE LEAVE + AUTO CORAL points
- * 3rd ALLIANCE BARGE points
- * 4th MATCH is replayed
- * @constant {object}
- * @default
- */
-const playoffTiebreakers = {
-  2026: ["foulPoints", "autoPoints", "endGameBargePoints"], // Update after rules release
-  2025: [
-    "foulPoints",
-    "autoMobilityPoints+autoCoralPoints",
-    "endGameBargePoints",
-  ],
-  2024: ["foulPoints", "autoPoints", "endGameTotalStagePoints"],
-  2023: ["foulPoints", "totalChargeStationPoints", "autoPoints"],
-  2022: ["foulPoints", "endgamePoints", "autoCargoTotal+autoTaxiPoints"],
-  2021: [
-    "foulPoints",
-    "autoPoints",
-    "endgamePoints",
-    "controlPanelPoints+teleopCellPoints",
-  ],
-  2020: [
-    "foulPoints",
-    "autoPoints",
-    "endgamePoints",
-    "controlPanelPoints+teleopCellPoints",
-  ],
-  2019: [
-    "foulPoints",
-    "cargoPoints",
-    "hatchPanelPoints",
-    "habClimbPoints",
-    "sandStormBonusPoints",
-  ],
-  2018: [
-    "foulPoints",
-    "endgamePoints",
-    "autoPoints",
-    "autoOwnershipPoints+teleopOwnershipPoints",
-    "vaultPoints",
-  ],
 };
 
 const navPages = [
@@ -164,6 +115,7 @@ var halloffame = _.cloneDeep(hallOfFame);
 const timezones = _.cloneDeep(timeZones);
 
 function App() {
+
   const { isAuthenticated, isLoading, user, getAccessTokenSilently, loginWithRedirect} = useAuth0();
 
   useEffect(() => {
@@ -294,6 +246,11 @@ function App() {
     "setting:autoAdvance",
     null
   );
+  const [highScoreMode, setHighScoreMode] = usePersistentState(
+    "setting:highScoreMode",
+    null
+  );
+
   const [autoUpdate, setAutoUpdate] = usePersistentState(
     "setting:autoUpdate",
     null
@@ -444,11 +401,6 @@ function App() {
     }
   }, [showReloaded, setShowReloaded, enqueueSnackbar, closeSnackbar]);
 
-  // Handle if users are offline. If they're offline but have an event and year selected, let them in.
-  const canAccessApp = () => {
-    return isOnline ? isAuthenticated : selectedEvent && selectedYear;
-  };
-
   /**
    * Trim all values in an array
    * @function trimArray
@@ -538,7 +490,7 @@ function App() {
       //do something
       practiceschedule = { schedule: { schedule: [] } };
     } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
-      const practiceResult = await httpClient.get(
+      const practiceResult = await httpClient.getNoAuth(
         `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/practice`
       );
       practiceschedule = await practiceResult.json();
@@ -572,12 +524,12 @@ function App() {
       //do something
       qualschedule = { schedule: { schedule: [] } };
     } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
-      const qualsResult = await httpClient.get(
+      const qualsResult = await httpClient.getNoAuth(
         `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/qual`
       );
       qualschedule = await qualsResult.json();
 
-      const qualsScoresResult = await httpClient.get(
+      const qualsScoresResult = await httpClient.getNoAuth(
         `${selectedYear?.value}/scores/${selectedEvent?.value.code}/qual`
       );
 
@@ -663,7 +615,7 @@ function App() {
       //set playoffschedule to be empty
       playoffschedule = { schedule: { schedule: [] } };
     } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
-      const playoffResult = await httpClient.get(
+      const playoffResult = await httpClient.getNoAuth(
         `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/playoff`
       );
       playoffschedule = await playoffResult.json();
@@ -713,7 +665,7 @@ function App() {
     // })]?.matchNumber;
 
     if (!selectedEvent?.value?.code.includes("PRACTICE")) {
-      const playoffScoresResult = await httpClient.get(
+      const playoffScoresResult = await httpClient.getNoAuth(
         `${selectedYear?.value}/scores/${selectedEvent?.value.code}/playoff`
       );
       var playoffScores = await playoffScoresResult.json();
@@ -748,42 +700,21 @@ function App() {
 
       _.forEach(playoffScores.MatchScores, (score) => {
         if (score.alliances[0].totalPoints === score.alliances[1].totalPoints) {
-          var tiebreaker = {
-            level: 0,
-            red: 0,
-            blue: 0,
-            winner: "TBD",
-          };
-          for (
-            var i = 0;
-            i < playoffTiebreakers[selectedYear?.value].length;
-            i++
-          ) {
-            tiebreaker.level = i + 1;
-            var criterion =
-              playoffTiebreakers[selectedYear?.value][i].split("+");
-            for (var a = 0; a < criterion.length; a++) {
-              tiebreaker.red += Number(score.alliances[1][criterion[a]]);
-              tiebreaker.blue += Number(score.alliances[0][criterion[a]]);
-            }
-            if (tiebreaker.red > tiebreaker.blue) {
-              tiebreaker.winner = "red";
-              break;
-            } else if (tiebreaker.red < tiebreaker.blue) {
-              tiebreaker.winner = "blue";
-              break;
-            }
-          }
           playoffschedule.schedule[
             _.findIndex(playoffschedule.schedule, {
               matchNumber: score.matchNumber,
             })
-          ].winner.tieWinner = tiebreaker?.winner;
+          ].winner.tieWinner = score?.winningAlliance === 2 ? "blue" : score?.winningAlliance === 1 ? "red" : "TBD";
           playoffschedule.schedule[
             _.findIndex(playoffschedule.schedule, {
               matchNumber: score.matchNumber,
             })
-          ].winner.level = tiebreaker?.level;
+          ].winner.level = score?.tiebreaker?.item1>=0 ? score?.tiebreaker?.item1 : 0;
+          playoffschedule.schedule[
+            _.findIndex(playoffschedule.schedule, {
+              matchNumber: score.matchNumber,
+            })
+          ].winner.tieDetail = score?.tiebreaker?.item2;
         }
       });
     }
@@ -805,7 +736,8 @@ function App() {
       ) {
         lastMatchPlayed -= 1;
       }
-      setCurrentMatch(lastMatchPlayed + 1);
+      if (currentMatch <= lastMatchPlayed ){
+      setCurrentMatch(lastMatchPlayed + 1);}
     }
 
     //setEventHighScores(highScores);
@@ -891,7 +823,7 @@ function App() {
           //https://api.gatool.org/v3/2023/teams?teamNumber=172
 
           var adHocTeams = adHocTeamList.map(async (team) => {
-            var request = await httpClient.get(
+            var request = await httpClient.getNoAuth(
               `${selectedYear?.value}/teams?teamNumber=${team}`
             );
             var teamDetails = await request.json();
@@ -909,7 +841,7 @@ function App() {
           });
         }
       } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
-        result = await httpClient.get(
+        result = await httpClient.getNoAuth(
           `${selectedYear?.value}/teams?eventCode=${selectedEvent?.value?.code}`
         );
         teams = await result.json();
@@ -935,7 +867,7 @@ function App() {
         });
         // get awards for those filtered events
         var districtEITeams = districtEvents.map(async (event) => {
-          var request = await httpClient.get(
+          var request = await httpClient.getNoAuth(
             `${selectedYear?.value}/awards/event/${event?.value?.code}`
           );
           var eventDetails = await request.json();
@@ -962,7 +894,7 @@ function App() {
           // get team details for those teams not in this event
           if (tempTeams.length > 0) {
             var EITeamData = tempTeams.map(async (teamNumber) => {
-              var request = await httpClient.get(
+              var request = await httpClient.getNoAuth(
                 `${selectedYear?.value}/teams?teamNumber=${teamNumber}`
               );
               var teamDetails = await request.json();
@@ -1083,7 +1015,7 @@ function App() {
 
       //fetch awards for the current teams
       var newTeams = teams.teams.map(async (team) => {
-        var request = await httpClient.get(
+        var request = await httpClient.getNoAuth(
           `${selectedYear?.value}/team/${team?.teamNumber}/awards`
         );
         var awards = await request.json();
@@ -1222,7 +1154,7 @@ function App() {
         ) {
           console.log("Getting Champs stats");
           champsTeams = teams.teams.map(async (team) => {
-            var champsRequest = await httpClient.get(
+            var champsRequest = await httpClient.getNoAuth(
               `/team/${team?.teamNumber}/appearances`
             );
             var appearances = await champsRequest.json();
@@ -1376,7 +1308,7 @@ function App() {
             // https://api.gatool.org/v3/team/172/updates
             console.log("Teams List loaded. Update from the Community");
             var adHocTeams = adHocTeamList.map(async (team) => {
-              var request = await httpClient.get(
+              var request = await httpClient.getNoAuth(
                 `/team/${team?.teamNumber}/updates`
               );
               var teamDetails = { teamNumber: team?.teamNumber };
@@ -1422,7 +1354,7 @@ function App() {
             teams = [];
           }
         } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
-          result = await httpClient.get(
+          result = await httpClient.getNoAuth(
             `${selectedYear?.value}/communityUpdates/${selectedEvent?.value.code}`
           );
           teams = await result.json();
@@ -1457,7 +1389,7 @@ function App() {
             );
             //get updates for these teams
             var EIUpdates = EITeams.map(async (EITeam) => {
-              var request = await httpClient.get(
+              var request = await httpClient.getNoAuth(
                 `/team/${EITeam?.teamNumber}/updates`
               );
               var teamDetails = { teamNumber: EITeam?.teamNumber };
@@ -1513,7 +1445,7 @@ function App() {
     if (selectedEvent?.value?.code.includes("OFFLINE")) {
       ranks = { rankings: { Rankings: [] } };
     } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
-      result = await httpClient.get(
+      result = await httpClient.getNoAuth(
         `${selectedYear?.value}/rankings/${selectedEvent?.value.code}`
       );
       ranks = await result.json();
@@ -1558,7 +1490,7 @@ function App() {
   async function getDistrictRanks() {
     var result = null;
     var districtranks = null;
-    result = await httpClient.get(
+    result = await httpClient.getNoAuth(
       `${selectedYear?.value}/district/rankings/${selectedEvent?.value.districtCode}`
     );
     districtranks = await result.json();
@@ -1575,7 +1507,7 @@ function App() {
    */
   async function getRobotImages() {
     var robotImageList = teamList?.teams.map(async (team) => {
-      var media = await httpClient.get(
+      var media = await httpClient.getNoAuth(
         `${selectedYear?.value}/team/${team?.teamNumber}/media`
       );
       var mediaArray = await media.json();
@@ -1598,7 +1530,7 @@ function App() {
    * @returns sets the world high scores
    */
   async function getWorldStats() {
-    var result = await httpClient.get(`${selectedYear?.value}/highscores`);
+    var result = await httpClient.getNoAuth(`${selectedYear?.value}/highscores`);
     var highscores = await result.json();
     var scores = {};
     var reducedScores = {};
@@ -1653,7 +1585,7 @@ function App() {
    * @returns sets the world high scores
    */
   async function getEventStats(year, code) {
-    var result = await httpClient.get(`${year}/highscores/${code}`);
+    var result = await httpClient.getNoAuth(`${year}/highscores/${code}`);
     var highscores = await result.json();
     var scores = {};
     var reducedScores = {};
@@ -1707,7 +1639,7 @@ function App() {
       !selectedEvent?.value?.code.includes("PRACTICE") &&
       !selectedEvent?.value?.code.includes("OFFLINE")
     ) {
-      result = await httpClient.get(
+      result = await httpClient.getNoAuth(
         `${selectedYear?.value}/alliances/${selectedEvent?.value.code}`
       );
       alliances = await result.json();
@@ -1858,7 +1790,7 @@ function App() {
    * @returns {Promise<object>} The team's update history array
    */
   async function getNotifications() {
-    var result = await httpClient.get(`announcements`);
+    var result = await httpClient.getNoAuth(`announcements`);
     var notifications = await result.json();
     if (result.status === 200) {
       return notifications;
@@ -1875,7 +1807,7 @@ function App() {
   }
 
   const getSyncStatus = async () => {
-    const result = await httpClient.get(`system/admin/syncUsers`);
+    const result = await httpClient.getNoAuth(`system/admin/syncUsers`);
     const syncResult = await result.json();
     if (result.status === 200) {
       return syncResult;
@@ -1905,7 +1837,7 @@ function App() {
    * @returns {Promise<object>} The team's update history array
    */
   async function getTeamHistory(teamNumber) {
-    var result = await httpClient.get(`team/${teamNumber}/updates/history/`);
+    var result = await httpClient.getNoAuth(`team/${teamNumber}/updates/history/`);
     var history = await result.json();
     return history;
   }
@@ -2054,7 +1986,7 @@ function App() {
 
   const getEvents = async () => {
     try {
-      const val = await httpClient.get(`${selectedYear?.value}/events`);
+      const val = await httpClient.getNoAuth(`${selectedYear?.value}/events`);
       const result = await val.json();
       if (typeof result.Events !== "undefined") {
         result.events = result.Events;
@@ -2165,7 +2097,7 @@ function App() {
 
   const getDistricts = async () => {
     try {
-      const val = await httpClient.get(`${selectedYear?.value}/districts`);
+      const val = await httpClient.getNoAuth(`${selectedYear?.value}/districts`);
       const json = await val.json();
       if (typeof json.Districts !== "undefined") {
         json.districts = json.Districts;
@@ -2237,7 +2169,7 @@ function App() {
 
   // Retrieve event list when year selection changes
   useEffect(() => {
-    if (httpClient && selectedYear && isAuthenticated) {
+    if (httpClient && selectedYear) {
       getDistricts();
       getEvents();
     }
@@ -2398,7 +2330,7 @@ function App() {
             <Blocks visible height="200" width="" ariaLabel="blocks-loading" />
           </Container>
         </div>
-      ) : canAccessApp() ? (
+      ) : (
         <BrowserRouter>
           <Routes>
             <Route
@@ -2479,6 +2411,7 @@ function App() {
                     monthsWarning={monthsWarning}
                     setMonthsWarning={setMonthsWarning}
                     user={user}
+                    isAuthenticated={isAuthenticated}
                     adHocMode={adHocMode}
                     setAdHocMode={setAdHocMode}
                     supportedYears={supportedYears}
@@ -2504,6 +2437,8 @@ function App() {
                     setShowInspection={setShowInspection}
                     showMinorAwards={showMinorAwards}
                     setShowMinorAwards={setShowMinorAwards}
+                    highScoreMode={highScoreMode}
+                    setHighScoreMode={setHighScoreMode}
                   />
                 }
               />
@@ -2565,6 +2500,7 @@ function App() {
                     originalAndSustaining={originalAndSustaining}
                     monthsWarning={monthsWarning}
                     user={user}
+                    isAuthenticated={isAuthenticated}
                     getTeamHistory={getTeamHistory}
                     timeFormat={timeFormat}
                     getCommunityUpdates={getCommunityUpdates}
@@ -2647,6 +2583,7 @@ function App() {
                     eventLabel={eventLabel}
                     playoffCountOverride={playoffCountOverride}
                     showInspection={showInspection}
+                    highScoreMode={highScoreMode}
                   />
                 }
               />
@@ -2694,6 +2631,7 @@ function App() {
                     eventLabel={eventLabel}
                     playoffCountOverride={playoffCountOverride}
                     showInspection={showInspection}
+                    highScoreMode={highScoreMode}
                   />
                 }
               />
@@ -2814,8 +2752,6 @@ function App() {
             </Route>
           </Routes>
         </BrowserRouter>
-      ) : (
-        <AnonymousUserPage />
       )}
     </div>
   );

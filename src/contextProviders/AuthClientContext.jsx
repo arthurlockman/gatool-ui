@@ -48,6 +48,34 @@ class AuthClient {
         throw new Error(errorText);
     }
 
+    async getNoAuth(path) {
+        if (!this.online) {
+            throw new Error('You are offline.')
+        }
+
+        this.operationStart();
+        var response = await fetch(`${apiBaseUrl}${path}`).finally(() => {
+            this.operationDone();
+        });
+        if (response.ok) return response;
+        var errorText = `Received a ${response.status} error from backend: "${response.statusText}"`;
+        if (response.status === 400) {
+            errorText += " This is an error with the FIRST APIs, not one caused by gatool. These usually clear in a few minutes, so please try again soon."
+        }
+        if (response.status === 401) {
+            errorText += " Your session may have expired. Please log out and log in again."
+        }
+        if (response.status === 404) {
+            errorText += " We couldn't find "+path;
+            return response;
+        }
+        if (response.status === 500) {
+            errorText += " Something happened in the backend that we don't understand. We have logged the request and will investigate soon."
+        }
+        toast.error(errorText);
+        throw new Error(errorText);
+    }
+
     async put(path, body) {
         if (!this.online) {
             throw new Error('You are offline.')

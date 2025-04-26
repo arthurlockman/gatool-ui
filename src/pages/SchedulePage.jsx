@@ -823,7 +823,18 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                                     <td >Post Time:</td><td colSpan={2}>{moment(scoresMatch?.postResultTime).format('dd hh:mm A')}</td>
                                 </tr>
                                 <tr>
-                                    <td >Winner:</td><td colSpan={2}>{scoresMatch?.winner.winner === "red" ? <span style={{ color: "red" }}><b>Red Alliance</b></span> : scoresMatch?.winner.winner === "blue" ? <span style={{ color: "blue" }}><b>Blue Alliance</b></span> : scoresMatch?.winner.winner === "tie" ? "Tie" : ""}</td>
+                                    <td >Winner:</td>
+                                    <td colSpan={2}>
+                                        {scoresMatch?.winner.winner === "red" ? 
+                                        <span style={{ color: "red" }}><b>Red Alliance</b></span> :
+                                         scoresMatch?.winner.winner === "blue" ? 
+                                         <span style={{ color: "blue" }}><b>Blue Alliance</b></span> : 
+                                         scoresMatch?.winner.tieWinner === "red" ? <span style={{ color: "red" }}><b>{scoresMatch?.winner.tieDetail}</b></span> : 
+                                         scoresMatch?.winner.tieWinner === "blue" ? 
+                                         <span style={{ color: "blue" }}><b>{scoresMatch?.winner.tieDetail}</b></span> : 
+                                         scoresMatch?.winner.tieWinner === "tie" ? <span style={{ color: "green" }}><b>{scoresMatch?.winner.tieDetail}</b></span> : 
+                                         <span>""</span>}
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td >Coopertition:</td><td colSpan={2}><Handshake result={scoresMatch?.scores?.coopertitionBonusAchieved || scoresMatch?.scores.alliances[0]?.coopertitionCriteriaMet} /></td>
