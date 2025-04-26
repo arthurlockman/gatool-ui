@@ -1,8 +1,9 @@
 export const appUpdates = [
   {
-    date: "April 25, 2025",
+    date: "April 26, 2025",
     message: (
       <ul>
+        <li><b>Introducing Unauthenticated mode.</b><br /> Users can now use gatool without login. Unauthenticated users can load events, see schedule and score details, announce teams and call matches. </li>
         <li>On Announce and Play-By-Play, gatool now shows the high score based on tournament phase. You can make it show the event high score instead via a switch on the Setup page</li>
         <li>Auto Advance now allows you to advance beyond the last known completed match + 1.</li>
         <li>Updated how we calculate Tiebreakers for Playoff matches</li>

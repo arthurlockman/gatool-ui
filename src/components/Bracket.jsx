@@ -101,7 +101,7 @@ function Bracket({ playoffSchedule, offlinePlayoffSchedule, setOfflinePlayoffSch
 	// returns the name of the alliance
 	function allianceName(matchNumber, allianceColor) {
 		var allianceName = "";
-		if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[0]?.teamNumber || matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[3]?.teamNumber) {
+		if ((matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[0]?.teamNumber || matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[3]?.teamNumber) && alliances?.Lookup) {
 			allianceName = alliances?.Lookup[`${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[0]?.teamNumber}`]?.alliance;
 			if (matchNumber <= 13 || matchNumber === 19) {
 				if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner?.tieWinner === "red") {
@@ -120,7 +120,7 @@ function Bracket({ playoffSchedule, offlinePlayoffSchedule, setOfflinePlayoffSch
 
 
 		}
-		return allianceName;
+		return allianceName || "";
 	}
 	// return the score of the match, by matchNumber
 	function matchScore(matchNumber, alliance) {
