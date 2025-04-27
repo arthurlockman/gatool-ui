@@ -1,5 +1,12 @@
 export const appUpdates = [
   {
+    date: "April 28, 2025",
+    message: (
+      <ul>
+        <li>Small Screen support on Alliance Selection and Awards</li>
+      </ul>
+    ),
+  },{
     date: "April 26, 2025",
     message: (
       <ul>

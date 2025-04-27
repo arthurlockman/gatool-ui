@@ -1,24 +1,18 @@
 .allianceContainer {
-  display: flex;
-  justify-content: center;
-  vertical-align: middle;
   text-align: center;
   background: rgba(255, 187, 248, 1);
 }
 
 .alliance {
-  flex-flow: column wrap;
-  justify-content: center;
-  vertical-align: middle;
   text-align: center;
 
   padding: 6px;
 }
 
 .availableTeam {
-  max-width: 60px;
   margin: 5px;
 }
+
 .availableRow {
   display: flex;
   flex-flow: row wrap;

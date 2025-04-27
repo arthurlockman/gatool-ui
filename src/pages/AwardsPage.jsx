@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Trophy } from "react-bootstrap-icons";
 import _ from "lodash";
 import { useHotkeysContext, useHotkeys } from "react-hotkeys-hook";
+import useWindowDimensions from "hooks/UseWindowDimensions";
 
 
 
@@ -13,6 +14,13 @@ function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates, e
     const [show, setShow] = useState(false);
     const [awardTeam, setAwardTeam] = useState(null);
     const [teamFilter, setTeamFilter] = useState("");
+
+    const { width } = useWindowDimensions();
+
+    const colCount = width > 1040 ? 6 :
+        width > 850 ? 5 :
+            width > 640 ? 4 :
+                width > 480 ? 3 : 2;
 
     var columns = [[], [], [], [], [], []];
     var sortedTeams = _.orderBy(teamList?.teams, "teamNumber", "asc");
@@ -34,15 +42,15 @@ function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates, e
     var rows = sortedTeams?.length;
     if (sortedTeams?.length > 0) {
         sortedTeams?.forEach((team, index) => {
-            if (index <= 1 * rows / 6 - 1) {
+            if (index <= 1 * rows / colCount - 1) {
                 columns[0].push(team);
-            } else if (index <= 2 * rows / 6 - 1) {
+            } else if (index <= 2 * rows / colCount - 1) {
                 columns[1].push(team);
-            } else if (index <= 3 * rows / 6 - 1) {
+            } else if (index <= 3 * rows / colCount - 1) {
                 columns[2].push(team);
-            } else if (index <= 4 * rows / 6 - 1) {
+            } else if (index <= 4 * rows / colCount - 1) {
                 columns[3].push(team);
-            } else if (index <= 5 * rows / 6 - 1) {
+            } else if (index <= 5 * rows / colCount - 1) {
                 columns[4].push(team);
             } else {
                 columns[5].push(team);
@@ -126,11 +134,11 @@ function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates, e
                         </Form>
                     </div>
                     <Row key={eventLabel}>{columns.map((column, index) => {
-                        return (<Col xs="2" key={index}>
+                        return (index<colCount? <Col  key={index}>
                             {column.map((team) => {
                                 return ((String(team?.teamNumber).startsWith(teamFilter) || teamFilter === "") && <Row className={"awardsButton"} key={team.teamNumber} ><Button value={JSON.stringify(team)} onClick={handleShow} size="sm" variant={(team?.teamNumber === Number(teamFilter) || (_.filter(sortedTeams, (team) => { return String(team?.teamNumber).startsWith(teamFilter) }).length === 1)) ? "success" : "outline-success"}>{team?.teamNumber}</Button></Row>)
                             })}
-                        </Col>)
+                        </Col> : null)
                     })}
                     </Row>
                     {awardTeam && <Modal centered={true} show={show} onHide={handleClose}>
