@@ -112,7 +112,7 @@ function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates, e
     }, { scopes: 'formEnter' });
 
     return (
-        <Container fluid>
+        <Container fluid style={{marginBottom: "20px"}}>
             {!selectedEvent && <div>
                 <Alert variant="warning" >You need to select an event before you can see anything here.</Alert>
             </div>}

@@ -454,7 +454,7 @@ function RanksPage({
                   <td colSpan={12}>
                     <b>
                       This table lists the teams in rank order for this
-                      competition.Its columns are sortable. This table updates
+                      competition. Its columns are sortable. This table updates
                       during the competition, and freezes once Playoff Matches
                       begin.
                     </b>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Alert, Button, ButtonToolbar, Col, Container, Form, InputGroup, Modal, Row } from "react-bootstrap";
+import { Alert, Button, ButtonToolbar, ButtonGroup, Col, Container, Form, InputGroup, Modal, Row } from "react-bootstrap";
 import _ from "lodash";
 import { HandThumbsDownFill, HandThumbsUpFill, TrophyFill, XSquare } from "react-bootstrap-icons";
 import { useHotkeysContext, useHotkeys } from "react-hotkeys-hook";
@@ -446,7 +446,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                             <Form onSubmit={handleFilterSelect}>
                                 <InputGroup className="mb-3" >
                                     <InputGroup.Text>Filter the teams</InputGroup.Text>
-                                    <Form.Control id={"filterControl"} type="number" placeholder="Enter a number" aria-label="Team Number" onChange={filterTeams} style={{minWidth:"100px"}}/>
+                                    <Form.Control id={"filterControl"} type="number" placeholder="Enter a number" aria-label="Team Number" onChange={filterTeams} style={{ minWidth: "100px" }} />
                                     <InputGroup.Text id="resetFilter" onClick={resetFilter}><XSquare /></InputGroup.Text>
                                     {(_.filter(asArrays?.availableTeams, { 'teamNumber': Number(teamFilter) }).length === 1) && <Button variant="primary" type="submit">Select this team</Button>}
                                     <span>    </span>
@@ -701,24 +701,34 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
 
                     </Modal.Body>
                     <Modal.Footer>
-                        <ButtonToolbar className="justify-content-between">
-                            <Button variant="primary" size="sm" onClick={handleClose}>
-                                {allianceMode === "show" && <span> <TrophyFill /> Alliance Announce</span>}
-                                {allianceMode === "a1captain" && <span> <TrophyFill /> Top Seeded Alliance</span>}
-                                {allianceMode === "captain" && <span> <TrophyFill /> Alliance Captain</span>}
-                                {allianceMode === "declined" && <span> <TrophyFill /> Sorry</span>}
-                                {(allianceMode === "decline" || allianceMode === "accept" || allianceMode === "skip") && <span><TrophyFill /> Oops, they reconsidered.</span>}
-                            </Button>
-                            {(allianceMode === "show" || allianceMode === "decline") && <Button id="declineButton" variant="danger" size="sm" onClick={(e) => { handleDecline(allianceTeam, allianceMode === "decline" ? "confirm" : "decline", e) }}>
-                                <HandThumbsDownFill /> Respectfully Decline
-                            </Button>}
-                            {(allianceMode === "show" || allianceMode === "accept") && <Button id="acceptButton" variant="success" size="sm" onClick={(e) => { handleAccept(allianceTeam, allianceMode === "accept" ? "confirm" : "accept", e) }}>
-                                <HandThumbsUpFill /> Gratefully Accept
-                            </Button>}
-                            {(allianceMode === "a1captain" || allianceMode === "captain" || allianceMode === "skip") && <Button id="skipButton" variant="warning" size="sm" onClick={(e) => { handleSkip(allianceTeam, allianceMode === "skip" ? "confirm" : "skip", e) }}>
-                                <HandThumbsUpFill /> Skip Alliance
-                            </Button>}
-                        </ButtonToolbar>
+                                <Button variant="primary" size="sm" onClick={handleClose} style={{ marginBottom: "10px" }}>
+                                    {allianceMode === "show" && <span> <TrophyFill /> Alliance Announce</span>}
+                                    {allianceMode === "a1captain" && <span> <TrophyFill /> Top Seeded Alliance</span>}
+                                    {allianceMode === "captain" && <span> <TrophyFill /> Alliance Captain</span>}
+                                    {allianceMode === "declined" && <span> <TrophyFill /> Sorry</span>}
+                                    {(allianceMode === "decline" || allianceMode === "accept" || allianceMode === "skip") && <span><TrophyFill /> Oops, they reconsidered.</span>}
+                                </Button>
+                            
+                            {(allianceMode === "show" || allianceMode === "decline") &&
+                                <Button id="declineButton" variant="danger" size="sm" style={{ marginBottom: "10px" }} onClick={(e) => { handleDecline(allianceTeam, allianceMode === "decline" ? "confirm" : "decline", e) }}>
+                                    <HandThumbsDownFill /> Respectfully Decline
+                                </Button>
+                                }
+                            {(allianceMode === "show" || allianceMode === "accept") &&
+                                
+                                    <Button id="acceptButton" variant="success" size="sm" style={{ marginBottom: "10px" }} onClick={(e) => { handleAccept(allianceTeam, allianceMode === "accept" ? "confirm" : "accept", e) }}>
+                                        <HandThumbsUpFill /> Gratefully Accept
+                                    </Button>
+                                }
+                            {(allianceMode === "a1captain" || allianceMode === "captain" || allianceMode === "skip") &&
+                                
+                                    <Button id="skipButton" variant="warning" size="sm" style={{
+                                        marginBottom: "10px"
+                                    }} onClick={(e) => { handleSkip(allianceTeam, allianceMode === "skip" ? "confirm" : "skip", e) }}>
+                                        <HandThumbsUpFill /> Skip Alliance
+                                    </Button>
+                                }
+                        
                     </Modal.Footer>
                 </Modal>}
             </Container>
