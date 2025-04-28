@@ -4,6 +4,7 @@ export const appUpdates = [
     message: (
       <ul>
         <li>Small Screen support on Alliance Selection and Awards</li>
+        <li>Adding EPA and season record to Rankings and Play-By-Play</li>
       </ul>
     ),
   },{
