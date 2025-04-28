@@ -116,7 +116,7 @@ const timezones = _.cloneDeep(timeZones);
 
 function App() {
 
-  const { isAuthenticated, isLoading, user, getAccessTokenSilently, loginWithRedirect} = useAuth0();
+  const { isAuthenticated, isLoading, user, getAccessTokenSilently, loginWithRedirect } = useAuth0();
 
   useEffect(() => {
     const checkLogin = async () => {
@@ -171,6 +171,7 @@ function App() {
     null
   );
   const [rankings, setRankings] = usePersistentState("cache:rankings", null);
+  const [EPA, setEPA] = usePersistentState("cache:EPA", null);
   const [rankingsOverride, setRankingsOverride] = usePersistentState(
     "setting:rankingsOverride",
     null
@@ -709,7 +710,7 @@ function App() {
             _.findIndex(playoffschedule.schedule, {
               matchNumber: score.matchNumber,
             })
-          ].winner.level = score?.tiebreaker?.item1>=0 ? score?.tiebreaker?.item1 : 0;
+          ].winner.level = score?.tiebreaker?.item1 >= 0 ? score?.tiebreaker?.item1 : 0;
           playoffschedule.schedule[
             _.findIndex(playoffschedule.schedule, {
               matchNumber: score.matchNumber,
@@ -732,12 +733,13 @@ function App() {
       if (
         lastMatchPlayed === qualschedule?.schedule.length + 1 ||
         lastMatchPlayed ===
-          qualschedule?.schedule.length + playoffschedule?.schedule.length + 2
+        qualschedule?.schedule.length + playoffschedule?.schedule.length + 2
       ) {
         lastMatchPlayed -= 1;
       }
-      if (currentMatch <= lastMatchPlayed ){
-      setCurrentMatch(lastMatchPlayed + 1);}
+      if (currentMatch <= lastMatchPlayed) {
+        setCurrentMatch(lastMatchPlayed + 1);
+      }
     }
 
     //setEventHighScores(highScores);
@@ -1470,11 +1472,13 @@ function App() {
       ranks.ranks = ranks.ranks.rankings;
       delete ranks.ranks.rankings;
     }
+
     ranks.lastModified = ranks.headers
       ? moment(ranks?.headers["last-modified"])
       : moment();
     ranks.lastUpdate = moment();
     setRankings(ranks);
+    getEPA()
     if (selectedEvent?.value.districtCode) {
       getDistrictRanks();
     }
@@ -1519,6 +1523,22 @@ function App() {
     });
     await Promise.all(robotImageList).then((values) => {
       setRobotImages(values);
+    });
+  }
+
+  async function getEPA() {
+    var epa = teamList?.teams.map(async (team) => {
+      var epaData = await httpClient.getNoAuth(
+        `team_year/${team?.teamNumber}/${selectedYear?.value}`, 'https://api.statbotics.io/v3/'
+      );
+      var epaArray = await epaData.json();
+      return {
+        teamNumber: team?.teamNumber,
+        epa: epaArray,
+      };
+    })
+    Promise.all(epa).then((values) => {
+      setEPA(values);
     });
   }
 
@@ -1858,16 +1878,16 @@ function App() {
           offlinePlayoffSchedule?.schedule?.length > 0 ||
           offlinePlayoffSchedule?.schedule?.schedule?.length > 0) &&
           currentMatch <
-            (practiceSchedule?.schedule?.length ||
-              practiceSchedule?.schedule?.schedule?.length ||
-              0) +
-              (offlinePlayoffSchedule?.schedule?.length ||
-                offlinePlayoffSchedule?.schedule?.schedule?.length ||
-                0))
+          (practiceSchedule?.schedule?.length ||
+            practiceSchedule?.schedule?.schedule?.length ||
+            0) +
+          (offlinePlayoffSchedule?.schedule?.length ||
+            offlinePlayoffSchedule?.schedule?.schedule?.length ||
+            0))
       ) {
         setAdHocMatch(
           practiceSchedule?.schedule[currentMatch]?.teams ||
-            practiceSchedule?.schedule[currentMatch]?.schedule?.teams
+          practiceSchedule?.schedule[currentMatch]?.schedule?.teams
         );
         setCurrentMatch(currentMatch + 1);
         if (!selectedEvent?.value?.code.includes("OFFLINE")) {
@@ -1879,7 +1899,7 @@ function App() {
         currentMatch <
         (qualSchedule?.schedule?.length ||
           qualSchedule?.schedule?.schedule.length) +
-          playoffSchedule?.schedule?.length
+        playoffSchedule?.schedule?.length
       ) {
         setCurrentMatch(currentMatch + 1);
         if (!selectedEvent?.value?.code.includes("OFFLINE")) {
@@ -1902,7 +1922,7 @@ function App() {
         if (practiceSchedule?.schedule?.length > 0) {
           setAdHocMatch(
             practiceSchedule?.schedule[currentMatch - 2]?.teams ||
-              practiceSchedule?.schedule?.schedule?.teams
+            practiceSchedule?.schedule?.schedule?.teams
           );
         }
         setCurrentMatch(currentMatch - 1);
@@ -2188,7 +2208,7 @@ function App() {
       var matchesPerTeam = 0;
       matchesPerTeam = _.toInteger(
         (6 * qualSchedule?.schedule?.length) /
-          (teamList?.teamCountTotal - teamReduction)
+        (teamList?.teamCountTotal - teamReduction)
       );
       // In order to start Alliance Selection, we need the following conditions to be true:
       // All matches must have been completed
@@ -2199,7 +2219,7 @@ function App() {
       if (
         qualSchedule?.schedule?.length === qualSchedule?.completedMatchCount &&
         _.filter(rankings?.ranks, { matchesPlayed: matchesPerTeam }).length ===
-          teamList?.teamCountTotal - teamReduction
+        teamList?.teamCountTotal - teamReduction
       ) {
         asReady = true;
       }
@@ -2530,6 +2550,7 @@ function App() {
                     districtRankings={districtRankings}
                     eventLabel={eventLabel}
                     communityUpdates={communityUpdates}
+                    EPA={EPA}
                   />
                 }
               />
@@ -2632,6 +2653,7 @@ function App() {
                     playoffCountOverride={playoffCountOverride}
                     showInspection={showInspection}
                     highScoreMode={highScoreMode}
+                    EPA={EPA}
                   />
                 }
               />

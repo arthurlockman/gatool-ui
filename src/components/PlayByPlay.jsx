@@ -33,9 +33,9 @@ function PlayByPlay({ station, team, inPlayoffs, selectedYear, selectedEvent, sh
                                 <table className={"wltTable"}>
                                     <tbody>
                                         <tr>
-                                            <td className={"wltCol"} style={team?.rankStyle}>Rank {team?.rank}<br />AV RP {team?.sortOrder1}</td><td className={"wltCol"}>Qual Avg<br />{team?.qualAverage}</td><td className={"wltCol"}>W-L-T<br />{team?.wins}-{team?.losses}-{team?.ties}</td>
+                                            <td className={"wltCol"} style={team?.rankStyle}>Rank {team?.rank}<br />AV RP {team?.sortOrder1}</td><td className={"wltCol"}>Qual Avg<br />{team?.qualAverage}</td><td className={"wltCol"}>W-L-T<br />{team?.wins}-{team?.losses}-{team?.ties}</td><td className={"wltCol"}>EPA<br/>{team?.epa?.epa?.total_points?.mean}</td><td className={"wltCol"}>Season<br />{team?.epa?.record?.wins}-{team?.epa?.record?.losses}-{team?.epa?.record?.ties}</td>
                                         </tr>
-                                        <tr><td colSpan={3}>Team high score: {team?.highScore?.score} in {team?.highScore?.description.replace(" ", " ")}</td>
+                                        <tr><td colSpan={6}>Team high score: {team?.highScore?.score} in {team?.highScore?.description.replace(" ", " ")}</td>
                                         </tr>
                                     </tbody>
                                 </table>

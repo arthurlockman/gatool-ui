@@ -48,13 +48,13 @@ class AuthClient {
         throw new Error(errorText);
     }
 
-    async getNoAuth(path) {
+    async getNoAuth(path,customAPIBaseUrl) {
         if (!this.online) {
             throw new Error('You are offline.')
         }
 
         this.operationStart();
-        var response = await fetch(`${apiBaseUrl}${path}`).finally(() => {
+        var response = await fetch(`${customAPIBaseUrl || apiBaseUrl}${path}`).finally(() => {
             this.operationDone();
         });
         if (response.ok) return response;

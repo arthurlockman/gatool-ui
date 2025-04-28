@@ -1,4 +1,12 @@
-import { Alert, Container, Table, Row, Col, OverlayTrigger, Tooltip } from "react-bootstrap";
+import {
+  Alert,
+  Container,
+  Table,
+  Row,
+  Col,
+  OverlayTrigger,
+  Tooltip,
+} from "react-bootstrap";
 import {
   SortNumericDown,
   SortNumericUp,
@@ -27,6 +35,7 @@ function RanksPage({
   districtRankings,
   eventLabel,
   communityUpdates,
+  EPA,
 }) {
   // This function clicks the hidden file upload button
   function clickLoadRanks() {
@@ -166,15 +175,18 @@ function RanksPage({
     return style;
   }
 
-    var rankingsList = rankings?.ranks?.map((teamRow) => {
-        teamRow.teamName = getTeamName(teamRow.teamNumber);
-        if (selectedEvent?.value?.districtCode) {
-            teamRow.districtRankDetails = _.cloneDeep(_.filter(districtRankings?.districtRanks, { "teamNumber": teamRow.teamNumber })[0]);
-            teamRow.districtRanking = teamRow.districtRankDetails?.rank;
-        }
-        return teamRow;
-    })
-
+  var rankingsList = rankings?.ranks?.map((teamRow) => {
+    teamRow.teamName = getTeamName(teamRow.teamNumber);
+    if (selectedEvent?.value?.districtCode) {
+      teamRow.districtRankDetails = _.cloneDeep(
+        _.filter(districtRankings?.districtRanks, {
+          teamNumber: teamRow.teamNumber,
+        })[0]
+      );
+      teamRow.districtRanking = teamRow.districtRankDetails?.rank;
+    }
+    return teamRow;
+  });
 
   if (rankSort.charAt(0) === "-") {
     rankingsList = _.orderBy(rankingsList, rankSort.slice(1), "desc");
@@ -512,38 +524,14 @@ function RanksPage({
                   </th>
                   <th
                     onClick={() =>
-                      rankSort === "wins"
-                        ? setRankSort("-wins")
-                        : setRankSort("wins")
+                      rankSort === "record"
+                        ? setRankSort("-record")
+                        : setRankSort("record")
                     }
                   >
                     <b>
-                      Wins{rankSort === "wins" ? <SortNumericUp /> : ""}
-                      {rankSort === "-wins" ? <SortNumericDown /> : ""}
-                    </b>
-                  </th>
-                  <th
-                    onClick={() =>
-                      rankSort === "losses"
-                        ? setRankSort("-losses")
-                        : setRankSort("losses")
-                    }
-                  >
-                    <b>
-                      Losses{rankSort === "losses" ? <SortNumericUp /> : ""}
-                      {rankSort === "-losses" ? <SortNumericDown /> : ""}
-                    </b>
-                  </th>
-                  <th
-                    onClick={() =>
-                      rankSort === "ties"
-                        ? setRankSort("-ties")
-                        : setRankSort("ties")
-                    }
-                  >
-                    <b>
-                      Ties{rankSort === "ties" ? <SortNumericUp /> : ""}
-                      {rankSort === "-ties" ? <SortNumericDown /> : ""}
+                      Event Record{rankSort === "event" ? <SortAlphaUp /> : ""}
+                      {rankSort === "-event" ? <SortAlphaDown /> : ""}
                     </b>
                   </th>
                   <th
@@ -582,6 +570,31 @@ function RanksPage({
                       {rankSort === "-matchesPlayed" ? <SortNumericDown /> : ""}
                     </b>
                   </th>
+                  <th
+                    onClick={() =>
+                      rankSort === "losses"
+                        ? setRankSort("-losses")
+                        : setRankSort("losses")
+                    }
+                  >
+                    <b>
+                      Season Record
+                      {rankSort === "losses" ? <SortAlphaUp /> : ""}
+                      {rankSort === "-losses" ? <SortAlphaDown /> : ""}
+                    </b>
+                  </th>
+                  <th
+                    onClick={() =>
+                      rankSort === "epaVal"
+                        ? setRankSort("-epaVal")
+                        : setRankSort("epaVal")
+                    }
+                  >
+                    <b>
+                      EPA{rankSort === "epaVal" ? <SortNumericUp /> : ""}
+                      {rankSort === "-epaVal" ? <SortNumericDown /> : ""}
+                    </b>
+                  </th>
                   {selectedEvent?.value?.districtCode && (
                     <th
                       onClick={() =>
@@ -613,12 +626,24 @@ function RanksPage({
                   rankingsList.map((rankRow) => {
                     rankRow = _.merge(
                       rankRow,
-                      communityUpdates[
-                        _.findIndex(communityUpdates, {
-                          teamNumber: rankRow.teamNumber,
-                        })
-                      ]
+                      communityUpdates
+                        ? communityUpdates[
+                            _.findIndex(communityUpdates, {
+                              teamNumber: rankRow.teamNumber,
+                            })
+                          ]
+                        : null,
+                      EPA
+                        ? EPA[
+                            _.findIndex(EPA, {
+                              teamNumber: rankRow.teamNumber,
+                            })
+                          ]
+                        : null
                     );
+                    rankRow.record = `${rankRow.wins}-${rankRow.losses}-${rankRow.ties}`;
+                    rankRow.epaVal = rankRow?.epa?.epa?.total_points?.mean;
+                    rankRow.season = `${rankRow?.epa?.record?.wins}-${rankRow?.epa?.record?.losses}-${rankRow?.epa?.record?.ties}`;
                     return (
                       <tr key={"rankings" + rankRow.teamNumber}>
                         <td>{rankRow.teamNumber}</td>
@@ -633,34 +658,82 @@ function RanksPage({
                           }}
                         ></td>
                         <td>{rankRow.sortOrder1}</td>
-                        <td>{rankRow.wins}</td>
-                        <td>{rankRow.losses}</td>
-                        <td>{rankRow.ties}</td>
+                        <td>{rankRow.record}</td>
                         <td>{rankRow.qualAverage}</td>
                         <td>{rankRow.dq}</td>
                         <td>{rankRow.matchesPlayed}</td>
+                        <td>{rankRow.season}</td>
+                        <td>{rankRow.epaVal}</td>
                         {selectedEvent?.value?.districtCode && (
                           <td>
-                            {rankRow?.districtRankDetails?.rank
-                              ? <OverlayTrigger delay={500} overlay={
-                                <Tooltip><>Points breakdown<br />
-                                Age points: {rankRow?.districtRankDetails?.teamAgePoints}<br />
-                                Event 1 ({rankRow?.districtRankDetails?.event1Code}) :{rankRow?.districtRankDetails?.event1Points}<br />
-                                Event 2 ({rankRow?.districtRankDetails?.event2Code}) :{rankRow?.districtRankDetails?.event2Points}<br />
-                                {rankRow?.districtRankDetails?.districtCmpCode ? <>DCMP ({rankRow?.districtRankDetails?.districtCmpCode}) :{rankRow?.districtRankDetails?.districtCmpPoints}</>:""}</></Tooltip>
-                              }><span>{`${rankRow?.districtRankDetails?.rank} (${rankRow?.districtRankDetails?.totalPoints} pts)`}</span></OverlayTrigger>
-                              : "Not in District"}
+                            {rankRow?.districtRankDetails?.rank ? (
+                              <OverlayTrigger
+                                delay={500}
+                                overlay={
+                                  <Tooltip>
+                                    <>
+                                      Points breakdown
+                                      <br />
+                                      Age points:{" "}
+                                      {
+                                        rankRow?.districtRankDetails
+                                          ?.teamAgePoints
+                                      }
+                                      <br />
+                                      Event 1 (
+                                      {rankRow?.districtRankDetails?.event1Code}
+                                      ) :
+                                      {
+                                        rankRow?.districtRankDetails
+                                          ?.event1Points
+                                      }
+                                      <br />
+                                      Event 2 (
+                                      {rankRow?.districtRankDetails?.event2Code}
+                                      ) :
+                                      {
+                                        rankRow?.districtRankDetails
+                                          ?.event2Points
+                                      }
+                                      <br />
+                                      {rankRow?.districtRankDetails
+                                        ?.districtCmpCode ? (
+                                        <>
+                                          DCMP (
+                                          {
+                                            rankRow?.districtRankDetails
+                                              ?.districtCmpCode
+                                          }
+                                          ) :
+                                          {
+                                            rankRow?.districtRankDetails
+                                              ?.districtCmpPoints
+                                          }
+                                        </>
+                                      ) : (
+                                        ""
+                                      )}
+                                    </>
+                                  </Tooltip>
+                                }
+                              >
+                                <span>{`${rankRow?.districtRankDetails?.rank} (${rankRow?.districtRankDetails?.totalPoints} pts)`}</span>
+                              </OverlayTrigger>
+                            ) : (
+                              "Not in District"
+                            )}
                             {rankRow?.districtRankDetails ? (
                               <>
-                              
-                                {rankRow?.districtRankDetails.qualifiedDistrictCmp ? (
+                                {rankRow?.districtRankDetails
+                                  .qualifiedDistrictCmp ? (
                                   <span>
                                     <b> D</b>
                                   </span>
                                 ) : (
                                   ""
                                 )}
-                                {rankRow?.districtRankDetails.qualifiedFirstCmp ? (
+                                {rankRow?.districtRankDetails
+                                  .qualifiedFirstCmp ? (
                                   <span>
                                     <b> W</b>
                                   </span>
