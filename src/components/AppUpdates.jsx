@@ -1,5 +1,13 @@
 export const appUpdates = [
   {
+    date: "April 28, 2025",
+    message: (
+      <ul>
+        <li>Small Screen support on Alliance Selection and Awards</li>
+        <li>Adding EPA and season record to Rankings and Play-By-Play</li>
+      </ul>
+    ),
+  },{
     date: "April 26, 2025",
     message: (
       <ul>

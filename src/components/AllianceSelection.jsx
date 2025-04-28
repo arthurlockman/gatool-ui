@@ -1,13 +1,11 @@
 import { useState } from "react";
-import { Alert, Button, ButtonToolbar, Col, Container, Form, InputGroup, Modal, Row } from "react-bootstrap";
+import { Alert, Button, ButtonToolbar, ButtonGroup, Col, Container, Form, InputGroup, Modal, Row } from "react-bootstrap";
 import _ from "lodash";
 import { HandThumbsDownFill, HandThumbsUpFill, TrophyFill, XSquare } from "react-bootstrap-icons";
 import { useHotkeysContext, useHotkeys } from "react-hotkeys-hook";
 import { useEffect } from "react";
 import { originalAndSustaining, allianceSelectionBaseRounds } from "./Constants";
-
-
-
+import useWindowDimensions from "hooks/UseWindowDimensions";
 
 function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays, handleReset, teamFilter, setTeamFilter }) {
     const OriginalAndSustaining = _.cloneDeep(originalAndSustaining);
@@ -17,6 +15,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
     const [allianceTeam, setAllianceTeam] = useState(null);
     const [allianceMode, setAllianceMode] = useState(null);
     const { disableScope, enableScope } = useHotkeysContext();
+    const { width } = useWindowDimensions();
 
 
     var availColumns = [[], [], [], [], []];
@@ -263,6 +262,10 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         setShow(true);
     }
 
+    const colCount = width > 1040 ? 5 :
+        width > 850 ? 4 :
+            3;
+
     useEffect(() => {
         if (teamFilter !== "") {
             enableScope("allianceFilter");
@@ -388,17 +391,18 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         // pick off the top 8 remaining teams to be the backup list
         backupTeams = asArrays?.rankedTeams.slice(allianceCount?.count, allianceCount?.count + 8);
 
+
         // set up the available teams block
         var rows = asArrays.availableTeams?.length;
         if (rows > 0) {
             asArrays.availableTeams?.forEach((team, index) => {
-                if (index <= 1 * rows / 5 - 1) {
+                if (index <= 1 * rows / colCount - 1) {
                     availColumns[0].push(team);
-                } else if (index <= 2 * rows / 5 - 1) {
+                } else if (index <= 2 * rows / colCount - 1) {
                     availColumns[1].push(team);
-                } else if (index <= 3 * rows / 5 - 1) {
+                } else if (index <= 3 * rows / colCount - 1) {
                     availColumns[2].push(team);
-                } else if (index <= 4 * rows / 5 - 1) {
+                } else if (index <= 4 * rows / colCount - 1) {
                     availColumns[3].push(team);
                 } else {
                     availColumns[4].push(team);
@@ -416,6 +420,20 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
     useHotkeys('meta+z, ctrl+z', () => document.getElementById("undoButton")?.click(), { scopes: 'undo' });
     useHotkeys('esc', () => document.getElementById("resetFilter")?.click(), { scopes: 'allianceFilter' });
     const currentRound = asArrays.allianceSelectionOrder[asArrays.nextChoice]?.round || -1;
+    const availCell = (team) => {
+        const currentRound = asArrays.allianceSelectionOrder[asArrays.nextChoice]?.round || -1;
+        const declined = asArrays?.declined.includes(team?.teamNumber);
+        const skipped = _.findIndex(_.filter(asArrays?.skipped, { round: currentRound }), { teamNumber: team?.teamNumber }) >= 0;
+        return (
+            <>
+                {(asArrays?.nextChoice < asArrays.allianceSelectionOrder?.length && team.rank !== 1 && !skipped) &&
+                    (String(team?.teamNumber).startsWith(teamFilter) || teamFilter === "") && <div key={"availableButton" + team?.teamNumber} className={declined ? "availableTeam allianceDecline" : skipped ? "availableTeam allianceTeam allianceSkip" : "availableTeam allianceTeam"} onClick={(e) => handleShow(team, declined ? "declined" : "show", e)}><b>{team.teamNumber}</b></div>}
+
+                {(asArrays?.nextChoice >= asArrays.allianceSelectionOrder?.length || team.rank === 1 || skipped) &&
+                    (String(team?.teamNumber).startsWith(teamFilter) || teamFilter === "") && <div key={"availableButtonDisabled" + team?.teamNumber} className={declined ? "availableTeam allianceDecline" : skipped ? "availableTeam allianceTeam allianceSkip" : "availableTeam allianceTeam"} ><b>{team?.teamNumber}</b></div>}
+            </>
+        )
+    }
     return (
         <>
             <Container fluid>
@@ -428,7 +446,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                             <Form onSubmit={handleFilterSelect}>
                                 <InputGroup className="mb-3" >
                                     <InputGroup.Text>Filter the teams</InputGroup.Text>
-                                    <Form.Control id={"filterControl"} type="number" placeholder="Enter a number" aria-label="Team Number" onChange={filterTeams} />
+                                    <Form.Control id={"filterControl"} type="number" placeholder="Enter a number" aria-label="Team Number" onChange={filterTeams} style={{ minWidth: "100px" }} />
                                     <InputGroup.Text id="resetFilter" onClick={resetFilter}><XSquare /></InputGroup.Text>
                                     {(_.filter(asArrays?.availableTeams, { 'teamNumber': Number(teamFilter) }).length === 1) && <Button variant="primary" type="submit">Select this team</Button>}
                                     <span>    </span>
@@ -441,35 +459,27 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                         <Row>
                             <Container fluid>
                                 <Row>
-                                    <Col xs={inChamps ? 4 : 5}>
+                                    <Col xs={width < 600 ? 12 : inChamps ? 4 : 5}>
                                         <Container fluid className="allianceContainer">
-                                            <Col id="availableTeamsDisplay">
-                                                <Row key={"titleRow"}>
-                                                    <div><strong>Teams for Alliance Selection</strong></div>
-                                                </Row>
-                                                <Row key={"AvailableTeams"} className={"availableRow"}>
-                                                    {asArrays.availableTeams?.map((team) => {
-                                                        const currentRound = asArrays.allianceSelectionOrder[asArrays.nextChoice]?.round || -1;
-                                                        const declined = asArrays?.declined.includes(team?.teamNumber);
-                                                        const skipped = _.findIndex(_.filter(asArrays?.skipped, { round: currentRound }), { teamNumber: team?.teamNumber }) >= 0;
-                                                        return (
-                                                            <>
-                                                                {(asArrays?.nextChoice < asArrays.allianceSelectionOrder?.length && team.rank !== 1 && !skipped) &&
-                                                                    (String(team?.teamNumber).startsWith(teamFilter) || teamFilter === "") && <div key={"availableButton" + team?.teamNumber} className={declined ? "availableTeam allianceDecline" : skipped ? "availableTeam allianceTeam allianceSkip" : "availableTeam allianceTeam"} onClick={(e) => handleShow(team, declined ? "declined" : "show", e)}><b>{team.teamNumber}</b></div>}
-
-                                                                {(asArrays?.nextChoice >= asArrays.allianceSelectionOrder?.length || team.rank === 1 || skipped) &&
-                                                                    (String(team?.teamNumber).startsWith(teamFilter) || teamFilter === "") && <div key={"availableButtonDisabled" + team?.teamNumber} className={declined ? "availableTeam allianceDecline" : skipped ? "availableTeam allianceTeam allianceSkip" : "availableTeam allianceTeam"} ><b>{team?.teamNumber}</b></div>}
-                                                            </>
-                                                        )
-                                                    })}
-                                                </Row>
-                                            </Col>
+                                            <Row>
+                                                <Col><strong>Teams for Alliance Selection</strong></Col>
+                                            </Row>
+                                            <Row key={"AvailableTeams"} >
+                                                {availColumns.map((column, index) => {
+                                                    return index < colCount ? (
+                                                        <Col key={`availableColumn${index}`}>
+                                                            {column.map((team) => {
+                                                                return availCell(team)
+                                                            })}
+                                                        </Col>
+                                                    ) : null
+                                                })}
+                                            </Row>
 
                                         </Container>
                                     </Col>
-                                    <Col xs={2} >
+                                    {width >= 600 && <Col xs={2} >
                                         <Container fluid className={"backupAlliancesTable"}>
-
                                             <Row>
                                                 <Col>
                                                     <p><strong>Backup Teams</strong><br />(Teams here are initially ranked {allianceCount?.count + 1} to {allianceCount?.count + 8} top to bottom. As Alliance Selection progresses, teams will rise up into this section as teams are selected.)</p>
@@ -511,8 +521,8 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                     </Col>
                                                 </Row>
                                             </Container>}
-                                    </Col>
-                                    <Col xs={inChamps ? 6 : 5}>
+                                    </Col>}
+                                    <Col xs={width < 600 ? 12 : inChamps ? 6 : 5}>
                                         <Row className={"alliancesTeamsTable alliancesTeamsTableHeader"}>{currentRound >= 0 ? `Round ${currentRound} of ${inChamps ? "3" : "2"}` : asArrays?.nextChoice > 0 ? "Alliance Selection Complete" : "Alliance Selection not started"}</Row>
                                         <Container fluid className={"alliancesTeamsTable"}>
                                             {allianceDisplayOrder.map((row) => {
@@ -616,6 +626,50 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
 
                                         </Container>
                                     </Col>
+                                    {width < 600 && <Col xs={12} >
+                                        <Container fluid className={"backupAlliancesTable"}>
+                                            <Row>
+                                                <Col>
+                                                    <p><strong>Backup Teams</strong><br />(Teams here are initially ranked {allianceCount?.count + 1} to {allianceCount?.count + 8} top to bottom. As Alliance Selection progresses, teams will rise up into this section as teams are selected.)</p>
+                                                </Col>
+                                            </Row>
+                                            <Row>
+                                                <Col id="backupTeamsDisplay">
+                                                    {backupTeams.map((team) => {
+                                                        var declined = asArrays.declined.includes(team.teamNumber);
+                                                        return (
+                                                            <>{(asArrays?.nextChoice < asArrays.allianceSelectionOrder?.length) &&
+                                                                <div key={"backupButton" + team?.teamNumber} className={declined ? "allianceDecline" : "allianceTeam"} onClick={(e) => handleShow(team, declined ? "declined" : "show", e)}><b>{team?.teamNumber}</b></div>}
+                                                                {(asArrays?.nextChoice >= asArrays.allianceSelectionOrder?.length) &&
+                                                                    <div key={"backupButtonDisabled" + team?.teamNumber} className={declined ? "allianceDecline" : "allianceTeam"} ><b>{team.teamNumber}</b></div>}
+                                                            </>
+                                                        )
+                                                    })}
+                                                </Col>
+                                            </Row>
+                                        </Container>
+
+                                        {asArrays?.skipped && asArrays.skipped.length > 0 &&
+                                            <Container fluid className={"skippedAlliancesTable"}>
+                                                <Row>
+                                                    <Col>
+                                                        <p><strong>Skipped Teams</strong><br />(Skipped Alliance Captains will have the opportunity to select a partner after the next successful selection or skip.)</p>
+                                                    </Col>
+                                                </Row>
+                                                <Row>
+                                                    <Col id="skippedTeamsDisplay">
+                                                        {asArrays?.skipped.map((team) => {
+                                                            var declined = asArrays.declined.includes(team.teamNumber);
+                                                            return (
+                                                                <>{(asArrays?.nextChoice < asArrays.allianceSelectionOrder?.length) &&
+                                                                    <div key={"skipButton" + team?.teamNumber} className={declined ? "allianceDecline" : "allianceTeam allianceSkip allianceTeamChoice"} ><b>{team?.teamNumber}</b></div>}
+                                                                </>
+                                                            )
+                                                        })}
+                                                    </Col>
+                                                </Row>
+                                            </Container>}
+                                    </Col>}
                                 </Row>
 
                             </Container>
@@ -647,24 +701,34 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
 
                     </Modal.Body>
                     <Modal.Footer>
-                        <ButtonToolbar className="justify-content-between">
-                            <Button variant="primary" size="sm" onClick={handleClose}>
-                                {allianceMode === "show" && <span> <TrophyFill /> Alliance Announce</span>}
-                                {allianceMode === "a1captain" && <span> <TrophyFill /> Top Seeded Alliance</span>}
-                                {allianceMode === "captain" && <span> <TrophyFill /> Alliance Captain</span>}
-                                {allianceMode === "declined" && <span> <TrophyFill /> Sorry</span>}
-                                {(allianceMode === "decline" || allianceMode === "accept" || allianceMode === "skip") && <span><TrophyFill /> Oops, they reconsidered.</span>}
-                            </Button>
-                            {(allianceMode === "show" || allianceMode === "decline") && <Button id="declineButton" variant="danger" size="sm" onClick={(e) => { handleDecline(allianceTeam, allianceMode === "decline" ? "confirm" : "decline", e) }}>
-                                <HandThumbsDownFill /> Respectfully Decline
-                            </Button>}
-                            {(allianceMode === "show" || allianceMode === "accept") && <Button id="acceptButton" variant="success" size="sm" onClick={(e) => { handleAccept(allianceTeam, allianceMode === "accept" ? "confirm" : "accept", e) }}>
-                                <HandThumbsUpFill /> Gratefully Accept
-                            </Button>}
-                            {(allianceMode === "a1captain" || allianceMode === "captain" || allianceMode === "skip") && <Button id="skipButton" variant="warning" size="sm" onClick={(e) => { handleSkip(allianceTeam, allianceMode === "skip" ? "confirm" : "skip", e) }}>
-                                <HandThumbsUpFill /> Skip Alliance
-                            </Button>}
-                        </ButtonToolbar>
+                                <Button variant="primary" size="sm" onClick={handleClose} style={{ marginBottom: "10px" }}>
+                                    {allianceMode === "show" && <span> <TrophyFill /> Alliance Announce</span>}
+                                    {allianceMode === "a1captain" && <span> <TrophyFill /> Top Seeded Alliance</span>}
+                                    {allianceMode === "captain" && <span> <TrophyFill /> Alliance Captain</span>}
+                                    {allianceMode === "declined" && <span> <TrophyFill /> Sorry</span>}
+                                    {(allianceMode === "decline" || allianceMode === "accept" || allianceMode === "skip") && <span><TrophyFill /> Oops, they reconsidered.</span>}
+                                </Button>
+                            
+                            {(allianceMode === "show" || allianceMode === "decline") &&
+                                <Button id="declineButton" variant="danger" size="sm" style={{ marginBottom: "10px" }} onClick={(e) => { handleDecline(allianceTeam, allianceMode === "decline" ? "confirm" : "decline", e) }}>
+                                    <HandThumbsDownFill /> Respectfully Decline
+                                </Button>
+                                }
+                            {(allianceMode === "show" || allianceMode === "accept") &&
+                                
+                                    <Button id="acceptButton" variant="success" size="sm" style={{ marginBottom: "10px" }} onClick={(e) => { handleAccept(allianceTeam, allianceMode === "accept" ? "confirm" : "accept", e) }}>
+                                        <HandThumbsUpFill /> Gratefully Accept
+                                    </Button>
+                                }
+                            {(allianceMode === "a1captain" || allianceMode === "captain" || allianceMode === "skip") &&
+                                
+                                    <Button id="skipButton" variant="warning" size="sm" style={{
+                                        marginBottom: "10px"
+                                    }} onClick={(e) => { handleSkip(allianceTeam, allianceMode === "skip" ? "confirm" : "skip", e) }}>
+                                        <HandThumbsUpFill /> Skip Alliance
+                                    </Button>
+                                }
+                        
                     </Modal.Footer>
                 </Modal>}
             </Container>

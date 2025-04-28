@@ -12,7 +12,7 @@ import moment from "moment";
 const paleGreen = "rgba(144, 238, 144, 0.5)"
 
 
-function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, showNotes, showMottoes, showQualsStats, showQualsStatsQuals, swapScreen, timeFormat, eventHighScores, backupTeam, setBackupTeam, nextMatch, previousMatch, setMatchFromMenu, practiceSchedule, offlinePlayoffSchedule, districtRankings, adHocMatch, setAdHocMatch, adHocMode, hidePracticeSchedule, teamReduction, qualsLength, playoffOnly, getSchedule, usePullDownToUpdate, useSwipe, eventLabel, playoffCountOverride, showInspection, highScoreMode }) {
+function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, communityUpdates, currentMatch, playoffSchedule, qualSchedule, allianceCount, alliances, setAlliances, showNotes, showMottoes, showQualsStats, showQualsStatsQuals, swapScreen, timeFormat, eventHighScores, backupTeam, setBackupTeam, nextMatch, previousMatch, setMatchFromMenu, practiceSchedule, offlinePlayoffSchedule, districtRankings, adHocMatch, setAdHocMatch, adHocMode, hidePracticeSchedule, teamReduction, qualsLength, playoffOnly, getSchedule, usePullDownToUpdate, useSwipe, eventLabel, playoffCountOverride, showInspection, highScoreMode, EPA }) {
     const matchesToNotify = _.toInteger((teamList?.teams?.length - teamReduction) / 6);
     const notification = (currentMatch >= (qualsLength - matchesToNotify) && currentMatch <= (qualsLength) && showInspection) ? { "expiry": moment().add(1, "hour"), "onTime": moment(), "message": "Please remind teams to have their robots reinspected before Playoffs and to send their team rep(s) for Alliance Selection." } : {};
 
@@ -27,8 +27,9 @@ function PlayByPlayPage({ selectedEvent, selectedYear, teamList, rankings, commu
             team = matchDetails?.teams[_.findIndex(matchDetails?.teams, { "station": station })];
             team = _.merge(team,
                 teamList?.teams[_.findIndex(teamList?.teams, { "teamNumber": team?.teamNumber })],
-                rankings?.ranks[_.findIndex(rankings?.ranks, { "teamNumber": team?.teamNumber })],
-                communityUpdates[_.findIndex(communityUpdates, { "teamNumber": team?.teamNumber })]
+                rankings?.ranks?.length > 0 ? rankings?.ranks[_.findIndex(rankings?.ranks, { "teamNumber": team?.teamNumber })] : null,
+                EPA?.length > 0 ? EPA[_.findIndex(EPA, { "teamNumber": team?.teamNumber })] : null,
+                communityUpdates?.length > 0 ? communityUpdates[_.findIndex(communityUpdates, { "teamNumber": team?.teamNumber })] : null,
             );
             team.rankStyle = rankHighlight(team?.rank, allianceCount || { "count": 8 });
             team.alliance = alliances?.Lookup[`${team?.teamNumber}`] ? alliances?.Lookup[`${team?.teamNumber}`]?.alliance || null : null;
