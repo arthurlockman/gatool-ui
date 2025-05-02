@@ -3,7 +3,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react"
 import { toast } from 'react-toastify';
 import { useOnlineStatus } from "./OnlineContext";
 
-const apiBaseUrl = "https://api.gatool.org/v3/";
+export const apiBaseUrl = process.env.REACT_APP_API_BASE || "https://api.gatool.org/v3/";
 
 class AuthClient {
     setOperationsInProgress = null;
@@ -156,7 +156,7 @@ class AuthClient {
 
     async getToken() {
         var tokenResponse = await this.tokenGetter({
-            audience: 'https://gatool.auth0.com/userinfo',
+            audience: `https://${process.env.REACT_APP_AUTH0_DOMAIN || 'gatool.auth0.com'}/userinfo`,
             scope: 'openid email profile offline_access',
             detailedResponse: true
         });
