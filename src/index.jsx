@@ -21,12 +21,12 @@ root.render(
     <HotkeysProvider initiallyActiveScopes={['matchNavigation', 'tabNavigation', 'none']}>
       <OnlineStatusProvider>
         <Auth0Provider
-          domain="auth.gatool.org"
-          clientId="afsE1dlAGS609U32NjmvNMaYSQmtO3NT"
+          domain={process.env.REACT_APP_AUTH0_LOGIN_DOMAIN || 'auth.gatool.org'}
+          clientId={process.env.REACT_APP_AUTH0_CLIENTID || 'afsE1dlAGS609U32NjmvNMaYSQmtO3NT'}
           redirectUri={window.location.origin}
           useRefreshTokens={true}
           cacheLocation='localstorage'
-          connection='email'
+          connection={process.env.REACT_APP_AUTH0_CONNECTION || 'email'}
           sessionCheckExpiryDays={7}
         >
           <AuthClientContextProvider>

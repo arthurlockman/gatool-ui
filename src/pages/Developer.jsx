@@ -54,7 +54,7 @@ function Developer({
   useEffect(() => {
     async function getToken() {
       const tokenResponse = await getAccessTokenSilently({
-        audience: "https://gatool.auth0.com/userinfo",
+        audience: `https://${process.env.REACT_APP_AUTH0_DOMAIN || 'gatool.auth0.com'}/userinfo`,
         scope: "openid email profile",
         detailedResponse: true,
       });
