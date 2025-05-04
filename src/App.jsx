@@ -86,6 +86,8 @@ function LayoutsWithNavbar({
   eventHighScores,
   worldHighScores,
   allianceSelection,
+  systemBell,
+  systemMessage,
 }) {
   return (
     <>
@@ -100,6 +102,8 @@ function LayoutsWithNavbar({
         worldHighScores={worldHighScores}
         allianceSelection={allianceSelection}
         practiceSchedule={practiceSchedule}
+        systemBell={systemBell}
+        systemMessage={systemMessage}
       />
       <Outlet />
       <BottomNavigation />
@@ -115,17 +119,22 @@ var halloffame = _.cloneDeep(hallOfFame);
 const timezones = _.cloneDeep(timeZones);
 
 function App() {
-
-  const { isAuthenticated, isLoading, user, getAccessTokenSilently, loginWithRedirect } = useAuth0();
+  const {
+    isAuthenticated,
+    isLoading,
+    user,
+    getAccessTokenSilently,
+    loginWithRedirect,
+  } = useAuth0();
 
   useEffect(() => {
     const checkLogin = async () => {
       try {
         await getAccessTokenSilently();
       } catch (error) {
-        console.log('Error refreshing access token:', error);
+        console.log("Error refreshing access token:", error);
       }
-    }
+    };
     checkLogin();
   }, [getAccessTokenSilently, isAuthenticated, loginWithRedirect]);
 
@@ -336,7 +345,19 @@ function App() {
   const [loadingCommunityUpdates, setLoadingCommunityUpdates] = useState(false);
   const [haveChampsTeams, setHaveChampsTeams] = useState(false);
   const [EITeams, setEITeams] = useState([]);
-  const [systemMessage, setSystemMessage] = useState(null);
+  const [systemMessage, setSystemMessage] = usePersistentState(
+    "setting:systemMessage",
+    null
+  );
+  const [systemBell, setSystemBell] = usePersistentState(
+    "setting:systemBell",
+    false
+  );
+  const [eventMessage, setEventMessage] = usePersistentState(
+    "setting:eventMessage",
+    []
+  );
+  const [eventBell, setEventBell] = usePersistentState("setting:eventBell", []);
 
   // Handle update notifications from the service worker
   const { waitingWorker, showReload, reloadPage } = useServiceWorker();
@@ -705,12 +726,18 @@ function App() {
             _.findIndex(playoffschedule.schedule, {
               matchNumber: score.matchNumber,
             })
-          ].winner.tieWinner = score?.winningAlliance === 2 ? "blue" : score?.winningAlliance === 1 ? "red" : "TBD";
+          ].winner.tieWinner =
+            score?.winningAlliance === 2
+              ? "blue"
+              : score?.winningAlliance === 1
+              ? "red"
+              : "TBD";
           playoffschedule.schedule[
             _.findIndex(playoffschedule.schedule, {
               matchNumber: score.matchNumber,
             })
-          ].winner.level = score?.tiebreaker?.item1 >= 0 ? score?.tiebreaker?.item1 : 0;
+          ].winner.level =
+            score?.tiebreaker?.item1 >= 0 ? score?.tiebreaker?.item1 : 0;
           playoffschedule.schedule[
             _.findIndex(playoffschedule.schedule, {
               matchNumber: score.matchNumber,
@@ -733,7 +760,7 @@ function App() {
       if (
         lastMatchPlayed === qualschedule?.schedule.length + 1 ||
         lastMatchPlayed ===
-        qualschedule?.schedule.length + playoffschedule?.schedule.length + 2
+          qualschedule?.schedule.length + playoffschedule?.schedule.length + 2
       ) {
         lastMatchPlayed -= 1;
       }
@@ -1478,7 +1505,7 @@ function App() {
       : moment();
     ranks.lastUpdate = moment();
     setRankings(ranks);
-    getEPA()
+    getEPA();
     if (selectedEvent?.value.districtCode) {
       getDistrictRanks();
     }
@@ -1529,17 +1556,20 @@ function App() {
   async function getEPA() {
     var epa = teamList?.teams.map(async (team) => {
       var epaData = await httpClient.getNoAuth(
-        `team_year/${team?.teamNumber}/${selectedYear?.value}`, 'https://api.statbotics.io/v3/'
+        `team_year/${team?.teamNumber}/${selectedYear?.value}`,
+        "https://api.statbotics.io/v3/"
       );
       var epaArray = await epaData.json();
       return {
         teamNumber: team?.teamNumber,
         epa: epaArray,
       };
-    })
-    Promise.all(epa).then((values) => {
-      setEPA(values);
     });
+    if (Array.isArray(epa) && epa.length > 0) {
+      Promise.all(epa).then((values) => {
+        setEPA(values);
+      });
+    }
   }
 
   /**
@@ -1550,7 +1580,9 @@ function App() {
    * @returns sets the world high scores
    */
   async function getWorldStats() {
-    var result = await httpClient.getNoAuth(`${selectedYear?.value}/highscores`);
+    var result = await httpClient.getNoAuth(
+      `${selectedYear?.value}/highscores`
+    );
     var highscores = await result.json();
     var scores = {};
     var reducedScores = {};
@@ -1791,7 +1823,22 @@ function App() {
    * @returns {Promise<object>} result
    */
   async function putNotifications(data) {
-    var result = await httpClient.put(`announcements`, data);
+    var result = await httpClient.put(`system/announcements`, data);
+    return result;
+  }
+
+  /**
+   * This function writes updated event alerts data back to gatool Cloud.
+   * @async
+   * @function putEventNotifications
+   * @param {object} data the data to be put to gatool Cloud
+   * @returns {Promise<object>} result
+   */
+  async function putEventNotifications(data) {
+    var result = await httpClient.put(
+      `system/announcements/${selectedEvent?.value?.code}`,
+      data
+    );
     return result;
   }
 
@@ -1807,7 +1854,7 @@ function App() {
    * This function fetches systemwide notifications from gatool Cloud.
    * @async
    * @function getNotifications
-   * @returns {Promise<object>} The team's update history array
+   * @returns {Promise<object>} system notifications posted by system admins
    */
   async function getNotifications() {
     var result = await httpClient.getNoAuth(`announcements`);
@@ -1826,8 +1873,49 @@ function App() {
     }
   }
 
+  /**
+   * This function fetches event specific notifications from gatool Cloud.
+   * @async
+   * @function getEventNotifications
+   * @returns {Promise<object>} The team's update history array
+   */
+  async function getEventNotifications() {
+    var result = await httpClient.getNoAuth(
+      `announcements/${selectedEvent?.value?.code}`
+    );
+
+    if (result.status === 200) {
+      var notifications = await result.json();
+      return notifications;
+    } else if (result.status === 404) {
+      return [
+        {
+          message: `**Error** ${result?.statusText || "not found"}`,
+          onTime: null,
+          offTime: null,
+          onDate: null,
+          offDate: null,
+          variant: "danger",
+          user: null,
+        },
+      ];
+    } else {
+      return [
+        {
+          message: `**Error** ${result?.statusText || "unknown"}`,
+          onTime: null,
+          offTime: null,
+          onDate: null,
+          offDate: null,
+          variant: "danger",
+          user: null,
+        },
+      ];
+    }
+  }
+
   const getSyncStatus = async () => {
-    const result = await httpClient.getNoAuth(`system/admin/syncUsers`);
+    const result = await httpClient.get(`system/admin/syncUsers`);
     const syncResult = await result.json();
     if (result.status === 200) {
       return syncResult;
@@ -1844,8 +1932,33 @@ function App() {
         expiry: moment(`${message?.offDate} ${message?.offTime}`),
         onTime: moment(`${message?.onDate} ${message?.onTime}`),
         variant: message?.variant || "",
+        link: message?.link || "",
       };
-      setSystemMessage(formattedMessage);
+      const visible =
+        moment().isBefore(formattedMessage?.expiry) &&
+        moment().isAfter(formattedMessage?.onTime);
+      if (JSON.stringify(formattedMessage) !== JSON.stringify(systemMessage)) {
+        setSystemBell(visible);
+        setSystemMessage(formattedMessage);
+      }
+    }
+  };
+
+  const getEventMessages = async () => {
+    var message = await getEventNotifications();
+    if (Array.isArray(message) && message[0]?.message.includes("**Error**")) {
+      console.log(`No Event Messages found for ${selectedEvent?.label}`);
+    } else {
+      var formattedMessage = message.map((item) => {
+        return {
+          message: item?.message,
+          expiry: moment(`${item?.offDate} ${item?.offTime}`),
+          onTime: moment(`${item?.onDate} ${item?.onTime}`),
+          variant: item?.variant || "",
+          user: item?.user || null,
+        };
+      });
+      setEventMessage(formattedMessage);
     }
   };
 
@@ -1857,7 +1970,9 @@ function App() {
    * @returns {Promise<object>} The team's update history array
    */
   async function getTeamHistory(teamNumber) {
-    var result = await httpClient.getNoAuth(`team/${teamNumber}/updates/history/`);
+    var result = await httpClient.getNoAuth(
+      `team/${teamNumber}/updates/history/`
+    );
     var history = await result.json();
     return history;
   }
@@ -1878,16 +1993,16 @@ function App() {
           offlinePlayoffSchedule?.schedule?.length > 0 ||
           offlinePlayoffSchedule?.schedule?.schedule?.length > 0) &&
           currentMatch <
-          (practiceSchedule?.schedule?.length ||
-            practiceSchedule?.schedule?.schedule?.length ||
-            0) +
-          (offlinePlayoffSchedule?.schedule?.length ||
-            offlinePlayoffSchedule?.schedule?.schedule?.length ||
-            0))
+            (practiceSchedule?.schedule?.length ||
+              practiceSchedule?.schedule?.schedule?.length ||
+              0) +
+              (offlinePlayoffSchedule?.schedule?.length ||
+                offlinePlayoffSchedule?.schedule?.schedule?.length ||
+                0))
       ) {
         setAdHocMatch(
           practiceSchedule?.schedule[currentMatch]?.teams ||
-          practiceSchedule?.schedule[currentMatch]?.schedule?.teams
+            practiceSchedule?.schedule[currentMatch]?.schedule?.teams
         );
         setCurrentMatch(currentMatch + 1);
         if (!selectedEvent?.value?.code.includes("OFFLINE")) {
@@ -1899,13 +2014,15 @@ function App() {
         currentMatch <
         (qualSchedule?.schedule?.length ||
           qualSchedule?.schedule?.schedule.length) +
-        playoffSchedule?.schedule?.length
+          playoffSchedule?.schedule?.length
       ) {
         setCurrentMatch(currentMatch + 1);
         if (!selectedEvent?.value?.code.includes("OFFLINE")) {
           getSchedule();
         }
       }
+      getSystemMessages();
+      getEventMessages();
       getWorldStats();
       getEventStats(selectedYear?.value, selectedEvent?.value?.code);
     }
@@ -1922,13 +2039,15 @@ function App() {
         if (practiceSchedule?.schedule?.length > 0) {
           setAdHocMatch(
             practiceSchedule?.schedule[currentMatch - 2]?.teams ||
-            practiceSchedule?.schedule?.schedule?.teams
+              practiceSchedule?.schedule?.schedule?.teams
           );
         }
         setCurrentMatch(currentMatch - 1);
         if (!selectedEvent?.value?.code.includes("OFFLINE")) {
           getSchedule();
         }
+        getSystemMessages();
+        getEventMessages();
         getWorldStats();
         getEventStats(selectedYear?.value, selectedEvent?.value?.code);
       }
@@ -1951,6 +2070,8 @@ function App() {
       setAdHocMatch(practiceSchedule?.schedule[e.value - 1].teams);
     }
     if (!selectedEvent?.value?.name.includes("OFFLINE")) {
+      getSystemMessages();
+      getEventMessages();
       getSchedule();
       getWorldStats();
     }
@@ -1984,7 +2105,7 @@ function App() {
       setAllianceSelectionArrays({});
       setAllianceSelection(false);
       await setRankingsOverride(null);
-      await setCurrentMatch(1);
+      setCurrentMatch(1);
       await setDistrictRankings(null);
       setAdHocMatch([
         { teamNumber: null, station: "Red1", surrogate: false, dq: false },
@@ -1994,11 +2115,15 @@ function App() {
         { teamNumber: null, station: "Blue2", surrogate: false, dq: false },
         { teamNumber: null, station: "Blue3", surrogate: false, dq: false },
       ]);
+      setEventMessage([]);
+      setSystemMessage(null);
+      setSystemBell(false);
       setTeamListLoading("");
       setHaveChampsTeams(false);
       getTeamList();
       getSchedule(true);
       getSystemMessages();
+      getEventMessages();
       getWorldStats();
       getEventStats(selectedYear?.value, selectedEvent?.value?.code);
     }
@@ -2035,7 +2160,11 @@ function App() {
         var eventTime = moment(e.dateEnd);
         e.name = e.name.trim();
         e.name = _.replace(e.name, `- FIRST Robotics Competition -`, `-`);
-        e.name = _.replace(e.name, `FIRST Championship - FIRST Robotics Competition`, `FIRST Championship - Einstein`);
+        e.name = _.replace(
+          e.name,
+          `FIRST Championship - FIRST Robotics Competition`,
+          `FIRST Championship - Einstein`
+        );
         if (e.code === "week0" || e.code === "WEEK0") {
           filters.push("week0");
         }
@@ -2117,7 +2246,9 @@ function App() {
 
   const getDistricts = async () => {
     try {
-      const val = await httpClient.getNoAuth(`${selectedYear?.value}/districts`);
+      const val = await httpClient.getNoAuth(
+        `${selectedYear?.value}/districts`
+      );
       const json = await val.json();
       if (typeof json.Districts !== "undefined") {
         json.districts = json.Districts;
@@ -2208,7 +2339,7 @@ function App() {
       var matchesPerTeam = 0;
       matchesPerTeam = _.toInteger(
         (6 * qualSchedule?.schedule?.length) /
-        (teamList?.teamCountTotal - teamReduction)
+          (teamList?.teamCountTotal - teamReduction)
       );
       // In order to start Alliance Selection, we need the following conditions to be true:
       // All matches must have been completed
@@ -2219,7 +2350,7 @@ function App() {
       if (
         qualSchedule?.schedule?.length === qualSchedule?.completedMatchCount &&
         _.filter(rankings?.ranks, { matchesPlayed: matchesPerTeam }).length ===
-        teamList?.teamCountTotal - teamReduction
+          teamList?.teamCountTotal - teamReduction
       ) {
         asReady = true;
       }
@@ -2291,6 +2422,8 @@ function App() {
       } else {
         console.log("Offline event. Just get the world stats if you can");
       }
+      getSystemMessages();
+      getEventMessages();
       getWorldStats();
       getEventStats(selectedYear?.value, selectedEvent?.value?.code);
     },
@@ -2367,6 +2500,8 @@ function App() {
                   worldHighScores={worldStats}
                   allianceSelection={allianceSelection}
                   practiceSchedule={practiceSchedule}
+                  systemBell={systemBell}
+                  systemMessage={systemMessage}
                 />
               }
             >
@@ -2459,7 +2594,14 @@ function App() {
                     setShowMinorAwards={setShowMinorAwards}
                     highScoreMode={highScoreMode}
                     setHighScoreMode={setHighScoreMode}
-                  />
+                    systemBell={systemBell}
+                    setSystemBell={setSystemBell}
+                    eventBell={eventBell}
+                    setEventBell={setEventBell} 
+                    eventMessage={eventMessage}
+                    setEventMessage={setEventMessage}
+                    putEventNotifications={putEventNotifications}
+                    />
                 }
               />
 
@@ -2605,6 +2747,9 @@ function App() {
                     playoffCountOverride={playoffCountOverride}
                     showInspection={showInspection}
                     highScoreMode={highScoreMode}
+                    eventMessage={eventMessage}
+                    eventBell={eventBell}
+                    setEventBell={setEventBell}
                   />
                 }
               />
@@ -2614,7 +2759,6 @@ function App() {
                 element={
                   <PlayByPlayPage
                     selectedEvent={selectedEvent}
-                    selectedYear={selectedYear}
                     teamList={teamList}
                     rankings={rankings}
                     communityUpdates={communityUpdates}
@@ -2654,6 +2798,9 @@ function App() {
                     showInspection={showInspection}
                     highScoreMode={highScoreMode}
                     EPA={EPA}
+                    eventMessage={eventMessage}
+                    eventBell={eventBell}
+                    setEventBell={setEventBell}
                   />
                 }
               />
@@ -2768,6 +2915,8 @@ function App() {
                     getNotifications={getNotifications}
                     forceUserSync={forceUserSync}
                     getSyncStatus={getSyncStatus}
+                    systemBell={systemBell}
+                    setSystemBell={setSystemBell}
                   />
                 }
               />

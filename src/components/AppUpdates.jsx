@@ -1,5 +1,14 @@
 export const appUpdates = [
   {
+    date: "May 3, 2025",
+    message: (
+      <ul>
+        <li>Added notification bell for system-wide notifications</li>
+        <li>Added event-level announcement reminders. You can now add time-bound announcements that appear on Announce and Play-By-Play</li>
+        <li>Made notifications and announcements dismissible.</li>
+      </ul>
+    ),
+  },{
     date: "April 28, 2025",
     message: (
       <ul>

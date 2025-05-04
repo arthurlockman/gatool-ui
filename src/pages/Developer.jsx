@@ -20,6 +20,8 @@ function Developer({
   getNotifications,
   forceUserSync,
   getSyncStatus,
+  systemBell,
+  setSystemBell,
 }) {
   const { user, getAccessTokenSilently } = useAuth0();
 
@@ -325,6 +327,8 @@ function Developer({
               <Form>
                 <NotificationBanner
                   notification={formattedMessage}
+                  systemBell={systemBell}
+                  setSystemBell={setSystemBell}
                 ></NotificationBanner>
                 <Form.Group className="mb-3" controlId="systemNotification">
                   <Form.Label>Notification</Form.Label>

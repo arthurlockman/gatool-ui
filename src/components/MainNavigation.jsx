@@ -1,77 +1,110 @@
 // @ts-nocheck
-import Nav from 'react-bootstrap/Nav';
-import Navbar from 'react-bootstrap/Navbar';
-import AuthWidget from './AuthWidget';
-import { NavLink } from 'react-router-dom';
-import { Calendar3, CardList, Eye, Flag, Gear, Gift, HandThumbsUp, Megaphone, QuestionOctagon, SortNumericDown, Speedometer, Trophy, WifiOff } from 'react-bootstrap-icons';
-import { TabStates } from '../App';
-import { useOnlineStatus } from '../contextProviders/OnlineContext';
-import { useEffect, useState } from 'react';
+import Nav from "react-bootstrap/Nav";
+import Navbar from "react-bootstrap/Navbar";
+import AuthWidget from "./AuthWidget";
+import { NavLink } from "react-router-dom";
+import {
+  BellFill,
+  Calendar3,
+  CardList,
+  Eye,
+  Flag,
+  Gear,
+  Gift,
+  HandThumbsUp,
+  Megaphone,
+  QuestionOctagon,
+  SortNumericDown,
+  Speedometer,
+  Trophy,
+  WifiOff,
+} from "react-bootstrap-icons";
+import { TabStates } from "../App";
+import { useOnlineStatus } from "../contextProviders/OnlineContext";
+import { useEffect, useState } from "react";
+import moment from "moment";
+import _ from "lodash";
 
 const tabActive = {
   backgroundColor: "#ccc",
-  boxShadow: "inset 0px 0px 5px 2px #3d85c6"
-}
+  boxShadow: "inset 0px 0px 5px 2px #3d85c6",
+};
 
 const tabActiveNotready = {
   backgroundColor: "rgba(255, 109, 109, 1.0)",
-  boxShadow: "inset 0px 0px 5px 2px #3d85c6"
-}
+  boxShadow: "inset 0px 0px 5px 2px #3d85c6",
+};
 
 const tabActiveReady = {
   backgroundColor: "rgba(144, 238, 144, 1.0)",
-  boxShadow: "inset 0px 0px 5px 2px #3d85c6"
-}
+  boxShadow: "inset 0px 0px 5px 2px #3d85c6",
+};
 
 const tabActiveReadyOffline = {
   backgroundColor: "rgba(255, 211, 51, 1.0)",
-  boxShadow: "inset 0px 0px 5px 2px #3d85c6"
-}
+  boxShadow: "inset 0px 0px 5px 2px #3d85c6",
+};
 
 const tabActiveStale = {
   backgroundColor: "rgba(255, 153, 51, 1.0)",
-  boxShadow: "inset 0px 0px 5px 2px #3d85c6"
-}
+  boxShadow: "inset 0px 0px 5px 2px #3d85c6",
+};
 
 const tabInactive = {
-  textDecoration: "none"
-}
+  textDecoration: "none",
+};
 
 const tabInactiveReady = {
   backgroundColor: "rgba(144, 238, 144, 0.5)",
-  textDecoration: "none"
-}
+  textDecoration: "none",
+};
 
 const tabInactiveReadyOffline = {
   backgroundColor: "rgba(255, 211, 51, 0.5)",
-  textDecoration: "none"
-}
+  textDecoration: "none",
+};
 
 const tabInactiveStale = {
   backgroundColor: "rgba(255, 153, 51, 0.5)",
-  textDecoration: "none"
-}
+  textDecoration: "none",
+};
 
 const tabInactiveNotready = {
   backgroundColor: "rgba(255, 109, 109, 0.5)",
-  textDecoration: "none"
-}
+  textDecoration: "none",
+};
 
-function MainNavigation({ selectedEvent, practiceSchedule, qualSchedule, playoffs, teamList, communityUpdates,
-  rankings, eventHighScores, worldHighScores, allianceSelection }) {
+function MainNavigation({
+  selectedEvent,
+  practiceSchedule,
+  qualSchedule,
+  playoffs,
+  teamList,
+  communityUpdates,
+  rankings,
+  eventHighScores,
+  worldHighScores,
+  allianceSelection,
+  systemBell,
+  systemMessage,
+}) {
   const [scheduleTabReady, setScheduleTabReady] = useState(TabStates.NotReady);
   const [teamDataTabReady, setTeamDataTabReady] = useState(TabStates.NotReady);
   const [ranksTabReady, setRanksTabReady] = useState(TabStates.NotReady);
   const [announceTabReady, setAnnounceTabReady] = useState(TabStates.NotReady);
   const [statsTabReady, setStatsTabReady] = useState(TabStates.NotReady);
-  const [allianceSelectionTabReady, setAllianceSelectionTabReady] = useState(TabStates.NotReady);
+  const [allianceSelectionTabReady, setAllianceSelectionTabReady] = useState(
+    TabStates.NotReady
+  );
   const isOnline = useOnlineStatus();
 
   function getTabStyle(active, state) {
-    if (state === null) { // tab has no ready state
+    if (state === null) {
+      // tab has no ready state
       if (active) return tabActive;
       else return tabInactive;
-    } else if (state === TabStates.Ready) { // tab is ready
+    } else if (state === TabStates.Ready) {
+      // tab is ready
       if (!isOnline) {
         if (active) return tabActiveReadyOffline;
         else return tabInactiveReadyOffline;
@@ -79,10 +112,12 @@ function MainNavigation({ selectedEvent, practiceSchedule, qualSchedule, playoff
         if (active) return tabActiveReady;
         else return tabInactiveReady;
       }
-    } else if (state === TabStates.NotReady) { // tab is not ready
+    } else if (state === TabStates.NotReady) {
+      // tab is not ready
       if (active) return tabActiveNotready;
       else return tabInactiveNotready;
-    } else if (state === TabStates.Stale) { // tab may contain stale data
+    } else if (state === TabStates.Stale) {
+      // tab may contain stale data
       if (active) return tabActiveStale;
       else return tabInactiveStale;
     }
@@ -94,14 +129,22 @@ function MainNavigation({ selectedEvent, practiceSchedule, qualSchedule, playoff
     // YELLOW: Event Selected, Schedule stale or Teams Data stale
     // RED: Event Selected, Schedule and Teams not loaded
 
-    if (selectedEvent && scheduleTabReady === TabStates.Ready && teamDataTabReady === TabStates.Ready) {
-      setAnnounceTabReady(TabStates.Ready)
-    } else if (selectedEvent && (scheduleTabReady === TabStates.Stale || teamDataTabReady === TabStates.Stale)) {
-      setAnnounceTabReady(TabStates.Stale)
+    if (
+      selectedEvent &&
+      scheduleTabReady === TabStates.Ready &&
+      teamDataTabReady === TabStates.Ready
+    ) {
+      setAnnounceTabReady(TabStates.Ready);
+    } else if (
+      selectedEvent &&
+      (scheduleTabReady === TabStates.Stale ||
+        teamDataTabReady === TabStates.Stale)
+    ) {
+      setAnnounceTabReady(TabStates.Stale);
     } else {
-      setAnnounceTabReady(TabStates.NotReady)
+      setAnnounceTabReady(TabStates.NotReady);
     }
-  }, [selectedEvent, scheduleTabReady, teamDataTabReady])
+  }, [selectedEvent, scheduleTabReady, teamDataTabReady]);
 
   // Handle ready state for Announce/Play By Play tab
   useEffect(() => {
@@ -110,14 +153,23 @@ function MainNavigation({ selectedEvent, practiceSchedule, qualSchedule, playoff
     // YELLOW: Event Selected, Qual Schedule loaded, has 0 matches in the array
     // RED: Event Selected, No qual schedule loaded
 
-    if (selectedEvent && (practiceSchedule?.schedule?.length > 0 || qualSchedule?.schedule?.length > 0 || playoffs)) {
-      setScheduleTabReady(TabStates.Ready)
-    } else if (selectedEvent && qualSchedule && qualSchedule?.schedule?.length === 0) {
-      setScheduleTabReady(TabStates.Stale)
+    if (
+      selectedEvent &&
+      (practiceSchedule?.schedule?.length > 0 ||
+        qualSchedule?.schedule?.length > 0 ||
+        playoffs)
+    ) {
+      setScheduleTabReady(TabStates.Ready);
+    } else if (
+      selectedEvent &&
+      qualSchedule &&
+      qualSchedule?.schedule?.length === 0
+    ) {
+      setScheduleTabReady(TabStates.Stale);
     } else {
-      setScheduleTabReady(TabStates.NotReady)
+      setScheduleTabReady(TabStates.NotReady);
     }
-  }, [qualSchedule, practiceSchedule, selectedEvent, playoffs])
+  }, [qualSchedule, practiceSchedule, selectedEvent, playoffs]);
 
   // Handle ready state for the team data tab
   useEffect(() => {
@@ -126,13 +178,13 @@ function MainNavigation({ selectedEvent, practiceSchedule, qualSchedule, playoff
     // RED: Event Selected, No teams loaded
 
     if (selectedEvent && teamList && communityUpdates) {
-      setTeamDataTabReady(TabStates.Ready)
+      setTeamDataTabReady(TabStates.Ready);
     } else if (selectedEvent && teamList && communityUpdates == null) {
-      setTeamDataTabReady(TabStates.Stale)
+      setTeamDataTabReady(TabStates.Stale);
     } else {
-      setTeamDataTabReady(TabStates.NotReady)
+      setTeamDataTabReady(TabStates.NotReady);
     }
-  }, [selectedEvent, teamList, communityUpdates])
+  }, [selectedEvent, teamList, communityUpdates]);
 
   // Handle ready state for the ranks tab
   useEffect(() => {
@@ -141,13 +193,13 @@ function MainNavigation({ selectedEvent, practiceSchedule, qualSchedule, playoff
     // RED: Event Selected, Ranks not loaded
 
     if (selectedEvent && rankings && rankings.ranks.length > 0) {
-      setRanksTabReady(TabStates.Ready)
+      setRanksTabReady(TabStates.Ready);
     } else if (selectedEvent && rankings && rankings?.ranks.length === 0) {
-      setRanksTabReady(TabStates.Stale)
+      setRanksTabReady(TabStates.Stale);
     } else {
-      setRanksTabReady(TabStates.NotReady)
+      setRanksTabReady(TabStates.NotReady);
     }
-  }, [selectedEvent, rankings])
+  }, [selectedEvent, rankings]);
 
   // Handle ready state for the Alliance Selection tab
   useEffect(() => {
@@ -156,13 +208,19 @@ function MainNavigation({ selectedEvent, practiceSchedule, qualSchedule, playoff
     // RED: Event Selected, Ranks not loaded
 
     if (selectedEvent && (allianceSelection || playoffs)) {
-      setAllianceSelectionTabReady(TabStates.Ready)
-    } else if (selectedEvent && rankings && rankings?.ranks.length === 0 && !allianceSelection && !playoffs) {
-      setAllianceSelectionTabReady(TabStates.Stale)
+      setAllianceSelectionTabReady(TabStates.Ready);
+    } else if (
+      selectedEvent &&
+      rankings &&
+      rankings?.ranks.length === 0 &&
+      !allianceSelection &&
+      !playoffs
+    ) {
+      setAllianceSelectionTabReady(TabStates.Stale);
     } else {
-      setAllianceSelectionTabReady(TabStates.NotReady)
+      setAllianceSelectionTabReady(TabStates.NotReady);
     }
-  }, [selectedEvent, rankings, allianceSelection, playoffs])
+  }, [selectedEvent, rankings, allianceSelection, playoffs]);
 
   // Handle ready state for the stats tab
   useEffect(() => {
@@ -170,41 +228,167 @@ function MainNavigation({ selectedEvent, practiceSchedule, qualSchedule, playoff
     // YELLOW: Event Selected, World High Scores Available, no matches complete for selected event
     // RED: Event Selected, no world high scores available
 
-    if (selectedEvent && (eventHighScores?.highscores?.overallqual || eventHighScores?.highscores?.overallplayoff) && worldHighScores) {
-      setStatsTabReady(TabStates.Ready)
+    if (
+      selectedEvent &&
+      (eventHighScores?.highscores?.overallqual ||
+        eventHighScores?.highscores?.overallplayoff) &&
+      worldHighScores
+    ) {
+      setStatsTabReady(TabStates.Ready);
     } else if (selectedEvent && worldHighScores) {
-      setStatsTabReady(TabStates.Stale)
+      setStatsTabReady(TabStates.Stale);
     } else {
-      setStatsTabReady(TabStates.NotReady)
+      setStatsTabReady(TabStates.NotReady);
     }
-  }, [selectedEvent, eventHighScores, worldHighScores])
+  }, [selectedEvent, eventHighScores, worldHighScores]);
 
   return (
     <>
-      <Navbar bg="light" sticky='top' style={{ color: "black" }}>
+      <Navbar bg="light" sticky="top" style={{ color: "black" }}>
         <Nav className="me-auto">
-          <Nav.Link id={"setupPage"} as={NavLink} style={({ isActive }) => getTabStyle(isActive, null)} to="/"><Gear /><div className='d-none d-md-block navBarText'>Setup</div></Nav.Link>
-          <Nav.Link id={"schedulePage"} as={NavLink} style={({ isActive }) => getTabStyle(isActive, scheduleTabReady)} to="/schedule"><Calendar3 /><div className='d-none d-md-block navBarText'>Schedule</div></Nav.Link>
-          <Nav.Link id={"teamsPage"} as={NavLink} style={({ isActive }) => getTabStyle(isActive, teamDataTabReady)} to="/teamdata"><CardList /><div className='d-none d-md-block navBarText'>Teams</div></Nav.Link>
-          <Nav.Link id={"ranksPage"} as={NavLink} style={({ isActive }) => getTabStyle(isActive, ranksTabReady)} to="/ranks"><SortNumericDown /><div className='d-none d-md-block navBarText'>Ranks</div></Nav.Link>
-          <Nav.Link id={"announcePage"} as={NavLink} style={({ isActive }) => getTabStyle(isActive, announceTabReady)} to="/announce"><Megaphone /><div className='d-none d-md-block navBarText'>Announce</div></Nav.Link>
-          <Nav.Link id={"playByPlayPage"} as={NavLink} style={({ isActive }) => getTabStyle(isActive, announceTabReady)} to="/playbyplay"><Speedometer /><div className='d-none d-md-block navBarText'>Play-by-Play</div></Nav.Link>
-          <Nav.Link id={"allianceSelectionPage"} as={NavLink} style={({ isActive }) => getTabStyle(isActive, allianceSelectionTabReady)} to="/allianceselection"><HandThumbsUp /><div className='d-none d-md-block navBarText'>{playoffs ? "Playoffs" : "Alliance Selection"}</div></Nav.Link>
-          <Nav.Link id={"awardsPage"} as={NavLink} style={({ isActive }) => getTabStyle(isActive, teamDataTabReady)} to="/awards"><Trophy /><div className='d-none d-md-block navBarText'>Awards</div></Nav.Link>
-          <Nav.Link id={"statsPage"} as={NavLink} style={({ isActive }) => getTabStyle(isActive, statsTabReady)} to="/stats"><Flag /><div className='d-none d-md-block navBarText'>Stats</div></Nav.Link>
-          <Nav.Link id={"cheatSheetPage"} as={NavLink} style={({ isActive }) => getTabStyle(isActive, null)} to="/cheatsheet"><Eye /><div className='d-none d-md-block navBarText'>Cheat Sheet</div></Nav.Link>
-          <Nav.Link id={"emceePage"} as={NavLink} style={({ isActive }) => getTabStyle(isActive, null)} to="/emcee"><Gift /><div className='d-none d-md-block navBarText'>Emcee #s</div></Nav.Link>
-          <Nav.Link as={NavLink} className='d-none d-md-block navBarText' style={({ isActive }) => getTabStyle(isActive, null)} to="https://github.com/arthurlockman/gatool-ui/wiki" target="_blank" rel="noopener noreferrer"><QuestionOctagon /><div className='d-none d-md-block navBarText'>Help</div></Nav.Link>
+          <Nav.Link
+            id={"setupPage"}
+            as={NavLink}
+            style={({ isActive }) => getTabStyle(isActive, null)}
+            to="/"
+          >
+            {moment().isBefore(systemMessage?.expiry) && moment().isAfter(systemMessage?.onTime) && (systemBell || _.isNull(systemBell)) ? (
+              <BellFill
+                  style={{
+                    animationName: "throb",
+                    animationDuration: "2s",
+                    animationIterationCount: "infinite",
+                    color:
+                      systemMessage?.variant === "info"
+                        ? "blue"
+                        : systemMessage?.variant === "danger"
+                        ? "red"
+                        : systemMessage?.variant === "warning"
+                        ? "orange"
+                        : "green",
+                  }}
+                />
+            ) : (
+              <Gear />
+            )}
+            <div className="d-none d-md-block navBarText">Setup</div>
+          </Nav.Link>
+          <Nav.Link
+            id={"schedulePage"}
+            as={NavLink}
+            style={({ isActive }) => getTabStyle(isActive, scheduleTabReady)}
+            to="/schedule"
+          >
+            <Calendar3 />
+            <div className="d-none d-md-block navBarText">Schedule</div>
+          </Nav.Link>
+          <Nav.Link
+            id={"teamsPage"}
+            as={NavLink}
+            style={({ isActive }) => getTabStyle(isActive, teamDataTabReady)}
+            to="/teamdata"
+          >
+            <CardList />
+            <div className="d-none d-md-block navBarText">Teams</div>
+          </Nav.Link>
+          <Nav.Link
+            id={"ranksPage"}
+            as={NavLink}
+            style={({ isActive }) => getTabStyle(isActive, ranksTabReady)}
+            to="/ranks"
+          >
+            <SortNumericDown />
+            <div className="d-none d-md-block navBarText">Ranks</div>
+          </Nav.Link>
+          <Nav.Link
+            id={"announcePage"}
+            as={NavLink}
+            style={({ isActive }) => getTabStyle(isActive, announceTabReady)}
+            to="/announce"
+          >
+            <Megaphone />
+            <div className="d-none d-md-block navBarText">Announce</div>
+          </Nav.Link>
+          <Nav.Link
+            id={"playByPlayPage"}
+            as={NavLink}
+            style={({ isActive }) => getTabStyle(isActive, announceTabReady)}
+            to="/playbyplay"
+          >
+            <Speedometer />
+            <div className="d-none d-md-block navBarText">Play-by-Play</div>
+          </Nav.Link>
+          <Nav.Link
+            id={"allianceSelectionPage"}
+            as={NavLink}
+            style={({ isActive }) =>
+              getTabStyle(isActive, allianceSelectionTabReady)
+            }
+            to="/allianceselection"
+          >
+            <HandThumbsUp />
+            <div className="d-none d-md-block navBarText">
+              {playoffs ? "Playoffs" : "Alliance Selection"}
+            </div>
+          </Nav.Link>
+          <Nav.Link
+            id={"awardsPage"}
+            as={NavLink}
+            style={({ isActive }) => getTabStyle(isActive, teamDataTabReady)}
+            to="/awards"
+          >
+            <Trophy />
+            <div className="d-none d-md-block navBarText">Awards</div>
+          </Nav.Link>
+          <Nav.Link
+            id={"statsPage"}
+            as={NavLink}
+            style={({ isActive }) => getTabStyle(isActive, statsTabReady)}
+            to="/stats"
+          >
+            <Flag />
+            <div className="d-none d-md-block navBarText">Stats</div>
+          </Nav.Link>
+          <Nav.Link
+            id={"cheatSheetPage"}
+            as={NavLink}
+            style={({ isActive }) => getTabStyle(isActive, null)}
+            to="/cheatsheet"
+          >
+            <Eye />
+            <div className="d-none d-md-block navBarText">Cheat Sheet</div>
+          </Nav.Link>
+          <Nav.Link
+            id={"emceePage"}
+            as={NavLink}
+            style={({ isActive }) => getTabStyle(isActive, null)}
+            to="/emcee"
+          >
+            <Gift />
+            <div className="d-none d-md-block navBarText">Emcee #s</div>
+          </Nav.Link>
+          <Nav.Link
+            as={NavLink}
+            className="d-none d-md-block navBarText"
+            style={({ isActive }) => getTabStyle(isActive, null)}
+            to="https://github.com/arthurlockman/gatool-ui/wiki"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <QuestionOctagon />
+            <div className="d-none d-md-block navBarText">Help</div>
+          </Nav.Link>
         </Nav>
-        {
-          !isOnline &&
-          <WifiOff style={{
-            color: 'red',
-            marginRight: '5px',
-            height: "31px",
-            width: "31px"
-          }} />
-        }
+        {!isOnline && (
+          <WifiOff
+            style={{
+              color: "red",
+              marginRight: "5px",
+              height: "31px",
+              width: "31px",
+            }}
+          />
+        )}
         <AuthWidget />
       </Navbar>
     </>
