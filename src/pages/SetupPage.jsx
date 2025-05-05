@@ -303,7 +303,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
 
                                 {eventBell.length > 0 && <Button variant="warning" size="sm" onClick={() => { setEventBell([]) }} >Reset dismissed Event Notifications</Button>}
                             </ButtonGroup>
-                            {(_.isNull(systemBell) || systemBell === false) &&
+                            {(systemBell === false) &&
                                 <ButtonGroup>
                                     <Button variant="warning" size="sm" onClick={() => { setSystemBell(true) }} >Reset dismissed System Notifications</Button>
                                 </ButtonGroup>}
@@ -613,10 +613,13 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                     </Col>
                                 </Row>
                             })}
+                            {eventMessageFormData && eventMessageFormData.length === 0 && <Row>
+                                <Col xs={12}><Alert variant="warning">No announcements have been created for this event. You can add one by clicking the plus sign above.</Alert></Col>
+                            </Row>}
                         </Container>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button variant="primary" onClick={() => { handleEventNotificationSave() }}>Save Changes</Button>
+                        <Button variant="primary" disabled={JSON.stringify(eventMessage) === JSON.stringify(eventMessageFormData)} onClick={() => { handleEventNotificationSave() }}>Save Changes</Button>
                         <Button variant="secondary" onClick={() => { handleEventNotificationClose() }}>Close</Button>
                     </Modal.Footer>
                 </Modal>

@@ -351,7 +351,7 @@ function App() {
   );
   const [systemBell, setSystemBell] = usePersistentState(
     "setting:systemBell",
-    false
+    null
   );
   const [eventMessage, setEventMessage] = usePersistentState(
     "setting:eventMessage",
@@ -2117,7 +2117,7 @@ function App() {
       ]);
       setEventMessage([]);
       setSystemMessage(null);
-      setSystemBell(false);
+      setSystemBell(null);
       setTeamListLoading("");
       setHaveChampsTeams(false);
       getTeamList();

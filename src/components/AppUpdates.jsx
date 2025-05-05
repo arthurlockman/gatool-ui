@@ -1,6 +1,6 @@
 export const appUpdates = [
   {
-    date: "May 3, 2025",
+    date: "May 5, 2025",
     message: (
       <ul>
         <li>Added notification bell for system-wide notifications</li>
