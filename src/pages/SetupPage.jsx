@@ -1,5 +1,5 @@
 import Select from "react-select";
-import { Row, Col, Container, Alert, Button, Modal, ButtonToolbar, ButtonGroup, Form, InputGroup } from 'react-bootstrap';
+import { Row, Col, Container, Alert, Button, Modal, ButtonGroup, Form, InputGroup } from 'react-bootstrap';
 import moment from "moment/moment";
 import LogoutButton from "../components/LogoutButton";
 import _ from "lodash";
@@ -10,7 +10,7 @@ import { toast } from "react-toastify";
 import { isSafari, isChrome, fullBrowserVersion, browserVersion, isIOS, browserName, isDesktop, isTablet, isMobile } from "react-device-detect";
 import { playoffOverrideMenu } from "components/Constants";
 import Contenteditable from "components/ContentEditable";
-import { ArrowClockwise, Trash, Copy, Plus } from 'react-bootstrap-icons';
+import { ArrowClockwise, Trash, Copy, Plus, BellFill } from 'react-bootstrap-icons';
 import NotificationBanner from "components/NotificationBanner";
 import { Link } from "react-router-dom";
 
@@ -193,8 +193,10 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
     }
 
     const handleEventNotificationSave = () => {
-        setEventMessage(eventMessageFormData);
-        const eventMessageFormDataTemp = eventMessageFormData.map((message) => {
+        setEventMessage(_.filter(eventMessageFormData, function (o) {
+            return (o.message !== "")
+        }));
+        let eventMessageFormDataTemp = eventMessageFormData.map((message) => {
             return {
                 ...message,
                 onDate: moment(message.onTime).format("YYYY-MM-DD"),
@@ -205,6 +207,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
         });
 
         putEventNotifications(eventMessageFormDataTemp);
+
         setEventMessageFormData(null);
         setManageAnnouncements(false);
     }
@@ -277,7 +280,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                         <Alert variant={"danger"}><b>ADVANCED EVENT SETTINGS:</b><br />If your event includes non-competing teams in the team list, indicate the number of non-competing teams here. <b>THIS IS A RARE CONDITION</b><Select options={teamReducer} value={teamReduction ? teamReduction : teamReducer[0]} onChange={setTeamReduction} isDisabled={!teamList?.teamCountTotal} /><br />
                             If your event requires a reduced Alliance Count, you can override the Alliance Count here. <b>THIS SHOULD ONLY APPLY TO EVENTS WITH LESS THAN 26 TEAMS. </b><Select options={playoffOverrideMenu} value={playoffCountOverride ? playoffCountOverride : (allianceCount?.menu ? allianceCount.menu : playoffOverrideMenu[0])} onChange={setPlayoffCountOverride} />
                         </Alert>
-                        <img style={{ width: "300px" }} src="/images/frc_reefscape.gif" alt="REEFSCAPE℠ presented by Haas Logo" />
+                        <div><img style={{ width: "100%" }} src="/images/frc_reefscape.gif" alt="REEFSCAPE℠ presented by Haas Logo" /></div>
                     </Col>
                     <Col sm={4}>
                         {selectedEvent?.value.allianceCount === "SixAlliance" && <p><b>Playoff Type: </b>Round Robin</p>}
@@ -290,24 +293,35 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                         {playoffSchedule?.matchesLastModified && <p><b>Playoff Results last updated: </b><br />{moment(playoffSchedule?.matchesLastModified).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
                         {teamList?.lastUpdate && <p><b>Team List last updated: </b><br />{moment(teamList?.lastUpdate).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
                         {rankings?.lastModified && <p><b>Rankings last updated: </b><br />{moment(rankings?.lastModified).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
-                        {((isAuthenticated && user["https://gatool.org/roles"] && (user["https://gatool.org/roles"].indexOf("user") >= 0)) && localUpdates.length > 0) && <Alert><p><b>You have {localUpdates.length === 1 ? "an update for team" : "updates for teams"} {_.sortBy(updatedTeamList).join(", ")} that can be uploaded to gatool Cloud.</b></p><span><Button disabled={!isOnline} style={{ width: "45%" }} onClick={uploadLocalUpdates}>Upload to gatool Cloud now</Button>  <Button disabled={!isOnline} variant={"warning"} style={{ width: "50%" }} onClick={deleteLocalUpdates}>Delete stored updates</Button></span></Alert>}
-                        <Alert variant={"warning"}><p><b>Update Team Data</b><br />You can refresh your community-sourced team data if it has changed on another device. <i><b>Know that we fetch all team data automatically when you load an event</b></i>, so you should not need this very often.</p><Button variant={"warning"} disabled={!isOnline} onClick={() => { handleGetTeamUpdates() }}>Update now</Button></Alert>
+                        {((isAuthenticated && user["https://gatool.org/roles"] && (user["https://gatool.org/roles"].indexOf("user") >= 0)) && localUpdates.length > 0) &&
+                            <Alert>
+                                <p><b>You have {localUpdates.length === 1 ? "an update for team" : "updates for teams"} {_.sortBy(updatedTeamList).join(", ")} that can be uploaded to gatool Cloud.</b></p>
+                                <span><Button disabled={!isOnline} style={{ width: "45%" }} onClick={uploadLocalUpdates}>Upload to gatool Cloud now</Button>  <Button disabled={!isOnline} variant={"warning"} style={{ width: "50%" }} onClick={deleteLocalUpdates}>Delete stored updates</Button></span>
+                            </Alert>
+                        }
+                        <Alert variant={"warning"}>
+                            <p><b>Update Team Data</b><br />
+                                You can refresh your community-sourced team data if it has changed on another device. <i><b>Know that we fetch all team data automatically when you load an event</b></i>, so you should not need this very often.</p>
+                            <Button variant={"warning"} disabled={!isOnline} onClick={() => { handleGetTeamUpdates() }}>Update now</Button>
+                        </Alert>
+                        {(isAuthenticated && (user["https://gatool.org/roles"].indexOf("user") >= 0 || user["https://gatool.org/roles"].indexOf("admin") >= 0)) &&
+                            <Alert variant="info">
+                                <p><b>Announcements</b><br />
+                                    You can manage your event's announcements here. You can add, edit, or delete announcements. You can also set the time and date for each announcement to appear and disappear.</p>
+                                <Button variant="info" onClick={() => { handleEventNotificationOpen() }}>Manage event notifications</Button></Alert>}
+
+                        {eventBell.length > 0 && <Button variant="warning" size="sm" onClick={() => { setEventBell([]) }} >Reset dismissed Event Announcements</Button>}
+
+                        {(systemBell === false) &&
+                            <ButtonGroup>
+                                <Button variant="warning" size="sm" onClick={() => { setSystemBell(true) }} ><BellFill />Reset dismissed System Notifications</Button>
+                            </ButtonGroup>}
                         {(isAuthenticated && user["https://gatool.org/roles"].indexOf("admin") >= 0) &&
                             <Link to="/dev">
                                 <Button variant="outline-danger" size="sm" onClick={() => { }} >Go to developer tools</Button>
                             </Link>}
-                        <ButtonToolbar>
-                            <ButtonGroup>
-                                {(isAuthenticated && (user["https://gatool.org/roles"].indexOf("user") >= 0 || user["https://gatool.org/roles"].indexOf("admin") >= 0)) &&
-                                    <Button variant="warning" size="sm" onClick={() => { handleEventNotificationOpen() }}>Manage event notifications</Button>}
 
-                                {eventBell.length > 0 && <Button variant="warning" size="sm" onClick={() => { setEventBell([]) }} >Reset dismissed Event Notifications</Button>}
-                            </ButtonGroup>
-                            {(systemBell === false) &&
-                                <ButtonGroup>
-                                    <Button variant="warning" size="sm" onClick={() => { setSystemBell(true) }} >Reset dismissed System Notifications</Button>
-                                </ButtonGroup>}
-                        </ButtonToolbar>
+
 
                     </Col>
                     <Col sm={4}>
@@ -585,6 +599,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                     <Col xs={5}>
                                         <Alert variant={message?.variant}>
                                             <Contenteditable
+                                                placeholder="Enter your announcement here"
                                                 onChange={(e) =>
                                                     handleEventNotification("message", index, e, user)
                                                 }
@@ -614,7 +629,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                 </Row>
                             })}
                             {eventMessageFormData && eventMessageFormData.length === 0 && <Row>
-                                <Col xs={12}><Alert variant="warning">No announcements have been created for this event. You can add one by clicking the plus sign above.</Alert></Col>
+                                <Col xs={12}><Alert variant="warning">No announcements have been created for this event. You can add one by clicking the plus sign <Plus size={25} /> above.</Alert></Col>
                             </Row>}
                         </Container>
                     </Modal.Body>
