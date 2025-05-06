@@ -1,12 +1,14 @@
 import { Alert } from "react-bootstrap";
 import moment from "moment";
+import _ from "lodash";
 
-const NotificationBanner = ({ notification }) => {
-    const visible = moment().isBefore(notification?.expiry) && moment().isAfter(notification?.onTime);
+const NotificationBanner = ({ notification, systemBell=null, setSystemBell=null }) => {
+    const visible = moment().isBefore(notification?.expiry) && moment().isAfter(notification?.onTime) && (_.isNull(systemBell) || systemBell);
+    const dismissable = !_.isNull(systemBell);
     return (
         <>
-        {visible ? 
-        <Alert onClick={()=>{if (notification?.link){window.open(notification?.link);}}} variant={notification?.variant ? notification?.variant : "primary"} style={{padding:"6px",marginBottom:"2px"}}><b>{notification?.message}</b></Alert> : <></>}
+        {visible  ? 
+        <Alert className={notification?.variant} dismissible={dismissable} onClose={()=>{setSystemBell(false)}} variant={notification?.variant ? notification?.variant : "primary"} style={{padding:"6px",marginBottom:"2px"}}><b>{notification?.message}</b>{notification?.link ? <Alert.Link onClick={()=>{if (notification?.link){window.open(notification?.link);}}}> Learn more</Alert.Link>:<></>}</Alert> : <></>}
         </>
     )
 

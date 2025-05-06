@@ -1,18 +1,18 @@
 import Select from "react-select";
-import { Row, Col, Container, Alert, Button, Modal } from 'react-bootstrap';
+import { Row, Col, Container, Alert, Button, Modal, ButtonGroup, Form, InputGroup } from 'react-bootstrap';
 import moment from "moment/moment";
 import LogoutButton from "../components/LogoutButton";
 import _ from "lodash";
 import Switch from "react-switch";
 import { useOnlineStatus } from "../contextProviders/OnlineContext";
-import {useState} from "react";
+import { useState } from "react";
 import { toast } from "react-toastify";
 import { isSafari, isChrome, fullBrowserVersion, browserVersion, isIOS, browserName, isDesktop, isTablet, isMobile } from "react-device-detect";
 import { playoffOverrideMenu } from "components/Constants";
-
-import { ArrowClockwise } from 'react-bootstrap-icons';
+import Contenteditable from "components/ContentEditable";
+import { ArrowClockwise, Trash, Copy, Plus, BellFill } from 'react-bootstrap-icons';
 import NotificationBanner from "components/NotificationBanner";
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 
 
 const filterTime = [
@@ -60,12 +60,14 @@ const monthsWarningMenu = [
 
 
 
-function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, districts,timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showNotesAnnounce, setShowNotesAnnounce, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, autoUpdate, setAutoUpdate, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, showQualsStatsQuals, setShowQualsStatsQuals, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee, showDistrictChampsStats, setShowDistrictChampsStats, monthsWarning, setMonthsWarning, user, isAuthenticated, adHocMode, setAdHocMode, supportedYears, reloadPage, autoHideSponsors, setAutoHideSponsors, setLoadingCommunityUpdates, hidePracticeSchedule, setHidePracticeSchedule, systemMessage, setTeamListLoading, getTeamList, getAlliances, setHaveChampsTeams, appUpdates, usePullDownToUpdate, setUsePullDownToUpdate, useSwipe, setUseSwipe, eventLabel, setEventLabel, showInspection, setShowInspection, showMinorAwards, setShowMinorAwards, highScoreMode, setHighScoreMode }) {
+function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, districts, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showNotesAnnounce, setShowNotesAnnounce, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, autoUpdate, setAutoUpdate, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, showQualsStatsQuals, setShowQualsStatsQuals, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee, showDistrictChampsStats, setShowDistrictChampsStats, monthsWarning, setMonthsWarning, user, isAuthenticated, adHocMode, setAdHocMode, supportedYears, reloadPage, autoHideSponsors, setAutoHideSponsors, setLoadingCommunityUpdates, hidePracticeSchedule, setHidePracticeSchedule, systemMessage, setTeamListLoading, getTeamList, getAlliances, setHaveChampsTeams, appUpdates, usePullDownToUpdate, setUsePullDownToUpdate, useSwipe, setUseSwipe, eventLabel, setEventLabel, showInspection, setShowInspection, showMinorAwards, setShowMinorAwards, highScoreMode, setHighScoreMode, systemBell, setSystemBell, eventBell, setEventBell, eventMessage, setEventMessage, putEventNotifications }) {
     const isOnline = useOnlineStatus();
     const PWASupported = (isChrome && Number(browserVersion) >= 76) || (isSafari && Number(browserVersion) >= 15 && Number(fullBrowserVersion.split(".")[1]) >= 4);
 
     const [deleteSavedModal, setDeleteSavedModal] = useState(false);
     const [showUpdateHistory, setShowUpdateHistory] = useState(false);
+    const [manageAnnouncements, setManageAnnouncements] = useState(false);
+    const [eventMessageFormData, setEventMessageFormData] = useState(eventMessage);
 
     const filtersMenu = [
         ...districts,
@@ -163,6 +165,52 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
         setEventLabel(e.label);
     }
 
+    const handleEventNotification = (property, index, value, user) => {
+        var eventNotificationsTemp = _.cloneDeep(eventMessageFormData);
+        if (property === "delete") {
+            eventNotificationsTemp.splice(index, 1);
+        } else if (property === "duplicate") {
+            eventNotificationsTemp.push({ ...eventNotificationsTemp[index], user: user?.email });
+        }
+        else if (property === "add") {
+            eventNotificationsTemp.push({ "message": "", "onTime": moment().add(1, "days").format("YYYY-MM-DDTHH:mm:ss"), "expiry": moment().add(1, "days").format("YYYY-MM-DDTHH:mm:ss"), "variant": "primary", "link": "" });
+        }
+        else {
+            eventNotificationsTemp[index][property] = value;
+            eventNotificationsTemp[index]["user"] = user?.email;
+        }
+        setEventMessageFormData(eventNotificationsTemp);
+    }
+
+    const handleEventNotificationOpen = () => {
+        setEventMessageFormData(_.cloneDeep(eventMessage));
+        setManageAnnouncements(true);
+    }
+
+    const handleEventNotificationClose = () => {
+        setEventMessageFormData(null);
+        setManageAnnouncements(false);
+    }
+
+    const handleEventNotificationSave = () => {
+        setEventMessage(_.filter(eventMessageFormData, function (o) {
+            return (o.message !== "")
+        }));
+        let eventMessageFormDataTemp = eventMessageFormData.map((message) => {
+            return {
+                ...message,
+                onDate: moment(message.onTime).format("YYYY-MM-DD"),
+                onTime: moment(message.onTime).format("HH:mm:ss"),
+                offDate: moment(message.expiry).format("YYYY-MM-DD"),
+                offTime: moment(message.expiry).format("HH:mm:ss"),
+            }
+        });
+
+        putEventNotifications(eventMessageFormDataTemp);
+
+        setEventMessageFormData(null);
+        setManageAnnouncements(false);
+    }
 
 
     var updatedTeamList = localUpdates.map((update) => {
@@ -207,7 +255,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
 
             </div>}
             {selectedEvent && <div>
-                <Row><NotificationBanner notification={systemMessage} /></Row>
+                <Row><NotificationBanner notification={systemMessage} systemBell={systemBell} setSystemBell={setSystemBell} /></Row>
                 <Row><Button size="lg" onClick={getSchedule} variant="outline-success" disabled={!isOnline}><b><ArrowClockwise /> Tap to refresh Schedule.</b> <br />Use after Alliance Selection to load Playoffs.</Button></Row>
                 <br />
                 <h4>{eventLabel}</h4>
@@ -232,7 +280,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                         <Alert variant={"danger"}><b>ADVANCED EVENT SETTINGS:</b><br />If your event includes non-competing teams in the team list, indicate the number of non-competing teams here. <b>THIS IS A RARE CONDITION</b><Select options={teamReducer} value={teamReduction ? teamReduction : teamReducer[0]} onChange={setTeamReduction} isDisabled={!teamList?.teamCountTotal} /><br />
                             If your event requires a reduced Alliance Count, you can override the Alliance Count here. <b>THIS SHOULD ONLY APPLY TO EVENTS WITH LESS THAN 26 TEAMS. </b><Select options={playoffOverrideMenu} value={playoffCountOverride ? playoffCountOverride : (allianceCount?.menu ? allianceCount.menu : playoffOverrideMenu[0])} onChange={setPlayoffCountOverride} />
                         </Alert>
-                        <img style={{ width: "300px" }} src="/images/frc_reefscape.gif" alt="REEFSCAPE℠ presented by Haas Logo" />
+                        <div><img style={{ width: "100%" }} src="/images/frc_reefscape.gif" alt="REEFSCAPE℠ presented by Haas Logo" /></div>
                     </Col>
                     <Col sm={4}>
                         {selectedEvent?.value.allianceCount === "SixAlliance" && <p><b>Playoff Type: </b>Round Robin</p>}
@@ -245,12 +293,36 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                         {playoffSchedule?.matchesLastModified && <p><b>Playoff Results last updated: </b><br />{moment(playoffSchedule?.matchesLastModified).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
                         {teamList?.lastUpdate && <p><b>Team List last updated: </b><br />{moment(teamList?.lastUpdate).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
                         {rankings?.lastModified && <p><b>Rankings last updated: </b><br />{moment(rankings?.lastModified).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
-                        {((isAuthenticated && user["https://gatool.org/roles"] && (user["https://gatool.org/roles"].indexOf("user") >= 0)) && localUpdates.length > 0) && <Alert><p><b>You have {localUpdates.length === 1 ? "an update for team" : "updates for teams"} {_.sortBy(updatedTeamList).join(", ")} that can be uploaded to gatool Cloud.</b></p><span><Button disabled={!isOnline} style={{ width: "45%" }} onClick={uploadLocalUpdates}>Upload to gatool Cloud now</Button>  <Button disabled={!isOnline} variant={"warning"} style={{ width: "50%" }} onClick={deleteLocalUpdates}>Delete stored updates</Button></span></Alert>}
-                        <Alert variant={"warning"}><p><b>Update Team Data</b><br />You can refresh your community-sourced team data if it has changed on another device. <i><b>Know that we fetch all team data automatically when you load an event</b></i>, so you should not need this very often.</p><Button variant={"warning"} disabled={!isOnline} onClick={() => { handleGetTeamUpdates() }}>Update now</Button></Alert>
-                        { (isAuthenticated && user["https://gatool.org/roles"].indexOf("admin") >= 0) &&
-                                <Link to="/dev">
-                                    <Button variant="outline-danger" size="lg" onClick={() => {}} >Go to developer tools</Button>
-                                </Link>}
+                        {((isAuthenticated && user["https://gatool.org/roles"] && (user["https://gatool.org/roles"].indexOf("user") >= 0)) && localUpdates.length > 0) &&
+                            <Alert>
+                                <p><b>You have {localUpdates.length === 1 ? "an update for team" : "updates for teams"} {_.sortBy(updatedTeamList).join(", ")} that can be uploaded to gatool Cloud.</b></p>
+                                <span><Button disabled={!isOnline} style={{ width: "45%" }} onClick={uploadLocalUpdates}>Upload to gatool Cloud now</Button>  <Button disabled={!isOnline} variant={"warning"} style={{ width: "50%" }} onClick={deleteLocalUpdates}>Delete stored updates</Button></span>
+                            </Alert>
+                        }
+                        <Alert variant={"warning"}>
+                            <p><b>Update Team Data</b><br />
+                                You can refresh your community-sourced team data if it has changed on another device. <i><b>Know that we fetch all team data automatically when you load an event</b></i>, so you should not need this very often.</p>
+                            <Button variant={"warning"} disabled={!isOnline} onClick={() => { handleGetTeamUpdates() }}>Update now</Button>
+                        </Alert>
+                        {(isAuthenticated && (user["https://gatool.org/roles"].indexOf("user") >= 0 || user["https://gatool.org/roles"].indexOf("admin") >= 0)) &&
+                            <Alert variant="info">
+                                <p><b>Announcements</b><br />
+                                    You can manage your event's announcements here. You can add, edit, or delete announcements. You can also set the time and date for each announcement to appear and disappear.</p>
+                                <Button variant="info" onClick={() => { handleEventNotificationOpen() }}>Manage event notifications</Button></Alert>}
+
+                        {eventBell.length > 0 && <Button variant="warning" size="sm" onClick={() => { setEventBell([]) }} >Reset dismissed Event Announcements</Button>}
+
+                        {(systemBell === false) &&
+                            <ButtonGroup>
+                                <Button variant="warning" size="sm" onClick={() => { setSystemBell(true) }} ><BellFill />Reset dismissed System Notifications</Button>
+                            </ButtonGroup>}
+                        {(isAuthenticated && user["https://gatool.org/roles"].indexOf("admin") >= 0) &&
+                            <Link to="/dev">
+                                <Button variant="outline-danger" size="sm" onClick={() => { }} >Go to developer tools</Button>
+                            </Link>}
+
+
+
                     </Col>
                     <Col sm={4}>
                         <table>
@@ -472,7 +544,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                     </Modal.Header>
                     <Modal.Body key={"updatesHistory"}>
                         <Container>
-                            {appUpdates.map((appUpdate,index) => {
+                            {appUpdates.map((appUpdate, index) => {
                                 return <Row key={`appUpdate-${index}`}><Col xs={3}><b>{appUpdate.date}</b></Col>
                                     <Col xs={9}>{appUpdate.message}</Col></Row>
                             })}
@@ -480,6 +552,90 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                     </Modal.Body>
                     <Modal.Footer>
                         <Button variant="secondary" onClick={handleHistory}>Done</Button>
+                    </Modal.Footer>
+                </Modal>
+                <Modal centered={true} show={manageAnnouncements} fullscreen onHide={() => { handleEventNotificationClose() }}>
+                    <Modal.Header className={"allianceDecline"} closeVariant={"white"} closeButton>
+                        <Modal.Title >Manage announcements for {selectedEvent?.label}</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body key={"manageAnnouncements"}>
+                        <Container fluid>
+                            <Row>
+                                <Col xs={12}>Each announcement must have an on time and an off time. You can also set an alert level for each announcement. Once you save, all users at {selectedEvent?.label} will see these announcements on their next refresh. You can delete, duplicate or add new announcements here.</Col>
+                            </Row>
+                            <Row>
+                                <Col xs={4}><b>Timing</b></Col>
+                                <Col xs={5}><b>Message (edit in the alert area)</b></Col>
+                                <Col xs={2}><b>Variant</b></Col>
+                                <Col xs={1}><Plus onClick={() => { handleEventNotification("add", user) }} size={30} /></Col>
+                            </Row>
+                            {eventMessageFormData && eventMessageFormData.map((message, index) => {
+                                return <Row key={`eventMessage-${index}`} style={{ borderTop: "1px solid black", paddingTop: "5px", paddingBottom: "5px", marginTop: "5px" }}>
+                                    <Col xs={4}>
+                                        <InputGroup>
+                                            <InputGroup.Text>On</InputGroup.Text>
+                                            <Form.Control
+                                                size="sm"
+                                                type="datetime-local"
+                                                value={moment(message?.onTime).format("YYYY-MM-DDTHH:mm")}
+                                                onChange={(e) =>
+                                                    handleEventNotification("onTime", index, e.target.value, user)
+                                                }
+                                            />
+                                        </InputGroup>
+
+                                        <InputGroup>
+                                            <InputGroup.Text>Off</InputGroup.Text>
+                                            <Form.Control
+                                                size="sm"
+                                                type="datetime-local"
+                                                value={moment(message?.expiry).format("YYYY-MM-DDTHH:mm")}
+                                                onChange={(e) =>
+                                                    handleEventNotification("expiry", index, e.target.value, user)
+                                                }
+                                            />
+                                        </InputGroup>
+                                    </Col>
+                                    <Col xs={5}>
+                                        <Alert variant={message?.variant}>
+                                            <Contenteditable
+                                                placeholder="Enter your announcement here"
+                                                onChange={(e) =>
+                                                    handleEventNotification("message", index, e, user)
+                                                }
+                                                value={message?.message} />
+                                        </Alert>
+                                    </Col>
+                                    <Col xs={2}>
+
+                                        <Form.Select
+                                            size="sm"
+                                            value={message?.variant}
+                                            onChange={(e) => handleEventNotification("variant", index, e.target.value, user)}
+                                        >
+                                            <option value={"info"}>Info</option>
+                                            <option value={"success"}>All OK</option>
+                                            <option value={"warning"}>Warning</option>
+                                            <option value={"danger"}>Urgent</option>
+                                        </Form.Select>
+                                    </Col>
+                                    <Col xs={1}>
+                                        <InputGroup >
+                                            <Trash size={20} style={{ color: "red" }} onClick={() => handleEventNotification("delete", index)} />
+
+                                            <Copy size={20} onClick={() => handleEventNotification("duplicate", index, user)} />
+                                        </InputGroup>
+                                    </Col>
+                                </Row>
+                            })}
+                            {eventMessageFormData && eventMessageFormData.length === 0 && <Row>
+                                <Col xs={12}><Alert variant="warning">No announcements have been created for this event. You can add one by clicking the plus sign <Plus size={25} /> above.</Alert></Col>
+                            </Row>}
+                        </Container>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="primary" disabled={JSON.stringify(eventMessage) === JSON.stringify(eventMessageFormData)} onClick={() => { handleEventNotificationSave() }}>Save Changes</Button>
+                        <Button variant="secondary" onClick={() => { handleEventNotificationClose() }}>Close</Button>
                     </Modal.Footer>
                 </Modal>
             </div>

@@ -366,6 +366,36 @@ td {
   }
 }
 
+@keyframes throb {
+  30% {
+    rotate:0deg;
+    scale: 1.5;
+  }
+  40% {
+    rotate: 30deg;
+  }
+  50% {
+    rotate: -30deg;
+  }
+  60% {
+    rotate: 30deg;
+  }
+  70% {
+    rotate: -30deg;
+  }
+  80% {
+    rotate: 30deg;
+  }
+  90% {
+    rotate: -30deg;
+    scale:1.5;
+  }
+  100% {
+    scale: 1;
+    rotate: 0deg
+  }
+}
+
 /* Column definitions for tables */
 .col1 {
   width: 8.333%;
@@ -454,7 +484,7 @@ td {
   border: 3px solid;
   border-collapse: collapse;
   margin-bottom: 10px;
-  height: 100%
+  height: 100%;
 }
 .gatool-worldHighScores {
   border-color: #dca7a7;
@@ -506,6 +536,14 @@ td {
   background-color: #dff0d8;
   border-color: #d6e9c6;
 }
+.alert-dismissible .btn-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  padding: .75rem 1rem;
+}
+
 
 .teamNumberButton {
   background-color: #ccc;

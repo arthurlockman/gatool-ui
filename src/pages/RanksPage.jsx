@@ -642,8 +642,12 @@ function RanksPage({
                         : null
                     );
                     rankRow.record = `${rankRow.wins}-${rankRow.losses}-${rankRow.ties}`;
-                    rankRow.epaVal = rankRow?.epa?.epa?.total_points?.mean;
-                    rankRow.season = `${rankRow?.epa?.record?.wins}-${rankRow?.epa?.record?.losses}-${rankRow?.epa?.record?.ties}`;
+                    rankRow.epaVal = rankRow?.epa?.epa?.total_points?.mean>=0
+                      ? rankRow?.epa?.epa?.total_points?.mean
+                      : "TBD";
+                    rankRow.season = rankRow?.epa?.record?.wins>=0
+                      ? `${rankRow?.epa?.record?.wins}-${rankRow?.epa?.record?.losses}-${rankRow?.epa?.record?.ties}`
+                      : `TBD`;
                     return (
                       <tr key={"rankings" + rankRow.teamNumber}>
                         <td>{rankRow.teamNumber}</td>
