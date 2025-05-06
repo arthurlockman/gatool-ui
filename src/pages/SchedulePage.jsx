@@ -833,7 +833,7 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                                          scoresMatch?.winner.tieWinner === "blue" ? 
                                          <span style={{ color: "blue" }}><b>{scoresMatch?.winner.tieDetail}</b></span> : 
                                          scoresMatch?.winner.tieWinner === "tie" ? <span style={{ color: "green" }}><b>{scoresMatch?.winner.tieDetail}</b></span> : 
-                                         <span>""</span>}
+                                         <span style={{ color: "green" }}><b>TIE</b></span>}
                                     </td>
                                 </tr>
                                 <tr>
