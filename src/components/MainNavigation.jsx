@@ -23,7 +23,6 @@ import { TabStates } from "../App";
 import { useOnlineStatus } from "../contextProviders/OnlineContext";
 import { useEffect, useState } from "react";
 import moment from "moment";
-import _ from "lodash";
 
 const tabActive = {
   backgroundColor: "#ccc",

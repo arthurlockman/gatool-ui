@@ -1934,9 +1934,6 @@ function App() {
         variant: message?.variant || "",
         link: message?.link || "",
       };
-      const visible =
-        moment().isBefore(formattedMessage?.expiry) &&
-        moment().isAfter(formattedMessage?.onTime);
       if (JSON.stringify(formattedMessage) !== JSON.stringify(systemMessage)) {
         setSystemBell("");
         setSystemMessage(formattedMessage);
