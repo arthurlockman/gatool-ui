@@ -252,7 +252,7 @@ function MainNavigation({
             style={({ isActive }) => getTabStyle(isActive, null)}
             to="/"
           >
-            {moment().isBefore(systemMessage?.expiry) && moment().isAfter(systemMessage?.onTime) && (systemBell || _.isNull(systemBell)) ? (
+            {moment().isBefore(systemMessage?.expiry) && moment().isAfter(systemMessage?.onTime) && (systemBell !== JSON.stringify(systemMessage)) ? (
               <BellFill
                   style={{
                     animationName: "throb",

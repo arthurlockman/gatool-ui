@@ -255,8 +255,12 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
 
             </div>}
             {selectedEvent && <div>
-                <Row><NotificationBanner notification={systemMessage} systemBell={systemBell} setSystemBell={setSystemBell} /></Row>
-                <Row><Button size="lg" onClick={getSchedule} variant="outline-success" disabled={!isOnline}><b><ArrowClockwise /> Tap to refresh Schedule.</b> <br />Use after Alliance Selection to load Playoffs.</Button></Row>
+                {systemBell !== JSON.stringify(systemMessage) &&
+                    <Row><NotificationBanner notification={systemMessage} systemBell={systemBell} setSystemBell={setSystemBell} />
+                    </Row>}
+                <Row>
+                    <Button size="lg" onClick={getSchedule} variant="outline-success" disabled={!isOnline}><b><ArrowClockwise /> Tap to refresh Schedule.</b> <br />Use after Alliance Selection to load Playoffs.</Button>
+                </Row>
                 <br />
                 <h4>{eventLabel}</h4>
                 <Row className="leftTable">
@@ -310,11 +314,15 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                     You can manage your event's announcements here. You can add, edit, or delete announcements. You can also set the time and date for each announcement to appear and disappear.</p>
                                 <Button variant="info" onClick={() => { handleEventNotificationOpen() }}>Manage event notifications</Button></Alert>}
 
-                        {eventBell.length > 0 && <Button variant="warning" size="sm" onClick={() => { setEventBell([]) }} >Reset dismissed Event Announcements</Button>}
+                        {eventBell.length > 0 &&
+                            <Button variant="warning" size="sm" onClick={() => { setEventBell([]) }} >Reset dismissed Event Announcements</Button>}
 
-                        {(systemBell === false) &&
+                        {systemBell === JSON.stringify(systemMessage) &&
                             <ButtonGroup>
-                                <Button variant="warning" size="sm" onClick={() => { setSystemBell(true) }} ><BellFill />Reset dismissed System Notifications</Button>
+                                <Button variant="warning" size="sm" onClick={() => {
+                                    setSystemBell("")
+                                }} >
+                                    <BellFill />Reset dismissed System Notifications</Button>
                             </ButtonGroup>}
                         {(isAuthenticated && user["https://gatool.org/roles"].indexOf("admin") >= 0) &&
                             <Link to="/dev">
