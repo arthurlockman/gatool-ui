@@ -10,7 +10,7 @@ const NotificationBanner = ({
   const visible =
     moment().isBefore(notification?.expiry) &&
     moment().isAfter(notification?.onTime) &&
-    JSON.stringify(systemBell) !== JSON.stringify(notification);
+    systemBell !== JSON.stringify(notification);
   const dismissable = !_.isNull(setSystemBell);
   return (
     <>

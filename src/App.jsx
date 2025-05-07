@@ -351,7 +351,7 @@ function App() {
   );
   const [systemBell, setSystemBell] = usePersistentState(
     "setting:systemBell",
-    null
+    ""
   );
   const [eventMessage, setEventMessage] = usePersistentState(
     "setting:eventMessage",
