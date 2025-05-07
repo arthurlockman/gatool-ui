@@ -351,7 +351,7 @@ function App() {
   );
   const [systemBell, setSystemBell] = usePersistentState(
     "setting:systemBell",
-    null
+    ""
   );
   const [eventMessage, setEventMessage] = usePersistentState(
     "setting:eventMessage",
@@ -1934,11 +1934,8 @@ function App() {
         variant: message?.variant || "",
         link: message?.link || "",
       };
-      const visible =
-        moment().isBefore(formattedMessage?.expiry) &&
-        moment().isAfter(formattedMessage?.onTime);
       if (JSON.stringify(formattedMessage) !== JSON.stringify(systemMessage)) {
-        setSystemBell(visible);
+        setSystemBell("");
         setSystemMessage(formattedMessage);
       }
     }
@@ -2117,7 +2114,7 @@ function App() {
       ]);
       setEventMessage([]);
       setSystemMessage(null);
-      setSystemBell(null);
+      setSystemBell("");
       setTeamListLoading("");
       setHaveChampsTeams(false);
       getTeamList();
