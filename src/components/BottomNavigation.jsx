@@ -53,6 +53,36 @@ function BottomNavigation() {
               <b>FIRST</b>
             </i>
             .
+          </span>{" "}
+          <span
+            style={{ cursor: "pointer", color: "blue" }}
+            onClick={() => {
+              setURL({
+                title: "TBA API",
+                url: "https://www.thebluealliance.com/apidocs/v3",
+              });
+            }}
+          >
+            Additional Data provided by{" "}
+            <i>
+              <b>TBA</b>
+            </i>
+            {" "}
+          </span>
+          <span
+            style={{ cursor: "pointer", color: "blue" }}
+            onClick={() => {
+              setURL({
+                title: "Statbotics API",
+                url: "https://www.statbotics.io",
+              });
+            }}
+          >
+            and by{" "}
+            <i>
+              <b>Statbotics.io</b>
+            </i>
+            .
           </span>
         </span>
       </Navbar>

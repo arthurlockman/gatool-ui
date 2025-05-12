@@ -171,7 +171,7 @@ function PlayoffDetails({ matchDetails, alliances, matches, selectedEvent, playo
             ? `M${_.filter(matchClasses, {
               matchNumber: matchDetails?.matchNumber,
             })[0]?.winnerTo
-            }${opponent?.winner ? ` against ${opponent?.winner}` : ""}`
+            }${opponent?.winner ? ` against ${opponent?.winner.replace(" "," ")}` : ""}`
             : "Finals"}
           <br />
           Losing Alliance{" "}
@@ -185,7 +185,7 @@ function PlayoffDetails({ matchDetails, alliances, matches, selectedEvent, playo
                   matchNumber: matchDetails?.matchNumber,
                 })[0]?.loserTo
               }
-              {opponent?.loser ? ` against ${opponent?.loser}` : ""}{" "}
+              {opponent?.loser ? ` against ${opponent?.loser.replace(" "," ")}` : ""}{" "}
             </>
           ) : (
             " eliminated"

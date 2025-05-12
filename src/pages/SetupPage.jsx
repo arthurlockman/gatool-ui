@@ -10,7 +10,7 @@ import { toast } from "react-toastify";
 import { isSafari, isChrome, fullBrowserVersion, browserVersion, isIOS, browserName, isDesktop, isTablet, isMobile } from "react-device-detect";
 import { playoffOverrideMenu } from "components/Constants";
 import Contenteditable from "components/ContentEditable";
-import { ArrowClockwise, Trash, Copy, Plus, BellFill } from 'react-bootstrap-icons';
+import { ArrowClockwise, Trash, Copy, Plus, BellFill, CaretUpFill, CaretDownFill } from 'react-bootstrap-icons';
 import NotificationBanner from "components/NotificationBanner";
 import { Link } from "react-router-dom";
 
@@ -68,6 +68,9 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
     const [showUpdateHistory, setShowUpdateHistory] = useState(false);
     const [manageAnnouncements, setManageAnnouncements] = useState(false);
     const [eventMessageFormData, setEventMessageFormData] = useState(eventMessage);
+    const [showTeamInfoSettings, setShowTeamInfoSettings] = useState(false);
+    const [showStatsSettings, setShowStatsSettings] = useState(false);
+    const [showUISettings, setShowUISettings] = useState(false);
 
     const filtersMenu = [
         ...districts,
@@ -335,55 +338,111 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                     <Col sm={4}>
                         <table>
                             <tbody>
-                                <tr>
-                                    <td><Switch checked={showSponsors === null ? false : showSponsors} onChange={setShowSponsors} /></td>
-                                    <td><b>Always show Sponsors on Announce </b></td>
+                                <tr onClick={() => { setShowTeamInfoSettings(!showTeamInfoSettings) }} className={"teamInfoSettings"}>
+                                    <td colSpan={2} style={{ fontSize: "1.25em" }}>{showTeamInfoSettings ? <CaretUpFill /> : <CaretDownFill />} <b>{showTeamInfoSettings ? "Hide" : "Show"} Team Info Settings</b></td>
                                 </tr>
-                                <tr>
-                                    <td><Switch checked={autoHideSponsors === null ? true : autoHideSponsors} onChange={setAutoHideSponsors} disabled={showSponsors} /></td>
-                                    <td><b>Hide Sponsors on Announce after first appearance</b></td>
+                                {showTeamInfoSettings && <>
+                                    <tr className={"teamInfoSettings"}>
+                                        <td><Switch checked={showSponsors === null ? false : showSponsors} onChange={setShowSponsors} /></td>
+                                        <td><b>Always show Sponsors on Announce </b></td>
+                                    </tr>
+                                    <tr className={"teamInfoSettings"}>
+                                        <td><Switch checked={autoHideSponsors === null ? true : autoHideSponsors} onChange={setAutoHideSponsors} disabled={showSponsors} /></td>
+                                        <td><b>Hide Sponsors on Announce after first appearance</b></td>
+                                    </tr>
+                                    <tr className={"teamInfoSettings"}>
+                                        <td><Switch checked={showAwards === null ? true : showAwards} onChange={setShowAwards} /></td>
+                                        <td><b>Show Awards on Announce</b></td>
+                                    </tr>
+                                    <td colSpan={2} className={"teamInfoSettings"}>
+                                        <label><b>For how many years should we display awards on the Announce Screen?</b><Select options={awardsMenuOptions} value={awardsMenu ? awardsMenu : awardsMenuOptions[0]} onChange={setAwardsMenu} /></label>
+                                    </td>
+                                    <tr className={"teamInfoSettings"}>
+                                        <td><Switch checked={_.isNull(showMinorAwards) ? true : showMinorAwards} onChange={setShowMinorAwards} disabled={!(showAwards || _.isNull(showAwards))} /></td>
+                                        <td><b>Show Minor Awards on Announce</b></td>
+                                    </tr>
+                                    <tr className={"teamInfoSettings"}>
+                                        <td>
+                                            <Switch checked={showNotesAnnounce === null ? true : showNotesAnnounce} onChange={setShowNotesAnnounce} />
+                                        </td>
+                                        <td>
+                                            <b>Show Notes on Announce</b>
+                                        </td>
+                                    </tr>
+                                    <tr className={"teamInfoSettings"}>
+                                        <td>
+                                            <Switch checked={showNotes === null ? true : showNotes} onChange={setShowNotes} />
+                                        </td>
+                                        <td>
+                                            <b>Show Notes on Play-By-Play</b>
+                                        </td>
+                                    </tr>
+                                    <tr className={"teamInfoSettings"}>
+                                        <td>
+                                            <Switch checked={showMottoes === null ? true : showMottoes} onChange={setShowMottoes} />
+                                        </td>
+                                        <td>
+                                            <b>Show Mottoes on Announce & Play-By-Play</b>
+                                        </td>
+                                    </tr>
+                                    <tr>
+
+                                    </tr>
+                                    <tr>
+                                        <td colSpan={2} className={"teamInfoSettings"}>
+                                            <label><b>How many months before we consider a team's data to be stale? The default is 6 months.</b><Select options={monthsWarningMenu} value={monthsWarning ? monthsWarning : monthsWarningMenu[2]} onChange={setMonthsWarning} /></label>
+                                        </td>
+                                    </tr>
+                                </>}
+                                <tr onClick={() => { setShowStatsSettings(!showStatsSettings) }} className={"statsSettings"} >
+                                    <td style={{ fontSize: "1.25em" }} colSpan={2}>{showStatsSettings ? <CaretUpFill /> : <CaretDownFill />} <b>{showStatsSettings ? "Hide" : "Show"} Event Statistics Settings</b></td>
                                 </tr>
-                                <tr>
-                                    <td>
-                                        <Switch checked={showAwards === null ? true : showAwards} onChange={setShowAwards} />
-                                    </td>
-                                    <td>
-                                        <b>Show Awards on Announce</b>
-                                    </td>
+                                {showStatsSettings && <>
+                                    <tr className={"statsSettings"}>
+                                        <td>
+                                            <Switch checked={showChampsStats === null ? false : showChampsStats} onChange={setShowChampsStats} />
+                                        </td>
+                                        <td>
+                                            <b>Show Champs Statistics on Announce in World and District Champs</b>
+                                        </td>
+                                    </tr>
+                                    {selectedEvent?.value?.districtCode && <tr className={"statsSettings"}>
+                                        <td>
+                                            <Switch checked={showDistrictChampsStats === null ? false : showDistrictChampsStats} onChange={setShowDistrictChampsStats} />
+                                        </td>
+                                        <td>
+                                            <b>Show District Champs Statistics on Announce in Playoffs outside of District Champs</b>
+                                        </td>
+                                    </tr>}
+                                    <tr className={"statsSettings"}>
+                                        <td>
+                                            <Switch checked={showQualsStatsQuals === null ? true : showQualsStatsQuals} onChange={setShowQualsStatsQuals} />
+                                        </td>
+                                        <td>
+                                            <b>Show Quals Statistics on Play-By-Play during Quals</b>
+                                        </td>
+                                    </tr>
+                                    <tr className={"statsSettings"}>
+                                        <td>
+                                            <Switch checked={showQualsStats === null ? false : showQualsStats} onChange={setShowQualsStats} />
+                                        </td>
+                                        <td>
+                                            <b>Show Quals Statistics on Play-By-Play during Playoffs</b>
+                                        </td>
+                                    </tr>
+                                    <tr className={"statsSettings"}>
+                                        <td>
+                                            <Switch checked={highScoreMode === null ? false : highScoreMode} onChange={setHighScoreMode} />
+                                        </td>
+                                        <td>
+                                            <b>Always show <b><i>event high score</i></b> on Announce and Play-By-Play</b>
+                                        </td>
+                                    </tr>
+                                </>}
+                                <tr onClick={() => { setShowUISettings(!showUISettings) }} className={"UISettings"} >
+                                    <td style={{ fontSize: "1.25em" }} colSpan={2}>{showUISettings ? <CaretUpFill /> : <CaretDownFill />} <b>{showUISettings ? "Hide" : "Show"} User Unterface Settings</b></td>
                                 </tr>
-                                <tr>
-                                    <td>
-                                        <Switch checked={_.isNull(showMinorAwards) ? true : showMinorAwards} onChange={setShowMinorAwards} disabled={!(showAwards || _.isNull(showAwards))} />
-                                    </td>
-                                    <td>
-                                        <b>Show Minor Awards on Announce</b>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <Switch checked={showNotesAnnounce === null ? true : showNotesAnnounce} onChange={setShowNotesAnnounce} />
-                                    </td>
-                                    <td>
-                                        <b>Show Notes on Announce</b>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <Switch checked={showNotes === null ? true : showNotes} onChange={setShowNotes} />
-                                    </td>
-                                    <td>
-                                        <b>Show Notes on Play-By-Play</b>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <Switch checked={showMottoes === null ? true : showMottoes} onChange={setShowMottoes} />
-                                    </td>
-                                    <td>
-                                        <b>Show Mottoes on Announce & Play-By-Play</b>
-                                    </td>
-                                </tr>
-                                <tr>
+                                {showUISettings && <><tr className={"UISettings"}>
                                     <td>
                                         <Switch checked={_.isNull(showInspection) || _.isUndefined(showInspection) ? false : showInspection} onChange={setShowInspection} />
                                     </td>
@@ -391,112 +450,68 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                         <b>Show Inspection/Alliance Selection reminder on Announce and Play-By-Play</b>
                                     </td>
                                 </tr>
-                                <tr>
-                                    <td>
-                                        <Switch checked={showChampsStats === null ? false : showChampsStats} onChange={setShowChampsStats} />
-                                    </td>
-                                    <td>
-                                        <b>Show Champs Statistics on Announce in World and District Champs</b>
-                                    </td>
-                                </tr>
-                                {selectedEvent?.value?.districtCode && <tr>
-                                    <td>
-                                        <Switch checked={showDistrictChampsStats === null ? false : showDistrictChampsStats} onChange={setShowDistrictChampsStats} />
-                                    </td>
-                                    <td>
-                                        <b>Show District Champs Statistics on Announce in Playoffs outside of District Champs</b>
-                                    </td>
-                                </tr>}
-                                <tr>
-                                    <td>
-                                        <Switch checked={showQualsStatsQuals === null ? true : showQualsStatsQuals} onChange={setShowQualsStatsQuals} />
-                                    </td>
-                                    <td>
-                                        <b>Show Quals Statistics on Play-By-Play during Quals</b>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <Switch checked={showQualsStats === null ? false : showQualsStats} onChange={setShowQualsStats} />
-                                    </td>
-                                    <td>
-                                        <b>Show Quals Statistics on Play-By-Play during Playoffs</b>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <Switch checked={highScoreMode === null ? false : highScoreMode} onChange={setHighScoreMode} />
-                                    </td>
-                                    <td>
-                                        <b>Always show <b><i>event high score</i></b> on Announce and Play-By-Play</b>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <Switch checked={swapScreen === null ? false : swapScreen} onChange={setSwapScreen} />
-                                    </td>
-                                    <td>
-                                        <b>Swap Play-By-Play Screen Orientation</b>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <Switch checked={reverseEmcee === null ? false : reverseEmcee} onChange={setReverseEmcee} />
-                                    </td>
-                                    <td>
-                                        <b>Swap Emcee Screen Orientation</b>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <Switch checked={autoAdvance === null ? false : autoAdvance} onChange={setAutoAdvance} />
-                                    </td>
-                                    <td>
-                                        <b>Automatically advance to the next match when loading the event <i style={{ "color": "red" }}>(Only affects when you load an event)</i></b>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <Switch checked={autoUpdate === null ? false : autoUpdate} onChange={setAutoUpdate} />
-                                    </td>
-                                    <td>
-                                        <b>Automatically track event progress, refreshing every 15 seconds <i style={{ "color": "red" }}>(will advance matches on all screens)</i></b>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <Switch checked={(_.isNull(hidePracticeSchedule) || _.isUndefined(hidePracticeSchedule)) ? false : hidePracticeSchedule} onChange={setHidePracticeSchedule} />
-                                    </td>
-                                    <td>
-                                        <b>Hide Practice Schedule before before Quals start</b>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <Switch checked={(_.isNull(useSwipe) || _.isUndefined(useSwipe)) ? false : useSwipe} onChange={setUseSwipe} />
-                                    </td>
-                                    <td>
-                                        <b>Enable swipe gestures to go to next/previous match<i><br />NOTE: You will need to use two fingers to scroll up/down when using this feature</i></b>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <Switch checked={(_.isNull(usePullDownToUpdate) || _.isUndefined(usePullDownToUpdate)) ? false : usePullDownToUpdate} onChange={setUsePullDownToUpdate} disabled={!useSwipe} />
-                                    </td>
-                                    <td>
-                                        <b>Enable pull down to update scores/ranks</b>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td colSpan={2}>
-                                        <label><b>For how many years should we display awards on the Announce Screen?</b><Select options={awardsMenuOptions} value={awardsMenu ? awardsMenu : awardsMenuOptions[0]} onChange={setAwardsMenu} /></label>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td colSpan={2}>
-                                        <label><b>How many months before we consider a team's data to be stale? The default is 6 months.</b><Select options={monthsWarningMenu} value={monthsWarning ? monthsWarning : monthsWarningMenu[2]} onChange={setMonthsWarning} /></label>
-                                    </td>
-                                </tr>
+                                    <tr className={"UISettings"}>
+                                        <td>
+                                            <Switch checked={swapScreen === null ? false : swapScreen} onChange={setSwapScreen} />
+                                        </td>
+                                        <td>
+                                            <b>Swap Play-By-Play Screen Orientation</b>
+                                        </td>
+                                    </tr>
+                                    <tr className={"UISettings"}>
+                                        <td>
+                                            <Switch checked={reverseEmcee === null ? false : reverseEmcee} onChange={setReverseEmcee} />
+                                        </td>
+                                        <td>
+                                            <b>Swap Emcee Screen Orientation</b>
+                                        </td>
+                                    </tr>
+                                    <tr className={"UISettings"}>
+                                        <td>
+                                            <Switch checked={autoAdvance === null ? false : autoAdvance} onChange={setAutoAdvance} />
+                                        </td>
+                                        <td>
+                                            <b>Automatically advance to the next match when loading the event <i style={{ "color": "red" }}>(Only affects when you load an event)</i></b>
+                                        </td>
+                                    </tr>
+                                    <tr className={"UISettings"}>
+                                        <td>
+                                            <Switch checked={autoUpdate === null ? false : autoUpdate} onChange={setAutoUpdate} />
+                                        </td>
+                                        <td>
+                                            <b>Automatically track event progress, refreshing every 15 seconds <i style={{ "color": "red" }}>(will advance matches on all screens)</i></b>
+                                        </td>
+                                    </tr>
+                                    <tr className={"UISettings"}>
+                                        <td>
+                                            <Switch checked={(_.isNull(hidePracticeSchedule) || _.isUndefined(hidePracticeSchedule)) ? false : hidePracticeSchedule} onChange={setHidePracticeSchedule} />
+                                        </td>
+                                        <td>
+                                            <b>Hide Practice Schedule before before Quals start</b>
+                                        </td>
+                                    </tr>
+                                    <tr className={"UISettings"}>
+                                        <td>
+                                            <Switch checked={(_.isNull(useSwipe) || _.isUndefined(useSwipe)) ? false : useSwipe} onChange={setUseSwipe} />
+                                        </td>
+                                        <td>
+                                            <b>Enable swipe gestures to go to next/previous match<i><br />NOTE: You will need to use two fingers to scroll up/down when using this feature</i></b>
+                                        </td>
+                                    </tr>
+                                    <tr className={"UISettings"}>
+                                        <td>
+                                            <Switch checked={(_.isNull(usePullDownToUpdate) || _.isUndefined(usePullDownToUpdate)) ? false : usePullDownToUpdate} onChange={setUsePullDownToUpdate} disabled={!useSwipe} />
+                                        </td>
+                                        <td>
+                                            <b>Enable pull down to update scores/ranks</b>
+                                        </td>
+                                    </tr>
+                                    <tr className={"UISettings"}>
+                                        <td colSpan={2}>
+                                            <label><b>Set your time format</b><Select options={timeFormatMenu} value={timeFormat} onChange={setTimeFormat} /></label>
+                                        </td>
+                                    </tr>
+                                </>}
                                 <tr>
                                     <td>
                                         <Switch checked={adHocMode === null ? false : adHocMode} onChange={setAdHocMode} />
@@ -505,11 +520,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                         <b>Enable Test Match Mode. If you enable this mode, you will need to enter team numbers on the Announce Screen. This will disable match navigation.</b>
                                     </td>
                                 </tr>
-                                <tr>
-                                    <td colSpan={2}>
-                                        <label><b>Set your time format</b><Select options={timeFormatMenu} value={timeFormat} onChange={setTimeFormat} /></label>
-                                    </td>
-                                </tr>
+
                                 <tr>
                                     <td colSpan={2}>
                                         <Alert variant={"warning"}><p><b>Reload cached gatool code</b><br />If you know that there are updates to gatool, but you are not seeing them here, you can reload the code. This will not remove any stored settings or team data. Your browser is {browserName} version {fullBrowserVersion} on {isDesktop ? <>desktop</> : isTablet ? <>tablet</> : isMobile ? <>mobile</> : <>unknown surface</>}.{!PWASupported ? <><br /><b><i>Note: Your browser may not support clearing cache this way. Please delete and restore your Home Screen {isIOS ? "icon" : "tile"}.</i></b></> : <></>}</p>
