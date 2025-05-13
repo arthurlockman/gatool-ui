@@ -239,6 +239,18 @@ td {
   background-color: #98b4f4;
 }
 
+.teamInfoSettings {
+  background-color: #dce5fa;
+}
+
+.statsSettings {
+  background-color: #faecdc;
+}
+
+.UISettings {
+  background-color: #f4dcfa;
+}
+
 .announceTeamNumber {
   font-size: x-large;
   color: black;
@@ -352,6 +364,7 @@ td {
   border-left: 5px solid red !important;
   color: red !important;
 }
+
 .modal-footer {
   justify-content: center;
 }
@@ -536,6 +549,7 @@ td {
   background-color: #dff0d8;
   border-color: #d6e9c6;
 }
+
 .alert-dismissible .btn-close {
   position: absolute;
   top: 0;

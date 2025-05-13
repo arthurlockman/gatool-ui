@@ -1,5 +1,15 @@
 export const appUpdates = [
   {
+    date: "May 12, 2025",
+    message: (
+      <ul>
+        <li>Added links to TBA and Statbotics in footer</li>
+        <li>Possible solution to moving footer on Announce</li>
+        <li>Consolidated settings into groups on Setup</li>
+        <li>Word spacing tweaks in Playoff match result guidance at bottom of Announce & Play-By-Play</li>
+      </ul>
+    ),
+  },{
     date: "May 6, 2025",
     message: (
       <ul>
