@@ -440,7 +440,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                     </tr>
                                 </>}
                                 <tr onClick={() => { setShowUISettings(!showUISettings) }} className={"UISettings"} >
-                                    <td style={{ fontSize: "1.25em" }} colSpan={2}>{showUISettings ? <CaretUpFill /> : <CaretDownFill />} <b>{showUISettings ? "Hide" : "Show"} User Unterface Settings</b></td>
+                                    <td style={{ fontSize: "1.25em" }} colSpan={2}>{showUISettings ? <CaretUpFill /> : <CaretDownFill />} <b>{showUISettings ? "Hide" : "Show"} User Interface Settings</b></td>
                                 </tr>
                                 {showUISettings && <><tr className={"UISettings"}>
                                     <td>
