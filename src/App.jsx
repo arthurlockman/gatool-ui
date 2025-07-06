@@ -185,6 +185,11 @@ function App() {
     "setting:rankingsOverride",
     null
   );
+  const [useCheesyArena, setUseCheesyArena] = usePersistentState(
+    "setting:useCheesyArena",
+    null
+  );
+  const [cheesyTeamList, setCheesyTeamList] = useState([]);
   const [alliances, setAlliances] = usePersistentState("cache:alliances", null);
   const [communityUpdates, setCommunityUpdates] = usePersistentState(
     "cache:communityUpdates",
@@ -363,6 +368,34 @@ function App() {
   const { waitingWorker, showReload, reloadPage } = useServiceWorker();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
+  // Cheesy Arena status
+  const [cheesyArenaAvailable, setCheesyArenaAvailable] = useState(false);
+
+  /**
+   * Function to get the Cheesy Arena status by connecting to the Cheesy Arena API
+   */
+  const getCheesyStatus = async () => {
+    // See if you can connect to Cheesy Arena
+    try {
+      var result = await fetch(
+        "http://10.0.100.5:8080/api/matches/qualification"
+      );
+      var data = result.status === 200;
+
+      // Set the IP address to the constant `ip`
+      if (data) {
+        setCheesyArenaAvailable(true);
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.error("Error fetching Cheesy Arena status:", error);
+      setCheesyArenaAvailable(false);
+      return false;
+    }
+  };
+
   // Display an alert when there are updates to the app. This allows the user to update the cached code.
   useEffect(() => {
     const reload = () => {
@@ -455,6 +488,118 @@ function App() {
   };
 
   /**
+   * @constant conformCheesyArenaMatch
+   * @param match Match details from TBA
+   * @param level Tournament Level
+   */
+  const conformCheesyArenaMatch = (match, level) => {
+    return {
+      description: match?.LongName,
+      tournamentLevel: level,
+      matchNumber: match?.TbaMatchKey?.MatchNumber,
+      startTime: match?.Time,
+      actualStartTime: match?.StartedAt,
+      postResultTime: match?.ScoreCommittedAt,
+      scoreRedFinal: match?.Result?.RedSummary?.Score,
+      scoreRedFoul: match?.Result?.RedSummary?.FoulPoints,
+      scoreRedAuto: match?.Result?.RedSummary?.AutoPoints,
+      scoreBlueFinal: match?.Result?.BlueSummary?.Score,
+      scoreBlueFoul: match?.Result?.BlueSummary?.FoulPoints,
+      scoreBlueAuto: match?.Result?.BlueSummary?.AutoPoints,
+      teams: [
+        {
+          teamNumber: match?.Red1,
+          station: "Red1",
+          surrogate: match?.Red1IsSurrogate,
+          dq: !1,
+        },
+        {
+          teamNumber: match?.Red2,
+          station: "Red2",
+          surrogate: match?.Red2IsSurrogate,
+          dq: !1,
+        },
+        {
+          teamNumber: match?.Red3,
+          station: "Red3",
+          surrogate: match?.Red3IsSurrogate,
+          dq: !1,
+        },
+        {
+          teamNumber: match?.Blue1,
+          station: "Blue1",
+          surrogate: match?.Blue1IsSurrogate,
+          dq: !1,
+        },
+        {
+          teamNumber: match?.Blue2,
+          station: "Blue2",
+          surrogate: match?.Blue2IsSurrogate,
+          dq: !1,
+        },
+        {
+          teamNumber: match?.Blue3,
+          station: "Blue3",
+          surrogate: match?.Blue3IsSurrogate,
+          dq: !1,
+        },
+      ],
+      winner: { winner: "", tieWinner: "", level: 0 },
+    };
+  };
+
+  /**
+   * @constant conformCheesyArenaScores
+   * @param match Match details from TBA
+   * @param level Tournament Level
+   */
+  const conformCheesyArenaScores = (match, level) => {
+    return {
+      matchLevel: level,
+      matchNumber: match?.TbaMatchKey?.MatchNumber,
+      winningAlliance:
+        match?.RedSummary?.Score > match?.BlueSummary?.Score
+          ? 1
+          : match?.RedSummary?.Score < match?.BlueSummary?.Score
+          ? 2
+          : 0,
+      tiebreaker: {
+        item1: !match?.UseTiebreakCriteria ? -1 : 1,
+        item2: match?.UseTiebreakCriteria ? match?.UseTiebreakCriteria : "",
+      },
+      coopertitionBonusAchieved:
+        match?.RedSummary?.CoopertitionBonus ||
+        match?.BlueSummary?.CoopertitionBonus,
+      alliances: [
+        { ...match?.Result?.BlueScore, alliance: "Blue" },
+        { ...match?.Result?.RedScore, alliance: "Red" },
+      ],
+    };
+  };
+
+  /**
+   * @constant conformCheesyArenaRankings
+   * @param match Match details from TBA
+   * @param level Tournament Level
+   */
+  const conformCheesyArenaRankings = (team) => {
+    return {
+      ...team,
+      rank: team?.Rank,
+      teamNumber: team?.TeamId,
+      wins: team?.Wins,
+      losses: team?.Losses,
+      ties: team?.Ties,
+      qualAverage:
+        team?.MatchPoints && team?.Played
+          ? team?.MatchPoints / team?.Played
+          : null,
+      dq: team?.Disqualifications,
+      matchesPlayed: team?.Played,
+    };
+  };
+
+  /**
    * This function retrieves a schedule from FIRST. It attempts to get both the Qual and Playoff Schedule and sets the global variables
    *
    * It uses the Hybrid Schedule endpoint to fetch the Qual schedule, then process the match data.
@@ -499,7 +644,9 @@ function App() {
 
     var practiceschedule = null;
     var qualschedule = null;
+    var qualScores = null;
     var playoffschedule = null;
+    var playoffScores = null;
     var qualslength = 0;
 
     console.log(
@@ -509,13 +656,44 @@ function App() {
       selectedEvent?.value?.code.includes("OFFLINE") ||
       selectedEvent?.value?.code.includes("PRACTICE")
     ) {
-      //do something
+      //create null schedule because there are no practice schedules for these events or they are using Cheesy Arena
       practiceschedule = { schedule: { schedule: [] } };
     } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
-      const practiceResult = await httpClient.getNoAuth(
-        `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/practice`
-      );
-      practiceschedule = await practiceResult.json();
+      if (useCheesyArena && cheesyArenaAvailable) {
+        // get schedule from Cheesy Arena
+        var result = await fetch("http://10.0.100.5:8080/api/matches/practice");
+        var data = await result.json();
+        if (data.length > 0) {
+          // reformat data to match FIRST API format
+          practiceschedule = {
+            schedule: {
+              schedule: data.map((match) => {
+                return conformCheesyArenaMatch(match, "Practice");
+              }),
+            },
+          };
+          var teams = [];
+          data.forEach((match) => {
+            teams.push(match.Red1);
+            teams.push(match.Red2);
+            teams.push(match.Red3);
+            teams.push(match.Blue1);
+            teams.push(match.Blue2);
+            teams.push(match.Blue3);
+          });
+          if (cheesyTeamList.length === 0) {
+            const reducedTeamList = _.uniq(teams)
+            setCheesyTeamList(reducedTeamList);
+            getTeamList(reducedTeamList);
+          }
+        }
+      } else {
+        // get the practice schedule from FIRST API
+        const practiceResult = await httpClient.getNoAuth(
+          `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/practice`
+        );
+        practiceschedule = await practiceResult.json();
+      }
     }
     if (typeof practiceschedule?.Schedule !== "undefined") {
       practiceschedule.schedule = practiceschedule?.Schedule;
@@ -546,16 +724,41 @@ function App() {
       //do something
       qualschedule = { schedule: { schedule: [] } };
     } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
-      const qualsResult = await httpClient.getNoAuth(
-        `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/qual`
-      );
-      qualschedule = await qualsResult.json();
+      if (useCheesyArena && cheesyArenaAvailable) {
+        // get schedule from Cheesy Arena
+        result = await fetch(
+          "http://10.0.100.5:8080/api/matches/qualification"
+        );
+        data = await result.json();
+        if (data.length > 0) {
+          // reformat data to match FIRST API format
+          qualschedule = {
+            schedule: {
+              schedule: data.map((match) => {
+                return conformCheesyArenaMatch(match, "Qualification");
+              }),
+            },
+          };
 
-      const qualsScoresResult = await httpClient.getNoAuth(
-        `${selectedYear?.value}/scores/${selectedEvent?.value.code}/qual`
-      );
+          // now get the scores from the same result.
+          qualScores = {
+            MatchScores: data.map((match) => {
+              return conformCheesyArenaScores(match, "Qualification");
+            }),
+          };
+        }
+      } else {
+        const qualsResult = await httpClient.getNoAuth(
+          `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/qual`
+        );
+        qualschedule = await qualsResult.json();
 
-      var qualScores = await qualsScoresResult.json();
+        const qualsScoresResult = await httpClient.getNoAuth(
+          `${selectedYear?.value}/scores/${selectedEvent?.value.code}/qual`
+        );
+
+        qualScores = await qualsScoresResult.json();
+      }
     } else {
       if (selectedEvent?.value?.code === "PRACTICE1") {
         qualschedule = { schedule: training.schedule.qual.partial };
@@ -637,10 +840,33 @@ function App() {
       //set playoffschedule to be empty
       playoffschedule = { schedule: { schedule: [] } };
     } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
-      const playoffResult = await httpClient.getNoAuth(
-        `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/playoff`
-      );
-      playoffschedule = await playoffResult.json();
+      if (useCheesyArena && cheesyArenaAvailable) {
+        // get scores and schedule from Cheesy Arena
+        result = await fetch("http://10.0.100.5:8080/api/matches/playoff");
+        data = await result.json();
+        if (data.length > 0) {
+          // reformat data to match FIRST API format
+          playoffschedule = {
+            schedule: {
+              schedule: data.map((match) => {
+                return conformCheesyArenaMatch(match, "Playoff");
+              }),
+            },
+          };
+
+          // now get the scores from the same result.
+          playoffScores = {
+            MatchScores: data.map((match) => {
+              return conformCheesyArenaScores(match, "Playoff");
+            }),
+          };
+        }
+      } else {
+        const playoffResult = await httpClient.getNoAuth(
+          `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/playoff`
+        );
+        playoffschedule = await playoffResult.json();
+      }
     } else {
       if (
         selectedEvent?.value?.code === "PRACTICE1" ||
@@ -690,7 +916,7 @@ function App() {
       const playoffScoresResult = await httpClient.getNoAuth(
         `${selectedYear?.value}/scores/${selectedEvent?.value.code}/playoff`
       );
-      var playoffScores = await playoffScoresResult.json();
+      playoffScores = await playoffScoresResult.json();
     } else if (
       selectedEvent?.value?.code === "PRACTICE1" ||
       selectedEvent?.value?.code === "PRACTICE2"
@@ -840,7 +1066,11 @@ function App() {
       var result = null;
       var teams = null;
 
-      if (selectedEvent?.value?.code.includes("OFFLINE") || inWorldChamps()) {
+      if (
+        selectedEvent?.value?.code.includes("OFFLINE") ||
+        inWorldChamps() ||
+        (cheesyArenaAvailable && useCheesyArena)
+      ) {
         teams = {
           teamCountTotal: adHocTeamList?.length || 0,
           teamCountPage: 1,
@@ -870,6 +1100,7 @@ function App() {
           });
         }
       } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
+        // get the team list from FIRST API
         result = await httpClient.getNoAuth(
           `${selectedYear?.value}/teams?eventCode=${selectedEvent?.value?.code}`
         );
@@ -1331,7 +1562,10 @@ function App() {
         var result = null;
         var teams = [];
 
-        if (selectedEvent?.value?.code.includes("OFFLINE")) {
+        if (
+          selectedEvent?.value?.code.includes("OFFLINE") ||
+          (cheesyArenaAvailable && useCheesyArena)
+        ) {
           //Do something with the team list
           if (adHocTeamList) {
             // https://api.gatool.org/v3/team/172/updates
@@ -1474,10 +1708,27 @@ function App() {
     if (selectedEvent?.value?.code.includes("OFFLINE")) {
       ranks = { rankings: { Rankings: [] } };
     } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
-      result = await httpClient.getNoAuth(
-        `${selectedYear?.value}/rankings/${selectedEvent?.value.code}`
-      );
-      ranks = await result.json();
+      if (useCheesyArena && cheesyArenaAvailable) {
+        // get rankings from Cheesy Arena
+        result = await fetch("http://10.0.100.5:8080/api/rankings");
+        var data = await result.json();
+        if (data?.Rankings.length > 0) {
+          // reformat data to FIRST API Rankings format
+          ranks = {
+            rankings: {
+              rankings: data?.Rankings.map((team) => {
+                return conformCheesyArenaRankings(team);
+              }),
+            },
+          };
+        }
+      } else {
+        //do not use Cheesy Arena and use FIRST API
+        result = await httpClient.getNoAuth(
+          `${selectedYear?.value}/rankings/${selectedEvent?.value.code}`
+        );
+        ranks = await result.json();
+      }
     } else if (selectedEvent?.value?.code === "PRACTICE1") {
       ranks = { rankings: _.cloneDeep(training.ranks.partial) };
     } else {
@@ -1691,10 +1942,33 @@ function App() {
       !selectedEvent?.value?.code.includes("PRACTICE") &&
       !selectedEvent?.value?.code.includes("OFFLINE")
     ) {
-      result = await httpClient.getNoAuth(
-        `${selectedYear?.value}/alliances/${selectedEvent?.value.code}`
-      );
-      alliances = await result.json();
+      if (useCheesyArena && cheesyArenaAvailable) {
+        // get rankings from Cheesy Arena
+        result = await fetch("http://10.0.100.5:8080/api/alliances");
+        var data = await result.json();
+        if (data.length > 0) {
+          // reformat data to FIRST API Rankings format
+          alliances = {
+            Alliances: data.map((Alliance) => {
+              return {
+                number: Alliance?.Id,
+                captain: Alliance?.TeamIds[0] || null,
+                round1: Alliance?.TeamIds[1] || null,
+                round2: Alliance?.TeamIds[2] || null,
+                round3: Alliance?.TeamIds[3] || null,
+                backup: Alliance?.TeamIds[4] || null,
+                backupReplaced: null,
+                name: `Alliance ${Alliance?.Id}`,
+              };
+            }),
+          };
+        }
+      } else {
+        result = await httpClient.getNoAuth(
+          `${selectedYear?.value}/alliances/${selectedEvent?.value.code}`
+        );
+        alliances = await result.json();
+      }
     } else if (
       selectedEvent?.value?.code === "PRACTICE1" ||
       selectedEvent?.value?.code === "PRACTICE2"
@@ -2112,6 +2386,8 @@ function App() {
         { teamNumber: null, station: "Blue2", surrogate: false, dq: false },
         { teamNumber: null, station: "Blue3", surrogate: false, dq: false },
       ]);
+      getCheesyStatus();
+      setCheesyTeamList([]);
       setEventMessage([]);
       setSystemMessage(null);
       setSystemBell("");
@@ -2410,11 +2686,22 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [httpClient, teamList?.lastUpdate]);
 
+  // run this once to get the status of Cheesy Arena
+  useEffect(() => {
+    getCheesyStatus();
+  }, [httpClient]);
+
+  // Timer to autmatically refresh event data
+  // This will run every refreshRate seconds, which is set in the settings.
+  // It will fetch the schedule, world stats, event stats, system messages and event messages
+  // It will also check if the event is online or offline, and fetch the schedule accordingly
+
   const { start, stop } = useInterval(
     () => {
       console.log("fetching event data now");
       if (!selectedEvent?.value?.code.includes("OFFLINE")) {
         console.log("Online event. Getting schedule and ranks");
+        getCheesyStatus();
         getSchedule();
       } else {
         console.log("Offline event. Just get the world stats if you can");
@@ -2594,11 +2881,14 @@ function App() {
                     systemBell={systemBell}
                     setSystemBell={setSystemBell}
                     eventBell={eventBell}
-                    setEventBell={setEventBell} 
+                    setEventBell={setEventBell}
                     eventMessage={eventMessage}
                     setEventMessage={setEventMessage}
                     putEventNotifications={putEventNotifications}
-                    />
+                    useCheesyArena={useCheesyArena}
+                    setUseCheesyArena={setUseCheesyArena}
+                    cheesyArenaAvailable={cheesyArenaAvailable}
+                  />
                 }
               />
 
