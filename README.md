@@ -10,6 +10,13 @@ You will need a login to access the tool. All registered GAs and MCs will receiv
 
 We welcome any and all contributions! Please feel free to fork the repository and contribute back to our development. [Issues can be filed in the GitHub issue tracker](https://github.com/arthurlockman/gatool-ui/issues/new).
 
+## Using GATool with Cheesy Arena
+
+GATool can use Cheesy Arena for its data source. This option will become available when you are using GATool while on the same network as Cheesy Arena. Some caveats:
+- Cheesy Arena must be running in secure HTTP mode. Cheesy Arena may be using self-signed certificates, so you will need to trust those certs in your browser and reload to use.
+- When using Cheesy Arena, your Playoff screen may not behave as expected. Also, the Stats page will not render properly, as that uses the FIRST APIs to get event details.
+- You can [see a short video of GATool and Cheesy Arena working together](https://youtu.be/DVf14KrW0Iw).
+
 ## Development
 
 This section has information on how to build and deploy the project.

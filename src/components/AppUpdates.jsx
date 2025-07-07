@@ -1,5 +1,12 @@
 export const appUpdates = [
   {
+    date: "July 6, 2025",
+    message: (
+      <ul>
+        <li>Added support for Cheesy Arena</li>
+      </ul>
+    ),
+  },{
     date: "May 12, 2025",
     message: (
       <ul>
