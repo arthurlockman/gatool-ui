@@ -378,7 +378,7 @@ function App() {
     // See if you can connect to Cheesy Arena
     try {
       var result = await fetch(
-        "https://10.0.100.5:8443/api/matches/qualification"
+        "http://10.0.100.5:8443/api/matches/qualification"
       );
       var data = result.status === 200;
 
@@ -661,7 +661,7 @@ function App() {
     } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
       if (useCheesyArena && cheesyArenaAvailable) {
         // get schedule from Cheesy Arena
-        var result = await fetch("https://10.0.100.5:8443/api/matches/practice");
+        var result = await fetch("http://10.0.100.5:8443/api/matches/practice");
         var data = await result.json();
         if (data.length > 0) {
           // reformat data to match FIRST API format
@@ -727,7 +727,7 @@ function App() {
       if (useCheesyArena && cheesyArenaAvailable) {
         // get schedule from Cheesy Arena
         result = await fetch(
-          "https://10.0.100.5:8443/api/matches/qualification"
+          "http://10.0.100.5:8443/api/matches/qualification"
         );
         data = await result.json();
         if (data.length > 0) {
@@ -842,7 +842,7 @@ function App() {
     } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
       if (useCheesyArena && cheesyArenaAvailable) {
         // get scores and schedule from Cheesy Arena
-        result = await fetch("https://10.0.100.5:8443/api/matches/playoff");
+        result = await fetch("http://10.0.100.5:8443/api/matches/playoff");
         data = await result.json();
         if (data.length > 0) {
           // reformat data to match FIRST API format
@@ -1710,7 +1710,7 @@ function App() {
     } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
       if (useCheesyArena && cheesyArenaAvailable) {
         // get rankings from Cheesy Arena
-        result = await fetch("https://10.0.100.5:8443/api/rankings");
+        result = await fetch("http://10.0.100.5:8443/api/rankings");
         var data = await result.json();
         if (data?.Rankings.length > 0) {
           // reformat data to FIRST API Rankings format
@@ -1944,7 +1944,7 @@ function App() {
     ) {
       if (useCheesyArena && cheesyArenaAvailable) {
         // get rankings from Cheesy Arena
-        result = await fetch("https://10.0.100.5:8443/api/alliances");
+        result = await fetch("http://10.0.100.5:8443/api/alliances");
         var data = await result.json();
         if (data.length > 0) {
           // reformat data to FIRST API Rankings format
