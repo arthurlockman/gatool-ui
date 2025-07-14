@@ -1,5 +1,13 @@
 export const appUpdates = [
   {
+    date: "July 14, 2025",
+    message: (
+      <ul>
+        <li>Added support for Cheesy Arena</li>
+        <li>Improved handling of statbotics responses to reduce error notifications</li>
+      </ul>
+    ),
+  },{
     date: "May 12, 2025",
     message: (
       <ul>

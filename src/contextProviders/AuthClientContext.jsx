@@ -38,7 +38,7 @@ class AuthClient {
             errorText += " Your session may have expired. Please log out and log in again."
         }
         if (response.status === 404) {
-            errorText += " We couldn't find "+path;
+            errorText += " We couldn't find " + path;
             return response;
         }
         if (response.status === 500) {
@@ -48,7 +48,7 @@ class AuthClient {
         throw new Error(errorText);
     }
 
-    async getNoAuth(path,customAPIBaseUrl) {
+    async getNoAuth(path, customAPIBaseUrl) {
         if (!this.online) {
             throw new Error('You are offline.')
         }
@@ -66,11 +66,16 @@ class AuthClient {
             errorText += " Your session may have expired. Please log out and log in again."
         }
         if (response.status === 404) {
-            errorText += " We couldn't find "+path;
+            errorText += " We couldn't find " + path;
             return response;
         }
         if (response.status === 500) {
-            errorText += " Something happened in the backend that we don't understand. We have logged the request and will investigate soon."
+            if (customAPIBaseUrl === 'https://api.statbotics.io/v3/') {
+                return response;
+            } else {
+
+                errorText += " Something happened in the backend that we don't understand. We have logged the request and will investigate soon."
+            }
         }
         toast.error(errorText);
         throw new Error(errorText);
