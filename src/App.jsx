@@ -390,7 +390,7 @@ function App() {
         return false;
       }
     } catch (error) {
-      console.error("Error fetching Cheesy Arena status:", error);
+      console.log("Error fetching Cheesy Arena status:", error.message);
       setCheesyArenaAvailable(false);
       return false;
     }
@@ -682,7 +682,7 @@ function App() {
             teams.push(match.Blue3);
           });
           if (cheesyTeamList.length === 0) {
-            const reducedTeamList = _.uniq(teams)
+            const reducedTeamList = _.uniq(teams);
             setCheesyTeamList(reducedTeamList);
             getTeamList(reducedTeamList);
           }
@@ -1810,11 +1810,18 @@ function App() {
         `team_year/${team?.teamNumber}/${selectedYear?.value}`,
         "https://api.statbotics.io/v3/"
       );
-      var epaArray = await epaData.json();
-      return {
-        teamNumber: team?.teamNumber,
-        epa: epaArray,
-      };
+      if (epaData.status === 500) {
+        return {
+          teamNumber: team?.teamNumber,
+          epa: {},
+        };
+      } else {
+        var epaArray = await epaData.json();
+        return {
+          teamNumber: team?.teamNumber,
+          epa: epaArray,
+        };
+      }
     });
     if (Array.isArray(epa) && epa.length > 0) {
       Promise.all(epa).then((values) => {
