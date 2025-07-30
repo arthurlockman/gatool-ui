@@ -64,16 +64,20 @@ const navPages = [
 ];
 
 const supportedYears = [
+  { label: "2026 REBUILT℠ presented by Haas", value: "2026" },
   { label: "2025 REEFSCAPE℠ presented by Haas", value: "2025" },
   { label: "2024 CRESCENDO℠", value: "2024" },
   { label: "2023 CHARGED UP℠ presented by Haas", value: "2023" },
-  { label: "2022 RAPID REACT℠ presented by The Boeing Company", value: "2022" },
-  { label: "2021 Infinite Recharge", value: "2021" },
-  { label: "2020 INFINITE RECHARGE", value: "2020" },
+];
+
+const FTCSupportedYears = [
+  { label: "2025/26 DECODE℠ presented by RTX", value: "2025" },
+  { label: "2024/25 INTO THE DEEP℠", value: "2024" },
 ];
 
 const paleYellow = "#fdfaed";
 const paleBlue = "#effdff";
+const ftcBaseURL = "https://api.gatool.org/ftc/v2/";
 
 function LayoutsWithNavbar({
   selectedEvent,
@@ -197,6 +201,10 @@ function App() {
   );
   const [eventFilters, setEventFilters] = usePersistentState(
     "setting:eventFilters",
+    []
+  );
+  const [regionFilters, setRegionFilters] = usePersistentState(
+    "setting:regionFilters",
     []
   );
   const [timeFilter, setTimeFilter] = usePersistentState(
@@ -339,6 +347,26 @@ function App() {
   const [usePullDownToUpdate, setUsePullDownToUpdate] = usePersistentState(
     "setting:usePullDownToUpdate",
     false
+  );
+
+  const [ftcMode, setFTCMode] = usePersistentState(
+    "setting:ftcMode",
+    false
+  );
+
+  const [ftcLeagues, setFTCLeagues] = usePersistentState(
+    "cache:ftcLeagues",
+    []
+  );
+
+  const [ftcRegions, setFTCRegions] = usePersistentState(
+    "cache:ftcRegions",
+    []
+  );
+
+  const [ftcTypes, setFTCTypes] = usePersistentState(
+    "cache:ftcTypes",
+    []
   );
 
   // Controllers for table sort order at render time
@@ -561,8 +589,8 @@ function App() {
         match?.RedSummary?.Score > match?.BlueSummary?.Score
           ? 1
           : match?.RedSummary?.Score < match?.BlueSummary?.Score
-          ? 2
-          : 0,
+            ? 2
+            : 0,
       tiebreaker: {
         item1: !match?.UseTiebreakCriteria ? -1 : 1,
         item2: match?.UseTiebreakCriteria ? match?.UseTiebreakCriteria : "",
@@ -658,7 +686,7 @@ function App() {
     ) {
       //create null schedule because there are no practice schedules for these events or they are using Cheesy Arena
       practiceschedule = { schedule: { schedule: [] } };
-    } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
+    } else if (!selectedEvent?.value?.code.includes("PRACTICE") && !ftcMode) {
       if (useCheesyArena && cheesyArenaAvailable) {
         // get schedule from Cheesy Arena
         var result = await fetch("http://10.0.100.5:8443/api/matches/practice");
@@ -749,12 +777,12 @@ function App() {
         }
       } else {
         const qualsResult = await httpClient.getNoAuth(
-          `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/qual`
+          `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/qual`, ftcMode ? ftcBaseURL : undefined
         );
         qualschedule = await qualsResult.json();
 
         const qualsScoresResult = await httpClient.getNoAuth(
-          `${selectedYear?.value}/scores/${selectedEvent?.value.code}/qual`
+          `${selectedYear?.value}/scores/${selectedEvent?.value.code}/qual`, ftcMode ? ftcBaseURL : undefined
         );
 
         qualScores = await qualsScoresResult.json();
@@ -774,6 +802,11 @@ function App() {
     if (typeof qualschedule.schedule?.Schedule !== "undefined") {
       qualschedule.schedule.schedule = qualschedule?.schedule?.Schedule;
       delete qualschedule.schedule.Schedule;
+    }
+
+    // normalize to nutty FRC API results
+    if (Array.isArray(qualschedule.schedule)) {
+      qualschedule.schedule = { schedule: qualschedule.schedule };
     }
 
     const qualMatches = qualschedule?.schedule?.schedule.map((match) => {
@@ -863,7 +896,7 @@ function App() {
         }
       } else {
         const playoffResult = await httpClient.getNoAuth(
-          `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/playoff`
+          `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/playoff`, ftcMode ? ftcBaseURL : undefined
         );
         playoffschedule = await playoffResult.json();
       }
@@ -914,7 +947,7 @@ function App() {
 
     if (!selectedEvent?.value?.code.includes("PRACTICE")) {
       const playoffScoresResult = await httpClient.getNoAuth(
-        `${selectedYear?.value}/scores/${selectedEvent?.value.code}/playoff`
+        `${selectedYear?.value}/scores/${selectedEvent?.value.code}/playoff`, ftcMode ? ftcBaseURL : undefined
       );
       playoffScores = await playoffScoresResult.json();
     } else if (
@@ -956,8 +989,8 @@ function App() {
             score?.winningAlliance === 2
               ? "blue"
               : score?.winningAlliance === 1
-              ? "red"
-              : "TBD";
+                ? "red"
+                : "TBD";
           playoffschedule.schedule[
             _.findIndex(playoffschedule.schedule, {
               matchNumber: score.matchNumber,
@@ -986,7 +1019,7 @@ function App() {
       if (
         lastMatchPlayed === qualschedule?.schedule.length + 1 ||
         lastMatchPlayed ===
-          qualschedule?.schedule.length + playoffschedule?.schedule.length + 2
+        qualschedule?.schedule.length + playoffschedule?.schedule.length + 2
       ) {
         lastMatchPlayed -= 1;
       }
@@ -1083,7 +1116,7 @@ function App() {
 
           var adHocTeams = adHocTeamList.map(async (team) => {
             var request = await httpClient.getNoAuth(
-              `${selectedYear?.value}/teams?teamNumber=${team}`
+              `${selectedYear?.value}/teams?teamNumber=${team}`, ftcMode ? ftcBaseURL : undefined
             );
             var teamDetails = await request.json();
 
@@ -1102,7 +1135,7 @@ function App() {
       } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
         // get the team list from FIRST API
         result = await httpClient.getNoAuth(
-          `${selectedYear?.value}/teams?eventCode=${selectedEvent?.value?.code}`
+          `${selectedYear?.value}/teams?eventCode=${selectedEvent?.value?.code}`, ftcMode ? ftcBaseURL : undefined
         );
         teams = await result.json();
       } else {
@@ -1128,7 +1161,7 @@ function App() {
         // get awards for those filtered events
         var districtEITeams = districtEvents.map(async (event) => {
           var request = await httpClient.getNoAuth(
-            `${selectedYear?.value}/awards/event/${event?.value?.code}`
+            `${selectedYear?.value}/awards/event/${event?.value?.code}`, ftcMode ? ftcBaseURL : undefined
           );
           var eventDetails = await request.json();
           // filter that list by EI {awardId: "633"} {name: "District Engineering Inspiration Award"} and {awardID: "417"} {name:"Rookie All Star Award"}
@@ -1155,7 +1188,7 @@ function App() {
           if (tempTeams.length > 0) {
             var EITeamData = tempTeams.map(async (teamNumber) => {
               var request = await httpClient.getNoAuth(
-                `${selectedYear?.value}/teams?teamNumber=${teamNumber}`
+                `${selectedYear?.value}/teams?teamNumber=${teamNumber}`, ftcMode ? ftcBaseURL : undefined
               );
               var teamDetails = await request.json();
               return teamDetails.teams[0];
@@ -1276,7 +1309,7 @@ function App() {
       //fetch awards for the current teams
       var newTeams = teams.teams.map(async (team) => {
         var request = await httpClient.getNoAuth(
-          `${selectedYear?.value}/team/${team?.teamNumber}/awards`
+          `${selectedYear?.value}/team/${team?.teamNumber}/awards`, ftcMode ? ftcBaseURL : undefined
         );
         var awards = await request.json();
         team.awards = awards;
@@ -1415,7 +1448,7 @@ function App() {
           console.log("Getting Champs stats");
           champsTeams = teams.teams.map(async (team) => {
             var champsRequest = await httpClient.getNoAuth(
-              `/team/${team?.teamNumber}/appearances`
+              `/team/${team?.teamNumber}/appearances`, ftcMode ? ftcBaseURL : undefined
             );
             var appearances = await champsRequest.json();
             var result = {
@@ -1572,7 +1605,7 @@ function App() {
             console.log("Teams List loaded. Update from the Community");
             var adHocTeams = adHocTeamList.map(async (team) => {
               var request = await httpClient.getNoAuth(
-                `/team/${team?.teamNumber}/updates`
+                `/team/${team?.teamNumber}/updates`, ftcMode ? ftcBaseURL : undefined
               );
               var teamDetails = { teamNumber: team?.teamNumber };
               var teamUpdate = _.cloneDeep(communityUpdateTemplate);
@@ -1618,7 +1651,7 @@ function App() {
           }
         } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
           result = await httpClient.getNoAuth(
-            `${selectedYear?.value}/communityUpdates/${selectedEvent?.value.code}`
+            `${selectedYear?.value}/communityUpdates/${selectedEvent?.value.code}`, ftcMode ? ftcBaseURL : undefined
           );
           teams = await result.json();
         } else {
@@ -1653,7 +1686,7 @@ function App() {
             //get updates for these teams
             var EIUpdates = EITeams.map(async (EITeam) => {
               var request = await httpClient.getNoAuth(
-                `/team/${EITeam?.teamNumber}/updates`
+                `/team/${EITeam?.teamNumber}/updates`, ftcMode ? ftcBaseURL : undefined
               );
               var teamDetails = { teamNumber: EITeam?.teamNumber };
               var teamUpdate = _.cloneDeep(communityUpdateTemplate);
@@ -1725,7 +1758,7 @@ function App() {
       } else {
         //do not use Cheesy Arena and use FIRST API
         result = await httpClient.getNoAuth(
-          `${selectedYear?.value}/rankings/${selectedEvent?.value.code}`
+          `${selectedYear?.value}/rankings/${selectedEvent?.value.code}`, ftcMode ? ftcBaseURL : undefined
         );
         ranks = await result.json();
       }
@@ -1756,7 +1789,7 @@ function App() {
       : moment();
     ranks.lastUpdate = moment();
     setRankings(ranks);
-    getEPA();
+    if (!ftcMode) { getEPA(); }
     if (selectedEvent?.value.districtCode) {
       getDistrictRanks();
     }
@@ -1773,7 +1806,7 @@ function App() {
     var result = null;
     var districtranks = null;
     result = await httpClient.getNoAuth(
-      `${selectedYear?.value}/district/rankings/${selectedEvent?.value.districtCode}`
+      `${selectedYear?.value}/district/rankings/${selectedEvent?.value.districtCode}`, ftcMode ? ftcBaseURL : undefined
     );
     districtranks = await result.json();
     districtranks.lastUpdate = moment();
@@ -1790,7 +1823,7 @@ function App() {
   async function getRobotImages() {
     var robotImageList = teamList?.teams.map(async (team) => {
       var media = await httpClient.getNoAuth(
-        `${selectedYear?.value}/team/${team?.teamNumber}/media`
+        `${selectedYear?.value}/team/${team?.teamNumber}/media`, ftcMode ? ftcBaseURL : undefined
       );
       var mediaArray = await media.json();
       var image = _.filter(mediaArray, { type: "imgur" })[0];
@@ -1839,7 +1872,7 @@ function App() {
    */
   async function getWorldStats() {
     var result = await httpClient.getNoAuth(
-      `${selectedYear?.value}/highscores`
+      `${selectedYear?.value}/highscores`, ftcMode ? ftcBaseURL : undefined
     );
     var highscores = await result.json();
     var scores = {};
@@ -1895,7 +1928,7 @@ function App() {
    * @returns sets the world high scores
    */
   async function getEventStats(year, code) {
-    var result = await httpClient.getNoAuth(`${year}/highscores/${code}`);
+    var result = await httpClient.getNoAuth(`${year}/highscores/${code}`, ftcMode ? ftcBaseURL : undefined);
     var highscores = await result.json();
     var scores = {};
     var reducedScores = {};
@@ -1972,7 +2005,7 @@ function App() {
         }
       } else {
         result = await httpClient.getNoAuth(
-          `${selectedYear?.value}/alliances/${selectedEvent?.value.code}`
+          `${selectedYear?.value}/alliances/${selectedEvent?.value.code}`, ftcMode ? ftcBaseURL : undefined
         );
         alliances = await result.json();
       }
@@ -2249,7 +2282,7 @@ function App() {
    */
   async function getTeamHistory(teamNumber) {
     var result = await httpClient.getNoAuth(
-      `team/${teamNumber}/updates/history/`
+      `team/${teamNumber}/updates/history/`, ftcMode ? ftcBaseURL : undefined
     );
     var history = await result.json();
     return history;
@@ -2271,16 +2304,16 @@ function App() {
           offlinePlayoffSchedule?.schedule?.length > 0 ||
           offlinePlayoffSchedule?.schedule?.schedule?.length > 0) &&
           currentMatch <
-            (practiceSchedule?.schedule?.length ||
-              practiceSchedule?.schedule?.schedule?.length ||
-              0) +
-              (offlinePlayoffSchedule?.schedule?.length ||
-                offlinePlayoffSchedule?.schedule?.schedule?.length ||
-                0))
+          (practiceSchedule?.schedule?.length ||
+            practiceSchedule?.schedule?.schedule?.length ||
+            0) +
+          (offlinePlayoffSchedule?.schedule?.length ||
+            offlinePlayoffSchedule?.schedule?.schedule?.length ||
+            0))
       ) {
         setAdHocMatch(
           practiceSchedule?.schedule[currentMatch]?.teams ||
-            practiceSchedule?.schedule[currentMatch]?.schedule?.teams
+          practiceSchedule?.schedule[currentMatch]?.schedule?.teams
         );
         setCurrentMatch(currentMatch + 1);
         if (!selectedEvent?.value?.code.includes("OFFLINE")) {
@@ -2292,7 +2325,7 @@ function App() {
         currentMatch <
         (qualSchedule?.schedule?.length ||
           qualSchedule?.schedule?.schedule.length) +
-          playoffSchedule?.schedule?.length
+        playoffSchedule?.schedule?.length
       ) {
         setCurrentMatch(currentMatch + 1);
         if (!selectedEvent?.value?.code.includes("OFFLINE")) {
@@ -2317,7 +2350,7 @@ function App() {
         if (practiceSchedule?.schedule?.length > 0) {
           setAdHocMatch(
             practiceSchedule?.schedule[currentMatch - 2]?.teams ||
-              practiceSchedule?.schedule?.schedule?.teams
+            practiceSchedule?.schedule?.schedule?.teams
           );
         }
         setCurrentMatch(currentMatch - 1);
@@ -2393,8 +2426,10 @@ function App() {
         { teamNumber: null, station: "Blue2", surrogate: false, dq: false },
         { teamNumber: null, station: "Blue3", surrogate: false, dq: false },
       ]);
-      getCheesyStatus();
-      setCheesyTeamList([]);
+      if (!ftcMode) {
+        getCheesyStatus();
+        setCheesyTeamList([]);
+      }
       setEventMessage([]);
       setSystemMessage(null);
       setSystemBell("");
@@ -2411,7 +2446,7 @@ function App() {
 
   const getEvents = async () => {
     try {
-      const val = await httpClient.getNoAuth(`${selectedYear?.value}/events`);
+      const val = await httpClient.getNoAuth(`${selectedYear?.value}/events`, ftcMode ? ftcBaseURL : undefined);
       const result = await val.json();
       if (typeof result.Events !== "undefined") {
         result.events = result.Events;
@@ -2421,6 +2456,16 @@ function App() {
 
       if (selectedYear?.value === supportedYears[0].value) {
         result.events = result?.events.concat(training.events.events);
+      }
+
+      const ftcEventRegions = _.uniqWith(result?.events.map((e) => { return { value: e.regionCode, label: e.regionCode } }), _.isEqual);
+      if (ftcMode && ftcEventRegions.length > 0) {
+        setFTCRegions(ftcEventRegions);
+      }
+      
+      const ftcEventTypes = _.sortBy(_.uniqWith(result?.events.map((e) => { return { value: e.type, label: e.typeName } }), _.isEqual), ['label']);
+      if (ftcMode && ftcEventTypes.length > 0) {
+        setFTCTypes(ftcEventTypes);
       }
 
       const events = result?.events.map((e) => {
@@ -2454,7 +2499,7 @@ function App() {
           optionPostfix = " ••";
           filters.push("offseason");
         }
-        if (e.type === "OffSeason") {
+        if (e.type === "OffSeason" || e.type === "10") {
           color = paleYellow;
           optionPrefix = "•• ";
           optionPostfix = " ••";
@@ -2467,7 +2512,11 @@ function App() {
         } else if (e.districtCode) {
           filters.push("district");
           filters.push(e.districtCode);
+        } else if (ftcMode) {
+          filters.push(e.type);
+          filters.push(e.regionCode);
         }
+
         if (timeNow.diff(eventTime) < 0) {
           filters.push("future");
         } else {
@@ -2544,6 +2593,28 @@ function App() {
     }
   };
 
+  const getFTCLeagues = async () => {
+    try {
+      const val = await httpClient.getNoAuth(
+        `${selectedYear?.value}/leagues`, ftcMode ? ftcBaseURL : undefined
+      );
+      const json = await val.json();
+      if (typeof json.Leagues !== "undefined") {
+        json.leagues = json.Leagues;
+        delete json.Leagues;
+      }
+      const leagues = json.leagues.map((league) => {
+        return { label: league.name, value: league.code };
+      });
+
+      setFTCLeagues(leagues);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+
+
   // Retrieve Community Updates when the team list changes
   useEffect(() => {
     if (
@@ -2601,11 +2672,11 @@ function App() {
   // Retrieve event list when year selection changes
   useEffect(() => {
     if (httpClient && selectedYear) {
-      getDistricts();
+      if (ftcMode) { getFTCLeagues() } else { getDistricts() };
       getEvents();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedYear, httpClient, setSelectedEvent, setEvents]);
+  }, [ftcMode, selectedYear, httpClient, setSelectedEvent, setEvents]);
 
   // check to see if Alliance Selection is ready when QualSchedule and Ranks changes
   useEffect(() => {
@@ -2619,7 +2690,7 @@ function App() {
       var matchesPerTeam = 0;
       matchesPerTeam = _.toInteger(
         (6 * qualSchedule?.schedule?.length) /
-          (teamList?.teamCountTotal - teamReduction)
+        (teamList?.teamCountTotal - teamReduction)
       );
       // In order to start Alliance Selection, we need the following conditions to be true:
       // All matches must have been completed
@@ -2630,7 +2701,7 @@ function App() {
       if (
         qualSchedule?.schedule?.length === qualSchedule?.completedMatchCount &&
         _.filter(rankings?.ranks, { matchesPlayed: matchesPerTeam }).length ===
-          teamList?.teamCountTotal - teamReduction
+        teamList?.teamCountTotal - teamReduction
       ) {
         asReady = true;
       }
@@ -2685,7 +2756,7 @@ function App() {
 
   // Retrieve robot images when the team list changes
   useEffect(() => {
-    if (teamList?.teams?.length > 0 && selectedEvent?.value?.name && isOnline) {
+    if (teamList?.teams?.length > 0 && selectedEvent?.value?.name && isOnline && !ftcMode) {
       console.log(`Fetching robot images for ${selectedEvent?.value?.name}...`);
       getRobotImages();
     }
@@ -2695,8 +2766,8 @@ function App() {
 
   // run this once to get the status of Cheesy Arena
   useEffect(() => {
-    getCheesyStatus();
-  }, [httpClient]);
+    if (!ftcMode) { getCheesyStatus() };
+  }, [ftcMode, httpClient]);
 
   // Timer to autmatically refresh event data
   // This will run every refreshRate seconds, which is set in the settings.
@@ -2708,7 +2779,7 @@ function App() {
       console.log("fetching event data now");
       if (!selectedEvent?.value?.code.includes("OFFLINE")) {
         console.log("Online event. Getting schedule and ranks");
-        getCheesyStatus();
+        if (!ftcMode) { getCheesyStatus() };
         getSchedule();
       } else {
         console.log("Offline event. Just get the world stats if you can");
@@ -2808,6 +2879,8 @@ function App() {
                     teamList={teamList}
                     eventFilters={eventFilters}
                     setEventFilters={setEventFilters}
+                    regionFilters={regionFilters}
+                    setRegionFilters={setRegionFilters}
                     districts={districts}
                     timeFilter={timeFilter}
                     setTimeFilter={setTimeFilter}
@@ -2861,6 +2934,7 @@ function App() {
                     adHocMode={adHocMode}
                     setAdHocMode={setAdHocMode}
                     supportedYears={supportedYears}
+                    FTCSupportedYears={FTCSupportedYears}
                     reloadPage={reloadPage}
                     autoHideSponsors={autoHideSponsors}
                     setAutoHideSponsors={setAutoHideSponsors}
@@ -2895,6 +2969,11 @@ function App() {
                     useCheesyArena={useCheesyArena}
                     setUseCheesyArena={setUseCheesyArena}
                     cheesyArenaAvailable={cheesyArenaAvailable}
+                    ftcLeagues={ftcLeagues}
+                    ftcTypes={ftcTypes}
+                    ftcMode={ftcMode}
+                    setFTCMode={setFTCMode}
+                    ftcRegions={ftcRegions}
                   />
                 }
               />

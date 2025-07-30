@@ -32,6 +32,14 @@ const filterTime = [
     { value: "week8", label: "Week 8" },
 ]
 
+const filterTimeFTC = [
+    { value: "all", label: "All Events" },
+    { value: "past", label: "Past Events" },
+    { value: "future", label: "Future Events" },
+    { value: "thisWeek", label: "This Week" },
+    { value: "thisMonth", label: "This Month" },
+]
+
 const teamReducer = [
     { value: 0, label: 0 },
     { value: 1, label: 1 },
@@ -58,9 +66,14 @@ const monthsWarningMenu = [
     { label: "12 months", value: "12" }
 ]
 
+const ftcModeOptions = [
+    { value: "FTC", label: "FTC" },
+    { value: "FRC", label: "FRC" }
+];
 
 
-function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, districts, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showNotesAnnounce, setShowNotesAnnounce, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, autoUpdate, setAutoUpdate, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, showQualsStatsQuals, setShowQualsStatsQuals, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee, showDistrictChampsStats, setShowDistrictChampsStats, monthsWarning, setMonthsWarning, user, isAuthenticated, adHocMode, setAdHocMode, supportedYears, reloadPage, autoHideSponsors, setAutoHideSponsors, setLoadingCommunityUpdates, hidePracticeSchedule, setHidePracticeSchedule, systemMessage, setTeamListLoading, getTeamList, getAlliances, setHaveChampsTeams, appUpdates, usePullDownToUpdate, setUsePullDownToUpdate, useSwipe, setUseSwipe, eventLabel, setEventLabel, showInspection, setShowInspection, showMinorAwards, setShowMinorAwards, highScoreMode, setHighScoreMode, systemBell, setSystemBell, eventBell, setEventBell, eventMessage, setEventMessage, putEventNotifications, useCheesyArena, setUseCheesyArena, cheesyArenaAvailable }) {
+
+function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, regionFilters, setRegionFilters, districts, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showNotesAnnounce, setShowNotesAnnounce, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, autoUpdate, setAutoUpdate, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, showQualsStatsQuals, setShowQualsStatsQuals, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee, showDistrictChampsStats, setShowDistrictChampsStats, monthsWarning, setMonthsWarning, user, isAuthenticated, adHocMode, setAdHocMode, supportedYears, FTCSupportedYears, reloadPage, autoHideSponsors, setAutoHideSponsors, setLoadingCommunityUpdates, hidePracticeSchedule, setHidePracticeSchedule, systemMessage, setTeamListLoading, getTeamList, getAlliances, setHaveChampsTeams, appUpdates, usePullDownToUpdate, setUsePullDownToUpdate, useSwipe, setUseSwipe, eventLabel, setEventLabel, showInspection, setShowInspection, showMinorAwards, setShowMinorAwards, highScoreMode, setHighScoreMode, systemBell, setSystemBell, eventBell, setEventBell, eventMessage, setEventMessage, putEventNotifications, useCheesyArena, setUseCheesyArena, cheesyArenaAvailable, ftcLeagues, ftcTypes, ftcRegions, ftcMode, setFTCMode }) {
     const isOnline = useOnlineStatus();
     const PWASupported = (isChrome && Number(browserVersion) >= 76) || (isSafari && Number(browserVersion) >= 15 && Number(fullBrowserVersion.split(".")[1]) >= 4);
 
@@ -79,9 +92,20 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
         { value: "offseason", label: "Offseason Events" }
     ];
 
+    const ftcFiltersMenu = [
+        ...ftcLeagues,
+        { value: "champs", label: "FIRST Championship" },
+        { value: "offseason", label: "Offseason Events" }
+    ]
+
+    const regionFiltersMenu = [
+        ...ftcTypes,
+        ...ftcRegions
+    ]
+
     function filterEvents(events) {
         //filter the array
-        var filters = eventFilters?.map((e) => { return e?.value });
+        var filters = [...eventFilters?.map((e) => { return e?.value }), ...regionFilters?.map((e) => { return e?.value })];
 
         var filteredEvents = events;
         //reduce the list by time, then additively include other filters
@@ -168,6 +192,10 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
         setEventLabel(e.label);
     }
 
+    const handleFTCMode = (checked) => {
+        setFTCMode(checked.value === "FTC");
+    }
+
     const handleEventNotification = (property, index, value, user) => {
         var eventNotificationsTemp = _.cloneDeep(eventMessageFormData);
         if (property === "delete") {
@@ -228,10 +256,13 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
             {!selectedYear && <Row>
                 <Alert variant="danger"><b>Awaiting event list</b></Alert>
             </Row>}
-            <Row className="setupPageMenus">
-                <Col sm={4}><b>Choose a year...</b><br /><Select options={supportedYears} value={selectedYear} onChange={setSelectedYear} isDisabled={!isOnline} />
+            <Row className={ftcMode?"ftcSetupPageMenus":"setupPageMenus"}>
+                <Col sm={2}>
+                    <b>Choose a program...</b><br /><Select options={ftcModeOptions} value={ftcMode ? { label: "FTC", value: "FTC" } : { label: "FRC", value: "FRC" }} onChange={handleFTCMode} />
                 </Col>
-                <Col sm={8}>
+                <Col sm={3}><b>Choose a year...</b><br /><Select options={ftcMode?FTCSupportedYears:supportedYears} value={selectedYear} onChange={setSelectedYear} isDisabled={!isOnline} />
+                </Col>
+                <Col sm={7}>
                     {eventList && <span><b>...then choose an event.</b><br /><Select options={filterEvents(eventList)} placeholder={eventList?.length > 0 ? "Select an event" : "Loading event list"} value={selectedEvent} onChange={handleEventSelection}
                         styles={{
                             // @ts-ignore
@@ -247,10 +278,13 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
             </Row>
             {eventList && <Row className="setupPageFilters">
                 <Col sm={4}><b>Filter by event timeframe here...</b><br />
-                    <Select options={filterTime} value={timeFilter ? timeFilter : filterTime[0]} onChange={setTimeFilter} isDisabled={!isOnline} />
+                    <Select options={ftcMode?filterTimeFTC:filterTime} value={timeFilter ? timeFilter : ftcMode?filterTimeFTC[0]:filterTime[0]} onChange={setTimeFilter} isDisabled={!isOnline} />
                 </Col>
-                <Col sm={8}><b>Filter by event type or District here...</b><br />
-                    <Select isMulti options={filtersMenu} value={eventFilters} onChange={setEventFilters} isDisabled={!isOnline} />
+                {ftcMode&&<Col sm={4}><b>Filter by Event Type or Region here...</b><br />
+                    <Select isMulti options={regionFiltersMenu} value={regionFilters} onChange={setRegionFilters} isDisabled={!isOnline} />
+                </Col>}
+                <Col sm={ftcMode?4:8}><b>Filter by event type or {ftcMode?"League":"District"} here...</b><br />
+                    <Select isMulti options={ftcMode?ftcFiltersMenu:filtersMenu} value={eventFilters} onChange={setEventFilters} isDisabled={!isOnline} />
                 </Col>
             </Row>}
             {!selectedEvent && <div>
@@ -287,7 +321,10 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                         <Alert variant={"danger"}><b>ADVANCED EVENT SETTINGS:</b><br />If your event includes non-competing teams in the team list, indicate the number of non-competing teams here. <b>THIS IS A RARE CONDITION</b><Select options={teamReducer} value={teamReduction ? teamReduction : teamReducer[0]} onChange={setTeamReduction} isDisabled={!teamList?.teamCountTotal} /><br />
                             If your event requires a reduced Alliance Count, you can override the Alliance Count here. <b>THIS SHOULD ONLY APPLY TO EVENTS WITH LESS THAN 26 TEAMS. </b><Select options={playoffOverrideMenu} value={playoffCountOverride ? playoffCountOverride : (allianceCount?.menu ? allianceCount.menu : playoffOverrideMenu[0])} onChange={setPlayoffCountOverride} />
                         </Alert>
-                        <div><img style={{ width: "100%" }} src="/images/frc_reefscape.gif" alt="REEFSCAPE℠ presented by Haas Logo" /></div>
+                        <div>
+                            {!ftcMode && <img style={{ width: "100%" }} src="/images/frc_reefscape.gif" alt="REEFSCAPE℠ presented by Haas Logo" />}
+                            {ftcMode && <img style={{ width: "100%" }} src="/images/first_age_ftc_decode_logo_vertical_rgb_fullcolor.png" alt="DECODE℠ presented by Haas Logo" />}
+                        </div>
                     </Col>
                     <Col sm={4}>
                         {selectedEvent?.value.allianceCount === "SixAlliance" && <p><b>Playoff Type: </b>Round Robin</p>}
