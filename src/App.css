@@ -87,6 +87,14 @@ td {
   margin-bottom: 5px;
 }
 
+.ftcSetupPageMenus {
+  background-color: rgb(255, 245, 227);
+  padding: 10px;
+  border-color: orange;
+  border-style: solid;
+  margin-bottom: 5px;
+}
+
 .setupPageFilters {
   background-color: rgb(231, 255, 227);
   padding: 10px;
