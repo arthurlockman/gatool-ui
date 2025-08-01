@@ -1274,12 +1274,12 @@ function App() {
       teams.teams = teamListSponsorsFixed;
 
       //fetch awards for the current teams
+      var req = await httpClient.postNoAuth(`${selectedYear?.value}/queryAwards`, {
+        "teams": teams.teams.map(t => t?.teamNumber)
+      });
+      var awards = await req.json();
       var newTeams = teams.teams.map(async (team) => {
-        var request = await httpClient.getNoAuth(
-          `${selectedYear?.value}/team/${team?.teamNumber}/awards`
-        );
-        var awards = await request.json();
-        team.awards = awards;
+        team.awards = awards[team?.teamNumber];
         return team;
       });
 
@@ -1788,20 +1788,16 @@ function App() {
    * @return sets the array of URLs
    */
   async function getRobotImages() {
-    var robotImageList = teamList?.teams.map(async (team) => {
-      var media = await httpClient.getNoAuth(
-        `${selectedYear?.value}/team/${team?.teamNumber}/media`
-      );
-      var mediaArray = await media.json();
-      var image = _.filter(mediaArray, { type: "imgur" })[0];
+    var req = await httpClient.postNoAuth(`${selectedYear?.value}/queryMedia`, {teams: teamList?.teams.map(t => t?.teamNumber)});
+    var mediaList = await req.json();
+    var images = Object.keys(mediaList).map(teamNumber => {
+      var image = _.filter(mediaList[teamNumber], { type: "imgur" })[0];
       return {
-        teamNumber: team?.teamNumber,
-        imageURL: image?.direct_url || null,
-      };
+        teamNumber: teamNumber,
+        imageUrl: image?.direct_url || null,
+      }
     });
-    await Promise.all(robotImageList).then((values) => {
-      setRobotImages(values);
-    });
+    setRobotImages(images);
   }
 
   async function getEPA() {
