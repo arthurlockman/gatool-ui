@@ -62,6 +62,7 @@ function AnnouncePage({
   eventMessage,
   eventBell,
   setEventBell,
+  ftcMode,
 }) {
   const matchesToNotify = _.toInteger(
     (teamList?.teams?.length - teamReduction) / 6
@@ -348,16 +349,9 @@ function AnnouncePage({
     };
   });
 
-  var displayOrder = [
-    "Red1",
-    "Red2",
-    "Red3",
-    "Red4",
-    "Blue1",
-    "Blue2",
-    "Blue3",
-    "Blue4",
-  ];
+  var displayOrder = !ftcMode
+    ? ["Red1", "Red2", "Red3", "Red4", "Blue1", "Blue2", "Blue3", "Blue4"]
+    : ["Red1", "Red2", "Red3", "Blue1", "Blue2", "Blue3"];
   var teamDetails = [];
   if (teamList && matchDetails) {
     //fill in the team details
@@ -377,19 +371,19 @@ function AnnouncePage({
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const swipeHandlers = useSwipeable({
-        onSwipedLeft: () => {
-          if (useSwipe) nextMatch();
-        },
-        onSwipedRight: () => {
-            if (useSwipe) previousMatch();
-        },
-        onSwipedDown: () => {
-          if (usePullDownToUpdate) {
-            if (useSwipe) getSchedule();
-          }
-        },
-        preventScrollOnSwipe: useSwipe,
-      });
+    onSwipedLeft: () => {
+      if (useSwipe) nextMatch();
+    },
+    onSwipedRight: () => {
+      if (useSwipe) previousMatch();
+    },
+    onSwipedDown: () => {
+      if (usePullDownToUpdate) {
+        if (useSwipe) getSchedule();
+      }
+    },
+    preventScrollOnSwipe: useSwipe,
+  });
 
   useHotkeys("right", () => nextMatch(), { scopes: "matchNavigation" });
   useHotkeys("left", () => previousMatch(), { scopes: "matchNavigation" });
@@ -454,15 +448,14 @@ function AnnouncePage({
               swapScreen={swapScreen}
               playoffOnly={playoffOnly}
               eventLabel={eventLabel}
+              ftcMode={ftcMode}
             />
-            <NotificationBanner
-              notification={notification}
-            ></NotificationBanner>
+            <NotificationBanner notification={notification} />
             <EventNotificationBanner
               notifications={eventMessage}
               eventBell={eventBell}
               setEventBell={setEventBell}
-            ></EventNotificationBanner>
+            />
             {!matchDetails?.description.includes("Bye Match") && (
               <table className={"table table-responsive"}>
                 <thead>
@@ -500,10 +493,11 @@ function AnnouncePage({
                           eventNamesCY={eventNamesCY}
                           showDistrictChampsStats={showDistrictChampsStats}
                           playoffOnly={playoffOnly}
+                          ftcMode={ftcMode}
                         />
                       );
                     } else {
-                      if (station.slice(-1) !== "4") {
+                      if ((!ftcMode && (station.slice(-1) !== "4") ) && (ftcMode && (station.slice(-1) !== "3") )) {
                         var allianceColor = _.toLower(station.slice(0, -1));
                         return (
                           <tr
