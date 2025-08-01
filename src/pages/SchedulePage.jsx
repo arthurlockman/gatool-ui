@@ -11,7 +11,7 @@ import { CheckCircleFill, XCircleFill } from "react-bootstrap-icons";
 import Handshake from "components/Handshake";
 
 
-function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSchedule, practiceSchedule, setPracticeSchedule, offlinePlayoffSchedule, setOfflinePlayoffSchedule, getTeamList, loadEvent, practiceFileUploaded, setPracticeFileUploaded, setTeamListLoading, getAlliances, playoffOnly, setPlayoffOnly, alliances, champsStyle, setChampsStyle, setQualsLength, playoffCountOverride, setPlayoffCountOverride, eventLabel, setEventLabel, allianceCount, hidePracticeSchedule }) {
+function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSchedule, practiceSchedule, setPracticeSchedule, offlinePlayoffSchedule, setOfflinePlayoffSchedule, getTeamList, loadEvent, practiceFileUploaded, setPracticeFileUploaded, setTeamListLoading, getAlliances, playoffOnly, setPlayoffOnly, alliances, champsStyle, setChampsStyle, setQualsLength, playoffCountOverride, setPlayoffCountOverride, eventLabel, setEventLabel, allianceCount, hidePracticeSchedule, ftcMode }) {
 
     const [showAdjustAlliances, setShowAdjustAlliances] = useState(false);
     const [showScores, setShowScores] = useState(false);
@@ -669,28 +669,34 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                                 <th className="col2"><b>Time</b></th>
                                 <th className="col2"><b>Description</b></th>
                                 <th className="col1"><b>Match Number</b></th>
-                                <th className="col1" colSpan={2}><b>Score</b></th>
+                                <th className="col1" colSpan={ftcMode?1:2}><b>Score</b></th>
                                 <th className="col1"><b>Station 1</b></th>
                                 <th className="col1"><b>Station 2</b></th>
-                                <th className="col1"><b>Station 3</b></th>
+                                {!ftcMode && <th className="col1"><b>Station 3</b></th>}
                             </tr>
                         </thead>
                         <tbody>
                             {practiceSchedule && !hidePracticeSchedule && practiceSchedule?.schedule?.length > 0 && practiceSchedule?.schedule.map((match) => {
                                 let redStyle = "red";
                                 let blueStyle = "blue";
-                                return (<tr key={"practiceSchedule" + match?.matchNumber} className="centerTable">
-                                    <td>{match?.actualStartTime ? "Actual:" : "Scheduled:"}<br /> {match?.actualStartTime ? moment(match.actualStartTime).format('dd hh:mm A') : moment(match?.startTime).format('dd hh:mm A')}</td>
-                                    <td>{match?.description}</td>
-                                    <td>{match?.matchNumber}</td>
-                                    <td colSpan={2}>
-                                        <tr className={`centerTable ${redStyle} block`} ><span>{match?.scoreRedFinal}</span></tr>
-                                        <tr className={`centerTable ${blueStyle} block`}><span>{match?.scoreBlueFinal}</span></tr>
-                                    </td>
-                                    <td><span className={redStyle}>{match?.teams[0]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[3]?.teamNumber}</span></td>
-                                    <td><span className={redStyle}>{match?.teams[1]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[4]?.teamNumber}</span></td>
-                                    <td><span className={redStyle}>{match?.teams[2]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[5]?.teamNumber}</span></td>
-                                </tr>
+                                return (
+                                    <tr key={"practiceSchedule" + match?.matchNumber} className="centerTable">
+                                        <td>{match?.actualStartTime ? "Actual:" : "Scheduled:"}<br /> {match?.actualStartTime ? moment(match.actualStartTime).format('dd hh:mm A') : moment(match?.startTime).format('dd hh:mm A')}</td>
+                                        <td>{match?.description}</td>
+                                        <td>{match?.matchNumber}</td>
+                                        <td colSpan={ftcMode?1:2}>
+                                            <tr className={`centerTable ${redStyle} block`} ><span>{match?.scoreRedFinal}</span></tr>
+                                            <tr className={`centerTable ${blueStyle} block`}><span>{match?.scoreBlueFinal}</span></tr>
+                                        </td>
+                                        {!ftcMode && <>
+                                            <td><span className={redStyle}>{match?.teams[0]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[3]?.teamNumber}</span></td>
+                                            <td><span className={redStyle}>{match?.teams[1]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[4]?.teamNumber}</span></td>
+                                            <td><span className={redStyle}>{match?.teams[2]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[5]?.teamNumber}</span></td></>}
+                                        {ftcMode && <>
+                                            <td><span className={redStyle}>{match?.teams[0]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[2]?.teamNumber}</span></td>
+                                            <td><span className={redStyle}>{match?.teams[1]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[3]?.teamNumber}</span></td>
+                                        </>}
+                                    </tr>
                                 )
                             })}
                             {offlinePlayoffSchedule && offlinePlayoffSchedule?.schedule?.length > 0 && offlinePlayoffSchedule?.schedule.map((match) => {
@@ -700,10 +706,15 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                                     <td>{match?.actualStartTime ? "Actual:" : "Scheduled:"}<br /> {match?.actualStartTime ? moment(match.actualStartTime).format('dd hh:mm A') : moment(match?.startTime).format('dd hh:mm A')}</td>
                                     <td>{match?.description}</td>
                                     <td>{match?.matchNumber}</td>
-                                    <td colSpan={2}><span className={redStyle}>{match?.scoreRedFinal}</span><br /><span className={blueStyle}>{match?.scoreBlueFinal}</span></td>
-                                    <td><span className={redStyle}>{match?.teams[0]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[3]?.teamNumber}</span></td>
-                                    <td><span className={redStyle}>{match?.teams[1]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[4]?.teamNumber}</span></td>
-                                    <td><span className={redStyle}>{match?.teams[2]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[5]?.teamNumber}</span></td>
+                                    <td colSpan={ftcMode?1:2}><span className={redStyle}>{match?.scoreRedFinal}</span><br /><span className={blueStyle}>{match?.scoreBlueFinal}</span></td>
+                                    {!ftcMode && <>
+                                            <td><span className={redStyle}>{match?.teams[0]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[3]?.teamNumber}</span></td>
+                                            <td><span className={redStyle}>{match?.teams[1]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[4]?.teamNumber}</span></td>
+                                            <td><span className={redStyle}>{match?.teams[2]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[5]?.teamNumber}</span></td></>}
+                                        {ftcMode && <>
+                                            <td><span className={redStyle}>{match?.teams[0]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[2]?.teamNumber}</span></td>
+                                            <td><span className={redStyle}>{match?.teams[1]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[3]?.teamNumber}</span></td>
+                                        </>}
                                 </tr>
                                 )
                             })}
@@ -732,18 +743,23 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                                         <tr className={`centerTable ${redStyle} block`}><span>{match?.scoreRedFinal}</span></tr>
                                         <tr className={`centerTable ${blueStyle} block`}><span>{match?.scoreBlueFinal}</span></tr>
                                     </td>
-                                    <td className={(match?.actualStartTime) ? `scheduleTable${winnerStyle} ${scoreStyle}` : ""} onClick={() => { if (match.scores) { handleOpenScores(match) } }}>
+                                    {!ftcMode && <td className={(match?.actualStartTime) ? `scheduleTable${winnerStyle} ${scoreStyle}` : ""} onClick={() => { if (match.scores) { handleOpenScores(match) } }}>
                                         <tr className={`centerTable ${redStyle} block`}><span style={{ whiteSpace: 'nowrap' }}>{match?.redRP ? rankPointDisplay(match?.redRP) : " "}</span></tr>
                                         <tr className={`centerTable ${blueStyle} block`}><span style={{ whiteSpace: 'nowrap' }}>{match?.blueRP ? rankPointDisplay(match?.blueRP) : " "}</span></tr>
-                                    </td>
-                                    <td><span className={redStyle}>{match?.teams[0]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[3]?.teamNumber}</span></td>
-                                    <td><span className={redStyle}>{match?.teams[1]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[4]?.teamNumber}</span></td>
-                                    <td><span className={redStyle}>{match?.teams[2]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[5]?.teamNumber}</span></td>
+                                    </td>}
+                                    {!ftcMode && <>
+                                            <td><span className={redStyle}>{match?.teams[0]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[3]?.teamNumber}</span></td>
+                                            <td><span className={redStyle}>{match?.teams[1]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[4]?.teamNumber}</span></td>
+                                            <td><span className={redStyle}>{match?.teams[2]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[5]?.teamNumber}</span></td></>}
+                                        {ftcMode && <>
+                                            <td><span className={redStyle}>{match?.teams[0]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[2]?.teamNumber}</span></td>
+                                            <td><span className={redStyle}>{match?.teams[1]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[3]?.teamNumber}</span></td>
+                                        </>}
                                 </tr>
                                 )
                             })
                             }
-                            {(playoffSchedule && playoffSchedule?.schedule?.length > 0) && playoffSchedule.schedule.map((match) => {
+                            {(playoffSchedule && playoffSchedule?.schedule?.length > 0) && playoffSchedule.schedule.map((match, index) => {
                                 let redStyle = "red";
                                 let blueStyle = "blue";
                                 let winnerStyle = "tie";
@@ -756,17 +772,22 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                                     winnerStyle = "blue";
                                 }
 
-                                return (<tr key={"playoffSchedule" + match?.matchNumber} className="centerTable">
+                                return (<tr key={"playoffSchedule" + (index+1)} className="centerTable">
                                     <td>{match?.actualStartTime ? "Actual:" : "Scheduled:"}<br /> {match?.actualStartTime ? moment(match?.actualStartTime).format('dd hh:mm A') : moment(match?.startTime).format('dd hh:mm A')}</td>
                                     <td>{match?.description}</td>
-                                    <td>{match?.matchNumber + (qualMatchCount || 0)}</td>
-                                    <td className={(match?.actualStartTime) ? `scheduleTable${winnerStyle}` : " "} onClick={() => { if (match?.scores) { handleOpenScores(match) } }} colSpan={2}>
+                                    <td>{(index+1) + (qualMatchCount || 0)}</td>
+                                    <td className={(match?.actualStartTime) ? `scheduleTable${winnerStyle}` : " "} onClick={() => { if (match?.scores) { handleOpenScores(match) } }} colSpan={ftcMode?1:2}>
                                         <tr className={`centerTable ${redStyle} block`} ><span>{match?.scoreRedFinal}</span></tr>
                                         <tr className={`centerTable ${blueStyle} block`}><span>{match?.scoreBlueFinal}</span></tr>
                                     </td>
-                                    <td><span className={redStyle}>{match?.teams[0]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[3]?.teamNumber}</span></td>
-                                    <td><span className={redStyle}>{match?.teams[1]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[4]?.teamNumber}</span></td>
-                                    <td><span className={redStyle}>{match?.teams[2]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[5]?.teamNumber}</span></td>
+                                    {!ftcMode && <>
+                                            <td><span className={redStyle}>{match?.teams[0]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[3]?.teamNumber}</span></td>
+                                            <td><span className={redStyle}>{match?.teams[1]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[4]?.teamNumber}</span></td>
+                                            <td><span className={redStyle}>{match?.teams[2]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[5]?.teamNumber}</span></td></>}
+                                        {ftcMode && <>
+                                            <td><span className={redStyle}>{match?.teams[0]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[2]?.teamNumber}</span></td>
+                                            <td><span className={redStyle}>{match?.teams[1]?.teamNumber}</span><br /><span className={blueStyle}>{match?.teams[3]?.teamNumber}</span></td>
+                                        </>}
                                 </tr>
                                 )
                             })}
@@ -825,15 +846,15 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                                 <tr>
                                     <td >Winner:</td>
                                     <td colSpan={2}>
-                                        {scoresMatch?.winner.winner === "red" ? 
-                                        <span style={{ color: "red" }}><b>Red Alliance</b></span> :
-                                         scoresMatch?.winner.winner === "blue" ? 
-                                         <span style={{ color: "blue" }}><b>Blue Alliance</b></span> : 
-                                         scoresMatch?.winner.tieWinner === "red" ? <span style={{ color: "red" }}><b>{scoresMatch?.winner.tieDetail}</b></span> : 
-                                         scoresMatch?.winner.tieWinner === "blue" ? 
-                                         <span style={{ color: "blue" }}><b>{scoresMatch?.winner.tieDetail}</b></span> : 
-                                         scoresMatch?.winner.tieWinner === "tie" ? <span style={{ color: "green" }}><b>{scoresMatch?.winner.tieDetail}</b></span> : 
-                                         <span style={{ color: "green" }}><b>TIE</b></span>}
+                                        {scoresMatch?.winner.winner === "red" ?
+                                            <span style={{ color: "red" }}><b>Red Alliance</b></span> :
+                                            scoresMatch?.winner.winner === "blue" ?
+                                                <span style={{ color: "blue" }}><b>Blue Alliance</b></span> :
+                                                scoresMatch?.winner.tieWinner === "red" ? <span style={{ color: "red" }}><b>{scoresMatch?.winner.tieDetail}</b></span> :
+                                                    scoresMatch?.winner.tieWinner === "blue" ?
+                                                        <span style={{ color: "blue" }}><b>{scoresMatch?.winner.tieDetail}</b></span> :
+                                                        scoresMatch?.winner.tieWinner === "tie" ? <span style={{ color: "green" }}><b>{scoresMatch?.winner.tieDetail}</b></span> :
+                                                            <span style={{ color: "green" }}><b>TIE</b></span>}
                                     </td>
                                 </tr>
                                 <tr>

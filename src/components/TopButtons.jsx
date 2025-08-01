@@ -6,7 +6,7 @@ import MatchClock from "../components/MatchClock";
 import _ from "lodash";
 import { useHotkeysContext } from "react-hotkeys-hook";
 
-function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatchFromMenu, selectedEvent, matchDetails, timeFormat, alliances, setAlliances, rankings, inPlayoffs, backupTeam, setBackupTeam, teamList, adHocMatch, setAdHocMatch, adHocMode, swapScreen, playoffOnly, eventLabel }) {
+function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatchFromMenu, selectedEvent, matchDetails, timeFormat, alliances, setAlliances, rankings, inPlayoffs, backupTeam, setBackupTeam, teamList, adHocMatch, setAdHocMatch, adHocMode, swapScreen, playoffOnly, eventLabel, ftcMode }) {
 
     const [show, setShow] = useState(null);
     const [showAdHoc, setAdHoc] = useState(null);
