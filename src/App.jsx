@@ -1329,10 +1329,13 @@ function App() {
       teams.teams = teamListSponsorsFixed;
 
       //fetch awards for the current teams
+      var req = await httpClient.postNoAuth(`${selectedYear?.value}/queryAwards`, {
+        "teams": teams.teams.map(t => t?.teamNumber)
+      });
+      var awards = await req.json();
       var newTeams = teams.teams.map(async (team) => {
         var request = await httpClient.getNoAuth(
-          `${selectedYear?.value}/team/${team?.teamNumber}/awards`,
-          ftcMode ? ftcBaseURL : undefined
+          `${selectedYear?.value}/team/${team?.teamNumber}/awards`
         );
         var awards = await request.json();
         team.awards = awards;
@@ -1858,19 +1861,16 @@ function App() {
   async function getRobotImages() {
     var robotImageList = teamList?.teams.map(async (team) => {
       var media = await httpClient.getNoAuth(
-        `${selectedYear?.value}/team/${team?.teamNumber}/media`,
-        ftcMode ? ftcBaseURL : undefined
+        `${selectedYear?.value}/team/${team?.teamNumber}/media`
       );
       var mediaArray = await media.json();
       var image = _.filter(mediaArray, { type: "imgur" })[0];
       return {
-        teamNumber: team?.teamNumber,
-        imageURL: image?.direct_url || null,
-      };
+        teamNumber: teamNumber,
+        imageUrl: image?.direct_url || null,
+      }
     });
-    await Promise.all(robotImageList).then((values) => {
-      setRobotImages(values);
-    });
+    setRobotImages(images);
   }
 
   async function getEPA() {
@@ -2508,32 +2508,9 @@ function App() {
         }
         var timeNow = moment();
 
-        if (selectedYear?.value === supportedYears[0].value) {
-          result.events = result?.events.concat(training.events.events);
-        }
-
-        const ftcEventRegions = _.uniqWith(
-          result?.events.map((e) => {
-            return { value: e.regionCode, label: e.regionCode };
-          }),
-          _.isEqual
-        );
-        if (ftcMode && ftcEventRegions.length > 0) {
-          setFTCRegions(ftcEventRegions);
-        }
-
-        const ftcEventTypes = _.sortBy(
-          _.uniqWith(
-            result?.events.map((e) => {
-              return { value: e.type, label: e.typeName };
-            }),
-            _.isEqual
-          ),
-          ["label"]
-        );
-        if (ftcMode && ftcEventTypes.length > 0) {
-          setFTCTypes(ftcEventTypes);
-        }
+      if (selectedYear?.value === supportedYears[0].value) {
+        result.events = result?.events.concat(training.events.events);
+      }
 
         const events = result?.events.map((e) => {
           var color = "";
