@@ -1331,268 +1331,265 @@ function App() {
       //fetch awards for the current teams
       var req = await httpClient.postNoAuth(`${selectedYear?.value}/queryAwards`, {
         "teams": teams.teams.map(t => t?.teamNumber)
-      });
+      }, ftcMode ? ftcBaseURL : undefined);
       var awards = await req.json();
-      var newTeams = teams.teams.map(async (team) => {
-        var request = await httpClient.getNoAuth(
-          `${selectedYear?.value}/team/${team?.teamNumber}/awards`
-        );
-        var awards = await request.json();
-        team.awards = awards;
+      var newTeams = teams.teams.map((team) => {
+        team.awards = awards[`${team?.teamNumber}`] || {};
         return team;
       });
 
-      await Promise.all(newTeams).then(function (values) {
-        // Parse awards to ensure we highlight them properly and remove extraneous text i.e. FIRST CHampionship from name
-        var formattedAwards = values.map((team) => {
-          // Add in special awards not reported by FIRST APIs (from 2021 season)
-          for (var index = 0; index < 3; index++) {
-            const targetYear = parseInt(selectedYear?.value) - index;
-            let items = specialAwards.filter(
-              (item) => item.Year === targetYear
+      // await Promise.all(newTeams).then(function (values) {
+      // Parse awards to ensure we highlight them properly and remove extraneous text i.e. FIRST CHampionship from name
+
+      var formattedAwards = newTeams.map((team) => {
+        // Add in special awards not reported by FIRST APIs (from 2021 season)
+        for (var index = 0; index < 3; index++) {
+          const targetYear = parseInt(selectedYear?.value) - index;
+          let items = specialAwards.filter(
+            (item) => item.Year === targetYear
+          );
+          if (items.length > 0) {
+            let teamAwards = items[0].awards.filter(
+              (item) => item.teamNumber === team.teamNumber
             );
-            if (items.length > 0) {
-              let teamAwards = items[0].awards.filter(
-                (item) => item.teamNumber === team.teamNumber
+            if (teamAwards.length > 0) {
+              team.awards[`${selectedYear?.value - index}`].Awards = _.concat(
+                team.awards[`${selectedYear?.value - index}`].Awards,
+                teamAwards
               );
-              if (teamAwards.length > 0) {
-                team.awards[`${selectedYear?.value - index}`].Awards = _.concat(
-                  team.awards[`${selectedYear?.value - index}`].Awards,
-                  teamAwards
-                );
-              }
             }
           }
-          var awardYears = Object.keys(team?.awards);
+        }
+        var awardYears = Object.keys(team?.awards);
 
-          awardYears?.forEach((year) => {
-            if (team?.awards[`${year}`] !== null) {
-              if (team.awards[`${year}`]?.awards) {
-                team.awards[`${year}`] = {
-                  Awards: team.awards[`${year}`].awards,
-                };
-              }
-              team.awards[`${year}`].Awards = team?.awards[
-                `${year}`
-              ]?.Awards.map((award) => {
-                award.highlight = awardsHilight(award.name);
-                award.eventName = eventnames[`${year}`][award.eventCode];
-                award.year = year;
-                return award;
-              });
-            } else {
-              team.awards[`${year}`] = { Awards: [] };
+        awardYears?.forEach((year) => {
+          if (team?.awards[`${year}`] !== null) {
+            if (team.awards[`${year}`]?.awards) {
+              team.awards[`${year}`] = {
+                Awards: team.awards[`${year}`].awards,
+              };
             }
-          });
-          team.hallOfFame = [];
-          _.filter(halloffame, { Chairmans: team.teamNumber }).forEach(
-            (award) => {
-              team.hallOfFame.push({
-                year: award?.Year,
-                challenge: award?.Challenge,
-                type: "chairmans",
-              });
-            }
-          );
-          _.filter(halloffame, { Impact: team.teamNumber }).forEach(
-            (award) => {
-              team.hallOfFame.push({
-                year: award?.Year,
-                challenge: award?.Challenge,
-                type: "impact",
-              });
+            team.awards[`${year}`].Awards = team?.awards[
+              `${year}`
+            ]?.Awards.map((award) => {
+              award.highlight = awardsHilight(award.name);
+              award.eventName = eventnames[`${year}`][award.eventCode];
+              award.year = year;
+              return award;
             });
-          _.filter(halloffame, { Inspire: team.teamNumber }).forEach(
-            (award) => {
-              team.hallOfFame.push({
-                year: award?.Year,
-                challenge: award?.Challenge,
-                type: "inspire",
-              });
-            }
-          );
-          _.filter(halloffame, { Winner1: team.teamNumber }).forEach(
-            (award) => {
-              team.hallOfFame.push({
-                year: award.Year,
-                challenge: award.Challenge,
-                type: "winner",
-              });
-            }
-          );
-          _.filter(halloffame, { Winner2: team.teamNumber }).forEach(
-            (award) => {
-              team.hallOfFame.push({
-                year: award.Year,
-                challenge: award.Challenge,
-                type: "winner",
-              });
-            }
-          );
-          _.filter(halloffame, { Winner3: team.teamNumber }).forEach(
-            (award) => {
-              team.hallOfFame.push({
-                year: award?.Year,
-                challenge: award?.Challenge,
-                type: "winner",
-              });
-            }
-          );
-          _.filter(halloffame, { Winner4: team.teamNumber }).forEach(
-            (award) => {
-              team.hallOfFame.push({
-                year: award.Year,
-                challenge: award.Challenge,
-                type: "winner",
-              });
-            }
-          );
-          _.filter(halloffame, { Winner5: team.teamNumber }).forEach(
-            (award) => {
-              team.hallOfFame.push({
-                year: award.Year,
-                challenge: award.Challenge,
-                type: "winner",
-              });
-            }
-          );
-
-          team.hallOfFame = _.orderBy(
-            team.hallOfFame,
-            ["type", "year"],
-            ["asc", "asc"]
-          );
-
-          return team;
+          } else {
+            team.awards[`${year}`] = { Awards: [] };
+          }
         });
-        teams.teams = formattedAwards;
+        team.hallOfFame = [];
+        _.filter(halloffame, { Chairmans: team.teamNumber }).forEach(
+          (award) => {
+            team.hallOfFame.push({
+              year: award?.Year,
+              challenge: award?.Challenge,
+              type: "chairmans",
+            });
+          }
+        );
+        _.filter(halloffame, { Impact: team.teamNumber }).forEach(
+          (award) => {
+            team.hallOfFame.push({
+              year: award?.Year,
+              challenge: award?.Challenge,
+              type: "impact",
+            });
+          });
+        _.filter(halloffame, { Inspire: team.teamNumber }).forEach(
+          (award) => {
+            team.hallOfFame.push({
+              year: award?.Year,
+              challenge: award?.Challenge,
+              type: "inspire",
+            });
+          }
+        );
+        _.filter(halloffame, { Winner1: team.teamNumber }).forEach(
+          (award) => {
+            team.hallOfFame.push({
+              year: award.Year,
+              challenge: award.Challenge,
+              type: "winner",
+            });
+          }
+        );
+        _.filter(halloffame, { Winner2: team.teamNumber }).forEach(
+          (award) => {
+            team.hallOfFame.push({
+              year: award.Year,
+              challenge: award.Challenge,
+              type: "winner",
+            });
+          }
+        );
+        _.filter(halloffame, { Winner3: team.teamNumber }).forEach(
+          (award) => {
+            team.hallOfFame.push({
+              year: award?.Year,
+              challenge: award?.Challenge,
+              type: "winner",
+            });
+          }
+        );
+        _.filter(halloffame, { Winner4: team.teamNumber }).forEach(
+          (award) => {
+            team.hallOfFame.push({
+              year: award.Year,
+              challenge: award.Challenge,
+              type: "winner",
+            });
+          }
+        );
+        _.filter(halloffame, { Winner5: team.teamNumber }).forEach(
+          (award) => {
+            team.hallOfFame.push({
+              year: award.Year,
+              challenge: award.Challenge,
+              type: "winner",
+            });
+          }
+        );
 
-        var champsTeams = [];
-        if (
-          selectedEvent?.value?.champLevel !== "" ||
-          showDistrictChampsStats ||
-          (selectedEvent?.value?.code.includes("OFFLINE") &&
-            playoffOnly &&
-            champsStyle)
-        ) {
-          console.log("Getting Champs stats");
-          champsTeams = teams.teams.map(async (team) => {
-            var champsRequest = await httpClient.getNoAuth(
-              `/team/${team?.teamNumber}/appearances`,
-              ftcMode ? ftcBaseURL : undefined
+        team.hallOfFame = _.orderBy(
+          team.hallOfFame,
+          ["type", "year"],
+          ["asc", "asc"]
+        );
+
+        return team;
+      });
+      teams.teams = formattedAwards;
+
+      var champsTeams = [];
+      if (
+        selectedEvent?.value?.champLevel !== "" ||
+        showDistrictChampsStats ||
+        (selectedEvent?.value?.code.includes("OFFLINE") &&
+          playoffOnly &&
+          champsStyle)
+      ) {
+        console.log("Getting Champs stats");
+        champsTeams = teams.teams.map(async (team) => {
+          var champsRequest = await httpClient.getNoAuth(
+            `/team/${team?.teamNumber}/appearances`,
+            ftcMode ? ftcBaseURL : undefined
+          );
+          var appearances = await champsRequest.json();
+          var result = {
+            teamNumber: team?.teamNumber,
+            champsAppearances: 0,
+            champsAppearancesYears: [],
+            einsteinAppearances: 0,
+            einsteinAppearancesYears: [],
+
+            districtChampsAppearances: 0,
+            districtChampsAppearancesYears: [],
+            districtEinsteinAppearances: 0,
+            districtEinsteinAppearancesYears: [],
+            FOCAppearances: 0,
+            FOCAppearancesYears: [],
+          };
+
+          appearances.forEach((appearance) => {
+            //check for district code
+            //DISTRICT_CMP = 2
+            //DISTRICT_CMP_DIVISION = 5
+            // Ontario (>=2019), Michigan (>=2017), Texas (>=2022), New England (>=2022),
+            // Indiana (>=2022) check for Einstein appearances
+            // appearances.district.abbreviation = "ont"
+            // appearances.district.abbreviation = "fim"
+            // appearances.district.abbreviation = "ne"
+            // appearances.district.abbreviation = "tx" || "fit"
+            // >=2017 check for Division appearance then Champs appearances
+            //test for champs prior to 2001
+
+            //Use timeDifference to filter out teams from the current year's Einstein appearances
+            // for World and District Champs events.
+            var timeDifference = moment(appearance?.end_date).diff(
+              moment(),
+              "minutes"
             );
-            var appearances = await champsRequest.json();
-            var result = {
-              teamNumber: team?.teamNumber,
-              champsAppearances: 0,
-              champsAppearancesYears: [],
-              einsteinAppearances: 0,
-              einsteinAppearancesYears: [],
 
-              districtChampsAppearances: 0,
-              districtChampsAppearancesYears: [],
-              districtEinsteinAppearances: 0,
-              districtEinsteinAppearancesYears: [],
-              FOCAppearances: 0,
-              FOCAppearancesYears: [],
-            };
-
-            appearances.forEach((appearance) => {
-              //check for district code
-              //DISTRICT_CMP = 2
-              //DISTRICT_CMP_DIVISION = 5
-              // Ontario (>=2019), Michigan (>=2017), Texas (>=2022), New England (>=2022),
-              // Indiana (>=2022) check for Einstein appearances
-              // appearances.district.abbreviation = "ont"
-              // appearances.district.abbreviation = "fim"
-              // appearances.district.abbreviation = "ne"
-              // appearances.district.abbreviation = "tx" || "fit"
-              // >=2017 check for Division appearance then Champs appearances
-              //test for champs prior to 2001
-
-              //Use timeDifference to filter out teams from the current year's Einstein appearances
-              // for World and District Champs events.
-              var timeDifference = moment(appearance?.end_date).diff(
-                moment(),
-                "minutes"
-              );
-
-              if (appearance.district !== null) {
-                if (
-                  (appearance.year >= 2019 &&
-                    appearance.district.abbreviation === "ont") ||
-                  (appearance.year >= 2017 &&
-                    appearance.district.abbreviation === "fim") ||
-                  (appearance.year >= 2022 &&
-                    appearance.district.abbreviation === "ne") ||
-                  (appearance.year >= 2022 &&
-                    (appearance.district.abbreviation === "tx" ||
-                      appearance.district.abbreviation === "fit"))
-                ) {
-                  if (appearance.event_type === 5) {
-                    result.districtChampsAppearances += 1;
-                    result.districtChampsAppearancesYears.push(appearance.year);
-                  }
-                  if (appearance.event_type === 2 && timeDifference < 0) {
-                    result.districtEinsteinAppearances += 1;
-                    result.districtEinsteinAppearancesYears.push(
-                      appearance.year
-                    );
-                  }
-                } else {
-                  if (appearance.event_type === 2) {
-                    result.districtChampsAppearances += 1;
-                    result.districtChampsAppearancesYears.push(appearance.year);
-                  }
+            if (appearance.district !== null) {
+              if (
+                (appearance.year >= 2019 &&
+                  appearance.district.abbreviation === "ont") ||
+                (appearance.year >= 2017 &&
+                  appearance.district.abbreviation === "fim") ||
+                (appearance.year >= 2022 &&
+                  appearance.district.abbreviation === "ne") ||
+                (appearance.year >= 2022 &&
+                  (appearance.district.abbreviation === "tx" ||
+                    appearance.district.abbreviation === "fit"))
+              ) {
+                if (appearance.event_type === 5) {
+                  result.districtChampsAppearances += 1;
+                  result.districtChampsAppearancesYears.push(appearance.year);
                 }
-              }
-
-              //check for champs Division code
-              //CMP_DIVISION = 3
-              //CMP_FINALS = 4
-              //FOC = 6
-              // >=2001 check for Division appearance then Champs appearances
-              if (appearance.event_type === 6) {
-                result.FOCAppearances += 1;
-                result.FOCAppearancesYears.push(appearance.year);
-              }
-              //test for champs prior to 2001
-              if (appearance.year < 2001) {
-                if (appearance.event_type === 4) {
-                  result.champsAppearances += 1;
-                  result.champsAppearancesYears.push(appearance.year);
+                if (appearance.event_type === 2 && timeDifference < 0) {
+                  result.districtEinsteinAppearances += 1;
+                  result.districtEinsteinAppearancesYears.push(
+                    appearance.year
+                  );
                 }
               } else {
-                if (appearance.event_type === 3) {
-                  result.champsAppearances += 1;
-                  result.champsAppearancesYears.push(appearance.year);
-                }
-
-                // FIXED: mapping out current year's Einstein appearances.
-                if (appearance.event_type === 4 && timeDifference < 0) {
-                  result.einsteinAppearances += 1;
-                  result.einsteinAppearancesYears.push(appearance.year);
+                if (appearance.event_type === 2) {
+                  result.districtChampsAppearances += 1;
+                  result.districtChampsAppearancesYears.push(appearance.year);
                 }
               }
-            });
+            }
 
-            team.champsAppearances = result;
-            return team;
+            //check for champs Division code
+            //CMP_DIVISION = 3
+            //CMP_FINALS = 4
+            //FOC = 6
+            // >=2001 check for Division appearance then Champs appearances
+            if (appearance.event_type === 6) {
+              result.FOCAppearances += 1;
+              result.FOCAppearancesYears.push(appearance.year);
+            }
+            //test for champs prior to 2001
+            if (appearance.year < 2001) {
+              if (appearance.event_type === 4) {
+                result.champsAppearances += 1;
+                result.champsAppearancesYears.push(appearance.year);
+              }
+            } else {
+              if (appearance.event_type === 3) {
+                result.champsAppearances += 1;
+                result.champsAppearancesYears.push(appearance.year);
+              }
+
+              // FIXED: mapping out current year's Einstein appearances.
+              if (appearance.event_type === 4 && timeDifference < 0) {
+                result.einsteinAppearances += 1;
+                result.einsteinAppearancesYears.push(appearance.year);
+              }
+            }
           });
 
-          Promise.all(champsTeams).then(function (values) {
-            teams.lastUpdate = moment();
+          team.champsAppearances = result;
+          return team;
+        });
 
-            teams.teams = values;
-            setTeamList(teams);
-            //getRobotImages(teams);
-          });
-        } else {
+        Promise.all(champsTeams).then(function (values) {
           teams.lastUpdate = moment();
+
+          teams.teams = values;
           setTeamList(teams);
           //getRobotImages(teams);
-        }
-      });
+        });
+      } else {
+        teams.lastUpdate = moment();
+        setTeamList(teams);
+        //getRobotImages(teams);
+      }
+      // });
       setTeamListLoading("");
     } else {
       console.log(
@@ -1858,7 +1855,7 @@ function App() {
    * @param teams The event's team list
    * @return sets the array of URLs
    */
-  async function getRobotImages() {
+  function getRobotImages() {
     var robotImageList = teamList?.teams.map(async (team) => {
       var media = await httpClient.getNoAuth(
         `${selectedYear?.value}/team/${team?.teamNumber}/media`
@@ -1866,11 +1863,13 @@ function App() {
       var mediaArray = await media.json();
       var image = _.filter(mediaArray, { type: "imgur" })[0];
       return {
-        teamNumber: teamNumber,
+        teamNumber: team?.teamNumber,
         imageUrl: image?.direct_url || null,
       }
     });
-    setRobotImages(images);
+    Promise.all(robotImageList).then((values) => {
+      setRobotImages(values);
+    })
   }
 
   async function getEPA() {
@@ -2508,9 +2507,9 @@ function App() {
         }
         var timeNow = moment();
 
-      if (selectedYear?.value === supportedYears[0].value) {
-        result.events = result?.events.concat(training.events.events);
-      }
+        if (selectedYear?.value === supportedYears[0].value) {
+          result.events = result?.events.concat(training.events.events);
+        }
 
         const events = result?.events.map((e) => {
           var color = "";
@@ -2699,7 +2698,7 @@ function App() {
       getAlliances();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [httpClient, playoffSchedule]);
+  }, [httpClient, playoffSchedule?.schedule]);
 
   //update the Alliance Count when conditions change
   useEffect(() => {
@@ -3261,6 +3260,7 @@ function App() {
                     eventMessage={eventMessage}
                     eventBell={eventBell}
                     setEventBell={setEventBell}
+                    ftcMode={ftcMode}
                   />
                 }
               />

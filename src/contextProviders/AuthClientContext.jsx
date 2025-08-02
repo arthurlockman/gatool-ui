@@ -145,13 +145,13 @@ class AuthClient {
         throw new Error(errorText);
     }
 
-    async postNoAuth(path, body) {
+    async postNoAuth(path, body, customAPIBaseUrl) {
         if (!this.online) {
             throw new Error('You are offline.')
         }
 
         this.operationStart();
-        var response = await fetch(`${apiBaseUrl}${path}`, {
+        var response = await fetch(`${customAPIBaseUrl || apiBaseUrl}${path}`, {
             headers: {
                 'Content-Type': 'application/json'
             },
