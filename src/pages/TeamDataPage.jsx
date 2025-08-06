@@ -350,7 +350,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
             delete record.hallOfFame;
             awardsKeys = Object.keys(awards)
             awardsKeys.forEach((key) => {
-                awards[key].Awards.forEach((award) => {
+                awards[key].awards.forEach((award) => {
                     record.awards.push(`${award.year} ${award.eventName}: ${award.name}${award.person ? `: ${award.person}` : ""}`)
                 })
             })
