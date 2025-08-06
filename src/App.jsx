@@ -1321,7 +1321,7 @@ function App() {
             if (team?.awards[`${year}`] !== null) {
               team.awards[`${year}`].awards = team?.awards[
                 `${year}`
-              ]?.awards.map((award) => {
+              ]?.awards?.map((award) => {
                 award.highlight = awardsHilight(award.name);
                 award.eventName = eventnames[`${year}`][award.eventCode];
                 award.year = year;
