@@ -1132,7 +1132,7 @@ function App() {
           );
           var eventDetails = await request.json();
           // filter that list by EI {awardId: "633"} {name: "District Engineering Inspiration Award"} and {awardID: "417"} {name:"Rookie All Star Award"}
-          return _.filter(eventDetails?.Awards, (award) => {
+          return _.filter(eventDetails?.awards, (award) => {
             return award.awardId === 633 || award.awardId === 417;
           });
         });
@@ -1297,8 +1297,8 @@ function App() {
                 (item) => item.teamNumber === team.teamNumber
               );
               if (teamAwards.length > 0) {
-                team.awards[`${selectedYear?.value - index}`].Awards = _.concat(
-                  team.awards[`${selectedYear?.value - index}`].Awards,
+                team.awards[`${selectedYear?.value - index}`].awards = _.concat(
+                  team.awards[`${selectedYear?.value - index}`].awards,
                   teamAwards
                 );
               }
@@ -1319,9 +1319,9 @@ function App() {
 
           awardYears?.forEach((year) => {
             if (team?.awards[`${year}`] !== null) {
-              team.awards[`${year}`].Awards = team?.awards[
+              team.awards[`${year}`].awards = team?.awards[
                 `${year}`
-              ]?.Awards.map((award) => {
+              ]?.awards.map((award) => {
                 award.highlight = awardsHilight(award.name);
                 award.eventName = eventnames[`${year}`][award.eventCode];
                 award.year = year;

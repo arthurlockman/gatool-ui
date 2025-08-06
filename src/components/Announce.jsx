@@ -9,7 +9,7 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
     var awardsYears = team?.awards ? Object.keys(team.awards) : []
     var awards = [];
     awardsYears.forEach((year) => {
-        team?.awards[year]?.Awards.forEach((award) => {
+        team?.awards[year]?.awards.forEach((award) => {
             awards.push(award);
         })
     })
