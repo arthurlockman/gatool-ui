@@ -31,6 +31,7 @@ import {
   originalAndSustaining,
   refreshRate,
   communityUpdateTemplate,
+  ftcRegions
 } from "./components/Constants";
 import { appUpdates } from "./components/AppUpdates";
 import { useOnlineStatus } from "./contextProviders/OnlineContext";
@@ -123,6 +124,12 @@ function LayoutsWithNavbar({
 const training = _.cloneDeep(trainingData);
 
 const timezones = _.cloneDeep(timeZones);
+
+var ftcregions = _.cloneDeep(ftcRegions);
+const regionLookup = [];
+ftcregions.forEach((region) => {
+  regionLookup[region.regionCode] = region.description;
+})
 
 function App() {
   const {
@@ -355,11 +362,6 @@ function App() {
 
   const [ftcLeagues, setFTCLeagues] = usePersistentState(
     "cache:ftcLeagues",
-    []
-  );
-
-  const [ftcRegions, setFTCRegions] = usePersistentState(
-    "cache:ftcRegions",
     []
   );
 
@@ -2510,7 +2512,8 @@ function App() {
         if (selectedYear?.value === supportedYears[0].value) {
           result.events = result?.events.concat(training.events.events);
         }
-
+        var regionCodes = [];
+        var types = []
         const events = result?.events.map((e) => {
           var color = "";
           var optionPrefix = "";
@@ -2557,7 +2560,10 @@ function App() {
             filters.push(e.districtCode);
           } else if (ftcMode) {
             filters.push(e.type);
+            filters.push(e.leagueCode)
             filters.push(e.regionCode);
+            regionCodes.push({ regionCode: e.regionCode, description: regionLookup[e.regionCode] ? `${regionLookup[e.regionCode]} (${e.regionCode})` : e.regionCode}  );
+            types.push({ type: e.type, description: e.typeName });
           }
 
           if (timeNow.diff(eventTime) < 0) {
@@ -2606,6 +2612,13 @@ function App() {
             filters: filters,
           };
         });
+
+        // use for diagnostics to find missing regionCodes
+        // regionCodes = _.filter(_.uniqBy(regionCodes,"regionCode"),function(o) {return _.filter(ftcregions, {regionCode:o.regionCode}).length === 0;});
+
+        ftcregions = _.orderBy(_.uniqBy(regionCodes,"regionCode"),"description","asc")
+        types = _.orderBy(_.uniqBy(types,"type"),"description","asc");
+        setFTCTypes(types);
 
         //Ensure that current year event names change when Division or sponsor names change
         events.forEach((event) => {
@@ -2729,7 +2742,7 @@ function App() {
     setAllianceCount(allianceCountTemp);
   }, [playoffCountOverride, teamList, setAllianceCount, selectedEvent]);
 
-  // Retrieve event list when year selection changes
+  // Retrieve event list when year selection or ftc Mode switch changes
   useEffect(() => {
     if (httpClient && selectedYear) {
       if (ftcMode) {
@@ -3053,10 +3066,10 @@ function App() {
                     setUseCheesyArena={setUseCheesyArena}
                     cheesyArenaAvailable={cheesyArenaAvailable}
                     ftcLeagues={ftcLeagues}
-                    ftcTypes={ftcTypes}
                     ftcMode={ftcMode}
                     setFTCMode={setFTCMode}
-                    ftcRegions={ftcRegions}
+                    ftcRegions={ftcregions}
+                    ftcTypes={ftcTypes}
                   />
                 }
               />
