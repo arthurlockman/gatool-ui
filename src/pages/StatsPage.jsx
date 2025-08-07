@@ -8,7 +8,7 @@ function StatsPage({
   eventHighScores,
   eventNamesCY,
   eventLabel,
-  districts,
+  districts, selectedYear,
 }) {
   const eventDistrict = _.filter(districts, {
     value: selectedEvent?.value?.districtCode,
@@ -54,14 +54,14 @@ function StatsPage({
                   <tr>
                     <StatsMatch
                       highScores={worldStats?.highscores}
-                      matchType={"penaltyFreequal"}
+                      matchType={`${selectedYear.value}penaltyFreequal`}
                       matchName={"No penalties in match"}
                       eventNamesCY={eventNamesCY}
                       tableType={"world"}
                     />
                     <StatsMatch
                       highScores={worldStats?.highscores}
-                      matchType={"penaltyFreeplayoff"}
+                      matchType={`${selectedYear.value}penaltyFreeplayoff`}
                       matchName={"No penalties in match"}
                       eventNamesCY={eventNamesCY}
                       tableType={"world"}
@@ -70,14 +70,14 @@ function StatsPage({
                   <tr>
                     <StatsMatch
                       highScores={worldStats?.highscores}
-                      matchType={"TBAPenaltyFreequal"}
+                      matchType={`${selectedYear.value}TBAPenaltyFreequal`}
                       matchName={"No penalties to winner"}
                       eventNamesCY={eventNamesCY}
                       tableType={"world"}
                     />
                     <StatsMatch
                       highScores={worldStats?.highscores}
-                      matchType={"TBAPenaltyFreeplayoff"}
+                      matchType={`${selectedYear.value}TBAPenaltyFreeplayoff`}
                       matchName={"No penalties to winner"}
                       eventNamesCY={eventNamesCY}
                       tableType={"world"}
@@ -86,14 +86,14 @@ function StatsPage({
                   <tr>
                     <StatsMatch
                       highScores={worldStats?.highscores}
-                      matchType={"offsettingqual"}
+                      matchType={`${selectedYear.value}offsettingqual`}
                       matchName={"Offsetting penalties"}
                       eventNamesCY={eventNamesCY}
                       tableType={"world"}
                     />
                     <StatsMatch
                       highScores={worldStats?.highscores}
-                      matchType={"offsettingplayoff"}
+                      matchType={`${selectedYear.value}offsettingplayoff`}
                       matchName={"Offsetting penalties"}
                       eventNamesCY={eventNamesCY}
                       tableType={"world"}
@@ -102,14 +102,14 @@ function StatsPage({
                   <tr>
                     <StatsMatch
                       highScores={worldStats?.highscores}
-                      matchType={"overallqual"}
+                      matchType={`${selectedYear.value}overallqual`}
                       matchName={"Incl. penalties"}
                       eventNamesCY={eventNamesCY}
                       tableType={"world"}
                     />
                     <StatsMatch
                       highScores={worldStats?.highscores}
-                      matchType={"overallplayoff"}
+                      matchType={`${selectedYear.value}overallplayoff`}
                       matchName={"Incl. penalties"}
                       eventNamesCY={eventNamesCY}
                       tableType={"world"}
@@ -136,14 +136,14 @@ function StatsPage({
                     <tr>
                       <StatsMatch
                         highScores={worldStats?.highscores}
-                        matchType={`District${selectedEvent?.value?.districtCode}PenaltyFreequal`}
+                        matchType={`${selectedYear.value}District${selectedEvent?.value?.districtCode}penaltyFreequal`}
                         matchName={"No penalties in match"}
                         eventNamesCY={eventNamesCY}
                         tableType={"district"}
                       />
                       <StatsMatch
                         highScores={worldStats?.highscores}
-                        matchType={`District${selectedEvent?.value?.districtCode}PenaltyFreeplayoff`}
+                        matchType={`${selectedYear.value}District${selectedEvent?.value?.districtCode}penaltyFreeplayoff`}
                         matchName={"No penalties in match"}
                         eventNamesCY={eventNamesCY}
                         tableType={"district"}
@@ -152,14 +152,14 @@ function StatsPage({
                     <tr>
                       <StatsMatch
                         highScores={worldStats?.highscores}
-                        matchType={`District${selectedEvent?.value?.districtCode}TBAPenaltyFreequal`}
+                        matchType={`${selectedYear.value}District${selectedEvent?.value?.districtCode}TBAPenaltyFreequal`}
                         matchName={"No penalties to winner"}
                         eventNamesCY={eventNamesCY}
                         tableType={"district"}
                       />
                       <StatsMatch
                         highScores={worldStats?.highscores}
-                        matchType={`District${selectedEvent?.value?.districtCode}TBAPenaltyFreeplayoff`}
+                        matchType={`${selectedYear.value}District${selectedEvent?.value?.districtCode}TBAPenaltyFreeplayoff`}
                         matchName={"No penalties to winner"}
                         eventNamesCY={eventNamesCY}
                         tableType={"district"}
@@ -168,14 +168,14 @@ function StatsPage({
                     <tr>
                       <StatsMatch
                         highScores={worldStats?.highscores}
-                        matchType={`District${selectedEvent?.value?.districtCode}offsettingqual`}
+                        matchType={`${selectedYear.value}District${selectedEvent?.value?.districtCode}offsettingqual`}
                         matchName={"Offsetting penalties"}
                         eventNamesCY={eventNamesCY}
                         tableType={"district"}
                       />
                       <StatsMatch
                         highScores={worldStats?.highscores}
-                        matchType={`District${selectedEvent?.value?.districtCode}offsettingplayoff`}
+                        matchType={`${selectedYear.value}District${selectedEvent?.value?.districtCode}offsettingplayoff`}
                         matchName={"Offsetting penalties"}
                         eventNamesCY={eventNamesCY}
                         tableType={"district"}
@@ -184,14 +184,14 @@ function StatsPage({
                     <tr>
                       <StatsMatch
                         highScores={worldStats?.highscores}
-                        matchType={`District${selectedEvent?.value?.districtCode}Overallqual`}
+                        matchType={`${selectedYear.value}District${selectedEvent?.value?.districtCode}overallqual`}
                         matchName={"Incl. penalties"}
                         eventNamesCY={eventNamesCY}
                         tableType={"district"}
                       />
                       <StatsMatch
                         highScores={worldStats?.highscores}
-                        matchType={`District${selectedEvent?.value?.districtCode}Overallplayoff`}
+                        matchType={`${selectedYear.value}District${selectedEvent?.value?.districtCode}overallplayoff`}
                         matchName={"Incl. penalties"}
                         eventNamesCY={eventNamesCY}
                         tableType={"district"}

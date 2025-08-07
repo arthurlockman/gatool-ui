@@ -1861,7 +1861,7 @@ function App() {
         //  details.eventName = score?.matchData?.event?.eventCode;
         //}
         details.alliance = _.upperFirst(score?.matchData?.highScoreAlliance);
-        details.scoreType = score?.type + score?.level;
+        details.scoreType = score?.yearType;
         details.matchName = score?.matchData?.match?.description;
         details.allianceMembers = _.filter(
           score?.matchData?.match?.teams,
@@ -3155,6 +3155,7 @@ function App() {
                     eventNamesCY={eventNamesCY}
                     eventLabel={eventLabel}
                     districts={districts}
+                    selectedYear={selectedYear}
                   />
                 }
               />
