@@ -1368,7 +1368,7 @@ function App() {
           if (team?.awards[`${year}`] !== null) {
             if (team.awards[`${year}`]?.awards) {
               team.awards[`${year}`] = {
-                Awards: team.awards[`${year}`].awards,
+                awards: team.awards[`${year}`].awards,
               };
             }
             team.awards[`${year}`].awards = team?.awards[
@@ -1380,7 +1380,7 @@ function App() {
               return award;
             });
           } else {
-            team.awards[`${year}`] = { Awards: [] };
+            team.awards[`${year}`] = { awards: [] };
           }
         });
         team.hallOfFame = [];
@@ -1685,7 +1685,10 @@ function App() {
             `${selectedYear?.value}/communityUpdates/${selectedEvent?.value.code}`,
             ftcMode ? ftcBaseURL : undefined
           );
-          teams = await result.json();
+          if (result.status === 404) {
+            setCommunityUpdates([]);
+            setLoadingCommunityUpdates(false);
+          }else {teams = await result.json();}
         } else {
           teams = training.teams.communityUpdates;
         }
@@ -1912,6 +1915,10 @@ function App() {
       `${selectedYear?.value}/highscores`,
       ftcMode ? ftcBaseURL : undefined
     );
+    if (result.status === 404 || result.status === 500) {
+      setWorldStats(null);
+      return;
+    }
     var highscores = await result.json();
     var scores = {};
     var reducedScores = {};
@@ -1970,6 +1977,10 @@ function App() {
       `${year}/highscores/${code}`,
       ftcMode ? ftcBaseURL : undefined
     );
+    if (result.status === 404 || result.status === 500) {
+      setEventHighScores(null);
+      return;
+    }
     var highscores = await result.json();
     var scores = {};
     var reducedScores = {};
@@ -2562,7 +2573,7 @@ function App() {
             filters.push(e.type);
             filters.push(e.leagueCode)
             filters.push(e.regionCode);
-            regionCodes.push({ regionCode: e.regionCode, description: regionLookup[e.regionCode] ? `${regionLookup[e.regionCode]} (${e.regionCode})` : e.regionCode}  );
+            regionCodes.push({ regionCode: e.regionCode, description: regionLookup[e.regionCode] ? `${regionLookup[e.regionCode]} (${e.regionCode})` : e.regionCode });
             types.push({ type: e.type, description: e.typeName });
           }
 
@@ -2616,8 +2627,8 @@ function App() {
         // use for diagnostics to find missing regionCodes
         // regionCodes = _.filter(_.uniqBy(regionCodes,"regionCode"),function(o) {return _.filter(ftcregions, {regionCode:o.regionCode}).length === 0;});
 
-        ftcregions = _.orderBy(_.uniqBy(regionCodes,"regionCode"),"description","asc")
-        types = _.orderBy(_.uniqBy(types,"type"),"description","asc");
+        ftcregions = _.orderBy(_.uniqBy(regionCodes, "regionCode"), "description", "asc")
+        types = _.orderBy(_.uniqBy(types, "type"), "description", "asc");
         setFTCTypes(types);
 
         //Ensure that current year event names change when Division or sponsor names change
