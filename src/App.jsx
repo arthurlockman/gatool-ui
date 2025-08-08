@@ -414,7 +414,9 @@ function App() {
     console.log("Checking Cheesy Arena status...");
     try {
       var result = await fetch(
-        "http://10.0.100.5:8443/api/matches/qualification"
+        "http://10.0.100.5:8443/api/matches/qualification", {
+      signal: AbortSignal.timeout(5000)
+    }
       );
       var data = result.status === 200;
       // Set the IP address to the constant `ip`
@@ -2480,7 +2482,7 @@ function App() {
         { teamNumber: null, station: "Blue2", surrogate: false, dq: false },
         { teamNumber: null, station: "Blue3", surrogate: false, dq: false },
       ]);
-      if (!ftcMode && useCheesyArena) {
+      if (!ftcMode ) {
         setCheesyArenaAvailable(await getCheesyStatus());
       }
       setCheesyTeamList([]);
