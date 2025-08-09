@@ -836,6 +836,7 @@ td {
 
 .foulButtons {
   font-size: 14px;
+  border : 2px solid #ccc;
 }
 
 .coopertition {

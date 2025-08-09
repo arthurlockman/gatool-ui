@@ -667,7 +667,7 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                         <thead className="thead-default">
                             <tr>
                                 <th className="col2"><b>Time</b></th>
-                                <th className="col2"><b>Description</b></th>
+                                <th className="col2"><b>Description{selectedEvent?.value?.fieldCount>1?` (${selectedEvent?.value?.fieldCount} fields)`:''}</b></th>
                                 <th className="col1"><b>Match Number</b></th>
                                 <th className="col1" colSpan={ftcMode?1:2}><b>Score</b></th>
                                 <th className="col1"><b>Station 1</b></th>
@@ -682,7 +682,7 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                                 return (
                                     <tr key={"practiceSchedule" + match?.matchNumber} className="centerTable">
                                         <td>{match?.actualStartTime ? "Actual:" : "Scheduled:"}<br /> {match?.actualStartTime ? moment(match.actualStartTime).format('dd hh:mm A') : moment(match?.startTime).format('dd hh:mm A')}</td>
-                                        <td>{match?.description}</td>
+                                        <td>{match?.description}{selectedEvent?.value?.fieldCount>1?` Field ${match?.series}`:''}</td>
                                         <td>{match?.matchNumber}</td>
                                         <td colSpan={ftcMode?1:2}>
                                             <tr className={`centerTable ${redStyle} block`} ><span>{match?.scoreRedFinal}</span></tr>
@@ -704,7 +704,7 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
                                 let blueStyle = "blue";
                                 return (<tr key={"practiceSchedule" + match?.matchNumber} className="centerTable">
                                     <td>{match?.actualStartTime ? "Actual:" : "Scheduled:"}<br /> {match?.actualStartTime ? moment(match.actualStartTime).format('dd hh:mm A') : moment(match?.startTime).format('dd hh:mm A')}</td>
-                                    <td>{match?.description}</td>
+                                    <td>{match?.description}{selectedEvent?.value?.fieldCount>1?` Field ${match?.series}`:''}</td>
                                     <td>{match?.matchNumber}</td>
                                     <td colSpan={ftcMode?1:2}><span className={redStyle}>{match?.scoreRedFinal}</span><br /><span className={blueStyle}>{match?.scoreBlueFinal}</span></td>
                                     {!ftcMode && <>
@@ -737,7 +737,7 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
 
                                 return (<tr key={"qualSchedule" + match?.matchNumber} className="centerTable">
                                     <td>{match?.actualStartTime ? "Actual:" : "Scheduled:"}<br /> {match?.actualStartTime ? moment(match?.actualStartTime).format('dd hh:mm A') : moment(match?.startTime).format('dd hh:mm A')}</td>
-                                    <td>{match?.description}</td>
+                                    <td>{match?.description}{selectedEvent?.value?.fieldCount>1?` Field ${match?.series}`:''}</td>
                                     <td>{match?.matchNumber}</td>
                                     <td className={(match?.actualStartTime) ? `scheduleTable${winnerStyle}` : ""} onClick={() => { if (match.scores) { handleOpenScores(match) } }}>
                                         <tr className={`centerTable ${redStyle} block`}><span>{match?.scoreRedFinal}</span></tr>
@@ -774,7 +774,7 @@ function SchedulePage({ selectedEvent, setSelectedEvent, playoffSchedule, qualSc
 
                                 return (<tr key={"playoffSchedule" + (index+1)} className="centerTable">
                                     <td>{match?.actualStartTime ? "Actual:" : "Scheduled:"}<br /> {match?.actualStartTime ? moment(match?.actualStartTime).format('dd hh:mm A') : moment(match?.startTime).format('dd hh:mm A')}</td>
-                                    <td>{match?.description}</td>
+                                   <td>{match?.description}{selectedEvent?.value?.fieldCount>1?` Field ${match?.series}`:''}</td>
                                     <td>{(index+1) + (qualMatchCount || 0)}</td>
                                     <td className={(match?.actualStartTime) ? `scheduleTable${winnerStyle}` : " "} onClick={() => { if (match?.scores) { handleOpenScores(match) } }} colSpan={ftcMode?1:2}>
                                         <tr className={`centerTable ${redStyle} block`} ><span>{match?.scoreRedFinal}</span></tr>

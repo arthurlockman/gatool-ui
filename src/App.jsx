@@ -415,19 +415,21 @@ function App() {
     try {
       var result = await fetch(
         "http://10.0.100.5:8443/api/matches/qualification", {
-      signal: AbortSignal.timeout(5000)
-    }
+        signal: AbortSignal.timeout(5000)
+      }
       );
       var data = result.status === 200;
       // Set the IP address to the constant `ip`
       if (data) {
-        return true;
+        console.log("Cheesy Arena is available.");
+        return setCheesyArenaAvailable(true);
       } else {
-        return false;
+        console.log("Cheesy Arena is not available.");
+        return setCheesyArenaAvailable(false);
       }
     } catch (error) {
       console.log("Error fetching Cheesy Arena status:", error.message);
-      return false;
+      return setCheesyArenaAvailable(false);
     }
   };
 
@@ -761,6 +763,7 @@ function App() {
     } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
       if (useCheesyArena && cheesyArenaAvailable) {
         // get schedule from Cheesy Arena
+        console.log("Using Cheesy Arena for Qual Schedule");
         result = await fetch(
           "http://10.0.100.5:8443/api/matches/qualification"
         );
@@ -874,6 +877,7 @@ function App() {
     } else if (qualschedule?.schedule?.length > 0) {
       qualslength = qualschedule?.schedule?.length;
     }
+    console.log(`There are ${qualslength} qualification matches loaded.`);
     setQualsLength(qualslength);
 
     console.log(
@@ -887,6 +891,7 @@ function App() {
     } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
       if (useCheesyArena && cheesyArenaAvailable) {
         // get scores and schedule from Cheesy Arena
+        console.log("Using Cheesy Arena for Playoff Schedule");
         result = await fetch("http://10.0.100.5:8443/api/matches/playoff");
         data = await result.json();
         if (data.length > 0) {
@@ -1047,7 +1052,9 @@ function App() {
 
     //setEventHighScores(highScores);
     playoffschedule.lastUpdate = moment();
+    console.log(`There are ${playoffschedule?.schedule.length} playoff matches loaded.`);
     setPlayoffSchedule(playoffschedule);
+    getAlliances();
     getRanks();
     getSystemMessages();
   }
@@ -1690,7 +1697,7 @@ function App() {
           if (result.status === 404) {
             setCommunityUpdates([]);
             setLoadingCommunityUpdates(false);
-          }else {teams = await result.json();}
+          } else { teams = await result.json(); }
         } else {
           teams = training.teams.communityUpdates;
         }
@@ -1867,7 +1874,8 @@ function App() {
       var media = await httpClient.getNoAuth(
         `${selectedYear?.value}/team/${team?.teamNumber}/media`
       );
-      var mediaArray = await media.json();
+      var mediaArray = [];
+      if (media?.status !== 204) { mediaArray = await media.json(); }
       var image = _.filter(mediaArray, { type: "imgur" })[0];
       return {
         teamNumber: team?.teamNumber,
@@ -1883,9 +1891,9 @@ function App() {
     var epa = teamList?.teams.map(async (team) => {
       var epaData = await httpClient.getNoAuth(
         `team_year/${team?.teamNumber}/${selectedYear?.value}`,
-        "https://api.statbotics.io/v3/"
+        "https://api.statbotics.io/v3/", 20000
       );
-      if (epaData.status === 500) {
+      if (epaData.status === 500 || epaData.status === 408 || epaData.status === 404) {
         return {
           teamNumber: team?.teamNumber,
           epa: {},
@@ -2062,7 +2070,14 @@ function App() {
           `${selectedYear?.value}/alliances/${selectedEvent?.value.code}`,
           ftcMode ? ftcBaseURL : undefined
         );
-        alliances = await result.json();
+        if (result.status === 404 || result.status === 408 || result.status === 500) { 
+          alliances = { Alliances: [] };
+          console.log(
+            `No Alliances found for ${selectedEvent?.value?.name}. Skipping...`
+          );
+        } else {
+          alliances = await result.json();
+        }
       }
     } else if (
       selectedEvent?.value?.code === "PRACTICE1" ||
@@ -2146,6 +2161,7 @@ function App() {
     }
 
     alliances.lastUpdate = moment();
+    console.log(`${alliances?.alliances?.length} Alliances loaded.`)
     setAlliances(alliances);
     if (alliances?.alliances?.length > 0) {
       setPlayoffs(true);
@@ -2180,7 +2196,7 @@ function App() {
    * @returns {Promise<object>} result
    */
   async function putTeamData(teamNumber, data) {
-    var result = await httpClient.put(`team/${teamNumber}/updates`, data);
+    var result = await httpClient.put(`team/${teamNumber}/updates`, data, ftcMode ? ftcBaseURL : undefined);
     return result;
   }
 
@@ -2459,7 +2475,7 @@ function App() {
       await setPlayoffSchedule(null);
       await setOfflinePlayoffSchedule(null);
       await setTeamList(null);
-      await setCommunityUpdates(null);
+      await setCommunityUpdates([]);
       setLoadingCommunityUpdates(false);
       setEITeams([]);
       await setRobotImages(null);
@@ -2482,8 +2498,8 @@ function App() {
         { teamNumber: null, station: "Blue2", surrogate: false, dq: false },
         { teamNumber: null, station: "Blue3", surrogate: false, dq: false },
       ]);
-      if (!ftcMode ) {
-        setCheesyArenaAvailable(await getCheesyStatus());
+      if (!ftcMode) {
+        getCheesyStatus();
       }
       setCheesyTeamList([]);
       setEventMessage([]);
@@ -2718,13 +2734,13 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [httpClient, teamList]);
 
-  // Retrieve Alliances when we have a playoff schedule
-  useEffect(() => {
-    if (playoffSchedule?.schedule?.length > 0) {
-      getAlliances();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [httpClient, playoffSchedule?.schedule]);
+  // // Retrieve Alliances when we have a playoff schedule
+  // useEffect(() => {
+  //   if (playoffSchedule?.schedule?.length > 0) {
+  //     getAlliances();
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [httpClient, playoffSchedule?.schedule.length>0]);
 
   //update the Alliance Count when conditions change
   useEffect(() => {
@@ -2732,18 +2748,32 @@ function App() {
 
     if (playoffCountOverride) {
       allianceCountTemp.count = parseInt(playoffCountOverride.value);
-    } else if (teamList?.teamCountTotal <= 24) {
-      allianceCountTemp.count = Math.floor((teamList?.teamCountTotal - 1) / 3);
+    } else if (!ftcMode) {
+      if (teamList?.teamCountTotal <= 24) {
+        allianceCountTemp.count = Math.floor((teamList?.teamCountTotal - 1) / 3);
+      } else {
+        allianceCountTemp.count = 8;
+      }
     } else {
-      allianceCountTemp.count = 8;
+      if (teamList?.teamCountTotal <= 10) {
+        allianceCountTemp.count = 2;
+      } else if (teamList?.teamCountTotal <= 20) {
+        allianceCountTemp.count = 4;
+      } else if (teamList?.teamCountTotal <= 40) {
+        allianceCountTemp.count = 6;
+      } else {
+        allianceCountTemp.count = 8;
+      }
     }
-    var allianceMultiplier = 2;
+
+
+    var allianceMultiplier = ftcMode ? 1 : 2;
     if (
       selectedEvent?.value?.champLevel === "CHAMPS" ||
       selectedEvent?.value?.champLevel === "CMPDIV" ||
       selectedEvent?.value?.champLevel === "CMPSUB"
     ) {
-      allianceMultiplier = 3;
+      allianceMultiplier += 1; // Champs have an extra alliance
     }
 
     allianceCountTemp.allianceSelectionLength =
@@ -2753,7 +2783,7 @@ function App() {
       label: allianceCountTemp.count,
     };
     setAllianceCount(allianceCountTemp);
-  }, [playoffCountOverride, teamList, setAllianceCount, selectedEvent]);
+  }, [playoffCountOverride, teamList, setAllianceCount, selectedEvent, ftcMode]);
 
   // Retrieve event list when year selection or ftc Mode switch changes
   useEffect(() => {
@@ -2885,9 +2915,7 @@ function App() {
       if (!selectedEvent?.value?.code.includes("OFFLINE")) {
         console.log("Online event. Getting schedule and ranks");
         if (!ftcMode && useCheesyArena) {
-          getCheesyStatus().then((result) => {
-            setCheesyArenaAvailable(result);
-          });
+          getCheesyStatus()
         }
         getSchedule();
       } else {

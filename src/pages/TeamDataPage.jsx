@@ -184,15 +184,19 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
             "robotNameLocal": robotNameLocal,
             "awardsLocal": "",
             "teamMottoLocal": teamMottoLocal,
-            "teamNotesLocal": teamNotesLocal,
+            "teamNotesLocal": teamNotesLocal === '<p><br></p>' ? "" : teamNotesLocal,
             "teamYearsNoCompeteLocal": teamYearsNoCompeteLocal,
             "showRobotName": showRobotName,
-            "teamNotes": teamNotes,
+            "teamNotes": teamNotes === '<p><br></p>' ? "" : teamNotes,
             "sayNumber": sayNumber,
             "awardsTextLocal": awardsTextLocal,
             "lastUpdate": moment().format(),
         }
-
+        if (!update) {
+            update = {};
+            update.teamNumber = updateTeam.teamNumber;
+        }
+        if (!communityUpdatesTemp) {communityUpdatesTemp = [{ "teamNumber": updateTeam.teamNumber }];}
         update.updates = formValue;
         communityUpdatesTemp[_.findIndex(communityUpdatesTemp, { "teamNumber": updateTeam.teamNumber })] = update;
         setCommunityUpdates(communityUpdatesTemp);
