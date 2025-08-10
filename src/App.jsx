@@ -1694,10 +1694,12 @@ function App() {
             `${selectedYear?.value}/communityUpdates/${selectedEvent?.value.code}`,
             ftcMode ? ftcBaseURL : undefined
           );
-          if (result.status === 404) {
+          if (result.status === 200) {
+            teams = await result.json();
+          } else  { 
             setCommunityUpdates([]);
-            setLoadingCommunityUpdates(false);
-          } else { teams = await result.json(); }
+            setLoadingCommunityUpdates(false); 
+          }
         } else {
           teams = training.teams.communityUpdates;
         }
@@ -1953,7 +1955,7 @@ function App() {
         //  details.eventName = score?.matchData?.event?.eventCode;
         //}
         details.alliance = _.upperFirst(score?.matchData?.highScoreAlliance);
-        details.scoreType = score?.type + score?.level;
+        details.scoreType = score?.yearType;
         details.matchName = score?.matchData?.match?.description;
         details.allianceMembers = _.filter(
           score?.matchData?.match?.teams,
@@ -2070,7 +2072,7 @@ function App() {
           `${selectedYear?.value}/alliances/${selectedEvent?.value.code}`,
           ftcMode ? ftcBaseURL : undefined
         );
-        if (result.status === 404 || result.status === 408 || result.status === 500) { 
+        if (result.status === 404 || result.status === 408 || result.status === 500) {
           alliances = { Alliances: [] };
           console.log(
             `No Alliances found for ${selectedEvent?.value?.name}. Skipping...`
@@ -3379,6 +3381,7 @@ function App() {
                     eventNamesCY={eventNamesCY}
                     eventLabel={eventLabel}
                     districts={districts}
+                    selectedYear={selectedYear}
                   />
                 }
               />
