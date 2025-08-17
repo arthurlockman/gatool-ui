@@ -832,7 +832,7 @@ function FoulButtons({ currentYear }) {
   return (
     <>
       <ButtonToolbar
-        style={{ alignContent: "center", width: "100%", display: "block" }}
+        style={{ alignContent: "center", width: "100%", display: "block", marginTop: "10px" }}
       >
         {_.filter(_.sortBy(commonFouls, ["card", "code", "rp"]), (foul) => {
           return foul.card === "red" || foul.card === "yellow";

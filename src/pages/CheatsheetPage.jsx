@@ -28,9 +28,9 @@ function CheatsheetPage({
     };
     var avatar = `<img src="${apiBaseUrl}${selectedYear.value}/avatars/team/${team?.teamNumber}/avatar.png" onerror="this.style.display='none'">&nbsp`;
     var robotImage = _.filter(robotImages, { teamNumber: team?.teamNumber })[0]
-      ?.imageURL
+      ?.imageUrl
       ? `<img height="225px" src="${
-          _.filter(robotImages, { teamNumber: team?.teamNumber })[0]?.imageURL
+          _.filter(robotImages, { teamNumber: team?.teamNumber })[0]?.imageUrl
         }" onerror="this.style.display='none'">`
       : "";
     if (communityUpdates) {

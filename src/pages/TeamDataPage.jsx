@@ -19,7 +19,7 @@ import 'react-quill/dist/quill.snow.css';
 import TeamTimer from "components/TeamTimer";
 import { useInterval } from "react-interval-hook";
 
-function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSort, setTeamSort, communityUpdates, setCommunityUpdates, allianceCount, lastVisit, setLastVisit, putTeamData, localUpdates, setLocalUpdates, qualSchedule, playoffSchedule, originalAndSustaining, monthsWarning, user, isAuthenticated, getTeamHistory, timeFormat, getCommunityUpdates, getTeamList, eventLabel }) {
+function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSort, setTeamSort, communityUpdates, setCommunityUpdates, allianceCount, lastVisit, setLastVisit, putTeamData, localUpdates, setLocalUpdates, qualSchedule, playoffSchedule, originalAndSustaining, monthsWarning, user, isAuthenticated, getTeamHistory, timeFormat, getCommunityUpdates, getTeamList, eventLabel, ftcMode }) {
     const [currentTime, setCurrentTime] = useState(moment());
     const [clockRunning, setClockRunning] = useState(true);
     const { disableScope, enableScope } = useHotkeysContext();
@@ -184,15 +184,19 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
             "robotNameLocal": robotNameLocal,
             "awardsLocal": "",
             "teamMottoLocal": teamMottoLocal,
-            "teamNotesLocal": teamNotesLocal,
+            "teamNotesLocal": teamNotesLocal === '<p><br></p>' ? "" : teamNotesLocal,
             "teamYearsNoCompeteLocal": teamYearsNoCompeteLocal,
             "showRobotName": showRobotName,
-            "teamNotes": teamNotes,
+            "teamNotes": teamNotes === '<p><br></p>' ? "" : teamNotes,
             "sayNumber": sayNumber,
             "awardsTextLocal": awardsTextLocal,
             "lastUpdate": moment().format(),
         }
-
+        if (!update) {
+            update = {};
+            update.teamNumber = updateTeam.teamNumber;
+        }
+        if (!communityUpdatesTemp) {communityUpdatesTemp = [{ "teamNumber": updateTeam.teamNumber }];}
         update.updates = formValue;
         communityUpdatesTemp[_.findIndex(communityUpdatesTemp, { "teamNumber": updateTeam.teamNumber })] = update;
         setCommunityUpdates(communityUpdatesTemp);
@@ -350,7 +354,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
             delete record.hallOfFame;
             awardsKeys = Object.keys(awards)
             awardsKeys.forEach((key) => {
-                awards[key].Awards.forEach((award) => {
+                awards[key].awards.forEach((award) => {
                     record.awards.push(`${award.year} ${award.eventName}: ${award.name}${award.person ? `: ${award.person}` : ""}`)
                 })
             })
@@ -727,20 +731,21 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                             var cityState = `${team?.city}, ${team?.stateProv}${(team?.country !== "USA") ? ", " + team?.country : ""}`;
                             var avatar = `<img src='${apiBaseUrl}${selectedYear.value}/avatars/team/${team?.teamNumber}/avatar.png' onerror="this.style.display='none'">&nbsp`;
                             var teamNameWithAvatar = team?.updates?.nameShortLocal ? team?.updates?.nameShortLocal : team?.nameShort;
-                            teamNameWithAvatar = avatar + "<br />" + teamNameWithAvatar;
+                            teamNameWithAvatar = !ftcMode ? avatar + "<br />" + teamNameWithAvatar : teamNameWithAvatar;
 
                             return <tr key={`teamDataRow${team?.teamNumber}`}>
                                 <TeamTimer team={team} lastVisit={lastVisit} monthsWarning={monthsWarning} handleShow={handleShow} currentTime={currentTime} />
                                 <td style={rankHighlight(team?.rank ? team?.rank : 100, allianceCount || { "count": 8 })}>{team?.rank}</td>
-                                <td dangerouslySetInnerHTML={{ __html: teamNameWithAvatar }} style={updateHighlight(team?.updates?.nameShortLocal)}></td>
+                                {ftcMode && <td style={updateHighlight(team?.updates?.nameShortLocal)}>{teamNameWithAvatar}</td>}
+                                {!ftcMode && <td dangerouslySetInnerHTML={{ __html: teamNameWithAvatar }} style={updateHighlight(team?.updates?.nameShortLocal)}></td>}
                                 <td style={updateHighlight(team?.updates?.cityStateLocal)}>{team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : cityState} </td>
                                 {(selectedEvent?.value?.type === "Championship" || selectedEvent?.value?.type === "ChampionshipDivision") ?
                                     <td style={updateHighlight(team?.updates?.topSponsorLocal)}>{team?.updates?.topSponsorLocal ? team?.updates?.topSponsorLocal : team?.topSponsor}</td> :
                                     <td style={updateHighlight(team?.updates?.topSponsorsLocal)}>{team?.updates?.topSponsorsLocal ? team?.updates?.topSponsorsLocal : team?.topSponsors}</td>
                                 }
-                                <td style={updateHighlight(team?.updates?.organizationLocal)}>{team?.updates?.organizationLocal ? team?.updates?.organizationLocal : team?.schoolName}</td>
+                                <td style={updateHighlight(team?.updates?.organizationLocal)}>{team?.updates?.organizationLocal ? team?.updates?.organizationLocal : team?.organization}</td>
                                 <td>{team?.rookieYear}</td>
-                                <td style={updateHighlight(team?.updates?.robotNameLocal)}>{team?.updates?.robotNameLocal}</td>
+                                <td style={updateHighlight(team?.updates?.robotNameLocal)}>{team?.updates?.robotNameLocal ? team?.updates?.robotNameLocal : team?.robotName}</td>
                                 <td align="left" style={updateHighlight(!_.isEmpty(team?.updates?.teamNotes))} className="teamNotes" dangerouslySetInnerHTML={{ __html: team?.updates?.teamNotes }}></td>
                             </tr>
                         })}
@@ -836,7 +841,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                             <Form.Group controlId="topSponsors">
                                 <Form.Label className={"formLabel"} ><b>Top Sponsor (Enter <i>one top sponsor</i> from the full sponsor list below). This will appear under the team name on the Announce Screen.</b></Form.Label>
                                 <InputGroup><Form.Control className={topSponsorLocal ? "formHighlight" : ""} type="text" placeholder={updateTeam?.topSponsor} value={topSponsorLocal} onChange={(e) => setTopSponsorLocal(e.target.value)} />
-                                <Button onClick={() => setTopSponsorLocal(updateTeam?.topSponsor)}>Tap to reset to TIMS value.</Button>
+                                    <Button onClick={() => setTopSponsorLocal(updateTeam?.topSponsor)}>Tap to reset to TIMS value.</Button>
                                 </InputGroup>
                             </Form.Group> :
                             <Form.Group controlId="topSponsors">
