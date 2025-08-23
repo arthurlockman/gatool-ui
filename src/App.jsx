@@ -985,8 +985,12 @@ function App() {
 
     if (playoffschedule?.schedule?.length > 0) {
       // adds the winner to the schedule.
-      playoffschedule.schedule = playoffschedule.schedule.map((match) => {
+      playoffschedule.schedule = playoffschedule.schedule.map((match, index) => {
         match.winner = winner(match);
+        //fix the match number fro FTC matches
+        if (ftcMode) {
+          match.matchNumber = index + 1;
+        }
         //figure out how to match scores to match
         if (playoffScores?.MatchScores) {
           const matchResults = playoffScores.MatchScores.filter(
@@ -1593,14 +1597,29 @@ function App() {
 
           teams.teams = values;
           setTeamList(teams);
-          //getRobotImages(teams);
+          
         });
       } else {
         teams.lastUpdate = moment();
         setTeamList(teams);
-        //getRobotImages(teams);
+        
       }
       // });
+      // determine the number of Alliances in the playoffs for FTC events
+      if (ftcMode && !selectedEvent.value.allianceCount) {
+        var allianceCount = "EightAlliance";
+        if (teams.teams.length<=10) {
+          allianceCount = "TwoAlliance"
+        } else if (teams.teams.length <= 20) {
+          allianceCount = "FourAlliance";
+        } else if (teams.teams.length <= 40) {
+          allianceCount = "SixAlliance";
+        }
+        const selectedEventTemp = _.cloneDeep(selectedEvent);
+        selectedEventTemp.value.allianceCount = allianceCount;
+        setSelectedEvent(selectedEventTemp);
+      }
+
       setTeamListLoading("");
     } else {
       console.log(
@@ -3354,6 +3373,7 @@ function App() {
                     usePullDownToUpdate={usePullDownToUpdate}
                     eventLabel={eventLabel}
                     playoffCountOverride={playoffCountOverride}
+                    ftcMode={ftcMode}
                   />
                 }
               />

@@ -2,7 +2,7 @@ import _ from "lodash";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useSwipeable } from "react-swipeable";
 
-function TwoAllianceBracket({ selectedEvent, playoffSchedule, alliances, nextMatch, previousMatch, getSchedule, useSwipe, usePullDownToUpdate, eventLabel }) {
+function TwoAllianceBracket({ nextMatch, previousMatch, getSchedule, useSwipe, usePullDownToUpdate, eventLabel, ftcMode, matches, allianceNumbers, allianceName, matchScore, matchWinner }) {
 	//Ball colors
 	const GOLD = "#FFCA10";
 	const RED = "#FF0000";
@@ -13,76 +13,6 @@ function TwoAllianceBracket({ selectedEvent, playoffSchedule, alliances, nextMat
 	const bold = "700";
 	const semibold = "600";
 	//const normal = "400";
-
-	var matches = playoffSchedule?.schedule;
-
-	//returns the three members of an alliance based on the match data.
-	function allianceNumbers(matchNumber, allianceColor) {
-		var alliance = "TBD";
-		var allianceMembers = [];
-		var targetAlliance = {};
-		var match = matches[_.findIndex(matches, { "matchNumber": matchNumber })];
-		if (match?.teams[0]?.teamNumber) {
-			targetAlliance = alliances?.Lookup[`${match?.teams[0]?.teamNumber}`];
-			allianceMembers = _.compact([targetAlliance?.captain, targetAlliance?.round1, targetAlliance?.round2, targetAlliance?.round3, targetAlliance?.backup]);
-			alliance = allianceMembers.join("  ");
-			if (allianceColor === "blue") {
-				targetAlliance = alliances?.Lookup[`${match?.teams[3]?.teamNumber}`]
-				allianceMembers = _.compact([targetAlliance?.captain, targetAlliance?.round1, targetAlliance?.round2, targetAlliance?.round3, targetAlliance?.backup]);
-				alliance = allianceMembers.join("  ");
-			}
-		}
-		//todo: layer in fourth member for new playoff modes
-		return alliance;
-	}
-
-	// returns the name of the alliance
-	function allianceName(matchNumber, allianceColor) {
-		var allianceName = "";
-		if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[0]?.teamNumber) {
-			allianceName = alliances?.Lookup[`${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[0]?.teamNumber}`]?.alliance;
-			if (matchNumber <= 13 || matchNumber === 19) {
-				if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner?.tieWinner === "red") {
-					allianceName += ` (L${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner.level})`;
-				}
-			}
-			if (allianceColor === "blue") {
-				allianceName = alliances?.Lookup[`${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[3]?.teamNumber}`]?.alliance;
-				if (matchNumber <= 13 || matchNumber === 19) {
-					if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner?.tieWinner === "blue") {
-						allianceName += ` (L${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner.level} WIN)`;
-					}
-				}
-
-			}
-
-
-		}
-		return allianceName;
-	}
-
-		// return the score of the match, by matchNumber
-		function matchScore(matchNumber, alliance) {
-			var score = null;
-			if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.actualStartTime) {
-				if (alliance === "red") {
-					score = matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.scoreRedFinal;
-				} else if (alliance === "blue") {
-					score = matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.scoreBlueFinal;
-				}
-	
-			}
-			return score;
-		}
-	
-		// return the winner of the match, by matchNumber
-		function matchWinner(matchNumber) {
-			var winner = null;
-			if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.actualStartTime) {
-				winner = matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner
-			}
-			return winner;
-		}
 
 	var overtimeOffset = 0;
 	var tournamentWinner = {
@@ -126,23 +56,23 @@ function TwoAllianceBracket({ selectedEvent, playoffSchedule, alliances, nextMat
 	const dotStart = 541;
 
 	// eslint-disable-next-line react-hooks/rules-of-hooks
-    const swipeHandlers = useSwipe ? useSwipeable(
-        {
-            onSwipedLeft: () => {
-                nextMatch();
-            },
-            onSwipedRight: () => {
-                previousMatch();
-            },
-            onSwipedDown: () => {
-                if (usePullDownToUpdate) {
-                    getSchedule();
-                }
-                
-            },
-            preventScrollOnSwipe: true,
-        }
-    ) : {}
+	const swipeHandlers = useSwipe ? useSwipeable(
+		{
+			onSwipedLeft: () => {
+				nextMatch();
+			},
+			onSwipedRight: () => {
+				previousMatch();
+			},
+			onSwipedDown: () => {
+				if (usePullDownToUpdate) {
+					getSchedule();
+				}
+
+			},
+			preventScrollOnSwipe: true,
+		}
+	) : {}
 
 	useHotkeys('right', () => nextMatch(), { scopes: 'matchNavigation' });
 	useHotkeys('left', () => previousMatch(), { scopes: 'matchNavigation' });
@@ -157,7 +87,7 @@ function TwoAllianceBracket({ selectedEvent, playoffSchedule, alliances, nextMat
 				<g id="background">
 					<rect width="1076" height="568" fill="#fff" />
 					<rect x="500.51" y="128" width="75" height="344.61" fill="#d9d8d7" />
-					<text transform="translate(505.92 123.26)" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"}  fontSize="20px" ><tspan x="0" y="0">FINALS</tspan></text>
+					<text transform="translate(505.92 123.26)" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="20px" ><tspan x="0" y="0">FINALS</tspan></text>
 					<text id="playoffBracketTitle" transform="translate(538 49.69)" dominantBaseline="middle" textAnchor="middle" fontFamily={eventLabel.length > 50 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={black} fontStyle={"normal"} fontSize="38px">{eventLabel}</text>
 				</g>
 
@@ -169,7 +99,7 @@ function TwoAllianceBracket({ selectedEvent, playoffSchedule, alliances, nextMat
 						<line x1="578.53" y1="246.81" x2="380.8" y2="246.81" fill="none" stroke="#fff" strokeMiterlimit="10" />
 						<rect x="380.8" y="195.19" width="31.97" height="103.3" />
 
-						<text transform="translate(403.29 287.99) rotate(-90)" fill="#fff" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="17.22px" ><tspan x="0" y="0">BEST 2 of 3</tspan></text>
+						<text transform={ftcMode ? "translate(403.29 274.99) rotate(-90)" : "translate(403.29 287.99) rotate(-90)"} fill="#fff" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="17.22px" ><tspan x="0" y="0">{ftcMode ? "FINALS" : "BEST 2 of 3"}</tspan></text>
 
 						<text transform="translate(495 216.06)" fill="#fff" textAnchor="middle" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="17.32px">
 							<tspan x="0" y="0">{allianceName(1, "red") ? allianceName(1, "red") : "Alliance 1"}</tspan>
@@ -199,11 +129,11 @@ function TwoAllianceBracket({ selectedEvent, playoffSchedule, alliances, nextMat
 						<tspan x="0" y="0" fill={RED} fontFamily="'myriad-pro'"
 							fontWeight={(matchWinner(1)?.winner === "red") ? black : semibold}
 							fontStyle={"normal"}
-							fontSize="20px" textAnchor="middle">{matchScore(1,"red")}</tspan>
+							fontSize="20px" textAnchor="middle">{matchScore(1, "red")}</tspan>
 						<tspan x="0" y="20" fill={BLUE} fontFamily="'myriad-pro'"
 							fontWeight={(matchWinner(1)?.winner === "blue") ? black : semibold}
 							fontStyle={"normal"}
-							fontSize="20px" textAnchor="middle">{matchScore(1,"blue")}</tspan>
+							fontSize="20px" textAnchor="middle">{matchScore(1, "blue")}</tspan>
 					</text>
 
 					<circle id="winnerMatch2Dot" cx={`${dotStart + 42 - overtimeOffset}`} cy="334.13" r="11.41" fill={(matchWinner(2)?.winner === "red") ? RED : (matchWinner(2)?.winner === "blue") ? BLUE : (matchWinner(2)?.winner === "tie") ? GREEN : "none"} />
@@ -211,11 +141,11 @@ function TwoAllianceBracket({ selectedEvent, playoffSchedule, alliances, nextMat
 						<tspan x="0" y="0" fill={RED} fontFamily="'myriad-pro'"
 							fontWeight={(matchWinner(2)?.winner === "red") ? black : semibold}
 							fontStyle={"normal"}
-							fontSize="20px" textAnchor="middle">{matchScore(2,"red")}</tspan>
+							fontSize="20px" textAnchor="middle">{matchScore(2, "red")}</tspan>
 						<tspan x="0" y="20" fill={BLUE} fontFamily="'myriad-pro'"
 							fontWeight={(matchWinner(2)?.winner === "blue") ? black : semibold}
 							fontStyle={"normal"}
-							fontSize="20px" textAnchor="middle">{matchScore(2,"blue")}</tspan>
+							fontSize="20px" textAnchor="middle">{matchScore(2, "blue")}</tspan>
 					</text>
 
 					<circle id="winnerMatch3Dot" cx={`${dotStart + 84 - overtimeOffset}`} cy="334.13" r="11.41" fill={(matchWinner(3)?.winner === "red") ? RED : (matchWinner(3)?.winner === "blue") ? BLUE : (matchWinner(3)?.winner === "tie") ? GREEN : "none"} />
@@ -223,11 +153,11 @@ function TwoAllianceBracket({ selectedEvent, playoffSchedule, alliances, nextMat
 						<tspan x="0" y="0" fill={RED} fontFamily="'myriad-pro'"
 							fontWeight={(matchWinner(3)?.winner === "red") ? black : semibold}
 							fontStyle={"normal"}
-							fontSize="20px" textAnchor="middle">{matchScore(3,"red")}</tspan>
+							fontSize="20px" textAnchor="middle">{matchScore(3, "red")}</tspan>
 						<tspan x="0" y="20" fill={BLUE} fontFamily="'myriad-pro'"
 							fontWeight={(matchWinner(3)?.winner === "blue") ? black : semibold}
 							fontStyle={"normal"}
-							fontSize="20px" textAnchor="middle">{matchScore(3,"blue")}</tspan>
+							fontSize="20px" textAnchor="middle">{matchScore(3, "blue")}</tspan>
 					</text>
 
 					<circle id="winnerMatch4Dot" cx={`${dotStart + 126 - overtimeOffset}`} cy="334.13" r="11.41" fill={(matchWinner(4)?.winner === "red") ? RED : (matchWinner(4)?.winner === "blue") ? BLUE : (matchWinner(4)?.winner === "tie") ? GREEN : "none"} />
@@ -235,11 +165,11 @@ function TwoAllianceBracket({ selectedEvent, playoffSchedule, alliances, nextMat
 						<tspan x="0" y="0" fill={RED} fontFamily="'myriad-pro'"
 							fontWeight={(matchWinner(4)?.winner === "red") ? black : semibold}
 							fontStyle={"normal"}
-							fontSize="20px" textAnchor="middle">{matchScore(4,"red")}</tspan>
+							fontSize="20px" textAnchor="middle">{matchScore(4, "red")}</tspan>
 						<tspan x="0" y="20" fill={BLUE} fontFamily="'myriad-pro'"
 							fontWeight={(matchWinner(4)?.winner === "blue") ? black : semibold}
 							fontStyle={"normal"}
-							fontSize="20px" textAnchor="middle">{matchScore(4,"blue")}</tspan>
+							fontSize="20px" textAnchor="middle">{matchScore(4, "blue")}</tspan>
 					</text>
 
 					<circle id="winnerMatch5Dot" cx={`${dotStart + 168 - overtimeOffset}`} cy="334.13" r="11.41" fill={(matchWinner(5)?.winner === "red") ? RED : (matchWinner(5)?.winner === "blue") ? BLUE : (matchWinner(5)?.winner === "tie") ? GREEN : "none"} />
@@ -247,11 +177,11 @@ function TwoAllianceBracket({ selectedEvent, playoffSchedule, alliances, nextMat
 						<tspan x="0" y="0" fill={RED} fontFamily="'myriad-pro'"
 							fontWeight={(matchWinner(5)?.winner === "red") ? black : semibold}
 							fontStyle={"normal"}
-							fontSize="20px" textAnchor="middle">{matchScore(5,"red")}</tspan>
+							fontSize="20px" textAnchor="middle">{matchScore(5, "red")}</tspan>
 						<tspan x="0" y="20" fill={BLUE} fontFamily="'myriad-pro'"
 							fontWeight={(matchWinner(5)?.winner === "blue") ? black : semibold}
 							fontStyle={"normal"}
-							fontSize="20px" textAnchor="middle">{matchScore(5,"blue")}</tspan>
+							fontSize="20px" textAnchor="middle">{matchScore(5, "blue")}</tspan>
 					</text>
 
 					<circle id="winnerMatch6Dot" cx={`${dotStart + 210 - overtimeOffset}`} cy="334.13" r="11.41" fill={(matchWinner(6)?.winner === "red") ? RED : (matchWinner(6)?.winner === "blue") ? BLUE : (matchWinner(6)?.winner === "tie") ? GREEN : "none"} />
@@ -259,11 +189,11 @@ function TwoAllianceBracket({ selectedEvent, playoffSchedule, alliances, nextMat
 						<tspan x="0" y="0" fill={RED} fontFamily="'myriad-pro'"
 							fontWeight={(matchWinner(6)?.winner === "red") ? black : semibold}
 							fontStyle={"normal"}
-							fontSize="20px" textAnchor="middle">{matchScore(6,"red")}</tspan>
+							fontSize="20px" textAnchor="middle">{matchScore(6, "red")}</tspan>
 						<tspan x="0" y="20" fill={BLUE} fontFamily="'myriad-pro'"
 							fontWeight={(matchWinner(6)?.winner === "blue") ? black : semibold}
 							fontStyle={"normal"}
-							fontSize="20px" textAnchor="middle">{matchScore(6,"blue")}</tspan>
+							fontSize="20px" textAnchor="middle">{matchScore(6, "blue")}</tspan>
 					</text>
 
 				</g>
