@@ -124,7 +124,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
 
     availableTeams = _.orderBy(availableTeams, ["label"], "asc");
     const inPractice = matchDetails?.description.toLowerCase().includes("practice");
-    const addBackupButton = inPlayoffs && ((selectedEvent?.value?.champLevel !== "CHAMPS" && selectedEvent?.value?.champLevel !== "CMPDIV" && selectedEvent?.value?.champLevel !== "CMPSUB") || (selectedEvent?.value?.code === "OFFLINE" && !playoffOnly));
+    const addBackupButton = !ftcMode && inPlayoffs && ((selectedEvent?.value?.champLevel !== "CHAMPS" && selectedEvent?.value?.champLevel !== "CMPDIV" && selectedEvent?.value?.champLevel !== "CMPSUB") || (selectedEvent?.value?.code === "OFFLINE" && !playoffOnly));
 
     let eventTeams = teamList?.teams.map((team) => {
         return ({ "label": team.teamNumber, "value": team.teamNumber })
@@ -144,7 +144,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
                     {!adHocMode && <Button size="lg" variant="outline-success" className={"gatool-button buttonNoWrap"} onClick={previousMatch}>{inPractice ? <span><CaretLeftFill /> <CaretLeftFill /></span> : <><span className={"d-none d-lg-block"}><CaretLeftFill /> Previous Match</span><span className={"d-block d-lg-none"}><CaretLeftFill /> <CaretLeftFill /></span></>}</Button>}
                 </Col>
                 {!adHocMode && <MatchClock matchDetails={matchDetails} timeFormat={timeFormat} />}
-                <Col xs={addBackupButton || inPractice ? "4" : "5"} lg={inPlayoffs || inPractice ? "3" : "4"}><b>{eventLabel?.replace("FIRST Championship - ", "").replace("FIRST In Texas District Championship - ", "").replace("FIRST Ontario Provincial Championship - ", "").replace("New England FIRST District Championship - ", "")}</b><br />
+                <Col xs={addBackupButton || inPractice ? "4" : "5"} lg={!ftcMode && (inPlayoffs || inPractice) ? "3" : "4"}><b>{eventLabel?.replace("FIRST Championship - ", "").replace("FIRST In Texas District Championship - ", "").replace("FIRST Ontario Provincial Championship - ", "").replace("New England FIRST District Championship - ", "")}</b><br />
                     {!adHocMode && <Select options={matchMenu} value={currentMatch ? matchMenu[currentMatch - 1] : matchMenu[0]} onChange={handleMatchSelection} styles={{
                         // @ts-ignore
                         option: (styles, { data }) => {

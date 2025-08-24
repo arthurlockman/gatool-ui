@@ -7,7 +7,7 @@ import { useEffect } from "react";
 import { originalAndSustaining, allianceSelectionBaseRounds } from "./Constants";
 import useWindowDimensions from "hooks/UseWindowDimensions";
 
-function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays, handleReset, teamFilter, setTeamFilter }) {
+function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays, handleReset, teamFilter, setTeamFilter, ftcMode }) {
     const OriginalAndSustaining = _.cloneDeep(originalAndSustaining);
     const AllianceSelectionBaseRounds = _.cloneDeep(allianceSelectionBaseRounds);
 
@@ -19,7 +19,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
 
 
     var availColumns = [[], [], [], [], []];
-    var allianceSelectionRounds = ["round1", "round2"]
+    var allianceSelectionRounds = ftcMode ? ["round1"] : ["round1", "round2"]
     var backupTeams = [];
     var alliances = null;
     var allianceDisplayOrder = [];
@@ -43,11 +43,16 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
             : false;
 
     var allianceSelectionOrder = [];
-    var allianceSelectionOrderRounds = { round1: [], round2: [] };
+    var allianceSelectionOrderRounds = ftcMode ? { round1: [] } : { round1: [], round2: [] };
 
     if (inChamps) {
-        allianceSelectionOrderRounds.round3 = [];
-        allianceSelectionRounds.push("round3");
+        if (!ftcMode) {
+            allianceSelectionOrderRounds.round3 = [];
+            allianceSelectionRounds.push("round3");
+        } else {
+            allianceSelectionOrderRounds.round2 = [];
+            allianceSelectionRounds.push("round2");
+        }
     };
 
     allianceSelectionRounds.forEach((round, index) => {
@@ -262,8 +267,13 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         setShow(true);
     }
 
-    const colCount = width > 1040 ? 5 :
-        width > 850 ? 4 :
+    const colCount = !ftcMode && width > 1040 ? 5 :
+        !ftcMode && width > 850 ? 4 :
+        ftcMode && width > 1500 ? 5 :
+        ftcMode && width > 1220 ? 4 :
+        ftcMode && width > 930 ? 3 :
+        ftcMode && width > 600 ? 2 :
+        ftcMode && width <= 600 ? 1 :
             3;
 
     useEffect(() => {
@@ -482,7 +492,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                         <Container fluid className={"backupAlliancesTable"}>
                                             <Row>
                                                 <Col>
-                                                    <p><strong>Backup Teams</strong><br />(Teams here are initially ranked {allianceCount?.count + 1} to {allianceCount?.count + 8} top to bottom. As Alliance Selection progresses, teams will rise up into this section as teams are selected.)</p>
+                                                    <p><strong>{ftcMode ? "Top Ranked Teams" : "Backup Teams"}</strong><br />(Teams here are initially ranked {allianceCount?.count + 1} to {allianceCount?.count + 8} top to bottom. As Alliance Selection progresses, teams will rise up into this section as teams are selected.)</p>
                                                 </Col>
                                             </Row>
                                             <Row>
@@ -589,22 +599,23 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                                                     </Row>}
 
                                                                                 <Row>
-                                                                                    <Col xs={inChamps ? 4 : 6} className={(asArrays.allianceSelectionOrder[asArrays?.nextChoice]?.number === allianceNumber) && (asArrays.allianceSelectionOrder[asArrays?.nextChoice]?.round === 1) ? "alliancedrop nextAllianceChoice" : "alliancedrop"}>
+                                                                                    <Col xs={inChamps && !ftcMode ? 4 : !inChamps && ftcMode ? 12 : 6} className={(asArrays.allianceSelectionOrder[asArrays?.nextChoice]?.number === allianceNumber) && (asArrays.allianceSelectionOrder[asArrays?.nextChoice]?.round === 1) ? "alliancedrop nextAllianceChoice" : "alliancedrop"}>
                                                                                         <div><b>1<sup>st</sup> pick</b></div>
                                                                                         <div key={`${allianceName}round1`}
                                                                                             className={round1?.declined ? "allianceDecline allianceTeamChoice" : round1?.teamNumber ? "allianceTeam allianceTeamChosen" : "allianceTeam allianceTeamChoice"}>{round1?.teamNumber ? <b>{round1?.teamNumber}</b> : <b>TBD</b>}
                                                                                         </div>
                                                                                     </Col>
 
-                                                                                    <Col xs={inChamps ? 4 : 6} className={(asArrays.allianceSelectionOrder[asArrays?.nextChoice]?.number === allianceNumber) && (asArrays.allianceSelectionOrder[asArrays?.nextChoice]?.round === 2) ? "alliancedrop nextAllianceChoice" : "alliancedrop"}>
-                                                                                        <div><b>2<sup>nd</sup> pick</b></div>
-                                                                                        <div key={`${allianceName}round2`}
-                                                                                            className={round2?.declined ? "allianceDecline allianceTeamChoice" : round2?.teamNumber ? "allianceTeam allianceTeamChosen" : "allianceTeam allianceTeamChoice"}>{round2?.teamNumber ? <b>{round2?.teamNumber}</b> : <b>TBD</b>}
-                                                                                        </div>
-                                                                                    </Col>
+                                                                                    {((inChamps && ftcMode) || !ftcMode) &&
+                                                                                        <Col xs={inChamps && !ftcMode ? 4 : 6} className={(asArrays.allianceSelectionOrder[asArrays?.nextChoice]?.number === allianceNumber) && (asArrays.allianceSelectionOrder[asArrays?.nextChoice]?.round === 2) ? "alliancedrop nextAllianceChoice" : "alliancedrop"}>
+                                                                                            <div><b>2<sup>nd</sup> pick</b></div>
+                                                                                            <div key={`${allianceName}round2`}
+                                                                                                className={round2?.declined ? "allianceDecline allianceTeamChoice" : round2?.teamNumber ? "allianceTeam allianceTeamChosen" : "allianceTeam allianceTeamChoice"}>{round2?.teamNumber ? <b>{round2?.teamNumber}</b> : <b>TBD</b>}
+                                                                                            </div>
+                                                                                        </Col>}
 
 
-                                                                                    {inChamps &&
+                                                                                    {inChamps && !ftcMode &&
                                                                                         <Col xs={inChamps ? 4 : 6} className={(asArrays.allianceSelectionOrder[asArrays?.nextChoice]?.number === allianceNumber) && (asArrays.allianceSelectionOrder[asArrays?.nextChoice]?.round === 3) ? "alliancedrop nextAllianceChoice" : "alliancedrop"}>
                                                                                             <div><b>3<sup>rd</sup> pick</b></div>
                                                                                             <div key={`${allianceName}round3`}
@@ -630,7 +641,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                         <Container fluid className={"backupAlliancesTable"}>
                                             <Row>
                                                 <Col>
-                                                    <p><strong>Backup Teams</strong><br />(Teams here are initially ranked {allianceCount?.count + 1} to {allianceCount?.count + 8} top to bottom. As Alliance Selection progresses, teams will rise up into this section as teams are selected.)</p>
+                                                    <p><strong>{ftcMode ? "Top Ranked Teams" : "Backup Teams"}</strong><br />(Teams here are initially ranked {allianceCount?.count + 1} to {allianceCount?.count + 8} top to bottom. As Alliance Selection progresses, teams will rise up into this section as teams are selected.)</p>
                                                 </Col>
                                             </Row>
                                             <Row>
@@ -701,34 +712,34 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
 
                     </Modal.Body>
                     <Modal.Footer>
-                                <Button variant="primary" size="sm" onClick={handleClose} style={{ marginBottom: "10px" }}>
-                                    {allianceMode === "show" && <span> <TrophyFill /> Alliance Announce</span>}
-                                    {allianceMode === "a1captain" && <span> <TrophyFill /> Top Seeded Alliance</span>}
-                                    {allianceMode === "captain" && <span> <TrophyFill /> Alliance Captain</span>}
-                                    {allianceMode === "declined" && <span> <TrophyFill /> Sorry</span>}
-                                    {(allianceMode === "decline" || allianceMode === "accept" || allianceMode === "skip") && <span><TrophyFill /> Oops, they reconsidered.</span>}
-                                </Button>
-                            
-                            {(allianceMode === "show" || allianceMode === "decline") &&
-                                <Button id="declineButton" variant="danger" size="sm" style={{ marginBottom: "10px" }} onClick={(e) => { handleDecline(allianceTeam, allianceMode === "decline" ? "confirm" : "decline", e) }}>
-                                    <HandThumbsDownFill /> Respectfully Decline
-                                </Button>
-                                }
-                            {(allianceMode === "show" || allianceMode === "accept") &&
-                                
-                                    <Button id="acceptButton" variant="success" size="sm" style={{ marginBottom: "10px" }} onClick={(e) => { handleAccept(allianceTeam, allianceMode === "accept" ? "confirm" : "accept", e) }}>
-                                        <HandThumbsUpFill /> Gratefully Accept
-                                    </Button>
-                                }
-                            {(allianceMode === "a1captain" || allianceMode === "captain" || allianceMode === "skip") &&
-                                
-                                    <Button id="skipButton" variant="warning" size="sm" style={{
-                                        marginBottom: "10px"
-                                    }} onClick={(e) => { handleSkip(allianceTeam, allianceMode === "skip" ? "confirm" : "skip", e) }}>
-                                        <HandThumbsUpFill /> Skip Alliance
-                                    </Button>
-                                }
-                        
+                        <Button variant="primary" size="sm" onClick={handleClose} style={{ marginBottom: "10px" }}>
+                            {allianceMode === "show" && <span> <TrophyFill /> Alliance Announce</span>}
+                            {allianceMode === "a1captain" && <span> <TrophyFill /> Top Seeded Alliance</span>}
+                            {allianceMode === "captain" && <span> <TrophyFill /> Alliance Captain</span>}
+                            {allianceMode === "declined" && <span> <TrophyFill /> Sorry</span>}
+                            {(allianceMode === "decline" || allianceMode === "accept" || allianceMode === "skip") && <span><TrophyFill /> Oops, they reconsidered.</span>}
+                        </Button>
+
+                        {(allianceMode === "show" || allianceMode === "decline") &&
+                            <Button id="declineButton" variant="danger" size="sm" style={{ marginBottom: "10px" }} onClick={(e) => { handleDecline(allianceTeam, allianceMode === "decline" ? "confirm" : "decline", e) }}>
+                                <HandThumbsDownFill /> Respectfully Decline
+                            </Button>
+                        }
+                        {(allianceMode === "show" || allianceMode === "accept") &&
+
+                            <Button id="acceptButton" variant="success" size="sm" style={{ marginBottom: "10px" }} onClick={(e) => { handleAccept(allianceTeam, allianceMode === "accept" ? "confirm" : "accept", e) }}>
+                                <HandThumbsUpFill /> Gratefully Accept
+                            </Button>
+                        }
+                        {(allianceMode === "a1captain" || allianceMode === "captain" || allianceMode === "skip") &&
+
+                            <Button id="skipButton" variant="warning" size="sm" style={{
+                                marginBottom: "10px"
+                            }} onClick={(e) => { handleSkip(allianceTeam, allianceMode === "skip" ? "confirm" : "skip", e) }}>
+                                <HandThumbsUpFill /> Skip Alliance
+                            </Button>
+                        }
+
                     </Modal.Footer>
                 </Modal>}
             </Container>

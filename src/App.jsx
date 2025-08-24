@@ -1134,7 +1134,7 @@ function App() {
 
       if (
         selectedEvent?.value?.code.includes("OFFLINE") ||
-        inWorldChamps() ||
+        (inWorldChamps() && !ftcMode) ||
         (cheesyArenaAvailable && useCheesyArena)
       ) {
         teams = {
@@ -1481,11 +1481,12 @@ function App() {
 
       var champsTeams = [];
       if (
-        selectedEvent?.value?.champLevel !== "" ||
+        // Do not attempt to get Champs stats for FTC events
+        (selectedEvent?.value?.champLevel !== "" ||
         showDistrictChampsStats ||
         (selectedEvent?.value?.code.includes("OFFLINE") &&
           playoffOnly &&
-          champsStyle)
+          champsStyle)) && !ftcMode
       ) {
         console.log("Getting Champs stats");
         champsTeams = teams.teams.map(async (team) => {
@@ -1597,18 +1598,18 @@ function App() {
 
           teams.teams = values;
           setTeamList(teams);
-          
+
         });
       } else {
         teams.lastUpdate = moment();
         setTeamList(teams);
-        
+
       }
       // });
       // determine the number of Alliances in the playoffs for FTC events
       if (ftcMode && !selectedEvent.value.allianceCount) {
         var allianceCount = "EightAlliance";
-        if (teams.teams.length<=10) {
+        if (teams.teams.length <= 10) {
           allianceCount = "TwoAlliance"
         } else if (teams.teams.length <= 20) {
           allianceCount = "FourAlliance";
@@ -1715,9 +1716,9 @@ function App() {
           );
           if (result.status === 200) {
             teams = await result.json();
-          } else  { 
+          } else {
             setCommunityUpdates([]);
-            setLoadingCommunityUpdates(false); 
+            setLoadingCommunityUpdates(false);
           }
         } else {
           teams = training.teams.communityUpdates;
@@ -2652,6 +2653,8 @@ function App() {
           } else if (e.type === "ChampionshipSubdivision") {
             e.champLevel = "CMPSUB";
           } else if (e.type === "Championship") {
+            e.champLevel = "CHAMPS";
+          } else if (e.type === "6") {
             e.champLevel = "CHAMPS";
           }
 

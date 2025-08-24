@@ -375,12 +375,12 @@ function PlayByPlayPage({
     }
   }
 
-  var inPlayoffs = matchDetails?.tournamentLevel === "Playoff" ? true : false;
+  var inPlayoffs = matchDetails?.tournamentLevel ? matchDetails?.tournamentLevel.toLowerCase() === "playoff" ? true : false : false;
   const matchMenu = schedule.map((match, index) => {
     var tag = `${match?.description} of ${qualSchedule?.schedule?.length}`;
     if (
-      match?.tournamentLevel === "Playoff" ||
-      match?.tournamentLevel === "Practice"
+      (match?.tournamentLevel && match?.tournamentLevel?.toLowerCase() === "playoff") ||
+      (match?.tournamentLevel && match?.tournamentLevel?.toLowerCase() === "practice")
     ) {
       tag = match?.description;
     }
