@@ -1344,19 +1344,21 @@ function App() {
       teams.teams = teamListSponsorsFixed;
 
       //fetch awards for the current teams
-      var req = await httpClient.postNoAuth(`${selectedYear?.value}/queryAwards`, {
-        "teams": teams.teams.map(t => t?.teamNumber)
-      }, ftcMode ? ftcBaseURL : undefined);
-      var awards = await req.json();
-      var newTeams = teams.teams.map((team) => {
-        team.awards = awards[`${team?.teamNumber}`] || {};
-        return team;
-      });
+      if (teams?.teams.length > 0) {
+        var req = await httpClient.postNoAuth(`${selectedYear?.value}/queryAwards`, {
+          "teams": teams.teams.map(t => t?.teamNumber)
+        }, ftcMode ? ftcBaseURL : undefined);
+        var awards = await req.json();
+        var newTeams = teams.teams.map((team) => {
+          team.awards = awards[`${team?.teamNumber}`] || {};
+          return team;
+        });
+      }
 
       // await Promise.all(newTeams).then(function (values) {
       // Parse awards to ensure we highlight them properly and remove extraneous text i.e. FIRST CHampionship from name
 
-      var formattedAwards = newTeams.map((team) => {
+      var formattedAwards = newTeams ? newTeams.map((team) => {
         // Add in special awards not reported by FIRST APIs (from 2021 season)
         for (var index = 0; index < 3; index++) {
           const targetYear = parseInt(selectedYear?.value) - index;
@@ -1476,17 +1478,17 @@ function App() {
         );
 
         return team;
-      });
-      teams.teams = formattedAwards;
+      }) : null;
+      teams.teams = formattedAwards ? formattedAwards : teams.teams;
 
       var champsTeams = [];
       if (
         // Do not attempt to get Champs stats for FTC events
         (selectedEvent?.value?.champLevel !== "" ||
-        showDistrictChampsStats ||
-        (selectedEvent?.value?.code.includes("OFFLINE") &&
-          playoffOnly &&
-          champsStyle)) && !ftcMode
+          showDistrictChampsStats ||
+          (selectedEvent?.value?.code.includes("OFFLINE") &&
+            playoffOnly &&
+            champsStyle)) && !ftcMode
       ) {
         console.log("Getting Champs stats");
         champsTeams = teams.teams.map(async (team) => {
@@ -3419,6 +3421,7 @@ function App() {
                     selectedYear={selectedYear}
                     robotImages={robotImages}
                     eventLabel={eventLabel}
+                    ftcMode={ftcMode}
                   />
                 }
               />

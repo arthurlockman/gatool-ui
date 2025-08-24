@@ -11,6 +11,7 @@ function CheatsheetPage({
   selectedYear,
   robotImages,
   eventLabel,
+  ftcMode
 }) {
   const sortedTeams = _.orderBy(teamList?.teams, "teamNumber", "asc");
   const cardStyle = {
@@ -29,18 +30,17 @@ function CheatsheetPage({
     var avatar = `<img src="${apiBaseUrl}${selectedYear.value}/avatars/team/${team?.teamNumber}/avatar.png" onerror="this.style.display='none'">&nbsp`;
     var robotImage = _.filter(robotImages, { teamNumber: team?.teamNumber })[0]
       ?.imageUrl
-      ? `<img height="225px" src="${
-          _.filter(robotImages, { teamNumber: team?.teamNumber })[0]?.imageUrl
-        }" onerror="this.style.display='none'">`
+      ? `<img height="225px" src="${_.filter(robotImages, { teamNumber: team?.teamNumber })[0]?.imageUrl
+      }" onerror="this.style.display='none'">`
       : "";
     if (communityUpdates) {
       team = _.merge(
         team,
         communityUpdates[
-          _.findIndex(communityUpdates, { teamNumber: team?.teamNumber })
+        _.findIndex(communityUpdates, { teamNumber: team?.teamNumber })
         ],
         teamList?.teams[
-          _.findIndex(teamList?.teams, { teamNumber: team?.teamNumber })
+        _.findIndex(teamList?.teams, { teamNumber: team?.teamNumber })
         ]
       );
     }
@@ -48,18 +48,16 @@ function CheatsheetPage({
     card.frontHTML = `<h1>${robotImage}<br /><b>${team.teamNumber}</b></h1>`;
     card.frontContentStyle = cardStyle;
     card.backContentStyle = cardStyle;
-    card.backHTML = `<h1>${avatar}<br /><b>${
-      team?.updates?.nameShortLocal
-        ? team?.updates?.nameShortLocal
-        : team?.nameShort
-    }</b><br />${
-      team?.updates?.cityStateLocal
+    card.backHTML = `<h1>${avatar}<br /><b>${team?.updates?.nameShortLocal
+      ? team?.updates?.nameShortLocal
+      : team?.nameShort
+      }</b><br />${team?.updates?.cityStateLocal
         ? team?.updates?.cityStateLocal
         : team?.city +
-          ", " +
-          team?.stateProv +
-          (team?.country === "USA" ? "" : " " + team?.country)
-    }</h1>`;
+        ", " +
+        team?.stateProv +
+        (team?.country === "USA" ? "" : " " + team?.country)
+      }</h1>`;
     return card;
   });
 
@@ -91,66 +89,69 @@ function CheatsheetPage({
 
   return (
     <Container fluid>
-      <img
-        src="/cheatsheet/reefscape-cheat-sheet-v4_02.png"
-        width="100%"
-        alt="Cheatsheet"
-      ></img>
-      <div>
-        <h3>
-          You can <br />
-          <span
-            style={{ cursor: "pointer", color: "blue" }}
-            onClick={() => {
-              downloadPDF("/cheatsheet/reefscape-cheat-sheet-v4.pdf");
-            }}
-          >
-            Download the Cheat Sheet
-          </span>{" "}
-          here.
-        </h3>
-        <p>
-          <br />
-        </p>
-      </div>
-      <div>
-        <h3>
-          Here is a very useful one-sheet show flow for Alliance Selection and
-          how skipping works, provided by FIRST.
-          <br />
-          <span
-            style={{ cursor: "pointer", color: "blue" }}
-            onClick={() => {
-              downloadPDF(
-                "/cheatsheet/alliance-selection-process-cheat-sheet.pdf"
-              );
-            }}
-          >
-            Download PDF.
-          </span>
-        </h3>
-        <p>
-          <br />
-        </p>
-      </div>
-      <div>
-        <h3>
-          Here is a very useful one-sheet show flow for the playoffs, provided
-          by Matt Bisson.
-          <br />
-          <span
-            style={{ cursor: "pointer", color: "blue" }}
-            onClick={() => {
-              downloadPDF("/cheatsheet/2024_Run_of_Show_Playoffs_Awards.pdf");
-            }}
-          >
-            Download PDF.
-          </span>
-        </h3>
-        <p>
-          <br />
-        </p>
-      </div>
+      {!ftcMode &&
+        <><img
+          src="/cheatsheet/reefscape-cheat-sheet-v4_02.png"
+          width="100%"
+          alt="Cheatsheet"
+        ></img>
+          <div>
+            <h3>
+              You can <br />
+              <span
+                style={{ cursor: "pointer", color: "blue" }}
+                onClick={() => {
+                  downloadPDF("/cheatsheet/reefscape-cheat-sheet-v4.pdf");
+                }}
+              >
+                Download the Cheat Sheet
+              </span>{" "}
+              here.
+            </h3>
+            <p>
+              <br />
+            </p>
+          </div>
+
+          <div>
+            <h3>
+              Here is a very useful one-sheet show flow for Alliance Selection and
+              how skipping works, provided by FIRST.
+              <br />
+              <span
+                style={{ cursor: "pointer", color: "blue" }}
+                onClick={() => {
+                  downloadPDF(
+                    "/cheatsheet/alliance-selection-process-cheat-sheet.pdf"
+                  );
+                }}
+              >
+                Download PDF.
+              </span>
+            </h3>
+            <p>
+              <br />
+            </p>
+          </div>
+          <div>
+            <h3>
+              Here is a very useful one-sheet show flow for the playoffs, provided
+              by Matt Bisson.
+              <br />
+              <span
+                style={{ cursor: "pointer", color: "blue" }}
+                onClick={() => {
+                  downloadPDF("/cheatsheet/2024_Run_of_Show_Playoffs_Awards.pdf");
+                }}
+              >
+                Download PDF.
+              </span>
+            </h3>
+            <p>
+              <br />
+            </p>
+          </div>
+        </>}
       {selectedEvent && teamList && communityUpdates && cards.length > 0 && (
         <Container fluid className={"flashCards"}>
           <Row>
