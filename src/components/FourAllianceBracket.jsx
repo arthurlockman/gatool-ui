@@ -5,7 +5,7 @@ import moment from "moment";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useSwipeable } from "react-swipeable";
 
-function FourAllianceBracket({ selectedEvent, playoffSchedule, alliances, currentMatch, qualsLength, nextMatch, previousMatch, getSchedule, useSwipe, usePullDownToUpdate, offlinePlayoffSchedule, setOfflinePlayoffSchedule,eventLabel }) {
+function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMatch, getSchedule, useSwipe, usePullDownToUpdate, offlinePlayoffSchedule, setOfflinePlayoffSchedule, eventLabel, ftcMode,matches,allianceNumbers, allianceName, matchScore,matchWinner }) {
 	const [showSelectWinner, setShowSelectWinner] = useState(false);
 	const [showConfirmWinner, setShowConfirmWinner] = useState(false);
 	const [winningAlliance, setWinningAlliance] = useState(null);
@@ -24,7 +24,6 @@ function FourAllianceBracket({ selectedEvent, playoffSchedule, alliances, curren
 	const semibold = "600";
 	//const normal = "400";
 
-	var matches = offlinePlayoffSchedule?.schedule || playoffSchedule?.schedule?.schedule || playoffSchedule?.schedule;
 	const currentPlayoffMatch = currentMatch - qualsLength;
 
 	var overtimeOffset = 0;
@@ -48,74 +47,6 @@ function FourAllianceBracket({ selectedEvent, playoffSchedule, alliances, curren
 		{ "matchNumber": 10, "description": "Overtime 2 (#10)", "winnerTo": { "matchNumber": 11, "station": "red" }, "loserTo": { "matchNumber": 11, "station": "blue" }, },
 		{ "matchNumber": 12, "description": "Overtime 3 (#11)", "winnerTo": null, "loserTo": null, },
 	]
-
-	//returns the three members of an alliance based on the match data.
-	function allianceNumbers(matchNumber, allianceColor) {
-		var alliance = "TBD";
-		var allianceMembers = [];
-		var targetAlliance = {};
-		var match = matches[_.findIndex(matches, { "matchNumber": matchNumber })];
-		if (match?.teams[0]?.teamNumber) {
-			targetAlliance = alliances?.Lookup[`${match?.teams[0]?.teamNumber}`];
-			allianceMembers = _.compact([targetAlliance?.captain, targetAlliance?.round1, targetAlliance?.round2, targetAlliance?.round3, targetAlliance?.backup]);
-			alliance = allianceMembers.join("  ");
-			if (allianceColor === "blue") {
-				targetAlliance = alliances?.Lookup[`${match?.teams[3]?.teamNumber}`]
-				allianceMembers = _.compact([targetAlliance?.captain, targetAlliance?.round1, targetAlliance?.round2, targetAlliance?.round3, targetAlliance?.backup]);
-				alliance = allianceMembers.join("  ");
-			}
-		}
-		//todo: layer in fourth member for new playoff modes
-		return alliance;
-	}
-
-	// returns the name of the alliance
-	function allianceName(matchNumber, allianceColor) {
-		var allianceName = "";
-		if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[0]?.teamNumber) {
-			allianceName = alliances?.Lookup[`${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[0]?.teamNumber}`]?.alliance;
-			if (matchNumber <= 13 || matchNumber === 19) {
-				if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner?.tieWinner === "red") {
-					allianceName += ` (L${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner.level})`;
-				}
-			}
-			if (allianceColor === "blue") {
-				allianceName = alliances?.Lookup[`${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.teams[3]?.teamNumber}`]?.alliance;
-				if (matchNumber <= 13 || matchNumber === 19) {
-					if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner?.tieWinner === "blue") {
-						allianceName += ` (L${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner.level} WIN)`;
-					}
-				}
-
-			}
-
-
-		}
-		return allianceName;
-	}
-
-	// return the score of the match, by matchNumber
-	function matchScore(matchNumber, alliance) {
-		var score = null;
-		if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.actualStartTime) {
-			if (alliance === "red") {
-				score = matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.scoreRedFinal;
-			} else if (alliance === "blue") {
-				score = matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.scoreBlueFinal;
-			}
-
-		}
-		return score;
-	}
-
-	// return the winner of the match, by matchNumber
-	function matchWinner(matchNumber) {
-		var winner = null;
-		if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.actualStartTime) {
-			winner = matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner
-		}
-		return winner;
-	}
 
 	
 	if (matches[10]?.actualStartTime) {
@@ -390,7 +321,7 @@ function FourAllianceBracket({ selectedEvent, playoffSchedule, alliances, curren
 								<polygon points="934.7 365 818.43 365 818.43 328.99 934.7 328.99 947.64 346.99 934.7 365" fill={BLUE} stroke={(tournamentWinner?.winner === "blue") ? GOLD : "none"} strokeWidth="5" />
 								<line x1="934.7" y1="328.75" x2="796" y2="328.75" fill="none" stroke="#fff" strokeMiterlimit="10" />
 								<rect x="796" y="292.54" width="22.43" height="72.46" fill={currentPlayoffMatch >= 6 ? GOLD : BLACK} />
-								<text transform="translate(811.78 357.63) rotate(-90)" fill={currentPlayoffMatch >= 6 ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">BEST 2 of 3</text>
+								<text transform={ftcMode?"translate(811.78 349.63) rotate(-90)":"translate(811.78 357.63) rotate(-90)"} fill={currentPlayoffMatch >= 6 ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{ftcMode?"FINALS":"BEST 2 of 3"}</text>
 
 								<text transform="matrix(0.9941 0 0 1 880 307)" textAnchor="middle">
 									<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(6, "red") ? allianceName(6, "red") : "Winner of M3"}</tspan>

@@ -324,8 +324,8 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                         </div>
                     </Col>
                     <Col sm={4}>
-                        {selectedEvent?.value.allianceCount === "SixAlliance" && <p><b>Playoff Type: </b>Round Robin</p>}
                         {selectedEvent?.value.allianceCount === "EightAlliance" && <p><b>Playoff Type: </b>8 Alliance Playoffs</p>}
+                        {selectedEvent?.value.allianceCount === "SixAlliance" && <p><b>Playoff Type: </b>6 Alliance Playoffs</p>}
                         {selectedEvent?.value.allianceCount === "FourAlliance" && <p><b>Playoff Type: </b>4 Alliance Playoff</p>}
                         {selectedEvent?.value.allianceCount === "TwoAlliance" && <p><b>Playoff Type: </b>Best 2 out of 3 Playoff</p>}
                         {qualSchedule?.scheduleLastModified && <p><b>Quals Schedule last updated: </b><br />{moment(qualSchedule?.scheduleLastModified).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
