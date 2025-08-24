@@ -1,5 +1,21 @@
 export const appUpdates = [
   {
+    date: "August 30, 2025",
+    message: (
+      <ul>
+        <li>Added support for FTC!</li>
+        <li>gatool now support loading events from FTC's Cloud API*. With this, you can now:</li>
+        <ul>
+          <li>Load FTC events and filter by event type, region and league</li>
+          <li>Edit team details and save to gatool Cloud</li>
+          <li>Announce teams and call matches</li>
+          <li>Use gatool's Alliance Selection mode</li>
+          <li>Announce awards</li>
+        </ul>
+        <i>* Loading live event data from a local Event server coming soon.</i>
+      </ul>
+    ),
+  }, {
     date: "July 14, 2025",
     message: (
       <ul>
@@ -7,7 +23,7 @@ export const appUpdates = [
         <li>Improved handling of statbotics responses to reduce error notifications</li>
       </ul>
     ),
-  },{
+  }, {
     date: "May 12, 2025",
     message: (
       <ul>
@@ -17,7 +33,7 @@ export const appUpdates = [
         <li>Word spacing tweaks in Playoff match result guidance at bottom of Announce & Play-By-Play</li>
       </ul>
     ),
-  },{
+  }, {
     date: "May 6, 2025",
     message: (
       <ul>
@@ -26,7 +42,7 @@ export const appUpdates = [
         <li>Made notifications and announcements dismissible.</li>
       </ul>
     ),
-  },{
+  }, {
     date: "April 28, 2025",
     message: (
       <ul>
@@ -34,7 +50,7 @@ export const appUpdates = [
         <li>Adding EPA and season record to Rankings and Play-By-Play</li>
       </ul>
     ),
-  },{
+  }, {
     date: "April 26, 2025",
     message: (
       <ul>
@@ -44,7 +60,7 @@ export const appUpdates = [
         <li>Updated how we calculate Tiebreakers for Playoff matches</li>
       </ul>
     ),
-  },{
+  }, {
     date: "April 23, 2025",
     message: (
       <ul>
@@ -57,21 +73,21 @@ export const appUpdates = [
         <li>Cosmetic updates and crash prevention</li>
       </ul>
     ),
-  },{
+  }, {
     date: "April 18, 2025",
     message: (
       <ul>
         <li>Expanded exported schedule (from Team Data page) to include additional score details</li>
       </ul>
     ),
-  },{
+  }, {
     date: "April 15, 2025",
     message: (
       <ul>
         <li>Fixed an issue with downloaded file names</li>
       </ul>
     ),
-  },{
+  }, {
     date: "April 10, 2025",
     message: (
       <ul>
@@ -80,7 +96,7 @@ export const appUpdates = [
         <li>Updated major awards highlighting</li>
       </ul>
     ),
-  },{
+  }, {
     date: "April 8, 2025",
     message: (
       <ul>
@@ -88,21 +104,21 @@ export const appUpdates = [
         <li>Adding in additional fouls</li>
       </ul>
     ),
-  },{
+  }, {
     date: "March 28, 2025",
     message: (
       <ul>
         <li>Fixing a bug that could cause a white screen while loading an event</li>
       </ul>
     ),
-  },{
+  }, {
     date: "March 25, 2025",
     message: (
       <ul>
         <li>Per Team Update 19, changed the calculation for Playoff Tiebreakers</li>
       </ul>
     ),
-  },{
+  }, {
     date: "March 20, 2025",
     message: (
       <ul>
@@ -110,7 +126,7 @@ export const appUpdates = [
         <li>Fixed a bug that suppressed highlighting the winning Alliance on the Schedule page when Red's score was zero</li>
       </ul>
     ),
-  },{
+  }, {
     date: "March 19, 2025",
     message: (
       <ul>
