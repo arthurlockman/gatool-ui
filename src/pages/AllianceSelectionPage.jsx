@@ -174,13 +174,13 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
                     <AllianceSelection selectedYear={selectedYear} selectedEvent={selectedEvent} rankings={rankings} teamList={teamList} allianceCount={allianceCount} communityUpdates={communityUpdates} allianceSelectionArrays={allianceSelectionArrays} setAllianceSelectionArrays={setAllianceSelectionArrays} handleReset={handleReset} teamFilter={teamFilter} setTeamFilter={setTeamFilter} />
                 </div>}
 
-            {(alliancesCount === 8) && playoffs &&
+            {selectedEvent && (alliancesCount === 8) && playoffs &&
                 <Bracket offlinePlayoffSchedule={offlinePlayoffSchedule} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} currentMatch={currentMatch} qualsLength={qualsLength} nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} usePullDownToUpdate={usePullDownToUpdate} useSwipe={useSwipe} eventLabel={eventLabel} playoffCountOverride={playoffCountOverride} ftcMode={ftcMode} matches={matches} allianceNumbers={allianceNumbers} allianceName={allianceName} matchScore={matchScore} matchWinner={matchWinner} />}
-            {(alliancesCount === 6) && playoffs &&
+            {selectedEvent && (alliancesCount === 6) && playoffs &&
                 <SixAllianceBracket offlinePlayoffSchedule={offlinePlayoffSchedule} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} currentMatch={currentMatch} qualsLength={qualsLength} nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} usePullDownToUpdate={usePullDownToUpdate} useSwipe={useSwipe} eventLabel={eventLabel} playoffCountOverride={playoffCountOverride} ftcMode={ftcMode} matches={matches} allianceNumbers={allianceNumbers} allianceName={allianceName} matchScore={matchScore} matchWinner={matchWinner} />}
-            {(alliancesCount === 4) && playoffs &&
+            {selectedEvent && (alliancesCount === 4) && playoffs &&
                 <FourAllianceBracket currentMatch={currentMatch} qualsLength={qualsLength} nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} useSwipe={useSwipe} usePullDownToUpdate={usePullDownToUpdate} offlinePlayoffSchedule={offlinePlayoffSchedule} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} eventLabel={eventLabel} ftcMode={ftcMode} matches={matches} allianceNumbers={allianceNumbers} allianceName={allianceName} matchScore={matchScore} matchWinner={matchWinner} />}
-            {(alliancesCount === 2) && playoffs &&
+            {selectedEvent && (alliancesCount === 2) && playoffs &&
                 <TwoAllianceBracket nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} useSwipe={useSwipe} usePullDownToUpdate={usePullDownToUpdate} eventLabel={eventLabel} ftcMode={ftcMode} matches={matches} allianceNumbers={allianceNumbers} allianceName={allianceName} matchScore={matchScore} matchWinner={matchWinner} />}
             <Modal centered={true} show={resetAllianceSelection} onHide={handleClose}>
                 <Modal.Header className={"allianceSelectionDecline"} closeVariant={"white"} closeButton>
