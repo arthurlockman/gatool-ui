@@ -78,8 +78,8 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
         const tieLevel = allianceCount === 8 ? 13 : allianceCount === 6 ? 10 : allianceCount === 4 ? 6 : 1;
         var allianceName = "";
         var match = matches[_.findIndex(matches, { "matchNumber": matchNumber })];
-        if ((match?.teams[0]?.teamNumber || match?.teams[3]?.teamNumber) && alliances?.Lookup) {
-            const lookupTeam = match?.teams[_.findIndex(match?.teams, { "station": allianceColor === "red" ? "Red1" : "Blue1" })]?.teamNumber;
+        const lookupTeam = match?.teams[_.findIndex(match?.teams, { "station": allianceColor === "red" ? "Red1" : "Blue1" })]?.teamNumber;
+        if (lookupTeam && alliances?.Lookup) {
             const targetAlliance = alliances?.Lookup[`${lookupTeam}`];
             allianceName = targetAlliance?.alliance;
             if (matchNumber <= tieLevel || matchNumber === tieLevel + 6) {
@@ -169,9 +169,9 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
                             }
                         </Alert>}
                 </div>}
-            {selectedEvent && (qualSchedule?.schedule?.length > 0 || qualSchedule?.schedule?.schedule?.length > 0 || practiceSchedule?.schedule?.length > 0) && !playoffs && (allianceSelection || overrideAllianceSelection) &&
+            {selectedEvent && ((qualSchedule?.schedule?.length > 0 || qualSchedule?.schedule?.schedule?.length > 0 || practiceSchedule?.schedule?.length > 0) && !playoffs && (allianceSelection || overrideAllianceSelection)) &&
                 <div>
-                    <AllianceSelection selectedYear={selectedYear} selectedEvent={selectedEvent} rankings={rankings} teamList={teamList} allianceCount={allianceCount} communityUpdates={communityUpdates} allianceSelectionArrays={allianceSelectionArrays} setAllianceSelectionArrays={setAllianceSelectionArrays} handleReset={handleReset} teamFilter={teamFilter} setTeamFilter={setTeamFilter} />
+                    <AllianceSelection selectedYear={selectedYear} selectedEvent={selectedEvent} rankings={rankings} teamList={teamList} allianceCount={allianceCount} communityUpdates={communityUpdates} allianceSelectionArrays={allianceSelectionArrays} setAllianceSelectionArrays={setAllianceSelectionArrays} handleReset={handleReset} teamFilter={teamFilter} setTeamFilter={setTeamFilter} ftcMode={ftcMode}/>
                 </div>}
 
             {selectedEvent && (alliancesCount === 8) && playoffs &&
