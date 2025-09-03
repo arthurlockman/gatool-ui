@@ -408,16 +408,21 @@ function App() {
 
   // FTC Offline status
   const [FTCOfflineAvailable, setFTCOfflineAvailable] = useState(false);
+  // Remove this in production
+  setFTCOfflineAvailable(false);
+  
   const [useFTCOffline, setUseFTCOffline] = usePersistentState(
     "setting:useFTCOffline",
     false
   );
-  const [FTCKey, setFTCKey] = usePersistentState("setting:FTCKey", "");
+  // const [FTCKey, setFTCKey] = usePersistentState("setting:FTCKey", "");
+  // const [FTCTeamList, setFTCTeamList] = useState([]);
+  
   const [FTCServerURL, setFTCServerURL] = usePersistentState(
     "setting:FTCServerURL",
     "http://http://10.0.100.5"
   );
-  const [FTCTeamList, setFTCTeamList] = useState([]);
+  
 
   /**
    * Function to get the Cheesy Arena status by connecting to the Cheesy Arena API
@@ -444,28 +449,6 @@ function App() {
     } catch (error) {
       console.log("Error fetching Cheesy Arena status:", error.message);
       return setCheesyArenaAvailable(false);
-    }
-  };
-
-  const getFTCOfflineStatus = async () => {
-    // See if you can connect to FTC Local Server
-    // Requires that FTC Server URL be set.
-    console.log("Checking FTC Local Server status...");
-    try {
-      var result = await fetch(`${FTCServerURL}/api/v1/version`, {
-        signal: AbortSignal.timeout(5000),
-      });
-      var data = result.status === 200;
-      if (data) {
-        console.log("FTC Local Server is available.");
-        return setFTCOfflineAvailable(true);
-      } else {
-        console.log("FTC Local Server is not available.");
-        return setFTCOfflineAvailable(false);
-      }
-    } catch (error) {
-      console.log("Error fetching FTC Local Server status:", error.message);
-      return setFTCOfflineAvailable(false);
     }
   };
 
@@ -672,161 +655,183 @@ function App() {
     };
   };
 
-  /**
-   * Should be merged with /events/{{eventName}}/matches/{{matchNumber}} for full schedule.
-   * @constant conformFTCOfflineScheduleMatch
-   * @param match Match details from FTC Server
-   * @param level Tournament Level
-   */
-  const conformCFTCOfflineScheduleMatch = (match, level) => {
-    return {
-      description: match?.matchName,
-      tournamentLevel: level,
-      field: match?.field,
-      matchNumber: match?.matchNumber,
-      startTime: moment(match?.time).format(),
-      actualStartTime: match?.finished ? moment(match?.time).format() : null,
-      postResultTime:
-        match?.matchState === "COMMITTED" ? moment(match?.time).format() : null,
-      scoreRedFinal: null,
-      scoreRedFoul: null,
-      scoreRedAuto: null,
-      scoreBlueFinal: null,
-      scoreBlueFoul: null,
-      scoreBlueAuto: null,
-      teams: [
-        {
-          teamNumber: match?.red?.team1,
-          station: "Red1",
-          surrogate: match?.red?.isTeam1Surrogate,
-          dq: !1,
-        },
-        {
-          teamNumber: match?.red?.team2,
-          station: "Red2",
-          surrogate: match?.red?.isTeam2Surrogate,
-          dq: !1,
-        },
-        {
-          teamNumber: match?.blue?.blue1,
-          station: "Blue1",
-          surrogate: match?.blue?.isTeam1Surrogate,
-          dq: !1,
-        },
-        {
-          teamNumber: match?.blue?.blue2,
-          station: "Blue2",
-          surrogate: match?.blue?.isTeam2Surrogate,
-          dq: !1,
-        },
-      ],
-      winner: { winner: "", tieWinner: "", level: 0 },
-    };
-  };
+    // const getFTCOfflineStatus = async () => {
+  //   // See if you can connect to FTC Local Server
+  //   // Requires that FTC Server URL be set.
+  //   console.log("Checking FTC Local Server status...");
+  //   try {
+  //     var result = await fetch(`${FTCServerURL}/api/v1/version`, {
+  //       signal: AbortSignal.timeout(5000),
+  //     });
+  //     var data = result.status === 200;
+  //     if (data) {
+  //       console.log("FTC Local Server is available.");
+  //       return setFTCOfflineAvailable(true);
+  //     } else {
+  //       console.log("FTC Local Server is not available.");
+  //       return setFTCOfflineAvailable(false);
+  //     }
+  //   } catch (error) {
+  //     console.log("Error fetching FTC Local Server status:", error.message);
+  //     return setFTCOfflineAvailable(false);
+  //   }
+  // };
 
-  /**
-   * Use with /events/{{eventName}}/matches/{{matchNumber}} to get full match details. Should be merged with /events/{{eventName}}/matches/ for full schedule.
-   * @constant conformFTCOfflineMatch
-   * @param match Full Match details from FTC Server
-   * @param level Tournament Level
-   */
-  const conformCFTCOfflineMatch = (match, level) => {
-    return {
-      description: match?.matchBrief?.matchName,
-      tournamentLevel: level,
-      field: match?.matchBrief?.field,
-      matchNumber: match?.matchBrief?.matchNumber,
-      startTime:
-        match?.scheduledTime >= 0
-          ? moment(match?.scheduledTime).format()
-          : null,
-      actualStartTime:
-        match?.startTime >= 0 ? moment(match?.startTime).format() : null,
-      postResultTime:
-        match?.resultPostedTime >= 0
-          ? moment(match?.resultPostedTime).format()
-          : null,
-      scoreRedFinal: match?.redScore,
-      scoreRedFoul: match?.red?.penalty,
-      scoreRedAuto: match?.red?.auto,
-      scoreBlueFinal: match?.blueScore,
-      scoreBlueFoul: match?.blue?.penalty,
-      scoreBlueAuto: match?.blue?.auto,
-      teams: [
-        {
-          teamNumber: match?.matchBrief?.red?.team1,
-          station: "Red1",
-          surrogate: match?.matchBrief?.red?.isTeam1Surrogate,
-          dq: match?.red?.dq1,
-        },
-        {
-          teamNumber: match?.matchBrief?.red?.team2,
-          station: "Red2",
-          surrogate: match?.matchBrief?.red?.isTeam2Surrogate,
-          dq: match?.red?.dq2,
-        },
-        {
-          teamNumber: match?.matchBrief?.blue?.team1,
-          station: "Blue1",
-          surrogate: match?.matchBrief?.blue?.isTeam1Surrogate,
-          dq: match?.blue?.dq1,
-        },
-        {
-          teamNumber: match?.matchBrief?.blue?.team2,
-          station: "Blue2",
-          surrogate: match?.matchBrief?.blue?.isTeam2Surrogate,
-          dq: match?.blue?.dq2,
-        },
-      ],
-      winner: { winner: "", tieWinner: "", level: 0 },
-    };
-  };
+  // /**
+  //  * Should be merged with /events/{{eventName}}/matches/{{matchNumber}} for full schedule.
+  //  * @constant conformFTCOfflineScheduleMatch
+  //  * @param match Match details from FTC Server
+  //  * @param level Tournament Level
+  //  */
+  // const conformCFTCOfflineScheduleMatch = (match, level) => {
+  //   return {
+  //     description: match?.matchName,
+  //     tournamentLevel: level,
+  //     field: match?.field,
+  //     matchNumber: match?.matchNumber,
+  //     startTime: moment(match?.time).format(),
+  //     actualStartTime: match?.finished ? moment(match?.time).format() : null,
+  //     postResultTime:
+  //       match?.matchState === "COMMITTED" ? moment(match?.time).format() : null,
+  //     scoreRedFinal: null,
+  //     scoreRedFoul: null,
+  //     scoreRedAuto: null,
+  //     scoreBlueFinal: null,
+  //     scoreBlueFoul: null,
+  //     scoreBlueAuto: null,
+  //     teams: [
+  //       {
+  //         teamNumber: match?.red?.team1,
+  //         station: "Red1",
+  //         surrogate: match?.red?.isTeam1Surrogate,
+  //         dq: !1,
+  //       },
+  //       {
+  //         teamNumber: match?.red?.team2,
+  //         station: "Red2",
+  //         surrogate: match?.red?.isTeam2Surrogate,
+  //         dq: !1,
+  //       },
+  //       {
+  //         teamNumber: match?.blue?.blue1,
+  //         station: "Blue1",
+  //         surrogate: match?.blue?.isTeam1Surrogate,
+  //         dq: !1,
+  //       },
+  //       {
+  //         teamNumber: match?.blue?.blue2,
+  //         station: "Blue2",
+  //         surrogate: match?.blue?.isTeam2Surrogate,
+  //         dq: !1,
+  //       },
+  //     ],
+  //     winner: { winner: "", tieWinner: "", level: 0 },
+  //   };
+  // };
 
-  /**
-   * Use to conform match scores, which come from /api/2025/v1/events/{code}/matches/{match}/ and which contain technical details of the match.
-   * @constant conformFTCOfflineScores
-   * @param match Match details from FTC Server
-   * @param level Tournament Level
-   */
-  const conformFTCOfflineScores = (match, level) => {
-    return {
-      matchLevel: level,
-      matchNumber: match?.matchBrief?.matchNumber,
-      winningAlliance:
-        match?.redScore > match?.blueScore
-          ? 1
-          : match?.redScore < match?.blueScore
-          ? 2
-          : 0,
-      tiebreaker: {
-        item1: -1, // Fix for Elims in FTC Server
-        item2: "",
-      },
-      coopertitionBonusAchieved: false, // no coopertition in FTC
-      alliances: [
-        { ...match?.blue, alliance: "Blue" },
-        { ...match?.red, alliance: "Red" },
-      ],
-    };
-  };
+  // /**
+  //  * Use with /events/{{eventName}}/matches/{{matchNumber}} to get full match details. Should be merged with /events/{{eventName}}/matches/ for full schedule.
+  //  * @constant conformFTCOfflineMatch
+  //  * @param match Full Match details from FTC Server
+  //  * @param level Tournament Level
+  //  */
+  // const conformCFTCOfflineMatch = (match, level) => {
+  //   return {
+  //     description: match?.matchBrief?.matchName,
+  //     tournamentLevel: level,
+  //     field: match?.matchBrief?.field,
+  //     matchNumber: match?.matchBrief?.matchNumber,
+  //     startTime:
+  //       match?.scheduledTime >= 0
+  //         ? moment(match?.scheduledTime).format()
+  //         : null,
+  //     actualStartTime:
+  //       match?.startTime >= 0 ? moment(match?.startTime).format() : null,
+  //     postResultTime:
+  //       match?.resultPostedTime >= 0
+  //         ? moment(match?.resultPostedTime).format()
+  //         : null,
+  //     scoreRedFinal: match?.redScore,
+  //     scoreRedFoul: match?.red?.penalty,
+  //     scoreRedAuto: match?.red?.auto,
+  //     scoreBlueFinal: match?.blueScore,
+  //     scoreBlueFoul: match?.blue?.penalty,
+  //     scoreBlueAuto: match?.blue?.auto,
+  //     teams: [
+  //       {
+  //         teamNumber: match?.matchBrief?.red?.team1,
+  //         station: "Red1",
+  //         surrogate: match?.matchBrief?.red?.isTeam1Surrogate,
+  //         dq: match?.red?.dq1,
+  //       },
+  //       {
+  //         teamNumber: match?.matchBrief?.red?.team2,
+  //         station: "Red2",
+  //         surrogate: match?.matchBrief?.red?.isTeam2Surrogate,
+  //         dq: match?.red?.dq2,
+  //       },
+  //       {
+  //         teamNumber: match?.matchBrief?.blue?.team1,
+  //         station: "Blue1",
+  //         surrogate: match?.matchBrief?.blue?.isTeam1Surrogate,
+  //         dq: match?.blue?.dq1,
+  //       },
+  //       {
+  //         teamNumber: match?.matchBrief?.blue?.team2,
+  //         station: "Blue2",
+  //         surrogate: match?.matchBrief?.blue?.isTeam2Surrogate,
+  //         dq: match?.blue?.dq2,
+  //       },
+  //     ],
+  //     winner: { winner: "", tieWinner: "", level: 0 },
+  //   };
+  // };
 
-  /**
-   * @constant conformFTCOfflineRankings
-   * @param match Match details from FTC Server
-   * @param level Tournament Level
-   */
-  const conformFTCOfflineRankings = (team) => {
-    return {
-      ...team,
-      rank: team?.ranking,
-      teamNumber: team?.team,
-      qualAverage:
-        team?.MatchPoints && team?.Played
-          ? team?.MatchPoints / team?.matchesPlayed
-          : null,
-      dq: team?.dq,
-    };
-  };
+  // /**
+  //  * Use to conform match scores, which come from /api/2025/v1/events/{code}/matches/{match}/ and which contain technical details of the match.
+  //  * @constant conformFTCOfflineScores
+  //  * @param match Match details from FTC Server
+  //  * @param level Tournament Level
+  //  */
+  // const conformFTCOfflineScores = (match, level) => {
+  //   return {
+  //     matchLevel: level,
+  //     matchNumber: match?.matchBrief?.matchNumber,
+  //     winningAlliance:
+  //       match?.redScore > match?.blueScore
+  //         ? 1
+  //         : match?.redScore < match?.blueScore
+  //         ? 2
+  //         : 0,
+  //     tiebreaker: {
+  //       item1: -1, // Fix for Elims in FTC Server
+  //       item2: "",
+  //     },
+  //     coopertitionBonusAchieved: false, // no coopertition in FTC
+  //     alliances: [
+  //       { ...match?.blue, alliance: "Blue" },
+  //       { ...match?.red, alliance: "Red" },
+  //     ],
+  //   };
+  // };
+
+  // /**
+  //  * @constant conformFTCOfflineRankings
+  //  * @param match Match details from FTC Server
+  //  * @param level Tournament Level
+  //  */
+  // const conformFTCOfflineRankings = (team) => {
+  //   return {
+  //     ...team,
+  //     rank: team?.ranking,
+  //     teamNumber: team?.team,
+  //     qualAverage:
+  //       team?.MatchPoints && team?.Played
+  //         ? team?.MatchPoints / team?.matchesPlayed
+  //         : null,
+  //     dq: team?.dq,
+  //   };
+  // };
 
   /**
    * This function retrieves a schedule from FIRST. It attempts to get both the Qual and Playoff Schedule and sets the global variables
