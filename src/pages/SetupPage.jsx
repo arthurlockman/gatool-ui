@@ -67,13 +67,14 @@ const monthsWarningMenu = [
 ]
 
 const ftcModeOptions = [
-    { value: "FTC", label: "FTC" },
-    { value: "FRC", label: "FRC" }
+    { value: "FRC", label: "FRC" },
+    { value: "FTCOnline", label: "FTC Online" },
+    { value: "FTCLocal", label: "FTC Local Server" },
 ];
 
 
 
-function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, regionFilters, setRegionFilters, districts, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showNotesAnnounce, setShowNotesAnnounce, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, autoUpdate, setAutoUpdate, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, showQualsStatsQuals, setShowQualsStatsQuals, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee, showDistrictChampsStats, setShowDistrictChampsStats, monthsWarning, setMonthsWarning, user, isAuthenticated, adHocMode, setAdHocMode, supportedYears, FTCSupportedYears, reloadPage, autoHideSponsors, setAutoHideSponsors, setLoadingCommunityUpdates, hidePracticeSchedule, setHidePracticeSchedule, systemMessage, setTeamListLoading, getTeamList, getAlliances, setHaveChampsTeams, appUpdates, usePullDownToUpdate, setUsePullDownToUpdate, useSwipe, setUseSwipe, eventLabel, setEventLabel, showInspection, setShowInspection, showMinorAwards, setShowMinorAwards, highScoreMode, setHighScoreMode, systemBell, setSystemBell, eventBell, setEventBell, eventMessage, setEventMessage, putEventNotifications, useCheesyArena, setUseCheesyArena, cheesyArenaAvailable, ftcLeagues, ftcRegions, ftcMode, setFTCMode, ftcTypes }) {
+function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, regionFilters, setRegionFilters, districts, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showNotesAnnounce, setShowNotesAnnounce, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, autoUpdate, setAutoUpdate, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, showQualsStatsQuals, setShowQualsStatsQuals, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee, showDistrictChampsStats, setShowDistrictChampsStats, monthsWarning, setMonthsWarning, user, isAuthenticated, adHocMode, setAdHocMode, supportedYears, FTCSupportedYears, reloadPage, autoHideSponsors, setAutoHideSponsors, setLoadingCommunityUpdates, hidePracticeSchedule, setHidePracticeSchedule, systemMessage, setTeamListLoading, getTeamList, getAlliances, setHaveChampsTeams, appUpdates, usePullDownToUpdate, setUsePullDownToUpdate, useSwipe, setUseSwipe, eventLabel, setEventLabel, showInspection, setShowInspection, showMinorAwards, setShowMinorAwards, highScoreMode, setHighScoreMode, systemBell, setSystemBell, eventBell, setEventBell, eventMessage, setEventMessage, putEventNotifications, useCheesyArena, setUseCheesyArena, cheesyArenaAvailable, ftcLeagues, ftcRegions, ftcMode, setFTCMode, ftcTypes, useFTCOffline, setUseFTCOffline, FTCServerURL, setFTCServerURL, FTCOfflineAvaialable }) {
     const isOnline = useOnlineStatus();
     const PWASupported = (isChrome && Number(browserVersion) >= 76) || (isSafari && Number(browserVersion) >= 15 && Number(fullBrowserVersion.split(".")[1]) >= 4);
 
@@ -190,7 +191,8 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
     }
 
     const handleFTCMode = (checked) => {
-        setFTCMode(checked.value === "FTC");
+        setFTCMode(checked.value === "FRC" ? null : checked);
+        setUseFTCOffline(checked.value === "FTCLocal")
     }
 
     const handleEventNotification = (property, index, value, user) => {
@@ -255,7 +257,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
             </Row>}
             <Row className={ftcMode ? "ftcSetupPageMenus" : "setupPageMenus"}>
                 <Col sm={2}>
-                    <b>Choose a program...</b><br /><Select options={ftcModeOptions} value={ftcMode ? { label: "FTC", value: "FTC" } : { label: "FRC", value: "FRC" }} onChange={handleFTCMode} />
+                    <b>Choose a program...</b><br /><Select options={ftcModeOptions} value={ftcMode ? ftcMode : { label: "FRC", value: "FRC" }} onChange={handleFTCMode} />
                 </Col>
                 <Col sm={3}><b>Choose a year...</b><br /><Select options={ftcMode ? FTCSupportedYears : supportedYears} value={selectedYear} onChange={setSelectedYear} isDisabled={!isOnline} />
                 </Col>
@@ -273,6 +275,23 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                         }} isDisabled={!isOnline} /></span>}
                 </Col>
             </Row>
+            {useFTCOffline && <Row className="ftcSetupPageMenus">
+                <Col><h4>You must configure gatool to use a local FTC server.<br/>
+                    Please take the following steps:</h4>
+                    <div style={{textAlign:"left"}}><ol>
+                        <li>Ensure that your browser is configured to use unsafe content.</li>
+                        <li>Enter the URL for the local FTC server</li>
+                        <li>Request API access, which your FTA must approve</li>
+                    </ol></div>
+                </Col>
+                <Col style={{textAlign:"left"}}><Form>
+                    <Form.Group controlId="FTCServerURL">
+                        <Form.Label className={"formLabel"}><b>Server URL (usually in http://10.0.100.5 format)</b></Form.Label>
+                        <Form.Control type="text" placeholder={"usually in http://10.0.100.5 format"} value={FTCServerURL} onChange={(e) => setFTCServerURL(e.target.value)} />
+                    </Form.Group>
+                </Form>
+                </Col>
+            </Row>}
             {eventList && <Row className="setupPageFilters">
                 <Col sm={4}><b>Filter by event timeframe here...</b><br />
                     <Select options={ftcMode ? filterTimeFTC : filterTime} value={timeFilter ? timeFilter : ftcMode ? filterTimeFTC[0] : filterTime[0]} onChange={setTimeFilter} isDisabled={!isOnline} />

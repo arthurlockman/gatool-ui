@@ -4,7 +4,7 @@ export const appUpdates = [
     message: (
       <ul>
         <li>Added support for FTC!</li>
-        <li>gatool now support loading events from FTC's Cloud API*. With this, you can now:</li>
+        <li>gatool now support loading events from FTC's Cloud API*. With this update, you can:</li>
         <ul>
           <li>Load FTC events and filter by event type, region and league</li>
           <li>Edit team details and save to gatool Cloud</li>
