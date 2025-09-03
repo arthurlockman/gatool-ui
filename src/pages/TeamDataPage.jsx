@@ -196,7 +196,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
             update = {};
             update.teamNumber = updateTeam.teamNumber;
         }
-        if (!communityUpdatesTemp) {communityUpdatesTemp = [{ "teamNumber": updateTeam.teamNumber }];}
+        if (!communityUpdatesTemp) { communityUpdatesTemp = [{ "teamNumber": updateTeam.teamNumber }]; }
         update.updates = formValue;
         communityUpdatesTemp[_.findIndex(communityUpdatesTemp, { "teamNumber": updateTeam.teamNumber })] = update;
         setCommunityUpdates(communityUpdatesTemp);
@@ -449,10 +449,11 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
     }
     function generateDocx(gameAnnouncer) {
         loadFile(
-            "images/gatool_team_information_sheets_merge_2024.docx",
+            ftcMode ? "images/ftc_team_information_sheets_merge_2025.docx" : "images/frc_team_information_sheets_merge_2025.docx",
             function (error, content) {
                 if (error) {
                     var errorText = "Something went wrong loading the template. Please try again."
+                    console.log(error)
                     throw new Error(errorText);
                 }
                 var zip = new PizZip(content);
@@ -481,21 +482,21 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                     record.tn = team.teamNumber;
                     record.year = selectedYear.value;
                     record.nameShort = team.nameShortLocal || team.nameShort;
-                    record.organization = team.updates.organizationLocal || team.organization;
-                    record.robotName = team.updates.robotNameLocal || team.robotName;
-                    record.cityState = team.updates.cityStateLocal || `${team.city}, ${team.stateProv}${team.country !== "USA" ? `, ${team.country}` : ""}`;
-                    record.topSponsors = team.updates.topSponsorsLocal || team.topSponsors;
-                    record.topSponsor = team.updates.topSponsorLocal || team.topSponsor;
-                    record.teamYearsNoCompete = team.updates.teamYearsNoCompeteLocal || "";
-                    record.teamMotto = team.updates.teamMottoLocal || "";
-                    record.rookieYear = team.rookieYear || "";
+                    record.organization = team.updates?.organizationLocal || team.organization;
+                    record.robotName = team.updates?.robotNameLocal || team.robotName;
+                    record.cityState = team.updates?.cityStateLocal || `${team.city}, ${team.stateProv}${team.country !== "USA" ? `, ${team.country}` : ""}`;
+                    record.topSponsors = team.updates?.topSponsorsLocal || team.topSponsors;
+                    record.topSponsor = team.updates?.topSponsorLocal || team.topSponsor;
+                    record.teamYearsNoCompete = team.updates?.teamYearsNoCompeteLocal || "";
+                    record.teamMotto = team.updates?.teamMottoLocal || "";
+                    record.rookieYear = team?.rookieYear || "";
                     record.eventName = eventLabel || selectedEvent?.label;
-                    record.sayNumber = team.updates.sayNumber || "";
+                    record.sayNumber = team.updates?.sayNumber || "";
                     //let tmp = document.createElement("DIV");
                     //tmp.innerHTML = team.teamNotes;
                     //record.teamNotes = tmp.textContent || tmp.innerText || "";
                     // eslint-disable-next-line
-                    record.teamNotes = team.updates.teamNotes.replace("<br>", "\n").replace("<\div>", "<\div>\n").replace(/&amp;/g, "&").replace(/&nbsp;/g, ' ').replace(/(<([^>]+)>)/gi, "") || "";
+                    record.teamNotes = team.updates?.teamNotes.replace("<br>", "\n").replace("<\div>", "<\div>\n").replace(/&amp;/g, "&").replace(/&nbsp;/g, ' ').replace(/(<([^>]+)>)/gi, "") || "";
                     record.gaName = gameAnnouncerFixed || false;
                     record.gaNames = gameAnnouncer.split(",").length > 1 || false;
                     if (index < teamListExtended.length - 1) {
