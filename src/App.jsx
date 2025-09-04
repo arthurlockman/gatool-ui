@@ -412,11 +412,13 @@ function App() {
     "setting:useFTCOffline",
     false
   );
+  // eslint-disable-next-line
   const [FTCKey, setFTCKey] = usePersistentState("setting:FTCKey", "");
   const [FTCServerURL, setFTCServerURL] = usePersistentState(
     "setting:FTCServerURL",
     "http://http://10.0.100.5"
   );
+  // eslint-disable-next-line
   const [FTCTeamList, setFTCTeamList] = useState([]);
 
   /**
@@ -447,7 +449,8 @@ function App() {
     }
   };
 
-  const getFTCOfflineStatus = async () => {
+    // eslint-disable-next-line
+const getFTCOfflineStatus = async () => {
     // See if you can connect to FTC Local Server
     // Requires that FTC Server URL be set.
     console.log("Checking FTC Local Server status...");
@@ -678,7 +681,8 @@ function App() {
    * @param match Match details from FTC Server
    * @param level Tournament Level
    */
-  const conformCFTCOfflineScheduleMatch = (match, level) => {
+    // eslint-disable-next-line
+const conformCFTCOfflineScheduleMatch = (match, level) => {
     return {
       description: match?.matchName,
       tournamentLevel: level,
@@ -730,7 +734,8 @@ function App() {
    * @param match Full Match details from FTC Server
    * @param level Tournament Level
    */
-  const conformCFTCOfflineMatch = (match, level) => {
+    // eslint-disable-next-line
+const conformCFTCOfflineMatch = (match, level) => {
     return {
       description: match?.matchBrief?.matchName,
       tournamentLevel: level,
@@ -788,6 +793,7 @@ function App() {
    * @param match Match details from FTC Server
    * @param level Tournament Level
    */
+  // eslint-disable-next-line
   const conformFTCOfflineScores = (match, level) => {
     return {
       matchLevel: level,
@@ -815,6 +821,7 @@ function App() {
    * @param match Match details from FTC Server
    * @param level Tournament Level
    */
+  // eslint-disable-next-line 
   const conformFTCOfflineRankings = (team) => {
     return {
       ...team,
