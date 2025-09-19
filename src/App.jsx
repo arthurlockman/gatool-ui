@@ -74,7 +74,7 @@ const supportedYears = [
 ];
 
 const FTCSupportedYears = [
-  //{ label: "2025/26 DECODE℠ presented by RTX", value: "2025" },
+  { label: "2025/26 DECODE℠ presented by RTX", value: "2025" },
   { label: "2024/25 INTO THE DEEP℠", value: "2024" },
   { label: "2023", value: "2023" },
   { label: "2022", value: "2022" },
@@ -412,11 +412,10 @@ function App() {
     "setting:useFTCOffline",
     false
   );
-  // eslint-disable-next-line
-  const [FTCKey, setFTCKey] = usePersistentState("setting:FTCKey", "");
+  const [FTCKey, setFTCKey] = usePersistentState("setting:FTCKey", {});
   const [FTCServerURL, setFTCServerURL] = usePersistentState(
     "setting:FTCServerURL",
-    "http://http://10.0.100.5"
+    "http://10.0.100.5"
   );
   // eslint-disable-next-line
   const [FTCTeamList, setFTCTeamList] = useState([]);
@@ -449,8 +448,8 @@ function App() {
     }
   };
 
-    // eslint-disable-next-line
-const getFTCOfflineStatus = async () => {
+  // eslint-disable-next-line
+  const getFTCOfflineStatus = async () => {
     // See if you can connect to FTC Local Server
     // Requires that FTC Server URL be set.
     console.log("Checking FTC Local Server status...");
@@ -637,8 +636,8 @@ const getFTCOfflineStatus = async () => {
         match?.RedSummary?.Score > match?.BlueSummary?.Score
           ? 1
           : match?.RedSummary?.Score < match?.BlueSummary?.Score
-          ? 2
-          : 0,
+            ? 2
+            : 0,
       tiebreaker: {
         item1: !match?.UseTiebreakCriteria ? -1 : 1,
         item2: match?.UseTiebreakCriteria ? match?.UseTiebreakCriteria : "",
@@ -681,8 +680,8 @@ const getFTCOfflineStatus = async () => {
    * @param match Match details from FTC Server
    * @param level Tournament Level
    */
-    // eslint-disable-next-line
-const conformCFTCOfflineScheduleMatch = (match, level) => {
+  // eslint-disable-next-line
+  const conformCFTCOfflineScheduleMatch = (match, level) => {
     return {
       description: match?.matchName,
       tournamentLevel: level,
@@ -734,8 +733,8 @@ const conformCFTCOfflineScheduleMatch = (match, level) => {
    * @param match Full Match details from FTC Server
    * @param level Tournament Level
    */
-    // eslint-disable-next-line
-const conformCFTCOfflineMatch = (match, level) => {
+  // eslint-disable-next-line
+  const conformCFTCOfflineMatch = (match, level) => {
     return {
       description: match?.matchBrief?.matchName,
       tournamentLevel: level,
@@ -802,8 +801,8 @@ const conformCFTCOfflineMatch = (match, level) => {
         match?.redScore > match?.blueScore
           ? 1
           : match?.redScore < match?.blueScore
-          ? 2
-          : 0,
+            ? 2
+            : 0,
       tiebreaker: {
         item1: -1, // Fix for Elims in FTC Server
         item2: "",
@@ -821,7 +820,7 @@ const conformCFTCOfflineMatch = (match, level) => {
    * @param match Match details from FTC Server
    * @param level Tournament Level
    */
-  // eslint-disable-next-line 
+  // eslint-disable-next-line
   const conformFTCOfflineRankings = (team) => {
     return {
       ...team,
@@ -1216,8 +1215,8 @@ const conformCFTCOfflineMatch = (match, level) => {
             score?.winningAlliance === 2
               ? "blue"
               : score?.winningAlliance === 1
-              ? "red"
-              : "TBD";
+                ? "red"
+                : "TBD";
           playoffschedule.schedule[
             _.findIndex(playoffschedule.schedule, {
               matchNumber: score.matchNumber,
@@ -1246,7 +1245,7 @@ const conformCFTCOfflineMatch = (match, level) => {
       if (
         lastMatchPlayed === qualschedule?.schedule.length + 1 ||
         lastMatchPlayed ===
-          qualschedule?.schedule.length + playoffschedule?.schedule.length + 2
+        qualschedule?.schedule.length + playoffschedule?.schedule.length + 2
       ) {
         lastMatchPlayed -= 1;
       }
@@ -1567,128 +1566,128 @@ const conformCFTCOfflineMatch = (match, level) => {
 
       var formattedAwards = newTeams
         ? newTeams.map((team) => {
-            // Add in special awards not reported by FIRST APIs (from 2021 season)
-            for (var index = 0; index < 3; index++) {
-              const targetYear = parseInt(selectedYear?.value) - index;
-              let items = specialAwards.filter(
-                (item) => item.Year === targetYear
+          // Add in special awards not reported by FIRST APIs (from 2021 season)
+          for (var index = 0; index < 3; index++) {
+            const targetYear = parseInt(selectedYear?.value) - index;
+            let items = specialAwards.filter(
+              (item) => item.Year === targetYear
+            );
+            if (items.length > 0) {
+              let teamAwards = items[0].awards.filter(
+                (item) => item.teamNumber === team.teamNumber
               );
-              if (items.length > 0) {
-                let teamAwards = items[0].awards.filter(
-                  (item) => item.teamNumber === team.teamNumber
-                );
-                if (teamAwards.length > 0) {
-                  team.awards[`${selectedYear?.value - index}`].awards =
-                    _.concat(
-                      team.awards[`${selectedYear?.value - index}`].awards,
-                      teamAwards
-                    );
-                }
+              if (teamAwards.length > 0) {
+                team.awards[`${selectedYear?.value - index}`].awards =
+                  _.concat(
+                    team.awards[`${selectedYear?.value - index}`].awards,
+                    teamAwards
+                  );
               }
             }
-            var awardYears = Object.keys(team?.awards);
+          }
+          var awardYears = Object.keys(team?.awards);
 
-            awardYears?.forEach((year) => {
-              if (team?.awards[`${year}`] !== null) {
-                if (team.awards[`${year}`]?.awards) {
-                  team.awards[`${year}`] = {
-                    awards: team.awards[`${year}`].awards,
-                  };
-                }
-                team.awards[`${year}`].awards = team?.awards[
-                  `${year}`
-                ]?.awards?.map((award) => {
-                  award.highlight = awardsHilight(award.name);
-                  award.eventName = eventnames[`${year}`][award.eventCode];
-                  award.year = year;
-                  return award;
-                });
-              } else {
-                team.awards[`${year}`] = { awards: [] };
+          awardYears?.forEach((year) => {
+            if (team?.awards[`${year}`] !== null) {
+              if (team.awards[`${year}`]?.awards) {
+                team.awards[`${year}`] = {
+                  awards: team.awards[`${year}`].awards,
+                };
               }
-            });
-            team.hallOfFame = [];
-            _.filter(halloffame, { Chairmans: team.teamNumber }).forEach(
-              (award) => {
-                team.hallOfFame.push({
-                  year: award?.Year,
-                  challenge: award?.Challenge,
-                  type: "chairmans",
-                });
-              }
-            );
-            _.filter(halloffame, { Impact: team.teamNumber }).forEach(
-              (award) => {
-                team.hallOfFame.push({
-                  year: award?.Year,
-                  challenge: award?.Challenge,
-                  type: "impact",
-                });
-              }
-            );
-            _.filter(halloffame, { Inspire: team.teamNumber }).forEach(
-              (award) => {
-                team.hallOfFame.push({
-                  year: award?.Year,
-                  challenge: award?.Challenge,
-                  type: "inspire",
-                });
-              }
-            );
-            _.filter(halloffame, { Winner1: team.teamNumber }).forEach(
-              (award) => {
-                team.hallOfFame.push({
-                  year: award.Year,
-                  challenge: award.Challenge,
-                  type: "winner",
-                });
-              }
-            );
-            _.filter(halloffame, { Winner2: team.teamNumber }).forEach(
-              (award) => {
-                team.hallOfFame.push({
-                  year: award.Year,
-                  challenge: award.Challenge,
-                  type: "winner",
-                });
-              }
-            );
-            _.filter(halloffame, { Winner3: team.teamNumber }).forEach(
-              (award) => {
-                team.hallOfFame.push({
-                  year: award?.Year,
-                  challenge: award?.Challenge,
-                  type: "winner",
-                });
-              }
-            );
-            _.filter(halloffame, { Winner4: team.teamNumber }).forEach(
-              (award) => {
-                team.hallOfFame.push({
-                  year: award.Year,
-                  challenge: award.Challenge,
-                  type: "winner",
-                });
-              }
-            );
-            _.filter(halloffame, { Winner5: team.teamNumber }).forEach(
-              (award) => {
-                team.hallOfFame.push({
-                  year: award.Year,
-                  challenge: award.Challenge,
-                  type: "winner",
-                });
-              }
-            );
+              team.awards[`${year}`].awards = team?.awards[
+                `${year}`
+              ]?.awards?.map((award) => {
+                award.highlight = awardsHilight(award.name);
+                award.eventName = eventnames[`${year}`][award.eventCode];
+                award.year = year;
+                return award;
+              });
+            } else {
+              team.awards[`${year}`] = { awards: [] };
+            }
+          });
+          team.hallOfFame = [];
+          _.filter(halloffame, { Chairmans: team.teamNumber }).forEach(
+            (award) => {
+              team.hallOfFame.push({
+                year: award?.Year,
+                challenge: award?.Challenge,
+                type: "chairmans",
+              });
+            }
+          );
+          _.filter(halloffame, { Impact: team.teamNumber }).forEach(
+            (award) => {
+              team.hallOfFame.push({
+                year: award?.Year,
+                challenge: award?.Challenge,
+                type: "impact",
+              });
+            }
+          );
+          _.filter(halloffame, { Inspire: team.teamNumber }).forEach(
+            (award) => {
+              team.hallOfFame.push({
+                year: award?.Year,
+                challenge: award?.Challenge,
+                type: "inspire",
+              });
+            }
+          );
+          _.filter(halloffame, { Winner1: team.teamNumber }).forEach(
+            (award) => {
+              team.hallOfFame.push({
+                year: award.Year,
+                challenge: award.Challenge,
+                type: "winner",
+              });
+            }
+          );
+          _.filter(halloffame, { Winner2: team.teamNumber }).forEach(
+            (award) => {
+              team.hallOfFame.push({
+                year: award.Year,
+                challenge: award.Challenge,
+                type: "winner",
+              });
+            }
+          );
+          _.filter(halloffame, { Winner3: team.teamNumber }).forEach(
+            (award) => {
+              team.hallOfFame.push({
+                year: award?.Year,
+                challenge: award?.Challenge,
+                type: "winner",
+              });
+            }
+          );
+          _.filter(halloffame, { Winner4: team.teamNumber }).forEach(
+            (award) => {
+              team.hallOfFame.push({
+                year: award.Year,
+                challenge: award.Challenge,
+                type: "winner",
+              });
+            }
+          );
+          _.filter(halloffame, { Winner5: team.teamNumber }).forEach(
+            (award) => {
+              team.hallOfFame.push({
+                year: award.Year,
+                challenge: award.Challenge,
+                type: "winner",
+              });
+            }
+          );
 
-            team.hallOfFame = _.orderBy(
-              team.hallOfFame,
-              ["type", "year"],
-              ["asc", "asc"]
-            );
+          team.hallOfFame = _.orderBy(
+            team.hallOfFame,
+            ["type", "year"],
+            ["asc", "asc"]
+          );
 
-            return team;
-          })
+          return team;
+        })
         : null;
       teams.teams = formattedAwards ? formattedAwards : teams.teams;
 
@@ -2623,16 +2622,16 @@ const conformCFTCOfflineMatch = (match, level) => {
           offlinePlayoffSchedule?.schedule?.length > 0 ||
           offlinePlayoffSchedule?.schedule?.schedule?.length > 0) &&
           currentMatch <
-            (practiceSchedule?.schedule?.length ||
-              practiceSchedule?.schedule?.schedule?.length ||
-              0) +
-              (offlinePlayoffSchedule?.schedule?.length ||
-                offlinePlayoffSchedule?.schedule?.schedule?.length ||
-                0))
+          (practiceSchedule?.schedule?.length ||
+            practiceSchedule?.schedule?.schedule?.length ||
+            0) +
+          (offlinePlayoffSchedule?.schedule?.length ||
+            offlinePlayoffSchedule?.schedule?.schedule?.length ||
+            0))
       ) {
         setAdHocMatch(
           practiceSchedule?.schedule[currentMatch]?.teams ||
-            practiceSchedule?.schedule[currentMatch]?.schedule?.teams
+          practiceSchedule?.schedule[currentMatch]?.schedule?.teams
         );
         setCurrentMatch(currentMatch + 1);
         if (!selectedEvent?.value?.code.includes("OFFLINE")) {
@@ -2644,7 +2643,7 @@ const conformCFTCOfflineMatch = (match, level) => {
         currentMatch <
         (qualSchedule?.schedule?.length ||
           qualSchedule?.schedule?.schedule.length) +
-          playoffSchedule?.schedule?.length
+        playoffSchedule?.schedule?.length
       ) {
         setCurrentMatch(currentMatch + 1);
         if (!selectedEvent?.value?.code.includes("OFFLINE")) {
@@ -2669,7 +2668,7 @@ const conformCFTCOfflineMatch = (match, level) => {
         if (practiceSchedule?.schedule?.length > 0) {
           setAdHocMatch(
             practiceSchedule?.schedule[currentMatch - 2]?.teams ||
-              practiceSchedule?.schedule?.schedule?.teams
+            practiceSchedule?.schedule?.schedule?.teams
           );
         }
         setCurrentMatch(currentMatch - 1);
@@ -2766,23 +2765,64 @@ const conformCFTCOfflineMatch = (match, level) => {
   const getEvents = async () => {
     if (
       eventsLoading === "" ||
-      eventsLoading !== `${ftcMode ? "FTC" : "FRC"}-${selectedYear?.value}`
+      eventsLoading !== `${ftcMode ? ftcMode.value : "FRC"}-${selectedYear?.value}`
     ) {
       console.log(
-        `Loading ${ftcMode ? "FTC" : "FRC"} events list for for ${
-          selectedYear?.value
+        `Loading ${ftcMode ? ftcMode.label : "FRC"} events list for for ${selectedYear?.value
         }...`
       );
-      setEventsLoading(`${ftcMode ? "FTC" : "FRC"}-${selectedYear?.value}`);
+      setEventsLoading(`${ftcMode ? ftcMode.label : "FRC"}-${selectedYear?.value}`);
       try {
         let result;
         if (useFTCOffline) {
           const val = await httpClient.getNoAuth(
-            `/api/v1/events`,
+            `/api/v1/events/`,
             FTCServerURL
           );
-          result= await val.json();
-
+          result = await val.json();
+          if (result?.eventCodes?.length > 0) {
+            let events = result.eventCodes.map(async (code) => {
+              const val = await httpClient.getNoAuth(
+                `/api/v1/events/${code}/`,
+                FTCServerURL
+              );
+              if (val.status === 200) {
+                const localEvent = await val.json();
+                return {
+                  eventId: localEvent.eventCode,
+                  code: localEvent.eventCode,
+                  divisionCode: null,
+                  name: localEvent.name,
+                  remote: false,
+                  hybrid: false,
+                  fieldCount: localEvent.fieldCount,
+                  published: false,
+                  type: localEvent.type,
+                  typeName: "Local Event",
+                  regionCode: null,
+                  leagueCode: null,
+                  districtCode: null,
+                  venue: null,
+                  address: null,
+                  city: null,
+                  stateprov: null,
+                  country: null,
+                  website: null,
+                  liveStreamUrl: null,
+                  coordinates: null,
+                  webcasts: null,
+                  timezone: null,
+                  dateStart: moment(localEvent.start).format(),
+                  dateEnd: moment(localEvent.end).format(),
+                };
+              }
+            });
+            await Promise.all(events).then((values) => {
+              result.events = values;
+            });
+          } else {
+            result.events = [];
+          }
         } else {
           const val = await httpClient.getNoAuth(
             `${selectedYear?.value}/events`,
@@ -2790,13 +2830,14 @@ const conformCFTCOfflineMatch = (match, level) => {
           );
           result = await val.json();
         }
+
         if (typeof result.Events !== "undefined") {
           result.events = result.Events;
           delete result.Events;
         }
         var timeNow = moment();
 
-        if (selectedYear?.value === supportedYears[0].value) {
+        if (selectedYear?.value === supportedYears[0].value && !ftcMode) {
           result.events = result?.events.concat(training.events.events);
         }
         var regionCodes = [];
@@ -2939,8 +2980,7 @@ const conformCFTCOfflineMatch = (match, level) => {
       }
     } else {
       console.log(
-        `Events already loaded for ${ftcMode ? "FTC" : "FRC"}-${
-          selectedYear?.value
+        `Events already loaded for ${ftcMode ? ftcMode.label : "FRC"}-${selectedYear?.value
         }. Skipping...`
       );
     }
@@ -2986,6 +3026,34 @@ const conformCFTCOfflineMatch = (match, level) => {
       console.error(e);
     }
   };
+
+  // Request FTC Key from local FTC Server
+  const requestFTCKey = async () => {
+    const val = await httpClient.postNoAuth(
+      `/api/v1/keyrequest/?name=gatool`,
+      null,
+      FTCServerURL,
+      null
+    );
+    if (val.status === 200) {
+      const json = await val.json();
+      setFTCKey({ ...json, active: false });
+    }
+  }
+
+  // Get the FTC Key from gatool Cloud
+  const checkFTCKey = async () => {
+    const val = await httpClient.getNoAuth(
+      `/api/v1/keycheck/`,
+      FTCServerURL,
+      undefined,
+      {"Authorization": FTCKey?.key || ""}
+    );
+    if (val.status === 200) {
+      const json = await val.json();
+      setFTCKey({ ...FTCKey, active: json?.active });
+    }
+  }
 
   // Retrieve Community Updates when the team list changes
   useEffect(() => {
@@ -3102,7 +3170,7 @@ const conformCFTCOfflineMatch = (match, level) => {
       var matchesPerTeam = 0;
       matchesPerTeam = _.toInteger(
         (6 * qualSchedule?.schedule?.length) /
-          (teamList?.teamCountTotal - teamReduction)
+        (teamList?.teamCountTotal - teamReduction)
       );
       // In order to start Alliance Selection, we need the following conditions to be true:
       // All matches must have been completed
@@ -3113,7 +3181,7 @@ const conformCFTCOfflineMatch = (match, level) => {
       if (
         qualSchedule?.schedule?.length === qualSchedule?.completedMatchCount &&
         _.filter(rankings?.ranks, { matchesPlayed: matchesPerTeam }).length ===
-          teamList?.teamCountTotal - teamReduction
+        teamList?.teamCountTotal - teamReduction
       ) {
         asReady = true;
       }
@@ -3387,13 +3455,15 @@ const conformCFTCOfflineMatch = (match, level) => {
                     ftcMode={ftcMode}
                     setFTCMode={setFTCMode}
                     ftcRegions={ftcregions}
-                    ftcTypes={ftcTypes} 
-                    useFTCOffline={useFTCOffline} 
-                    setUseFTCOffline={setUseFTCOffline} 
-                    FTCServerURL={FTCServerURL} 
-                    setFTCServerURL={setFTCServerURL} 
-                    FTCOfflineAvaialable={FTCOfflineAvailable}  
-                                    />
+                    ftcTypes={ftcTypes}
+                    useFTCOffline={useFTCOffline}
+                    setUseFTCOffline={setUseFTCOffline}
+                    FTCServerURL={FTCServerURL}
+                    setFTCServerURL={setFTCServerURL}
+                    FTCKey={FTCKey}
+                    requestFTCKey={requestFTCKey}
+                    checkFTCKey={checkFTCKey}
+                  />
                 }
               />
 

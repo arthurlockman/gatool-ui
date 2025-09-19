@@ -52,16 +52,18 @@ class AuthClient {
         throw new Error(errorText);
     }
 
-    async getNoAuth(path, customAPIBaseUrl, timeOut = 300000) {
+    async getNoAuth(path, customAPIBaseUrl, timeOut = 300000, headers) {
         if (!this.online) {
             throw new Error("You are offline.");
         }
 
         this.operationStart();
         try {
-            var response = await fetch(`${customAPIBaseUrl || apiBaseUrl}${path}`, {
+            var options = {
                 signal: AbortSignal.timeout(timeOut),
-            }).finally(() => {
+            }
+            if (headers) options.headers = headers
+            var response = await fetch(`${customAPIBaseUrl || apiBaseUrl}${path}`, options).finally(() => {
                 this.operationDone();
             });
             if (response.ok) return response;
@@ -165,14 +167,14 @@ class AuthClient {
         throw new Error(errorText);
     }
 
-    async postNoAuth(path, body, customAPIBaseUrl) {
+    async postNoAuth(path, body, customAPIBaseUrl, headers) {
         if (!this.online) {
             throw new Error("You are offline.");
         }
 
         this.operationStart();
         var response = await fetch(`${customAPIBaseUrl || apiBaseUrl}${path}`, {
-            headers: {
+            headers: {...headers,
                 "Content-Type": "application/json",
             },
             method: "POST",

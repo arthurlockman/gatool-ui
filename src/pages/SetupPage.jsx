@@ -74,7 +74,7 @@ const ftcModeOptions = [
 
 
 
-function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, regionFilters, setRegionFilters, districts, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showNotesAnnounce, setShowNotesAnnounce, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, autoUpdate, setAutoUpdate, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, showQualsStatsQuals, setShowQualsStatsQuals, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee, showDistrictChampsStats, setShowDistrictChampsStats, monthsWarning, setMonthsWarning, user, isAuthenticated, adHocMode, setAdHocMode, supportedYears, FTCSupportedYears, reloadPage, autoHideSponsors, setAutoHideSponsors, setLoadingCommunityUpdates, hidePracticeSchedule, setHidePracticeSchedule, systemMessage, setTeamListLoading, getTeamList, getAlliances, setHaveChampsTeams, appUpdates, usePullDownToUpdate, setUsePullDownToUpdate, useSwipe, setUseSwipe, eventLabel, setEventLabel, showInspection, setShowInspection, showMinorAwards, setShowMinorAwards, highScoreMode, setHighScoreMode, systemBell, setSystemBell, eventBell, setEventBell, eventMessage, setEventMessage, putEventNotifications, useCheesyArena, setUseCheesyArena, cheesyArenaAvailable, ftcLeagues, ftcRegions, ftcMode, setFTCMode, ftcTypes, useFTCOffline, setUseFTCOffline, FTCServerURL, setFTCServerURL, FTCOfflineAvaialable }) {
+function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, regionFilters, setRegionFilters, districts, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showNotesAnnounce, setShowNotesAnnounce, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, autoUpdate, setAutoUpdate, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, showQualsStatsQuals, setShowQualsStatsQuals, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee, showDistrictChampsStats, setShowDistrictChampsStats, monthsWarning, setMonthsWarning, user, isAuthenticated, adHocMode, setAdHocMode, supportedYears, FTCSupportedYears, reloadPage, autoHideSponsors, setAutoHideSponsors, setLoadingCommunityUpdates, hidePracticeSchedule, setHidePracticeSchedule, systemMessage, setTeamListLoading, getTeamList, getAlliances, setHaveChampsTeams, appUpdates, usePullDownToUpdate, setUsePullDownToUpdate, useSwipe, setUseSwipe, eventLabel, setEventLabel, showInspection, setShowInspection, showMinorAwards, setShowMinorAwards, highScoreMode, setHighScoreMode, systemBell, setSystemBell, eventBell, setEventBell, eventMessage, setEventMessage, putEventNotifications, useCheesyArena, setUseCheesyArena, cheesyArenaAvailable, ftcLeagues, ftcRegions, ftcMode, setFTCMode, ftcTypes, useFTCOffline, setUseFTCOffline, FTCServerURL, setFTCServerURL, FTCKey, requestFTCKey, checkFTCKey }) {
     const isOnline = useOnlineStatus();
     const PWASupported = (isChrome && Number(browserVersion) >= 76) || (isSafari && Number(browserVersion) >= 15 && Number(fullBrowserVersion.split(".")[1]) >= 4);
 
@@ -276,20 +276,25 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                 </Col>
             </Row>
             {useFTCOffline && <Row className="ftcSetupPageMenus">
-                <Col><h4>You must configure gatool to use a local FTC server.<br/>
+                <Col><h4>You must configure gatool to use a local FTC server.<br />
                     Please take the following steps:</h4>
-                    <div style={{textAlign:"left"}}><ol>
+                    <div style={{ textAlign: "left" }}><ol>
                         <li>Ensure that your browser is configured to use unsafe content.</li>
                         <li>Enter the URL for the local FTC server</li>
                         <li>Request API access, which your FTA must approve</li>
                     </ol></div>
                 </Col>
-                <Col style={{textAlign:"left"}}><Form>
+                <Col style={{ textAlign: "left" }}><Form>
                     <Form.Group controlId="FTCServerURL">
                         <Form.Label className={"formLabel"}><b>Server URL (usually in http://10.0.100.5 format)</b></Form.Label>
                         <Form.Control type="text" placeholder={"usually in http://10.0.100.5 format"} value={FTCServerURL} onChange={(e) => setFTCServerURL(e.target.value)} />
                     </Form.Group>
                 </Form>
+                    {!FTCKey?.key && !FTCKey?.active && <Button onClick={requestFTCKey}>Request API Access</Button>}
+                    {FTCKey?.key && <Button  onClick={requestFTCKey}>Request new API Key</Button>}
+                    {FTCKey?.key && !FTCKey?.active && <Button onClick={checkFTCKey}>Check API Access</Button>}
+                    {FTCKey?.key && FTCKey?.active && <><Button onClick={checkFTCKey} variant="success">API Access Granted!</Button>{FTCKey?.key ? <><br/>{`Key: ${FTCKey?.key}`}</> : ""}</>}
+
                 </Col>
             </Row>}
             {eventList && <Row className="setupPageFilters">
