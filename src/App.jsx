@@ -2296,6 +2296,7 @@ function App() {
     if (selectedEvent?.value?.code.includes("OFFLINE")) {
       ranks = { rankings: { Rankings: [] } };
     } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
+      ranks = { rankings: { Rankings: [] } };
       if (useCheesyArena && cheesyArenaAvailable) {
         // get rankings from Cheesy Arena
         result = await fetch("http://10.0.100.5:8443/api/rankings");
