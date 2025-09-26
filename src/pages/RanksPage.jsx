@@ -115,7 +115,7 @@ function RanksPage({
           return tempRow;
         });
 
-        formattedRankings.lastUpdate = moment();
+        formattedRankings.lastUpdate = moment().format();
         setRankingsOverride(true);
         setRankings(_.cloneDeep(formattedRankings));
         setAllianceSelectionArrays({});

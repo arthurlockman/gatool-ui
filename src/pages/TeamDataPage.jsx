@@ -150,7 +150,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
 
     const handleTrack = async () => {
         var visits = _.cloneDeep(lastVisit);
-        visits[`${updateTeam.teamNumber}`] = moment();
+        visits[`${updateTeam.teamNumber}`] = moment().format();
         await setLastVisit(visits);
         setUpdateTeam(null);
         setShow(false);
@@ -171,7 +171,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
      */
     const handleSubmit = async (mode, e) => {
         var visits = _.cloneDeep(lastVisit);
-        visits[`${updateTeam.teamNumber}`] = moment();
+        visits[`${updateTeam.teamNumber}`] = moment().format();
         var communityUpdatesTemp = _.cloneDeep(communityUpdates);
         var update = _.filter(communityUpdatesTemp, { "teamNumber": updateTeam.teamNumber })[0];
         var formValue = {
