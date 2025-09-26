@@ -633,6 +633,7 @@ function PlayByPlayPage({
               adHocMode={adHocMode}
               playoffCountOverride={playoffCountOverride}
               highScoreMode={highScoreMode}
+              ftcMode={ftcMode}
             />
           </Container>
         )}

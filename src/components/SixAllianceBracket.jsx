@@ -4,6 +4,7 @@ import { useState } from "react";
 import moment from "moment";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useSwipeable } from "react-swipeable";
+import { matchClassesBase } from "./Constants";
 
 function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMatch, qualsLength, nextMatch, previousMatch, getSchedule, usePullDownToUpdate, useSwipe, eventLabel, playoffCountOverride, ftcMode, matches, allianceNumbers, allianceName, matchScore, matchWinner }) {
 	const [showSelectWinner, setShowSelectWinner] = useState(false);
@@ -47,22 +48,7 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 		{ "bye": 0, "replacementMatchClasses": [] }
 	]
 
-	var matchClasses = [
-		{ "matchNumber": 1, "description": "Match 1 (R1) (#1)", "winnerTo": { "matchNumber": 3, "station": "blue" }, "loserTo": { "matchNumber": 6, "station": "blue" }, },
-		{ "matchNumber": 2, "description": "Match 2 (R1) (#2)", "winnerTo": { "matchNumber": 4, "station": "blue" }, "loserTo": { "matchNumber": 5, "station": "blue" }, },
-		{ "matchNumber": 3, "description": "Match 3 (R1) (#3)", "winnerTo": { "matchNumber": 7, "station": "red" }, "loserTo": { "matchNumber": 5, "station": "red" }, },
-		{ "matchNumber": 4, "description": "Match 4 (R1) (#4)", "winnerTo": { "matchNumber": 7, "station": "blue" }, "loserTo": { "matchNumber": 6, "station": "red" }, },
-		{ "matchNumber": 5, "description": "Match 5 (R2) (#5)", "winnerTo": { "matchNumber": 8, "station": "blue" }, "loserTo": null },
-		{ "matchNumber": 6, "description": "Match 6 (R2) (#6)", "winnerTo": { "matchNumber": 8, "station": "red" }, "loserTo": null, },
-		{ "matchNumber": 7, "description": "Match 7 (R2) (#7)", "winnerTo": { "matchNumber": 10, "station": "red" }, "loserTo": { "matchNumber": 9, "station": "red" }, },
-		{ "matchNumber": 8, "description": "Match 8 (R2) (#8)", "winnerTo": { "matchNumber": 9, "station": "blue" }, "loserTo": null, },
-		{ "matchNumber": 9, "description": "Match 9 (R3) (#9)", "winnerTo": { "matchNumber": 10, "station": "blue" }, "loserTo": null, },
-		{ "matchNumber": 10, "description": "Final 1 (#10)", "winnerTo": { "matchNumber": 11, "station": "blue" }, "loserTo": { "matchNumber": 11, "station": "red" }, },
-		{ "matchNumber": 11, "description": "Final 2 (#11)", "winnerTo": { "matchNumber": 12, "station": "red" }, "loserTo": { "matchNumber": 12, "station": "red" }, },
-		{ "matchNumber": 12, "description": "Overtime 1 (#12)", "winnerTo": { "matchNumber": 13, "station": "blue" }, "loserTo": { "matchNumber": 13, "station": "red" }, },
-		{ "matchNumber": 13, "description": "Overtime 2 (#13)", "winnerTo": { "matchNumber": 14, "station": "blue" }, "loserTo": { "matchNumber": 14, "station": "red" }, },
-		{ "matchNumber": 14, "description": "Overtime 3 (#14)", "winnerTo": { "matchNumber": null, "station": null }, "loserTo": { "matchNumber": null, "station": null }, }
-	]
+	var matchClasses = _.cloneDeep(matchClassesBase.sixAlliance);
 
 	_.forEach(byeCount[playoffCountOverride?.value || 8].replacementMatchClasses, (match) => {
 		var tempClass = _.findIndex(matchClasses, { "matchNumber": match.matchNumber });

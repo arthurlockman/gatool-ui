@@ -2663,6 +2663,13 @@ function App() {
         } else {
           // @ts-ignore
           alliances = await result.json();
+          // remove "Seed" from FTC alliance names
+          if (ftcMode) {
+            alliances.alliances = alliances.alliances.map((alliance) => {
+              alliance.name = alliance?.name.replace("Seed ", "");
+              return alliance;
+            });
+          }
         }
       }
     } else if (
@@ -2705,17 +2712,19 @@ function App() {
           backup: alliance.backup,
           backupReplaced: alliance.backupReplaced,
         };
-        allianceLookup[`${alliance.round2}`] = {
-          role: `Round 2 Selection`,
-          alliance: alliance.name,
-          number: alliance.number,
-          captain: alliance.captain,
-          round1: alliance.round1,
-          round2: alliance.round2,
-          round3: alliance.round3,
-          backup: alliance.backup,
-          backupReplaced: alliance.backupReplaced,
-        };
+        if (alliance.round2) {
+          allianceLookup[`${alliance.round2}`] = {
+            role: `Round 2 Selection`,
+            alliance: alliance.name,
+            number: alliance.number,
+            captain: alliance.captain,
+            round1: alliance.round1,
+            round2: alliance.round2,
+            round3: alliance.round3,
+            backup: alliance.backup,
+            backupReplaced: alliance.backupReplaced,
+          };
+        }
         if (alliance.round3) {
           allianceLookup[`${alliance.round3}`] = {
             role: `Round 3 Selection`,
@@ -4157,6 +4166,7 @@ function App() {
                     useSwipe={useSwipe}
                     eventLabel={eventLabel}
                     playoffCountOverride={playoffCountOverride}
+                    ftcMode={ftcMode}
                   />
                 }
               />
