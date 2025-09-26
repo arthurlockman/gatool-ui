@@ -831,22 +831,22 @@ function App() {
     };
   };
 
-   /**
+  /**
    * @constant conformFTCOfflineAlliance
    * @param {*} alliance team details from FTC Offline server
    * @returns reformatted team details from FTC Offline server
    */
   const conformFTCOfflineAlliance = (alliance) => {
     return {
-                number: alliance?.seed,
-                captain: alliance?.captain || null,
-                round1: alliance?.pick1 || null,
-                round2: alliance?.pick2 || null,
-                round3: alliance?.pick3 || null,
-                backup:  null,
-                backupReplaced: null,
-                name: `Alliance ${alliance?.seed}`,
-              };
+      number: alliance?.seed,
+      captain: alliance?.captain || null,
+      round1: alliance?.pick1 || null,
+      round2: alliance?.pick2 || null,
+      round3: alliance?.pick3 || null,
+      backup: null,
+      backupReplaced: null,
+      name: `Alliance ${alliance?.seed}`,
+    };
   };
 
   /**
@@ -903,6 +903,7 @@ function App() {
     console.log(
       `Fetching Practice Schedule for ${selectedEvent?.value?.name}...`
     );
+    practiceschedule = { schedule: [] };
     if (
       selectedEvent?.value?.code.includes("OFFLINE") ||
       selectedEvent?.value?.code.includes("PRACTICE")
@@ -960,7 +961,7 @@ function App() {
 
     if (
       practiceschedule?.schedule?.length > 0 ||
-      practiceschedule?.schedule?.schedule.length > 0
+      practiceschedule?.schedule?.schedule?.length > 0
     ) {
       if (typeof practiceSchedule?.schedule?.schedule !== "undefined") {
         practiceSchedule.schedule = practiceSchedule?.schedule?.schedule;
@@ -1174,8 +1175,8 @@ function App() {
       `Fetching Playoff Schedule for ${selectedEvent?.value?.name}...`
     );
     playoffschedule = {
-          schedule: [],
-        };
+      schedule: [],
+    };
     //get the playoff schedule
     completedMatchCount = 0;
     if (selectedEvent?.value?.code.includes("OFFLINE")) {
@@ -2298,16 +2299,18 @@ function App() {
       if (useCheesyArena && cheesyArenaAvailable) {
         // get rankings from Cheesy Arena
         result = await fetch("http://10.0.100.5:8443/api/rankings");
-        var data = await result.json();
-        if (data?.Rankings.length > 0) {
-          // reformat data to FIRST API Rankings format
-          ranks = {
-            rankings: {
-              rankings: data?.Rankings.map((team) => {
-                return conformCheesyArenaRankings(team);
-              }),
-            },
-          };
+        if (result.status === 200) {
+          var data = await result.json();
+          if (data?.Rankings.length > 0) {
+            // reformat data to FIRST API Rankings format
+            ranks = {
+              rankings: {
+                rankings: data?.Rankings.map((team) => {
+                  return conformCheesyArenaRankings(team);
+                }),
+              },
+            };
+          }
         }
       } else if (
         useFTCOffline &&
@@ -2344,8 +2347,10 @@ function App() {
           `${selectedYear?.value}/rankings/${selectedEvent?.value.code}`,
           ftcMode ? ftcBaseURL : undefined
         );
-        // @ts-ignore
-        ranks = await result.json();
+        if (result.status === 200) {
+          // @ts-ignore
+          ranks = await result.json();
+        }
       }
     } else if (selectedEvent?.value?.code === "PRACTICE1") {
       ranks = { rankings: _.cloneDeep(training.ranks.partial) };
@@ -2592,7 +2597,7 @@ function App() {
   async function getAlliances(allianceTemp) {
     console.log("Getting Alliances");
     var result = null;
-    var alliances = allianceTemp || {Alliances:[]};
+    var alliances = allianceTemp || { Alliances: [] };
     if (
       !selectedEvent?.value?.code.includes("PRACTICE") &&
       !selectedEvent?.value?.code.includes("OFFLINE")
@@ -2637,13 +2642,13 @@ function App() {
           if (allianceData?.alliances?.length > 0) {
             // reformat data to FIRST API Rankings format
             alliances = {
-            Alliances: allianceData?.alliances.map((alliance) => {
-              return conformFTCOfflineAlliance(alliance);
-            }),
-          };
+              Alliances: allianceData?.alliances.map((alliance) => {
+                return conformFTCOfflineAlliance(alliance);
+              }),
+            };
           }
         } else if (allianceResult.status === 204) {
-          alliances = { Alliances: []  };
+          alliances = { Alliances: [] };
         }
       } else {
         result = await httpClient.getNoAuth(
@@ -2984,7 +2989,7 @@ function App() {
       if (
         currentMatch <
         (qualSchedule?.schedule?.length ||
-          qualSchedule?.schedule?.schedule.length) +
+          qualSchedule?.schedule?.schedule?.length) +
           playoffSchedule?.schedule?.length
       ) {
         setCurrentMatch(currentMatch + 1);

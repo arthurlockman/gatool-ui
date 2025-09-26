@@ -1235,13 +1235,14 @@ function SchedulePage({
                         </td>
                         <td>{match?.description}</td>
                         <td>{match?.matchNumber}</td>
-                        <td colSpan={ftcMode ? 1 : 2}>
-                          <tr className={`centerTable ${redStyle} block`}>
-                            <span>{match?.scoreRedFinal}</span>
-                          </tr>
-                          <tr className={`centerTable ${blueStyle} block`}>
-                            <span>{match?.scoreBlueFinal}</span>
-                          </tr>
+                        <td className={`centerTable`} colSpan={ftcMode ? 1 : 2}>
+                          <span className={redStyle}>
+                            {match?.scoreRedFinal}
+                          </span>
+                          <br />
+                          <span className={blueStyle}>
+                            {match?.scoreBlueFinal}
+                          </span>
                         </td>
                         {!ftcMode && (
                           <>
@@ -1427,8 +1428,8 @@ function SchedulePage({
                         <td
                           className={
                             match?.actualStartTime
-                              ? `scheduleTable${winnerStyle}`
-                              : ""
+                              ? `centerTable scheduleTable${winnerStyle}`
+                              : "centerTable"
                           }
                           onClick={() => {
                             if (match?.postResultTime && match?.scores) {
@@ -1436,12 +1437,13 @@ function SchedulePage({
                             }
                           }}
                         >
-                          <tr className={`centerTable ${redStyle} block`}>
-                            <span>{match?.scoreRedFinal}</span>
-                          </tr>
-                          <tr className={`centerTable ${blueStyle} block`}>
-                            <span>{match?.scoreBlueFinal}</span>
-                          </tr>
+                          <span className={redStyle}>
+                            {match?.scoreRedFinal}
+                          </span>
+                          <br />
+                          <span className={blueStyle}>
+                            {match?.scoreBlueFinal}
+                          </span>
                         </td>
                         {!ftcMode && (
                           <td
@@ -1566,8 +1568,8 @@ function SchedulePage({
                         <td
                           className={
                             match?.actualStartTime
-                              ? `scheduleTable${winnerStyle}`
-                              : " "
+                              ? `centerTable scheduleTable${winnerStyle}`
+                              : "centerTable"
                           }
                           onClick={() => {
                             if (match?.postResultTime && match?.scores) {
@@ -1576,12 +1578,13 @@ function SchedulePage({
                           }}
                           colSpan={ftcMode ? 1 : 2}
                         >
-                          <tr className={`centerTable ${redStyle} block`}>
-                            <span>{match?.scoreRedFinal}</span>
-                          </tr>
-                          <tr className={`centerTable ${blueStyle} block`}>
-                            <span>{match?.scoreBlueFinal}</span>
-                          </tr>
+                          <span className={redStyle}>
+                            {match?.scoreRedFinal}
+                          </span>
+                          <br />
+                          <span className={blueStyle}>
+                            {match?.scoreBlueFinal}
+                          </span>
                         </td>
                         {!ftcMode && (
                           <>
