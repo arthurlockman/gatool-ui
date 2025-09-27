@@ -22,6 +22,7 @@ function Developer({
   getSyncStatus,
   systemBell,
   setSystemBell,
+  resetCache,
 }) {
   const { user, getAccessTokenSilently } = useAuth0();
 
@@ -56,7 +57,9 @@ function Developer({
   useEffect(() => {
     async function getToken() {
       const tokenResponse = await getAccessTokenSilently({
-        audience: `https://${process.env.REACT_APP_AUTH0_DOMAIN || 'gatool.auth0.com'}/userinfo`,
+        audience: `https://${
+          process.env.REACT_APP_AUTH0_DOMAIN || "gatool.auth0.com"
+        }/userinfo`,
         scope: "openid email profile",
         detailedResponse: true,
       });
@@ -69,8 +72,12 @@ function Developer({
   useEffect(() => {
     setFormattedMessage({
       message: formValue?.message,
-      expiry: moment(`${formValue?.offDate} ${formValue?.offTime}`),
-      onTime: moment(`${formValue?.onDate} ${formValue?.onTime}`),
+      expiry: formValue?.offDate
+        ? moment(`${formValue?.offDate} ${formValue?.offTime}`)
+        : null,
+      onTime: formValue?.onDate
+        ? moment(`${formValue?.onDate} ${formValue?.onTime}`)
+        : null,
       variant: formValue?.variant || "",
       link: formValue?.link,
     });
@@ -223,6 +230,10 @@ function Developer({
     });
   };
 
+  const handleResetCache = async () => {
+    resetCache();
+  };
+
   return (
     <>
       <br />
@@ -242,6 +253,15 @@ function Developer({
                 }}
               >
                 Copy token to Clipboard
+              </Button>
+            </Container>
+            <Container>
+              <br />
+              If you suspect that there are cached data that need to be
+              released, you can clear the cache on the server side here.
+              <br />
+              <Button variant="danger" onClick={handleResetCache}>
+                Clear Cache
               </Button>
             </Container>
           </Tab>
