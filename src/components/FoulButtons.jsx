@@ -10,8 +10,9 @@ import { useState } from "react";
 import _ from "lodash";
 import { useHotkeysContext, useHotkeys } from "react-hotkeys-hook";
 import { commonFouls } from "./Fouls";
+import { commonFoulsFTC } from "./FoulsFTC";
 
-function FoulButtons({ currentYear }) {
+function FoulButtons({ currentYear, ftcMode = null }) {
   const [showFoul, setShowFoul] = useState(false);
   const [foul, setFoul] = useState(null);
   const { disableScope, enableScope } = useHotkeysContext();
@@ -40,11 +41,23 @@ function FoulButtons({ currentYear }) {
   return (
     <>
       <ButtonToolbar
-        style={{ alignContent: "center", width: "100%", display: "block", marginTop: "10px" }}
+        style={{
+          alignContent: "center",
+          width: "100%",
+          display: "block",
+          marginTop: "10px",
+        }}
       >
-        {_.filter(_.sortBy(commonFouls, ["card", "code", "rp"]), (foul) => {
-          return foul.card === "red" || foul.card === "yellow";
-        }).map((foul) => {
+        {_.filter(
+          _.sortBy(ftcMode ? commonFoulsFTC : commonFouls, [
+            "card",
+            "code",
+            "rp",
+          ]),
+          (foul) => {
+            return foul.card === "red" || foul.card === "yellow";
+          }
+        ).map((foul) => {
           return (
             <Button
               onClick={() => handleShow(foul)}
@@ -69,9 +82,16 @@ function FoulButtons({ currentYear }) {
             </Button>
           );
         })}
-        {_.filter(_.sortBy(commonFouls, ["card", "code", "rp"]), (foul) => {
-          return foul.card !== "red" && foul.card !== "yellow";
-        }).map((foul) => {
+        {_.filter(
+          _.sortBy(ftcMode ? commonFoulsFTC : commonFouls, [
+            "card",
+            "code",
+            "rp",
+          ]),
+          (foul) => {
+            return foul.card !== "red" && foul.card !== "yellow";
+          }
+        ).map((foul) => {
           return (
             <Button
               onClick={() => handleShow(foul)}
@@ -90,11 +110,11 @@ function FoulButtons({ currentYear }) {
             </Button>
           );
         })}
+
         <Button
           className={"foulButtons"}
           key={"foulLookup"}
           onClick={() => {
-            // window.open(`https://frctools.com/${currentYear}`);
             handleShow({
               year: currentYear,
               code: "LOOKUP",
@@ -107,7 +127,11 @@ function FoulButtons({ currentYear }) {
                   <iframe
                     width="100%"
                     height="100%"
-                    src={`https://frctools.com/${currentYear}`}
+                    src={
+                      ftcMode
+                        ? "https://ftc.game/cm-html"
+                        : `https://frctools.com/${currentYear}`
+                    }
                     title="Foul Lookup"
                   />
                 </div>

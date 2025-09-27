@@ -104,7 +104,7 @@ export const commonFouls = [
     text: (
       <>
         <p>
-          A team member may only enter or exit the FIELD through open gates.
+          All teams must be civil toward everyone and respectful of team and event equipment while at a FIRST Robotics Competition event. Please review the FIRST Code of Conduct and Core Values for more information.
         </p>
       </>
     ),
