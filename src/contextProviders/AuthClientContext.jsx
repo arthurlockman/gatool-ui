@@ -71,8 +71,8 @@ class AuthClient {
       });
       if (response.ok) return response;
     } catch (e) {
-      console.log("Fetch timeout exceeded");
       this.operationDone();
+      console.log("Fetch timeout exceeded");
       return { status: 408, statusText: "Request Timeout" };
     }
     var errorText = `Received a ${response.status} error from backend: "${response.statusText}"`;
@@ -98,10 +98,8 @@ class AuthClient {
     }
     if (response.status === 503) {
       if (path.includes("/elim/alliances")) {
-        this.operationDone();
         return { status: 204, statusText: "No Alliances loaded" };
       } else if (path.includes("/elims/")) {
-        this.operationDone();
         return { status: 204, statusText: "No Playoff matches loaded" };
       } else {
         errorText += " The serice is currently unavailable.";
@@ -117,18 +115,24 @@ class AuthClient {
     }
 
     this.operationStart();
-    var token = await this.getToken();
-    var response = await fetch(`${customAPIBaseUrl || apiBaseUrl}${path}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      method: "PUT",
-      body: JSON.stringify(body),
-    }).finally(() => {
+    try {
+      var token = await this.getToken();
+      var response = await fetch(`${customAPIBaseUrl || apiBaseUrl}${path}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        method: "PUT",
+        body: JSON.stringify(body),
+      }).finally(() => {
+        this.operationDone();
+      });
+      if (response.ok) return response;
+    } catch (e) {
       this.operationDone();
-    });
-    if (response.ok) return response;
+      console.log("Fetch timeout exceeded");
+      return { status: 408, statusText: "Request Timeout" };
+    }
     var errorText = `Received a ${response.status} error from backend: "${response.statusText}"`;
     if (response.status === 400) {
       errorText +=
@@ -152,18 +156,24 @@ class AuthClient {
     }
 
     this.operationStart();
-    var token = await this.getToken();
-    var response = await fetch(`${apiBaseUrl}${path}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      method: "POST",
-      body: body == null ? null : JSON.stringify(body),
-    }).finally(() => {
+    try {
+      var token = await this.getToken();
+      var response = await fetch(`${apiBaseUrl}${path}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+        body: body == null ? null : JSON.stringify(body),
+      }).finally(() => {
+        this.operationDone();
+      });
+      if (response.ok) return response;
+    } catch (e) {
       this.operationDone();
-    });
-    if (response.ok) return response;
+      console.log("Fetch timeout exceeded");
+      return { status: 408, statusText: "Request Timeout" };
+    }
     var errorText = `Received a ${response.status} error from backend: "${response.statusText}"`;
     if (response.status === 400) {
       errorText +=
@@ -187,14 +197,20 @@ class AuthClient {
     }
 
     this.operationStart();
-    var response = await fetch(`${customAPIBaseUrl || apiBaseUrl}${path}`, {
-      headers: { ...headers, "Content-Type": "application/json" },
-      method: "POST",
-      body: body == null ? null : JSON.stringify(body),
-    }).finally(() => {
+    try {
+      var response = await fetch(`${customAPIBaseUrl || apiBaseUrl}${path}`, {
+        headers: { ...headers, "Content-Type": "application/json" },
+        method: "POST",
+        body: body == null ? null : JSON.stringify(body),
+      }).finally(() => {
+        this.operationDone();
+      });
+      if (response.ok) return response;
+    } catch (e) {
       this.operationDone();
-    });
-    if (response.ok) return response;
+      console.log("Fetch timeout exceeded");
+      return { status: 408, statusText: "Request Timeout" };
+    }
     var errorText = `Received a ${response.status} error from backend: "${response.statusText}"`;
     if (response.status === 400) {
       errorText +=
@@ -218,16 +234,22 @@ class AuthClient {
     }
 
     this.operationStart();
-    var token = await this.getToken();
-    var response = await fetch(`${apiBaseUrl}${path}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      method: "DELETE",
-    }).finally(() => {
+    try {
+      var token = await this.getToken();
+      var response = await fetch(`${apiBaseUrl}${path}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        method: "DELETE",
+      }).finally(() => {
+        this.operationDone();
+      });
+      if (response.ok) return response;
+    } catch (e) {
       this.operationDone();
-    });
-    if (response.ok) return response;
+      console.log("Fetch timeout exceeded");
+      return { status: 408, statusText: "Request Timeout" };
+    }
     var errorText = `Received a ${response.status} error from backend: "${response.statusText}"`;
     if (response.status === 400) {
       errorText +=
@@ -294,7 +316,9 @@ function AuthClientContextProvider({ children }) {
   }, [isOnline, client]);
   // @ts-ignore
   return (
-    <AuthClientContext.Provider value={[client, operationsInProgress]}>
+    <AuthClientContext.Provider value={[client, 
+// @ts-ignore
+    operationsInProgress]}>
       {children}
     </AuthClientContext.Provider>
   );

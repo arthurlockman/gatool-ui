@@ -939,10 +939,11 @@ function App() {
             getTeamList(reducedTeamList);
           }
         }
-      } else {
+      } else if (!useFTCOffline) {
         // get the practice schedule from FIRST API
         const practiceResult = await httpClient.getNoAuth(
-          `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/practice`
+          `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/practice`,
+        ftcMode ? ftcBaseURL : undefined
         );
         if (practiceResult.status === 200) {
           // @ts-ignore
@@ -1069,7 +1070,7 @@ function App() {
           }
           return match;
         });
-      } else {
+      } else if (!useFTCOffline){
         const qualsResult = await httpClient.getNoAuth(
           `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/qual`,
           ftcMode ? ftcBaseURL : undefined
@@ -1286,7 +1287,7 @@ function App() {
           }
           return match;
         });
-      } else {
+      } else if (!useFTCOffline){
         const playoffResult = await httpClient.getNoAuth(
           `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/playoff`,
           ftcMode ? ftcBaseURL : undefined
@@ -1341,7 +1342,7 @@ function App() {
     //   return (match?.scoreRedFinal !== null) || (match?.scoreBlueFinal !== null)
     // })]?.matchNumber;
 
-    if (!selectedEvent?.value?.code.includes("PRACTICE")) {
+    if (!selectedEvent?.value?.code.includes("PRACTICE") && !useFTCOffline) {
       const playoffScoresResult = await httpClient.getNoAuth(
         `${selectedYear?.value}/scores/${selectedEvent?.value.code}/playoff`,
         ftcMode ? ftcBaseURL : undefined
@@ -1798,6 +1799,7 @@ function App() {
         );
         var newTeams = [];
         if (req.status === 200) {
+          // @ts-ignore
           var awards = await req.json();
 
           newTeams = teams.teams.map((team) => {
@@ -2342,7 +2344,7 @@ function App() {
         } else if (rankingsResult.status === 204) {
           ranks = { rankings: { Rankings: [] } };
         }
-      } else {
+      } else if (!useFTCOffline) {
         //do not use Cheesy Arena and use FIRST API
         result = await httpClient.getNoAuth(
           `${selectedYear?.value}/rankings/${selectedEvent?.value.code}`,
@@ -2651,7 +2653,7 @@ function App() {
         } else if (allianceResult.status === 204) {
           alliances = { Alliances: [] };
         }
-      } else {
+      } else if (!useFTCOffline){
         result = await httpClient.getNoAuth(
           `${selectedYear?.value}/alliances/${selectedEvent?.value.code}`,
           ftcMode ? ftcBaseURL : undefined
@@ -2832,6 +2834,7 @@ function App() {
    * @returns {Promise<{ok}|void|undefined>}
    */
   async function forceUserSync() {
+    // @ts-ignore
     return await httpClient.post(`system/syncUsers`);
   }
 
@@ -3413,6 +3416,7 @@ function App() {
       null
     );
     if (val.status === 200) {
+      // @ts-ignore
       const json = await val.json();
       setFTCKey({ ...json, FTCServerURL: FTCServerURL, active: false });
     }
