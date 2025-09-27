@@ -1198,7 +1198,7 @@ function SchedulePage({
                   <th className="col1">
                     <b>Match Number</b>
                   </th>
-                  <th className="col1" colSpan={ftcMode ? 1 : 2}>
+                  <th className="col1" colSpan={2}>
                     <b>Score</b>
                   </th>
                   <th className="col1">
@@ -1235,7 +1235,7 @@ function SchedulePage({
                         </td>
                         <td>{match?.description}</td>
                         <td>{match?.matchNumber}</td>
-                        <td className={`centerTable`} colSpan={ftcMode ? 1 : 2}>
+                        <td className={`centerTable`} colSpan={2}>
                           <span className={redStyle}>
                             {match?.scoreRedFinal}
                           </span>
@@ -1244,38 +1244,36 @@ function SchedulePage({
                             {match?.scoreBlueFinal}
                           </span>
                         </td>
-                        {!ftcMode && (
-                          <>
-                            <td>
-                              <span className={redStyle}>
-                                {match?.teams[0]?.teamNumber}
-                              </span>
-                              <br />
-                              <span className={blueStyle}>
-                                {match?.teams[3]?.teamNumber}
-                              </span>
-                            </td>
-                            <td>
-                              <span className={redStyle}>
-                                {match?.teams[1]?.teamNumber}
-                              </span>
-                              <br />
-                              <span className={blueStyle}>
-                                {match?.teams[4]?.teamNumber}
-                              </span>
-                            </td>
-                            <td>
-                              <span className={redStyle}>
-                                {match?.teams[2]?.teamNumber}
-                              </span>
-                              <br />
-                              <span className={blueStyle}>
-                                {match?.teams[5]?.teamNumber}
-                              </span>
-                            </td>
-                          </>
-                        )}
-                        {ftcMode && (
+
+                        <td>
+                          <span className={redStyle}>
+                            {match?.teams[0]?.teamNumber}
+                          </span>
+                          <br />
+                          <span className={blueStyle}>
+                            {match?.teams[3]?.teamNumber}
+                          </span>
+                        </td>
+                        <td>
+                          <span className={redStyle}>
+                            {match?.teams[1]?.teamNumber}
+                          </span>
+                          <br />
+                          <span className={blueStyle}>
+                            {match?.teams[4]?.teamNumber}
+                          </span>
+                        </td>
+                        <td>
+                          <span className={redStyle}>
+                            {match?.teams[2]?.teamNumber}
+                          </span>
+                          <br />
+                          <span className={blueStyle}>
+                            {match?.teams[5]?.teamNumber}
+                          </span>
+                        </td>
+
+                        {/* {ftcMode && (
                           <>
                             <td>
                               <span className={redStyle}>
@@ -1296,7 +1294,7 @@ function SchedulePage({
                               </span>
                             </td>
                           </>
-                        )}
+                        )} */}
                       </tr>
                     );
                   })}
@@ -1445,35 +1443,38 @@ function SchedulePage({
                             {match?.scoreBlueFinal}
                           </span>
                         </td>
-                        {!ftcMode && (
-                          <td
-                            className={
-                              match?.actualStartTime
-                                ? `scheduleTable${winnerStyle} ${scoreStyle}`
-                                : ""
+
+                        <td
+                          className={
+                            match?.actualStartTime
+                              ? `centerTable scheduleTable${winnerStyle} ${scoreStyle}`
+                              : "centerTable"
+                          }
+                          onClick={() => {
+                            if (match?.postResultTime && match?.scores) {
+                              handleOpenScores(match);
                             }
-                            onClick={() => {
-                              if (match?.postResultTime && match?.scores) {
-                                handleOpenScores(match);
-                              }
-                            }}
+                          }}
+                        >
+                          <span
+                            className={redStyle}
+                            style={{ whiteSpace: "nowrap" }}
                           >
-                            <tr className={`centerTable ${redStyle} block`}>
-                              <span style={{ whiteSpace: "nowrap" }}>
-                                {match?.redRP
-                                  ? rankPointDisplay(match?.redRP)
-                                  : " "}
-                              </span>
-                            </tr>
-                            <tr className={`centerTable ${blueStyle} block`}>
-                              <span style={{ whiteSpace: "nowrap" }}>
-                                {match?.blueRP
-                                  ? rankPointDisplay(match?.blueRP)
-                                  : " "}
-                              </span>
-                            </tr>
-                          </td>
-                        )}
+                            {match?.redRP && match?.postResultTime
+                              ? rankPointDisplay(match?.redRP)
+                              : " "}
+                          </span>
+                          <br />
+                          <span
+                            className={blueStyle}
+                            style={{ whiteSpace: "nowrap" }}
+                          >
+                            {match?.blueRP && match?.postResultTime
+                              ? rankPointDisplay(match?.blueRP)
+                              : " "}
+                          </span>
+                        </td>
+
                         {!ftcMode && (
                           <>
                             <td>
@@ -1576,7 +1577,7 @@ function SchedulePage({
                               handleOpenScores(match);
                             }
                           }}
-                          colSpan={ftcMode ? 1 : 2}
+                          colSpan={2}
                         >
                           <span className={redStyle}>
                             {match?.scoreRedFinal}

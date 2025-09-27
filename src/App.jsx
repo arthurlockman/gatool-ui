@@ -798,11 +798,9 @@ function App() {
       ...team,
       rank: team?.ranking,
       teamNumber: team?.team,
-      qualAverage:
-        team?.MatchPoints && team?.Played
-          ? team?.MatchPoints / team?.matchesPlayed
-          : null,
-      dq: team?.dq || null,
+      qualAverage: team?.tbp1,
+      dq: team?.dq || 0,
+      sortOrder1: Number(team?.rankingPoints) || 0,
     };
   };
 
@@ -943,7 +941,7 @@ function App() {
         // get the practice schedule from FIRST API
         const practiceResult = await httpClient.getNoAuth(
           `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/practice`,
-        ftcMode ? ftcBaseURL : undefined
+          ftcMode ? ftcBaseURL : undefined
         );
         if (practiceResult.status === 200) {
           // @ts-ignore
@@ -1053,7 +1051,7 @@ function App() {
         // put the results back into the matches
         qualschedule.schedule = qualschedule.schedule.map((match) => {
           const matchScores = qualScores.MatchScores.filter((scoreMatch) => {
-            return scoreMatch.matchNumber === match.matchNumber;
+            return scoreMatch.matchNumber === match?.matchNumber;
           })[0];
           if (matchScores) {
             match = {
@@ -1067,10 +1065,23 @@ function App() {
               actualStartTime: matchScores.actualStartTime,
               postResultTime: matchScores.postResultTime,
             };
+            // add in DQ
+            if (matchScores?.alliances) {
+              matchScores?.alliances.forEach((alliance) => {
+                var team1 = _.findIndex(match.teams, {
+                  teamNumber: alliance.robot1,
+                });
+                var team2 = _.findIndex(match.teams, {
+                  teamNumber: alliance.robot2,
+                });
+                match.teams[team1].dq = alliance?.dq1 || false;
+                match.teams[team2].dq = alliance?.dq2 || false;
+              });
+            }
           }
           return match;
         });
-      } else if (!useFTCOffline){
+      } else if (!useFTCOffline) {
         const qualsResult = await httpClient.getNoAuth(
           `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/qual`,
           ftcMode ? ftcBaseURL : undefined
@@ -1124,11 +1135,11 @@ function App() {
           match.scores = matchResults;
           // @ts-ignore
           match.redRP = _.pickBy(matchResults.alliances[1], (value, key) => {
-            return key.endsWith("BonusAchieved");
+            return key.endsWith("BonusAchieved") || key.endsWith("RP");
           });
           // @ts-ignore
           match.blueRP = _.pickBy(matchResults.alliances[0], (value, key) => {
-            return key.endsWith("BonusAchieved");
+            return key.endsWith("BonusAchieved") || key.endsWith("RP");
           });
         }
       }
@@ -1287,7 +1298,7 @@ function App() {
           }
           return match;
         });
-      } else if (!useFTCOffline){
+      } else if (!useFTCOffline) {
         const playoffResult = await httpClient.getNoAuth(
           `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/playoff`,
           ftcMode ? ftcBaseURL : undefined
@@ -2137,7 +2148,8 @@ function App() {
 
         if (
           selectedEvent?.value?.code.includes("OFFLINE") ||
-          (cheesyArenaAvailable && useCheesyArena) || useFTCOffline
+          (cheesyArenaAvailable && useCheesyArena) ||
+          useFTCOffline
         ) {
           //Do something with the team list
           if (adHocTeamList) {
@@ -2153,13 +2165,13 @@ function App() {
                 // @ts-ignore
                 var teamUpdate = await request?.json();
                 teamDetails.updates = _.merge(
-              _.cloneDeep(communityUpdateTemplate),
-              teamUpdate?.updates
-            );
-            // {
-            //       ..._.cloneDeep(communityUpdateTemplate),
-            //       ...teamUpdate,
-            //     };
+                  _.cloneDeep(communityUpdateTemplate),
+                  teamUpdate?.updates
+                );
+                // {
+                //       ..._.cloneDeep(communityUpdateTemplate),
+                //       ...teamUpdate,
+                //     };
               } else {
                 teamDetails.updates = [];
               }
@@ -2199,7 +2211,10 @@ function App() {
             console.log("no teams loaded yet");
             teams = [];
           }
-        } else if (!selectedEvent?.value?.code.includes("PRACTICE") && !useFTCOffline) {
+        } else if (
+          !selectedEvent?.value?.code.includes("PRACTICE") &&
+          !useFTCOffline
+        ) {
           result = await httpClient.getNoAuth(
             `${selectedYear?.value}/communityUpdates/${selectedEvent?.value.code}`,
             ftcMode ? ftcBaseURL : undefined
@@ -2382,9 +2397,54 @@ function App() {
       delete ranks.ranks.rankings;
     }
 
+    // fix FTC online rankings
+    const teamResults = teamList?.teams.map((team) => {
+      return {
+        teamNumber: team?.teamNumber,
+        qualTotal: 0,
+        dqTotal: 0,
+        matchesPlayed: 0,
+      };
+    });
+    if (ftcMode && ranks?.ranks?.length > 0) {
+      if (qualSchedule?.schedule?.length > 0) {
+        qualSchedule.schedule.forEach((match) => {
+          const matchReference = _.cloneDeep(match);
+          match.teams.forEach((matchTeam) => {
+            const teamIndex = _.findIndex(teamResults, {
+              teamNumber: matchTeam.teamNumber,
+            });
+            if (teamIndex >= 0 && !matchTeam.surrogate) {
+              const teamScore = matchTeam.station.toLowerCase().includes("red")
+                ? matchReference.scoreRedFinal
+                : matchReference.scoreBlueFinal;
+              teamResults[teamIndex].qualTotal += teamScore;
+              if (matchTeam.dq) {
+                teamResults[teamIndex].dqTotal += 1;
+              }
+              teamResults[teamIndex].matchesPlayed += 1;
+            }
+          });
+        });
+      }
+      // merge the teamResults into the ranks
+      ranks.ranks = ranks.ranks.map((rank) => {
+        const teamIndex = _.findIndex(teamResults, {
+          teamNumber: rank.teamNumber,
+        });
+        if (teamIndex >= 0) {
+          rank.qualAverage =
+            teamResults[teamIndex].qualTotal /
+            teamResults[teamIndex].matchesPlayed;
+          rank.dq = teamResults[teamIndex].dqTotal;
+        }
+        return rank;
+      });
+    }
+
     ranks.lastModified = ranks.headers
-      ? moment(ranks?.headers["last-modified"])
-      : moment();
+      ? moment(ranks?.headers["last-modified"]).format()
+      : moment().format();
     ranks.lastUpdate = moment().format();
     setRankings(ranks);
     if (!ftcMode) {
@@ -2658,7 +2718,7 @@ function App() {
         } else if (allianceResult.status === 204) {
           alliances = { Alliances: [] };
         }
-      } else if (!useFTCOffline){
+      } else if (!useFTCOffline) {
         result = await httpClient.getNoAuth(
           `${selectedYear?.value}/alliances/${selectedEvent?.value.code}`,
           ftcMode ? ftcBaseURL : undefined
@@ -3461,7 +3521,7 @@ function App() {
     ) {
       if (selectedEvent) {
         console.log("Team list changed. Fetching Community Updates.");
-        if (ftcMode.value === "FTCLocal") {
+        if (ftcMode?.value === "FTCLocal") {
           getCommunityUpdates(false, teamList?.teams);
         } else {
           getCommunityUpdates();
