@@ -1558,7 +1558,7 @@ function App() {
             teams.teams = _.filter(values, (n) => {
               return n ? true : false;
             });
-            getCommunityUpdates(false, values);
+            getCommunityUpdates(false, teams.teams);
           });
         }
       } else if (
@@ -1603,6 +1603,7 @@ function App() {
               teams.lastUpdate = moment().format();
               teams.teams = values;
               teams.teamCountTotal = values.length;
+              getCommunityUpdates(false, teams.teams);
             });
           }
         }
@@ -2136,7 +2137,7 @@ function App() {
 
         if (
           selectedEvent?.value?.code.includes("OFFLINE") ||
-          (cheesyArenaAvailable && useCheesyArena)
+          (cheesyArenaAvailable && useCheesyArena) || useFTCOffline
         ) {
           //Do something with the team list
           if (adHocTeamList) {
@@ -2151,10 +2152,14 @@ function App() {
               if (request.status === 200) {
                 // @ts-ignore
                 var teamUpdate = await request?.json();
-                teamDetails.updates = {
-                  ..._.cloneDeep(communityUpdateTemplate),
-                  ...teamUpdate,
-                };
+                teamDetails.updates = _.merge(
+              _.cloneDeep(communityUpdateTemplate),
+              teamUpdate?.updates
+            );
+            // {
+            //       ..._.cloneDeep(communityUpdateTemplate),
+            //       ...teamUpdate,
+            //     };
               } else {
                 teamDetails.updates = [];
               }
@@ -2194,7 +2199,7 @@ function App() {
             console.log("no teams loaded yet");
             teams = [];
           }
-        } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
+        } else if (!selectedEvent?.value?.code.includes("PRACTICE") && !useFTCOffline) {
           result = await httpClient.getNoAuth(
             `${selectedYear?.value}/communityUpdates/${selectedEvent?.value.code}`,
             ftcMode ? ftcBaseURL : undefined
@@ -3456,7 +3461,7 @@ function App() {
     ) {
       if (selectedEvent) {
         console.log("Team list changed. Fetching Community Updates.");
-        if (ftcMode.value === "FTCLocal)") {
+        if (ftcMode.value === "FTCLocal") {
           getCommunityUpdates(false, teamList?.teams);
         } else {
           getCommunityUpdates();
