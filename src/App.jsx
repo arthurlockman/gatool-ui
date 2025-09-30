@@ -98,6 +98,7 @@ function LayoutsWithNavbar({
   allianceSelection,
   systemBell,
   systemMessage,
+  ftcMode,
 }) {
   return (
     <>
@@ -116,7 +117,7 @@ function LayoutsWithNavbar({
         systemMessage={systemMessage}
       />
       <Outlet />
-      <BottomNavigation />
+      <BottomNavigation ftcMode={ftcMode} />
     </>
   );
 }
@@ -674,7 +675,7 @@ function App() {
       qualAverage:
         team?.MatchPoints && team?.Played
           ? team?.MatchPoints / team?.Played
-          : null,
+          : 0,
       dq: team?.Disqualifications,
       matchesPlayed: team?.Played,
     };
@@ -798,7 +799,7 @@ function App() {
       ...team,
       rank: team?.ranking,
       teamNumber: team?.team,
-      qualAverage: team?.tbp1,
+      qualAverage: Math.round(100 * team?.tbp1) / 100,
       dq: team?.dq || 0,
       sortOrder1: Number(team?.rankingPoints) || 0,
     };
@@ -2433,9 +2434,12 @@ function App() {
           teamNumber: rank.teamNumber,
         });
         if (teamIndex >= 0) {
-          rank.qualAverage =
-            teamResults[teamIndex].qualTotal /
-            teamResults[teamIndex].matchesPlayed;
+          rank.qualAverage = teamResults[teamIndex].matchesPlayed
+            ? Math.round(
+                (teamResults[teamIndex].qualTotal * 100) /
+                  teamResults[teamIndex].matchesPlayed
+              ) / 100
+            : 0;
           rank.dq = teamResults[teamIndex].dqTotal;
         }
         return rank;
@@ -2449,6 +2453,8 @@ function App() {
     setRankings(ranks);
     if (!ftcMode) {
       getEPA();
+    } else if (ftcMode) {
+      getEPAFTC();
     }
     if (selectedEvent?.value.districtCode) {
       getDistrictRanks();
@@ -2527,6 +2533,68 @@ function App() {
           epa: epaArray,
         };
       }
+    });
+    if (Array.isArray(epa) && epa.length > 0) {
+      Promise.all(epa).then((values) => {
+        setEPA(values);
+      });
+    }
+  }
+
+  async function getEPAFTC() {
+    var epa = teamList?.teams.map(async (team) => {
+      var epaArray = {
+        teamNumber: team?.teamNumber,
+        epa: {},
+      };
+      var seasonStats = { wins: 0, losses: 0, ties: 0, qualMatchesPlayed: 0, dq: 0, eventCount:0 };
+      // first let's get the EPA for the team
+      // https://api.ftcscout.org/rest/v1/teams/172/quick-stats?season=2023
+
+      var epaData = await httpClient.getNoAuth(
+        `teams/${team?.teamNumber}/quick-stats?season=${selectedYear?.value}`,
+        "https://api.ftcscout.org/rest/v1/",
+        20000
+      );
+      if (epaData.status === 200) {
+        // @ts-ignore
+        epaArray = await epaData.json();
+        // now let's get the season stats for the same team.
+        // https://api.ftcscout.org/rest/v1/teams/172/events/2023
+        // to get wins, losses, ties, played, dq
+        var seasonResult = await httpClient.getNoAuth(
+          `teams/${team?.teamNumber}/events/${selectedYear?.value}`,
+          "https://api.ftcscout.org/rest/v1/",
+          20000
+        );
+        if (seasonResult.status === 200) {
+          // @ts-ignore
+          var events = await seasonResult.json();
+          events.forEach((event) => {
+            if (event?.stats) {
+              seasonStats.wins += event.stats.wins || 0;
+              seasonStats.losses += event.stats.losses || 0;
+              seasonStats.ties += event.stats.ties || 0;
+              seasonStats.qualMatchesPlayed +=
+                event.stats.qualMatchesPlayed || 0;
+              seasonStats.dq += event.stats.dq || 0;
+              seasonStats.eventCount += event.stats.qualMatchesPlayed > 0 ? 1 : 0;
+            }
+          });
+        }
+      }
+      return {
+        teamNumber: team?.teamNumber,
+        epa: {
+          epa: {
+            total_points: {
+              mean: Math.round(100 * epaArray?.tot?.value) / 100 || 0,
+              sd: 0,
+            },
+          },
+          record: seasonStats
+        },
+      };
     });
     if (Array.isArray(epa) && epa.length > 0) {
       Promise.all(epa).then((values) => {
@@ -3807,6 +3875,7 @@ function App() {
                   practiceSchedule={practiceSchedule}
                   systemBell={systemBell}
                   systemMessage={systemMessage}
+                  ftcMode={ftcMode}
                 />
               }
             >
@@ -4020,6 +4089,7 @@ function App() {
                     eventLabel={eventLabel}
                     communityUpdates={communityUpdates}
                     EPA={EPA}
+                    ftcMode={ftcMode}
                   />
                 }
               />

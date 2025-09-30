@@ -8,7 +8,7 @@ import {
 } from "react-bootstrap";
 import { useState } from "react";
 
-function BottomNavigation() {
+function BottomNavigation({ ftcMode }) {
   const [url, setURL] = useState({ title: null, url: null });
   const handleClose = () => {
     setURL({ title: null, url: null });
@@ -39,51 +39,89 @@ function BottomNavigation() {
           >
             Gorham-Falmouth Alliance for Robotics.
           </span>{" "}
-          <span
-            style={{ cursor: "pointer", color: "blue" }}
-            onClick={() => {
-              setURL({
-                title: "FIRST API",
-                url: "https://frc-events.firstinspires.org/services/API",
-              });
-            }}
-          >
-            Event Data provided by{" "}
-            <i>
-              <b>FIRST</b>
-            </i>
-            .
-          </span>{" "}
-          <span
-            style={{ cursor: "pointer", color: "blue" }}
-            onClick={() => {
-              setURL({
-                title: "TBA API",
-                url: "https://www.thebluealliance.com/apidocs/v3",
-              });
-            }}
-          >
-            Additional Data provided by{" "}
-            <i>
-              <b>TBA</b>
-            </i>
-            {" "}
-          </span>
-          <span
-            style={{ cursor: "pointer", color: "blue" }}
-            onClick={() => {
-              setURL({
-                title: "Statbotics API",
-                url: "https://www.statbotics.io",
-              });
-            }}
-          >
-            and by{" "}
-            <i>
-              <b>Statbotics.io</b>
-            </i>
-            .
-          </span>
+          {!ftcMode && (
+            <>
+              <span
+                style={{ cursor: "pointer", color: "blue" }}
+                onClick={() => {
+                  setURL({
+                    title: "FIRST API",
+                    url: "https://frc-events.firstinspires.org/services/API",
+                  });
+                }}
+              >
+                Event Data provided by{" "}
+                <i>
+                  <b>FIRST</b>
+                </i>
+                .
+              </span>{" "}
+              <span
+                style={{ cursor: "pointer", color: "blue" }}
+                onClick={() => {
+                  setURL({
+                    title: "TBA API",
+                    url: "https://www.thebluealliance.com/apidocs/v3",
+                  });
+                }}
+              >
+                Additional Data provided by{" "}
+                <i>
+                  <b>TBA</b>
+                </i>{" "}
+              </span>
+              <span
+                style={{ cursor: "pointer", color: "blue" }}
+                onClick={() => {
+                  setURL({
+                    title: "Statbotics API",
+                    url: "https://www.statbotics.io",
+                  });
+                }}
+              >
+                and by{" "}
+                <i>
+                  <b>Statbotics.io</b>
+                </i>
+                .
+              </span>
+            </>
+          )}
+          {ftcMode && (
+            <>
+              <span
+                style={{ cursor: "pointer", color: "blue" }}
+                onClick={() => {
+                  setURL({
+                    title: "FIRST API",
+                    url: "https://ftc-events.firstinspires.org/services/API",
+                  });
+                }}
+              >
+                Event Data provided by{" "}
+                <i>
+                  <b>FIRST</b>
+                </i>
+                .
+              </span>{" "}
+              <span>Additional Data provided by </span>
+              <span
+                style={{ cursor: "pointer", color: "blue" }}
+                onClick={() => {
+                  setURL({
+                    title: "FTC Scout API",
+                    url: "https://ftcscout.org/api",
+                  });
+                }}
+              >
+                {" "}
+                <b>
+                  FTC<i>Scout</i>
+                </b>
+                APIs
+              </span>
+            </>
+          )}
         </span>
       </Navbar>
       <Modal centered={true} show={url?.title} onHide={handleClose} fullscreen>

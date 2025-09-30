@@ -36,6 +36,7 @@ function RanksPage({
   eventLabel,
   communityUpdates,
   EPA,
+  ftcMode
 }) {
   // This function clicks the hidden file upload button
   function clickLoadRanks() {
@@ -591,7 +592,7 @@ function RanksPage({
                     }
                   >
                     <b>
-                      EPA{rankSort === "epaVal" ? <SortNumericUp /> : ""}
+                      {ftcMode?'OPA':'EPA'}{rankSort === "epaVal" ? <SortNumericUp /> : ""}
                       {rankSort === "-epaVal" ? <SortNumericDown /> : ""}
                     </b>
                   </th>

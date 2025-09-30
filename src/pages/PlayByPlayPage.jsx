@@ -56,58 +56,30 @@ function PlayByPlayPage({
   eventMessage,
   eventBell,
   setEventBell,
-  ftcMode
+  ftcMode,
 }) {
   const matchesToNotify = _.toInteger(
     (teamList?.teams?.length - teamReduction) / 6
   );
   const notification =
     currentMatch >= qualsLength - matchesToNotify &&
-      currentMatch <= qualsLength &&
-      showInspection
+    currentMatch <= qualsLength &&
+    showInspection
       ? {
-        expiry: moment().add(1, "hour"),
-        onTime: moment(),
-        message:
-          "Please remind teams to have their robots reinspected before Playoffs and to send their team rep(s) for Alliance Selection.",
-      }
+          expiry: moment().add(1, "hour"),
+          onTime: moment(),
+          message:
+            "Please remind teams to have their robots reinspected before Playoffs and to send their team rep(s) for Alliance Selection.",
+        }
       : {};
 
-  var displayOrder = ftcMode ? [
-    "Blue1",
-    "Red2",
-    "Blue2",
-    "Red1",
-    "Blue3",
-    "Red3",
-  ] : [
-    "Blue1",
-    "Red3",
-    "Blue2",
-    "Red2",
-    "Blue3",
-    "Red1",
-    "Blue4",
-    "Red4",
-  ];
+  var displayOrder = ftcMode
+    ? ["Blue1", "Red2", "Blue2", "Red1", "Blue3", "Red3"]
+    : ["Blue1", "Red3", "Blue2", "Red2", "Blue3", "Red1", "Blue4", "Red4"];
   if (swapScreen === true) {
-    displayOrder = ftcMode ? [
-      "Red2",
-      "Blue1",
-      "Red2",
-      "Blue1",
-      "Red3",
-      "Blue3",
-    ] : [
-      "Red3",
-      "Blue1",
-      "Red2",
-      "Blue2",
-      "Red1",
-      "Blue3",
-      "Red4",
-      "Blue4",
-    ];
+    displayOrder = ftcMode
+      ? ["Red2", "Blue1", "Red2", "Blue1", "Red3", "Blue3"]
+      : ["Red3", "Blue1", "Red2", "Blue2", "Red1", "Blue3", "Red4", "Blue4"];
   }
 
   function updateTeamDetails(station, matchDetails) {
@@ -120,25 +92,25 @@ function PlayByPlayPage({
     if (station.slice(-1) !== "4") {
       team =
         matchDetails?.teams[
-        _.findIndex(matchDetails?.teams, { station: station })
+          _.findIndex(matchDetails?.teams, { station: station })
         ];
       team = _.merge(
         team,
         teamList?.teams[
-        _.findIndex(teamList?.teams, { teamNumber: team?.teamNumber })
+          _.findIndex(teamList?.teams, { teamNumber: team?.teamNumber })
         ],
         rankings?.ranks?.length > 0
           ? rankings?.ranks[
-          _.findIndex(rankings?.ranks, { teamNumber: team?.teamNumber })
-          ]
+              _.findIndex(rankings?.ranks, { teamNumber: team?.teamNumber })
+            ]
           : null,
         EPA?.length > 0
           ? EPA[_.findIndex(EPA, { teamNumber: team?.teamNumber })]
           : null,
         communityUpdates?.length > 0
           ? communityUpdates[
-          _.findIndex(communityUpdates, { teamNumber: team?.teamNumber })
-          ]
+              _.findIndex(communityUpdates, { teamNumber: team?.teamNumber })
+            ]
           : null
       );
       team.rankStyle = rankHighlight(team?.rank, allianceCount || { count: 8 });
@@ -188,13 +160,13 @@ function PlayByPlayPage({
           team = _.merge(
             team,
             teamList?.teams[
-            _.findIndex(teamList?.teams, { teamNumber: remainingTeam[0] })
+              _.findIndex(teamList?.teams, { teamNumber: remainingTeam[0] })
             ],
             rankings?.ranks[
-            _.findIndex(rankings?.ranks, { teamNumber: remainingTeam[0] })
+              _.findIndex(rankings?.ranks, { teamNumber: remainingTeam[0] })
             ],
             communityUpdates[
-            _.findIndex(communityUpdates, { teamNumber: remainingTeam[0] })
+              _.findIndex(communityUpdates, { teamNumber: remainingTeam[0] })
             ]
           );
           team.rankStyle = rankHighlight(
@@ -289,78 +261,78 @@ function PlayByPlayPage({
   var matchDetails = !adHocMode
     ? schedule[currentMatch - 1]
     : {
-      description: "Practice Match",
-      startTime: null,
-      matchNumber: 1,
-      field: "Primary",
-      tournamentLevel: "Practice",
-      teams: [
-        {
-          teamNumber: adHocMatch[0]?.teamNumber
-            ? adHocMatch[0]?.teamNumber
-            : null,
-          station: "Red1",
-          surrogate: false,
-          dq: false,
+        description: "Practice Match",
+        startTime: null,
+        matchNumber: 1,
+        field: "Primary",
+        tournamentLevel: "Practice",
+        teams: [
+          {
+            teamNumber: adHocMatch[0]?.teamNumber
+              ? adHocMatch[0]?.teamNumber
+              : null,
+            station: "Red1",
+            surrogate: false,
+            dq: false,
+          },
+          {
+            teamNumber: adHocMatch[1]?.teamNumber
+              ? adHocMatch[1]?.teamNumber
+              : null,
+            station: "Red2",
+            surrogate: false,
+            dq: false,
+          },
+          {
+            teamNumber: adHocMatch[2]?.teamNumber
+              ? adHocMatch[2]?.teamNumber
+              : null,
+            station: "Red3",
+            surrogate: false,
+            dq: false,
+          },
+          {
+            teamNumber: adHocMatch[3]?.teamNumber
+              ? adHocMatch[3]?.teamNumber
+              : null,
+            station: "Blue1",
+            surrogate: false,
+            dq: false,
+          },
+          {
+            teamNumber: adHocMatch[4]?.teamNumber
+              ? adHocMatch[4]?.teamNumber
+              : null,
+            station: "Blue2",
+            surrogate: false,
+            dq: false,
+          },
+          {
+            teamNumber: adHocMatch[5]?.teamNumber
+              ? adHocMatch[5]?.teamNumber
+              : null,
+            station: "Blue3",
+            surrogate: false,
+            dq: false,
+          },
+        ],
+        isReplay: false,
+        matchVideoLink: null,
+        scoreRedFinal: null,
+        scoreRedFoul: null,
+        scoreRedAuto: null,
+        scoreBlueFinal: null,
+        scoreBlueFoul: null,
+        scoreBlueAuto: null,
+        autoStartTime: null,
+        actualStartTime: null,
+        postResultTime: null,
+        winner: {
+          winner: null,
+          tieWinner: null,
+          level: null,
         },
-        {
-          teamNumber: adHocMatch[1]?.teamNumber
-            ? adHocMatch[1]?.teamNumber
-            : null,
-          station: "Red2",
-          surrogate: false,
-          dq: false,
-        },
-        {
-          teamNumber: adHocMatch[2]?.teamNumber
-            ? adHocMatch[2]?.teamNumber
-            : null,
-          station: "Red3",
-          surrogate: false,
-          dq: false,
-        },
-        {
-          teamNumber: adHocMatch[3]?.teamNumber
-            ? adHocMatch[3]?.teamNumber
-            : null,
-          station: "Blue1",
-          surrogate: false,
-          dq: false,
-        },
-        {
-          teamNumber: adHocMatch[4]?.teamNumber
-            ? adHocMatch[4]?.teamNumber
-            : null,
-          station: "Blue2",
-          surrogate: false,
-          dq: false,
-        },
-        {
-          teamNumber: adHocMatch[5]?.teamNumber
-            ? adHocMatch[5]?.teamNumber
-            : null,
-          station: "Blue3",
-          surrogate: false,
-          dq: false,
-        },
-      ],
-      isReplay: false,
-      matchVideoLink: null,
-      scoreRedFinal: null,
-      scoreRedFoul: null,
-      scoreRedAuto: null,
-      scoreBlueFinal: null,
-      scoreBlueFoul: null,
-      scoreBlueAuto: null,
-      autoStartTime: null,
-      actualStartTime: null,
-      postResultTime: null,
-      winner: {
-        winner: null,
-        tieWinner: null,
-        level: null,
-      },
-    };
+      };
 
   if (
     (practiceSchedule?.schedule?.schedule?.length > 0 ||
@@ -375,12 +347,18 @@ function PlayByPlayPage({
     }
   }
 
-  var inPlayoffs = matchDetails?.tournamentLevel ? matchDetails?.tournamentLevel.toLowerCase() === "playoff" ? true : false : false;
+  var inPlayoffs = matchDetails?.tournamentLevel
+    ? matchDetails?.tournamentLevel.toLowerCase() === "playoff"
+      ? true
+      : false
+    : false;
   const matchMenu = schedule.map((match, index) => {
     var tag = `${match?.description} of ${qualSchedule?.schedule?.length}`;
     if (
-      (match?.tournamentLevel && match?.tournamentLevel?.toLowerCase() === "playoff") ||
-      (match?.tournamentLevel && match?.tournamentLevel?.toLowerCase() === "practice")
+      (match?.tournamentLevel &&
+        match?.tournamentLevel?.toLowerCase() === "playoff") ||
+      (match?.tournamentLevel &&
+        match?.tournamentLevel?.toLowerCase() === "practice")
     ) {
       tag = match?.description;
     }
@@ -508,6 +486,7 @@ function PlayByPlayPage({
                       showQualsStatsQuals={showQualsStatsQuals}
                       adHocMode={adHocMode}
                       playoffOnly={playoffOnly}
+                      ftcMode={ftcMode}
                     />
                     <PlayByPlay
                       station={displayOrder[1]}
@@ -521,6 +500,7 @@ function PlayByPlayPage({
                       showQualsStatsQuals={showQualsStatsQuals}
                       adHocMode={adHocMode}
                       playoffOnly={playoffOnly}
+                      ftcMode={ftcMode}
                     />
                   </tr>
                   <tr className={"gatool-playbyplay"}>
@@ -536,6 +516,7 @@ function PlayByPlayPage({
                       showQualsStatsQuals={showQualsStatsQuals}
                       adHocMode={adHocMode}
                       playoffOnly={playoffOnly}
+                      ftcMode={ftcMode}
                     />
                     <PlayByPlay
                       station={displayOrder[3]}
@@ -549,36 +530,41 @@ function PlayByPlayPage({
                       showQualsStatsQuals={showQualsStatsQuals}
                       adHocMode={adHocMode}
                       playoffOnly={playoffOnly}
+                      ftcMode={ftcMode}
                     />
                   </tr>
-                  {!ftcMode && <tr className={"gatool-playbyplay"}>
-                    <PlayByPlay
-                      station={displayOrder[4]}
-                      team={teamDetails[displayOrder[4]]}
-                      inPlayoffs={inPlayoffs}
-                      key={displayOrder[4]}
-                      selectedEvent={selectedEvent}
-                      showNotes={showNotes}
-                      showMottoes={showMottoes}
-                      showQualsStats={showQualsStats}
-                      showQualsStatsQuals={showQualsStatsQuals}
-                      adHocMode={adHocMode}
-                      playoffOnly={playoffOnly}
-                    />
-                    <PlayByPlay
-                      station={displayOrder[5]}
-                      team={teamDetails[displayOrder[5]]}
-                      inPlayoffs={inPlayoffs}
-                      key={displayOrder[5]}
-                      selectedEvent={selectedEvent}
-                      showNotes={showNotes}
-                      showMottoes={showMottoes}
-                      showQualsStats={showQualsStats}
-                      showQualsStatsQuals={showQualsStatsQuals}
-                      adHocMode={adHocMode}
-                      playoffOnly={playoffOnly}
-                    />
-                  </tr>}
+                  {!ftcMode && (
+                    <tr className={"gatool-playbyplay"}>
+                      <PlayByPlay
+                        station={displayOrder[4]}
+                        team={teamDetails[displayOrder[4]]}
+                        inPlayoffs={inPlayoffs}
+                        key={displayOrder[4]}
+                        selectedEvent={selectedEvent}
+                        showNotes={showNotes}
+                        showMottoes={showMottoes}
+                        showQualsStats={showQualsStats}
+                        showQualsStatsQuals={showQualsStatsQuals}
+                        adHocMode={adHocMode}
+                        playoffOnly={playoffOnly}
+                        ftcMode={ftcMode}
+                      />
+                      <PlayByPlay
+                        station={displayOrder[5]}
+                        team={teamDetails[displayOrder[5]]}
+                        inPlayoffs={inPlayoffs}
+                        key={displayOrder[5]}
+                        selectedEvent={selectedEvent}
+                        showNotes={showNotes}
+                        showMottoes={showMottoes}
+                        showQualsStats={showQualsStats}
+                        showQualsStatsQuals={showQualsStatsQuals}
+                        adHocMode={adHocMode}
+                        playoffOnly={playoffOnly}
+                        ftcMode={ftcMode}
+                      />
+                    </tr>
+                  )}
                   {(inPlayoffs ||
                     selectedEvent?.value?.champLevel === "CHAMPS") &&
                     (!_.isEmpty(teamDetails["Red4"]) ||
@@ -596,6 +582,7 @@ function PlayByPlayPage({
                           showQualsStatsQuals={showQualsStatsQuals}
                           adHocMode={adHocMode}
                           playoffOnly={playoffOnly}
+                          ftcMode={ftcMode}
                         />
                         <PlayByPlay
                           station={displayOrder[7]}
@@ -609,6 +596,7 @@ function PlayByPlayPage({
                           showQualsStatsQuals={showQualsStatsQuals}
                           adHocMode={adHocMode}
                           playoffOnly={playoffOnly}
+                          ftcMode={ftcMode}
                         />
                       </tr>
                     )}
