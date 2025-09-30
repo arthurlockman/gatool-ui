@@ -77,8 +77,11 @@ class AuthClient {
     }
     var errorText = `Received a ${response.status} error from backend: "${response.statusText}"`;
     if (response.status === 400) {
-      errorText +=
-        " This is an error with the FIRST APIs, not one caused by gatool. These usually clear in a few minutes, so please try again soon.";
+      if (customAPIBaseUrl === "https://api.statbotics.io/v3/" || customAPIBaseUrl === 'https://api.ftcscout.org/rest/v1/'
+) {
+        return response;
+      } else { errorText +=
+        " This is an error with the FIRST APIs, not one caused by gatool. These usually clear in a few minutes, so please try again soon.";}
     }
     if (response.status === 401) {
       errorText +=

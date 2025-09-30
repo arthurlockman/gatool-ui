@@ -1858,7 +1858,7 @@ function App() {
                   `${year}`
                 ]?.awards?.map((award) => {
                   award.highlight = awardsHilight(award.name);
-                  award.eventName = eventnames[`${year}`][award.eventCode];
+                  award.eventName = eventnames[`${year}`] ? eventnames[`${year}`][award.eventCode] : award.eventCode;
                   award.year = year;
                   return award;
                 });
@@ -2546,8 +2546,23 @@ function App() {
       var epaArray = {
         teamNumber: team?.teamNumber,
         epa: {},
+        record: {
+          wins: 0,
+          losses: 0,
+          ties: 0,
+          qualMatchesPlayed: 0,
+          dq: 0,
+          eventCount: 0,
+        },
       };
-      var seasonStats = { wins: 0, losses: 0, ties: 0, qualMatchesPlayed: 0, dq: 0, eventCount:0 };
+      var seasonStats = {
+        wins: 0,
+        losses: 0,
+        ties: 0,
+        qualMatchesPlayed: 0,
+        dq: 0,
+        eventCount: 0,
+      };
       // first let's get the EPA for the team
       // https://api.ftcscout.org/rest/v1/teams/172/quick-stats?season=2023
 
@@ -2578,10 +2593,19 @@ function App() {
               seasonStats.qualMatchesPlayed +=
                 event.stats.qualMatchesPlayed || 0;
               seasonStats.dq += event.stats.dq || 0;
-              seasonStats.eventCount += event.stats.qualMatchesPlayed > 0 ? 1 : 0;
+              seasonStats.eventCount +=
+                event.stats.qualMatchesPlayed > 0 ? 1 : 0;
             }
           });
         }
+      } else if (
+        epaData.status === 500 ||
+        epaData.status === 408 ||
+        epaData.status === 404 ||
+        epaData.status === 400 
+      ) {
+        // do nothing
+        console.log("No EPA data for team " + team?.teamNumber);
       }
       return {
         teamNumber: team?.teamNumber,
@@ -2592,7 +2616,7 @@ function App() {
               sd: 0,
             },
           },
-          record: seasonStats
+          record: seasonStats,
         },
       };
     });
