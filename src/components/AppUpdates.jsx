@@ -1,6 +1,6 @@
 export const appUpdates = [
   {
-    date: "August 30, 2025",
+    date: "September 30, 2025",
     message: (
       <ul>
         <li>Added support for FTC!</li>
@@ -11,8 +11,9 @@ export const appUpdates = [
           <li>Announce teams and call matches</li>
           <li>Use gatool's Alliance Selection mode</li>
           <li>Announce awards</li>
+          <li>See team stats from FTCScout</li>
         </ul>
-        <i>* Loading live event data from a local Event server coming soon.</i>
+        <i>* Loading live event data from a local Event server is available but requires browser configuration.</i>
       </ul>
     ),
   }, {
