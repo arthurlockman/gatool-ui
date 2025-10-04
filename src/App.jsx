@@ -3621,15 +3621,6 @@ function App() {
     }
   };
 
-  // reset after mode change
-  const resetForModeChange = () => {
-    setEventFilters([]);
-    setRegionFilters([]);
-    setTimeFilter({ label: "All Events", value: "all" });
-    setSelectedEvent(null);
-    setSelectedYear(ftcMode ? FTCSupportedYears[0] : supportedYears[0]);
-  }
-
   // Retrieve Community Updates when the team list changes
   useEffect(() => {
     if (
