@@ -77,7 +77,7 @@ class AuthClient {
     }
     var errorText = `Received a ${response.status} error from backend: "${response.statusText}"`;
     if (response.status === 400) {
-      if (customAPIBaseUrl === "https://api.statbotics.io/v3/" || customAPIBaseUrl === 'https://api.ftcscout.org/rest/v1/'
+      if (customAPIBaseUrl === "https://api.statbotics.io/v3/" || customAPIBaseUrl === 'https://api.ftcscout.org/rest/v1/' 
 ) {
         return response;
       } else { errorText +=
@@ -285,6 +285,7 @@ class AuthClient {
 
   operationDone() {
     this.operationsInProgress -= 1;
+    this.operationsInProgress = Math.max(0, this.operationsInProgress);
     this.setOperationsInProgress(this.operationsInProgress);
   }
 
