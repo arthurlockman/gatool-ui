@@ -77,11 +77,9 @@ class AuthClient {
     }
     var errorText = `Received a ${response.status} error from backend: "${response.statusText}"`;
     if (response.status === 400) {
-      if (
-        customAPIBaseUrl.includes("statbotics") ||
-        customAPIBaseUrl.includes("ftcscout") ||
-        path.includes("/teams?teamNumber=")
-      ) {
+      if (path.includes("statbotics") || path.includes("ftcscout")) {
+        return response;
+      } else if (path.includes("/teams?teamNumber=")) {
         return response;
       } else {
         errorText +=
@@ -97,10 +95,7 @@ class AuthClient {
       return response;
     }
     if (response.status === 500) {
-      if (
-        customAPIBaseUrl.includes("statbotics") ||
-        customAPIBaseUrl.includes("ftcscout")
-      ) {
+      if (path.includes("statbotics") || path.includes("ftcscout")) {
         return response;
       } else {
         errorText +=
