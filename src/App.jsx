@@ -4012,6 +4012,7 @@ function App() {
                     checkFTCKey={checkFTCKey}
                     FTCOfflineAvailable={FTCOfflineAvailable}
                     getFTCOfflineStatus={getFTCOfflineStatus}
+                    getCheesyStatus={getCheesyStatus}
                   />
                 }
               />
