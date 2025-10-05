@@ -79,7 +79,8 @@ class AuthClient {
     if (response.status === 400) {
       if (
         customAPIBaseUrl.includes("statbotics") ||
-        customAPIBaseUrl.includes("ftcscout")
+        customAPIBaseUrl.includes("ftcscout") ||
+        path.includes("/teams?teamNumber=")
       ) {
         return response;
       } else {
