@@ -77,11 +77,15 @@ class AuthClient {
     }
     var errorText = `Received a ${response.status} error from backend: "${response.statusText}"`;
     if (response.status === 400) {
-      if (customAPIBaseUrl === "https://api.statbotics.io/v3/" || customAPIBaseUrl === 'https://api.ftcscout.org/rest/v1/' 
-) {
+      if (
+        customAPIBaseUrl.includes("statbotics") ||
+        customAPIBaseUrl.includes("ftcscout")
+      ) {
         return response;
-      } else { errorText +=
-        " This is an error with the FIRST APIs, not one caused by gatool. These usually clear in a few minutes, so please try again soon.";}
+      } else {
+        errorText +=
+          " This is an error with the FIRST APIs, not one caused by gatool. These usually clear in a few minutes, so please try again soon.";
+      }
     }
     if (response.status === 401) {
       errorText +=
@@ -92,7 +96,10 @@ class AuthClient {
       return response;
     }
     if (response.status === 500) {
-      if (customAPIBaseUrl === "https://api.statbotics.io/v3/") {
+      if (
+        customAPIBaseUrl.includes("statbotics") ||
+        customAPIBaseUrl.includes("ftcscout")
+      ) {
         return response;
       } else {
         errorText +=
@@ -320,9 +327,13 @@ function AuthClientContextProvider({ children }) {
   }, [isOnline, client]);
   // @ts-ignore
   return (
-    <AuthClientContext.Provider value={[client, 
-// @ts-ignore
-    operationsInProgress]}>
+    <AuthClientContext.Provider
+      value={[
+        client,
+        // @ts-ignore
+        operationsInProgress,
+      ]}
+    >
       {children}
     </AuthClientContext.Provider>
   );
