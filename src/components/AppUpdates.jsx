@@ -1,6 +1,6 @@
 export const appUpdates = [
   {
-    date: "September 30, 2025",
+    date: "October 5, 2025",
     message: (
       <ul>
         <li>Added support for FTC!</li>
