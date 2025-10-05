@@ -420,7 +420,7 @@ function App() {
   /**
    * Function to get the Cheesy Arena status by connecting to the Cheesy Arena API
    */
-  const getCheesyStatus = async () => {
+  const getCheesyStatus = async (loadSchedule) => {
     // See if you can connect to Cheesy Arena
     console.log("Checking Cheesy Arena status...");
     try {
@@ -434,14 +434,21 @@ function App() {
       // Set the IP address to the constant `ip`
       if (data) {
         console.log("Cheesy Arena is available.");
-        return setCheesyArenaAvailable(true);
+        setCheesyArenaAvailable(true)
+        if (loadSchedule) {
+          getTeamList();
+          getSchedule();
+        }
+        return true;
       } else {
         console.log("Cheesy Arena is not available.");
-        return setCheesyArenaAvailable(false);
+        setCheesyArenaAvailable(false);
+        return false;
       }
     } catch (error) {
       console.log("Error fetching Cheesy Arena status:", error.message);
-      return setCheesyArenaAvailable(false);
+      setCheesyArenaAvailable(false);
+      return false;
     }
   };
 
@@ -573,11 +580,11 @@ function App() {
    * @param match Match details from TBA
    * @param level Tournament Level
    */
-  const conformCheesyArenaMatch = (match, level) => {
+  const conformCheesyArenaMatch = (match, level, index) => {
     return {
       description: match?.LongName,
       tournamentLevel: level,
-      matchNumber: match?.TbaMatchKey?.MatchNumber,
+      matchNumber: index,
       startTime: match?.Time,
       actualStartTime: match?.StartedAt,
       postResultTime: match?.ScoreCommittedAt,
@@ -917,8 +924,8 @@ function App() {
           // reformat data to match FIRST API format
           practiceschedule = {
             schedule: {
-              schedule: data.map((match) => {
-                return conformCheesyArenaMatch(match, "Practice");
+              schedule: data.map((match, index) => {
+                return conformCheesyArenaMatch(match, "Practice", index + 1);
               }),
             },
           };
@@ -990,8 +997,12 @@ function App() {
           // reformat data to match FIRST API format
           qualschedule = {
             schedule: {
-              schedule: data.map((match) => {
-                return conformCheesyArenaMatch(match, "Qualification");
+              schedule: data.map((match, index) => {
+                return conformCheesyArenaMatch(
+                  match,
+                  "Qualification",
+                  index + 1
+                );
               }),
             },
           };
@@ -1212,8 +1223,8 @@ function App() {
             // reformat data to match FIRST API format
             playoffschedule = {
               schedule: {
-                schedule: data.map((match) => {
-                  return conformCheesyArenaMatch(match, "Playoff");
+                schedule: data.map((match, index) => {
+                  return conformCheesyArenaMatch(match, "Playoff", index + 1);
                 }),
               },
             };
@@ -2574,21 +2585,17 @@ function App() {
       //   "https://api.statbotics.io/v3/",
       //   20000
       // );
-      if (
-        epaData.status === 500 ||
-        epaData.status === 408 ||
-        epaData.status === 404
-      ) {
-        return {
-          teamNumber: team?.teamNumber,
-          epa: {},
-        };
-      } else {
+      if (epaData.status === 200) {
         // @ts-ignore
         var epaArray = await epaData.json();
         return {
           teamNumber: team?.teamNumber,
           epa: epaArray,
+        };
+      } else {
+        return {
+          teamNumber: team?.teamNumber,
+          epa: {},
         };
       }
     });

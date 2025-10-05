@@ -248,10 +248,10 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
         setManageAnnouncements(false);
     }
 
-    const handleUseCheesy = (checked) => {
-        setUseCheesyArena(checked);
+    const handleUseCheesy = async (checked) => {
+        await setUseCheesyArena(checked);
         if (checked) {
-            getCheesyStatus();
+            getCheesyStatus(true);
         }
     }
 
@@ -600,7 +600,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                         <Switch checked={useCheesyArena === null ? false : useCheesyArena} onChange={handleUseCheesy} />
                                     </td>
                                     <td>
-                                        <b>Use Cheesy Arena for match data. Please ensure that your device is on the same network as the Cheesy Arena field system.</b>
+                                        <b>Use Cheesy Arena for match data. Please ensure that your device is on the same network as the Cheesy Arena field system.{useCheesyArena && <span style={{color:"red"}}><br /><i>NOTE: you may need to tap Refresh Schedule above to fetch the initial data from Cheesy Arena.</i></span>}</b>
                                     </td>
                                 </tr>}
 

@@ -664,7 +664,7 @@ function RanksPage({
                         ></td>
                         <td>{rankRow.sortOrder1}</td>
                         <td>{rankRow.record}</td>
-                        <td>{rankRow.qualAverage}</td>
+                        <td>{Math.floor(rankRow.qualAverage*100)/100}</td>
                         <td>{rankRow.dq}</td>
                         <td>{rankRow.matchesPlayed}</td>
                         <td>{rankRow.season}</td>
