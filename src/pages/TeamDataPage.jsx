@@ -27,7 +27,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
 
     /**
      * Display the delay on the Announce Screen if we have a schedule
-     * @param {moment.Moment} updateTime 
+     * @param {moment.Moment} updateTime
      */
     function updateClass(updateTime) {
         var timeDifference = 0;
@@ -166,8 +166,8 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
     /**
      * Stores the team updates for a specific team. If we are unable to save to gatool Cloud, it will store the update locally
      * for update later.
-     * @param {string} mode - determines whether to send the update to gatool Cloud. "update" = send to cloud 
-     * @param {*} e - the inbound event from clicking the button. 
+     * @param {string} mode - determines whether to send the update to gatool Cloud. "update" = send to cloud
+     * @param {*} e - the inbound event from clicking the button.
      */
     const handleSubmit = async (mode, e) => {
         var visits = _.cloneDeep(lastVisit);
@@ -256,9 +256,9 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
 
 
     /**
-     * Opens the team data screen so that a user can view and edit the team details 
+     * Opens the team data screen so that a user can view and edit the team details
      * @param {object} team - The team to display
-     * @param {*} e  - the inbound event from clicking the button. 
+     * @param {*} e  - the inbound event from clicking the button.
      */
     const handleShow = (team, e) => {
         if (isAuthenticated && user["https://gatool.org/roles"] && user["https://gatool.org/roles"].indexOf("user") >= 0) {
