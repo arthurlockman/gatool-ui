@@ -62,6 +62,7 @@ function AnnouncePage({
   eventMessage,
   eventBell,
   setEventBell,
+  ftcMode,
 }) {
   const matchesToNotify = _.toInteger(
     (teamList?.teams?.length - teamReduction) / 6
@@ -73,14 +74,14 @@ function AnnouncePage({
   }
   const notification =
     currentMatch >= qualsLength - matchesToNotify &&
-    currentMatch <= qualsLength &&
-    showInspection
+      currentMatch <= qualsLength &&
+      showInspection
       ? {
-          expiry: moment().add(1, "hour"),
-          onTime: moment(),
-          message:
-            "Please remind teams to have their robots reinspected before Playoffs and to send their team rep(s) for Alliance Selection.",
-        }
+        expiry: moment().add(1, "hour"),
+        onTime: moment(),
+        message:
+          "Please remind teams to have their robots reinspected before Playoffs and to send their team rep(s) for Alliance Selection.",
+      }
       : {};
 
   function updateTeamDetails(station, matchDetails) {
@@ -94,30 +95,30 @@ function AnnouncePage({
     if (station.slice(-1) !== "4") {
       team =
         matchDetails?.teams[
-          _.findIndex(matchDetails?.teams, { station: station })
+        _.findIndex(matchDetails?.teams, { station: station })
         ];
       team = communityUpdates
         ? _.merge(
-            team,
-            teamList?.teams[
-              _.findIndex(teamList?.teams, { teamNumber: team?.teamNumber })
-            ],
-            rankings?.ranks[
-              _.findIndex(rankings?.ranks, { teamNumber: team?.teamNumber })
-            ],
-            communityUpdates[
-              _.findIndex(communityUpdates, { teamNumber: team?.teamNumber })
-            ]
-          )
+          team,
+          teamList?.teams[
+          _.findIndex(teamList?.teams, { teamNumber: team?.teamNumber })
+          ],
+          rankings?.ranks[
+          _.findIndex(rankings?.ranks, { teamNumber: team?.teamNumber })
+          ],
+          communityUpdates[
+          _.findIndex(communityUpdates, { teamNumber: team?.teamNumber })
+          ]
+        )
         : _.merge(
-            team,
-            teamList?.teams[
-              _.findIndex(teamList?.teams, { teamNumber: team?.teamNumber })
-            ],
-            rankings?.ranks[
-              _.findIndex(rankings?.ranks, { teamNumber: team?.teamNumber })
-            ]
-          );
+          team,
+          teamList?.teams[
+          _.findIndex(teamList?.teams, { teamNumber: team?.teamNumber })
+          ],
+          rankings?.ranks[
+          _.findIndex(rankings?.ranks, { teamNumber: team?.teamNumber })
+          ]
+        );
       team.rankStyle = rankHighlight(team?.rank, allianceCount || { count: 8 });
       team.alliance = alliances?.Lookup[`${team?.teamNumber}`]
         ? alliances?.Lookup[`${team?.teamNumber}`]?.alliance || null
@@ -142,8 +143,8 @@ function AnnouncePage({
         });
         var allianceTeams = allianceNumber
           ? _.filter(playoffTeams, { alliance: allianceNumber }).map((o) => {
-              return o.teamNumber;
-            })
+            return o.teamNumber;
+          })
           : [];
         // var allianceMembers = allianceNumber ? _.filter(alliances?.alliances, { "number": Number(allianceNumber.slice(-1)) })[0] : [];
         var allianceMembers = allianceNumber
@@ -165,19 +166,19 @@ function AnnouncePage({
           team = _.merge(
             team,
             teamList?.teams[
-              _.findIndex(teamList?.teams, { teamNumber: remainingTeam[0] })
+            _.findIndex(teamList?.teams, { teamNumber: remainingTeam[0] })
             ],
             rankings?.ranks?.length > 0
               ? rankings?.ranks[
-                  _.findIndex(rankings?.ranks, { teamNumber: remainingTeam[0] })
-                ]
+              _.findIndex(rankings?.ranks, { teamNumber: remainingTeam[0] })
+              ]
               : null,
             communityUpdates?.length > 0
               ? communityUpdates[
-                  _.findIndex(communityUpdates, {
-                    teamNumber: remainingTeam[0],
-                  })
-                ]
+              _.findIndex(communityUpdates, {
+                teamNumber: remainingTeam[0],
+              })
+              ]
               : null
           );
           team.rankStyle = rankHighlight(
@@ -246,7 +247,7 @@ function AnnouncePage({
   var matchDetails = !adHocMode
     ? schedule[currentMatch - 1]
     : adHocMatch
-    ? {
+      ? {
         description: "Practice Match",
         startTime: null,
         matchNumber: 1,
@@ -319,7 +320,7 @@ function AnnouncePage({
           level: null,
         },
       }
-    : null;
+      : null;
 
   if (
     practiceSchedule?.schedule.length > 0 &&
@@ -331,13 +332,13 @@ function AnnouncePage({
     }
   }
 
-  var inPlayoffs = matchDetails?.tournamentLevel === "Playoff" ? true : false;
+  var inPlayoffs = matchDetails?.tournamentLevel ? matchDetails?.tournamentLevel.toLowerCase() === "playoff" ? true : false : false;
 
   const matchMenu = schedule.map((match, index) => {
     var tag = `${match?.description} of ${qualSchedule?.schedule?.length}`;
     if (
-      match?.tournamentLevel === "Playoff" ||
-      match?.tournamentLevel === "Practice"
+      (match?.tournamentLevel && match?.tournamentLevel?.toLowerCase() === "playoff") ||
+      (match?.tournamentLevel && match?.tournamentLevel?.toLowerCase() === "practice")
     ) {
       tag = match?.description;
     }
@@ -348,16 +349,9 @@ function AnnouncePage({
     };
   });
 
-  var displayOrder = [
-    "Red1",
-    "Red2",
-    "Red3",
-    "Red4",
-    "Blue1",
-    "Blue2",
-    "Blue3",
-    "Blue4",
-  ];
+  var displayOrder = !ftcMode
+    ? ["Red1", "Red2", "Red3", "Red4", "Blue1", "Blue2", "Blue3", "Blue4"]
+    : ["Red1", "Red2", "Red3", "Blue1", "Blue2", "Blue3"];
   var teamDetails = [];
   if (teamList && matchDetails) {
     //fill in the team details
@@ -377,19 +371,19 @@ function AnnouncePage({
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const swipeHandlers = useSwipeable({
-        onSwipedLeft: () => {
-          if (useSwipe) nextMatch();
-        },
-        onSwipedRight: () => {
-            if (useSwipe) previousMatch();
-        },
-        onSwipedDown: () => {
-          if (usePullDownToUpdate) {
-            if (useSwipe) getSchedule();
-          }
-        },
-        preventScrollOnSwipe: useSwipe,
-      });
+    onSwipedLeft: () => {
+      if (useSwipe) nextMatch();
+    },
+    onSwipedRight: () => {
+      if (useSwipe) previousMatch();
+    },
+    onSwipedDown: () => {
+      if (usePullDownToUpdate) {
+        if (useSwipe) getSchedule();
+      }
+    },
+    preventScrollOnSwipe: useSwipe,
+  });
 
   useHotkeys("right", () => nextMatch(), { scopes: "matchNavigation" });
   useHotkeys("left", () => previousMatch(), { scopes: "matchNavigation" });
@@ -454,15 +448,14 @@ function AnnouncePage({
               swapScreen={swapScreen}
               playoffOnly={playoffOnly}
               eventLabel={eventLabel}
+              ftcMode={ftcMode}
             />
-            <NotificationBanner
-              notification={notification}
-            ></NotificationBanner>
+            <NotificationBanner notification={notification} />
             <EventNotificationBanner
               notifications={eventMessage}
               eventBell={eventBell}
               setEventBell={setEventBell}
-            ></EventNotificationBanner>
+            />
             {!matchDetails?.description.includes("Bye Match") && (
               <table className={"table table-responsive"}>
                 <thead>
@@ -500,10 +493,11 @@ function AnnouncePage({
                           eventNamesCY={eventNamesCY}
                           showDistrictChampsStats={showDistrictChampsStats}
                           playoffOnly={playoffOnly}
+                          ftcMode={ftcMode}
                         />
                       );
                     } else {
-                      if (station.slice(-1) !== "4") {
+                      if ((!ftcMode && (station.slice(-1) !== "4")) && (ftcMode && (station.slice(-1) !== "3"))) {
                         var allianceColor = _.toLower(station.slice(0, -1));
                         return (
                           <tr
@@ -540,6 +534,7 @@ function AnnouncePage({
               adHocMode={adHocMode}
               playoffCountOverride={playoffCountOverride}
               highScoreMode={highScoreMode}
+              ftcMode={ftcMode}
             />
           </Container>
         )}

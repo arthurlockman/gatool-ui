@@ -1,17 +1,20 @@
 import { Alert, Col, Row, Container, Modal, Button } from "react-bootstrap";
 import Bracket from "../components/Bracket";
 import FourAllianceBracket from "components/FourAllianceBracket";
+import FourAllianceBracketFTC from "components/FourAllianceBracketFTC";
+import SixAllianceBracket from "components/SixAllianceBracket";
 import TwoAllianceBracket from "components/TwollianceBracket";
 import moment from "moment/moment";
 import AllianceSelection from "../components/AllianceSelection";
 import { useState } from "react";
 import Switch from "react-switch";
 import { useHotkeysContext, useHotkeys } from "react-hotkeys-hook";
+import _ from "lodash";
 
 import './AllianceSelectionPage.css';
 
 
-function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, playoffSchedule, offlinePlayoffSchedule, alliances, rankings, timeFormat, getRanks, allianceSelection, playoffs, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays, rankingsOverride, loadEvent, practiceSchedule, setOfflinePlayoffSchedule, currentMatch, qualsLength, nextMatch, previousMatch, getSchedule, useSwipe, usePullDownToUpdate, eventLabel, playoffCountOverride }) {
+function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, playoffSchedule, offlinePlayoffSchedule, alliances, rankings, timeFormat, getRanks, allianceSelection, playoffs, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays, rankingsOverride, loadEvent, practiceSchedule, setOfflinePlayoffSchedule, currentMatch, qualsLength, nextMatch, previousMatch, getSchedule, useSwipe, usePullDownToUpdate, eventLabel, playoffCountOverride, ftcMode }) {
     const [overrideAllianceSelection, setOverrideAllianceSelection] = useState(false);
     const [resetAllianceSelection, setResetAllianceSelection] = useState(false);
     const [teamFilter, setTeamFilter] = useState("");
@@ -49,14 +52,79 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
         ranksLastUpdateDisplay = moment(rankings?.lastUpdate).format("ddd, MMM Do YYYY, " + timeFormat.value)
     }
 
+    const matches = offlinePlayoffSchedule?.schedule || playoffSchedule?.schedule?.schedule || playoffSchedule?.schedule;
+
+    const alliancesCount = alliances?.alliances.length;
+
+    //returns the three members of an alliance based on the match data.
+    const allianceNumbers = (matchNumber, allianceColor) => {
+        var alliance = "TBD";
+        var allianceMembers = [];
+        var targetAlliance = {};
+        var match = matches[_.findIndex(matches, { "matchNumber": matchNumber })];
+        if (match && match?.description?.includes("Bye Match")) {
+            alliance = "Bye Match"
+        } else if ((match?.teams[0]?.teamNumber || match?.teams[3]?.teamNumber) && alliances?.Lookup) {
+            const lookupTeam = match?.teams[_.findIndex(match?.teams, { "station": allianceColor === "red" ? "Red1" : "Blue1" })]?.teamNumber;
+            targetAlliance = alliances?.Lookup[`${lookupTeam}`];
+            allianceMembers = _.compact([targetAlliance?.captain, targetAlliance?.round1, targetAlliance?.round2, targetAlliance?.round3, targetAlliance?.backup]);
+            alliance = allianceMembers.join("  ");
+        }
+        //todo: layer in fourth member for new playoff modes
+        return alliance;
+    }
+
+    // returns the name of the alliance
+    const allianceName = (matchNumber, allianceColor) => {
+        const tieLevel = allianceCount === 8 ? 13 : allianceCount === 6 ? 10 : allianceCount === 4 ? 6 : 1;
+        var allianceName = "";
+        var match = matches[_.findIndex(matches, { "matchNumber": matchNumber })];
+        const lookupTeam = match?.teams[_.findIndex(match?.teams, { "station": allianceColor === "red" ? "Red1" : "Blue1" })]?.teamNumber;
+        if (lookupTeam && alliances?.Lookup) {
+            const targetAlliance = alliances?.Lookup[`${lookupTeam}`];
+            allianceName = targetAlliance?.alliance;
+            if (matchNumber <= tieLevel || matchNumber === tieLevel + 6) {
+                if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner?.tieWinner === "red") {
+                    allianceName += ` (L${matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner.level} WIN)`;
+                }
+            }
+        }
+        return allianceName || "";
+    }
+
+    // return the score of the match, by matchNumber
+    function matchScore(matchNumber, alliance) {
+        var score = null;
+        if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.actualStartTime) {
+            if (alliance === "red") {
+                score = matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.scoreRedFinal;
+            } else if (alliance === "blue") {
+                score = matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.scoreBlueFinal;
+            }
+
+        }
+        return score;
+    }
+
+    // return the winner of the match, by matchNumber
+    function matchWinner(matchNumber) {
+        var winner = null;
+        if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.actualStartTime) {
+            winner = matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner
+        }
+        return winner;
+    }
+
     useHotkeys('return', () => document.getElementById("resetAllianceSelection").click(), { scopes: 'resetAllianceSelection' });
+
+
 
     return (
         < >
             {!selectedEvent && <div>
                 <Alert variant="warning" ><div>You need to select an event before you can see anything here.</div></Alert>
             </div>}
-            {selectedEvent && (!qualSchedule || qualSchedule?.schedule?.length === 0 || qualSchedule?.schedule?.schedule?.length === 0) && (!practiceSchedule || practiceSchedule?.schedule?.length === 0 || practiceSchedule?.schedule?.schedule?.length === 0) && (!playoffSchedule || playoffSchedule?.schedule?.length === 0 ) &&
+            {selectedEvent && (!qualSchedule || qualSchedule?.schedule?.length === 0 || qualSchedule?.schedule?.schedule?.length === 0) && (!practiceSchedule || practiceSchedule?.schedule?.length === 0 || practiceSchedule?.schedule?.schedule?.length === 0) && (!playoffSchedule || playoffSchedule?.schedule?.length === 0) &&
                 <div>
                     <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div><div>Waiting for Qualification Match Schedule</div></Alert>
                 </div>}
@@ -102,17 +170,21 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
                             }
                         </Alert>}
                 </div>}
-            {selectedEvent && (qualSchedule?.schedule?.length > 0 || qualSchedule?.schedule?.schedule?.length > 0 || practiceSchedule?.schedule?.length > 0) && !playoffs && (allianceSelection || overrideAllianceSelection) &&
+            {selectedEvent && ((qualSchedule?.schedule?.length > 0 || qualSchedule?.schedule?.schedule?.length > 0 || practiceSchedule?.schedule?.length > 0) && !playoffs && (allianceSelection || overrideAllianceSelection)) &&
                 <div>
-                    <AllianceSelection selectedYear={selectedYear} selectedEvent={selectedEvent} rankings={rankings} teamList={teamList} allianceCount={allianceCount} communityUpdates={communityUpdates} allianceSelectionArrays={allianceSelectionArrays} setAllianceSelectionArrays={setAllianceSelectionArrays} handleReset={handleReset} teamFilter={teamFilter} setTeamFilter={setTeamFilter} />
+                    <AllianceSelection selectedYear={selectedYear} selectedEvent={selectedEvent} rankings={rankings} teamList={teamList} allianceCount={allianceCount} communityUpdates={communityUpdates} allianceSelectionArrays={allianceSelectionArrays} setAllianceSelectionArrays={setAllianceSelectionArrays} handleReset={handleReset} teamFilter={teamFilter} setTeamFilter={setTeamFilter} ftcMode={ftcMode}/>
                 </div>}
 
-            {selectedEvent?.value?.allianceCount === "EightAlliance" && playoffs &&
-                <Bracket playoffSchedule={playoffSchedule} offlinePlayoffSchedule={offlinePlayoffSchedule} alliances={alliances} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} currentMatch={currentMatch} qualsLength={qualsLength} nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} usePullDownToUpdate={usePullDownToUpdate} useSwipe={useSwipe} eventLabel={eventLabel} playoffCountOverride={playoffCountOverride} />}
-            {selectedEvent?.value?.allianceCount === "FourAlliance" && playoffs &&
-                <FourAllianceBracket selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} alliances={alliances} currentMatch={currentMatch} qualsLength={qualsLength} nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} useSwipe={useSwipe} usePullDownToUpdate={usePullDownToUpdate} offlinePlayoffSchedule={offlinePlayoffSchedule} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} eventLabel={eventLabel} />}
-            {selectedEvent?.value?.allianceCount === "TwoAlliance" && playoffs &&
-                <TwoAllianceBracket selectedEvent={selectedEvent} playoffSchedule={playoffSchedule} alliances={alliances} nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} useSwipe={useSwipe} usePullDownToUpdate={usePullDownToUpdate} eventLabel={eventLabel} />}
+            {selectedEvent && (alliancesCount === 8) && playoffs &&
+                <Bracket offlinePlayoffSchedule={offlinePlayoffSchedule} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} currentMatch={currentMatch} qualsLength={qualsLength} nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} usePullDownToUpdate={usePullDownToUpdate} useSwipe={useSwipe} eventLabel={eventLabel} playoffCountOverride={playoffCountOverride} ftcMode={ftcMode} matches={matches} allianceNumbers={allianceNumbers} allianceName={allianceName} matchScore={matchScore} matchWinner={matchWinner} />}
+            {selectedEvent && (alliancesCount === 6) && playoffs &&
+                <SixAllianceBracket offlinePlayoffSchedule={offlinePlayoffSchedule} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} currentMatch={currentMatch} qualsLength={qualsLength} nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} usePullDownToUpdate={usePullDownToUpdate} useSwipe={useSwipe} eventLabel={eventLabel} playoffCountOverride={playoffCountOverride} ftcMode={ftcMode} matches={matches} allianceNumbers={allianceNumbers} allianceName={allianceName} matchScore={matchScore} matchWinner={matchWinner} />}
+            {selectedEvent && (alliancesCount === 4) && playoffs && !ftcMode &&
+                <FourAllianceBracket currentMatch={currentMatch} qualsLength={qualsLength} nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} useSwipe={useSwipe} usePullDownToUpdate={usePullDownToUpdate} offlinePlayoffSchedule={offlinePlayoffSchedule} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} eventLabel={eventLabel} ftcMode={ftcMode} matches={matches} allianceNumbers={allianceNumbers} allianceName={allianceName} matchScore={matchScore} matchWinner={matchWinner} />}
+            {selectedEvent && (alliancesCount === 4) && playoffs && ftcMode &&
+                <FourAllianceBracketFTC currentMatch={currentMatch} qualsLength={qualsLength} nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} useSwipe={useSwipe} usePullDownToUpdate={usePullDownToUpdate} offlinePlayoffSchedule={offlinePlayoffSchedule} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} eventLabel={eventLabel} ftcMode={ftcMode} matches={matches} allianceNumbers={allianceNumbers} allianceName={allianceName} matchScore={matchScore} matchWinner={matchWinner} />}
+            {selectedEvent && (alliancesCount === 2) && playoffs &&
+                <TwoAllianceBracket nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} useSwipe={useSwipe} usePullDownToUpdate={usePullDownToUpdate} eventLabel={eventLabel} ftcMode={ftcMode} matches={matches} allianceNumbers={allianceNumbers} allianceName={allianceName} matchScore={matchScore} matchWinner={matchWinner} />}
             <Modal centered={true} show={resetAllianceSelection} onHide={handleClose}>
                 <Modal.Header className={"allianceSelectionDecline"} closeVariant={"white"} closeButton>
                     <Modal.Title>

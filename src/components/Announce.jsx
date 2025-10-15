@@ -3,13 +3,13 @@ import _ from "lodash";
 
 const announceBackground = { "red": "#F7B3B4", "blue": "#98B4F4" }
 
-function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selectedEvent, showNotesAnnounce, showAwards, showMinorAwards, showSponsors, autoHideSponsors, showMottoes, showChampsStats, eventNamesCY, showDistrictChampsStats, playoffOnly }) {
+function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selectedEvent, showNotesAnnounce, showAwards, showMinorAwards, showSponsors, autoHideSponsors, showMottoes, showChampsStats, eventNamesCY, showDistrictChampsStats, playoffOnly, ftcMode }) {
     const originalAndSustaining = ["20", "45", "126", "148", "151", "157", "190", "191", "250"];
     var allianceColor = station.slice(0, -1);
     var awardsYears = team?.awards ? Object.keys(team.awards) : []
     var awards = [];
     awardsYears.forEach((year) => {
-        team?.awards[year]?.awards?.forEach((award) => {
+        team?.awards[year]?.awards.forEach((award) => {
             awards.push(award);
         })
     })
@@ -34,7 +34,7 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
             <td className={'col2'} style={{ backgroundColor: _.toLower(allianceColor) === "red" ? announceBackground.red : announceBackground.blue }}>
                 <span className={"teamName"}>{team?.updates?.nameShortLocal ? team?.updates?.nameShortLocal : team?.nameShort}</span><br />
                 <span>{team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : `${team?.city}, ${team?.stateProv}${team?.country !== "USA" ? `, ${team?.country}` : ""}`}</span><br />
-                {team?.updates?.robotNameLocal && <span className={"robotName"}>{team?.updates?.robotNameLocal}<br /></span>}
+                {(team?.updates?.robotNameLocal || team?.robotName )&& <span className={"robotName"}>{team?.updates?.robotNameLocal?team?.updates?.robotNameLocal:team?.robotName}<br /></span>}
                 {team?.updates?.teamMottoLocal && (showMottoes || _.isNull(showMottoes)) && <span className={"mottoes"}>{team?.updates?.teamMottoLocal}<br /></span>}
                 {(selectedEvent?.value?.champLevel === "CHAMPS" || selectedEvent?.value?.champLevel === "CMPDIV" || selectedEvent?.value?.champLevel === "CMPSUB") && showChampsStats &&
                     <span className={"champs"}>
@@ -60,7 +60,7 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
                 </span>}
             </td>
             <td className={'col7'} style={{ backgroundColor: _.toLower(allianceColor) === "red" ? announceBackground.red : announceBackground.blue }}>
-                <p className={"announceOrganization"}>{team?.updates?.organizationLocal ? team?.updates?.organizationLocal : team?.schoolName}</p>
+                <p className={"announceOrganization"}>{team?.updates?.organizationLocal ? team?.updates?.organizationLocal : team?.organization}</p>
                 {(showSponsors || ((autoHideSponsors || _.isNull(autoHideSponsors)) && !team?.rank)) &&
                     ((selectedEvent?.value?.type === "Championship" || selectedEvent?.value?.type === "ChampionshipDivision") ?
                         <p className={"sponsors"} >{team?.updates?.topSponsorLocal ? team?.updates?.topSponsorLocal : team?.topSponsor}</p> :

@@ -2,6 +2,7 @@ import Select from "react-select";
 import { Row, Col, Container, Alert, Button, Modal, ButtonGroup, Form, InputGroup } from 'react-bootstrap';
 import moment from "moment/moment";
 import LogoutButton from "../components/LogoutButton";
+import LoginButton from "components/LoginButton";
 import _ from "lodash";
 import Switch from "react-switch";
 import { useOnlineStatus } from "../contextProviders/OnlineContext";
@@ -32,6 +33,14 @@ const filterTime = [
     { value: "week8", label: "Week 8" },
 ]
 
+const filterTimeFTC = [
+    { value: "all", label: "All Events" },
+    { value: "past", label: "Past Events" },
+    { value: "future", label: "Future Events" },
+    { value: "thisWeek", label: "This Week" },
+    { value: "thisMonth", label: "This Month" },
+]
+
 const teamReducer = [
     { value: 0, label: 0 },
     { value: 1, label: 1 },
@@ -58,9 +67,15 @@ const monthsWarningMenu = [
     { label: "12 months", value: "12" }
 ]
 
+const ftcModeOptions = [
+    { value: "FRC", label: "FRC" },
+    { value: "FTCOnline", label: "FTC Online" },
+    { value: "FTCLocal", label: "FTC Local Server" },
+];
 
 
-function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, districts, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showNotesAnnounce, setShowNotesAnnounce, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, autoUpdate, setAutoUpdate, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, showQualsStatsQuals, setShowQualsStatsQuals, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee, showDistrictChampsStats, setShowDistrictChampsStats, monthsWarning, setMonthsWarning, user, isAuthenticated, adHocMode, setAdHocMode, supportedYears, reloadPage, autoHideSponsors, setAutoHideSponsors, setLoadingCommunityUpdates, hidePracticeSchedule, setHidePracticeSchedule, systemMessage, setTeamListLoading, getTeamList, getAlliances, setHaveChampsTeams, appUpdates, usePullDownToUpdate, setUsePullDownToUpdate, useSwipe, setUseSwipe, eventLabel, setEventLabel, showInspection, setShowInspection, showMinorAwards, setShowMinorAwards, highScoreMode, setHighScoreMode, systemBell, setSystemBell, eventBell, setEventBell, eventMessage, setEventMessage, putEventNotifications, useCheesyArena, setUseCheesyArena, cheesyArenaAvailable }) {
+
+function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, regionFilters, setRegionFilters, districts, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showNotesAnnounce, setShowNotesAnnounce, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, autoUpdate, setAutoUpdate, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, showQualsStatsQuals, setShowQualsStatsQuals, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee, showDistrictChampsStats, setShowDistrictChampsStats, monthsWarning, setMonthsWarning, user, isAuthenticated, adHocMode, setAdHocMode, supportedYears, FTCSupportedYears, reloadPage, autoHideSponsors, setAutoHideSponsors, setLoadingCommunityUpdates, hidePracticeSchedule, setHidePracticeSchedule, systemMessage, setTeamListLoading, getTeamList, getAlliances, setHaveChampsTeams, appUpdates, usePullDownToUpdate, setUsePullDownToUpdate, useSwipe, setUseSwipe, eventLabel, setEventLabel, showInspection, setShowInspection, showMinorAwards, setShowMinorAwards, highScoreMode, setHighScoreMode, systemBell, setSystemBell, eventBell, setEventBell, eventMessage, setEventMessage, putEventNotifications, useCheesyArena, setUseCheesyArena, ftcLeagues, ftcRegions, ftcMode, setFTCMode, ftcTypes, useFTCOffline, setUseFTCOffline, FTCServerURL, setFTCServerURL, FTCKey, requestFTCKey, checkFTCKey, FTCOfflineAvailable, getFTCOfflineStatus, getCheesyStatus }) {
     const isOnline = useOnlineStatus();
     const PWASupported = (isChrome && Number(browserVersion) >= 76) || (isSafari && Number(browserVersion) >= 15 && Number(fullBrowserVersion.split(".")[1]) >= 4);
 
@@ -79,9 +94,17 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
         { value: "offseason", label: "Offseason Events" }
     ];
 
+    const ftcFiltersMenu = _.orderBy(ftcLeagues, "label", "asc")
+
+    const regionFiltersMenu = [...ftcTypes.map((/** @type {{ type: string; description: string; }} */ type) => {
+        return { value: type.type, label: type.description }
+    }), ..._.orderBy(ftcRegions.map((/** @type {{ regionCode: string; description: string; }} */ region) => {
+        return { value: region.regionCode, label: region.description }
+    }), "label", "asc")];
+
     function filterEvents(events) {
         //filter the array
-        var filters = eventFilters?.map((e) => { return e?.value });
+        var filters = [...eventFilters?.map((e) => { return e?.value }), ...regionFilters?.map((e) => { return e?.value })];
 
         var filteredEvents = events;
         //reduce the list by time, then additively include other filters
@@ -168,6 +191,16 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
         setEventLabel(e.label);
     }
 
+    const handleFTCMode = (checked) => {
+        setFTCMode(checked.value === "FRC" ? null : checked);
+        setUseFTCOffline(checked.value === "FTCLocal");
+        setEventFilters([]);
+        setRegionFilters([]);
+        setTimeFilter({ label: "All Events", value: "all" });
+        setSelectedEvent(null);
+        setSelectedYear(checked.value === "FRC" ? supportedYears[0] : FTCSupportedYears[0]);
+    }
+
     const handleEventNotification = (property, index, value, user) => {
         var eventNotificationsTemp = _.cloneDeep(eventMessageFormData);
         if (property === "delete") {
@@ -215,6 +248,13 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
         setManageAnnouncements(false);
     }
 
+    const handleUseCheesy = async (checked) => {
+        await setUseCheesyArena(checked);
+        if (checked) {
+            getCheesyStatus(true);
+        }
+    }
+
 
     var updatedTeamList = localUpdates.map((update) => {
         return update.teamNumber
@@ -228,10 +268,13 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
             {!selectedYear && <Row>
                 <Alert variant="danger"><b>Awaiting event list</b></Alert>
             </Row>}
-            <Row className="setupPageMenus">
-                <Col sm={4}><b>Choose a year...</b><br /><Select options={supportedYears} value={selectedYear} onChange={setSelectedYear} isDisabled={!isOnline} />
+            <Row className={ftcMode ? "ftcSetupPageMenus" : "setupPageMenus"}>
+                <Col sm={2}>
+                    <b>Choose a program...</b><br /><Select options={ftcModeOptions} value={ftcMode ? ftcMode : { label: "FRC", value: "FRC" }} onChange={handleFTCMode} />
                 </Col>
-                <Col sm={8}>
+                <Col sm={3}><b>Choose a year...</b><br /><Select options={ftcMode ? FTCSupportedYears : supportedYears} value={selectedYear} onChange={setSelectedYear} isDisabled={!isOnline} />
+                </Col>
+                <Col sm={7}>
                     {eventList && <span><b>...then choose an event.</b><br /><Select options={filterEvents(eventList)} placeholder={eventList?.length > 0 ? "Select an event" : "Loading event list"} value={selectedEvent} onChange={handleEventSelection}
                         styles={{
                             // @ts-ignore
@@ -245,16 +288,45 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                         }} isDisabled={!isOnline} /></span>}
                 </Col>
             </Row>
-            {eventList && <Row className="setupPageFilters">
+            {eventList && !useFTCOffline && <Row className="setupPageFilters">
                 <Col sm={4}><b>Filter by event timeframe here...</b><br />
-                    <Select options={filterTime} value={timeFilter ? timeFilter : filterTime[0]} onChange={setTimeFilter} isDisabled={!isOnline} />
+                    <Select options={ftcMode ? filterTimeFTC : filterTime} value={timeFilter ? timeFilter : ftcMode ? filterTimeFTC[0] : filterTime[0]} onChange={setTimeFilter} isDisabled={!isOnline} />
                 </Col>
-                <Col sm={8}><b>Filter by event type or District here...</b><br />
-                    <Select isMulti options={filtersMenu} value={eventFilters} onChange={setEventFilters} isDisabled={!isOnline} />
+                {ftcMode && <Col sm={4}><b>Filter by Event Type or Region here...</b><br />
+                    <Select isMulti options={regionFiltersMenu} value={regionFilters} onChange={setRegionFilters} isDisabled={!isOnline} />
+                </Col>}
+                <Col sm={ftcMode ? 4 : 8}><b>Filter by  {ftcMode ? "League" : "event type or District"} here...</b><br />
+                    <Select isMulti options={ftcMode ? ftcFiltersMenu : filtersMenu} value={eventFilters} onChange={setEventFilters} isDisabled={!isOnline} />
+                </Col>
+            </Row>}
+            {useFTCOffline && <Row className="ftcSetupPageMenus">
+                <Col><h4>You must configure gatool to use a local FTC server.<br />
+                    Please take the following steps:</h4>
+                    <div style={{ textAlign: "left" }}><ol>
+                        <li>Ensure that your browser is configured to use unsafe content.</li>
+                        <li>Enter the URL for the local FTC server</li>
+                        <li>Request API access, which your FTA must approve</li>
+                        <li>Once approved, verify API status</li>
+                        <li>Select your event from the menu above</li>
+                    </ol></div>
+                </Col>
+                <Col style={{ textAlign: "left" }}><Form>
+                    <Form.Group controlId="FTCServerURL">
+                        <Form.Label className={"formLabel"}><b>Server URL (usually in http://10.0.100.5 format)</b></Form.Label>
+                        <Form.Control type="text" placeholder={"usually in http://10.0.100.5 format"} value={FTCServerURL} onChange={(e) => setFTCServerURL(e.target.value)} />
+                    </Form.Group>
+                </Form>
+                    {!FTCKey?.key && !FTCKey?.active && FTCOfflineAvailable && <Button onClick={requestFTCKey}>Request API Access</Button>}
+                    {FTCKey?.key && FTCKey?.FTCServerURL !== FTCServerURL && FTCOfflineAvailable && <Button onClick={requestFTCKey}>Request new API Access</Button>}
+                    {FTCKey?.key && FTCKey?.FTCServerURL === FTCServerURL && !FTCKey?.active && FTCOfflineAvailable && <Button onClick={checkFTCKey}>Verify API Access</Button>}
+                    {FTCKey?.key && FTCKey?.FTCServerURL === FTCServerURL && FTCKey?.active && FTCOfflineAvailable && <><Button onClick={checkFTCKey} variant="success">API Access Granted!</Button>{FTCKey?.key ? <><br />{`Key: ${FTCKey?.key}`}</> : ""}</>}
+                    {!FTCOfflineAvailable && <Button onClick={getFTCOfflineStatus} variant={"danger"}>FTC Local Server unavailable. Click to check status.</Button>}
+
                 </Col>
             </Row>}
             {!selectedEvent && <div>
-                <Alert variant="warning" >You need to select an event before you can see anything here. {isAuthenticated && <LogoutButton disabled={!isOnline} />}</Alert>
+                <Alert variant="warning" >You need to select an event before you can see anything here. {isAuthenticated && <LogoutButton disabled={!isOnline} />}
+                    {!isAuthenticated && <LoginButton disabled={!isOnline} />}</Alert>
 
             </div>}
             {selectedEvent && <div>
@@ -269,7 +341,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                 <Row className="leftTable">
                     <Col sm={4}>
                         <p><b>Event Code: </b>{selectedEvent?.value.code}</p>
-                        {!selectedEvent?.value.type.includes("OffSeason") && <p><b>Event Week: </b>{selectedEvent?.value.weekNumber}</p>}
+                        {!selectedEvent?.value.type.includes("OffSeason") && !ftcMode && <p><b>Event Week: </b>{selectedEvent?.value.weekNumber}</p>}
                         {selectedEvent?.value.type === "Regional" && <p><b>Regional Event</b></p>}
                         {selectedEvent?.value.type === "OffSeasonWithAzureSync" && <p><b>FMS Registered Offseason Event</b></p>}
                         {(selectedEvent?.value.type === "OffSeason") && <p><b>Offseason Event not registered with FMS</b></p>}
@@ -287,11 +359,14 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                         <Alert variant={"danger"}><b>ADVANCED EVENT SETTINGS:</b><br />If your event includes non-competing teams in the team list, indicate the number of non-competing teams here. <b>THIS IS A RARE CONDITION</b><Select options={teamReducer} value={teamReduction ? teamReduction : teamReducer[0]} onChange={setTeamReduction} isDisabled={!teamList?.teamCountTotal} /><br />
                             If your event requires a reduced Alliance Count, you can override the Alliance Count here. <b>THIS SHOULD ONLY APPLY TO EVENTS WITH LESS THAN 26 TEAMS. </b><Select options={playoffOverrideMenu} value={playoffCountOverride ? playoffCountOverride : (allianceCount?.menu ? allianceCount.menu : playoffOverrideMenu[0])} onChange={setPlayoffCountOverride} />
                         </Alert>
-                        <div><img style={{ width: "100%" }} src="/images/frc_reefscape.gif" alt="REEFSCAPE℠ presented by Haas Logo" /></div>
+                        <div>
+                            {!ftcMode && <img style={{ width: "100%" }} src="/images/frc_reefscape.gif" alt="REEFSCAPE℠ presented by Haas Logo" />}
+                            {ftcMode && <img style={{ width: "100%" }} src="/images/first_age_ftc_decode_logo_vertical_rgb_fullcolor.png" alt="DECODE℠ presented by Haas Logo" />}
+                        </div>
                     </Col>
                     <Col sm={4}>
-                        {selectedEvent?.value.allianceCount === "SixAlliance" && <p><b>Playoff Type: </b>Round Robin</p>}
                         {selectedEvent?.value.allianceCount === "EightAlliance" && <p><b>Playoff Type: </b>8 Alliance Playoffs</p>}
+                        {selectedEvent?.value.allianceCount === "SixAlliance" && <p><b>Playoff Type: </b>6 Alliance Playoffs</p>}
                         {selectedEvent?.value.allianceCount === "FourAlliance" && <p><b>Playoff Type: </b>4 Alliance Playoff</p>}
                         {selectedEvent?.value.allianceCount === "TwoAlliance" && <p><b>Playoff Type: </b>Best 2 out of 3 Playoff</p>}
                         {qualSchedule?.scheduleLastModified && <p><b>Quals Schedule last updated: </b><br />{moment(qualSchedule?.scheduleLastModified).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
@@ -520,12 +595,12 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                         <b>Enable Test Match Mode. If you enable this mode, you will need to enter team numbers on the Announce Screen. This will disable match navigation.</b>
                                     </td>
                                 </tr>
-                                {cheesyArenaAvailable && <tr>
+                                {!ftcMode && <tr>
                                     <td>
-                                        <Switch checked={useCheesyArena === null ? false : useCheesyArena} onChange={setUseCheesyArena} />
+                                        <Switch checked={useCheesyArena === null ? false : useCheesyArena} onChange={handleUseCheesy} />
                                     </td>
                                     <td>
-                                        <b>Use Cheesy Arena for match data. Please ensure that your device is on the same network as the Cheesy Arena field system.</b>
+                                        <b>Use Cheesy Arena for match data. Please ensure that your device is on the same network as the Cheesy Arena field system.{useCheesyArena && <span style={{color:"red"}}><br /><i>NOTE: you may need to tap Refresh Schedule above to fetch the initial data from Cheesy Arena.</i></span>}</b>
                                     </td>
                                 </tr>}
 
@@ -542,6 +617,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                 <tr>
                                     <td colSpan={2}>
                                         {isAuthenticated && <LogoutButton disabled={!isOnline} />}
+                                        {!isAuthenticated && <LoginButton disabled={!isOnline} />}
                                     </td>
                                 </tr>
                             </tbody>

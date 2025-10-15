@@ -36,6 +36,7 @@ function RanksPage({
   eventLabel,
   communityUpdates,
   EPA,
+  ftcMode
 }) {
   // This function clicks the hidden file upload button
   function clickLoadRanks() {
@@ -115,7 +116,7 @@ function RanksPage({
           return tempRow;
         });
 
-        formattedRankings.lastUpdate = moment();
+        formattedRankings.lastUpdate = moment().format();
         setRankingsOverride(true);
         setRankings(_.cloneDeep(formattedRankings));
         setAllianceSelectionArrays({});
@@ -591,7 +592,7 @@ function RanksPage({
                     }
                   >
                     <b>
-                      EPA{rankSort === "epaVal" ? <SortNumericUp /> : ""}
+                      {ftcMode?'OPA':'EPA'}{rankSort === "epaVal" ? <SortNumericUp /> : ""}
                       {rankSort === "-epaVal" ? <SortNumericDown /> : ""}
                     </b>
                   </th>
@@ -663,7 +664,7 @@ function RanksPage({
                         ></td>
                         <td>{rankRow.sortOrder1}</td>
                         <td>{rankRow.record}</td>
-                        <td>{rankRow.qualAverage}</td>
+                        <td>{Math.floor(rankRow.qualAverage*100)/100}</td>
                         <td>{rankRow.dq}</td>
                         <td>{rankRow.matchesPlayed}</td>
                         <td>{rankRow.season}</td>

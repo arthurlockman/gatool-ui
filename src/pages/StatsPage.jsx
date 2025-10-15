@@ -8,7 +8,8 @@ function StatsPage({
   eventHighScores,
   eventNamesCY,
   eventLabel,
-  districts, selectedYear,
+  districts,
+  selectedYear,
 }) {
   const eventDistrict = _.filter(districts, {
     value: selectedEvent?.value?.districtCode,
