@@ -1215,6 +1215,7 @@ function SchedulePage({
                 </tr>
               </thead>
               <tbody>
+                {/* When available, we'll show the practice schedule here. */}
                 {practiceSchedule &&
                   !hidePracticeSchedule &&
                   practiceSchedule?.schedule?.length > 0 &&
@@ -1272,32 +1273,10 @@ function SchedulePage({
                             {match?.teams[5]?.teamNumber}
                           </span>
                         </td>
-
-                        {/* {ftcMode && (
-                          <>
-                            <td>
-                              <span className={redStyle}>
-                                {match?.teams[0]?.teamNumber}
-                              </span>
-                              <br />
-                              <span className={blueStyle}>
-                                {match?.teams[2]?.teamNumber}
-                              </span>
-                            </td>
-                            <td>
-                              <span className={redStyle}>
-                                {match?.teams[1]?.teamNumber}
-                              </span>
-                              <br />
-                              <span className={blueStyle}>
-                                {match?.teams[3]?.teamNumber}
-                              </span>
-                            </td>
-                          </>
-                        )} */}
                       </tr>
                     );
                   })}
+                {/* When available, we'll show the offline playoff schedule here. */}
                 {offlinePlayoffSchedule &&
                   offlinePlayoffSchedule?.schedule?.length > 0 &&
                   offlinePlayoffSchedule?.schedule.map((match) => {
@@ -1382,6 +1361,7 @@ function SchedulePage({
                       </tr>
                     );
                   })}
+                {/* When available, we'll show the qualification schedule here. */}
                 {qualSchedule?.schedule?.length > 0 &&
                   qualSchedule?.schedule?.map((match) => {
                     let redStyle = "red";
@@ -1531,6 +1511,7 @@ function SchedulePage({
                       </tr>
                     );
                   })}
+                {/* When available, we'll show the playoff schedule here. */}
                 {playoffSchedule &&
                   playoffSchedule?.schedule?.length > 0 &&
                   playoffSchedule.schedule.map((match, index) => {

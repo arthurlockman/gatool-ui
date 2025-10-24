@@ -1353,6 +1353,13 @@ function App() {
         if (match?.matchScores) {
           delete match.matchScores;
         }
+        match.redRP = _.pickBy(match.scores?.alliances[1], (value, key) => {
+          return key.endsWith("BonusAchieved") || key.endsWith("RP");
+        });
+        // @ts-ignore
+        match.blueRP = _.pickBy(match?.scores?.alliances[0], (value, key) => {
+          return key.endsWith("BonusAchieved") || key.endsWith("RP");
+        });
       }
       return match;
     });
