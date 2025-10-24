@@ -68,20 +68,20 @@ function AnnouncePage({
     (teamList?.teams?.length - teamReduction) / 6
   );
   if (
-    qualSchedule?.schedule?.schedule?.length ||
-    qualSchedule?.schedule?.length
+    qualSchedule?.schedule?.schedule?.length > 0 ||
+    qualSchedule?.schedule?.length > 0
   ) {
   }
   const notification =
     currentMatch >= qualsLength - matchesToNotify &&
-      currentMatch <= qualsLength &&
-      showInspection
+    currentMatch <= qualsLength &&
+    showInspection
       ? {
-        expiry: moment().add(1, "hour"),
-        onTime: moment(),
-        message:
-          "Please remind teams to have their robots reinspected before Playoffs and to send their team rep(s) for Alliance Selection.",
-      }
+          expiry: moment().add(1, "hour"),
+          onTime: moment(),
+          message:
+            "Please remind teams to have their robots reinspected before Playoffs and to send their team rep(s) for Alliance Selection.",
+        }
       : {};
 
   function updateTeamDetails(station, matchDetails) {
@@ -95,30 +95,30 @@ function AnnouncePage({
     if (station.slice(-1) !== "4") {
       team =
         matchDetails?.teams[
-        _.findIndex(matchDetails?.teams, { station: station })
+          _.findIndex(matchDetails?.teams, { station: station })
         ];
       team = communityUpdates
         ? _.merge(
-          team,
-          teamList?.teams[
-          _.findIndex(teamList?.teams, { teamNumber: team?.teamNumber })
-          ],
-          rankings?.ranks[
-          _.findIndex(rankings?.ranks, { teamNumber: team?.teamNumber })
-          ],
-          communityUpdates[
-          _.findIndex(communityUpdates, { teamNumber: team?.teamNumber })
-          ]
-        )
+            team,
+            teamList?.teams[
+              _.findIndex(teamList?.teams, { teamNumber: team?.teamNumber })
+            ],
+            rankings?.ranks[
+              _.findIndex(rankings?.ranks, { teamNumber: team?.teamNumber })
+            ],
+            communityUpdates[
+              _.findIndex(communityUpdates, { teamNumber: team?.teamNumber })
+            ]
+          )
         : _.merge(
-          team,
-          teamList?.teams[
-          _.findIndex(teamList?.teams, { teamNumber: team?.teamNumber })
-          ],
-          rankings?.ranks[
-          _.findIndex(rankings?.ranks, { teamNumber: team?.teamNumber })
-          ]
-        );
+            team,
+            teamList?.teams[
+              _.findIndex(teamList?.teams, { teamNumber: team?.teamNumber })
+            ],
+            rankings?.ranks[
+              _.findIndex(rankings?.ranks, { teamNumber: team?.teamNumber })
+            ]
+          );
       team.rankStyle = rankHighlight(team?.rank, allianceCount || { count: 8 });
       team.alliance = alliances?.Lookup[`${team?.teamNumber}`]
         ? alliances?.Lookup[`${team?.teamNumber}`]?.alliance || null
@@ -143,8 +143,8 @@ function AnnouncePage({
         });
         var allianceTeams = allianceNumber
           ? _.filter(playoffTeams, { alliance: allianceNumber }).map((o) => {
-            return o.teamNumber;
-          })
+              return o.teamNumber;
+            })
           : [];
         // var allianceMembers = allianceNumber ? _.filter(alliances?.alliances, { "number": Number(allianceNumber.slice(-1)) })[0] : [];
         var allianceMembers = allianceNumber
@@ -166,19 +166,19 @@ function AnnouncePage({
           team = _.merge(
             team,
             teamList?.teams[
-            _.findIndex(teamList?.teams, { teamNumber: remainingTeam[0] })
+              _.findIndex(teamList?.teams, { teamNumber: remainingTeam[0] })
             ],
             rankings?.ranks?.length > 0
               ? rankings?.ranks[
-              _.findIndex(rankings?.ranks, { teamNumber: remainingTeam[0] })
-              ]
+                  _.findIndex(rankings?.ranks, { teamNumber: remainingTeam[0] })
+                ]
               : null,
             communityUpdates?.length > 0
               ? communityUpdates[
-              _.findIndex(communityUpdates, {
-                teamNumber: remainingTeam[0],
-              })
-              ]
+                  _.findIndex(communityUpdates, {
+                    teamNumber: remainingTeam[0],
+                  })
+                ]
               : null
           );
           team.rankStyle = rankHighlight(
@@ -247,7 +247,7 @@ function AnnouncePage({
   var matchDetails = !adHocMode
     ? schedule[currentMatch - 1]
     : adHocMatch
-      ? {
+    ? {
         description: "Practice Match",
         startTime: null,
         matchNumber: 1,
@@ -320,7 +320,7 @@ function AnnouncePage({
           level: null,
         },
       }
-      : null;
+    : null;
 
   if (
     practiceSchedule?.schedule.length > 0 &&
@@ -332,13 +332,19 @@ function AnnouncePage({
     }
   }
 
-  var inPlayoffs = matchDetails?.tournamentLevel ? matchDetails?.tournamentLevel.toLowerCase() === "playoff" ? true : false : false;
+  var inPlayoffs = matchDetails?.tournamentLevel
+    ? matchDetails?.tournamentLevel.toLowerCase() === "playoff"
+      ? true
+      : false
+    : false;
 
   const matchMenu = schedule.map((match, index) => {
     var tag = `${match?.description} of ${qualSchedule?.schedule?.length}`;
     if (
-      (match?.tournamentLevel && match?.tournamentLevel?.toLowerCase() === "playoff") ||
-      (match?.tournamentLevel && match?.tournamentLevel?.toLowerCase() === "practice")
+      (match?.tournamentLevel &&
+        match?.tournamentLevel?.toLowerCase() === "playoff") ||
+      (match?.tournamentLevel &&
+        match?.tournamentLevel?.toLowerCase() === "practice")
     ) {
       tag = match?.description;
     }
@@ -497,7 +503,12 @@ function AnnouncePage({
                         />
                       );
                     } else {
-                      if ((!ftcMode && (station.slice(-1) !== "4")) && (ftcMode && (station.slice(-1) !== "3"))) {
+                      if (
+                        !ftcMode &&
+                        station.slice(-1) !== "4" &&
+                        ftcMode &&
+                        station.slice(-1) !== "3"
+                      ) {
                         var allianceColor = _.toLower(station.slice(0, -1));
                         return (
                           <tr
