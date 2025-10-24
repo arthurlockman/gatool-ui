@@ -1886,6 +1886,7 @@ function App() {
               ...tbaTeams,
               lastUpdate: moment().format(),
             };
+            getCommunityUpdates(false, teams.teams);
           }
         }
       } else if (useFTCOffline) {
@@ -2454,7 +2455,7 @@ function App() {
    * @param selectedYear The currently selected year, which is a persistent state variable
    * @param ignoreLocalUpdates don't load the community updates
    * @param selectedEvent The currently selected event, which is a persistent state variable
-   * @param adHocTeamList A list of team numbers to support offline events
+   * @param adHocTeamList An array of team numbers to support offline events
    * @return sets the communityUpdates persistent state
    */
   async function getCommunityUpdates(
@@ -2474,7 +2475,8 @@ function App() {
         if (
           selectedEvent?.value?.code.includes("OFFLINE") ||
           (cheesyArenaAvailable && useCheesyArena) ||
-          useFTCOffline
+          useFTCOffline ||
+          (selectedEvent?.value?.type === "OffSeason" && !ftcMode)
         ) {
           //Do something with the team list
           if (adHocTeamList) {
@@ -3192,6 +3194,7 @@ function App() {
           if (tbaAlliances && tbaAlliances?.alliances?.length > 0) {
             alliances = {
               Alliances: tbaAlliances?.alliances,
+              count: tbaAlliances?.count,
             };
           } else {
             alliances = { Alliances: [] };
@@ -4008,6 +4011,8 @@ function App() {
       if (selectedEvent) {
         console.log("Team list changed. Fetching Community Updates.");
         if (ftcMode?.value === "FTCLocal") {
+          getCommunityUpdates(false, teamList?.teams);
+        } else if (selectedEvent?.value?.type === "OffSeason" && !ftcMode) {
           getCommunityUpdates(false, teamList?.teams);
         } else {
           getCommunityUpdates();
