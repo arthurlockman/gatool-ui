@@ -1254,14 +1254,19 @@ function App() {
       ) {
         // get the qual schedule from TBA via gatool Offseason API
         console.log("Using TBA for Offseason Event Qual Schedule");
-        const tbaEventKey = await getTBAEventKeyFromFIRSTCode(
-          selectedEvent?.value,
-          selectedYear?.value
-        );
+        // Use cached TBA event key if available, otherwise fetch it
+        let eventKey = tbaEventKey;
+        if (!eventKey) {
+          eventKey = await getTBAEventKeyFromFIRSTCode(
+            selectedEvent?.value,
+            selectedYear?.value
+          );
+          setTbaEventKey(eventKey);
+        }
 
-        if (tbaEventKey) {
+        if (eventKey) {
           const tbaMatches = await fetchTBAMatches(
-            tbaEventKey,
+            eventKey,
             selectedYear?.value
           );
 
@@ -1527,14 +1532,19 @@ function App() {
       ) {
         // get the playoff schedule from TBA via gatool Offseason API
         console.log("Using TBA for Offseason Event Playoff Schedule");
-        const tbaEventKey = await getTBAEventKeyFromFIRSTCode(
-          selectedEvent?.value,
-          selectedYear?.value
-        );
+        // Use cached TBA event key if available, otherwise fetch it
+        let eventKey = tbaEventKey;
+        if (!eventKey) {
+          eventKey = await getTBAEventKeyFromFIRSTCode(
+            selectedEvent?.value,
+            selectedYear?.value
+          );
+          setTbaEventKey(eventKey);
+        }
 
-        if (tbaEventKey) {
+        if (eventKey) {
           const tbaMatches = await fetchTBAMatches(
-            tbaEventKey,
+            eventKey,
             selectedYear?.value
           );
 
@@ -1882,17 +1892,19 @@ function App() {
       ) {
         // get the team list from TBA via gatool Offseason API
         console.log("Using TBA for Offseason Event Team List");
-        const tbaEventKey = await getTBAEventKeyFromFIRSTCode(
-          selectedEvent?.value,
-          selectedYear?.value
-        );
-        
-        // Store TBA event key in state for display
-        setTbaEventKey(tbaEventKey);
+        // Use cached TBA event key if available, otherwise fetch it
+        let eventKey = tbaEventKey;
+        if (!eventKey) {
+          eventKey = await getTBAEventKeyFromFIRSTCode(
+            selectedEvent?.value,
+            selectedYear?.value
+          );
+          setTbaEventKey(eventKey);
+        }
 
-        if (tbaEventKey) {
+        if (eventKey) {
           const tbaTeams = await fetchTBATeams(
-            tbaEventKey,
+            eventKey,
             selectedYear?.value
           );
 
@@ -2750,14 +2762,19 @@ function App() {
       ) {
         // get the ranks from TBA via gatool Offseason API
         console.log("Using TBA for Offseason Event Rankings");
-        const tbaEventKey = await getTBAEventKeyFromFIRSTCode(
-          selectedEvent?.value,
-          selectedYear?.value
-        );
+        // Use cached TBA event key if available, otherwise fetch it
+        let eventKey = tbaEventKey;
+        if (!eventKey) {
+          eventKey = await getTBAEventKeyFromFIRSTCode(
+            selectedEvent?.value,
+            selectedYear?.value
+          );
+          setTbaEventKey(eventKey);
+        }
 
-        if (tbaEventKey) {
+        if (eventKey) {
           const tbaRankings = await fetchTBARankings(
-            tbaEventKey,
+            eventKey,
             selectedYear?.value
           );
 
@@ -3232,14 +3249,19 @@ function App() {
       ) {
         // get the alliances from TBA via gatool Offseason API
         console.log("Using TBA for Offseason Event Alliances");
-        const tbaEventKey = await getTBAEventKeyFromFIRSTCode(
-          selectedEvent?.value,
-          selectedYear?.value
-        );
+        // Use cached TBA event key if available, otherwise fetch it
+        let eventKey = tbaEventKey;
+        if (!eventKey) {
+          eventKey = await getTBAEventKeyFromFIRSTCode(
+            selectedEvent?.value,
+            selectedYear?.value
+          );
+          setTbaEventKey(eventKey);
+        }
 
-        if (tbaEventKey) {
+        if (eventKey) {
           const tbaAlliances = await fetchTBAAlliances(
-            tbaEventKey,
+            eventKey,
             selectedYear?.value
           );
 

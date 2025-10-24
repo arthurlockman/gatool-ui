@@ -3,8 +3,8 @@ export const appUpdates = [
     date: "October 23, 2025",
     message: (
       <ul>
-        <li>Added support for Offline Events using TBA!</li>
-        <li>gatool will now attempt to load event details from TBA for events that do not sync with FIRST API.</li>
+        <li>Ofseason demo team updates will now be keyed to a specific event. No more cross-contamination of updates during events!</li>
+        <li>Added support for Offline Events using TBA! gatool will now attempt to load event details from TBA for events that do not sync with FIRST API.</li>
         <ul>
           <li>When you select an Offseason Event that's got a beige tint, gatool will attempt to load event details from TBA.</li>
           <li>When you select an Offseason Event that's got a blue tint, gatool will attempt to load event details from FIRST API.</li>
