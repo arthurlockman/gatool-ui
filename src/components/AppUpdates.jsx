@@ -1,5 +1,18 @@
 export const appUpdates = [
   {
+    date: "October 23, 2025",
+    message: (
+      <ul>
+        <li>Added support for Offline Events using TBA!</li>
+        <li>gatool will now attempt to load event details from TBA for events that do not sync with FIRST API.</li>
+        <ul>
+          <li>When you select an Offseason Event that's got a beige tint, gatool will attempt to load event details from TBA.</li>
+          <li>When you select an Offseason Event that's got a blue tint, gatool will attempt to load event details from FIRST API.</li>
+          <li>If TBA doesn't have the event details, you should try using OFFLINE mode if the event uses the FIRST field system.</li>
+        </ul>
+      </ul>
+    ),
+  }, {
     date: "October 5, 2025",
     message: (
       <ul>

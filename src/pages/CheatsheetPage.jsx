@@ -95,7 +95,7 @@ function CheatsheetPage({
       {ftcMode && (
         <>
           <img
-            src="/cheatsheet/decode_cheat_sheet_10212025.png"
+            src="/cheatsheet/decode_cheat_sheet_10232025.png"
             width="100%"
             alt="Cheatsheet"
           ></img>
@@ -105,7 +105,7 @@ function CheatsheetPage({
               <span
                 style={{ cursor: "pointer", color: "blue" }}
                 onClick={() => {
-                  downloadPDF("/cheatsheet/decode_cheat_sheet_10212025.pdf");
+                  downloadPDF("/cheatsheet/decode_cheat_sheet_10232025.pdf");
                 }}
               >
                 Download the Cheat Sheet

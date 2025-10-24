@@ -434,7 +434,7 @@ function App() {
       // Set the IP address to the constant `ip`
       if (data) {
         console.log("Cheesy Arena is available.");
-        setCheesyArenaAvailable(true)
+        setCheesyArenaAvailable(true);
         if (loadSchedule) {
           getTeamList();
           getSchedule();
@@ -855,6 +855,157 @@ function App() {
   };
 
   /**
+   * Helper function to fetch TBA event by matching FIRST event
+   * This searches through TBA events to find one that matches the FIRST event code or name
+   * @param {object} firstEvent Complete FIRST event object with code and name properties
+   * @param {string} year Year
+   * @returns TBA event code (e.g., "2025cc")
+   */
+  const getTBAEventKeyFromFIRSTCode = async (firstEvent, year) => {
+    try {
+      console.log(
+        `Looking up TBA event key for FIRST event: ${firstEvent?.code} - ${firstEvent?.name}`
+      );
+
+      // Fetch all TBA events for the year
+      const result = await httpClient.getNoAuth(`${year}/offseason/events/`);
+      if (result.status === 200) {
+        // @ts-ignore
+        const tbaEvents = await result.json();
+
+        // First, try to find by firstEventCode
+        let matchingEventIndex = _.findIndex(tbaEvents.events, {
+          firstEventCode: firstEvent?.code.toLowerCase(),
+        });
+
+        if (matchingEventIndex >= 0) {
+          let matchingEvent = tbaEvents.events[matchingEventIndex];
+          console.log(
+            `Found TBA event key: ${matchingEvent?.code} for FIRST event: ${firstEvent?.code}`
+          );
+          return matchingEvent?.code.split(year)[1];
+        } else {
+          console.log("trying to match by name");
+          matchingEventIndex = _.findIndex(tbaEvents.events, {
+            name: firstEvent?.name,
+          });
+          if (matchingEventIndex >= 0) {
+            let matchingEvent = tbaEvents.events[matchingEventIndex];
+            console.log(
+              `Found TBA event key: ${matchingEvent?.code} for FIRST event: ${firstEvent?.name}`
+            );
+            return matchingEvent.code?.split(year)[1];
+          }
+          console.log(
+            `No matching TBA event found for FIRST event: ${firstEvent?.code} - ${firstEvent?.name}`
+          );
+          return null;
+        }
+      }
+      return null;
+    } catch (error) {
+      console.error("Error fetching TBA event key:", error);
+      return null;
+    }
+  };
+
+  /**
+   * Helper function to fetch TBA teams for an event
+   * @param {string} tbaEventKey TBA event key
+   * @param {string} year Year
+   * @returns Array of TBA teams
+   */
+  const fetchTBATeams = async (tbaEventKey, year) => {
+    try {
+      console.log(`Fetching TBA teams for event: ${tbaEventKey}`);
+      const result = await httpClient.getNoAuth(
+        `${year}/offseason/teams/${tbaEventKey}`
+      );
+      if (result.status === 200) {
+        // @ts-ignore
+        const teams = await result.json();
+        return teams;
+      }
+      return [];
+    } catch (error) {
+      console.error("Error fetching TBA teams:", error);
+      return [];
+    }
+  };
+
+  /**
+   * Helper function to fetch TBA matches for an event
+   * @param {string} tbaEventKey TBA event key
+   * @param {string} year Year
+   * @returns Array of TBA matches
+   */
+  const fetchTBAMatches = async (tbaEventKey, year) => {
+    try {
+      console.log(`Fetching TBA matches for event: ${tbaEventKey}`);
+      const result = await httpClient.getNoAuth(
+        `${year}/offseason/schedule/hybrid/${tbaEventKey}/`
+      );
+      if (result.status === 200) {
+        // @ts-ignore
+        const matches = await result.json();
+        return matches;
+      }
+      return [];
+    } catch (error) {
+      console.error("Error fetching TBA matches:", error);
+      return [];
+    }
+  };
+
+  /**
+   * Helper function to fetch TBA rankings for an event
+   * @param {string} tbaEventKey TBA event key
+   * @param {string} year Year
+   * @returns TBA rankings
+   */
+  const fetchTBARankings = async (tbaEventKey, year) => {
+    try {
+      console.log(`Fetching TBA rankings for event: ${tbaEventKey}`);
+      const result = await httpClient.getNoAuth(
+        `${year}/offseason/rankings/${tbaEventKey}/`
+      );
+      if (result.status === 200) {
+        // @ts-ignore
+        const rankings = await result.json();
+        return rankings;
+      }
+      return null;
+    } catch (error) {
+      console.error("Error fetching TBA rankings:", error);
+      return null;
+    }
+  };
+
+  /**
+   * Helper function to fetch TBA alliances for an event
+   * @param {string} tbaEventKey TBA event key
+   * @param {string} year Year
+   * @returns Array of TBA alliances
+   */
+  const fetchTBAAlliances = async (tbaEventKey, year) => {
+    try {
+      console.log(`Fetching TBA alliances for event: ${tbaEventKey}`);
+      const result = await httpClient.getNoAuth(
+        `${year}/offseason/alliances/${tbaEventKey}/`
+      );
+      if (result.status === 200) {
+        // @ts-ignore
+        const alliances = await result.json();
+        return alliances;
+      }
+      return [];
+    } catch (error) {
+      console.error("Error fetching TBA alliances:", error);
+      return [];
+    }
+  };
+
+  /**
    * This function retrieves a schedule from FIRST. It attempts to get both the Qual and Playoff Schedule and sets the global variables
    *
    * It uses the Hybrid Schedule endpoint to fetch the Qual schedule, then process the match data.
@@ -1092,6 +1243,39 @@ function App() {
           }
           return match;
         });
+      } else if (
+        !useFTCOffline &&
+        selectedEvent?.value?.type === "OffSeason" &&
+        !ftcMode
+      ) {
+        // get the qual schedule from TBA via gatool Offseason API
+        console.log("Using TBA for Offseason Event Qual Schedule");
+        const tbaEventKey = await getTBAEventKeyFromFIRSTCode(
+          selectedEvent?.value,
+          selectedYear?.value
+        );
+
+        if (tbaEventKey) {
+          const tbaMatches = await fetchTBAMatches(
+            tbaEventKey,
+            selectedYear?.value
+          );
+
+          if (tbaMatches && tbaMatches?.Schedule?.schedule?.length > 0) {
+            // Filter for qualification matches only
+            const qualMatches = tbaMatches.Schedule.schedule
+              .filter((match) => match.tournamentLevel === "Qual")
+              .sort((a, b) => a.matchNumber - b.matchNumber);
+
+            if (qualMatches.length > 0) {
+              qualschedule = {
+                schedule: {
+                  schedule: qualMatches,
+                },
+              };
+            }
+          }
+        }
       } else if (!useFTCOffline) {
         const qualsResult = await httpClient.getNoAuth(
           `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/qual`,
@@ -1128,7 +1312,8 @@ function App() {
     if (
       !selectedEvent?.value?.code.includes("PRACTICE") &&
       !useFTCOffline &&
-      qualschedule?.schedule?.schedule?.length > 0
+      qualschedule?.schedule?.schedule?.length > 0 &&
+      !(selectedEvent?.value?.type === "OffSeason")
     ) {
       const qualsScoresResult = await httpClient.getNoAuth(
         `${selectedYear?.value}/scores/${selectedEvent?.value.code}/qual`,
@@ -1145,7 +1330,10 @@ function App() {
 
     const qualMatches = qualschedule?.schedule?.schedule.map((match) => {
       match.winner = winner(match);
-      if (qualScores?.MatchScores) {
+      if (
+        qualScores?.MatchScores &&
+        !(selectedEvent?.value?.type === "OffSeason")
+      ) {
         const matchResults = qualScores.MatchScores.filter((scoreMatch) => {
           return scoreMatch.matchNumber === match.matchNumber;
         })[0];
@@ -1159,6 +1347,11 @@ function App() {
           match.blueRP = _.pickBy(matchResults.alliances[0], (value, key) => {
             return key.endsWith("BonusAchieved") || key.endsWith("RP");
           });
+        }
+      } else if (selectedEvent?.value?.type === "OffSeason") {
+        match.scores = match?.matchScores || [];
+        if (match?.matchScores) {
+          delete match.matchScores;
         }
       }
       return match;
@@ -1316,6 +1509,37 @@ function App() {
           }
           return match;
         });
+      } else if (
+        !useFTCOffline &&
+        selectedEvent?.value?.type === "OffSeason" &&
+        !ftcMode
+      ) {
+        // get the playoff schedule from TBA via gatool Offseason API
+        console.log("Using TBA for Offseason Event Playoff Schedule");
+        const tbaEventKey = await getTBAEventKeyFromFIRSTCode(
+          selectedEvent?.value,
+          selectedYear?.value
+        );
+
+        if (tbaEventKey) {
+          const tbaMatches = await fetchTBAMatches(
+            tbaEventKey,
+            selectedYear?.value
+          );
+
+          if (tbaMatches && tbaMatches?.Schedule?.schedule?.length > 0) {
+            // Filter for playoff matches only (excluding qm)
+            const playoffMatches = tbaMatches?.Schedule?.schedule
+              .filter((match) => match.tournamentLevel === "Playoff")
+              .sort((a, b) => a.matchNumber - b.matchNumber);
+
+            if (playoffMatches.length > 0) {
+              playoffschedule = {
+                schedule: playoffMatches,
+              };
+            }
+          }
+        }
       } else if (!useFTCOffline) {
         const playoffResult = await httpClient.getNoAuth(
           `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/playoff`,
@@ -1374,6 +1598,7 @@ function App() {
     if (
       !selectedEvent?.value?.code.includes("PRACTICE") &&
       !useFTCOffline &&
+      !(selectedEvent?.value?.type === "OffSeason") &&
       playoffschedule?.schedule?.length > 0
     ) {
       const playoffScoresResult = await httpClient.getNoAuth(
@@ -1410,7 +1635,10 @@ function App() {
             match.matchNumber = index + 1;
           }
           //figure out how to match scores to match
-          if (playoffScores?.MatchScores) {
+          if (
+            playoffScores?.MatchScores &&
+            !(selectedEvent?.value?.type === "OffSeason")
+          ) {
             const matchResults = playoffScores.MatchScores.filter(
               (scoreMatch) => {
                 return scoreMatch.matchNumber === match.matchNumber;
@@ -1418,6 +1646,11 @@ function App() {
             )[0];
             if (matchResults) {
               match.scores = matchResults;
+            }
+          } else if (selectedEvent?.value?.type === "OffSeason") {
+            match.scores = match?.matchScores || [];
+            if (match?.matchScores) {
+              delete match.matchScores;
             }
           }
           return match;
@@ -1617,7 +1850,8 @@ function App() {
         }
       } else if (
         !selectedEvent?.value?.code.includes("PRACTICE") &&
-        !useFTCOffline
+        !useFTCOffline &&
+        selectedEvent?.value?.type !== "OffSeason"
       ) {
         // get the team list from FIRST API
         result = await httpClient.getNoAuth(
@@ -1627,6 +1861,32 @@ function App() {
         if (result.status === 200) {
           // @ts-ignore
           teams = await result.json();
+        }
+      } else if (
+        !selectedEvent?.value?.code.includes("PRACTICE") &&
+        selectedEvent?.value?.type === "OffSeason" &&
+        !useFTCOffline &&
+        !ftcMode
+      ) {
+        // get the team list from TBA via gatool Offseason API
+        console.log("Using TBA for Offseason Event Team List");
+        const tbaEventKey = await getTBAEventKeyFromFIRSTCode(
+          selectedEvent?.value,
+          selectedYear?.value
+        );
+
+        if (tbaEventKey) {
+          const tbaTeams = await fetchTBATeams(
+            tbaEventKey,
+            selectedYear?.value
+          );
+
+          if (tbaTeams && tbaTeams.teams.length > 0) {
+            teams = {
+              ...tbaTeams,
+              lastUpdate: moment().format(),
+            };
+          }
         }
       } else if (useFTCOffline) {
         // get the team list from the FTC Offline API
@@ -2429,6 +2689,38 @@ function App() {
         } else if (rankingsResult.status === 204) {
           ranks = { rankings: { Rankings: [] } };
         }
+      } else if (
+        !useFTCOffline &&
+        selectedEvent?.value?.type === "OffSeason" &&
+        !ftcMode
+      ) {
+        // get the ranks from TBA via gatool Offseason API
+        console.log("Using TBA for Offseason Event Rankings");
+        const tbaEventKey = await getTBAEventKeyFromFIRSTCode(
+          selectedEvent?.value,
+          selectedYear?.value
+        );
+
+        if (tbaEventKey) {
+          const tbaRankings = await fetchTBARankings(
+            tbaEventKey,
+            selectedYear?.value
+          );
+
+          if (
+            tbaRankings &&
+            tbaRankings.rankings &&
+            tbaRankings.rankings.rankings.length > 0
+          ) {
+            ranks = {
+              rankings: {
+                rankings: tbaRankings.rankings.rankings,
+              },
+            };
+          } else {
+            ranks = { rankings: { Rankings: [] } };
+          }
+        }
       } else if (!useFTCOffline) {
         //do not use Cheesy Arena and use FIRST API
         result = await httpClient.getNoAuth(
@@ -2878,6 +3170,35 @@ function App() {
           }
         } else if (allianceResult.status === 204) {
           alliances = { Alliances: [] };
+        }
+      } else if (
+        !useFTCOffline &&
+        selectedEvent?.value?.type === "OffSeason" &&
+        !ftcMode
+      ) {
+        // get the alliances from TBA via gatool Offseason API
+        console.log("Using TBA for Offseason Event Alliances");
+        const tbaEventKey = await getTBAEventKeyFromFIRSTCode(
+          selectedEvent?.value,
+          selectedYear?.value
+        );
+
+        if (tbaEventKey) {
+          const tbaAlliances = await fetchTBAAlliances(
+            tbaEventKey,
+            selectedYear?.value
+          );
+
+          if (tbaAlliances && tbaAlliances?.alliances?.length > 0) {
+            alliances = {
+              Alliances: tbaAlliances?.alliances,
+            };
+          } else {
+            alliances = { Alliances: [] };
+            console.log(
+              `No Alliances found for ${selectedEvent?.value?.name} on TBA. Skipping...`
+            );
+          }
         }
       } else if (!useFTCOffline) {
         result = await httpClient.getNoAuth(
