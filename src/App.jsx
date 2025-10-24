@@ -166,6 +166,10 @@ function App() {
     "cache:eventLabel",
     null
   );
+  const [tbaEventKey, setTbaEventKey] = usePersistentState(
+    "cache:tbaEventKey",
+    null
+  );
   const [playoffSchedule, setPlayoffSchedule] = usePersistentState(
     "cache:playoffSchedule",
     null
@@ -1346,7 +1350,7 @@ function App() {
           // @ts-ignore
           match.blueRP = _.pickBy(matchResults.alliances[0], (value, key) => {
             return key.endsWith("BonusAchieved") || key.endsWith("RP");
-          });
+        });
         }
       } else if (selectedEvent?.value?.type === "OffSeason") {
         match.scores = match?.matchScores || [];
@@ -1861,6 +1865,7 @@ function App() {
         selectedEvent?.value?.type !== "OffSeason"
       ) {
         // get the team list from FIRST API
+        setTbaEventKey(null); // Clear TBA event key for non-offseason events
         result = await httpClient.getNoAuth(
           `${selectedYear?.value}/teams?eventCode=${selectedEvent?.value?.code}`,
           ftcMode ? ftcBaseURL : undefined
@@ -1881,6 +1886,9 @@ function App() {
           selectedEvent?.value,
           selectedYear?.value
         );
+        
+        // Store TBA event key in state for display
+        setTbaEventKey(tbaEventKey);
 
         if (tbaEventKey) {
           const tbaTeams = await fetchTBATeams(
@@ -2455,6 +2463,38 @@ function App() {
   }
 
   /**
+   * Helper function to get the effective team number for API calls
+   * For FRC demo teams (9970-9999), prepend the event code or TBA key
+   * FTC teams are not modified
+   * @param {number} teamNumber The team number
+   * @param {string} eventCode The FIRST event code (optional)
+   * @param {string} tbaEventKey The TBA event key (optional)
+   * @returns {Promise<string>} The effective team number for API calls
+   */
+  const getEffectiveTeamNumber = async (teamNumber, eventCode = null, tbaEventKey = null) => {
+    // Check if team number is a demo team (9970-9999) and NOT in FTC mode
+    if (teamNumber >= 9970 && teamNumber <= 9999 && !ftcMode) {
+      // Use eventCode if available
+      if (eventCode) {
+        return `${eventCode}_${teamNumber}`;
+      }
+      // Otherwise, fetch TBA event key if we have the event details
+      if (!tbaEventKey && selectedEvent?.value?.type === "OffSeason") {
+        tbaEventKey = await getTBAEventKeyFromFIRSTCode(
+          selectedEvent?.value,
+          selectedYear?.value
+        );
+      }
+      // Use TBA event key if available
+      if (tbaEventKey) {
+        return `${tbaEventKey}_${teamNumber}`;
+      }
+    }
+    // Return normal team number
+    return teamNumber.toString();
+  };
+
+  /**
    * This function retrieves communnity updates for a specified event from gatool Cloud.
    * @async
    * @function getCommunityUpdates
@@ -2483,15 +2523,20 @@ function App() {
           selectedEvent?.value?.code.includes("OFFLINE") ||
           (cheesyArenaAvailable && useCheesyArena) ||
           useFTCOffline ||
-          (selectedEvent?.value?.type === "OffSeason" && !ftcMode)
+          (selectedEvent?.value?.type?.includes("OffSeason") && !ftcMode)
         ) {
           //Do something with the team list
           if (adHocTeamList) {
             // https://api.gatool.org/v3/team/172/updates
             console.log("Teams List loaded. Update from the Community");
             var adHocTeams = adHocTeamList.map(async (team) => {
+              // Get effective team number (with event prefix for demo teams)
+              const effectiveTeamNumber = await getEffectiveTeamNumber(
+                team?.teamNumber,
+                selectedEvent?.value?.code
+              );
               var request = await httpClient.getNoAuth(
-                `/team/${team?.teamNumber}/updates`,
+                `/team/${effectiveTeamNumber}/updates`,
                 ftcMode ? ftcBaseURL : undefined
               );
               var teamDetails = { teamNumber: team?.teamNumber };
@@ -3351,8 +3396,13 @@ function App() {
    * @returns {Promise<object>} result
    */
   async function putTeamData(teamNumber, data) {
+    // Get effective team number (with event prefix for demo teams)
+    const effectiveTeamNumber = await getEffectiveTeamNumber(
+      teamNumber,
+      selectedEvent?.value?.code
+    );
     var result = await httpClient.put(
-      `team/${teamNumber}/updates`,
+      `team/${effectiveTeamNumber}/updates`,
       data,
       ftcMode ? ftcBaseURL : undefined
     );
@@ -4019,7 +4069,7 @@ function App() {
         console.log("Team list changed. Fetching Community Updates.");
         if (ftcMode?.value === "FTCLocal") {
           getCommunityUpdates(false, teamList?.teams);
-        } else if (selectedEvent?.value?.type === "OffSeason" && !ftcMode) {
+        } else if (selectedEvent?.value?.type?.includes("OffSeason") && !ftcMode) {
           getCommunityUpdates(false, teamList?.teams);
         } else {
           getCommunityUpdates();
@@ -4372,6 +4422,7 @@ function App() {
                     setUseSwipe={setUseSwipe}
                     eventLabel={eventLabel}
                     setEventLabel={setEventLabel}
+                    tbaEventKey={tbaEventKey}
                     showInspection={showInspection}
                     setShowInspection={setShowInspection}
                     showMinorAwards={showMinorAwards}
