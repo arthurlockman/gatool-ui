@@ -1,3 +1,4 @@
+import React from "react";
 import Select from "react-select";
 import {
   Alert,
@@ -627,9 +628,9 @@ function SchedulePage({
         earned: value,
       });
     });
-    return pointsDisplay.map((point) => {
+    return pointsDisplay.map((point, index) => {
       return (
-        <>
+        <React.Fragment key={`rp-${point.bonus}-${index}`}>
           <OverlayTrigger
             delay={500}
             overlay={
@@ -642,7 +643,7 @@ function SchedulePage({
               {point.bonus.slice(0, 1)}
             </span>
           </OverlayTrigger>
-        </>
+        </React.Fragment>
       );
     });
   };
@@ -711,22 +712,23 @@ function SchedulePage({
           <td className="scheduleTableblue"></td>
         </tr>
 
-        {Object.keys(redRow).map((itemKey) => {
+        {Object.keys(redRow).map((itemKey, itemIndex) => {
           if (typeof redRow[itemKey] === "object") {
             const redRowKeys = Object.keys(redRow[itemKey]);
             return (
-              <>
+              <React.Fragment key={`redrow-${itemKey}-${itemIndex}`}>
                 <tr>
                   <td>
-                    <b>     {itemKey}</b>
+                    <b>     {itemKey}</b>
                   </td>
                   <td className="scheduleTablered">
                     <tr>
                       <td>
                         <tr>
-                          {redRowKeys.map((score) => {
+                          {redRowKeys.map((score, scoreIndex) => {
                             return (
                               <td
+                                key={`red-header-${score}-${scoreIndex}`}
                                 style={{
                                   writingMode: "vertical-rl",
                                   padding: "5px 0px 0px 5px",
@@ -738,7 +740,7 @@ function SchedulePage({
                           })}
                         </tr>
                         <tr>
-                          {redRowKeys.map((score) => {
+                          {redRowKeys.map((score, scoreIndex) => {
                             const writingMode =
                               typeof redRow[itemKey][score] === "string"
                                 ? "vertical-rl"
@@ -747,6 +749,7 @@ function SchedulePage({
                                 : "horizontal-tb";
                             return (
                               <td
+                                key={`red-value-${score}-${scoreIndex}`}
                                 style={{
                                   writingMode: writingMode,
                                   padding: "5px 0px 0px 5px",
@@ -768,9 +771,10 @@ function SchedulePage({
                     <tr>
                       <td>
                         <tr>
-                          {redRowKeys.map((score) => {
+                          {redRowKeys.map((score, scoreIndex) => {
                             return (
                               <td
+                                key={`blue-header-${score}-${scoreIndex}`}
                                 style={{
                                   writingMode: "vertical-rl",
                                   padding: "5px 0px 0px 5px",
@@ -782,7 +786,7 @@ function SchedulePage({
                           })}
                         </tr>
                         <tr>
-                          {redRowKeys.map((score) => {
+                          {redRowKeys.map((score, scoreIndex) => {
                             const writingMode =
                               typeof redRow[itemKey][score] === "string"
                                 ? "vertical-rl"
@@ -791,6 +795,7 @@ function SchedulePage({
                                 : "horizontal-tb";
                             return (
                               <td
+                                key={`blue-value-${score}-${scoreIndex}`}
                                 style={{
                                   writingMode: writingMode,
                                   padding: "5px 0px 0px 5px",
@@ -809,11 +814,11 @@ function SchedulePage({
                     </tr>
                   </td>
                 </tr>
-              </>
+              </React.Fragment>
             );
           } else {
             return (
-              <tr>
+              <tr key={`redrow-simple-${itemKey}-${itemIndex}`}>
                 <td>
                   <b>     {itemKey}</b>
                 </td>
@@ -1682,9 +1687,9 @@ function SchedulePage({
                   <Col>Round 2</Col>
                   <Col>Round 3</Col>
                 </Row>
-                {formData?.alliances.map((alliance) => {
+                {formData?.alliances.map((alliance, allianceIndex) => {
                   return (
-                    <Row>
+                    <Row key={`alliance-${alliance.number}-${allianceIndex}`}>
                       <Col>{alliance.number}</Col>
                       <Col>
                         <Form.Control
