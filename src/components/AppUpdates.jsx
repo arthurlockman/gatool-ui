@@ -1,5 +1,15 @@
 export const appUpdates = [
   {
+    date: "October 25, 2025",
+    message: (
+      <ul>
+        <li>Fixed TBA offseason event data loading - events without FIRST equivalents now appear in the event list</li>
+        <li>Ranking points now display immediately after match completion (previously delayed until next match)</li>
+        <li>Added FTC-specific resource buttons (FTC Scout, FTC event links) in Team Data page</li>
+        <li>Fixed crashes when loading TBA events without score data</li>
+      </ul>
+    ),
+  },{
     date: "October 23, 2025",
     message: (
       <ul>
