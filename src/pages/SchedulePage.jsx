@@ -1410,7 +1410,7 @@ function SchedulePage({
                               : "centerTable"
                           }
                           onClick={() => {
-                            if (match?.postResultTime && match?.scores) {
+                            if (match?.actualStartTime && match?.scores) {
                               handleOpenScores(match);
                             }
                           }}
@@ -1431,7 +1431,7 @@ function SchedulePage({
                               : "centerTable"
                           }
                           onClick={() => {
-                            if (match?.postResultTime && match?.scores) {
+                            if (match?.actualStartTime && match?.scores) {
                               handleOpenScores(match);
                             }
                           }}
@@ -1440,18 +1440,18 @@ function SchedulePage({
                             className={redStyle}
                             style={{ whiteSpace: "nowrap" }}
                           >
-                            {match?.redRP && match?.postResultTime
+                            {match?.redRP && match?.actualStartTime
                               ? rankPointDisplay(match?.redRP)
-                              : " "}
+                              : " "}
                           </span>
                           <br />
                           <span
                             className={blueStyle}
                             style={{ whiteSpace: "nowrap" }}
                           >
-                            {match?.blueRP && match?.postResultTime
+                            {match?.blueRP && match?.actualStartTime
                               ? rankPointDisplay(match?.blueRP)
-                              : " "}
+                              : " "}
                           </span>
                         </td>
 
@@ -1554,7 +1554,7 @@ function SchedulePage({
                               : "centerTable"
                           }
                           onClick={() => {
-                            if (match?.postResultTime && match?.scores) {
+                            if (match?.actualStartTime && match?.scores) {
                               handleOpenScores(match);
                             }
                           }}
