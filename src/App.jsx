@@ -3725,6 +3725,7 @@ function App() {
       await setRankingsOverride(null);
       setCurrentMatch(1);
       await setDistrictRankings(null);
+      await setTbaEventKey(null); // Clear TBA event key when loading a new event
       setAdHocMatch([
         { teamNumber: null, station: "Red1", surrogate: false, dq: false },
         { teamNumber: null, station: "Red2", surrogate: false, dq: false },
