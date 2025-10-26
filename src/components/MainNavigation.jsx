@@ -172,13 +172,16 @@ function MainNavigation({
 
   // Handle ready state for the team data tab
   useEffect(() => {
-    // GREEN: Event Selected, teams loaded, Community updates for the event loaded
-    // YELLOW: Event Selected, Teams loaded, no Community updates loaded
+    // GREEN: Event Selected, teams loaded (>0 teams), Community updates for the event loaded
+    // YELLOW: Event Selected, Teams loaded (0 teams or >0 teams), no Community updates loaded
+    // ORANGE: Event Selected, Teams loaded but empty (0 teams)
     // RED: Event Selected, No teams loaded
 
-    if (selectedEvent && teamList && communityUpdates) {
+    if (selectedEvent && teamList && teamList.teams.length > 0 && communityUpdates) {
       setTeamDataTabReady(TabStates.Ready);
-    } else if (selectedEvent && teamList && communityUpdates == null) {
+    } else if (selectedEvent && teamList && teamList.teams.length > 0 && communityUpdates == null) {
+      setTeamDataTabReady(TabStates.Stale);
+    } else if (selectedEvent && teamList && teamList.teams.length === 0) {
       setTeamDataTabReady(TabStates.Stale);
     } else {
       setTeamDataTabReady(TabStates.NotReady);
