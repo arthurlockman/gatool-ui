@@ -29,6 +29,19 @@ function EmceePage({
   ftcMode,
 }) {
   const { height, width } = useWindowDimensions();
+  
+  /**
+   * This function finds a team by their station assignment
+   * @param teams the array of team objects
+   * @param station the station to find (e.g., "Red1", "Red2", "Red3", "Blue1", "Blue2", "Blue3")
+   * @returns the team number or null if not found
+   */
+  const getTeamByStation = (teams, station) => {
+    if (!teams || !Array.isArray(teams)) return null;
+    const team = teams.find((t) => t?.station?.toLowerCase() === station?.toLowerCase());
+    return team?.teamNumber || null;
+  };
+
   const formatMatchClasses = (baseClasses) => {
     const newClasses = baseClasses.map((match) => {
       return {
@@ -132,19 +145,26 @@ function EmceePage({
     var captain = ";";
     var allianceShortName = "";
     const match = matches[_.findIndex(matches, { matchNumber: matchNumber })];
-    if (match?.teams[0]?.teamNumber) {
+    const red1Team = getTeamByStation(match?.teams, "Red1");
+    const red2Team = getTeamByStation(match?.teams, "Red2");
+    const red3Team = getTeamByStation(match?.teams, "Red3");
+    const blue1Team = getTeamByStation(match?.teams, "Blue1");
+    const blue2Team = getTeamByStation(match?.teams, "Blue2");
+    const blue3Team = getTeamByStation(match?.teams, "Blue3");
+    
+    if (red1Team) {
       allianceName = ftcMode
-        ? alliances?.Lookup[`${match?.teams[0]?.teamNumber}`]?.alliance ||
-          alliances?.Lookup[`${match?.teams[1]?.teamNumber}`]?.alliance
-        : alliances?.Lookup[`${match?.teams[0]?.teamNumber}`]?.alliance ||
-          alliances?.Lookup[`${match?.teams[1]?.teamNumber}`]?.alliance ||
-          alliances?.Lookup[`${match?.teams[2]?.teamNumber}`]?.alliance;
+        ? alliances?.Lookup[`${red1Team}`]?.alliance ||
+          alliances?.Lookup[`${red2Team}`]?.alliance
+        : alliances?.Lookup[`${red1Team}`]?.alliance ||
+          alliances?.Lookup[`${red2Team}`]?.alliance ||
+          alliances?.Lookup[`${red3Team}`]?.alliance;
       captain = ftcMode
-        ? alliances?.Lookup[`${match?.teams[0]?.teamNumber}`]?.captain ||
-          alliances?.Lookup[`${match?.teams[1]?.teamNumber}`]?.captain
-        : alliances?.Lookup[`${match?.teams[0]?.teamNumber}`]?.captain ||
-          alliances?.Lookup[`${match?.teams[1]?.teamNumber}`]?.captain ||
-          alliances?.Lookup[`${match?.teams[2]?.teamNumber}`]?.captain;
+        ? alliances?.Lookup[`${red1Team}`]?.captain ||
+          alliances?.Lookup[`${red2Team}`]?.captain
+        : alliances?.Lookup[`${red1Team}`]?.captain ||
+          alliances?.Lookup[`${red2Team}`]?.captain ||
+          alliances?.Lookup[`${red3Team}`]?.captain;
       if (matchNumber < finalsStart) {
         if (match?.winner?.tieWinner === "red") {
           allianceName += ` (L${match?.winner.level})`;
@@ -152,17 +172,17 @@ function EmceePage({
       }
       if (allianceColor === "blue") {
         allianceName = ftcMode
-          ? alliances?.Lookup[`${match?.teams[2]?.teamNumber}`]?.alliance ||
-            alliances?.Lookup[`${match?.teams[3]?.teamNumber}`]?.alliance
-          : alliances?.Lookup[`${match?.teams[3]?.teamNumber}`]?.alliance ||
-            alliances?.Lookup[`${match?.teams[4]?.teamNumber}`]?.alliance ||
-            alliances?.Lookup[`${match?.teams[5]?.teamNumber}`]?.alliance;
+          ? alliances?.Lookup[`${blue1Team}`]?.alliance ||
+            alliances?.Lookup[`${blue2Team}`]?.alliance
+          : alliances?.Lookup[`${blue1Team}`]?.alliance ||
+            alliances?.Lookup[`${blue2Team}`]?.alliance ||
+            alliances?.Lookup[`${blue3Team}`]?.alliance;
         captain = ftcMode
-          ? alliances?.Lookup[`${match?.teams[2]?.teamNumber}`]?.captain ||
-            alliances?.Lookup[`${match?.teams[3]?.teamNumber}`]?.captain
-          : alliances?.Lookup[`${match?.teams[3]?.teamNumber}`]?.captain ||
-            alliances?.Lookup[`${match?.teams[4]?.teamNumber}`]?.captain ||
-            alliances?.Lookup[`${match?.teams[5]?.teamNumber}`]?.captain;
+          ? alliances?.Lookup[`${blue1Team}`]?.captain ||
+            alliances?.Lookup[`${blue2Team}`]?.captain
+          : alliances?.Lookup[`${blue1Team}`]?.captain ||
+            alliances?.Lookup[`${blue2Team}`]?.captain ||
+            alliances?.Lookup[`${blue3Team}`]?.captain;
         if (matchNumber < finalsStart) {
           if (match?.winner?.tieWinner === "blue") {
             allianceName += ` (L${match?.winner.level} WIN)`;

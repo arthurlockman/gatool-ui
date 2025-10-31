@@ -27,6 +27,18 @@ function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previous
 
 	const currentPlayoffMatch = currentMatch - qualsLength;
 
+	/**
+	 * This function finds a team by their station assignment
+	 * @param teams the array of team objects
+	 * @param station the station to find (e.g., "Red1", "Red2", "Red3", "Blue1", "Blue2", "Blue3")
+	 * @returns the team number or null if not found
+	 */
+	const getTeamByStation = (teams, station) => {
+		if (!teams || !Array.isArray(teams)) return null;
+		const team = teams.find((t) => t?.station?.toLowerCase() === station?.toLowerCase());
+		return team?.teamNumber || null;
+	};
+
 	var overtimeOffset = 0;
 	var tournamentWinner = {
 		"red": 0,
@@ -107,8 +119,9 @@ function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previous
 			tempMatches.schedule[winnerMatch - 1].scoreRedFinal = 10;
 		}
 
-		tempTeams.red = [tempMatches.schedule[winnerMatch - 1].teams[0].teamNumber, tempMatches.schedule[winnerMatch - 1].teams[1].teamNumber, tempMatches.schedule[winnerMatch - 1].teams[2].teamNumber];
-		tempTeams.blue = [tempMatches.schedule[winnerMatch - 1].teams[3].teamNumber, tempMatches.schedule[winnerMatch - 1].teams[4].teamNumber, tempMatches.schedule[winnerMatch - 1].teams[5].teamNumber];
+		const matchTeams = tempMatches.schedule[winnerMatch - 1].teams;
+		tempTeams.red = [getTeamByStation(matchTeams, "Red1"), getTeamByStation(matchTeams, "Red2"), getTeamByStation(matchTeams, "Red3")];
+		tempTeams.blue = [getTeamByStation(matchTeams, "Blue1"), getTeamByStation(matchTeams, "Blue2"), getTeamByStation(matchTeams, "Blue3")];
 
 		tempMatches.schedule[winnerMatch - 1].actualStartTime = moment().format();
 		tempMatches.schedule[winnerMatch - 1].winner.winner = winningAlliance;

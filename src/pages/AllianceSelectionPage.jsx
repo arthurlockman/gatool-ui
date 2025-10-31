@@ -15,6 +15,18 @@ import './AllianceSelectionPage.css';
 
 
 function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, playoffSchedule, offlinePlayoffSchedule, alliances, rankings, timeFormat, getRanks, allianceSelection, playoffs, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays, rankingsOverride, loadEvent, practiceSchedule, setOfflinePlayoffSchedule, currentMatch, qualsLength, nextMatch, previousMatch, getSchedule, useSwipe, usePullDownToUpdate, eventLabel, playoffCountOverride, ftcMode }) {
+    /**
+     * This function finds a team by their station assignment
+     * @param teams the array of team objects
+     * @param station the station to find (e.g., "Red1", "Red2", "Red3", "Blue1", "Blue2", "Blue3")
+     * @returns the team number or null if not found
+     */
+    const getTeamByStation = (teams, station) => {
+        if (!teams || !Array.isArray(teams)) return null;
+        const team = teams.find((t) => t?.station?.toLowerCase() === station?.toLowerCase());
+        return team?.teamNumber || null;
+    };
+
     const [overrideAllianceSelection, setOverrideAllianceSelection] = useState(false);
     const [resetAllianceSelection, setResetAllianceSelection] = useState(false);
     const [teamFilter, setTeamFilter] = useState("");
@@ -64,8 +76,8 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
         var match = matches[_.findIndex(matches, { "matchNumber": matchNumber })];
         if (match && match?.description?.includes("Bye Match")) {
             alliance = "Bye Match"
-        } else if ((match?.teams[0]?.teamNumber || match?.teams[3]?.teamNumber) && alliances?.Lookup) {
-            const lookupTeam = match?.teams[_.findIndex(match?.teams, { "station": allianceColor === "red" ? "Red1" : "Blue1" })]?.teamNumber;
+        } else if ((getTeamByStation(match?.teams, "Red1") || getTeamByStation(match?.teams, "Blue1")) && alliances?.Lookup) {
+            const lookupTeam = getTeamByStation(match?.teams, allianceColor === "red" ? "Red1" : "Blue1");
             targetAlliance = alliances?.Lookup[`${lookupTeam}`];
             allianceMembers = _.compact([targetAlliance?.captain, targetAlliance?.round1, targetAlliance?.round2, targetAlliance?.round3, targetAlliance?.backup]);
             alliance = allianceMembers.join("  ");

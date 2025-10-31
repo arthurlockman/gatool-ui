@@ -28,6 +28,18 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 
 	const currentPlayoffMatch = currentMatch - qualsLength;
 
+	/**
+	 * This function finds a team by their station assignment
+	 * @param teams the array of team objects
+	 * @param station the station to find (e.g., "Red1", "Red2", "Red3", "Blue1", "Blue2", "Blue3")
+	 * @returns the team number or null if not found
+	 */
+	const getTeamByStation = (teams, station) => {
+		if (!teams || !Array.isArray(teams)) return null;
+		const team = teams.find((t) => t?.station?.toLowerCase() === station?.toLowerCase());
+		return team?.teamNumber || null;
+	};
+
 	var overtimeOffset = 0;
 	var tournamentWinner = {
 		"red": 0,
@@ -128,8 +140,9 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 			tempMatches.schedule[winnerMatch - 1].scoreRedFinal = 10;
 		}
 
-		tempTeams.red = [tempMatches.schedule[winnerMatch - 1].teams[0].teamNumber, tempMatches.schedule[winnerMatch - 1].teams[1].teamNumber, tempMatches.schedule[winnerMatch - 1].teams[2].teamNumber];
-		tempTeams.blue = [tempMatches.schedule[winnerMatch - 1].teams[3].teamNumber, tempMatches.schedule[winnerMatch - 1].teams[4].teamNumber, tempMatches.schedule[winnerMatch - 1].teams[5].teamNumber];
+		const matchTeams = tempMatches.schedule[winnerMatch - 1].teams;
+		tempTeams.red = [getTeamByStation(matchTeams, "Red1"), getTeamByStation(matchTeams, "Red2"), getTeamByStation(matchTeams, "Red3")];
+		tempTeams.blue = [getTeamByStation(matchTeams, "Blue1"), getTeamByStation(matchTeams, "Blue2"), getTeamByStation(matchTeams, "Blue3")];
 
 		tempMatches.schedule[winnerMatch - 1].actualStartTime = moment().format();
 		tempMatches.schedule[winnerMatch - 1].winner.winner = winningAlliance;
@@ -316,13 +329,13 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 							<rect x="109" y="89" fill="#DBDAD9" width="75" height="684" />
 							<rect x="302" y="89" fill="#DBDAD9" width="75" height="684" />
 							<rect x="490" y="89" fill="#DBDAD9" width="75" height="684" />
-							<polyline points="242 175.1 430.8 175.1 430.8 328.1 242.6 328.1" fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="2" />
-							<polyline points="242.5 175.1 242.5 213.6 199.1 213.6" fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="2" />
-							<polyline points="242.5 328.1 242.5 368.6 199.1 368.6" fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="2" />
-							<polyline points="431 254 1006 254 1006 504.1 816.8 504.1 816.8 574.1 630 574.1" fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="2" />
-							<polyline points="611.7 648 629.7 648 629.7 509 611.7 509" fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="2" />
-							<line x1="1024" y1="421" x2="1006" y2="421" fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="2" />
-							<line x1="70" y1="419" x2="971" y2="419" fill="none" stroke="#8e8e8e" stroke-miterlimit="10" stroke-width="2" />
+						<polyline points="242 175.1 430.8 175.1 430.8 328.1 242.6 328.1" fill="none" stroke="#000" strokeMiterlimit="10" strokeWidth="2" />
+						<polyline points="242.5 175.1 242.5 213.6 199.1 213.6" fill="none" stroke="#000" strokeMiterlimit="10" strokeWidth="2" />
+						<polyline points="242.5 328.1 242.5 368.6 199.1 368.6" fill="none" stroke="#000" strokeMiterlimit="10" strokeWidth="2" />
+						<polyline points="431 254 1006 254 1006 504.1 816.8 504.1 816.8 574.1 630 574.1" fill="none" stroke="#000" strokeMiterlimit="10" strokeWidth="2" />
+						<polyline points="611.7 648 629.7 648 629.7 509 611.7 509" fill="none" stroke="#000" strokeMiterlimit="10" strokeWidth="2" />
+						<line x1="1024" y1="421" x2="1006" y2="421" fill="none" stroke="#000" strokeMiterlimit="10" strokeWidth="2" />
+						<line x1="70" y1="419" x2="971" y2="419" fill="none" stroke="#8e8e8e" strokeMiterlimit="10" strokeWidth="2" />
 							<text transform="matrix(0 -1 1 0 49.7114 348.6689)" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="26px">UPPER BRACKET</text>
 							<text transform="matrix(0 -1 1 0 49.7114 673.2046)" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="26px">LOWER BRACKET</text>
 							<text transform="matrix(1 0 0 1 116.6694 84.2646)" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="16px">ROUND 1</text>
