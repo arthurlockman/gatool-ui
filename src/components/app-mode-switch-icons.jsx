@@ -10,13 +10,13 @@ export const frcSelected = (
       d="M7.9,1.7c-3.6,0-6.5,2.9-6.5,6.5s2.9,6.5,6.5,6.5h19.8V1.7H7.9Z"
       fill="#00a3e6"
       stroke="#1c1c1a"
-      stroke-miterlimit="10"
+      strokeMiterlimit="10"
     />
     <path
       d="M49,1.7h-19.8v13h19.8c3.6,0,6.5-2.9,6.5-6.5s-2.9-6.5-6.5-6.5h0Z"
       fill="#c9c9ca"
       stroke="#1c1c1a"
-      stroke-miterlimit="10"
+      strokeMiterlimit="10"
     />
     <rect
       x="27.7"
@@ -25,7 +25,7 @@ export const frcSelected = (
       height="13"
       fill="#1c1c1a"
       stroke="#1c1c1a"
-      stroke-miterlimit="10"
+      strokeMiterlimit="10"
     />
     <path
       d="M34.6,12.4c0,0,0,.1,0,.1h-1.3c0,0,0,0,0-.1v-7.7c0,0,0,0,0,0h4.6c0,0,0,0,.1,0v1.1c.1,0,0,0,0,0h-3.4v2.1h3.1c0,0,0,0,0,0v1.1c0,0,0,0,0,0h-3.1v3.1h0Z"
@@ -66,13 +66,13 @@ export const ftcSelected = (
       d="M7.9,1.7c-3.6,0-6.5,2.9-6.5,6.5s2.9,6.5,6.5,6.5h19.8V1.7H7.9Z"
       fill="#c9c9ca"
       stroke="#1c1c1a"
-      stroke-miterlimit="10"
+      strokeMiterlimit="10"
     />
     <path
       d="M49,1.7h-19.8v13h19.8c3.6,0,6.5-2.9,6.5-6.5s-2.9-6.5-6.5-6.5h0Z"
       fill="#f4a13b"
       stroke="#1c1c1a"
-      stroke-miterlimit="10"
+      strokeMiterlimit="10"
     />
     <rect
       x="27.7"
@@ -81,7 +81,7 @@ export const ftcSelected = (
       height="13"
       fill="#1c1c1a"
       stroke="#1c1c1a"
-      stroke-miterlimit="10"
+      strokeMiterlimit="10"
     />
     <path
       d="M34.6,12.4c0,0,0,.1,0,.1h-1.3c0,0,0,0,0-.1v-7.7c0,0,0,0,0,0h4.6c0,0,0,0,.1,0v1.1c.1,0,0,0,0,0h-3.4v2.1h3.1c0,0,0,0,0,0v1.1c0,0,0,0,0,0h-3.1v3.1h0Z"

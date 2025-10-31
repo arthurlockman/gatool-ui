@@ -2996,7 +2996,7 @@ function App() {
         epaData.status === 400
       ) {
         // do nothing
-        console.log("No EPA data for team " + team?.teamNumber);
+        // console.log("No EPA data for team " + team?.teamNumber);
       }
       return {
         teamNumber: team?.teamNumber,

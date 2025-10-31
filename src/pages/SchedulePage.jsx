@@ -465,21 +465,13 @@ function SchedulePage({
           alliancesTemp.Alliances = playoffOffset.allianceOrder.map(
             (allianceMember, index) => {
               try {
-                var stationOffset = allianceMember.station === "red" ? 0 : 3;
+                var stationPrefix = allianceMember.station === "red" ? "Red" : "Blue";
+                var matchTeams = innerSchedule[allianceMember.match - 1].teams;
                 var tempAlliance = {
                   number: 1 + index,
-                  captain:
-                    innerSchedule[allianceMember.match - 1].teams[
-                      0 + stationOffset
-                    ].teamNumber,
-                  round1:
-                    innerSchedule[allianceMember.match - 1].teams[
-                      1 + stationOffset
-                    ].teamNumber,
-                  round2:
-                    innerSchedule[allianceMember.match - 1].teams[
-                      2 + stationOffset
-                    ].teamNumber,
+                  captain: getTeamByStation(matchTeams, `${stationPrefix}1`),
+                  round1: getTeamByStation(matchTeams, `${stationPrefix}2`),
+                  round2: getTeamByStation(matchTeams, `${stationPrefix}3`),
                   round3: null,
                   backup: null,
                   backupReplaced: null,
@@ -537,6 +529,18 @@ function SchedulePage({
   function removeSurrogate(teamNumber) {
     teamNumber = teamNumber.replace("*", "");
     return teamNumber;
+  }
+
+  /**
+   * This function finds a team by their station assignment
+   * @param teams the array of team objects
+   * @param station the station to find (e.g., "Red1", "Red2", "Red3", "Blue1", "Blue2", "Blue3")
+   * @returns the team object or null if not found
+   */
+  function getTeamByStation(teams, station) {
+    if (!teams || !Array.isArray(teams)) return null;
+    const team = teams.find((t) => t?.station?.toLowerCase() === station?.toLowerCase());
+    return team?.teamNumber || null;
   }
 
   const handleOpen = () => {
@@ -1253,29 +1257,29 @@ function SchedulePage({
 
                         <td>
                           <span className={redStyle}>
-                            {match?.teams[0]?.teamNumber}
+                            {getTeamByStation(match?.teams, "Red1")}
                           </span>
                           <br />
                           <span className={blueStyle}>
-                            {match?.teams[3]?.teamNumber}
+                            {getTeamByStation(match?.teams, "Blue1")}
                           </span>
                         </td>
                         <td>
                           <span className={redStyle}>
-                            {match?.teams[1]?.teamNumber}
+                            {getTeamByStation(match?.teams, "Red2")}
                           </span>
                           <br />
                           <span className={blueStyle}>
-                            {match?.teams[4]?.teamNumber}
+                            {getTeamByStation(match?.teams, "Blue2")}
                           </span>
                         </td>
                         <td>
                           <span className={redStyle}>
-                            {match?.teams[2]?.teamNumber}
+                            {getTeamByStation(match?.teams, "Red3")}
                           </span>
                           <br />
                           <span className={blueStyle}>
-                            {match?.teams[5]?.teamNumber}
+                            {getTeamByStation(match?.teams, "Blue3")}
                           </span>
                         </td>
                       </tr>
@@ -1314,29 +1318,29 @@ function SchedulePage({
                           <>
                             <td>
                               <span className={redStyle}>
-                                {match?.teams[0]?.teamNumber}
+                                {getTeamByStation(match?.teams, "Red1")}
                               </span>
                               <br />
                               <span className={blueStyle}>
-                                {match?.teams[3]?.teamNumber}
+                                {getTeamByStation(match?.teams, "Blue1")}
                               </span>
                             </td>
                             <td>
                               <span className={redStyle}>
-                                {match?.teams[1]?.teamNumber}
+                                {getTeamByStation(match?.teams, "Red2")}
                               </span>
                               <br />
                               <span className={blueStyle}>
-                                {match?.teams[4]?.teamNumber}
+                                {getTeamByStation(match?.teams, "Blue2")}
                               </span>
                             </td>
                             <td>
                               <span className={redStyle}>
-                                {match?.teams[2]?.teamNumber}
+                                {getTeamByStation(match?.teams, "Red3")}
                               </span>
                               <br />
                               <span className={blueStyle}>
-                                {match?.teams[5]?.teamNumber}
+                                {getTeamByStation(match?.teams, "Blue3")}
                               </span>
                             </td>
                           </>
@@ -1345,20 +1349,20 @@ function SchedulePage({
                           <>
                             <td>
                               <span className={redStyle}>
-                                {match?.teams[0]?.teamNumber}
+                                {getTeamByStation(match?.teams, "Red1")}
                               </span>
                               <br />
                               <span className={blueStyle}>
-                                {match?.teams[2]?.teamNumber}
+                                {getTeamByStation(match?.teams, "Blue1")}
                               </span>
                             </td>
                             <td>
                               <span className={redStyle}>
-                                {match?.teams[1]?.teamNumber}
+                                {getTeamByStation(match?.teams, "Red2")}
                               </span>
                               <br />
                               <span className={blueStyle}>
-                                {match?.teams[3]?.teamNumber}
+                                {getTeamByStation(match?.teams, "Blue2")}
                               </span>
                             </td>
                           </>
@@ -1464,29 +1468,29 @@ function SchedulePage({
                           <>
                             <td>
                               <span className={redStyle}>
-                                {match?.teams[0]?.teamNumber}
+                                {getTeamByStation(match?.teams, "Red1")}
                               </span>
                               <br />
                               <span className={blueStyle}>
-                                {match?.teams[3]?.teamNumber}
+                                {getTeamByStation(match?.teams, "Blue1")}
                               </span>
                             </td>
                             <td>
                               <span className={redStyle}>
-                                {match?.teams[1]?.teamNumber}
+                                {getTeamByStation(match?.teams, "Red2")}
                               </span>
                               <br />
                               <span className={blueStyle}>
-                                {match?.teams[4]?.teamNumber}
+                                {getTeamByStation(match?.teams, "Blue2")}
                               </span>
                             </td>
                             <td>
                               <span className={redStyle}>
-                                {match?.teams[2]?.teamNumber}
+                                {getTeamByStation(match?.teams, "Red3")}
                               </span>
                               <br />
                               <span className={blueStyle}>
-                                {match?.teams[5]?.teamNumber}
+                                {getTeamByStation(match?.teams, "Blue3")}
                               </span>
                             </td>
                           </>
@@ -1495,20 +1499,20 @@ function SchedulePage({
                           <>
                             <td>
                               <span className={redStyle}>
-                                {match?.teams[0]?.teamNumber}
+                                {getTeamByStation(match?.teams, "Red1")}
                               </span>
                               <br />
                               <span className={blueStyle}>
-                                {match?.teams[2]?.teamNumber}
+                                {getTeamByStation(match?.teams, "Blue1")}
                               </span>
                             </td>
                             <td>
                               <span className={redStyle}>
-                                {match?.teams[1]?.teamNumber}
+                                {getTeamByStation(match?.teams, "Red2")}
                               </span>
                               <br />
                               <span className={blueStyle}>
-                                {match?.teams[3]?.teamNumber}
+                                {getTeamByStation(match?.teams, "Blue2")}
                               </span>
                             </td>
                           </>
@@ -1577,29 +1581,29 @@ function SchedulePage({
                           <>
                             <td>
                               <span className={redStyle}>
-                                {match?.teams[0]?.teamNumber}
+                                {getTeamByStation(match?.teams, "Red1")}
                               </span>
                               <br />
                               <span className={blueStyle}>
-                                {match?.teams[3]?.teamNumber}
+                                {getTeamByStation(match?.teams, "Blue1")}
                               </span>
                             </td>
                             <td>
                               <span className={redStyle}>
-                                {match?.teams[1]?.teamNumber}
+                                {getTeamByStation(match?.teams, "Red2")}
                               </span>
                               <br />
                               <span className={blueStyle}>
-                                {match?.teams[4]?.teamNumber}
+                                {getTeamByStation(match?.teams, "Blue2")}
                               </span>
                             </td>
                             <td>
                               <span className={redStyle}>
-                                {match?.teams[2]?.teamNumber}
+                                {getTeamByStation(match?.teams, "Red3")}
                               </span>
                               <br />
                               <span className={blueStyle}>
-                                {match?.teams[5]?.teamNumber}
+                                {getTeamByStation(match?.teams, "Blue3")}
                               </span>
                             </td>
                           </>
@@ -1608,20 +1612,20 @@ function SchedulePage({
                           <>
                             <td>
                               <span className={redStyle}>
-                                {match?.teams[0]?.teamNumber}
+                                {getTeamByStation(match?.teams, "Red1")}
                               </span>
                               <br />
                               <span className={blueStyle}>
-                                {match?.teams[2]?.teamNumber}
+                                {getTeamByStation(match?.teams, "Blue1")}
                               </span>
                             </td>
                             <td>
                               <span className={redStyle}>
-                                {match?.teams[1]?.teamNumber}
+                                {getTeamByStation(match?.teams, "Red2")}
                               </span>
                               <br />
                               <span className={blueStyle}>
-                                {match?.teams[3]?.teamNumber}
+                                {getTeamByStation(match?.teams, "Blue2")}
                               </span>
                             </td>
                           </>
