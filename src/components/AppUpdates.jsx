@@ -1,5 +1,13 @@
 export const appUpdates = [
   {
+    date: "October 31, 2025",
+    message: (
+      <ul>
+        <li>Added event high scores to Announce, Play-By-Play and Stats pages for FTC and Offline events</li>
+        <li>Fixed a bug that mixed up the placement of teams on Alliances in the Schedule and Brackets pages</li>
+      </ul>
+    ),
+  },{
     date: "October 25, 2025",
     message: (
       <ul>

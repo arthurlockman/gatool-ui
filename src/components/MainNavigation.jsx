@@ -226,15 +226,14 @@ function MainNavigation({
 
   // Handle ready state for the stats tab
   useEffect(() => {
-    // GREEN: Event Selected, World High Scores available, Event High Scores available
-    // YELLOW: Event Selected, World High Scores Available, no matches complete for selected event
-    // RED: Event Selected, no world high scores available
+    // GREEN: Event Selected and Event High Scores available
+    // YELLOW: Event Selected, World High Scores available but no event matches complete yet
+    // RED: Event Selected, no world high scores or event high scores available
 
     if (
       selectedEvent &&
       (eventHighScores?.highscores?.overallqual ||
-        eventHighScores?.highscores?.overallplayoff) &&
-      worldHighScores
+        eventHighScores?.highscores?.overallplayoff)
     ) {
       setStatsTabReady(TabStates.Ready);
     } else if (selectedEvent && worldHighScores) {
