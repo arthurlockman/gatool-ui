@@ -23,7 +23,7 @@ function StatsPage({
           </Alert>
         </div>
       )}
-      {selectedEvent && !worldStats && (
+      {selectedEvent && !worldStats && !eventHighScores && (
         <div>
           <Alert variant="warning">
             <Alert variant="warning">
@@ -35,10 +35,10 @@ function StatsPage({
           </Alert>
         </div>
       )}
-      {selectedEvent && worldStats && (
+      {selectedEvent && (worldStats || eventHighScores) && (
         <Container fluid>
           <Row>
-            <Col xs={"12"} sm={selectedEvent?.value?.districtCode ? "4" : "6"}>
+            {worldStats && <Col xs={"12"} sm={selectedEvent?.value?.districtCode ? "4" : "6"}>
               <table className="table table-condensed gatool-highScores-Table gatool-worldHighScores">
                 <thead>
                   <tr>
@@ -118,7 +118,7 @@ function StatsPage({
                   </tr>
                 </tbody>
               </table>
-            </Col>
+            </Col>}
             {selectedEvent?.value?.districtCode && (
               <Col xs={"12"} sm={"4"}>
                 <table className="table table-condensed gatool-highScores-Table gatool-districtHighScores">
@@ -202,7 +202,7 @@ function StatsPage({
                 </table>
               </Col>
             )}
-            <Col xs={"12"} sm={selectedEvent?.value?.districtCode ? "4" : "6"}>
+            <Col xs={"12"} sm={selectedEvent?.value?.districtCode && worldStats ? "4" : worldStats ? "6" : "12"}>
               <table className="table table-condensed gatool-highScores-Table gatool-eventHighScores">
                 <thead>
                   <tr>

@@ -1702,6 +1702,7 @@ function App() {
       `There are ${playoffschedule?.schedule.length} playoff matches loaded.`
     );
     setPlayoffSchedule(playoffschedule);
+    
     if (playoffschedule?.schedule?.length > 0) {
       getAlliances();
     }
@@ -3081,21 +3082,168 @@ function App() {
   }
 
   /**
-   * This function retrieves the event high scores for the selected event from FIRST.
+   * This function calculates event high scores from local match data.
+   * Tracks 4 categories: overall, penaltyFree, TBAPenaltyFree, and offsetting
+   * For both qualification and playoff matches.
+   * @function calculateEventHighScores
+   * @param qualSchedule The qualification schedule
+   * @param playoffSchedule The playoff schedule
+   * @param year The current year
+   * @param eventCode The current event code
+   * @param districtCode The current district code
+   * @returns Array of high score records
+   */
+  function calculateEventHighScores(qualSchedule, playoffSchedule, year, eventCode, districtCode) {
+    const highScores = {
+      qual: {
+        overall: null,
+        penaltyFree: null,
+        TBAPenaltyFree: null,
+        offsetting: null
+      },
+      playoff: {
+        overall: null,
+        penaltyFree: null,
+        TBAPenaltyFree: null,
+        offsetting: null
+      }
+    };
+
+    // Helper function to determine if a match qualifies for a category and get the high score
+    function processMatch(match, level, tournamentType) {
+      if (!match || match.scoreRedFinal === undefined || match.scoreBlueFinal === undefined) {
+        return;
+      }
+
+      const redScore = match.scoreRedFinal || 0;
+      const blueScore = match.scoreBlueFinal || 0;
+      const redFoul = match.scoreRedFoul || 0;
+      const blueFoul = match.scoreBlueFoul || 0;
+
+      // Determine which alliance has the high score
+      const highScoreAlliance = redScore >= blueScore ? "red" : "blue";
+      const highScore = Math.max(redScore, blueScore);
+      const winningAlliance = redScore > blueScore ? "red" : (blueScore > redScore ? "blue" : "tie");
+
+      // Create match data object
+      const matchData = {
+        event: {
+          districtCode: districtCode || "",
+          eventCode: eventCode || "",
+          type: tournamentType
+        },
+        highScoreAlliance: highScoreAlliance,
+        match: {
+          field: match.field || "Primary",
+          startTime: match.startTime,
+          autoStartTime: match.autoStartTime,
+          matchVideoLink: match.matchVideoLink,
+          matchNumber: match.matchNumber,
+          isReplay: match.isReplay || false,
+          actualStartTime: match.actualStartTime,
+          tournamentLevel: match.tournamentLevel,
+          postResultTime: match.postResultTime,
+          description: match.description,
+          scoreRedFinal: redScore,
+          scoreRedFoul: redFoul,
+          scoreRedAuto: match.scoreRedAuto,
+          scoreBlueFinal: blueScore,
+          scoreBlueFoul: blueFoul,
+          scoreBlueAuto: match.scoreBlueAuto,
+          teams: match.teams || [],
+          eventCode: eventCode || "",
+          districtCode: districtCode || "",
+          matchScores: match.matchScores || null
+        }
+      };
+
+      // Category 1: Overall - highest score regardless of penalties
+      if (!highScores[level].overall || highScore > highScores[level].overall.score) {
+        highScores[level].overall = { matchData, score: highScore };
+      }
+
+      // Category 2: Penalty Free - no penalties for either alliance
+      if (redFoul === 0 && blueFoul === 0) {
+        if (!highScores[level].penaltyFree || highScore > highScores[level].penaltyFree.score) {
+          highScores[level].penaltyFree = { matchData, score: highScore };
+        }
+      }
+
+      // Category 3: TBA Penalty Free - winning alliance has no penalty points
+      if (winningAlliance !== "tie") {
+        const winnerFoul = winningAlliance === "red" ? redFoul : blueFoul;
+        if (winnerFoul === 0) {
+          if (!highScores[level].TBAPenaltyFree || highScore > highScores[level].TBAPenaltyFree.score) {
+            highScores[level].TBAPenaltyFree = { matchData, score: highScore };
+          }
+        }
+      }
+
+      // Category 4: Offsetting - both alliances have equal penalty points
+      if (redFoul === blueFoul && redFoul > 0) {
+        if (!highScores[level].offsetting || highScore > highScores[level].offsetting.score) {
+          highScores[level].offsetting = { matchData, score: highScore };
+        }
+      }
+    }
+
+    // Process qualification matches
+    if (qualSchedule?.schedule && Array.isArray(qualSchedule.schedule)) {
+      qualSchedule.schedule.forEach(match => {
+        processMatch(match, 'qual', 'qual');
+      });
+    }
+
+    // Process playoff matches
+    if (playoffSchedule?.schedule && Array.isArray(playoffSchedule.schedule)) {
+      playoffSchedule.schedule.forEach(match => {
+        processMatch(match, 'playoff', 'playoff');
+      });
+    }
+
+    // Convert to the desired output format
+    const result = [];
+    ['qual', 'playoff'].forEach(level => {
+      ['overall', 'penaltyFree', 'TBAPenaltyFree', 'offsetting'].forEach(type => {
+        if (highScores[level][type]) {
+          result.push({
+            level: level,
+            matchData: highScores[level][type].matchData,
+            type: type,
+            year: parseInt(year),
+            yearType: `${year}${type}${level}`
+          });
+        }
+      });
+    });
+
+    return result;
+  }
+
+  /**
+   * This function calculates the event high scores for the selected event using local match data.
    * @async
    * @function getEventStats
    * @param year The currently selected year
    * @param code The currently selected event code
-   * @returns sets the world high scores
+   * @returns sets the event high scores
    */
   async function getEventStats(year, code) {
-    var result = await httpClient.getNoAuth(
-      `${year}/highscores/${code}`,
-      ftcMode ? ftcBaseURL : undefined
+    // Use locally calculated high scores instead of API call
+    if (!qualSchedule && !playoffSchedule) {
+      setEventHighScores(null);
+      return;
+    }
+
+    const highscores = calculateEventHighScores(
+      qualSchedule,
+      playoffSchedule,
+      year,
+      code,
+      selectedEvent?.value?.districtCode
     );
-    if (result.status === 200) {
-      // @ts-ignore
-      var highscores = await result.json();
+
+    if (highscores && highscores.length > 0) {
       var scores = {};
       var reducedScores = {};
 
@@ -4301,6 +4449,12 @@ function App() {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [httpClient, selectedEvent]);
+
+  // Reset event high scores when FTC mode changes to prevent showing stale data from the previous mode
+  useEffect(() => {
+    setEventHighScores(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ftcMode]);
 
   // Retrieve robot images when the team list changes
   useEffect(() => {
