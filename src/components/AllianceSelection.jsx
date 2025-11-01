@@ -479,7 +479,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                     return index < colCount ? (
                                                         <Col key={`availableColumn${index}`}>
                                                             {column.map((team) => {
-                                                                return availCell(team)
+                                                                return <div key={`availCell${team.teamNumber}`}>{availCell(team)}</div>
                                                             })}
                                                         </Col>
                                                     ) : null
