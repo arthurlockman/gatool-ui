@@ -4033,8 +4033,15 @@ function App() {
         }
         var timeNow = moment();
 
+        // Add training events for current season only
         if (selectedYear?.value === supportedYears[0].value && !ftcMode) {
           result.events = result?.events.concat(training.events.events);
+        } else if (!ftcMode) {
+          // Add OFFLINE event for all FRC seasons
+          const offlineEvent = training.events.events.find(e => e.code === "OFFLINE");
+          if (offlineEvent) {
+            result.events = result?.events.concat([offlineEvent]);
+          }
         }
 
         // Fetch and merge TBA offseason events for FRC mode

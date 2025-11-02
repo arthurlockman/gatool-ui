@@ -299,14 +299,74 @@ function SchedulePage({
       count: playoffCountOverride?.value > 0 ? playoffCountOverride?.value : 8,
     };
 
+    // Determine if file is CSV or Excel based on extension
+    const fileName = f.name.toLowerCase();
+    const isCSV = fileName.endsWith('.csv');
+
     reader.onload = async function (e) {
       // @ts-ignore
       var data = new Uint8Array(e.target.result);
       var workbook;
-      workbook = read(data, { type: "array" });
-      var worksheet = workbook.Sheets[workbook.SheetNames[0]];
-      var schedule = utils.sheet_to_json(worksheet, { range: 4 });
-      var eventnameTemp = worksheet.B3?.v || selectedEvent?.label;
+      var schedule;
+      var eventnameTemp = selectedEvent?.label;
+      
+      if (isCSV) {
+        // Parse CSV file
+        const csvText = new TextDecoder().decode(data);
+        const lines = csvText.split('\n');
+        
+        // Parse header to understand column structure
+        const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
+        
+        // Find event name (usually in second row, first column)
+        if (lines[1]) {
+          const secondRow = lines[1].split(',').map(c => c.replace(/"/g, '').trim());
+          if (secondRow[0]) {
+            eventnameTemp = secondRow[0];
+          }
+        }
+        
+        // Find column indices (CSV format from FIRST)
+        const timeCol = headers.findIndex(h => h.toLowerCase().includes('starttime') || h.toLowerCase().includes('time'));
+        const descCol = headers.findIndex(h => h.toLowerCase().includes('textbox17') || h.toLowerCase().includes('description'));
+        const blue1Col = headers.findIndex(h => h.toLowerCase().includes('bluestation1') || h === 'textbox15');
+        const blue2Col = headers.findIndex(h => h.toLowerCase().includes('bluestation2'));
+        const blue3Col = headers.findIndex(h => h.toLowerCase().includes('bluestation3'));
+        const red1Col = headers.findIndex(h => h.toLowerCase().includes('redstation1'));
+        const red2Col = headers.findIndex(h => h.toLowerCase().includes('redstation2'));
+        const red3Col = headers.findIndex(h => h.toLowerCase().includes('redstation3'));
+        
+        // Parse data rows (skip header and first 3 rows)
+        schedule = [];
+        for (let i = 3; i < lines.length; i++) {
+          if (!lines[i].trim()) continue;
+          
+          const cols = lines[i].split(',').map(c => c.replace(/"/g, '').trim());
+          
+          // Skip rows without match data
+          if (!cols[descCol] || (!cols[descCol].toLowerCase().includes('qualification') && !cols[descCol].toLowerCase().includes('practice'))) {
+            continue;
+          }
+          
+          schedule.push({
+            Time: cols[timeCol] || "",
+            Description: cols[descCol] || "",
+            "Blue 1": cols[blue1Col] || "",
+            "Blue 2": cols[blue2Col] || "",
+            "Blue 3": cols[blue3Col] || "",
+            "Red 1": cols[red1Col] || "",
+            "Red 2": cols[red2Col] || "",
+            "Red 3": cols[red3Col] || "",
+          });
+        }
+      } else {
+        // Parse Excel file (existing logic)
+        workbook = read(data, { type: "array" });
+        var worksheet = workbook.Sheets[workbook.SheetNames[0]];
+        schedule = utils.sheet_to_json(worksheet, { range: 4 });
+        eventnameTemp = worksheet.B3?.v || selectedEvent?.label;
+      }
+      
       var formattedSchedule = {};
       var matchNumber = 0;
       var errorMatches = [];
@@ -337,7 +397,7 @@ function SchedulePage({
           match[key] = match[key].toString();
         });
         // detect matches with missing teams
-        if (match["Description"]?.includes("Practice")) {
+        if (match["Description"]?.includes("Practice") || match["Description"]?.includes("Qualification")) {
           for (var i = 0; i < matchKeys?.length; i++) {
             if (match[matchKeys[i]] === "") {
               errorMatches.push(match);

@@ -5,6 +5,8 @@ export const appUpdates = [
       <ul>
         <li>Added event high scores to Announce, Play-By-Play and Stats pages for FTC and Offline events</li>
         <li>Fixed a bug that mixed up the placement of teams on Alliances in the Schedule and Brackets pages</li>
+        <li>Added ••OFFLINE•• to the event list for all seasons.</li>
+        <li>Added support for csv schedule uploads for FRC Offline events</li>
       </ul>
     ),
   },{
