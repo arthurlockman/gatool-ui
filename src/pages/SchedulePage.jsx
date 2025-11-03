@@ -348,6 +348,14 @@ function SchedulePage({
             continue;
           }
           
+          // Check if at least one team number exists to avoid blank matches
+          const hasTeamData = cols[blue1Col] || cols[blue2Col] || cols[blue3Col] || 
+                             cols[red1Col] || cols[red2Col] || cols[red3Col];
+          
+          if (!hasTeamData) {
+            continue;
+          }
+          
           schedule.push({
             Time: cols[timeCol] || "",
             Description: cols[descCol] || "",
@@ -406,6 +414,13 @@ function SchedulePage({
           }
         }
         return match;
+      });
+
+      // Filter out blank rows (rows without any team data)
+      schedule = schedule.filter((match) => {
+        const hasTeamData = match["Blue 1"] || match["Blue 2"] || match["Blue 3"] || 
+                           match["Red 1"] || match["Red 2"] || match["Red 3"];
+        return hasTeamData;
       });
 
       if (errorMatches?.length > 0) {
@@ -1693,11 +1708,15 @@ function SchedulePage({
                       </tr>
                     );
                   })}
-                {(!qualSchedule ||
-                  qualSchedule?.schedule?.length === 0 ||
-                  qualSchedule?.schedule?.schedule?.length === 0 ||
-                  (selectedEvent?.value?.code.includes("OFFLINE") &&
-                    !playoffOnly)) &&
+                {((selectedEvent?.value?.code.includes("OFFLINE") &&
+                    !playoffOnly &&
+                    (!practiceSchedule || 
+                     practiceSchedule?.schedule?.length === 0 ||
+                     practiceSchedule?.schedule?.schedule?.length === 0)) ||
+                  (!selectedEvent?.value?.code.includes("OFFLINE") &&
+                    (!qualSchedule ||
+                     qualSchedule?.schedule?.length === 0 ||
+                     qualSchedule?.schedule?.schedule?.length === 0))) &&
                   !(
                     selectedEvent?.value?.type === "Championship" ||
                     selectedEvent?.value?.type ===
