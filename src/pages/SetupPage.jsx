@@ -75,7 +75,7 @@ const ftcModeOptions = [
 
 
 
-function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, regionFilters, setRegionFilters, districts, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showNotesAnnounce, setShowNotesAnnounce, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, autoUpdate, setAutoUpdate, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, showQualsStatsQuals, setShowQualsStatsQuals, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee, showDistrictChampsStats, setShowDistrictChampsStats, monthsWarning, setMonthsWarning, user, isAuthenticated, adHocMode, setAdHocMode, supportedYears, FTCSupportedYears, reloadPage, autoHideSponsors, setAutoHideSponsors, setLoadingCommunityUpdates, hidePracticeSchedule, setHidePracticeSchedule, systemMessage, setTeamListLoading, getTeamList, getAlliances, setHaveChampsTeams, appUpdates, usePullDownToUpdate, setUsePullDownToUpdate, useSwipe, setUseSwipe, eventLabel, setEventLabel, showInspection, setShowInspection, showMinorAwards, setShowMinorAwards, highScoreMode, setHighScoreMode, systemBell, setSystemBell, eventBell, setEventBell, eventMessage, setEventMessage, putEventNotifications, useCheesyArena, setUseCheesyArena, ftcLeagues, ftcRegions, ftcMode, setFTCMode, ftcTypes, useFTCOffline, setUseFTCOffline, FTCServerURL, setFTCServerURL, FTCKey, requestFTCKey, checkFTCKey, FTCOfflineAvailable, getFTCOfflineStatus, getCheesyStatus }) {
+function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, regionFilters, setRegionFilters, districts, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showNotesAnnounce, setShowNotesAnnounce, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, autoUpdate, setAutoUpdate, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, showQualsStatsQuals, setShowQualsStatsQuals, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee, showDistrictChampsStats, setShowDistrictChampsStats, monthsWarning, setMonthsWarning, user, isAuthenticated, adHocMode, setAdHocMode, supportedYears, FTCSupportedYears, reloadPage, autoHideSponsors, setAutoHideSponsors, setLoadingCommunityUpdates, hidePracticeSchedule, setHidePracticeSchedule, systemMessage, setTeamListLoading, getTeamList, getAlliances, setHaveChampsTeams, appUpdates, usePullDownToUpdate, setUsePullDownToUpdate, useSwipe, setUseSwipe, eventLabel, setEventLabel, showInspection, setShowInspection, showMinorAwards, setShowMinorAwards, highScoreMode, setHighScoreMode, systemBell, setSystemBell, eventBell, setEventBell, eventMessage, setEventMessage, putEventNotifications, useCheesyArena, setUseCheesyArena, ftcLeagues, ftcRegions, ftcMode, setFTCMode, ftcTypes, useFTCOffline, setUseFTCOffline, FTCServerURL, setFTCServerURL, FTCKey, requestFTCKey, checkFTCKey, FTCOfflineAvailable, getFTCOfflineStatus, getCheesyStatus, showBlueBanners, setShowBlueBanners }) {
     const isOnline = useOnlineStatus();
     const PWASupported = (isChrome && Number(browserVersion) >= 76) || (isSafari && Number(browserVersion) >= 15 && Number(fullBrowserVersion.split(".")[1]) >= 4);
 
@@ -474,20 +474,28 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                     <td style={{ fontSize: "1.25em" }} colSpan={2}>{showStatsSettings ? <CaretUpFill /> : <CaretDownFill />} <b>{showStatsSettings ? "Hide" : "Show"} Event Statistics Settings</b></td>
                                 </tr>
                                 {showStatsSettings && <>
-                                    <tr className={"statsSettings"}>
+                                    {!ftcMode && <tr className={"statsSettings"}>
                                         <td>
                                             <Switch checked={showChampsStats === null ? false : showChampsStats} onChange={setShowChampsStats} />
                                         </td>
                                         <td>
                                             <b>Show Champs Statistics on Announce in World and District Champs</b>
                                         </td>
-                                    </tr>
-                                    {selectedEvent?.value?.districtCode && <tr className={"statsSettings"}>
+                                    </tr>}
+                                    {selectedEvent?.value?.districtCode && !ftcMode && <tr className={"statsSettings"}>
                                         <td>
                                             <Switch checked={showDistrictChampsStats === null ? false : showDistrictChampsStats} onChange={setShowDistrictChampsStats} />
                                         </td>
                                         <td>
                                             <b>Show District Champs Statistics on Announce in Playoffs outside of District Champs</b>
+                                        </td>
+                                    </tr>}
+                                    {!ftcMode &&<tr className={"statsSettings"}>
+                                        <td>
+                                            <Switch checked={showBlueBanners === null ? true : showBlueBanners} onChange={setShowBlueBanners} />
+                                        </td>
+                                        <td>
+                                            <b>Show Blue Banners Statistics on Announce</b>
                                         </td>
                                     </tr>}
                                     <tr className={"statsSettings"}>
@@ -601,7 +609,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                         <Switch checked={useCheesyArena === null ? false : useCheesyArena} onChange={handleUseCheesy} />
                                     </td>
                                     <td>
-                                        <b>Use Cheesy Arena for match data. This is an escape hatch for offseason events that don't sync with FIRST or TBA. Please ensure that your device is on the same network as the Cheesy Arena field system.{useCheesyArena && <span style={{color:"red"}}><br /><i>NOTE: you may need to tap Refresh Schedule above to fetch the initial data from Cheesy Arena.</i></span>}</b>
+                                        <b>Use Cheesy Arena for match data. This is an escape hatch for offseason events that don't sync with FIRST or TBA. Please ensure that your device is on the same network as the Cheesy Arena field system.{useCheesyArena && <span style={{ color: "red" }}><br /><i>NOTE: you may need to tap Refresh Schedule above to fetch the initial data from Cheesy Arena.</i></span>}</b>
                                     </td>
                                 </tr>}
 

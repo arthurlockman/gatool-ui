@@ -42,6 +42,7 @@ function AnnouncePage({
   eventNamesCY,
   districtRankings,
   showDistrictChampsStats,
+  showBlueBanners,
   adHocMatch,
   setAdHocMatch,
   adHocMode,
@@ -496,6 +497,7 @@ function AnnouncePage({
                           showSponsors={showSponsors}
                           showMottoes={showMottoes}
                           showChampsStats={showChampsStats}
+                          showBlueBanners={showBlueBanners}
                           eventNamesCY={eventNamesCY}
                           showDistrictChampsStats={showDistrictChampsStats}
                           playoffOnly={playoffOnly}
