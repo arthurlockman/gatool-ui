@@ -1,12 +1,14 @@
 export const appUpdates = [
   {
-    date: "October 31, 2025",
+    date: "November 3, 2025",
     message: (
       <ul>
         <li>Added event high scores to Announce, Play-By-Play and Stats pages for FTC and Offline events</li>
         <li>Fixed a bug that mixed up the placement of teams on Alliances in the Schedule and Brackets pages</li>
         <li>Added ••OFFLINE•• to the event list for all seasons.</li>
         <li>Added support for csv schedule uploads for FRC Offline events</li>
+        <li>Added Blue Banner statistics to Announce pages, configurable on Setup page</li>
+        <li>Fixed a bug that ignored certain event properties when loading from TBA</li>
       </ul>
     ),
   },{
