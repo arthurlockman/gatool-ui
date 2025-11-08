@@ -5247,6 +5247,7 @@ function App() {
                     setPlayoffCountOverride={setPlayoffCountOverride}
                     hidePracticeSchedule={hidePracticeSchedule}
                     ftcMode={ftcMode}
+                    remapNumberToString={remapNumberToString}
                   />
                 }
               />

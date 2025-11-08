@@ -4,6 +4,7 @@ export const appUpdates = [
     message: (
       <ul>
         <li>Refined how offline works for FTC. There is now a switch to enable true offline mode when using FTC Local Server mode. Use when the FTC Local Server networks is completely isolated.</li>
+        <li>Included support for remapping team numbers for TBA offseason events</li>
       </ul>
     ),
   },{
