@@ -1,5 +1,12 @@
 export const appUpdates = [
   {
+    date: "November 8, 2025",
+    message: (
+      <ul>
+        <li>Refined how offline works for FTC. There is now a switch to enable true offline mode when using FTC Local Server mode. Use when the FTC Local Server networks is completely isolated.</li>
+      </ul>
+    ),
+  },{
     date: "November 3, 2025",
     message: (
       <ul>

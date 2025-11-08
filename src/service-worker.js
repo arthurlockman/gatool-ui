@@ -11,7 +11,7 @@ import { clientsClaim } from 'workbox-core';
 import { ExpirationPlugin } from 'workbox-expiration';
 import { precacheAndRoute, createHandlerBoundToURL } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
-import { StaleWhileRevalidate } from 'workbox-strategies';
+import { StaleWhileRevalidate, CacheFirst } from 'workbox-strategies';
 
 clientsClaim();
 
@@ -47,14 +47,75 @@ registerRoute(
   createHandlerBoundToURL(process.env.PUBLIC_URL + '/index.html')
 );
 
-// Cache everything that comes from the same origin for two days
+// Cache all public folder assets with CacheFirst strategy for offline support
+// This includes PDFs, images, SVGs, and other static resources
+registerRoute(
+  ({ url }) => {
+    return url.origin === self.location.origin && (
+      url.pathname.startsWith('/images/') ||
+      url.pathname.startsWith('/cheatsheet/') ||
+      url.pathname.startsWith('/bracket/') ||
+      url.pathname.startsWith('/json/') ||
+      url.pathname.endsWith('.pdf') ||
+      url.pathname.endsWith('.png') ||
+      url.pathname.endsWith('.jpg') ||
+      url.pathname.endsWith('.jpeg') ||
+      url.pathname.endsWith('.gif') ||
+      url.pathname.endsWith('.svg') ||
+      url.pathname.endsWith('.docx') ||
+      url.pathname.endsWith('.doc')
+    );
+  },
+  new CacheFirst({
+    cacheName: 'public-assets',
+    plugins: [
+      // Cache for 30 days
+      new ExpirationPlugin({ 
+        maxAgeSeconds: 30 * 24 * 60 * 60,
+        maxEntries: 500, // Limit cache to 500 assets
+      }),
+    ],
+  })
+);
+
+// Cache external fonts from Adobe Typekit, Google Fonts, and other CDNs
+registerRoute(
+  ({ url }) => {
+    return (
+      // Adobe Typekit/Adobe Fonts
+      url.origin === 'https://use.typekit.net' ||
+      url.origin === 'https://p.typekit.net' ||
+      // Google Fonts
+      url.origin === 'https://fonts.googleapis.com' ||
+      url.origin === 'https://fonts.gstatic.com' ||
+      // Font file extensions from any origin
+      url.pathname.endsWith('.woff') ||
+      url.pathname.endsWith('.woff2') ||
+      url.pathname.endsWith('.ttf') ||
+      url.pathname.endsWith('.otf') ||
+      url.pathname.endsWith('.eot')
+    );
+  },
+  new CacheFirst({
+    cacheName: 'external-fonts',
+    plugins: [
+      // Cache fonts for 1 year - they rarely change
+      new ExpirationPlugin({ 
+        maxAgeSeconds: 365 * 24 * 60 * 60,
+        maxEntries: 100,
+      }),
+    ],
+  })
+);
+
+// Cache HTML files and other same-origin content with StaleWhileRevalidate
 registerRoute(
   ({ url }) => url.origin === self.location.origin,
   new StaleWhileRevalidate({
     cacheName: 'public-files',
     plugins: [
-      // Expire cached objects after 2 days
-      new ExpirationPlugin({ maxAgeSeconds: 172800, }),
+      // Expire cached objects after 5 days
+      new ExpirationPlugin({ maxAgeSeconds: 432000, }),
     ],
   })
 );
