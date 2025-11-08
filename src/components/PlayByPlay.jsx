@@ -1,16 +1,19 @@
 import _ from "lodash";
 import useWindowDimensions from "hooks/UseWindowDimensions";
 
-function PlayByPlay({ station, team, inPlayoffs, selectedEvent, showNotes, showMottoes, showQualsStats, showQualsStatsQuals, adHocMode, playoffOnly, ftcMode}) {
+function PlayByPlay({ station, team, inPlayoffs, selectedEvent, showNotes, showMottoes, showQualsStats, showQualsStatsQuals, adHocMode, playoffOnly, ftcMode, remapNumberToString}) {
     const { height, width } = useWindowDimensions();
     var allianceColor = station.slice(0, -1);
+    
+    // Display remapped team number if available
+    const displayTeamNumber = remapNumberToString ? remapNumberToString(team?.teamNumber) : team?.teamNumber;
 
     return (
         <>
             <td className={`col2 ${allianceColor.toLowerCase()}AlliancePlayByPlay align-middle`} align="center" >
                 {team?.teamNumber && (team?.teamNumber !== 0) &&
                     <>
-                        <p className={"playByPlayteamNumber"}>{team?.teamNumber}</p>
+                        <p className={"playByPlayteamNumber"}>{displayTeamNumber}</p>
                         <p className={"playByPlaysayNumber"} >{team?.updates?.sayNumber}</p>
                         <p className={team?.updates?.organizationLocal ? (team?.updates?.organizationLocal?.length > 60 ? "playByPlayOrganization narrowFont" : "playByPlayOrganization") : (team?.schoolName?.length > 60 ? "playByPlayOrganization narrowFont" : "playByPlayOrganization")}>{team?.updates?.organizationLocal ? team?.updates?.organizationLocal : team?.schoolName}</p>
                         <p className={"playByPlayCity"}>{team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : `${team?.city}, ${team?.stateProv}${team?.country !== "USA" ? `, ${team?.country}` : ""}`}</p>

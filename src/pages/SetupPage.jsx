@@ -322,14 +322,14 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                     {FTCKey?.key && FTCKey?.FTCServerURL === FTCServerURL && FTCKey?.active && FTCOfflineAvailable && <><Button onClick={checkFTCKey} variant="success">API Access Granted!</Button>{FTCKey?.key ? <><br />{`Key: ${FTCKey?.key}`}</> : ""}</>}
                     {!FTCOfflineAvailable && <Button onClick={getFTCOfflineStatus} variant={"danger"}>FTC Local Server unavailable. Click to check status.</Button>}
                     <br /><br />
-                    <table>
+                    {useFTCOffline && <table>
                         <tbody>
                             <tr className="UISettings">
                                 <td><Switch checked={manualOfflineMode === null ? false : manualOfflineMode} onChange={setManualOfflineMode} /></td>
                                 <td><b>I have no Internet connection on the FTC Local Server network.</b><br/>Enable this when you're connected to the FTC Local Server network but don't have internet access.</td>
                             </tr>
                         </tbody>
-                    </table>
+                    </table>}
                 </Col>
             </Row>}
             {!selectedEvent && <div>

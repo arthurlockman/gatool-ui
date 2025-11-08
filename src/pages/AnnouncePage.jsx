@@ -64,6 +64,8 @@ function AnnouncePage({
   eventBell,
   setEventBell,
   ftcMode,
+  remapNumberToString,
+  remapStringToNumber,
 }) {
   const matchesToNotify = _.toInteger(
     (teamList?.teams?.length - teamReduction) / 6
@@ -98,6 +100,10 @@ function AnnouncePage({
         matchDetails?.teams[
           _.findIndex(matchDetails?.teams, { station: station })
         ];
+      
+      // Reverse-map the team number to get the actual team number for lookups
+      const lookupTeamNumber = remapNumberToString(team?.teamNumber);
+      
       team = communityUpdates
         ? _.merge(
             team,
@@ -105,7 +111,7 @@ function AnnouncePage({
               _.findIndex(teamList?.teams, { teamNumber: team?.teamNumber })
             ],
             rankings?.ranks[
-              _.findIndex(rankings?.ranks, { teamNumber: team?.teamNumber })
+              _.findIndex(rankings?.ranks, { teamNumber: lookupTeamNumber })
             ],
             communityUpdates[
               _.findIndex(communityUpdates, { teamNumber: team?.teamNumber })
@@ -117,20 +123,21 @@ function AnnouncePage({
               _.findIndex(teamList?.teams, { teamNumber: team?.teamNumber })
             ],
             rankings?.ranks[
-              _.findIndex(rankings?.ranks, { teamNumber: team?.teamNumber })
+              _.findIndex(rankings?.ranks, { teamNumber: lookupTeamNumber })
             ]
           );
+      
       team.rankStyle = rankHighlight(team?.rank, allianceCount || { count: 8 });
-      team.alliance = alliances?.Lookup[`${team?.teamNumber}`]
-        ? alliances?.Lookup[`${team?.teamNumber}`]?.alliance || null
+      team.alliance = alliances?.Lookup[`${lookupTeamNumber}`]
+        ? alliances?.Lookup[`${lookupTeamNumber}`]?.alliance || null
         : null;
-      team.allianceRole = alliances?.Lookup[`${team?.teamNumber}`]
-        ? alliances?.Lookup[`${team?.teamNumber}`]?.role || null
+      team.allianceRole = alliances?.Lookup[`${lookupTeamNumber}`]
+        ? alliances?.Lookup[`${lookupTeamNumber}`]?.role || null
         : null;
 
       var teamDistrictRanks =
         _.filter(districtRankings?.districtRanks, {
-          teamNumber: team.teamNumber,
+          teamNumber: lookupTeamNumber,
         })[0] || null;
       team.districtRanking = teamDistrictRanks?.rank;
       team.qualifiedDistrictCmp = teamDistrictRanks?.qualifiedDistrictCmp;
@@ -164,36 +171,40 @@ function AnnouncePage({
 
         var remainingTeam = _.difference(allianceArray, allianceTeams);
         if (remainingTeam.length > 0 && teamList?.teams?.length > 0) {
+          // Reverse-map the team number to get the actual team number for lookups
+          const lookupRemainingTeam = remapNumberToString(remainingTeam[0]);
+          
           team = _.merge(
             team,
             teamList?.teams[
-              _.findIndex(teamList?.teams, { teamNumber: remainingTeam[0] })
+              _.findIndex(teamList?.teams, { teamNumber: lookupRemainingTeam })
             ],
             rankings?.ranks?.length > 0
               ? rankings?.ranks[
-                  _.findIndex(rankings?.ranks, { teamNumber: remainingTeam[0] })
+                  _.findIndex(rankings?.ranks, { teamNumber: lookupRemainingTeam })
                 ]
               : null,
             communityUpdates?.length > 0
               ? communityUpdates[
                   _.findIndex(communityUpdates, {
-                    teamNumber: remainingTeam[0],
+                    teamNumber: lookupRemainingTeam,
                   })
                 ]
               : null
           );
+          
           team.rankStyle = rankHighlight(
             team?.rank,
             allianceCount || { count: 8 }
           );
           team.alliance =
-            alliances?.Lookup[`${remainingTeam[0]}`]?.alliance || null;
+            alliances?.Lookup[`${lookupRemainingTeam}`]?.alliance || null;
           team.allianceRole =
-            alliances?.Lookup[`${remainingTeam[0]}`]?.role || null;
+            alliances?.Lookup[`${lookupRemainingTeam}`]?.role || null;
 
           teamDistrictRanks =
             _.filter(districtRankings?.districtRanks, {
-              teamNumber: team.teamNumber,
+              teamNumber: lookupRemainingTeam,
             })[0] || null;
           team.districtRanking = teamDistrictRanks?.rank;
           team.qualifiedDistrictCmp = teamDistrictRanks?.qualifiedDistrictCmp;
@@ -502,6 +513,7 @@ function AnnouncePage({
                           showDistrictChampsStats={showDistrictChampsStats}
                           playoffOnly={playoffOnly}
                           ftcMode={ftcMode}
+                          remapNumberToString={remapNumberToString}
                         />
                       );
                     } else {

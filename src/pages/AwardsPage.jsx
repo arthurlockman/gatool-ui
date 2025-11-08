@@ -7,7 +7,7 @@ import useWindowDimensions from "hooks/UseWindowDimensions";
 
 
 
-function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates, eventLabel }) {
+function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates, eventLabel, remapNumberToString }) {
     const originalAndSustaining = ["20", "45", "126", "148", "151", "157", "190", "191", "250"];
     const { disableScope, enableScope } = useHotkeysContext();
 
@@ -136,7 +136,8 @@ function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates, e
                     <Row key={eventLabel}>{columns.map((column, index) => {
                         return (index<colCount? <Col  key={index}>
                             {column.map((team) => {
-                                return ((String(team?.teamNumber).startsWith(teamFilter) || teamFilter === "") && <Row className={"awardsButton"} key={team.teamNumber} ><Button value={JSON.stringify(team)} onClick={handleShow} size="sm" variant={(team?.teamNumber === Number(teamFilter) || (_.filter(sortedTeams, (team) => { return String(team?.teamNumber).startsWith(teamFilter) }).length === 1)) ? "success" : "outline-success"}>{team?.teamNumber}</Button></Row>)
+                                const displayTeamNumber = remapNumberToString ? remapNumberToString(team?.teamNumber) : team?.teamNumber;
+                                return ((String(team?.teamNumber).startsWith(teamFilter) || teamFilter === "") && <Row className={"awardsButton"} key={team.teamNumber} ><Button value={JSON.stringify(team)} onClick={handleShow} size="sm" variant={(team?.teamNumber === Number(teamFilter) || (_.filter(sortedTeams, (team) => { return String(team?.teamNumber).startsWith(teamFilter) }).length === 1)) ? "success" : "outline-success"}>{displayTeamNumber}</Button></Row>)
                             })}
                         </Col> : null)
                     })}
@@ -146,7 +147,7 @@ function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates, e
                             <Modal.Title className={"success"}>Awards Announcement</Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
-                            <span className={"allianceAnnounceDialog"}>Team {awardTeam?.teamNumber} {awardTeam?.updates?.nameShortLocal ? awardTeam.updates.nameShortLocal : awardTeam?.nameShort}<br />
+                            <span className={"allianceAnnounceDialog"}>Team {remapNumberToString ? remapNumberToString(awardTeam?.teamNumber) : awardTeam?.teamNumber} {awardTeam?.updates?.nameShortLocal ? awardTeam.updates.nameShortLocal : awardTeam?.nameShort}<br />
                                 is {awardTeam?.updates?.awardsTextLocal ? awardTeam?.updates?.awardsTextLocal : <>{originalAndSustaining.includes(String(awardTeam?.teamNumber)) ? "an Original and Sustaining Team " : ""}from<br />
                                     {awardTeam?.updates?.organizationLocal ? awardTeam?.updates?.organizationLocal : awardTeam?.organization}<br />
                                     in</>} {awardTeam?.updates?.cityStateLocal ? awardTeam?.updates?.cityStateLocal : `${awardTeam?.city}, ${awardTeam?.stateProv}`}{awardTeam?.country !== "USA" ? `, ${awardTeam?.country}` : ""}<br />

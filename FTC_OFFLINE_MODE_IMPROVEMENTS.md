@@ -31,7 +31,7 @@ if (useFTCOffline && (!isOnline || manualOfflineMode)) {
 ```
 
 ### 2. Added Manual Offline Mode Switch (SetupPage.jsx)
-**Location**: `src/pages/SetupPage.jsx`, lines 325-342
+**Location**: `src/pages/SetupPage.jsx`, lines 325-332
 
 **What Changed**:
 - Added a new persistent state variable `manualOfflineMode` to allow users to manually indicate they have no internet
@@ -39,12 +39,15 @@ if (useFTCOffline && (!isOnline || manualOfflineMode)) {
 - Switch is labeled "I have no Internet connection on the FTC Local Server network"
 - Includes helpful text explaining when to use this feature
 - State persists across sessions using `usePersistentState`
+- **The switch is only visible when FTC Offline mode is enabled** (`useFTCOffline` is true)
+- When switching to other modes (FTC Online, FRC, etc.), the switch is hidden and ignored
 
 **Benefits**:
 - Addresses unreliable browser network detection in local network scenarios
 - Gives users direct control over offline behavior
 - Particularly useful when connected to FTC Local Server network without internet access
 - Prevents unnecessary network requests that would timeout or fail
+- **Mode-specific**: Only applies when in FTC Local Server mode, preventing confusion
 
 ### 3. Prevented External API Calls in FTC Offline Mode (App.jsx)
 **Location**: `src/App.jsx`
@@ -134,17 +137,30 @@ if (useFTCOffline && (!isOnline || manualOfflineMode)) {
 
 ### Test 1: Manual Offline Mode Switch (NEW)
 1. Open the app and log in
-2. Select FTC Local Server mode from the program dropdown
+2. **Switch to FTC Local Server mode** from the program dropdown (the manual offline switch will appear)
 3. Scroll down to the FTC configuration section
 4. Locate the switch labeled "I have no Internet connection on the FTC Local Server network"
-5. **With Internet Connected**: Toggle the switch ON
-6. Load team data and try to update community data
-7. **Expected**: Community updates should NOT be fetched (manual override)
-8. **Check console**: Should see "FTC Offline mode: Skipping community updates while offline (manual override)"
-9. Toggle the switch OFF
-10. Try to update community data again
-11. **Expected**: Community updates SHOULD be fetched from the network
-12. **Check console**: Should see "Teams List loaded. Update from the Community"
+5. **Expected**: Switch is visible below the API Access buttons
+6. **With Internet Connected**: Toggle the switch ON
+7. Load team data and try to update community data
+8. **Expected**: Community updates should NOT be fetched (manual override)
+9. **Check console**: Should see "FTC Offline mode: Skipping community updates while offline (manual override)"
+10. Toggle the switch OFF
+11. Try to update community data again
+12. **Expected**: Community updates SHOULD be fetched from the network
+13. **Check console**: Should see "Teams List loaded. Update from the Community"
+
+### Test 1.5: Manual Offline Mode Switch - Mode Switching (NEW)
+1. With the manual offline switch enabled (from Test 1)
+2. Switch to **FTC Online** or **FRC** mode from the program dropdown
+3. Go to Settings page
+4. **Expected**: Manual offline switch is no longer visible (it's hidden)
+5. Load an event and check console
+6. **Expected**: No "manual override" messages - external APIs are called normally
+7. Switch back to **FTC Local Server** mode
+8. Go to Settings page
+9. **Expected**: Manual offline switch reappears with previous setting preserved
+10. **Expected**: If switch was ON, offline behavior resumes with "manual override" messages
 
 ### Test 2: Online Mode with FTC Offline
 1. Open the app and log in

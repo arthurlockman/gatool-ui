@@ -3,7 +3,7 @@ import _ from "lodash";
 
 const announceBackground = { "red": "#F7B3B4", "blue": "#98B4F4" }
 
-function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selectedEvent, showNotesAnnounce, showAwards, showMinorAwards, showSponsors, autoHideSponsors, showMottoes, showChampsStats, eventNamesCY, showDistrictChampsStats, playoffOnly, ftcMode, showBlueBanners }) {
+function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selectedEvent, showNotesAnnounce, showAwards, showMinorAwards, showSponsors, autoHideSponsors, showMottoes, showChampsStats, eventNamesCY, showDistrictChampsStats, playoffOnly, ftcMode, showBlueBanners, remapNumberToString }) {
     const originalAndSustaining = ["20", "45", "126", "148", "151", "157", "190", "191", "250"];
     var allianceColor = station.slice(0, -1);
     var awardsYears = team?.awards ? Object.keys(team.awards) : []
@@ -22,11 +22,14 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
     if (years.toString().endsWith("3")) { yearsDisplay = "rd" }
     if (years.toString() === "11" || years.toString() === "12" || years.toString() === "13") { yearsDisplay = "th" }
     if (years.toString() === "1") { yearsDisplay = "Rookie" };
+    
+    // Display remapped team number if available
+    const displayTeamNumber = remapNumberToString ? remapNumberToString(team.teamNumber) : team.teamNumber;
 
     return (
         <><tr key={station} className={`gatool-announce ${_.toLower(allianceColor)}Alliance`} >
             <td className={'col1'} style={{ backgroundColor: _.toLower(allianceColor) === "red" ? announceBackground.red : announceBackground.blue }}>
-                <span className={"announceTeamNumber"} ><b>{team.teamNumber}</b></span><br />
+                <span className={"announceTeamNumber"} ><b>{displayTeamNumber}</b></span><br />
                 {team?.updates?.sayNumber && <span className={"playByPlaysayNumber"}>{team.updates?.sayNumber}<br /></span>}
                 <span >{team?.rookieYear}<br />({years === 1 ? "" : years}{yearsDisplay} season)</span>
                 {inPlayoffs && <p className={"announceAlliance"}>{team.alliance}{(selectedEvent?.value?.name.includes("OFFLINE") && !playoffOnly) ? <></> : <><br />{team.allianceRole}</>}</p>}

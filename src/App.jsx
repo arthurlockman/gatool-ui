@@ -198,6 +198,7 @@ function App() {
     null
   );
   const [alliances, setAlliances] = usePersistentState("cache:alliances", null);
+  const [teamRemappings, setTeamRemappings] = usePersistentState("cache:teamRemappings", null);
   const [communityUpdates, setCommunityUpdates] = usePersistentState(
     "cache:communityUpdates",
     null
@@ -980,6 +981,57 @@ function App() {
   };
 
   /**
+   * Helper function to fetch team remappings for a TBA event
+   * @param {string} tbaEventKey TBA event key
+   * @param {string} year Year
+   * @returns Object with team remapping data
+   */
+  const fetchTeamRemappings = async (tbaEventKey, year) => {
+    try {
+      console.log(`Fetching team remappings for event: ${tbaEventKey}`);
+      const result = await httpClient.getNoAuth(
+        `${year}/offseason/event/${tbaEventKey}`
+      );
+      if (result.status === 200) {
+        // @ts-ignore
+        const eventData = await result.json();
+        const remappedTeams = eventData?.remapTeams || null;
+        const keys = Object.keys(remappedTeams);
+        const remappedTeamsObject = {numbers: {}, strings: {}};
+        keys.forEach((key, index) => {
+          remappedTeamsObject.numbers[key.replace("frc","")] = remappedTeams[key].replace("frc","");
+          remappedTeamsObject.strings[remappedTeams[key].replace("frc","")] = key.replace("frc","");
+        });
+        return remappedTeamsObject;
+      }
+      return null;
+    } catch (error) {
+      console.error("Error fetching team remappings:", error);
+      return null;
+    }
+  };
+
+  /**
+   * Remaps a string team identifier to its numeric team number (e.g., "TeamA" -> 9990)
+   * @param {string} teamString The string team identifier
+   * @returns {number} The numeric team number, or null if not found
+   */
+  const remapStringToNumber = (teamString) => {
+    if (!teamRemappings) return Number(teamString);
+    return Number(teamRemappings.strings[teamString]) || Number(teamString) || null;
+  };
+
+  /**
+   * Remaps a numeric team number to its string identifier (e.g., 9990 -> "TeamA")
+   * @param {number} teamNumber The numeric team number
+   * @returns {string|number} The string team identifier, or the original number if not found
+   */
+  const remapNumberToString = (teamNumber) => {
+    if (!teamRemappings) return teamNumber;
+    return teamRemappings.numbers[teamNumber] || teamNumber || "";
+  };
+
+  /**
    * This function retrieves a schedule from FIRST. It attempts to get both the Qual and Playoff Schedule and sets the global variables
    *
    * It uses the Hybrid Schedule endpoint to fetch the Qual schedule, then process the match data.
@@ -1251,9 +1303,29 @@ function App() {
               .sort((a, b) => a.matchNumber - b.matchNumber);
 
             if (qualMatches.length > 0) {
+              // Remap string team identifiers to numeric team numbers
+              const remappedMatches = qualMatches.map((match) => {
+                if (match.teams) {
+                  const remappedTeams = match.teams.map((team) => {
+                    if (typeof team.teamNumber === 'string') {
+                      const numericTeam = remapStringToNumber(team.teamNumber);
+                      if (numericTeam) {
+                        console.log(`Remapping ${team.teamNumber} to ${numericTeam}`);
+                        return { ...team, teamNumber: numericTeam };
+                      } else {
+                        console.log(`No mapping found for ${team.teamNumber}, teamRemappings:`, teamRemappings);
+                      }
+                    }
+                    return team;
+                  });
+                  return { ...match, teams: remappedTeams };
+                }
+                return match;
+              });
+
               qualschedule = {
                 schedule: {
-                  schedule: qualMatches,
+                  schedule: remappedMatches,
                 },
               };
             }
@@ -1534,8 +1606,25 @@ function App() {
               .sort((a, b) => a.matchNumber - b.matchNumber);
 
             if (playoffMatches.length > 0) {
+              // Remap string team identifiers to numeric team numbers
+              const remappedMatches = playoffMatches.map((match) => {
+                if (match.teams) {
+                  const remappedTeams = match.teams.map((team) => {
+                    if (typeof team.teamNumber === 'string') {
+                      const numericTeam = remapStringToNumber(team.teamNumber);
+                      if (numericTeam) {
+                        return { ...team, teamNumber: numericTeam };
+                      }
+                    }
+                    return team;
+                  });
+                  return { ...match, teams: remappedTeams };
+                }
+                return match;
+              });
+
               playoffschedule = {
-                schedule: playoffMatches,
+                schedule: remappedMatches,
               };
             }
           }
@@ -3973,6 +4062,7 @@ function App() {
     var result = await httpClient.getNoAuth(`announcements`);
     // @ts-ignore
     if (result.status === 200) {
+      // @ts-ignore
       var notifications = await result.json();
 
       return notifications;
@@ -4251,6 +4341,20 @@ function App() {
       setSystemBell("");
       setTeamListLoading("");
       setHaveChampsTeams(false);
+      
+      // Fetch team remappings for TBA offseason events
+      if (selectedEvent?.value?.type === "OffSeason" && selectedEvent?.value?.tbaEventKey && !ftcMode) {
+        const remappings = await fetchTeamRemappings(
+          selectedEvent.value.tbaEventKey,
+          selectedYear.value
+        );
+        await setTeamRemappings(remappings);
+        console.log("Team remappings loaded:", remappings);
+      } else {
+        // Clear remappings for non-TBA events
+        await setTeamRemappings(null);
+      }
+      
       getTeamList();
       getSchedule(true);
       getSystemMessages();
@@ -5177,6 +5281,7 @@ function App() {
                     getTeamList={getTeamList}
                     eventLabel={eventLabel}
                     ftcMode={ftcMode}
+                    remapNumberToString={remapNumberToString}
                   />
                 }
               />
@@ -5203,6 +5308,8 @@ function App() {
                     communityUpdates={communityUpdates}
                     EPA={EPA}
                     ftcMode={ftcMode}
+                    remapNumberToString={remapNumberToString}
+                    remapStringToNumber={remapStringToNumber}
                   />
                 }
               />
@@ -5262,6 +5369,8 @@ function App() {
                     eventBell={eventBell}
                     setEventBell={setEventBell}
                     ftcMode={ftcMode}
+                    remapNumberToString={remapNumberToString}
+                    remapStringToNumber={remapStringToNumber}
                   />
                 }
               />
@@ -5314,6 +5423,8 @@ function App() {
                     eventBell={eventBell}
                     setEventBell={setEventBell}
                     ftcMode={ftcMode}
+                    remapNumberToString={remapNumberToString}
+                    remapStringToNumber={remapStringToNumber}
                   />
                 }
               />
@@ -5352,6 +5463,7 @@ function App() {
                     eventLabel={eventLabel}
                     playoffCountOverride={playoffCountOverride}
                     ftcMode={ftcMode}
+                    remapNumberToString={remapNumberToString}
                   />
                 }
               />
@@ -5365,6 +5477,7 @@ function App() {
                     teamList={teamList}
                     communityUpdates={communityUpdates}
                     eventLabel={eventLabel}
+                    remapNumberToString={remapNumberToString}
                   />
                 }
               />
