@@ -500,7 +500,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                     </tr>}
                                     {!ftcMode && <tr className={"statsSettings"}>
                                         <td>
-                                            <Switch checked={showBlueBanners === null ? true : showBlueBanners} onChange={setShowBlueBanners} />
+                                            <Switch checked={showBlueBanners === null ? false : showBlueBanners} onChange={setShowBlueBanners} />
                                         </td>
                                         <td>
                                             <b>Show Blue Banners Statistics on Announce</b>

@@ -1807,6 +1807,9 @@ function App() {
     }
     getRanks();
     getSystemMessages();
+    
+    // Calculate event high scores after schedule is loaded
+    getEventStats(selectedYear?.value, selectedEvent?.value?.code);
   }
 
   /**
@@ -4262,7 +4265,6 @@ function App() {
       getSystemMessages();
       getEventMessages();
       getWorldStats();
-      getEventStats(selectedYear?.value, selectedEvent?.value?.code);
     }
   };
 
@@ -4287,7 +4289,6 @@ function App() {
         getSystemMessages();
         getEventMessages();
         getWorldStats();
-        getEventStats(selectedYear?.value, selectedEvent?.value?.code);
       }
     }
   };
@@ -4376,11 +4377,10 @@ function App() {
       }
       
       getTeamList();
-      getSchedule(true);
+      await getSchedule(true);
       getSystemMessages();
       getEventMessages();
       getWorldStats();
-      getEventStats(selectedYear?.value, selectedEvent?.value?.code);
     }
   };
 
@@ -4924,6 +4924,15 @@ function App() {
     }
   }, [ftcMode, manualOfflineMode, setManualOfflineMode]);
 
+  // Refresh team list when showBlueBanners is enabled to fetch blue banner data
+  useEffect(() => {
+    if (showBlueBanners === true && !ftcMode && selectedEvent && teamList?.teams?.length > 0 && isOnline) {
+      console.log("Show Blue Banners enabled, refreshing team list to fetch blue banner data");
+      getTeamList();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showBlueBanners]);
+
   // check to see if Alliance Selection is ready when QualSchedule and Ranks changes
   useEffect(() => {
     if (
@@ -5041,7 +5050,6 @@ function App() {
       getSystemMessages();
       getEventMessages();
       getWorldStats();
-      getEventStats(selectedYear?.value, selectedEvent?.value?.code);
     },
     refreshRate * 1000,
     {
