@@ -409,6 +409,10 @@ function App() {
     null
   );
   const [cheesyTeamList, setCheesyTeamList] = useState([]);
+  const [useFourTeamAlliances, setUseFourTeamAlliances] = usePersistentState(
+    "setting:useFourTeamAlliances",
+    null
+  );
 
   // FTC Offline status
   const [FTCOfflineAvailable, setFTCOfflineAvailable] = useState(false);
@@ -2690,17 +2694,24 @@ function App() {
       teams.teams = formattedAwards ? formattedAwards : teams.teams;
 
       var champsTeams = [];
-      if (
-        // Do not attempt to get Champs stats for FTC events
-        (selectedEvent?.value?.champLevel !== "" ||
-          showDistrictChampsStats ||
-          showBlueBanners ||
-          (selectedEvent?.value?.code.includes("OFFLINE") &&
-            playoffOnly &&
-            champsStyle)) &&
-        !ftcMode
-      ) {
-        console.log("Getting Champs stats");
+      // When online and in FRC mode, always check for blue banners if showBlueBanners is enabled
+      const shouldFetchChampsData = !ftcMode && (
+        selectedEvent?.value?.champLevel !== "" ||
+        showDistrictChampsStats ||
+        (isOnline && showBlueBanners) ||
+        (selectedEvent?.value?.code.includes("OFFLINE") &&
+          playoffOnly &&
+          champsStyle)
+      );
+      
+      if (shouldFetchChampsData) {
+        console.log("Getting Champs stats", {
+          champLevel: selectedEvent?.value?.champLevel,
+          showDistrictChampsStats,
+          showBlueBanners,
+          isOnline,
+          eventType: selectedEvent?.value?.type
+        });
         champsTeams = teams.teams.map(async (team) => {
           // Initialize blueBanners outside the try-catch so it's always available
           var blueBanners = {
@@ -4861,9 +4872,10 @@ function App() {
     if (
       selectedEvent?.value?.champLevel === "CHAMPS" ||
       selectedEvent?.value?.champLevel === "CMPDIV" ||
-      selectedEvent?.value?.champLevel === "CMPSUB"
+      selectedEvent?.value?.champLevel === "CMPSUB" ||
+      useFourTeamAlliances
     ) {
-      allianceMultiplier += 1; // Champs have an extra alliance
+      allianceMultiplier += 1; // Champs have an extra alliance member (4 teams instead of 3)
     }
 
     allianceCountTemp.allianceSelectionLength =
@@ -4879,6 +4891,7 @@ function App() {
     setAllianceCount,
     selectedEvent,
     ftcMode,
+    useFourTeamAlliances,
   ]);
 
   // Retrieve event list when year selection or ftc Mode switch changes
@@ -5195,6 +5208,8 @@ function App() {
                     putEventNotifications={putEventNotifications}
                     useCheesyArena={useCheesyArena}
                     setUseCheesyArena={setUseCheesyArena}
+                    useFourTeamAlliances={useFourTeamAlliances}
+                    setUseFourTeamAlliances={setUseFourTeamAlliances}
                     ftcLeagues={ftcLeagues}
                     ftcMode={ftcMode}
                     setFTCMode={setFTCMode}
@@ -5465,6 +5480,7 @@ function App() {
                     playoffCountOverride={playoffCountOverride}
                     ftcMode={ftcMode}
                     remapNumberToString={remapNumberToString}
+                    useFourTeamAlliances={useFourTeamAlliances}
                   />
                 }
               />

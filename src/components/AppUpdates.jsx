@@ -5,6 +5,8 @@ export const appUpdates = [
       <ul>
         <li>Refined how offline works for FTC. There is now a switch to enable true offline mode when using FTC Local Server mode. Use when the FTC Local Server networks is completely isolated.</li>
         <li>Included support for remapping team numbers for TBA offseason events</li>
+        <li>Added switch to enable 4-team Alliances for Offseason events</li>
+        <li>Fixed a bug where Blue Banner statistics were not displayed correctly on Announce for TBA-soueces events</li>
       </ul>
     ),
   },{

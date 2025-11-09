@@ -14,7 +14,7 @@ import _ from "lodash";
 import './AllianceSelectionPage.css';
 
 
-function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, playoffSchedule, offlinePlayoffSchedule, alliances, rankings, timeFormat, getRanks, allianceSelection, playoffs, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays, rankingsOverride, loadEvent, practiceSchedule, setOfflinePlayoffSchedule, currentMatch, qualsLength, nextMatch, previousMatch, getSchedule, useSwipe, usePullDownToUpdate, eventLabel, playoffCountOverride, ftcMode, remapNumberToString }) {
+function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, playoffSchedule, offlinePlayoffSchedule, alliances, rankings, timeFormat, getRanks, allianceSelection, playoffs, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays, rankingsOverride, loadEvent, practiceSchedule, setOfflinePlayoffSchedule, currentMatch, qualsLength, nextMatch, previousMatch, getSchedule, useSwipe, usePullDownToUpdate, eventLabel, playoffCountOverride, ftcMode, remapNumberToString, useFourTeamAlliances }) {
     /**
      * This function finds a team by their station assignment
      * @param teams the array of team objects
@@ -184,7 +184,7 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
                 </div>}
             {selectedEvent && ((qualSchedule?.schedule?.length > 0 || qualSchedule?.schedule?.schedule?.length > 0 || practiceSchedule?.schedule?.length > 0) && !playoffs && (allianceSelection || overrideAllianceSelection)) &&
                 <div>
-                    <AllianceSelection selectedYear={selectedYear} selectedEvent={selectedEvent} rankings={rankings} teamList={teamList} allianceCount={allianceCount} communityUpdates={communityUpdates} allianceSelectionArrays={allianceSelectionArrays} setAllianceSelectionArrays={setAllianceSelectionArrays} handleReset={handleReset} teamFilter={teamFilter} setTeamFilter={setTeamFilter} ftcMode={ftcMode} remapNumberToString={remapNumberToString}/>
+                    <AllianceSelection selectedYear={selectedYear} selectedEvent={selectedEvent} rankings={rankings} teamList={teamList} allianceCount={allianceCount} communityUpdates={communityUpdates} allianceSelectionArrays={allianceSelectionArrays} setAllianceSelectionArrays={setAllianceSelectionArrays} handleReset={handleReset} teamFilter={teamFilter} setTeamFilter={setTeamFilter} ftcMode={ftcMode} remapNumberToString={remapNumberToString} useFourTeamAlliances={useFourTeamAlliances}/>
                 </div>}
 
             {selectedEvent && (alliancesCount === 8) && playoffs &&

@@ -7,7 +7,7 @@ import { useEffect } from "react";
 import { originalAndSustaining, allianceSelectionBaseRounds } from "./Constants";
 import useWindowDimensions from "hooks/UseWindowDimensions";
 
-function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays, handleReset, teamFilter, setTeamFilter, ftcMode, remapNumberToString }) {
+function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays, handleReset, teamFilter, setTeamFilter, ftcMode, remapNumberToString, useFourTeamAlliances }) {
     const OriginalAndSustaining = _.cloneDeep(originalAndSustaining);
     const AllianceSelectionBaseRounds = _.cloneDeep(allianceSelectionBaseRounds);
 
@@ -19,7 +19,6 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
 
 
     var availColumns = [[], [], [], [], []];
-    var allianceSelectionRounds = ftcMode ? ["round1"] : ["round1", "round2"]
     var backupTeams = [];
     var alliances = null;
     var allianceDisplayOrder = [];
@@ -38,9 +37,18 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
     const inChamps =
         selectedEvent?.value?.champLevel === "CHAMPS" ||
             selectedEvent?.value?.champLevel === "CMPDIV" ||
-            selectedEvent?.value?.champLevel === "CMPSUB"
+            selectedEvent?.value?.champLevel === "CMPSUB" ||
+            useFourTeamAlliances
             ? true
             : false;
+
+    // Determine alliance selection rounds based on mode and championship level
+    var allianceSelectionRounds;
+    if (ftcMode) {
+        allianceSelectionRounds = inChamps ? ["round1", "round2"] : ["round1"];
+    } else {
+        allianceSelectionRounds = inChamps ? ["round1", "round2", "round3"] : ["round1", "round2"];
+    }
 
     var allianceSelectionOrder = [];
     var allianceSelectionOrderRounds = ftcMode ? { round1: [] } : { round1: [], round2: [] };
@@ -48,10 +56,8 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
     if (inChamps) {
         if (!ftcMode) {
             allianceSelectionOrderRounds.round3 = [];
-            allianceSelectionRounds.push("round3");
         } else {
             allianceSelectionOrderRounds.round2 = [];
-            allianceSelectionRounds.push("round2");
         }
     };
 
@@ -283,6 +289,26 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
             disableScope("allianceFilter");
         }
     }, [teamFilter, enableScope, disableScope])
+
+    // Reset alliance selection when useFourTeamAlliances changes
+    useEffect(() => {
+        if (allianceSelectionArrays && allianceSelectionArrays.allianceCount > 0) {
+            // Check if the current stored rounds configuration matches what it should be
+            const expectedRounds = inChamps 
+                ? (ftcMode ? ["round1", "round2"] : ["round1", "round2", "round3"])
+                : (ftcMode ? ["round1"] : ["round1", "round2"]);
+            
+            const currentRounds = Object.keys(allianceSelectionArrays.rounds || {});
+            
+            // If the rounds don't match, reset the alliance selection
+            if (JSON.stringify(currentRounds.sort()) !== JSON.stringify(expectedRounds.sort())) {
+                console.log("Alliance configuration changed, resetting alliance selection");
+                handleReset();
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [useFourTeamAlliances])
+
 
     if (selectedEvent && rankings && teamList && allianceCount?.count > 0 && communityUpdates) {
         sortedTeams = sortedTeams.map((team) => {
