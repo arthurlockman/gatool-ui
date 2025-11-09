@@ -76,23 +76,23 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
                     const totalWoodieFlowersWinners = (team?.blueBanners?.championshipWoodieFlowers || 0);
                     return (
                         <span className={"champs"}>
-                            <span><b>{team?.blueBanners?.blueBanners} Blue Banner{team?.blueBanners?.blueBanners > 1 ? "s" : ""}</b><br /></span>
-                            {team?.blueBanners?.regionalWins > 0 && <span>  {team?.blueBanners?.regionalWins} Regional Win{team?.blueBanners?.regionalWins > 1 ? "s" : ""}<br /></span>}
-                            {team?.blueBanners?.districtWins > 0 && <span>  {team?.blueBanners?.districtWins} District Win{team?.blueBanners?.districtWins > 1 ? "s" : ""}<br /></span>}
-                            {team?.blueBanners?.districtChampionshipWins > 0 && <span>  {team?.blueBanners?.districtChampionshipWins} District Championship Win{team?.blueBanners?.districtChampionshipWins > 1 ? "s" : ""}<br /></span>}
-                            {team?.blueBanners?.championshipDivisionWins > 0 && <span>  {team?.blueBanners?.championshipDivisionWins} Championship Division Win{team?.blueBanners?.championshipDivisionWins > 1 ? "s" : ""}<br /></span>}
-                            {team?.blueBanners?.einsteinWins > 0 && <span>  {team?.blueBanners?.einsteinWins} Einstein Win{team?.blueBanners?.einsteinWins > 1 ? "s" : ""}<br /></span>}
-                            {totalChairmansImpact > 0 && <span>  <b>{totalChairmansImpact} Chairman's/Impact Award{totalChairmansImpact > 1 ? "s" : ""}<br /></b></span>}
-                            {team?.blueBanners?.einsteinChairmans > 0 && <span>    <b>{team?.blueBanners?.einsteinChairmans} Chairman's Award{team?.blueBanners?.einsteinChairmans > 1 ? "s" : ""}<br /></b></span>}
-                            {team?.blueBanners?.einsteinImpact > 0 && <span>    <b>{team?.blueBanners?.einsteinImpact} Impact Award{team?.blueBanners?.einsteinImpact > 1 ? "s" : ""}<br /></b></span>}
-                            {team?.blueBanners?.einsteinChairmansFinalist > 0 && <span>    <b>{team?.blueBanners?.einsteinChairmansFinalist} Chairman's Award Finalist{team?.blueBanners?.einsteinChairmansFinalist > 1 ? "s" : ""}<br /></b></span>}
-                            {team?.blueBanners?.einsteinImpactFinalist > 0 && <span>    <b>{team?.blueBanners?.einsteinImpactFinalist} Impact Award Finalist{team?.blueBanners?.einsteinImpactFinalist > 1 ? "s" : ""}<br /></b></span>}
-                            {team?.blueBanners?.regionalChairmans > 0 && <span>    {team?.blueBanners?.regionalChairmans} Regional Chairman's Award{team?.blueBanners?.regionalChairmans > 1 ? "s" : ""}<br /></span>}
-                            {team?.blueBanners?.districtChairmans > 0 && <span>    {team?.blueBanners?.districtChairmans} District Chairman's Award{team?.blueBanners?.districtChairmans > 1 ? "s" : ""}<br /></span>}
-                            {team?.blueBanners?.regionalImpact > 0 && <span>    {team?.blueBanners?.regionalImpact} Regional Impact Award{team?.blueBanners?.regionalImpact > 1 ? "s" : ""}<br /></span>}
-                            {team?.blueBanners?.districtImpact > 0 && <span>    {team?.blueBanners?.districtImpact} District Impact Award{team?.blueBanners?.districtImpact > 1 ? "s" : ""}<br /></span>}
-                            {totalWoodieFlowersFinalists > 0 && <span>  {totalWoodieFlowersFinalists} Woodie Flowers Finalist{totalWoodieFlowersFinalists > 1 ? "s" : ""}<br /></span>}
-                            {totalWoodieFlowersWinners > 0 && <span>  {totalWoodieFlowersWinners} Woodie Flowers Award{totalWoodieFlowersWinners > 1 ? "s" : ""}<br /></span>}
+                            <span key="blueBannersTotal"><b>{team?.blueBanners?.blueBanners} Blue Banner{team?.blueBanners?.blueBanners > 1 ? "s" : ""}</b><br /></span>
+                            {team?.blueBanners?.regionalWins > 0 && <span key="regionalWins">  {team?.blueBanners?.regionalWins} Regional Win{team?.blueBanners?.regionalWins > 1 ? "s" : ""}<br /></span>}
+                            {team?.blueBanners?.districtWins > 0 && <span key="districtWins">  {team?.blueBanners?.districtWins} District Win{team?.blueBanners?.districtWins > 1 ? "s" : ""}<br /></span>}
+                            {team?.blueBanners?.districtChampionshipWins > 0 && <span key="districtChampionshipWins">  {team?.blueBanners?.districtChampionshipWins} District Championship Win{team?.blueBanners?.districtChampionshipWins > 1 ? "s" : ""}<br /></span>}
+                            {team?.blueBanners?.championshipDivisionWins > 0 && <span key="championshipDivisionWins">  {team?.blueBanners?.championshipDivisionWins} Championship Division Win{team?.blueBanners?.championshipDivisionWins > 1 ? "s" : ""}<br /></span>}
+                            {team?.blueBanners?.einsteinWins > 0 && <span key="einsteinWins">  {team?.blueBanners?.einsteinWins} Einstein Win{team?.blueBanners?.einsteinWins > 1 ? "s" : ""}<br /></span>}
+                            {totalChairmansImpact > 0 && <span key="totalChairmansImpact">  <b>{totalChairmansImpact} Chairman's/Impact Award{totalChairmansImpact > 1 ? "s" : ""}<br /></b></span>}
+                            {team?.blueBanners?.einsteinChairmans > 0 && <span key="einsteinChairmans">    <b>{team?.blueBanners?.einsteinChairmans} Chairman's Award{team?.blueBanners?.einsteinChairmans > 1 ? "s" : ""}<br /></b></span>}
+                            {team?.blueBanners?.einsteinImpact > 0 && <span key="einsteinImpact">    <b>{team?.blueBanners?.einsteinImpact} Impact Award{team?.blueBanners?.einsteinImpact > 1 ? "s" : ""}<br /></b></span>}
+                            {team?.blueBanners?.einsteinChairmansFinalist > 0 && <span key="einsteinChairmansFinalist">    <b>{team?.blueBanners?.einsteinChairmansFinalist} Chairman's Award Finalist{team?.blueBanners?.einsteinChairmansFinalist > 1 ? "s" : ""}<br /></b></span>}
+                            {team?.blueBanners?.einsteinImpactFinalist > 0 && <span key="einsteinImpactFinalist">    <b>{team?.blueBanners?.einsteinImpactFinalist} Impact Award Finalist{team?.blueBanners?.einsteinImpactFinalist > 1 ? "s" : ""}<br /></b></span>}
+                            {team?.blueBanners?.regionalChairmans > 0 && <span key="regionalChairmans">    {team?.blueBanners?.regionalChairmans} Regional Chairman's Award{team?.blueBanners?.regionalChairmans > 1 ? "s" : ""}<br /></span>}
+                            {team?.blueBanners?.districtChairmans > 0 && <span key="districtChairmans">    {team?.blueBanners?.districtChairmans} District Chairman's Award{team?.blueBanners?.districtChairmans > 1 ? "s" : ""}<br /></span>}
+                            {team?.blueBanners?.regionalImpact > 0 && <span key="regionalImpact">    {team?.blueBanners?.regionalImpact} Regional Impact Award{team?.blueBanners?.regionalImpact > 1 ? "s" : ""}<br /></span>}
+                            {team?.blueBanners?.districtImpact > 0 && <span key="districtImpact">    {team?.blueBanners?.districtImpact} District Impact Award{team?.blueBanners?.districtImpact > 1 ? "s" : ""}<br /></span>}
+                            {totalWoodieFlowersFinalists > 0 && <span key="woodieFlowersFinalists">  {totalWoodieFlowersFinalists} Woodie Flowers Finalist{totalWoodieFlowersFinalists > 1 ? "s" : ""}<br /></span>}
+                            {totalWoodieFlowersWinners > 0 && <span key="woodieFlowersWinners">  {totalWoodieFlowersWinners} Woodie Flowers Award{totalWoodieFlowersWinners > 1 ? "s" : ""}<br /></span>}
                         </span>
                     );
                 })()}

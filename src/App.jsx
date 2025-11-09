@@ -992,7 +992,6 @@ function App() {
    */
   const fetchTeamRemappings = async (tbaEventKey, year) => {
     try {
-      console.log(`Fetching team remappings for event: ${tbaEventKey}`);
       const result = await httpClient.getNoAuth(
         `${year}/offseason/event/${tbaEventKey}`
       );
@@ -1314,7 +1313,6 @@ function App() {
                     if (typeof team.teamNumber === 'string') {
                       const numericTeam = remapStringToNumber(team.teamNumber);
                       if (numericTeam) {
-                        console.log(`Remapping ${team.teamNumber} to ${numericTeam}`);
                         return { ...team, teamNumber: numericTeam };
                       } else {
                         console.log(`No mapping found for ${team.teamNumber}, teamRemappings:`, teamRemappings);
@@ -2698,7 +2696,7 @@ function App() {
       const shouldFetchChampsData = !ftcMode && (
         selectedEvent?.value?.champLevel !== "" ||
         showDistrictChampsStats ||
-        (isOnline && showBlueBanners) ||
+        (isOnline && showBlueBanners === true) ||
         (selectedEvent?.value?.code.includes("OFFLINE") &&
           playoffOnly &&
           champsStyle)
@@ -2710,7 +2708,8 @@ function App() {
           showDistrictChampsStats,
           showBlueBanners,
           isOnline,
-          eventType: selectedEvent?.value?.type
+          eventType: selectedEvent?.value?.type,
+          shouldFetchChampsData
         });
         champsTeams = teams.teams.map(async (team) => {
           // Initialize blueBanners outside the try-catch so it's always available
@@ -4360,7 +4359,6 @@ function App() {
           selectedYear.value
         );
         await setTeamRemappings(remappings);
-        console.log("Team remappings loaded:", remappings);
       } else {
         // Clear remappings for non-TBA events
         await setTeamRemappings(null);
