@@ -2860,7 +2860,7 @@ function App() {
           }
         });
 
-        Promise.all(champsTeams).then(function (values) {
+        await Promise.all(champsTeams).then(function (values) {
           teams.lastUpdate = moment().format();
 
           teams.teams = _.filter(values, (value) => {
