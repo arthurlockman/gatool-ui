@@ -318,7 +318,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
 
 
     function getTeamRank(teamNumber) {
-        var team = find(rankings?.ranks, { "teamNumber": teamNumber });
+        var team = find(rankings?.ranks, { "teamNumber": remapNumberToString(teamNumber) });
         return team?.rank;
     }
 

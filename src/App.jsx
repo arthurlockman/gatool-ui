@@ -4924,6 +4924,15 @@ function App() {
     }
   }, [ftcMode, manualOfflineMode, setManualOfflineMode]);
 
+  // Refresh team list when showBlueBanners is enabled to fetch blue banner data
+  useEffect(() => {
+    if (showBlueBanners === true && !ftcMode && selectedEvent && teamList?.teams?.length > 0 && isOnline) {
+      console.log("Show Blue Banners enabled, refreshing team list to fetch blue banner data");
+      getTeamList();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showBlueBanners]);
+
   // check to see if Alliance Selection is ready when QualSchedule and Ranks changes
   useEffect(() => {
     if (
