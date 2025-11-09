@@ -2870,6 +2870,17 @@ function App() {
           setTeamList(teams);
         });
       } else {
+        // Initialize empty blueBanners for all teams when not fetching champs data
+        teams.teams = teams.teams.map((team) => {
+          if (!team.blueBanners) {
+            team.blueBanners = {
+              teamNumber: team?.teamNumber,
+              blueBanners: 0,
+              blueBannersYears: [],
+            };
+          }
+          return team;
+        });
         teams.lastUpdate = moment().format();
         setTeamList(teams);
       }
@@ -4904,6 +4915,14 @@ function App() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ftcMode, selectedYear, httpClient]);
+
+  // Reset manual offline mode when switching to FRC or FTC Online mode
+  useEffect(() => {
+    if (ftcMode?.value !== "FTCLocal" && manualOfflineMode) {
+      console.log("Switching to online mode, resetting manual offline mode");
+      setManualOfflineMode(false);
+    }
+  }, [ftcMode, manualOfflineMode, setManualOfflineMode]);
 
   // check to see if Alliance Selection is ready when QualSchedule and Ranks changes
   useEffect(() => {
