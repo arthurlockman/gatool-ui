@@ -1807,6 +1807,9 @@ function App() {
     }
     getRanks();
     getSystemMessages();
+    
+    // Calculate event high scores after schedule is loaded
+    getEventStats(selectedYear?.value, selectedEvent?.value?.code);
   }
 
   /**
@@ -4262,7 +4265,6 @@ function App() {
       getSystemMessages();
       getEventMessages();
       getWorldStats();
-      getEventStats(selectedYear?.value, selectedEvent?.value?.code);
     }
   };
 
@@ -4287,7 +4289,6 @@ function App() {
         getSystemMessages();
         getEventMessages();
         getWorldStats();
-        getEventStats(selectedYear?.value, selectedEvent?.value?.code);
       }
     }
   };
@@ -4376,11 +4377,10 @@ function App() {
       }
       
       getTeamList();
-      getSchedule(true);
+      await getSchedule(true);
       getSystemMessages();
       getEventMessages();
       getWorldStats();
-      getEventStats(selectedYear?.value, selectedEvent?.value?.code);
     }
   };
 
@@ -5050,7 +5050,6 @@ function App() {
       getSystemMessages();
       getEventMessages();
       getWorldStats();
-      getEventStats(selectedYear?.value, selectedEvent?.value?.code);
     },
     refreshRate * 1000,
     {
