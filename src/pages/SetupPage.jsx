@@ -75,7 +75,7 @@ const ftcModeOptions = [
 
 
 
-function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, regionFilters, setRegionFilters, districts, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showNotesAnnounce, setShowNotesAnnounce, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, autoUpdate, setAutoUpdate, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, showQualsStatsQuals, setShowQualsStatsQuals, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee, showDistrictChampsStats, setShowDistrictChampsStats, monthsWarning, setMonthsWarning, user, isAuthenticated, adHocMode, setAdHocMode, supportedYears, FTCSupportedYears, reloadPage, autoHideSponsors, setAutoHideSponsors, setLoadingCommunityUpdates, hidePracticeSchedule, setHidePracticeSchedule, systemMessage, setTeamListLoading, getTeamList, getAlliances, setHaveChampsTeams, appUpdates, usePullDownToUpdate, setUsePullDownToUpdate, useSwipe, setUseSwipe, eventLabel, setEventLabel, showInspection, setShowInspection, showMinorAwards, setShowMinorAwards, highScoreMode, setHighScoreMode, systemBell, setSystemBell, eventBell, setEventBell, eventMessage, setEventMessage, putEventNotifications, useCheesyArena, setUseCheesyArena, ftcLeagues, ftcRegions, ftcMode, setFTCMode, ftcTypes, useFTCOffline, setUseFTCOffline, FTCServerURL, setFTCServerURL, FTCKey, requestFTCKey, checkFTCKey, FTCOfflineAvailable, getFTCOfflineStatus, getCheesyStatus, showBlueBanners, setShowBlueBanners }) {
+function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, regionFilters, setRegionFilters, districts, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showNotesAnnounce, setShowNotesAnnounce, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, autoUpdate, setAutoUpdate, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, showQualsStatsQuals, setShowQualsStatsQuals, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee, showDistrictChampsStats, setShowDistrictChampsStats, monthsWarning, setMonthsWarning, user, isAuthenticated, adHocMode, setAdHocMode, supportedYears, FTCSupportedYears, reloadPage, autoHideSponsors, setAutoHideSponsors, setLoadingCommunityUpdates, hidePracticeSchedule, setHidePracticeSchedule, systemMessage, setTeamListLoading, getTeamList, getAlliances, setHaveChampsTeams, appUpdates, usePullDownToUpdate, setUsePullDownToUpdate, useSwipe, setUseSwipe, eventLabel, setEventLabel, showInspection, setShowInspection, showMinorAwards, setShowMinorAwards, highScoreMode, setHighScoreMode, systemBell, setSystemBell, eventBell, setEventBell, eventMessage, setEventMessage, putEventNotifications, useCheesyArena, setUseCheesyArena, useFourTeamAlliances, setUseFourTeamAlliances, ftcLeagues, ftcRegions, ftcMode, setFTCMode, ftcTypes, useFTCOffline, setUseFTCOffline, FTCServerURL, setFTCServerURL, FTCKey, requestFTCKey, checkFTCKey, FTCOfflineAvailable, getFTCOfflineStatus, getCheesyStatus, showBlueBanners, setShowBlueBanners, manualOfflineMode, setManualOfflineMode }) {
     const isOnline = useOnlineStatus();
     const PWASupported = (isChrome && Number(browserVersion) >= 76) || (isSafari && Number(browserVersion) >= 15 && Number(fullBrowserVersion.split(".")[1]) >= 4);
 
@@ -321,7 +321,15 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                     {FTCKey?.key && FTCKey?.FTCServerURL === FTCServerURL && !FTCKey?.active && FTCOfflineAvailable && <Button onClick={checkFTCKey}>Verify API Access</Button>}
                     {FTCKey?.key && FTCKey?.FTCServerURL === FTCServerURL && FTCKey?.active && FTCOfflineAvailable && <><Button onClick={checkFTCKey} variant="success">API Access Granted!</Button>{FTCKey?.key ? <><br />{`Key: ${FTCKey?.key}`}</> : ""}</>}
                     {!FTCOfflineAvailable && <Button onClick={getFTCOfflineStatus} variant={"danger"}>FTC Local Server unavailable. Click to check status.</Button>}
-
+                    <br /><br />
+                    {useFTCOffline && <table>
+                        <tbody>
+                            <tr className="UISettings">
+                                <td><Switch checked={manualOfflineMode === null ? false : manualOfflineMode} onChange={setManualOfflineMode} /></td>
+                                <td><b>I have no Internet connection on the FTC Local Server network.</b><br/>Enable this when you're connected to the FTC Local Server network but don't have internet access.</td>
+                            </tr>
+                        </tbody>
+                    </table>}
                 </Col>
             </Row>}
             {!selectedEvent && <div>
@@ -490,7 +498,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                             <b>Show District Champs Statistics on Announce in Playoffs outside of District Champs</b>
                                         </td>
                                     </tr>}
-                                    {!ftcMode &&<tr className={"statsSettings"}>
+                                    {!ftcMode && <tr className={"statsSettings"}>
                                         <td>
                                             <Switch checked={showBlueBanners === null ? true : showBlueBanners} onChange={setShowBlueBanners} />
                                         </td>
@@ -604,7 +612,15 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                         <b>Enable Test Match Mode. If you enable this mode, you will need to enter team numbers on the Announce Screen. This will disable match navigation.</b>
                                     </td>
                                 </tr>
-                                {!ftcMode && <tr>
+                                {!ftcMode && (selectedEvent?.value?.type === "OffSeason" || selectedEvent?.value?.type === "OffSeasonWithAzureSync") && <tr>
+                                    <td>
+                                        <Switch checked={useFourTeamAlliances === null ? false : useFourTeamAlliances} onChange={setUseFourTeamAlliances} />
+                                    </td>
+                                    <td>
+                                        <b>Use 4 team Alliances for playoffs</b>
+                                    </td>
+                                </tr>}
+                                {!ftcMode && selectedEvent?.value?.type === "OffSeason" && <tr>
                                     <td>
                                         <Switch checked={useCheesyArena === null ? false : useCheesyArena} onChange={handleUseCheesy} />
                                     </td>
@@ -612,7 +628,6 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                         <b>Use Cheesy Arena for match data. This is an escape hatch for offseason events that don't sync with FIRST or TBA. Please ensure that your device is on the same network as the Cheesy Arena field system.{useCheesyArena && <span style={{ color: "red" }}><br /><i>NOTE: you may need to tap Refresh Schedule above to fetch the initial data from Cheesy Arena.</i></span>}</b>
                                     </td>
                                 </tr>}
-
                                 <tr>
                                     <td colSpan={2}>
                                         <Alert variant={"warning"}><p><b>Reload cached gatool code</b><br />If you know that there are updates to gatool, but you are not seeing them here, you can reload the code. This will not remove any stored settings or team data. Your browser is {browserName} version {fullBrowserVersion} on {isDesktop ? <>desktop</> : isTablet ? <>tablet</> : isMobile ? <>mobile</> : <>unknown surface</>}.{!PWASupported ? <><br /><b><i>Note: Your browser may not support clearing cache this way. Please delete and restore your Home Screen {isIOS ? "icon" : "tile"}.</i></b></> : <></>}</p>

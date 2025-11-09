@@ -57,6 +57,8 @@ function PlayByPlayPage({
   eventBell,
   setEventBell,
   ftcMode,
+  remapNumberToString,
+  remapStringToNumber,
 }) {
   const matchesToNotify = _.toInteger(
     (teamList?.teams?.length - teamReduction) / 6
@@ -82,6 +84,42 @@ function PlayByPlayPage({
       : ["Red3", "Blue1", "Red2", "Blue2", "Red1", "Blue3", "Red4", "Blue4"];
   }
 
+  // Helper function to reverse-map display team numbers back to actual team numbers
+  const reverseMapTeamNumber = (teamNumber) => {
+    if (!teamNumber) return teamNumber;
+    
+    // If it's a string team identifier (like "1323B")
+    if (typeof teamNumber === 'string') {
+      // First try using remapStringToNumber if available
+      const numericTeam = remapStringToNumber ? remapStringToNumber(teamNumber) : null;
+      if (numericTeam !== null) {
+        return numericTeam;
+      }
+      
+      // If no mapping exists, extract the numeric part from the string
+      const match = teamNumber.match(/^(\d+)/);
+      if (match) {
+        return parseInt(match[1]);
+      }
+      
+      return teamNumber;
+    }
+    
+    // If it's a remapped number (9990-9999), convert back to the original team number
+    if (teamNumber >= 9990 && teamNumber <= 9999 && remapNumberToString) {
+      const displayString = remapNumberToString(teamNumber);
+      // Extract the numeric part from the display string (e.g., "1323B" -> 1323)
+      if (typeof displayString === 'string') {
+        const match = displayString.match(/^(\d+)/);
+        if (match) {
+          return parseInt(match[1]);
+        }
+      }
+    }
+    
+    return teamNumber;
+  };
+
   function updateTeamDetails(station, matchDetails) {
     var team = {};
     var alliance = station.slice(0, station.length - 1);
@@ -94,36 +132,41 @@ function PlayByPlayPage({
         matchDetails?.teams[
           _.findIndex(matchDetails?.teams, { station: station })
         ];
+      
+      // Reverse-map the team number to get the actual team number for lookups
+      const lookupTeamNumber = reverseMapTeamNumber(team?.teamNumber);
+      
       team = _.merge(
         team,
         teamList?.teams[
-          _.findIndex(teamList?.teams, { teamNumber: team?.teamNumber })
+          _.findIndex(teamList?.teams, { teamNumber: lookupTeamNumber })
         ],
         rankings?.ranks?.length > 0
           ? rankings?.ranks[
-              _.findIndex(rankings?.ranks, { teamNumber: team?.teamNumber })
+              _.findIndex(rankings?.ranks, { teamNumber: lookupTeamNumber })
             ]
           : null,
         EPA?.length > 0
-          ? EPA[_.findIndex(EPA, { teamNumber: team?.teamNumber })]
+          ? EPA[_.findIndex(EPA, { teamNumber: lookupTeamNumber })]
           : null,
         communityUpdates?.length > 0
           ? communityUpdates[
-              _.findIndex(communityUpdates, { teamNumber: team?.teamNumber })
+              _.findIndex(communityUpdates, { teamNumber: lookupTeamNumber })
             ]
           : null
       );
+      
       team.rankStyle = rankHighlight(team?.rank, allianceCount || { count: 8 });
-      team.alliance = alliances?.Lookup[`${team?.teamNumber}`]
-        ? alliances?.Lookup[`${team?.teamNumber}`]?.alliance || null
+      team.alliance = alliances?.Lookup[`${lookupTeamNumber}`]
+        ? alliances?.Lookup[`${lookupTeamNumber}`]?.alliance || null
         : null;
-      team.allianceRole = alliances?.Lookup[`${team?.teamNumber}`]
-        ? alliances?.Lookup[`${team?.teamNumber}`]?.role || null
+      team.allianceRole = alliances?.Lookup[`${lookupTeamNumber}`]
+        ? alliances?.Lookup[`${lookupTeamNumber}`]?.role || null
         : null;
 
       var teamDistrictRanks =
         _.filter(districtRankings?.districtRanks, {
-          teamNumber: team.teamNumber,
+          teamNumber: lookupTeamNumber,
         })[0] || null;
       team.districtRanking = teamDistrictRanks?.rank;
       team.qualifiedDistrictCmp = teamDistrictRanks?.qualifiedDistrictCmp;
@@ -157,30 +200,34 @@ function PlayByPlayPage({
 
         var remainingTeam = _.difference(allianceArray, allianceTeams);
         if (remainingTeam.length > 0) {
+          // Reverse-map the team number to get the actual team number for lookups
+          const lookupRemainingTeam = reverseMapTeamNumber(remainingTeam[0]);
+          
           team = _.merge(
             team,
             teamList?.teams[
-              _.findIndex(teamList?.teams, { teamNumber: remainingTeam[0] })
+              _.findIndex(teamList?.teams, { teamNumber: lookupRemainingTeam })
             ],
             rankings?.ranks[
-              _.findIndex(rankings?.ranks, { teamNumber: remainingTeam[0] })
+              _.findIndex(rankings?.ranks, { teamNumber: lookupRemainingTeam })
             ],
             communityUpdates[
-              _.findIndex(communityUpdates, { teamNumber: remainingTeam[0] })
+              _.findIndex(communityUpdates, { teamNumber: lookupRemainingTeam })
             ]
           );
+          
           team.rankStyle = rankHighlight(
             team?.rank,
             allianceCount || { count: 8 }
           );
           team.alliance =
-            alliances?.Lookup[`${remainingTeam[0]}`]?.alliance || null;
+            alliances?.Lookup[`${lookupRemainingTeam}`]?.alliance || null;
           team.allianceRole =
-            alliances?.Lookup[`${remainingTeam[0]}`]?.role || null;
+            alliances?.Lookup[`${lookupRemainingTeam}`]?.role || null;
 
           teamDistrictRanks =
             _.filter(districtRankings?.districtRanks, {
-              teamNumber: team.teamNumber,
+              teamNumber: lookupRemainingTeam,
             })[0] || null;
           team.districtRanking = teamDistrictRanks?.rank;
           team.qualifiedDistrictCmp = teamDistrictRanks?.qualifiedDistrictCmp;
@@ -487,6 +534,7 @@ function PlayByPlayPage({
                       adHocMode={adHocMode}
                       playoffOnly={playoffOnly}
                       ftcMode={ftcMode}
+                      remapNumberToString={remapNumberToString}
                     />
                     <PlayByPlay
                       station={displayOrder[1]}
@@ -501,6 +549,7 @@ function PlayByPlayPage({
                       adHocMode={adHocMode}
                       playoffOnly={playoffOnly}
                       ftcMode={ftcMode}
+                      remapNumberToString={remapNumberToString}
                     />
                   </tr>
                   <tr className={"gatool-playbyplay"}>
@@ -517,6 +566,7 @@ function PlayByPlayPage({
                       adHocMode={adHocMode}
                       playoffOnly={playoffOnly}
                       ftcMode={ftcMode}
+                      remapNumberToString={remapNumberToString}
                     />
                     <PlayByPlay
                       station={displayOrder[3]}
@@ -531,6 +581,7 @@ function PlayByPlayPage({
                       adHocMode={adHocMode}
                       playoffOnly={playoffOnly}
                       ftcMode={ftcMode}
+                      remapNumberToString={remapNumberToString}
                     />
                   </tr>
                   {!ftcMode && (
@@ -548,6 +599,7 @@ function PlayByPlayPage({
                         adHocMode={adHocMode}
                         playoffOnly={playoffOnly}
                         ftcMode={ftcMode}
+                        remapNumberToString={remapNumberToString}
                       />
                       <PlayByPlay
                         station={displayOrder[5]}
@@ -562,6 +614,7 @@ function PlayByPlayPage({
                         adHocMode={adHocMode}
                         playoffOnly={playoffOnly}
                         ftcMode={ftcMode}
+                        remapNumberToString={remapNumberToString}
                       />
                     </tr>
                   )}
@@ -583,6 +636,7 @@ function PlayByPlayPage({
                           adHocMode={adHocMode}
                           playoffOnly={playoffOnly}
                           ftcMode={ftcMode}
+                          remapNumberToString={remapNumberToString}
                         />
                         <PlayByPlay
                           station={displayOrder[7]}
@@ -597,6 +651,7 @@ function PlayByPlayPage({
                           adHocMode={adHocMode}
                           playoffOnly={playoffOnly}
                           ftcMode={ftcMode}
+                          remapNumberToString={remapNumberToString}
                         />
                       </tr>
                     )}

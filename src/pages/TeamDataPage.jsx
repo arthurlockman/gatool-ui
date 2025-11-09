@@ -19,7 +19,7 @@ import 'react-quill/dist/quill.snow.css';
 import TeamTimer from "components/TeamTimer";
 import { useInterval } from "react-interval-hook";
 
-function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSort, setTeamSort, communityUpdates, setCommunityUpdates, allianceCount, lastVisit, setLastVisit, putTeamData, localUpdates, setLocalUpdates, qualSchedule, playoffSchedule, originalAndSustaining, monthsWarning, user, isAuthenticated, getTeamHistory, timeFormat, getCommunityUpdates, getTeamList, eventLabel, ftcMode }) {
+function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSort, setTeamSort, communityUpdates, setCommunityUpdates, allianceCount, lastVisit, setLastVisit, putTeamData, localUpdates, setLocalUpdates, qualSchedule, playoffSchedule, originalAndSustaining, monthsWarning, user, isAuthenticated, getTeamHistory, timeFormat, getCommunityUpdates, getTeamList, eventLabel, ftcMode, remapNumberToString }) {
     const [currentTime, setCurrentTime] = useState(moment());
     const [clockRunning, setClockRunning] = useState(true);
     const { disableScope, enableScope } = useHotkeysContext();

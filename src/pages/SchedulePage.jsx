@@ -50,6 +50,7 @@ function SchedulePage({
   allianceCount,
   hidePracticeSchedule,
   ftcMode,
+  remapNumberToString,
 }) {
   const [showAdjustAlliances, setShowAdjustAlliances] = useState(false);
   const [showScores, setShowScores] = useState(false);
@@ -615,7 +616,9 @@ function SchedulePage({
   function getTeamByStation(teams, station) {
     if (!teams || !Array.isArray(teams)) return null;
     const team = teams.find((t) => t?.station?.toLowerCase() === station?.toLowerCase());
-    return team?.teamNumber || null;
+    const teamNumber = team?.teamNumber || null;
+    // Use remapNumberToString to display the original team identifier (e.g., "841B" instead of 9991)
+    return remapNumberToString ? remapNumberToString(teamNumber) : teamNumber;
   }
 
   const handleOpen = () => {

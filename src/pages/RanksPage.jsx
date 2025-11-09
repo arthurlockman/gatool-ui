@@ -36,7 +36,9 @@ function RanksPage({
   eventLabel,
   communityUpdates,
   EPA,
-  ftcMode
+  ftcMode,
+  remapNumberToString,
+  remapStringToNumber
 }) {
   // This function clicks the hidden file upload button
   function clickLoadRanks() {
@@ -86,7 +88,8 @@ function RanksPage({
           (errorRanks.length > 1 ? "es:" : ":") +
           "</br>";
         errorRanks.forEach((match) => {
-          errorMessage += match["teamNumber"] + "</br>";
+          const displayTeamNumber = remapNumberToString ? remapNumberToString(match["teamNumber"]) : match["teamNumber"];
+          errorMessage += displayTeamNumber + "</br>";
         });
         errorMessage += "Please check the report and reload.</br>";
         toast.error(errorMessage);
@@ -154,7 +157,10 @@ function RanksPage({
   }
 
   function getTeamName(teamNumber) {
-    var team = _.find(teamList?.teams, { teamNumber: teamNumber });
+    // If teamNumber is a string like "1323B", we need to find the actual team by looking it up
+    // Otherwise, use remapStringToNumber to convert it to the lookup number
+    const lookupNumber = remapStringToNumber ? remapStringToNumber(teamNumber) : teamNumber;
+    var team = _.find(teamList?.teams, { teamNumber: lookupNumber });
     return team?.nameShortLocal ? team?.nameShortLocal : team?.nameShort;
   }
 
@@ -179,9 +185,11 @@ function RanksPage({
   var rankingsList = rankings?.ranks?.map((teamRow) => {
     teamRow.teamName = getTeamName(teamRow.teamNumber);
     if (selectedEvent?.value?.districtCode) {
+      // Use remapStringToNumber to get the lookup number for district rankings
+      const lookupNumber = remapStringToNumber ? remapStringToNumber(teamRow.teamNumber) : teamRow.teamNumber;
       teamRow.districtRankDetails = _.cloneDeep(
         _.filter(districtRankings?.districtRanks, {
-          teamNumber: teamRow.teamNumber,
+          teamNumber: lookupNumber,
         })[0]
       );
       teamRow.districtRanking = teamRow.districtRankDetails?.rank;
@@ -625,19 +633,21 @@ function RanksPage({
                 {rankings &&
                   rankings?.ranks &&
                   rankingsList.map((rankRow) => {
+                    // Use remapStringToNumber to get the lookup number for updates and EPA
+                    const lookupNumber = remapStringToNumber ? remapStringToNumber(rankRow.teamNumber) : rankRow.teamNumber;
                     rankRow = _.merge(
                       rankRow,
                       communityUpdates
                         ? communityUpdates[
                             _.findIndex(communityUpdates, {
-                              teamNumber: rankRow.teamNumber,
+                              teamNumber: lookupNumber,
                             })
                           ]
                         : null,
                       EPA
                         ? EPA[
                             _.findIndex(EPA, {
-                              teamNumber: rankRow.teamNumber,
+                              teamNumber: lookupNumber,
                             })
                           ]
                         : null
@@ -649,9 +659,13 @@ function RanksPage({
                     rankRow.season = rankRow?.epa?.record?.wins>=0
                       ? `${rankRow?.epa?.record?.wins}-${rankRow?.epa?.record?.losses}-${rankRow?.epa?.record?.ties}`
                       : `TBD`;
+                    
+                    // Display remapped team number if available
+                    const displayTeamNumber = remapNumberToString ? remapNumberToString(rankRow.teamNumber) : rankRow.teamNumber;
+                    
                     return (
                       <tr key={"rankings" + rankRow.teamNumber}>
-                        <td>{rankRow.teamNumber}</td>
+                        <td>{displayTeamNumber}</td>
                         <td style={rankHighlight(rankRow.rank)}>
                           {rankRow.rank}
                         </td>
