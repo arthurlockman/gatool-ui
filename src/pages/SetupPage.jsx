@@ -438,9 +438,11 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                         <td><Switch checked={showAwards === null ? true : showAwards} onChange={setShowAwards} /></td>
                                         <td><b>Show Awards on Announce</b></td>
                                     </tr>
-                                    <td colSpan={2} className={"teamInfoSettings"}>
-                                        <label><b>For how many years should we display awards on the Announce Screen?</b><Select options={awardsMenuOptions} value={awardsMenu ? awardsMenu : awardsMenuOptions[0]} onChange={setAwardsMenu} /></label>
-                                    </td>
+                                    <tr className={"teamInfoSettings"}>
+                                        <td colSpan={2}>
+                                            <label><b>For how many years should we display awards on the Announce Screen?</b><Select options={awardsMenuOptions} value={awardsMenu ? awardsMenu : awardsMenuOptions[0]} onChange={setAwardsMenu} /></label>
+                                        </td>
+                                    </tr>
                                     <tr className={"teamInfoSettings"}>
                                         <td><Switch checked={_.isNull(showMinorAwards) ? true : showMinorAwards} onChange={setShowMinorAwards} disabled={!(showAwards || _.isNull(showAwards))} /></td>
                                         <td><b>Show Minor Awards on Announce</b></td>
@@ -503,7 +505,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                             <Switch checked={showBlueBanners === null ? false : showBlueBanners} onChange={setShowBlueBanners} />
                                         </td>
                                         <td>
-                                            <b>Show Blue Banners Statistics on Announce</b>
+                                            <b>Show Blue Banners Statistics on Announce.</b>
                                         </td>
                                     </tr>}
                                     <tr className={"statsSettings"}>

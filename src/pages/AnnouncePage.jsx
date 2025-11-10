@@ -77,14 +77,14 @@ function AnnouncePage({
   }
   const notification =
     currentMatch >= qualsLength - matchesToNotify &&
-    currentMatch <= qualsLength &&
-    showInspection
+      currentMatch <= qualsLength &&
+      showInspection
       ? {
-          expiry: moment().add(1, "hour"),
-          onTime: moment(),
-          message:
-            "Please remind teams to have their robots reinspected before Playoffs and to send their team rep(s) for Alliance Selection.",
-        }
+        expiry: moment().add(1, "hour"),
+        onTime: moment(),
+        message:
+          "Please remind teams to have their robots reinspected before Playoffs and to send their team rep(s) for Alliance Selection.",
+      }
       : {};
 
   function updateTeamDetails(station, matchDetails) {
@@ -95,38 +95,39 @@ function AnnouncePage({
         _.findIndex(matchDetails?.teams, { station: `${alliance}1` })
       ]?.alliance;
 
+
     if (station.slice(-1) !== "4") {
       team =
         matchDetails?.teams[
-          _.findIndex(matchDetails?.teams, { station: station })
+        _.findIndex(matchDetails?.teams, { station: station })
         ];
-      
       // Reverse-map the team number to get the actual team number for lookups
       const lookupTeamNumber = remapNumberToString(team?.teamNumber);
-      
+
+
       team = communityUpdates
         ? _.merge(
-            team,
-            teamList?.teams[
-              _.findIndex(teamList?.teams, { teamNumber: team?.teamNumber })
-            ],
-            rankings?.ranks[
-              _.findIndex(rankings?.ranks, { teamNumber: lookupTeamNumber })
-            ],
-            communityUpdates[
-              _.findIndex(communityUpdates, { teamNumber: team?.teamNumber })
-            ]
-          )
+          team,
+          teamList?.teams[
+          _.findIndex(teamList?.teams, { teamNumber: team?.teamNumber })
+          ],
+          rankings?.ranks[
+          _.findIndex(rankings?.ranks, { teamNumber: lookupTeamNumber })
+          ],
+          communityUpdates[
+          _.findIndex(communityUpdates, { teamNumber: team?.teamNumber })
+          ]
+        )
         : _.merge(
-            team,
-            teamList?.teams[
-              _.findIndex(teamList?.teams, { teamNumber: team?.teamNumber })
-            ],
-            rankings?.ranks[
-              _.findIndex(rankings?.ranks, { teamNumber: lookupTeamNumber })
-            ]
-          );
-      
+          team,
+          teamList?.teams[
+          _.findIndex(teamList?.teams, { teamNumber: team?.teamNumber })
+          ],
+          rankings?.ranks[
+          _.findIndex(rankings?.ranks, { teamNumber: lookupTeamNumber })
+          ]
+        );
+
       team.rankStyle = rankHighlight(team?.rank, allianceCount || { count: 8 });
       team.alliance = alliances?.Lookup[`${lookupTeamNumber}`]
         ? alliances?.Lookup[`${lookupTeamNumber}`]?.alliance || null
@@ -137,7 +138,7 @@ function AnnouncePage({
 
       var teamDistrictRanks =
         _.filter(districtRankings?.districtRanks, {
-          teamNumber: lookupTeamNumber,
+          teamNumber: team?.teamNumber,
         })[0] || null;
       team.districtRanking = teamDistrictRanks?.rank;
       team.qualifiedDistrictCmp = teamDistrictRanks?.qualifiedDistrictCmp;
@@ -145,14 +146,17 @@ function AnnouncePage({
     }
 
     if (station?.slice(-1) === "4") {
+
       if (inPlayoffs || selectedEvent?.value?.champLevel === "CHAMPS") {
         var playoffTeams = matchDetails?.teams.map((team) => {
-          return { teamNumber: team?.teamNumber, alliance: team?.alliance };
+          // Reverse-map the team number to get the actual team number for lookups
+          const lookupTeamNumber = remapNumberToString(team?.teamNumber);
+          return { teamNumber: lookupTeamNumber, alliance: team?.alliance };
         });
         var allianceTeams = allianceNumber
           ? _.filter(playoffTeams, { alliance: allianceNumber }).map((o) => {
-              return o.teamNumber;
-            })
+            return o.teamNumber;
+          })
           : [];
         // var allianceMembers = allianceNumber ? _.filter(alliances?.alliances, { "number": Number(allianceNumber.slice(-1)) })[0] : [];
         var allianceMembers = allianceNumber
@@ -172,27 +176,27 @@ function AnnouncePage({
         var remainingTeam = _.difference(allianceArray, allianceTeams);
         if (remainingTeam.length > 0 && teamList?.teams?.length > 0) {
           // Reverse-map the team number to get the actual team number for lookups
-          const lookupRemainingTeam = remapNumberToString(remainingTeam[0]);
-          
+          const lookupRemainingTeam = remainingTeam[0];
+
           team = _.merge(
             team,
             teamList?.teams[
-              _.findIndex(teamList?.teams, { teamNumber: lookupRemainingTeam })
+            _.findIndex(teamList?.teams, { teamNumber: remapStringToNumber(lookupRemainingTeam) })
             ],
             rankings?.ranks?.length > 0
               ? rankings?.ranks[
-                  _.findIndex(rankings?.ranks, { teamNumber: lookupRemainingTeam })
-                ]
+              _.findIndex(rankings?.ranks, { teamNumber: lookupRemainingTeam })
+              ]
               : null,
             communityUpdates?.length > 0
               ? communityUpdates[
-                  _.findIndex(communityUpdates, {
-                    teamNumber: lookupRemainingTeam,
-                  })
-                ]
+              _.findIndex(communityUpdates, {
+                teamNumber: remapStringToNumber(lookupRemainingTeam),
+              })
+              ]
               : null
           );
-          
+
           team.rankStyle = rankHighlight(
             team?.rank,
             allianceCount || { count: 8 }
@@ -259,7 +263,7 @@ function AnnouncePage({
   var matchDetails = !adHocMode
     ? schedule[currentMatch - 1]
     : adHocMatch
-    ? {
+      ? {
         description: "Practice Match",
         startTime: null,
         matchNumber: 1,
@@ -332,7 +336,7 @@ function AnnouncePage({
           level: null,
         },
       }
-    : null;
+      : null;
 
   if (
     practiceSchedule?.schedule.length > 0 &&

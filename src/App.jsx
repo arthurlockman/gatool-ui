@@ -1000,10 +1000,10 @@ function App() {
         const eventData = await result.json();
         const remappedTeams = eventData?.remapTeams || null;
         const keys = Object.keys(remappedTeams);
-        const remappedTeamsObject = {numbers: {}, strings: {}};
+        const remappedTeamsObject = { numbers: {}, strings: {} };
         keys.forEach((key, index) => {
-          remappedTeamsObject.numbers[key.replace("frc","")] = remappedTeams[key].replace("frc","");
-          remappedTeamsObject.strings[remappedTeams[key].replace("frc","")] = key.replace("frc","");
+          remappedTeamsObject.numbers[key.replace("frc", "")] = remappedTeams[key].replace("frc", "");
+          remappedTeamsObject.strings[remappedTeams[key].replace("frc", "")] = key.replace("frc", "");
         });
         return remappedTeamsObject;
       }
@@ -1807,7 +1807,7 @@ function App() {
     }
     getRanks();
     getSystemMessages();
-    
+
     // Calculate event high scores after schedule is loaded
     getEventStats(selectedYear?.value, selectedEvent?.value?.code);
   }
@@ -2704,7 +2704,7 @@ function App() {
           playoffOnly &&
           champsStyle)
       );
-      
+
       if (shouldFetchChampsData) {
         console.log("Getting Champs stats", {
           champLevel: selectedEvent?.value?.champLevel,
@@ -3541,49 +3541,52 @@ function App() {
       return;
     }
     // @ts-ignore
-    var highscores = await result.json();
-    var scores = {};
-    var reducedScores = {};
+    if (result.status === 200) {
+      // @ts-ignore
+      var highscores = await result.json();
+      var scores = {};
+      var reducedScores = {};
 
-    scores.year = selectedYear?.value;
-    scores.lastUpdate = moment().format();
+      scores.year = selectedYear?.value;
+      scores.lastUpdate = moment().format();
 
-    highscores.forEach((score) => {
-      if (score?.matchData?.match) {
-        var details = {};
-        if (!_.isEmpty(eventnames[worldStats?.year])) {
-          details.eventName =
-            eventnames[worldStats?.year][score?.matchData?.event?.eventCode] ||
-            score?.matchData?.event?.eventCode;
-        } else {
-          details.eventName = score?.matchData?.event?.eventCode;
-        }
-
-        //if (worldStats) {
-        //  details.eventName = eventnames[worldStats?.year][score?.matchData?.event?.eventCode]
-        //} else {
-        //  details.eventName = score?.matchData?.event?.eventCode;
-        //}
-        details.alliance = _.upperFirst(score?.matchData?.highScoreAlliance);
-        details.scoreType = score?.yearType;
-        details.matchName = score?.matchData?.match?.description;
-        details.allianceMembers = _.filter(
-          score?.matchData?.match?.teams,
-          function (o) {
-            return _.startsWith(o.station, details.alliance);
+      highscores.forEach((score) => {
+        if (score?.matchData?.match) {
+          var details = {};
+          if (!_.isEmpty(eventnames[worldStats?.year])) {
+            details.eventName =
+              eventnames[worldStats?.year][score?.matchData?.event?.eventCode] ||
+              score?.matchData?.event?.eventCode;
+          } else {
+            details.eventName = score?.matchData?.event?.eventCode;
           }
-        )
-          .map((team) => {
-            return team.teamNumber;
-          })
-          .join(" ");
-        details.score = score.matchData.match[`score${details.alliance}Final`];
-        reducedScores[details.scoreType] = details;
-      }
-    });
-    scores.highscores = reducedScores;
 
-    setWorldStats(scores);
+          //if (worldStats) {
+          //  details.eventName = eventnames[worldStats?.year][score?.matchData?.event?.eventCode]
+          //} else {
+          //  details.eventName = score?.matchData?.event?.eventCode;
+          //}
+          details.alliance = _.upperFirst(score?.matchData?.highScoreAlliance);
+          details.scoreType = score?.yearType;
+          details.matchName = score?.matchData?.match?.description;
+          details.allianceMembers = _.filter(
+            score?.matchData?.match?.teams,
+            function (o) {
+              return _.startsWith(o.station, details.alliance);
+            }
+          )
+            .map((team) => {
+              return team.teamNumber;
+            })
+            .join(" ");
+          details.score = score.matchData.match[`score${details.alliance}Final`];
+          reducedScores[details.scoreType] = details;
+        }
+      });
+      scores.highscores = reducedScores;
+
+      setWorldStats(scores);
+    }
   }
 
   /**
@@ -4363,7 +4366,7 @@ function App() {
       setSystemBell("");
       setTeamListLoading("");
       setHaveChampsTeams(false);
-      
+
       // Fetch team remappings for TBA offseason events
       if (selectedEvent?.value?.type === "OffSeason" && selectedEvent?.value?.tbaEventKey && !ftcMode) {
         const remappings = await fetchTeamRemappings(
@@ -4375,7 +4378,7 @@ function App() {
         // Clear remappings for non-TBA events
         await setTeamRemappings(null);
       }
-      
+
       getTeamList();
       await getSchedule(true);
       getSystemMessages();
