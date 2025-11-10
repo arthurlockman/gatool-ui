@@ -84,41 +84,7 @@ function PlayByPlayPage({
       : ["Red3", "Blue1", "Red2", "Blue2", "Red1", "Blue3", "Red4", "Blue4"];
   }
 
-  // Helper function to reverse-map display team numbers back to actual team numbers
-  const reverseMapTeamNumber = (teamNumber) => {
-    if (!teamNumber) return teamNumber;
-    
-    // If it's a string team identifier (like "1323B")
-    if (typeof teamNumber === 'string') {
-      // First try using remapStringToNumber if available
-      const numericTeam = remapStringToNumber ? remapStringToNumber(teamNumber) : null;
-      if (numericTeam !== null) {
-        return numericTeam;
-      }
-      
-      // If no mapping exists, extract the numeric part from the string
-      const match = teamNumber.match(/^(\d+)/);
-      if (match) {
-        return parseInt(match[1]);
-      }
-      
-      return teamNumber;
-    }
-    
-    // If it's a remapped number (9990-9999), convert back to the original team number
-    if (teamNumber >= 9990 && teamNumber <= 9999 && remapNumberToString) {
-      const displayString = remapNumberToString(teamNumber);
-      // Extract the numeric part from the display string (e.g., "1323B" -> 1323)
-      if (typeof displayString === 'string') {
-        const match = displayString.match(/^(\d+)/);
-        if (match) {
-          return parseInt(match[1]);
-        }
-      }
-    }
-    
-    return teamNumber;
-  };
+ 
 
   function updateTeamDetails(station, matchDetails) {
     var team = {};
@@ -134,12 +100,12 @@ function PlayByPlayPage({
         ];
       
       // Reverse-map the team number to get the actual team number for lookups
-      const lookupTeamNumber = reverseMapTeamNumber(team?.teamNumber);
+      const lookupTeamNumber = remapNumberToString(team?.teamNumber);
       
       team = _.merge(
         team,
         teamList?.teams[
-          _.findIndex(teamList?.teams, { teamNumber: lookupTeamNumber })
+          _.findIndex(teamList?.teams, { teamNumber: team?.teamNumber })
         ],
         rankings?.ranks?.length > 0
           ? rankings?.ranks[
@@ -147,11 +113,11 @@ function PlayByPlayPage({
             ]
           : null,
         EPA?.length > 0
-          ? EPA[_.findIndex(EPA, { teamNumber: lookupTeamNumber })]
+          ? EPA[_.findIndex(EPA, { teamNumber: team?.teamNumber })]
           : null,
         communityUpdates?.length > 0
           ? communityUpdates[
-              _.findIndex(communityUpdates, { teamNumber: lookupTeamNumber })
+              _.findIndex(communityUpdates, { teamNumber: team?.teamNumber })
             ]
           : null
       );
@@ -166,7 +132,7 @@ function PlayByPlayPage({
 
       var teamDistrictRanks =
         _.filter(districtRankings?.districtRanks, {
-          teamNumber: lookupTeamNumber,
+          teamNumber: team?.teamNumber,
         })[0] || null;
       team.districtRanking = teamDistrictRanks?.rank;
       team.qualifiedDistrictCmp = teamDistrictRanks?.qualifiedDistrictCmp;
@@ -201,18 +167,18 @@ function PlayByPlayPage({
         var remainingTeam = _.difference(allianceArray, allianceTeams);
         if (remainingTeam.length > 0) {
           // Reverse-map the team number to get the actual team number for lookups
-          const lookupRemainingTeam = reverseMapTeamNumber(remainingTeam[0]);
+          const lookupRemainingTeam = remainingTeam[0];
           
           team = _.merge(
             team,
             teamList?.teams[
-              _.findIndex(teamList?.teams, { teamNumber: lookupRemainingTeam })
+              _.findIndex(teamList?.teams, { teamNumber: remapStringToNumber(lookupRemainingTeam) })
             ],
             rankings?.ranks[
               _.findIndex(rankings?.ranks, { teamNumber: lookupRemainingTeam })
             ],
             communityUpdates[
-              _.findIndex(communityUpdates, { teamNumber: lookupRemainingTeam })
+              _.findIndex(communityUpdates, { teamNumber: remapStringToNumber(lookupRemainingTeam) })
             ]
           );
           
@@ -227,7 +193,7 @@ function PlayByPlayPage({
 
           teamDistrictRanks =
             _.filter(districtRankings?.districtRanks, {
-              teamNumber: lookupRemainingTeam,
+              teamNumber: remapStringToNumber(lookupRemainingTeam),
             })[0] || null;
           team.districtRanking = teamDistrictRanks?.rank;
           team.qualifiedDistrictCmp = teamDistrictRanks?.qualifiedDistrictCmp;

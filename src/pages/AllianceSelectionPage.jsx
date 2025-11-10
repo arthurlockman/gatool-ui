@@ -78,7 +78,7 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
             alliance = "Bye Match"
         } else if ((getTeamByStation(match?.teams, "Red1") || getTeamByStation(match?.teams, "Blue1")) && alliances?.Lookup) {
             const lookupTeam = getTeamByStation(match?.teams, allianceColor === "red" ? "Red1" : "Blue1");
-            targetAlliance = alliances?.Lookup[`${lookupTeam}`];
+            targetAlliance = alliances?.Lookup[`${remapNumberToString(lookupTeam)}`];
             allianceMembers = _.compact([targetAlliance?.captain, targetAlliance?.round1, targetAlliance?.round2, targetAlliance?.round3, targetAlliance?.backup]);
             alliance = allianceMembers.join("  ");
         }
@@ -93,7 +93,7 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
         var match = matches[_.findIndex(matches, { "matchNumber": matchNumber })];
         const lookupTeam = match?.teams[_.findIndex(match?.teams, { "station": allianceColor === "red" ? "Red1" : "Blue1" })]?.teamNumber;
         if (lookupTeam && alliances?.Lookup) {
-            const targetAlliance = alliances?.Lookup[`${lookupTeam}`];
+            const targetAlliance = alliances?.Lookup[`${remapNumberToString(lookupTeam)}`];
             allianceName = targetAlliance?.alliance;
             if (matchNumber <= tieLevel || matchNumber === tieLevel + 6) {
                 if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner?.tieWinner === "red") {
