@@ -6,7 +6,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { useSwipeable } from "react-swipeable";
 import { matchClassesBase } from "./Constants";
 
-function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMatch, getSchedule, useSwipe, usePullDownToUpdate, offlinePlayoffSchedule, setOfflinePlayoffSchedule, eventLabel, ftcMode,matches,allianceNumbers, allianceName, matchScore,matchWinner, remapNumberToString }) {
+function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMatch, getSchedule, useSwipe, usePullDownToUpdate, offlinePlayoffSchedule, setOfflinePlayoffSchedule, eventLabel, ftcMode, matches, allianceNumbers, allianceName, matchScore, matchWinner }) {
 	const [showSelectWinner, setShowSelectWinner] = useState(false);
 	const [showConfirmWinner, setShowConfirmWinner] = useState(false);
 	const [winningAlliance, setWinningAlliance] = useState(null);
@@ -49,7 +49,7 @@ function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMat
 
 	const matchClasses = _.cloneDeep(matchClassesBase.fourAlliance)
 
-	
+
 	if (matches[10]?.actualStartTime) {
 		overtimeOffset = 75;
 	} else if (matches[9]?.actualStartTime) {
@@ -323,7 +323,7 @@ function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMat
 								<polygon points="934.7 365 818.43 365 818.43 328.99 934.7 328.99 947.64 346.99 934.7 365" fill={BLUE} stroke={(tournamentWinner?.winner === "blue") ? GOLD : "none"} strokeWidth="5" />
 								<line x1="934.7" y1="328.75" x2="796" y2="328.75" fill="none" stroke="#fff" strokeMiterlimit="10" />
 								<rect x="796" y="292.54" width="22.43" height="72.46" fill={currentPlayoffMatch >= 6 ? GOLD : BLACK} />
-								<text transform={ftcMode?"translate(811.78 349.63) rotate(-90)":"translate(811.78 357.63) rotate(-90)"} fill={currentPlayoffMatch >= 6 ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{ftcMode?"FINALS":"BEST 2 of 3"}</text>
+								<text transform={ftcMode ? "translate(811.78 329.63) rotate(-90)" : "translate(811.78 357.63) rotate(-90)"} fill={currentPlayoffMatch >= 6 ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{ftcMode ? "FINALS" : "BEST 2 of 3"}</text>
 
 								<text transform="matrix(0.9941 0 0 1 880 307)" textAnchor="middle">
 									<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(6, "red") ? allianceName(6, "red") : "Winner of M3"}</tspan>

@@ -6,7 +6,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { useSwipeable } from "react-swipeable";
 import { matchClassesBase } from "./Constants";
 
-function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMatch, qualsLength, nextMatch, previousMatch, getSchedule, usePullDownToUpdate, useSwipe, eventLabel, playoffCountOverride, ftcMode, matches, allianceNumbers, allianceName, matchScore, matchWinner, remapNumberToString }) {
+function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMatch, qualsLength, nextMatch, previousMatch, getSchedule, usePullDownToUpdate, useSwipe, eventLabel, playoffCountOverride, ftcMode, matches, allianceNumbers, allianceName, matchScore, matchWinner }) {
 	const [showSelectWinner, setShowSelectWinner] = useState(false);
 	const [showConfirmWinner, setShowConfirmWinner] = useState(false);
 	const [winningAlliance, setWinningAlliance] = useState(null);
@@ -81,25 +81,39 @@ function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMat
 		}
 
 
-		for (var finalsMatches = 14; finalsMatches < 19; finalsMatches++) {
-			if (matches[_.findIndex(matches, { "matchNumber": finalsMatches })]?.winner.winner === "red") {
-				tournamentWinner.red += 1
-			}
-			if (matches[_.findIndex(matches, { "matchNumber": finalsMatches })]?.winner.winner === "blue") {
-				tournamentWinner.blue += 1
-			}
+	// 8-Alliance Finals: series 14-18 are displayed as match numbers 14-18 in the bracket
+	// Access by array index (series - 1), so indices 13-18 for display matches 14-19
+	for (var finalsMatchIndex = 13; finalsMatchIndex < 19; finalsMatchIndex++) {
+		const finalsMatch = matches[finalsMatchIndex];
+		if (finalsMatch?.winner?.winner === "red") {
+			tournamentWinner.red += 1
 		}
-		if (tournamentWinner.red === 2) {
-			tournamentWinner.winner = "red";
-		} else if (tournamentWinner.blue === 2) {
-			tournamentWinner.winner = "blue";
-		} else if (matchWinner(19)?.tieWinner === "red") {
-			tournamentWinner.winner = "red";
-			tournamentWinner.level = matchWinner(19)?.level;
-		} else if (matchWinner(19)?.tieWinner === "blue") {
-			tournamentWinner.winner = "blue";
-			tournamentWinner.level = matchWinner(19)?.level;
+		if (finalsMatch?.winner?.winner === "blue") {
+			tournamentWinner.blue += 1
 		}
+	}
+	// FTC: Red (higher seed) wins with 1 victory, Blue (lower seed) needs 2 victories
+	// FRC: Both alliances need 2 victories (best of 3)
+	if (ftcMode) {
+		if (tournamentWinner.red >= 1) {
+			tournamentWinner.winner = "red";
+		} else if (tournamentWinner.blue >= 2) {
+			tournamentWinner.winner = "blue";
+		}
+	} else {
+		if (tournamentWinner.red >= 2) {
+			tournamentWinner.winner = "red";
+		} else if (tournamentWinner.blue >= 2) {
+			tournamentWinner.winner = "blue";
+		}
+	}
+	if (matches[18]?.winner?.tieWinner === "red") {
+		tournamentWinner.winner = "red";
+		tournamentWinner.level = matches[18]?.winner?.level;
+	} else if (matches[18]?.winner?.tieWinner === "blue") {
+		tournamentWinner.winner = "blue";
+		tournamentWinner.level = matches[18]?.winner?.level;
+	}
 	}
 
 	const setMatchWinner = (matchNumber) => {
@@ -357,8 +371,8 @@ function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMat
 								<polygon fill={RED} points="1164.7,389.6 1048.4,389.6 1048.4,353.5 1164.7,353.5 1177.6,371.6" stroke={(tournamentWinner?.winner === "red") ? GOLD : "none"} strokeWidth="5" />
 								<polygon fill={BLUE} points="1164.7,426 1048.4,426 1048.4,390 1164.7,390 1177.6,408" stroke={(tournamentWinner?.winner === "blue") ? GOLD : "none"} strokeWidth="5" />
 								<line fill="none" stroke="#FFFFFF" strokeMiterlimit="10" x1="1164.7" y1="389.7" x2="1026" y2="389.7" />
-								<rect x="1026" y="353.5" width="22.4" height="72.5" fill={currentPlayoffMatch >= 14 ? GOLD : BLACK} />
-								<text transform={ftcMode ? "matrix(0 -1.0059 1 0 1041.7773 409.6328)" : "matrix(0 -1.0059 1 0 1041.7773 418.6328)"} fill={currentPlayoffMatch >= 14 ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{ftcMode ? "FINALS" : "BEST 2 of 3"}</text>
+							<rect x="1026" y="353.5" width="22.4" height="72.5" fill={currentPlayoffMatch >= 14 ? GOLD : BLACK} />
+							<text transform={ftcMode ? "matrix(0 -1.0059 1 0 1041.7773 409.6328)" : "matrix(0 -1.0059 1 0 1041.7773 418.6328)"} fill={currentPlayoffMatch >= 14 ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize={"12.076px"}>{ftcMode ? "FINALS" : "BEST 2 of 3"}</text>
 								<text transform="matrix(0.9941 0 0 1 1106 367)" textAnchor="middle">
 									<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(14, "red") ? allianceName(14, "red") : "Winner of M11"}</tspan>
 									<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(14, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(14, "red")}</tspan></text>

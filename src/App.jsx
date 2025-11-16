@@ -4946,8 +4946,10 @@ function App() {
     ) {
       var asReady = false;
       var matchesPerTeam = 0;
+      // FTC has 4 teams per match (2 per alliance), FRC has 6 teams per match (3 per alliance)
+      const teamsPerMatch = ftcMode ? 4 : 6;
       matchesPerTeam = _.toInteger(
-        (6 * qualSchedule?.schedule?.length) /
+        (teamsPerMatch * qualSchedule?.schedule?.length) /
         (teamList?.teamCountTotal - teamReduction)
       );
       // In order to start Alliance Selection, we need the following conditions to be true:
@@ -4973,6 +4975,7 @@ function App() {
     teamReduction,
     playoffSchedule,
     setAllianceSelection,
+    ftcMode,
   ]);
 
   // check to see if Alliance Selection is ready when in Offline and we have uploaded Ranks
