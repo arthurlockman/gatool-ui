@@ -62,17 +62,22 @@ function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previous
 		overtimeOffset = 15;
 	}
 
-	for (var finalsMatches = 6; finalsMatches < 12; finalsMatches++) {
-		if (matches[_.findIndex(matches, { "matchNumber": finalsMatches })]?.winner.winner === "red") {
+	// FTC Finals: series 6-11 are displayed as match numbers 6-11 in the bracket
+	// Access by array index (series - 1), so indices 5-10 for display matches 6-11
+	// Red (higher seed) wins with 1 victory, Blue (lower seed) needs 2 victories
+	for (var finalsMatchIndex = 5; finalsMatchIndex < 11; finalsMatchIndex++) {
+		const finalsMatch = matches[finalsMatchIndex];
+		if (finalsMatch?.winner?.winner === "red") {
 			tournamentWinner.red += 1
 		}
-		if (matches[_.findIndex(matches, { "matchNumber": finalsMatches })]?.winner.winner === "blue") {
+		if (finalsMatch?.winner?.winner === "blue") {
 			tournamentWinner.blue += 1
 		}
 	}
-	if (tournamentWinner?.red === 2) {
+	
+	if (tournamentWinner?.red >= 1) {
 		tournamentWinner.winner = "red";
-	} else if (tournamentWinner?.blue === 2) {
+	} else if (tournamentWinner?.blue >= 2) {
 		tournamentWinner.winner = "blue";
 	} else if (matchWinner(11)?.tieWinner === "red") {
 		tournamentWinner.winner = "red";
@@ -322,8 +327,8 @@ function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previous
 								<polygon points="934.7 328.56 818.43 328.56 818.43 292.54 934.7 292.54 947.64 310.55 934.7 328.56" fill={RED} stroke={(tournamentWinner?.winner === "red") ? GOLD : "none"} strokeWidth="5" />
 								<polygon points="934.7 365 818.43 365 818.43 328.99 934.7 328.99 947.64 346.99 934.7 365" fill={BLUE} stroke={(tournamentWinner?.winner === "blue") ? GOLD : "none"} strokeWidth="5" />
 								<line x1="934.7" y1="328.75" x2="796" y2="328.75" fill="none" stroke="#fff" strokeMiterlimit="10" />
-								<rect x="796" y="292.54" width="22.43" height="72.46" fill={currentPlayoffMatch >= 6 ? GOLD : BLACK} />
-								<text transform={ftcMode?"translate(811.78 349.63) rotate(-90)":"translate(811.78 357.63) rotate(-90)"} fill={currentPlayoffMatch >= 6 ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{ftcMode?"FINALS":"BEST 2 of 3"}</text>
+							<rect x="796" y="292.54" width="22.43" height="72.46" fill={currentPlayoffMatch >= 6 ? GOLD : BLACK} />
+							<text transform="translate(811.78 357.63) rotate(-90)" fill={currentPlayoffMatch >= 6 ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="10.076px">FINALS</text>
 
 								<text transform="matrix(0.9941 0 0 1 880 307)" textAnchor="middle">
 									<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(6, "red") ? allianceName(6, "red") : "Winner of M3"}</tspan>

@@ -1,8 +1,7 @@
-import _ from "lodash";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useSwipeable } from "react-swipeable";
 
-function TwoAllianceBracket({ nextMatch, previousMatch, getSchedule, useSwipe, usePullDownToUpdate, eventLabel, ftcMode, matches, allianceNumbers, allianceName, matchScore, matchWinner, remapNumberToString }) {
+function TwoAllianceBracket({ nextMatch, previousMatch, getSchedule, useSwipe, usePullDownToUpdate, eventLabel, ftcMode, matches, allianceNumbers, allianceName, matchScore, matchWinner }) {
 	//Ball colors
 	const GOLD = "#FFCA10";
 	const RED = "#FF0000";
@@ -33,24 +32,31 @@ function TwoAllianceBracket({ nextMatch, previousMatch, getSchedule, useSwipe, u
 		overtimeOffset = 21;
 	}
 
-	for (var finalsMatches = 1; finalsMatches < 7; finalsMatches++) {
-		if (matches[_.findIndex(matches, { "matchNumber": finalsMatches })]?.winner.winner === "red") {
+	// 2-Alliance Finals: series 1-6 (all matches are finals)
+	// Access by array index (series - 1), so indices 0-5 for display matches 1-6
+	for (var finalsMatchIndex = 0; finalsMatchIndex < 6; finalsMatchIndex++) {
+		const finalsMatch = matches[finalsMatchIndex];
+		if (finalsMatch?.winner?.winner === "red") {
 			tournamentWinner.red += 1
 		}
-		if (matches[_.findIndex(matches, { "matchNumber": finalsMatches })]?.winner.winner === "blue") {
+		if (finalsMatch?.winner?.winner === "blue") {
 			tournamentWinner.blue += 1
 		}
 	}
-	if (tournamentWinner.red === 2) {
+	// Both alliances need 2 victories (best of 3) for both FTC and FRC
+	if (tournamentWinner.red >= 2) {
 		tournamentWinner.winner = "red";
-	} else if (tournamentWinner.blue === 2) {
+	} else if (tournamentWinner.blue >= 2) {
 		tournamentWinner.winner = "blue";
-	} else if (matchWinner(6)?.tieWinner === "red") {
+	}
+
+	// In FRC, if we get to 6 matches, we go to tiebreakers.
+	if (matches[5]?.winner?.tieWinner === "red") {
 		tournamentWinner.winner = "red";
-		tournamentWinner.level = matchWinner(6)?.level;
-	} else if (matchWinner(6)?.tieWinner === "blue") {
+		tournamentWinner.level = matches[5]?.winner?.level;
+	} else if (matches[5]?.winner?.tieWinner === "blue") {
 		tournamentWinner.winner = "blue";
-		tournamentWinner.level = matchWinner(6)?.level;
+		tournamentWinner.level = matches[5]?.winner?.level;
 	}
 
 	const dotStart = 541;
@@ -99,7 +105,7 @@ function TwoAllianceBracket({ nextMatch, previousMatch, getSchedule, useSwipe, u
 						<line x1="578.53" y1="246.81" x2="380.8" y2="246.81" fill="none" stroke="#fff" strokeMiterlimit="10" />
 						<rect x="380.8" y="195.19" width="31.97" height="103.3" />
 
-						<text transform={ftcMode ? "translate(403.29 274.99) rotate(-90)" : "translate(403.29 287.99) rotate(-90)"} fill="#fff" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="17.22px" ><tspan x="0" y="0">{ftcMode ? "FINALS" : "BEST 2 of 3"}</tspan></text>
+						<text transform={ftcMode ? "translate(403.29 272.99) rotate(-90)" : "translate(403.29 287.99) rotate(-90)"} fill="#fff" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize={"17.22px"} ><tspan x="0" y="0">{ftcMode ? "FINALS" : "BEST 2 of 3"}</tspan></text>
 
 						<text transform="translate(495 216.06)" fill="#fff" textAnchor="middle" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="17.32px">
 							<tspan x="0" y="0">{allianceName(1, "red") ? allianceName(1, "red") : "Alliance 1"}</tspan>

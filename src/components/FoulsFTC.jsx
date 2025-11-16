@@ -648,7 +648,97 @@ export const commonFoulsFTC = [
       </>
     ),
   },
-
+  {
+    year: 2025,
+    code: "G417",
+    name: "ROBOTS only operate GATES as directed.",
+    level: "major",
+    card: null,
+    rp: true,
+    text: (
+      <>
+        <p>
+          ROBOTs may not:
+          <ol type={"A"}>
+            <li>
+              contact, either directly or transitively through a SCORING
+              ELEMENT, an opposing ALLIANCE’S GATE, or
+            </li>
+            <li>apply any closing force to either GATE.</li>
+          </ol>
+        </p>
+      </>
+    ),
+    violation: (
+      <>
+        MAJOR FOUL and the opposing ALLIANCE is awarded the PATTERN RP if
+        G417.A.
+      </>
+    ),
+  },
+  {
+    year: 2025,
+    code: "G418",
+    name: "ROBOTS may not meddle with ARTIFACTS on RAMPS",
+    level: "major",
+    card: null,
+    rp: true,
+    text: (
+      <>
+        <p>
+          ROBOTS may not contact, either directly or transitively through a
+          SCORING ELEMENT CONTROLLED by the ROBOT, ARTIFACTS on a RAMP,
+          including their own RAMP. Additionally, ROBOTS may not:
+          <ol type={"A"}>
+            <li>
+              remove an ARTIFACT from their own RAMP except by operating the
+              GATE, or
+            </li>
+            <li>remove an ARTIFACT from the opponent’s RAMP by any means.</li>
+          </ol>
+        </p>
+      </>
+    ),
+    violation: (
+      <>
+        MAJOR FOUL per ARTIFACT, and the ALLIANCE is ineligible for the PATTERN
+        RP if G418.A, or the opposing ALLIANCE is awarded the PATTERN RP if
+        G418.B.
+      </>
+    ),
+  },
+  {
+    year: 2025,
+    code: "G419",
+    name: "ROBOTS LAUNCH into their own GOAL.",
+    level: "major",
+    card: null,
+    rp: true,
+    text: (
+      <>
+        <p>
+          ROBOTS may not:
+          <ol type={"A"}>
+            <li>
+              intentionally place or LAUNCH ARTIFACTS directly onto their own
+              RAMP, or
+            </li>
+            <li>
+              place or LAUNCH ARTIFACTS into the opponent’s GOAL or onto the
+              opponent’s RAMP.
+            </li>
+          </ol>
+        </p>
+      </>
+    ),
+    violation: (
+      <>
+        MAJOR FOUL per ARTIFACT, and the ALLIANCE is ineligible for the PATTERN
+        RP if G418.A, or the opposing ALLIANCE is awarded the PATTERN RP if
+        G418.B.
+      </>
+    ),
+  },
   {
     year: 2025,
     code: "G420",
