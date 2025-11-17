@@ -6,7 +6,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { useSwipeable } from "react-swipeable";
 import { matchClassesBase } from "./Constants";
 
-function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMatch, qualsLength, nextMatch, previousMatch, getSchedule, usePullDownToUpdate, useSwipe, eventLabel, playoffCountOverride, ftcMode, matches, allianceNumbers, allianceName, matchScore, matchWinner, remapNumberToString }) {
+function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMatch, qualsLength, nextMatch, previousMatch, getSchedule, usePullDownToUpdate, useSwipe, eventLabel, playoffCountOverride, ftcMode, matches, allianceNumbers, allianceName, matchScore, matchWinner }) {
 	const [showSelectWinner, setShowSelectWinner] = useState(false);
 	const [showConfirmWinner, setShowConfirmWinner] = useState(false);
 	const [winningAlliance, setWinningAlliance] = useState(null);
@@ -82,25 +82,39 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 		}
 
 
-		for (var finalsMatches = 14; finalsMatches < 19; finalsMatches++) {
-			if (matches[_.findIndex(matches, { "matchNumber": finalsMatches })]?.winner.winner === "red") {
-				tournamentWinner.red += 1
-			}
-			if (matches[_.findIndex(matches, { "matchNumber": finalsMatches })]?.winner.winner === "blue") {
-				tournamentWinner.blue += 1
-			}
+	// 6-Alliance Finals: series 10-15 are displayed as match numbers 10-15 in the bracket
+	// Access by array index (series - 1), so indices 9-14 for display matches 10-15
+	for (var finalsMatchIndex = 9; finalsMatchIndex < 15; finalsMatchIndex++) {
+		const finalsMatch = matches[finalsMatchIndex];
+		if (finalsMatch?.winner?.winner === "red") {
+			tournamentWinner.red += 1
 		}
-		if (tournamentWinner.red === 2) {
-			tournamentWinner.winner = "red";
-		} else if (tournamentWinner.blue === 2) {
-			tournamentWinner.winner = "blue";
-		} else if (matchWinner(19)?.tieWinner === "red") {
-			tournamentWinner.winner = "red";
-			tournamentWinner.level = matchWinner(19)?.level;
-		} else if (matchWinner(19)?.tieWinner === "blue") {
-			tournamentWinner.winner = "blue";
-			tournamentWinner.level = matchWinner(19)?.level;
+		if (finalsMatch?.winner?.winner === "blue") {
+			tournamentWinner.blue += 1
 		}
+	}
+	// FTC: Red (higher seed) wins with 1 victory, Blue (lower seed) needs 2 victories
+	// FRC: Both alliances need 2 victories (best of 3)
+	if (ftcMode) {
+		if (tournamentWinner.red >= 1) {
+			tournamentWinner.winner = "red";
+		} else if (tournamentWinner.blue >= 2) {
+			tournamentWinner.winner = "blue";
+		}
+	} else {
+		if (tournamentWinner.red >= 2) {
+			tournamentWinner.winner = "red";
+		} else if (tournamentWinner.blue >= 2) {
+			tournamentWinner.winner = "blue";
+		}
+	}
+	if (matches[14]?.winner?.tieWinner === "red") {
+		tournamentWinner.winner = "red";
+		tournamentWinner.level = matches[14]?.winner?.level;
+	} else if (matches[14]?.winner?.tieWinner === "blue") {
+		tournamentWinner.winner = "blue";
+		tournamentWinner.level = matches[14]?.winner?.level;
+	}
 	}
 
 	const setMatchWinner = (matchNumber) => {
@@ -329,13 +343,13 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 							<rect x="109" y="89" fill="#DBDAD9" width="75" height="684" />
 							<rect x="302" y="89" fill="#DBDAD9" width="75" height="684" />
 							<rect x="490" y="89" fill="#DBDAD9" width="75" height="684" />
-						<polyline points="242 175.1 430.8 175.1 430.8 328.1 242.6 328.1" fill="none" stroke="#000" strokeMiterlimit="10" strokeWidth="2" />
-						<polyline points="242.5 175.1 242.5 213.6 199.1 213.6" fill="none" stroke="#000" strokeMiterlimit="10" strokeWidth="2" />
-						<polyline points="242.5 328.1 242.5 368.6 199.1 368.6" fill="none" stroke="#000" strokeMiterlimit="10" strokeWidth="2" />
-						<polyline points="431 254 1006 254 1006 504.1 816.8 504.1 816.8 574.1 630 574.1" fill="none" stroke="#000" strokeMiterlimit="10" strokeWidth="2" />
-						<polyline points="611.7 648 629.7 648 629.7 509 611.7 509" fill="none" stroke="#000" strokeMiterlimit="10" strokeWidth="2" />
-						<line x1="1024" y1="421" x2="1006" y2="421" fill="none" stroke="#000" strokeMiterlimit="10" strokeWidth="2" />
-						<line x1="70" y1="419" x2="971" y2="419" fill="none" stroke="#8e8e8e" strokeMiterlimit="10" strokeWidth="2" />
+							<polyline points="242 175.1 430.8 175.1 430.8 328.1 242.6 328.1" fill="none" stroke="#000" strokeMiterlimit="10" strokeWidth="2" />
+							<polyline points="242.5 175.1 242.5 213.6 199.1 213.6" fill="none" stroke="#000" strokeMiterlimit="10" strokeWidth="2" />
+							<polyline points="242.5 328.1 242.5 368.6 199.1 368.6" fill="none" stroke="#000" strokeMiterlimit="10" strokeWidth="2" />
+							<polyline points="431 254 1006 254 1006 504.1 816.8 504.1 816.8 574.1 630 574.1" fill="none" stroke="#000" strokeMiterlimit="10" strokeWidth="2" />
+							<polyline points="611.7 648 629.7 648 629.7 509 611.7 509" fill="none" stroke="#000" strokeMiterlimit="10" strokeWidth="2" />
+							<line x1="1024" y1="421" x2="1006" y2="421" fill="none" stroke="#000" strokeMiterlimit="10" strokeWidth="2" />
+							<line x1="70" y1="419" x2="971" y2="419" fill="none" stroke="#8e8e8e" strokeMiterlimit="10" strokeWidth="2" />
 							<text transform="matrix(0 -1 1 0 49.7114 348.6689)" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="26px">UPPER BRACKET</text>
 							<text transform="matrix(0 -1 1 0 49.7114 673.2046)" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="26px">LOWER BRACKET</text>
 							<text transform="matrix(1 0 0 1 116.6694 84.2646)" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="16px">ROUND 1</text>
@@ -353,8 +367,8 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 								<polygon fill={RED} points="1164.7,389.6 1048.4,389.6 1048.4,353.5 1164.7,353.5 1177.6,371.6" stroke={(tournamentWinner?.winner === "red") ? GOLD : "none"} strokeWidth="5" />
 								<polygon fill={BLUE} points="1164.7,426 1048.4,426 1048.4,390 1164.7,390 1177.6,408" stroke={(tournamentWinner?.winner === "blue") ? GOLD : "none"} strokeWidth="5" />
 								<line fill="none" stroke="#FFFFFF" strokeMiterlimit="10" x1="1164.7" y1="389.7" x2="1026" y2="389.7" />
-								<rect x="1026" y="353.5" width="22.4" height="72.5" fill={currentPlayoffMatch >= 10 ? GOLD : BLACK} />
-								<text transform={ftcMode ? "matrix(0 -1.0059 1 0 1041.7773 410.6328)" : "matrix(0 -1.0059 1 0 1041.7773 418.6328)"} fill={currentPlayoffMatch >= 14 ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{ftcMode ? "FINALS" : "BEST 2 of 3"}</text>
+							<rect x="1026" y="353.5" width="22.4" height="72.5" fill={currentPlayoffMatch >= 10 ? GOLD : BLACK} />
+							<text transform={ftcMode ? "matrix(0 -1.0059 1 0 1041.7773 409.6328)" : "matrix(0 -1.0059 1 0 1041.7773 418.6328)"} fill={currentPlayoffMatch >= 14 ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize={"12.076px"}>{ftcMode ? "FINALS" : "BEST 2 of 3"}</text>
 								<text transform="matrix(0.9941 0 0 1 1106 367)" textAnchor="middle">
 									<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(10, "red") ? allianceName(10, "red") : "Winner of M7"}</tspan>
 									<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(10, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(10, "red")}</tspan></text>
