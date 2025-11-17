@@ -13,7 +13,7 @@ import AwardsPage from "./pages/AwardsPage";
 import StatsPage from "./pages/StatsPage";
 import CheatsheetPage from "./pages/CheatsheetPage";
 import EmceePage from "./pages/EmceePage";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { UseAuthClient } from "./contextProviders/AuthClientContext";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Blocks } from "react-loader-spinner";
@@ -156,6 +156,7 @@ function App() {
     "setting:selectedEvent",
     null
   );
+  const previousEventRef = useRef(null);
   const [selectedYear, setSelectedYear] = usePersistentState(
     "setting:selectedYear",
     null
@@ -357,7 +358,7 @@ function App() {
     false
   );
 
-  const [ftcMode, setFTCMode] = usePersistentState("setting:ftcMode", false);
+  const [ftcMode, setFTCMode] = usePersistentState("setting:ftcMode", null);
 
   const [ftcLeagues, setFTCLeagues] = usePersistentState(
     "cache:ftcLeagues",
@@ -1454,7 +1455,15 @@ function App() {
     qualschedule.completedMatchCount = completedMatchCount;
 
     qualschedule.lastUpdate = moment().format();
-    await setQualSchedule(qualschedule);
+    
+    // For OFFLINE events, only update qualSchedule if there's no uploaded schedule already
+    const isOfflineEvent = selectedEvent?.value?.code === "OFFLINE";
+    if (!isOfflineEvent || !qualSchedule || qualSchedule?.schedule?.length === 0) {
+      await setQualSchedule(qualschedule);
+    } else {
+      console.log("OFFLINE event - preserving uploaded qual schedule");
+    }
+    
     if (
       practiceschedule?.schedule?.length > 0 &&
       qualschedule?.schedule?.length === 0
@@ -1462,6 +1471,9 @@ function App() {
       qualslength = practiceschedule?.schedule?.length;
     } else if (qualschedule?.schedule?.length > 0) {
       qualslength = qualschedule?.schedule?.length;
+    } else if (isOfflineEvent && qualSchedule?.schedule?.length > 0) {
+      // Use the existing uploaded schedule length for OFFLINE events
+      qualslength = qualSchedule?.schedule?.length;
     }
     console.log(`There are ${qualslength} qualification matches loaded.`);
     setQualsLength(qualslength);
@@ -1800,9 +1812,15 @@ function App() {
     console.log(
       `There are ${playoffschedule?.schedule.length} playoff matches loaded.`
     );
-    setPlayoffSchedule(playoffschedule);
+    
+    // For OFFLINE events, only update playoffSchedule if there's no uploaded schedule already
+    if (!isOfflineEvent || !playoffSchedule || playoffSchedule?.schedule?.length === 0) {
+      setPlayoffSchedule(playoffschedule);
+    } else {
+      console.log("OFFLINE event - preserving uploaded playoff schedule");
+    }
 
-    if (playoffschedule?.schedule?.length > 0) {
+    if (playoffschedule?.schedule?.length > 0 || (isOfflineEvent && playoffSchedule?.schedule?.length > 0)) {
       getAlliances();
     }
     getRanks();
@@ -3328,8 +3346,16 @@ function App() {
       ? moment(ranks?.headers["last-modified"]).format()
       : moment().format();
     ranks.lastUpdate = moment().format();
-    setRankings(ranks);
-    if (ranks?.ranks?.length > 0) {
+    
+    // For OFFLINE events, only update rankings if there's no uploaded rankings already
+    const isOfflineEvent = selectedEvent?.value?.code === "OFFLINE";
+    if (!isOfflineEvent || !rankings || rankings?.ranks?.length === 0) {
+      setRankings(ranks);
+    } else {
+      console.log("OFFLINE event - preserving uploaded rankings");
+    }
+    
+    if (ranks?.ranks?.length > 0 || (isOfflineEvent && rankings?.ranks?.length > 0)) {
       if (!ftcMode) {
         getEPA();
       } else if (ftcMode) {
@@ -4328,25 +4354,51 @@ function App() {
     console.log("starting to load event");
     if (httpClient && selectedEvent?.value?.name && selectedYear?.value) {
       console.log(`Conditions match to load ${selectedEvent?.value?.name}...`);
-      await setPracticeSchedule(null);
-      setPracticeFileUploaded(false);
-      await setQualSchedule(null);
-      await setPlayoffSchedule(null);
-      await setOfflinePlayoffSchedule(null);
-      await setTeamList(null);
+      const isOfflineEvent = selectedEvent?.value?.code === "OFFLINE";
+      const previousWasOffline = previousEventRef.current?.code === "OFFLINE";
+      const isSameEvent = previousEventRef.current?.code === selectedEvent?.value?.code;
+      
+      // For OFFLINE events, only preserve uploaded data if we're staying on the same OFFLINE event
+      // (e.g., page reload). If switching TO OFFLINE from another event, clear everything.
+      const shouldPreserveOfflineData = isOfflineEvent && previousWasOffline && isSameEvent;
+      
+      if (!shouldPreserveOfflineData) {
+        await setPracticeSchedule(null);
+        setPracticeFileUploaded(false);
+        await setQualSchedule(null);
+        await setPlayoffSchedule(null);
+        await setOfflinePlayoffSchedule(null);
+        await setTeamList(null);
+        await setRankings(null);
+        if (isOfflineEvent && !isSameEvent) {
+          console.log("Switching to OFFLINE event - clearing previous event data");
+        }
+      } else {
+        console.log("Reloading same OFFLINE event - preserving uploaded schedules, rankings, and team list");
+      }
+      
+      // Update the ref to track current event for next time
+      previousEventRef.current = selectedEvent?.value;
+      
       await setCommunityUpdates([]);
       setLoadingCommunityUpdates(false);
       setEITeams([]);
       await setRobotImages(null);
-      await setRankings(null);
       await setEventHighScores(null);
       await setPlayoffs(false);
-      await setAllianceCount(null);
-      await setTeamReduction(null);
-      await setPlayoffCountOverride(null);
-      setAllianceSelectionArrays({});
-      setAllianceSelection(false);
-      await setRankingsOverride(null);
+      
+      // For OFFLINE events, preserve alliance-related settings only if reloading same event
+      if (!shouldPreserveOfflineData) {
+        await setAllianceCount(null);
+        await setTeamReduction(null);
+        await setPlayoffCountOverride(null);
+        setAllianceSelectionArrays({});
+        setAllianceSelection(false);
+        await setRankingsOverride(null);
+      } else {
+        console.log("Reloading same OFFLINE event - preserving alliance count and settings");
+      }
+      
       setCurrentMatch(1);
       await setDistrictRankings(null);
       setAdHocMatch([
@@ -4723,9 +4775,19 @@ function App() {
         setEventNamesCY(eventnames[selectedYear?.value]);
 
         setEvents(events);
-        if (!_.some(events, selectedEvent)) {
-          setSelectedEvent(null);
-          setEventsLoading("");
+        // Check if the currently selected event still exists in the newly loaded events list
+        if (selectedEvent) {
+          const matchingEvent = _.find(events, (event) => event?.value?.code === selectedEvent?.value?.code);
+          if (matchingEvent) {
+            // Update the selected event with fresh data from the API
+            console.log("Updating selected event with fresh data from API");
+            setSelectedEvent(matchingEvent);
+          } else {
+            // Event no longer exists in the list, clear selection
+            console.log("Previously selected event not found in current events list, clearing selection");
+            setSelectedEvent(null);
+            setEventsLoading("");
+          }
         }
       } catch (e) {
         console.error(e);
@@ -4906,9 +4968,38 @@ function App() {
     useFourTeamAlliances,
   ]);
 
+  // Ensure FRC mode is set when OFFLINE or training events are loaded from localStorage
+  // This needs to check when data loads from localStorage ONLY, not on user interactions
+  const hasRunOfflineCheck = useRef(false);
+  useEffect(() => {
+    // Only run this check once when the component mounts and data loads from localStorage
+    // Don't interfere with user selections
+    if (hasRunOfflineCheck.current) {
+      return; // Already ran, don't run again
+    }
+    
+    // If a training/OFFLINE event is selected but ftcMode is null, set it to FRC mode (false)
+    // This handles the edge case where page reloads with OFFLINE event selected
+    if (selectedEvent?.value?.code && ftcMode === null && selectedYear) {
+      const isTrainingEvent = selectedEvent.value.code === "OFFLINE" || 
+                             selectedEvent.value.code.includes("PRACTICE");
+      if (isTrainingEvent) {
+        console.log("OFFLINE/training event detected on load, setting program to FRC mode");
+        setFTCMode(false);
+      }
+      hasRunOfflineCheck.current = true;
+    } else if (ftcMode !== null) {
+      // If ftcMode is already set, mark as complete so we don't interfere
+      hasRunOfflineCheck.current = true;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedEvent, ftcMode, selectedYear]); // Removed setFTCMode from deps
+
   // Retrieve event list when year selection or ftc Mode switch changes
   useEffect(() => {
-    if (httpClient && selectedYear) {
+    // Only load events if both program (ftcMode) and season (selectedYear) are selected
+    // ftcMode !== null ensures a program has been explicitly selected (false = FRC, object = FTC modes)
+    if (httpClient && selectedYear && ftcMode !== null) {
       if (ftcMode) {
         getFTCLeagues();
       } else {
@@ -4948,20 +5039,74 @@ function App() {
       var matchesPerTeam = 0;
       // FTC has 4 teams per match (2 per alliance), FRC has 6 teams per match (3 per alliance)
       const teamsPerMatch = ftcMode ? 4 : 6;
-      matchesPerTeam = _.toInteger(
-        (teamsPerMatch * qualSchedule?.schedule?.length) /
-        (teamList?.teamCountTotal - teamReduction)
-      );
+      
+      // Get the actual schedule array - handle both nested (API) and flat (upload) structures
+      const scheduleArray = qualSchedule?.schedule?.schedule || qualSchedule?.schedule;
+      
+      // Extract unique team numbers that actually competed from the schedule
+      // This is especially important for FTC where registered teams may not compete
+      // Cross-reference with rankings to ensure we only count teams that actually played
+      const competingTeamNumbers = new Set();
+      const teamsInSchedule = new Set();
+      
+      scheduleArray?.forEach((match) => {
+        match?.teams?.forEach((team) => {
+          if (team?.teamNumber) {
+            teamsInSchedule.add(team.teamNumber);
+          }
+        });
+      });
+      
+      // Cross-reference with rankings: only count teams that are in schedule AND have matchesPlayed > 0
+      teamsInSchedule.forEach((teamNumber) => {
+        const teamRanking = _.find(rankings?.ranks, { teamNumber: teamNumber });
+        if (teamRanking && teamRanking.matchesPlayed > 0) {
+          competingTeamNumbers.add(teamNumber);
+        }
+      });
+      
+      const actualCompetingTeamsCount = competingTeamNumbers.size;
+      
+      const totalMatches = scheduleArray?.length || 0;
+      
+      // Calculate expected matches per team based on actual competing teams
+      // Use Math.round for better accuracy with uneven distributions
+      const calculatedMatchesPerTeam = actualCompetingTeamsCount > 0
+        ? Math.round((teamsPerMatch * totalMatches) / actualCompetingTeamsCount)
+        : 0;
+      
+      // For additional accuracy, check the actual matchesPlayed from rankings
+      const teamsWithMatches = _.filter(rankings?.ranks, (team) => team.matchesPlayed > 0);
+      const actualMatchesPerTeam = teamsWithMatches.length > 0 
+        ? _.maxBy(teamsWithMatches, 'matchesPlayed')?.matchesPlayed 
+        : calculatedMatchesPerTeam;
+      
+      // Use the actual matches played if it's close to calculated (within 1 match)
+      // Otherwise fall back to calculated value
+      matchesPerTeam = Math.abs(actualMatchesPerTeam - calculatedMatchesPerTeam) <= 1
+        ? actualMatchesPerTeam
+        : calculatedMatchesPerTeam;
+      
       // In order to start Alliance Selection, we need the following conditions to be true:
       // All matches must have been completed
-      // All teams must have completed their scheduled matches
+      // All teams that participated must have completed their scheduled matches
       // We test these in different places: the schedule and the rankings. This ensures that
       // we have both API results, and that they are both current and complete.
 
+      // For FTC: Check if all teams that actually competed have completed their matches
+      // For FRC: Use the traditional team list count minus reductions
+      const expectedTeamCount = ftcMode ? actualCompetingTeamsCount : (teamList?.teamCountTotal - teamReduction);
+      const teamsWithExpectedMatches = _.filter(rankings?.ranks, { matchesPlayed: matchesPerTeam }).length;
+      
+      // Additional check: all competing teams have at least the expected matches
+      const allCompetingTeamsComplete = teamsWithMatches.length > 0 &&
+        _.every(teamsWithMatches, (team) => team.matchesPlayed >= matchesPerTeam) &&
+        teamsWithMatches.length >= actualCompetingTeamsCount;
+
       if (
         qualSchedule?.schedule?.length === qualSchedule?.completedMatchCount &&
-        _.filter(rankings?.ranks, { matchesPlayed: matchesPerTeam }).length ===
-        teamList?.teamCountTotal - teamReduction
+        (teamsWithExpectedMatches >= expectedTeamCount ||
+         (ftcMode && allCompetingTeamsComplete))
       ) {
         asReady = true;
       }

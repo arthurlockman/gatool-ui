@@ -270,7 +270,9 @@ function SchedulePage({
   function addTeamsToTeamList(formattedSchedule) {
     //generate the team list from the schedule
     var tempTeamList = [];
-    _.forEach(formattedSchedule.schedule, function (row) {
+    // Handle both nested structure (schedule.schedule) and flat structure (schedule)
+    const scheduleArray = formattedSchedule.schedule?.schedule || formattedSchedule.schedule;
+    _.forEach(scheduleArray, function (row) {
       //do something
       _.forEach(row.teams, function (team) {
         if (_.findIndex(tempTeamList, team.teamNumber) < 0) {
@@ -566,10 +568,14 @@ function SchedulePage({
           getAlliances(alliancesTemp);
         }
 
-        formattedSchedule.schedule = _.filter(innerSchedule, "description");
+        const scheduleArray = _.filter(innerSchedule, "description");
+        // Normalize to match API structure: schedule.schedule (nested)
+        // This ensures consistency with how getSchedule formats data from FIRST API
+        formattedSchedule.schedule = { schedule: scheduleArray };
+        
         if (!forPlayoffs) {
           await setPracticeSchedule(formattedSchedule);
-          setQualsLength(formattedSchedule?.schedule?.length);
+          setQualsLength(formattedSchedule?.schedule?.schedule?.length);
         } else {
           await setOfflinePlayoffSchedule(formattedSchedule);
         }
