@@ -252,7 +252,10 @@ function AnnouncePage({
     schedule = _.concat(schedule, offlinePlayoffSchedule?.schedule);
   }
 
-  if (qualSchedule?.schedule.length > 0) {
+  // Handle nested structure (standard from API/uploads) or flat structure (legacy)
+  if (qualSchedule?.schedule?.schedule?.length > 0) {
+    schedule = _.concat(schedule, qualSchedule?.schedule?.schedule);
+  } else if (qualSchedule?.schedule?.length > 0) {
     schedule = _.concat(schedule, qualSchedule?.schedule);
   }
 

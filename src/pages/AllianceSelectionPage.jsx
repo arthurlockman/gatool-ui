@@ -184,7 +184,15 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
                 </div>}
             {selectedEvent && ((qualSchedule?.schedule?.length > 0 || qualSchedule?.schedule?.schedule?.length > 0 || practiceSchedule?.schedule?.length > 0) && !playoffs && (allianceSelection || overrideAllianceSelection)) &&
                 <div>
-                    <AllianceSelection selectedYear={selectedYear} selectedEvent={selectedEvent} rankings={rankings} teamList={teamList} allianceCount={allianceCount} communityUpdates={communityUpdates} allianceSelectionArrays={allianceSelectionArrays} setAllianceSelectionArrays={setAllianceSelectionArrays} handleReset={handleReset} teamFilter={teamFilter} setTeamFilter={setTeamFilter} ftcMode={ftcMode} remapNumberToString={remapNumberToString} useFourTeamAlliances={useFourTeamAlliances} />
+                    {!allianceCount || !allianceCount?.count || allianceCount?.count <= 0 ? (
+                        <Alert variant="danger">
+                            <h4>Alliance Count Required</h4>
+                            <p>Please go to the <b>Setup Page</b> and choose an Alliance Count before proceeding with Alliance Selection.</p>
+                            <p>The Alliance Count determines how many alliances will participate in playoffs (typically 2, 4, 6, or 8 alliances).</p>
+                        </Alert>
+                    ) : (
+                        <AllianceSelection selectedYear={selectedYear} selectedEvent={selectedEvent} rankings={rankings} teamList={teamList} allianceCount={allianceCount} communityUpdates={communityUpdates} allianceSelectionArrays={allianceSelectionArrays} setAllianceSelectionArrays={setAllianceSelectionArrays} handleReset={handleReset} teamFilter={teamFilter} setTeamFilter={setTeamFilter} ftcMode={ftcMode} remapNumberToString={remapNumberToString} useFourTeamAlliances={useFourTeamAlliances} />
+                    )}
                 </div>}
 
             {selectedEvent && (alliancesCount === 8) && playoffs &&

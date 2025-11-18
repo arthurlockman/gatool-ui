@@ -17,6 +17,7 @@ import { utils, read } from "xlsx";
 import { toast } from "react-toastify";
 import _ from "lodash";
 import moment from "moment";
+import { rankHighlight } from "../components/HelperFunctions";
 
 function RanksPage({
   selectedEvent,
@@ -162,24 +163,6 @@ function RanksPage({
     const lookupNumber = remapStringToNumber ? remapStringToNumber(teamNumber) : teamNumber;
     var team = _.find(teamList?.teams, { teamNumber: lookupNumber });
     return team?.nameShortLocal ? team?.nameShortLocal : team?.nameShort;
-  }
-
-  function rankHighlight(rank) {
-    var style = { color: "black", backgroundColor: "white" };
-    if (rank <= allianceCount?.count && rank > 1) {
-      style.color = "white";
-      style.backgroundColor = "green";
-    } else if (rank < allianceCount?.count + 3 && rank > allianceCount?.count) {
-      style.color = "black";
-      style.backgroundColor = "yellow";
-    } else if (rank === 1) {
-      style.color = "white";
-      style.backgroundColor = "orange";
-    } else {
-      style.color = "";
-      style.backgroundColor = "";
-    }
-    return style;
   }
 
   var rankingsList = rankings?.ranks?.map((teamRow) => {
@@ -666,7 +649,7 @@ function RanksPage({
                     return (
                       <tr key={"rankings" + rankRow.teamNumber}>
                         <td>{displayTeamNumber}</td>
-                        <td style={rankHighlight(rankRow.rank)}>
+                        <td style={rankHighlight(rankRow.rank, allianceCount || { count: 8 })}>
                           {rankRow.rank}
                         </td>
                         <td

@@ -192,7 +192,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
     }
 
     const handleFTCMode = (checked) => {
-        setFTCMode(checked.value === "FRC" ? null : checked);
+        setFTCMode(checked.value === "FRC" ? false : checked);
         setUseFTCOffline(checked.value === "FTCLocal");
         setEventFilters([]);
         setRegionFilters([]);
@@ -265,38 +265,56 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
             {!isOnline && <Row>
                 <Alert variant="danger"><b>You're offline. Only cached data is available. Some options may be unavailable. <br />Reconnect to the internet to choose a different event.</b></Alert>
             </Row>}
-            {!selectedYear && <Row>
-                <Alert variant="danger"><b>Awaiting event list</b></Alert>
+            {(ftcMode === null || !selectedYear) && <Row>
+                <Alert variant="danger"><b>Awaiting event list - {ftcMode === null ? "please select a program" : "please select a season"}</b></Alert>
             </Row>}
             <Row className={ftcMode ? "ftcSetupPageMenus" : "setupPageMenus"}>
                 <Col sm={2}>
-                    <b>Choose a program...</b><br /><Select options={ftcModeOptions} value={ftcMode ? ftcMode : { label: "FRC", value: "FRC" }} onChange={handleFTCMode} />
+                    <b>Choose a program...</b><br /><Select options={ftcModeOptions} value={ftcMode === false ? { label: "FRC", value: "FRC" } : ftcMode} onChange={handleFTCMode} placeholder="Select a program" isDisabled={false} />
                 </Col>
-                <Col sm={3}><b>Choose a year...</b><br /><Select options={ftcMode ? FTCSupportedYears : supportedYears} value={selectedYear} onChange={setSelectedYear} isDisabled={!isOnline} />
+                <Col sm={3}><b>Choose a year...</b><br /><Select options={ftcMode === false ? supportedYears : (ftcMode ? FTCSupportedYears : [])} value={selectedYear} onChange={setSelectedYear} isDisabled={!isOnline || ftcMode === null} placeholder={ftcMode === null ? "Select program first" : "Select a year"} />
                 </Col>
                 <Col sm={7}>
-                    {eventList && <span><b>...then choose an event.</b><br /><Select options={filterEvents(eventList)} placeholder={eventList?.length > 0 ? "Select an event" : "Loading event list"} value={selectedEvent} onChange={handleEventSelection}
+                    {eventList && <span><b>...then choose an event.</b><br /><Select 
+                        options={filterEvents(eventList)} 
+                        placeholder={ftcMode === null ? "Select program first" : !selectedYear ? "Select season first" : (eventList?.length > 0 ? "Select an event" : "Loading event list")} 
+                        value={selectedEvent} 
+                        onChange={handleEventSelection}
+                        getOptionValue={(option) => option?.value?.code}
+                        getOptionLabel={(option) => option?.label}
                         styles={{
                             // @ts-ignore
-                            option: (styles, { data }) => {
+                            option: (styles, { data, isSelected }) => {
+                                return {
+                                    ...styles,
+                                    backgroundColor: isSelected ? '#2684FF' : data.color,
+                                    color: isSelected ? 'white' : 'black',
+                                    fontWeight: isSelected ? 'bold' : 'normal'
+                                };
+                            },
+                            // @ts-ignore
+                            singleValue: (styles, { data }) => {
                                 return {
                                     ...styles,
                                     backgroundColor: data.color,
-                                    color: "black"
+                                    color: "black",
+                                    padding: "2px 6px",
+                                    borderRadius: "3px"
                                 };
                             },
-                        }} isDisabled={!isOnline} /></span>}
+                        }} 
+                        isDisabled={!isOnline || ftcMode === null || !selectedYear} /></span>}
                 </Col>
             </Row>
             {eventList && !useFTCOffline && <Row className="setupPageFilters">
                 <Col sm={4}><b>Filter by event timeframe here...</b><br />
-                    <Select options={ftcMode ? filterTimeFTC : filterTime} value={timeFilter ? timeFilter : ftcMode ? filterTimeFTC[0] : filterTime[0]} onChange={setTimeFilter} isDisabled={!isOnline} />
+                    <Select options={ftcMode ? filterTimeFTC : filterTime} value={timeFilter ? timeFilter : ftcMode ? filterTimeFTC[0] : filterTime[0]} onChange={setTimeFilter} isDisabled={!isOnline || ftcMode === null || !selectedYear} />
                 </Col>
                 {ftcMode && <Col sm={4}><b>Filter by Event Type or Region here...</b><br />
-                    <Select isMulti options={regionFiltersMenu} value={regionFilters} onChange={setRegionFilters} isDisabled={!isOnline} />
+                    <Select isMulti options={regionFiltersMenu} value={regionFilters} onChange={setRegionFilters} isDisabled={!isOnline || ftcMode === null || !selectedYear} />
                 </Col>}
                 <Col sm={ftcMode ? 4 : 8}><b>Filter by  {ftcMode ? "League" : "event type or District"} here...</b><br />
-                    <Select isMulti options={ftcMode ? ftcFiltersMenu : filtersMenu} value={eventFilters} onChange={setEventFilters} isDisabled={!isOnline} />
+                    <Select isMulti options={ftcMode ? ftcFiltersMenu : filtersMenu} value={eventFilters} onChange={setEventFilters} isDisabled={!isOnline || ftcMode === null || !selectedYear} />
                 </Col>
             </Row>}
             {useFTCOffline && <Row className="ftcSetupPageMenus">

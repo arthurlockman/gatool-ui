@@ -1,5 +1,16 @@
 export const appUpdates = [
   {
+    date: "November 17, 2025",
+    message: (
+      <ul>
+        <li>ALL PROGRAMS:Refined the reload experience to reduce the number of times a user must choose program, season and events</li>
+        <li>FRC: Persisting OFFLINE event details across reloads</li>
+        <li>FTC: Fixing a bug that prevented Alliance Selection screen from activating</li>
+        <li>FTC: Fixed event winner display on the Playoff Brackets for FTC events</li>
+        <li>FTC: Fixed cache timing issues in our APIs that prevented some team data from loading in a timely manner</li>
+      </ul>
+    ),
+  },{
     date: "November 8, 2025",
     message: (
       <ul>
