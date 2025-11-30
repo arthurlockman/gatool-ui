@@ -1,8 +1,10 @@
+import React, { useState } from "react";
 import { Container, Row } from "react-bootstrap";
 import { FlashcardArray } from "react-quizlet-flashcard";
 import { saveAs } from "file-saver";
 import _ from "lodash";
 import { apiBaseUrl } from "../contextProviders/AuthClientContext";
+import NotificationBanner from "../components/NotificationBanner";
 
 function CheatsheetPage({
   teamList,
@@ -19,6 +21,8 @@ function CheatsheetPage({
     alignItems: "center",
     justifyContent: "center",
   };
+
+  const [popupNotification, setPopupNotification] = useState(null);
 
   const cards = sortedTeams.map((team, index) => {
     var card = {
@@ -65,33 +69,63 @@ function CheatsheetPage({
   });
 
   function downloadPDF(filePath) {
-    var oReq = new XMLHttpRequest();
+    // Use fetch + blob. On iOS (including Firefox on iOS) the download
+    // attribute and programmatic downloads are unreliable, so fall back
+    // to opening the PDF in a new tab using an object URL.
+    fetch(filePath)
+      .then((res) => {
+        if (!res.ok) throw new Error(`Network response was not ok: ${res.status}`);
+        return res.blob();
+      })
+      .then((blob) => {
+        const ua = navigator.userAgent || '';
+        // Firefox on iOS identifies as FxiOS in the UA string
+        const isFirefoxOniOS = /FxiOS/i.test(ua);
+        // Generic iOS detection (covers Safari and other WebKit-based browsers)
+        const isIOS = /iP(hone|od|ad)/.test(navigator.platform) || (ua.includes('Mac') && 'ontouchend' in document);
 
-    // Configure XMLHttpRequest
-    oReq.open("GET", filePath, true);
-
-    // Important to use the blob response type
-    oReq.responseType = "blob";
-
-    // When the file request finishes
-    // Is up to you, the configuration for error events etc.
-    oReq.onload = function () {
-      // Once the file is downloaded, open a new window with the PDF
-      // Remember to allow the POP-UPS in your browser
-      var file = new Blob([oReq.response], {
-        type: "application/pdf",
+        if (isFirefoxOniOS || isIOS) {
+          // Opening blob URL in a new tab is a more reliable UX on iOS.
+          const url = URL.createObjectURL(blob);
+          const newWindow = window.open(url, '_blank');
+          if (!newWindow) {
+            // If popup blocked, navigate current window as a last resort
+            window.location.href = url;
+            // Show a temporary notification to the user that popup was blocked
+            if (setPopupNotification) {
+              setPopupNotification({
+                message: 'Popup was blocked; opened PDF in this tab.',
+                onTime: new Date().toISOString(),
+                expiry: new Date(Date.now() + 15000).toISOString(),
+                variant: 'warning',
+              });
+              // Clear the notification after its expiry plus a small buffer
+              setTimeout(() => setPopupNotification(null), 16000);
+            }
+          }
+          // Revoke URL after a short delay to free memory
+          setTimeout(() => URL.revokeObjectURL(url), 10000);
+        } else {
+          // For other browsers use file-saver for a proper download
+          const fileName = filePath.split('/').pop();
+          saveAs(blob, fileName);
+        }
+      })
+      .catch((err) => {
+        // Fallback: open the original file path in a new tab (server-served PDF)
+        console.error('downloadPDF error:', err);
+        try {
+          window.open(filePath, '_blank');
+        } catch (e) {
+          // As a last resort set location
+          window.location.href = filePath;
+        }
       });
-
-      // Generate file download directly in the browser !
-      var fileName = filePath.split("/").pop();
-      saveAs(file, fileName);
-    };
-
-    oReq.send();
   }
 
   return (
     <Container fluid>
+      <NotificationBanner notification={popupNotification} setSystemBell={null} />
       {ftcMode && (
         <>
           <img
