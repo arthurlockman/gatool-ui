@@ -1,7 +1,6 @@
 import React from "react";
 import { Container, Row } from "react-bootstrap";
 import { FlashcardArray } from "react-quizlet-flashcard";
-import { saveAs } from "file-saver";
 import _ from "lodash";
 import { apiBaseUrl } from "../contextProviders/AuthClientContext";
 
