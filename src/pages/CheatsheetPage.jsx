@@ -1,6 +1,6 @@
+import React from "react";
 import { Container, Row } from "react-bootstrap";
 import { FlashcardArray } from "react-quizlet-flashcard";
-import { saveAs } from "file-saver";
 import _ from "lodash";
 import { apiBaseUrl } from "../contextProviders/AuthClientContext";
 
@@ -65,29 +65,42 @@ function CheatsheetPage({
   });
 
   function downloadPDF(filePath) {
-    var oReq = new XMLHttpRequest();
-
-    // Configure XMLHttpRequest
-    oReq.open("GET", filePath, true);
-
-    // Important to use the blob response type
-    oReq.responseType = "blob";
-
-    // When the file request finishes
-    // Is up to you, the configuration for error events etc.
-    oReq.onload = function () {
-      // Once the file is downloaded, open a new window with the PDF
-      // Remember to allow the POP-UPS in your browser
-      var file = new Blob([oReq.response], {
-        type: "application/pdf",
+    // Use fetch + blob and trigger a native download via hidden <a> element.
+    // This works reliably on Firefox iOS and other browsers.
+    fetch(filePath)
+      .then((res) => {
+        if (!res.ok) throw new Error(`Network response was not ok: ${res.status}`);
+        return res.blob();
+      })
+      .then((blob) => {
+        const fileName = filePath.split('/').pop();
+        const url = URL.createObjectURL(blob);
+        
+        // Create a hidden anchor element and trigger a click to download
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        link.target = '_blank'; // Ensure PWA home screen mode downloads instead of opening fullscreen
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        
+        // Trigger the download
+        link.click();
+        
+        // Clean up
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      })
+      .catch((err) => {
+        // Fallback: open the original file path in a new tab (server-served PDF)
+        console.error('downloadPDF error:', err);
+        try {
+          window.open(filePath, '_blank');
+        } catch (e) {
+          // As a last resort set location
+          window.location.href = filePath;
+        }
       });
-
-      // Generate file download directly in the browser !
-      var fileName = filePath.split("/").pop();
-      saveAs(file, fileName);
-    };
-
-    oReq.send();
   }
 
   return (
