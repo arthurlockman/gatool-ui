@@ -31,6 +31,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         "undo": [],
         "declined": [],
         "skipped": [],
+        "removedTeams": [],
         "rounds": {},
     };
 
@@ -240,12 +241,58 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
 
     }
 
+    const handleRemoveFromPlayoffs = (team, mode, e) => {
+        if (mode === "remove") {
+            setAllianceTeam(team);
+            setAllianceMode("remove");
+            disableScope('allianceAccept');
+            disableScope('allianceDecline');
+            disableScope('allianceSkip');
+            setShow(true);
+        }
+        if (mode === "confirm") {
+            var undo = _.cloneDeep(asArrays);
+            delete undo.undo;
+            asArrays.undo.push(undo);
+            
+            // Add team to removed teams list
+            asArrays.removedTeams.push(team.teamNumber);
+            
+            // If team is rank 1 or not in available teams, add them to available teams
+            const availableIndex = _.findIndex(asArrays.availableTeams, { "teamNumber": team.teamNumber });
+            if (availableIndex < 0) {
+                asArrays.availableTeams.push(team);
+                asArrays.availableTeams = _.orderBy(asArrays.availableTeams, ["teamNumber"], ["asc"]);
+            }
+            
+            // If the team is an alliance captain, promote the next team (skipping other removed teams)
+            const captainIndex = _.findIndex(asArrays.alliances, { "captain": team });
+            if (captainIndex >= 0) {
+                // Filter out removed teams to get available teams for captain positions
+                var filteredRankedTeams = _.filter(asArrays.rankedTeams, (t) => {
+                    return !asArrays.removedTeams.includes(t.teamNumber);
+                });
+                
+                // Promote teams in the captain positions
+                for (var i = captainIndex; i < allianceCount?.count; i++) {
+                    if (i < filteredRankedTeams.length) {
+                        asArrays.alliances[i].captain = filteredRankedTeams[i];
+                    }
+                }
+            }
+            
+            setAllianceSelectionArrays(asArrays);
+            handleClose();
+        }
+    }
+
     const handleUndo = () => {
         var undo = asArrays.undo.pop();
         asArrays.alliances = undo.alliances;
         asArrays.availableTeams = undo.availableTeams;
         asArrays.declined = undo.declined;
         asArrays.skipped = undo.skipped;
+        asArrays.removedTeams = undo.removedTeams || [];
         asArrays.nextChoice = undo.nextChoice;
         asArrays.rankedTeams = undo.rankedTeams;
         setAllianceSelectionArrays(asArrays);
@@ -421,14 +468,33 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
             asArrays.nextChoice = 0;
             asArrays.undo = [];
             asArrays.declined = [];
+            asArrays.removedTeams = [];
             asArrays.rounds = allianceSelectionOrderRounds;
             asArrays.allianceSelectionOrder = allianceSelectionOrder;
             setAllianceSelectionArrays(asArrays);
 
         } else { asArrays = _.cloneDeep(allianceSelectionArrays) }
 
+        // Update alliance captains if any removed teams are captains and filter removed teams from ranked teams
+        if (asArrays.removedTeams && asArrays.removedTeams.length > 0) {
+            // Filter out removed teams from ranked teams
+            asArrays.rankedTeams = _.filter(asArrays.rankedTeams, (team) => {
+                return !asArrays.removedTeams.includes(team.teamNumber);
+            });
+            
+            asArrays.alliances.forEach((alliance, index) => {
+                if (alliance.captain && asArrays.removedTeams.includes(alliance.captain.teamNumber)) {
+                    // Promote the next available ranked team (skipping removed teams)
+                    if (index < asArrays.rankedTeams.length) {
+                        alliance.captain = asArrays.rankedTeams[index];
+                    } else {
+                        alliance.captain = null;
+                    }
+                }
+            });
+        }
 
-        // pick off the top 8 remaining teams to be the backup list
+        // pick off the top 8 remaining teams to be the backup list (excluding removed teams)
         backupTeams = asArrays?.rankedTeams.slice(allianceCount?.count, allianceCount?.count + 8);
 
 
@@ -463,15 +529,17 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
     const availCell = (team) => {
         const currentRound = asArrays.allianceSelectionOrder[asArrays.nextChoice]?.round || -1;
         const declined = asArrays?.declined.includes(team?.teamNumber);
+        const removed = asArrays?.removedTeams?.includes(team?.teamNumber);
         const skipped = _.findIndex(_.filter(asArrays?.skipped, { round: currentRound }), { teamNumber: team?.teamNumber }) >= 0;
         const displayTeamNumber = remapNumberToString ? remapNumberToString(team?.teamNumber) : team?.teamNumber;
+        const isRank1AndNotRemoved = team.rank === 1 && !removed;
         return (
             <>
-                {(asArrays?.nextChoice < asArrays.allianceSelectionOrder?.length && team.rank !== 1 && !skipped) &&
+                {(asArrays?.nextChoice < asArrays.allianceSelectionOrder?.length && !isRank1AndNotRemoved && !skipped && !removed) &&
                     (String(team?.teamNumber).startsWith(teamFilter) || teamFilter === "") && <div key={"availableButton" + team?.teamNumber} className={declined ? "availableTeam allianceDecline" : skipped ? "availableTeam allianceTeam allianceSkip" : "availableTeam allianceTeam"} onClick={(e) => handleShow(team, declined ? "declined" : "show", e)}><b>{displayTeamNumber}</b></div>}
 
-                {(asArrays?.nextChoice >= asArrays.allianceSelectionOrder?.length || team.rank === 1 || skipped) &&
-                    (String(team?.teamNumber).startsWith(teamFilter) || teamFilter === "") && <div key={"availableButtonDisabled" + team?.teamNumber} className={declined ? "availableTeam allianceDecline" : skipped ? "availableTeam allianceTeam allianceSkip" : "availableTeam allianceTeam"} ><b>{displayTeamNumber}</b></div>}
+                {(asArrays?.nextChoice >= asArrays.allianceSelectionOrder?.length || isRank1AndNotRemoved || skipped || removed) &&
+                    (String(team?.teamNumber).startsWith(teamFilter) || teamFilter === "") && <div key={"availableButtonDisabled" + team?.teamNumber} className={declined ? "availableTeam allianceDecline" : removed ? "availableTeam allianceTeam" : skipped ? "availableTeam allianceTeam allianceSkip" : "availableTeam allianceTeam"} style={removed ? { backgroundColor: "orange", color: "white" } : {}}><b>{displayTeamNumber}</b></div>}
             </>
         )
     }
@@ -530,12 +598,13 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                 <Col id="backupTeamsDisplay">
                                                     {backupTeams.map((team) => {
                                                         var declined = asArrays.declined.includes(team.teamNumber);
+                                                        var removed = asArrays?.removedTeams?.includes(team.teamNumber);
                                                         const displayTeamNumber = remapNumberToString ? remapNumberToString(team?.teamNumber) : team?.teamNumber;
                                                         return (
-                                                            <>{(asArrays?.nextChoice < asArrays.allianceSelectionOrder?.length) &&
+                                                            <>{(asArrays?.nextChoice < asArrays.allianceSelectionOrder?.length && !removed) &&
                                                                 <div key={"backupButton" + team?.teamNumber} className={declined ? "allianceDecline" : "allianceTeam"} onClick={(e) => handleShow(team, declined ? "declined" : "show", e)}><b>{displayTeamNumber}</b></div>}
-                                                                {(asArrays?.nextChoice >= asArrays.allianceSelectionOrder?.length) &&
-                                                                    <div key={"backupButtonDisabled" + team?.teamNumber} className={declined ? "allianceDecline" : "allianceTeam"} ><b>{displayTeamNumber}</b></div>}
+                                                                {(asArrays?.nextChoice >= asArrays.allianceSelectionOrder?.length || removed) &&
+                                                                    <div key={"backupButtonDisabled" + team?.teamNumber} className={declined ? "allianceDecline" : "allianceTeam"} style={removed ? { backgroundColor: "orange", color: "white" } : {}}><b>{displayTeamNumber}</b></div>}
                                                             </>
                                                         )
                                                     })}
@@ -681,12 +750,13 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                 <Col id="backupTeamsDisplay">
                                                     {backupTeams.map((team) => {
                                                         var declined = asArrays.declined.includes(team.teamNumber);
+                                                        var removed = asArrays?.removedTeams?.includes(team.teamNumber);
                                                         const displayTeamNumber = remapNumberToString ? remapNumberToString(team?.teamNumber) : team?.teamNumber;
                                                         return (
-                                                            <>{(asArrays?.nextChoice < asArrays.allianceSelectionOrder?.length) &&
+                                                            <>{(asArrays?.nextChoice < asArrays.allianceSelectionOrder?.length && !removed) &&
                                                                 <div key={"backupButton" + team?.teamNumber} className={declined ? "allianceDecline" : "allianceTeam"} onClick={(e) => handleShow(team, declined ? "declined" : "show", e)}><b>{displayTeamNumber}</b></div>}
-                                                                {(asArrays?.nextChoice >= asArrays.allianceSelectionOrder?.length) &&
-                                                                    <div key={"backupButtonDisabled" + team?.teamNumber} className={declined ? "allianceDecline" : "allianceTeam"} ><b>{displayTeamNumber}</b></div>}
+                                                                {(asArrays?.nextChoice >= asArrays.allianceSelectionOrder?.length || removed) &&
+                                                                    <div key={"backupButtonDisabled" + team?.teamNumber} className={declined ? "allianceDecline" : "allianceTeam"} style={removed ? { backgroundColor: "orange", color: "white" } : {}}><b>{displayTeamNumber}</b></div>}
                                                             </>
                                                         )
                                                     })}
@@ -725,8 +795,8 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                     </>
                 }
                 {allianceTeam && <Modal centered={true} show={show} onHide={handleClose}>
-                    <Modal.Header className={allianceMode === "decline" ? "allianceSelectionDecline" : "allianceChoice"} closeVariant={"white"} closeButton>
-                        <Modal.Title >{allianceMode === "decline" ? "Team declines the offer" : allianceMode === "skip" ? "Skip Alliance" : allianceMode === "accept" ? "Are you sure they want to accept?" : allianceMode === "a1captain" ? "Top Seeded Alliance" : "Alliance Choice"}</Modal.Title>
+                    <Modal.Header className={allianceMode === "decline" ? "allianceSelectionDecline" : allianceMode === "remove" ? "allianceSelectionDecline" : "allianceChoice"} closeVariant={"white"} closeButton>
+                        <Modal.Title >{allianceMode === "decline" ? "Team declines the offer" : allianceMode === "remove" ? "Remove team from Playoffs" : allianceMode === "skip" ? "Skip Alliance" : allianceMode === "accept" ? "Are you sure they want to accept?" : allianceMode === "a1captain" ? "Top Seeded Alliance" : "Alliance Choice"}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         {(allianceMode === "show" || allianceMode === "a1captain" || allianceMode === "captain") && <span className={"allianceAnnounceDialog"}>Team {remapNumberToString ? remapNumberToString(allianceTeam?.teamNumber) : allianceTeam?.teamNumber} {allianceTeam?.updates?.nameShortLocal ? allianceTeam?.updates.nameShortLocal : allianceTeam?.nameShort}<br />
@@ -744,6 +814,8 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                             is an Alliance Captain. They are inelegible to be selected by another alliance.</span>} */}
                         {allianceMode === "skip" && <span className={"allianceAnnounceDialog"}>Team {remapNumberToString ? remapNumberToString(allianceTeam?.teamNumber) : allianceTeam?.teamNumber} {allianceTeam?.updates?.nameShortLocal ? allianceTeam?.updates?.nameShortLocal : allianceTeam?.nameShort}<br />
                             has missed their time window for selecting an Alliance partner.</span>}
+                        {allianceMode === "remove" && <span className={"allianceAnnounceDialog"}>Team {remapNumberToString ? remapNumberToString(allianceTeam?.teamNumber) : allianceTeam?.teamNumber} {allianceTeam?.updates?.nameShortLocal ? allianceTeam?.updates?.nameShortLocal : allianceTeam?.nameShort}<br />
+                            will be removed from playoff participation. They will not be eligible to be selected by an alliance or serve as an alliance captain. Are you sure?</span>}
 
                     </Modal.Body>
                     <Modal.Footer>
@@ -752,7 +824,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                             {allianceMode === "a1captain" && <span> <TrophyFill /> Top Seeded Alliance</span>}
                             {allianceMode === "captain" && <span> <TrophyFill /> Alliance Captain</span>}
                             {allianceMode === "declined" && <span> <TrophyFill /> Sorry</span>}
-                            {(allianceMode === "decline" || allianceMode === "accept" || allianceMode === "skip") && <span><TrophyFill /> Oops, they reconsidered.</span>}
+                            {(allianceMode === "decline" || allianceMode === "accept" || allianceMode === "skip" || allianceMode === "remove") && <span><TrophyFill /> Oops, they reconsidered.</span>}
                         </Button>
 
                         {(allianceMode === "show" || allianceMode === "decline") &&
@@ -772,6 +844,16 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                 marginBottom: "10px"
                             }} onClick={(e) => { handleSkip(allianceTeam, allianceMode === "skip" ? "confirm" : "skip", e) }}>
                                 <HandThumbsUpFill /> Skip Alliance
+                            </Button>
+                        }
+                        {(allianceMode === "show" || allianceMode === "remove" || allianceMode === "a1captain" || allianceMode === "captain") &&
+
+                            <Button id="removeButton" variant="warning" size="sm" style={{
+                                marginBottom: "10px",
+                                backgroundColor: "orange",
+                                borderColor: "orange"
+                            }} onClick={(e) => { handleRemoveFromPlayoffs(allianceTeam, allianceMode === "remove" ? "confirm" : "remove", e) }}>
+                                <XSquare /> Remove team from Playoffs
                             </Button>
                         }
 
