@@ -388,7 +388,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                         </Alert>
                         <div>
                             {!ftcMode && <img style={{ width: "100%" }} src="/images/first_age_frc_rebuilt_logo_vertical_rgb_fullcolor.png" alt="REEFSCAPE℠ presented by Haas Logo" />}
-                            {ftcMode && <img style={{ width: "100%" }} src="/images/first_age_ftc_decode_logo_vertical_rgb_fullcolor.png" alt="DECODE℠ presented by RTC Logo" />}
+                            {ftcMode && <img style={{ width: "100%" }} src="/images/first_age_ftc_decode_logo_vertical_rgb_fullcolor.png" alt="DECODE℠ presented by RTX Logo" />}
                         </div>
                     </Col>
                     <Col sm={4}>
