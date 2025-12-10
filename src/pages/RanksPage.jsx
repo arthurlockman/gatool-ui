@@ -39,7 +39,7 @@ function RanksPage({
   EPA,
   ftcMode,
   remapNumberToString,
-  remapStringToNumber
+  remapStringToNumber,
 }) {
   // This function clicks the hidden file upload button
   function clickLoadRanks() {
@@ -89,7 +89,9 @@ function RanksPage({
           (errorRanks.length > 1 ? "es:" : ":") +
           "</br>";
         errorRanks.forEach((match) => {
-          const displayTeamNumber = remapNumberToString ? remapNumberToString(match["teamNumber"]) : match["teamNumber"];
+          const displayTeamNumber = remapNumberToString
+            ? remapNumberToString(match["teamNumber"])
+            : match["teamNumber"];
           errorMessage += displayTeamNumber + "</br>";
         });
         errorMessage += "Please check the report and reload.</br>";
@@ -160,16 +162,22 @@ function RanksPage({
   function getTeamName(teamNumber) {
     // If teamNumber is a string like "1323B", we need to find the actual team by looking it up
     // Otherwise, use remapStringToNumber to convert it to the lookup number
-    const lookupNumber = remapStringToNumber ? remapStringToNumber(teamNumber) : teamNumber;
+    const lookupNumber = remapStringToNumber
+      ? remapStringToNumber(teamNumber)
+      : teamNumber;
     var team = _.find(teamList?.teams, { teamNumber: lookupNumber });
     return team?.nameShortLocal ? team?.nameShortLocal : team?.nameShort;
   }
+
+  const isLeagueMeet = ftcMode && selectedEvent?.value?.type === "1";
 
   var rankingsList = rankings?.ranks?.map((teamRow) => {
     teamRow.teamName = getTeamName(teamRow.teamNumber);
     if (selectedEvent?.value?.districtCode) {
       // Use remapStringToNumber to get the lookup number for district rankings
-      const lookupNumber = remapStringToNumber ? remapStringToNumber(teamRow.teamNumber) : teamRow.teamNumber;
+      const lookupNumber = remapStringToNumber
+        ? remapStringToNumber(teamRow.teamNumber)
+        : teamRow.teamNumber;
       teamRow.districtRankDetails = _.cloneDeep(
         _.filter(districtRankings?.districtRanks, {
           teamNumber: lookupNumber,
@@ -178,6 +186,11 @@ function RanksPage({
       teamRow.districtRanking = teamRow.districtRankDetails?.rank;
     }
     return teamRow;
+  });
+
+  // remove teams not in the team list
+  rankingsList = _.filter(rankingsList, (teamRow) => {
+    return teamRow.teamName !== undefined;
   });
 
   if (rankSort.charAt(0) === "-") {
@@ -455,14 +468,26 @@ function RanksPage({
             <Table responsive striped bordered size="sm">
               <thead className="thead-default">
                 <tr>
-                  <td colSpan={12}>
-                    <b>
-                      This table lists the teams in rank order for this
-                      competition. Its columns are sortable. This table updates
-                      during the competition, and freezes once Playoff Matches
-                      begin.
-                    </b>
-                  </td>
+                  {isLeagueMeet && (
+                    <td colSpan={12}>
+                      <b>
+                        This table lists the teams competing in this event. It
+                        shows their ranks based on performance in the League.
+                        Its columns are sortable. This table updates during the
+                        competition, and freezes once Playoff Matches begin.
+                      </b>
+                    </td>
+                  )}
+                  {!isLeagueMeet && (
+                    <td colSpan={12}>
+                      <b>
+                        This table lists the teams in rank order for this
+                        competition. Its columns are sortable. This table
+                        updates during the competition, and freezes once Playoff
+                        Matches begin.
+                      </b>
+                    </td>
+                  )}
                 </tr>
                 <tr>
                   <th
@@ -485,7 +510,8 @@ function RanksPage({
                     }
                   >
                     <b>
-                      Rank{rankSort === "rank" ? <SortNumericUp /> : ""}
+                      {isLeagueMeet ? "League Rank" : "Rank"}
+                      {rankSort === "rank" ? <SortNumericUp /> : ""}
                       {rankSort === "-rank" ? <SortNumericDown /> : ""}
                     </b>
                   </th>
@@ -509,7 +535,7 @@ function RanksPage({
                     }
                   >
                     <b>
-                      RP Avg.
+                      {isLeagueMeet ? "League " : ""}RP Avg.
                       {rankSort === "sortOrder1" ? <SortNumericUp /> : ""}
                       {rankSort === "-sortOrder1" ? <SortNumericDown /> : ""}
                     </b>
@@ -522,7 +548,8 @@ function RanksPage({
                     }
                   >
                     <b>
-                      Event Record{rankSort === "event" ? <SortAlphaUp /> : ""}
+                      {isLeagueMeet ? "League" : "Event"} Record
+                      {rankSort === "event" ? <SortAlphaUp /> : ""}
                       {rankSort === "-event" ? <SortAlphaDown /> : ""}
                     </b>
                   </th>
@@ -557,7 +584,7 @@ function RanksPage({
                     }
                   >
                     <b>
-                      Matches Played
+                      {isLeagueMeet ? "League " : ""}Matches Played
                       {rankSort === "matchesPlayed" ? <SortNumericUp /> : ""}
                       {rankSort === "-matchesPlayed" ? <SortNumericDown /> : ""}
                     </b>
@@ -583,7 +610,8 @@ function RanksPage({
                     }
                   >
                     <b>
-                      {ftcMode?'OPA':'EPA'}{rankSort === "epaVal" ? <SortNumericUp /> : ""}
+                      {ftcMode ? "OPA" : "EPA"}
+                      {rankSort === "epaVal" ? <SortNumericUp /> : ""}
                       {rankSort === "-epaVal" ? <SortNumericDown /> : ""}
                     </b>
                   </th>
@@ -617,7 +645,9 @@ function RanksPage({
                   rankings?.ranks &&
                   rankingsList.map((rankRow) => {
                     // Use remapStringToNumber to get the lookup number for updates and EPA
-                    const lookupNumber = remapStringToNumber ? remapStringToNumber(rankRow.teamNumber) : rankRow.teamNumber;
+                    const lookupNumber = remapStringToNumber
+                      ? remapStringToNumber(rankRow.teamNumber)
+                      : rankRow.teamNumber;
                     rankRow = _.merge(
                       rankRow,
                       communityUpdates
@@ -636,20 +666,29 @@ function RanksPage({
                         : null
                     );
                     rankRow.record = `${rankRow.wins}-${rankRow.losses}-${rankRow.ties}`;
-                    rankRow.epaVal = rankRow?.epa?.epa?.total_points?.mean>=0
-                      ? rankRow?.epa?.epa?.total_points?.mean
-                      : "TBD";
-                    rankRow.season = rankRow?.epa?.record?.wins>=0
-                      ? `${rankRow?.epa?.record?.wins}-${rankRow?.epa?.record?.losses}-${rankRow?.epa?.record?.ties}`
-                      : `TBD`;
-                    
+                    rankRow.epaVal =
+                      rankRow?.epa?.epa?.total_points?.mean >= 0
+                        ? rankRow?.epa?.epa?.total_points?.mean
+                        : "TBD";
+                    rankRow.season =
+                      rankRow?.epa?.record?.wins >= 0
+                        ? `${rankRow?.epa?.record?.wins}-${rankRow?.epa?.record?.losses}-${rankRow?.epa?.record?.ties}`
+                        : `TBD`;
+
                     // Display remapped team number if available
-                    const displayTeamNumber = remapNumberToString ? remapNumberToString(rankRow.teamNumber) : rankRow.teamNumber;
-                    
+                    const displayTeamNumber = remapNumberToString
+                      ? remapNumberToString(rankRow.teamNumber)
+                      : rankRow.teamNumber;
+
                     return (
                       <tr key={"rankings" + rankRow.teamNumber}>
                         <td>{displayTeamNumber}</td>
-                        <td style={rankHighlight(rankRow.rank, allianceCount || { count: 8 })}>
+                        <td
+                          style={rankHighlight(
+                            rankRow.rank,
+                            allianceCount || { count: 8 }
+                          )}
+                        >
                           {rankRow.rank}
                         </td>
                         <td
@@ -661,7 +700,7 @@ function RanksPage({
                         ></td>
                         <td>{rankRow.sortOrder1}</td>
                         <td>{rankRow.record}</td>
-                        <td>{Math.floor(rankRow.qualAverage*100)/100}</td>
+                        <td>{Math.floor(rankRow.qualAverage * 100) / 100}</td>
                         <td>{rankRow.dq}</td>
                         <td>{rankRow.matchesPlayed}</td>
                         <td>{rankRow.season}</td>

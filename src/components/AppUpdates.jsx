@@ -1,5 +1,16 @@
 export const appUpdates = [
   {
+    date: "December 9, 2025",
+    message: (
+      <ul>
+        <li>ALL PROGRAMS: Updated logic for Alliance Selection to only show teams that are competing in the event</li>
+        <li>FRC: Updated game brand on Setting page to REBUILT™</li>
+        <li>FTC: Updated Alliance Selection screen to show correct number of rounds for FTC events</li>
+        <li>FTC: Removed non-competing teams from rankings on League Meet events</li>
+        <li>FTC: Fixed a bug that prevented OPA and season stats from displaying correctly on the Ranks and Play-By-Play pages</li>
+      </ul>
+    ),
+  },{
     date: "November 17, 2025",
     message: (
       <ul>

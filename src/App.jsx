@@ -3478,7 +3478,8 @@ function App() {
       // first let's get the EPA for the team
 
       var epaData = await httpClient.getNoAuth(
-        `${selectedYear?.value}/ftcscout/quick-stats/${team?.teamNumber}`
+        `${selectedYear?.value}/ftcscout/quick-stats/${team?.teamNumber}`,
+        ftcMode ? ftcBaseURL : undefined
       );
       // var epaData = await httpClient.getNoAuth(
       //   `teams/${team?.teamNumber}/quick-stats?season=${selectedYear?.value}`,
@@ -3492,8 +3493,10 @@ function App() {
         // https://api.ftcscout.org/rest/v1/teams/172/events/2023
         // to get wins, losses, ties, played, dq
         var seasonResult = await httpClient.getNoAuth(
-          `${selectedYear?.value}/ftcscout/events/${team?.teamNumber}`
-        ); // var seasonResult = await httpClient.getNoAuth(
+          `${selectedYear?.value}/ftcscout/events/${team?.teamNumber}`,
+          ftcMode ? ftcBaseURL : undefined
+        ); 
+        // var seasonResult = await httpClient.getNoAuth(
         //   `teams/${team?.teamNumber}/events/${selectedYear?.value}`,
         //   "https://api.ftcscout.org/rest/v1/",
         //   20000

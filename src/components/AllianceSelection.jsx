@@ -74,6 +74,10 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
     })
 
     var sortedTeams = _.orderBy(rankings?.ranks, "teamNumber", "asc");
+    // remove non-competing teams from sortedTeams
+    sortedTeams = _.filter(sortedTeams, (team) => {
+        return _.findIndex(teamList?.teams, { "teamNumber": team?.teamNumber }) >= 0;
+    });
 
     if (allianceCount?.count <= 4) {
         allianceDisplayOrder = [[1, 4], [2, 3]]
@@ -275,12 +279,12 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
 
     const colCount = !ftcMode && width > 1040 ? 5 :
         !ftcMode && width > 850 ? 4 :
-        ftcMode && width > 1500 ? 5 :
-        ftcMode && width > 1220 ? 4 :
-        ftcMode && width > 930 ? 3 :
-        ftcMode && width > 600 ? 2 :
-        ftcMode && width <= 600 ? 1 :
-            3;
+            ftcMode && width > 1500 ? 5 :
+                ftcMode && width > 1220 ? 4 :
+                    ftcMode && width > 930 ? 3 :
+                        ftcMode && width > 600 ? 2 :
+                            ftcMode && width <= 600 ? 1 :
+                                3;
 
     useEffect(() => {
         if (teamFilter !== "") {
@@ -294,12 +298,12 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
     useEffect(() => {
         if (allianceSelectionArrays && allianceSelectionArrays.allianceCount > 0) {
             // Check if the current stored rounds configuration matches what it should be
-            const expectedRounds = inChamps 
+            const expectedRounds = inChamps
                 ? (ftcMode ? ["round1", "round2"] : ["round1", "round2", "round3"])
                 : (ftcMode ? ["round1"] : ["round1", "round2"]);
-            
+
             const currentRounds = Object.keys(allianceSelectionArrays.rounds || {});
-            
+
             // If the rounds don't match, reset the alliance selection
             if (JSON.stringify(currentRounds.sort()) !== JSON.stringify(expectedRounds.sort())) {
                 console.log("Alliance configuration changed, resetting alliance selection");
@@ -562,7 +566,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                             </Container>}
                                     </Col>}
                                     <Col xs={width < 600 ? 12 : inChamps ? 6 : 5}>
-                                        <Row className={"alliancesTeamsTable alliancesTeamsTableHeader"}>{currentRound >= 0 ? `Round ${currentRound} of ${inChamps ? "3" : "2"}` : asArrays?.nextChoice > 0 ? "Alliance Selection Complete" : "Alliance Selection not started"}</Row>
+                                        <Row className={"alliancesTeamsTable alliancesTeamsTableHeader"}>{currentRound >= 0 ? `Round ${currentRound} of ${allianceSelectionRounds?.length}` : asArrays?.nextChoice > 0 ? "Alliance Selection Complete" : "Alliance Selection not started"}</Row>
                                         <Container fluid className={"alliancesTeamsTable"}>
                                             {allianceDisplayOrder.map((row) => {
 
@@ -574,7 +578,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
 
                                                                 const alliance = _.filter(alliances, { "number": allianceNumber })
                                                                 const allianceName = alliance[0]?.name;
-                                                                const fullAlliance = inChamps ? alliance[0]?.round3 : alliance[0]?.round2;
+                                                                const fullAlliance = allianceSelectionRounds?.length === 3 ? alliance[0]?.round3 : allianceSelectionRounds?.length === 2 ? alliance[0]?.round2 : alliance[0]?.round1;
                                                                 var captain = alliance[0]?.captain;
                                                                 if (captain) {
                                                                     captain.declined = asArrays?.declined?.includes(captain?.teamNumber);
