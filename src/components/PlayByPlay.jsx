@@ -3,6 +3,12 @@ import useWindowDimensions from "hooks/UseWindowDimensions";
 
 function PlayByPlay({ station, team, inPlayoffs, selectedEvent, showNotes, showMottoes, showQualsStats, showQualsStatsQuals, adHocMode, playoffOnly, ftcMode, remapNumberToString}) {
     const { height, width } = useWindowDimensions();
+    
+    // Guard against undefined station
+    if (!station) {
+        return null;
+    }
+    
     var allianceColor = station.slice(0, -1);
     
     // Display remapped team number if available
@@ -56,7 +62,7 @@ function PlayByPlay({ station, team, inPlayoffs, selectedEvent, showNotes, showM
                     </>
                 }
                 {!team?.teamNumber && <>
-                    <div className={"tbd"}>{adHocMode ? "No team selected" : "No fourth Alliance member"}</div>
+                    <div className={"tbd"}>{adHocMode ? "No team selected" : ftcMode ? "No third Alliance member" : "No fourth Alliance member"}</div>
                 </>}
             </td>
         </>

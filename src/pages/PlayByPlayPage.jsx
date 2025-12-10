@@ -65,14 +65,14 @@ function PlayByPlayPage({
   );
   const notification =
     currentMatch >= qualsLength - matchesToNotify &&
-    currentMatch <= qualsLength &&
-    showInspection
+      currentMatch <= qualsLength &&
+      showInspection
       ? {
-          expiry: moment().add(1, "hour"),
-          onTime: moment(),
-          message:
-            "Please remind teams to have their robots reinspected before Playoffs and to send their team rep(s) for Alliance Selection.",
-        }
+        expiry: moment().add(1, "hour"),
+        onTime: moment(),
+        message:
+          "Please remind teams to have their robots reinspected before Playoffs and to send their team rep(s) for Alliance Selection.",
+      }
       : {};
 
   var displayOrder = ftcMode
@@ -80,11 +80,11 @@ function PlayByPlayPage({
     : ["Blue1", "Red3", "Blue2", "Red2", "Blue3", "Red1", "Blue4", "Red4"];
   if (swapScreen === true) {
     displayOrder = ftcMode
-      ? ["Red2", "Blue1", "Red2", "Blue1", "Red3", "Blue3"]
+      ? ["Red2", "Blue1", "Red1", "Blue2", "Red3", "Blue3"]
       : ["Red3", "Blue1", "Red2", "Blue2", "Red1", "Blue3", "Red4", "Blue4"];
   }
 
- 
+
 
   function updateTeamDetails(station, matchDetails) {
     var team = {};
@@ -96,32 +96,32 @@ function PlayByPlayPage({
     if (station.slice(-1) !== "4") {
       team =
         matchDetails?.teams[
-          _.findIndex(matchDetails?.teams, { station: station })
+        _.findIndex(matchDetails?.teams, { station: station })
         ];
-      
+
       // Reverse-map the team number to get the actual team number for lookups
       const lookupTeamNumber = remapNumberToString(team?.teamNumber);
-      
+
       team = _.merge(
         team,
         teamList?.teams[
-          _.findIndex(teamList?.teams, { teamNumber: team?.teamNumber })
+        _.findIndex(teamList?.teams, { teamNumber: team?.teamNumber })
         ],
         rankings?.ranks?.length > 0
           ? rankings?.ranks[
-              _.findIndex(rankings?.ranks, { teamNumber: lookupTeamNumber })
-            ]
+          _.findIndex(rankings?.ranks, { teamNumber: lookupTeamNumber })
+          ]
           : null,
         EPA?.length > 0
           ? EPA[_.findIndex(EPA, { teamNumber: team?.teamNumber })]
           : null,
         communityUpdates?.length > 0
           ? communityUpdates[
-              _.findIndex(communityUpdates, { teamNumber: team?.teamNumber })
-            ]
+          _.findIndex(communityUpdates, { teamNumber: team?.teamNumber })
+          ]
           : null
       );
-      
+
       team.rankStyle = rankHighlight(team?.rank, allianceCount || { count: 8 });
       team.alliance = alliances?.Lookup[`${lookupTeamNumber}`]
         ? alliances?.Lookup[`${lookupTeamNumber}`]?.alliance || null
@@ -168,20 +168,20 @@ function PlayByPlayPage({
         if (remainingTeam.length > 0) {
           // Reverse-map the team number to get the actual team number for lookups
           const lookupRemainingTeam = remainingTeam[0];
-          
+
           team = _.merge(
             team,
             teamList?.teams[
-              _.findIndex(teamList?.teams, { teamNumber: remapStringToNumber(lookupRemainingTeam) })
+            _.findIndex(teamList?.teams, { teamNumber: remapStringToNumber(lookupRemainingTeam) })
             ],
             rankings?.ranks[
-              _.findIndex(rankings?.ranks, { teamNumber: lookupRemainingTeam })
+            _.findIndex(rankings?.ranks, { teamNumber: lookupRemainingTeam })
             ],
             communityUpdates[
-              _.findIndex(communityUpdates, { teamNumber: remapStringToNumber(lookupRemainingTeam) })
+            _.findIndex(communityUpdates, { teamNumber: remapStringToNumber(lookupRemainingTeam) })
             ]
           );
-          
+
           team.rankStyle = rankHighlight(
             team?.rank,
             allianceCount || { count: 8 }
@@ -277,78 +277,78 @@ function PlayByPlayPage({
   var matchDetails = !adHocMode
     ? schedule[currentMatch - 1]
     : {
-        description: "Practice Match",
-        startTime: null,
-        matchNumber: 1,
-        field: "Primary",
-        tournamentLevel: "Practice",
-        teams: [
-          {
-            teamNumber: adHocMatch[0]?.teamNumber
-              ? adHocMatch[0]?.teamNumber
-              : null,
-            station: "Red1",
-            surrogate: false,
-            dq: false,
-          },
-          {
-            teamNumber: adHocMatch[1]?.teamNumber
-              ? adHocMatch[1]?.teamNumber
-              : null,
-            station: "Red2",
-            surrogate: false,
-            dq: false,
-          },
-          {
-            teamNumber: adHocMatch[2]?.teamNumber
-              ? adHocMatch[2]?.teamNumber
-              : null,
-            station: "Red3",
-            surrogate: false,
-            dq: false,
-          },
-          {
-            teamNumber: adHocMatch[3]?.teamNumber
-              ? adHocMatch[3]?.teamNumber
-              : null,
-            station: "Blue1",
-            surrogate: false,
-            dq: false,
-          },
-          {
-            teamNumber: adHocMatch[4]?.teamNumber
-              ? adHocMatch[4]?.teamNumber
-              : null,
-            station: "Blue2",
-            surrogate: false,
-            dq: false,
-          },
-          {
-            teamNumber: adHocMatch[5]?.teamNumber
-              ? adHocMatch[5]?.teamNumber
-              : null,
-            station: "Blue3",
-            surrogate: false,
-            dq: false,
-          },
-        ],
-        isReplay: false,
-        matchVideoLink: null,
-        scoreRedFinal: null,
-        scoreRedFoul: null,
-        scoreRedAuto: null,
-        scoreBlueFinal: null,
-        scoreBlueFoul: null,
-        scoreBlueAuto: null,
-        autoStartTime: null,
-        actualStartTime: null,
-        postResultTime: null,
-        winner: {
-          winner: null,
-          tieWinner: null,
-          level: null,
+      description: "Practice Match",
+      startTime: null,
+      matchNumber: 1,
+      field: "Primary",
+      tournamentLevel: "Practice",
+      teams: [
+        {
+          teamNumber: adHocMatch[0]?.teamNumber
+            ? adHocMatch[0]?.teamNumber
+            : null,
+          station: "Red1",
+          surrogate: false,
+          dq: false,
         },
-      };
+        {
+          teamNumber: adHocMatch[1]?.teamNumber
+            ? adHocMatch[1]?.teamNumber
+            : null,
+          station: "Red2",
+          surrogate: false,
+          dq: false,
+        },
+        {
+          teamNumber: adHocMatch[2]?.teamNumber
+            ? adHocMatch[2]?.teamNumber
+            : null,
+          station: "Red3",
+          surrogate: false,
+          dq: false,
+        },
+        {
+          teamNumber: adHocMatch[3]?.teamNumber
+            ? adHocMatch[3]?.teamNumber
+            : null,
+          station: "Blue1",
+          surrogate: false,
+          dq: false,
+        },
+        {
+          teamNumber: adHocMatch[4]?.teamNumber
+            ? adHocMatch[4]?.teamNumber
+            : null,
+          station: "Blue2",
+          surrogate: false,
+          dq: false,
+        },
+        {
+          teamNumber: adHocMatch[5]?.teamNumber
+            ? adHocMatch[5]?.teamNumber
+            : null,
+          station: "Blue3",
+          surrogate: false,
+          dq: false,
+        },
+      ],
+      isReplay: false,
+      matchVideoLink: null,
+      scoreRedFinal: null,
+      scoreRedFoul: null,
+      scoreRedAuto: null,
+      scoreBlueFinal: null,
+      scoreBlueFoul: null,
+      scoreBlueAuto: null,
+      autoStartTime: null,
+      actualStartTime: null,
+      postResultTime: null,
+      winner: {
+        winner: null,
+        tieWinner: null,
+        level: null,
+      },
+    };
 
   if (
     (practiceSchedule?.schedule?.schedule?.length > 0 ||
@@ -553,7 +553,7 @@ function PlayByPlayPage({
                       remapNumberToString={remapNumberToString}
                     />
                   </tr>
-                  {!ftcMode && (
+                  {(!ftcMode || (inPlayoffs &&ftcMode && selectedEvent?.value?.champLevel === "CHAMPS")) && (
                     <tr className={"gatool-playbyplay"}>
                       <PlayByPlay
                         station={displayOrder[4]}
@@ -587,7 +587,7 @@ function PlayByPlayPage({
                       />
                     </tr>
                   )}
-                  {(inPlayoffs ||
+                  {((inPlayoffs && !ftcMode) ||
                     selectedEvent?.value?.champLevel === "CHAMPS") &&
                     (!_.isEmpty(teamDetails["Red4"]) ||
                       !_.isEmpty(teamDetails["Blue4"])) && (
