@@ -7,7 +7,7 @@ import { useEffect } from "react";
 import { originalAndSustaining, allianceSelectionBaseRounds } from "./Constants";
 import useWindowDimensions from "hooks/UseWindowDimensions";
 
-function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays, handleReset, teamFilter, setTeamFilter, ftcMode, remapNumberToString, useFourTeamAlliances }) {
+function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays, handleReset, teamFilter, setTeamFilter, ftcMode, remapNumberToString, useFourTeamAlliances, setResetAllianceSelection }) {
     const OriginalAndSustaining = _.cloneDeep(originalAndSustaining);
     const AllianceSelectionBaseRounds = _.cloneDeep(allianceSelectionBaseRounds);
 
@@ -561,7 +561,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                     <span>    </span>
                                     {(asArrays?.undo?.length > 0) && <Button id="undoButton" size="sm" onClick={handleUndo} active >Undo Previous Choice</Button>}
                                     {(asArrays?.undo?.length === 0) && <Button size="sm" onClick={handleUndo} disabled >Undo Previous Choice</Button>}
-                                    <span>    </span><Button size="sm" variant="warning" onClick={handleReset} active>Restart Alliance Selection</Button>
+                                    <span>    </span><Button size="sm" variant="success" onClick={()=>setResetAllianceSelection(true)} active>Refresh Rankings</Button><span>    </span><Button size="sm" variant="warning" onClick={handleReset} active>Restart Alliance Selection</Button>
                                 </InputGroup>
                             </Form>
                         </Row>

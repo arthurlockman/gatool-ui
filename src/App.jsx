@@ -5169,6 +5169,15 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ftcMode]);
 
+  // Recalculate event high scores whenever schedules update (when event loads or matches are played)
+  useEffect(() => {
+    if (selectedEvent?.value?.code && selectedYear?.value && (qualSchedule || playoffSchedule)) {
+      console.log('Schedules updated, recalculating event high scores...');
+      getEventStats(selectedYear?.value, selectedEvent?.value?.code);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [qualSchedule?.lastUpdate, playoffSchedule?.lastUpdate, selectedEvent?.value?.code, selectedYear?.value]);
+
   // Retrieve robot images when the team list changes
   useEffect(() => {
     if (

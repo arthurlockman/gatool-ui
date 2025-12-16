@@ -1,10 +1,19 @@
 export const appUpdates = [
   {
-    date: "December 9, 2025",
+    date: "December 16, 2025",
     message: (
       <ul>
-        <li>ALL PROGRAMS: Added option to remove a team from the list of available teams in Alliance Selection</li>
-        <li>FRC: Updated game brand on Setting page to animated REBUILT™ logo</li>
+        <li>ALL PROGRAMS: </li>
+        <ul>
+          <li>Added option to remove a team from the list of available teams in Alliance Selection</li>
+          <li>Added button to refresh rankings in Alliance Selection. This also restarts Alliance Selection to ensure proper ranking order is displayed</li>
+          <li>Fixed timing issue with displaying event stats on first event load</li>
+        </ul>
+        
+        <li>FRC:</li>
+        <ul>
+        <li>Updated game brand on Setting page to animated REBUILT™ logo</li>
+        </ul>
       </ul>
     ),
   },{
