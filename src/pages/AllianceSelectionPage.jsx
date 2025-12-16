@@ -6,7 +6,7 @@ import SixAllianceBracket from "components/SixAllianceBracket";
 import TwoAllianceBracket from "components/TwollianceBracket";
 import moment from "moment/moment";
 import AllianceSelection from "../components/AllianceSelection";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Switch from "react-switch";
 import { useHotkeysContext, useHotkeys } from "react-hotkeys-hook";
 import _ from "lodash";
@@ -30,6 +30,8 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
     const [overrideAllianceSelection, setOverrideAllianceSelection] = useState(false);
     const [resetAllianceSelection, setResetAllianceSelection] = useState(false);
     const [teamFilter, setTeamFilter] = useState("");
+    const [waitingForRankingsUpdate, setWaitingForRankingsUpdate] = useState(false);
+    const previousRankingsRef = useRef(null);
     const { disableScope, enableScope } = useHotkeysContext();
 
     const updateRanks = () => {
@@ -39,12 +41,22 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
     }
 
     const handleResetAllianceSelection = () => {
-        if (overrideAllianceSelection) {
-            handleReset();
-        }
+        // Store current rankings timestamp to detect when they update
+        previousRankingsRef.current = rankings?.lastUpdate;
+        setWaitingForRankingsUpdate(true);
         getRanks();
         handleClose();
     }
+
+    // Watch for rankings updates and reset alliance selection after they complete
+    useEffect(() => {
+        if (waitingForRankingsUpdate && rankings?.lastUpdate && rankings?.lastUpdate !== previousRankingsRef.current) {
+            // Rankings have been updated, now reset alliance selection
+            setWaitingForRankingsUpdate(false);
+            handleReset();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [rankings?.lastUpdate, waitingForRankingsUpdate]);
 
     const handleReset = () => {
         // @ts-ignore
@@ -163,7 +175,7 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
                         </Alert>}
                     {allianceSelection && !rankingsOverride && !selectedEvent?.value?.code.includes("OFFLINE") &&
                         <Alert variant="success" >
-                            <div onClick={loadEvent}><b>We believe your event is ready for Alliance Selection, but you must confirm that the rank order below agrees with the rank order in FMS before proceeding with Alliance Selection. If you see a discrepancy, take these steps:
+                            <div onClick={() => { previousRankingsRef.current = rankings?.lastUpdate; setWaitingForRankingsUpdate(true); loadEvent(); }}><b>We believe your event is ready for Alliance Selection, but you must confirm that the rank order below agrees with the rank order in FMS before proceeding with Alliance Selection. If you see a discrepancy, take these steps:
                                 <div>Tap the RESTART ALLIANCE SELECTION button below to reset using current data</div>
                                 <div>Tap this alert to see if we can get a more current rankings. <i>This will reload your event and may take a minute or two.</i></div>
                             </b><br />
@@ -191,7 +203,7 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
                             <p>The Alliance Count determines how many alliances will participate in playoffs (typically 2, 4, 6, or 8 alliances).</p>
                         </Alert>
                     ) : (
-                        <AllianceSelection selectedYear={selectedYear} selectedEvent={selectedEvent} rankings={rankings} teamList={teamList} allianceCount={allianceCount} communityUpdates={communityUpdates} allianceSelectionArrays={allianceSelectionArrays} setAllianceSelectionArrays={setAllianceSelectionArrays} handleReset={handleReset} teamFilter={teamFilter} setTeamFilter={setTeamFilter} ftcMode={ftcMode} remapNumberToString={remapNumberToString} useFourTeamAlliances={useFourTeamAlliances} />
+                        <AllianceSelection selectedYear={selectedYear} selectedEvent={selectedEvent} rankings={rankings} teamList={teamList} allianceCount={allianceCount} communityUpdates={communityUpdates} allianceSelectionArrays={allianceSelectionArrays} setAllianceSelectionArrays={setAllianceSelectionArrays} handleReset={handleReset} teamFilter={teamFilter} setTeamFilter={setTeamFilter} ftcMode={ftcMode} remapNumberToString={remapNumberToString} useFourTeamAlliances={useFourTeamAlliances} setResetAllianceSelection={setResetAllianceSelection}/>
                     )}
                 </div>}
 
