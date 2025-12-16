@@ -387,7 +387,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                             If your event requires a reduced Alliance Count, you can override the Alliance Count here. <b>THIS SHOULD ONLY APPLY TO EVENTS WITH LESS THAN 26 TEAMS. </b><Select options={playoffOverrideMenu} value={playoffCountOverride ? playoffCountOverride : (allianceCount?.menu ? allianceCount.menu : playoffOverrideMenu[0])} onChange={setPlayoffCountOverride} />
                         </Alert>
                         <div>
-                            {!ftcMode && <img style={{ width: "100%" }} src="/images/first_age_frc_rebuilt_logo_vertical_rgb_fullcolor.png" alt="REEFSCAPE℠ presented by Haas Logo" />}
+                            {!ftcMode && <img style={{ width: "100%" }} src="/images/first_age_frc_rebuilt_logo_vertical_rgb_fullcolor.gif" alt="REEFSCAPE℠ presented by Haas Logo" />}
                             {ftcMode && <img style={{ width: "100%" }} src="/images/first_age_ftc_decode_logo_vertical_rgb_fullcolor.png" alt="DECODE℠ presented by RTX Logo" />}
                         </div>
                     </Col>

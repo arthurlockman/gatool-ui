@@ -3,6 +3,14 @@ export const appUpdates = [
     date: "December 9, 2025",
     message: (
       <ul>
+        <li>ALL PROGRAMS: Added option to remove a team from the list of available teams in Alliance Selection</li>
+        <li>FRC: Updated game brand on Setting page to animated REBUILT™ logo</li>
+      </ul>
+    ),
+  },{
+    date: "December 9, 2025",
+        message: (
+      <ul>
         <li>ALL PROGRAMS: Updated logic for Alliance Selection to only show teams that are competing in the event</li>
         <li>FRC: Updated game brand on Setting page to REBUILT™</li>
         <li>FTC: Updated Alliance Selection screen to show correct number of rounds for FTC events</li>
