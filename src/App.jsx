@@ -84,6 +84,9 @@ const paleYellow = "#fdfaed";
 const paleBlue = "#effdff";
 const ftcBaseURL = "https://api.gatool.org/ftc/v2/";
 
+// Pages that should remember scroll position
+const pagesWithScrollMemory = ['schedule', 'teamdata', 'ranks', 'announce', 'playbyplay', 'allianceselection'];
+
 function LayoutsWithNavbar({
   selectedEvent,
   practiceSchedule,
@@ -100,9 +103,6 @@ function LayoutsWithNavbar({
   ftcMode,
 }) {
   const location = useLocation();
-  
-  // Pages that should remember scroll position
-  const pagesWithScrollMemory = ['schedule', 'teamdata', 'ranks', 'announce', 'playbyplay', 'allianceselection'];
   
   // Scroll to top for pages that don't have scroll memory
   useEffect(() => {
