@@ -7,8 +7,10 @@ import TopButtons from "../components/TopButtons";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useSwipeable } from "react-swipeable";
 import moment from "moment";
+import { useEffect, useRef } from "react";
 import NotificationBanner from "components/NotificationBanner";
 import EventNotificationBanner from "components/EventNotificationBanner";
+import useScrollPosition from "../hooks/useScrollPosition";
 
 const paleGreen = "rgba(144, 238, 144, 0.5)";
 
@@ -66,7 +68,24 @@ function AnnouncePage({
   ftcMode,
   remapNumberToString,
   remapStringToNumber,
+  useScrollMemory,
 }) {
+  // Remember scroll position for Announce page
+  useScrollPosition('announce', true, false, useScrollMemory);
+
+  // Reset scroll position when navigating to a different match
+  // Reset both Announce and Play By Play scroll positions when match changes
+  const previousMatchRef = useRef(currentMatch);
+  useEffect(() => {
+    if (previousMatchRef.current !== currentMatch && previousMatchRef.current !== undefined) {
+      window.scrollTo(0, 0);
+      // Clear saved scroll position for both Announce and Play By Play when match changes
+      sessionStorage.removeItem('scrollPosition_announce');
+      sessionStorage.removeItem('scrollPosition_playbyplay');
+    }
+    previousMatchRef.current = currentMatch;
+  }, [currentMatch]);
+
   const matchesToNotify = _.toInteger(
     (teamList?.teams?.length - teamReduction) / 6
   );

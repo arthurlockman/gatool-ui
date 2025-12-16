@@ -9,6 +9,8 @@ import { useSwipeable } from "react-swipeable";
 import NotificationBanner from "components/NotificationBanner";
 import EventNotificationBanner from "components/EventNotificationBanner";
 import moment from "moment";
+import useScrollPosition from "../hooks/useScrollPosition";
+import { useEffect, useRef } from "react";
 
 const paleGreen = "rgba(144, 238, 144, 0.5)";
 
@@ -59,7 +61,24 @@ function PlayByPlayPage({
   ftcMode,
   remapNumberToString,
   remapStringToNumber,
+  useScrollMemory,
 }) {
+  // Remember scroll position for Play by play page
+  useScrollPosition('playbyplay', true, false, useScrollMemory);
+
+  // Reset scroll position when navigating to a different match
+  // Reset both Announce and Play By Play scroll positions when match changes
+  const previousMatchRef = useRef(currentMatch);
+  useEffect(() => {
+    if (previousMatchRef.current !== currentMatch && previousMatchRef.current !== undefined) {
+      window.scrollTo(0, 0);
+      // Clear saved scroll position for both Announce and Play By Play when match changes
+      sessionStorage.removeItem('scrollPosition_announce');
+      sessionStorage.removeItem('scrollPosition_playbyplay');
+    }
+    previousMatchRef.current = currentMatch;
+  }, [currentMatch]);
+
   const matchesToNotify = _.toInteger(
     (teamList?.teams?.length - teamReduction) / 6
   );

@@ -7,8 +7,18 @@ export const usePersistentState = (key, defaultValue) => {
     useEffect(() => {
         async function load() {
             const saved = await localforage.getItem(key);
-            const initial = JSON.parse(saved);
-            setValue(initial || defaultValue);
+            if (saved !== null) {
+                try {
+                    const initial = JSON.parse(saved);
+                    // Check for null/undefined explicitly to preserve false, 0, empty string, etc.
+                    setValue(initial !== null && initial !== undefined ? initial : defaultValue);
+                } catch (e) {
+                    // If parsing fails, use default value
+                    setValue(defaultValue);
+                }
+            } else {
+                setValue(defaultValue);
+            }
         }
         load()
     // eslint-disable-next-line react-hooks/exhaustive-deps

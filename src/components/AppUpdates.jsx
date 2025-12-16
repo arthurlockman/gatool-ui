@@ -8,6 +8,8 @@ export const appUpdates = [
           <li>Added option to remove a team from the list of available teams in Alliance Selection</li>
           <li>Added button to refresh rankings in Alliance Selection. This also restarts Alliance Selection to ensure proper ranking order is displayed</li>
           <li>Fixed timing issue with displaying event stats on first event load</li>
+          <li>Fixed 🤞 rendering issue which caused the footer to move when scrolling on the Alliance Selection screen</li>
+          <li>Added scrolling memory for screens. Enabled by default, can be disabled on the Setup page</li>
         </ul>
         
         <li>FRC:</li>

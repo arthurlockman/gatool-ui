@@ -10,11 +10,12 @@ import { useState, useEffect, useRef } from "react";
 import Switch from "react-switch";
 import { useHotkeysContext, useHotkeys } from "react-hotkeys-hook";
 import _ from "lodash";
+import useScrollPosition from "../hooks/useScrollPosition";
 
 import './AllianceSelectionPage.css';
 
 
-function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, playoffSchedule, offlinePlayoffSchedule, alliances, rankings, timeFormat, getRanks, allianceSelection, playoffs, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays, rankingsOverride, loadEvent, practiceSchedule, setOfflinePlayoffSchedule, currentMatch, qualsLength, nextMatch, previousMatch, getSchedule, useSwipe, usePullDownToUpdate, eventLabel, playoffCountOverride, ftcMode, remapNumberToString, useFourTeamAlliances }) {
+function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, playoffSchedule, offlinePlayoffSchedule, alliances, rankings, timeFormat, getRanks, allianceSelection, playoffs, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays, rankingsOverride, loadEvent, practiceSchedule, setOfflinePlayoffSchedule, currentMatch, qualsLength, nextMatch, previousMatch, getSchedule, useSwipe, usePullDownToUpdate, eventLabel, playoffCountOverride, ftcMode, remapNumberToString, useFourTeamAlliances, useScrollMemory }) {
     /**
      * This function finds a team by their station assignment
      * @param teams the array of team objects
@@ -33,6 +34,11 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
     const [waitingForRankingsUpdate, setWaitingForRankingsUpdate] = useState(false);
     const previousRankingsRef = useRef(null);
     const { disableScope, enableScope } = useHotkeysContext();
+
+    // Remember scroll position for Alliance Selection page
+    // When in Brackets mode (playoffs === true), always scroll to top (no memory)
+    // When in Alliance Selection mode (playoffs === false), remember scroll position
+    useScrollPosition('allianceselection', !playoffs, playoffs, useScrollMemory);
 
     const updateRanks = () => {
         setResetAllianceSelection(true);
