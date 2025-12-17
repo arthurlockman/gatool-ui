@@ -16,7 +16,22 @@ function BottomNavigation({ ftcMode }) {
 
   return (
     <>
-      <Navbar fixed="bottom" bg="light">
+      <Navbar 
+        fixed="bottom" 
+        bg="light"
+        className="navbar-fixed-bottom-custom"
+        style={{
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          width: "100%",
+          zIndex: 1030,
+          transform: "translateZ(0)",
+          WebkitTransform: "translateZ(0)",
+          margin: 0
+        }}
+      >
         <span style={{ width: "100%", fontSize: "11px" }}>
           © 2017-{new Date().getFullYear()} Arthur Rosa &amp; James Lockman,{" "}
           <span

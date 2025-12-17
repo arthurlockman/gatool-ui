@@ -1,7 +1,7 @@
 import MainNavigation from "./components/MainNavigation";
 import BottomNavigation from "./components/BottomNavigation";
 import { Outlet, Route, Routes } from "react-router";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, useLocation } from "react-router-dom";
 import SetupPage from "./pages/SetupPage";
 import SchedulePage from "./pages/SchedulePage";
 import TeamDataPage from "./pages/TeamDataPage";
@@ -84,6 +84,9 @@ const paleYellow = "#fdfaed";
 const paleBlue = "#effdff";
 const ftcBaseURL = "https://api.gatool.org/ftc/v2/";
 
+// Pages that should remember scroll position
+const pagesWithScrollMemory = ['schedule', 'teamdata', 'ranks', 'announce', 'playbyplay', 'allianceselection'];
+
 function LayoutsWithNavbar({
   selectedEvent,
   practiceSchedule,
@@ -99,6 +102,18 @@ function LayoutsWithNavbar({
   systemMessage,
   ftcMode,
 }) {
+  const location = useLocation();
+  
+  // Scroll to top for pages that don't have scroll memory
+  useEffect(() => {
+    const currentPath = location.pathname.replace('/', '') || '';
+    // Only scroll to top if this page doesn't have scroll memory
+    // (Pages with scroll memory handle their own scrolling via useScrollPosition hook)
+    if (!pagesWithScrollMemory.includes(currentPath)) {
+      window.scrollTo(0, 0);
+    }
+  }, [location.pathname]);
+
   return (
     <>
       <MainNavigation
@@ -356,6 +371,10 @@ function App() {
   const [usePullDownToUpdate, setUsePullDownToUpdate] = usePersistentState(
     "setting:usePullDownToUpdate",
     false
+  );
+  const [useScrollMemory, setUseScrollMemory] = usePersistentState(
+    "setting:useScrollMemory",
+    true
   );
 
   const [ftcMode, setFTCMode] = usePersistentState("setting:ftcMode", null);
@@ -5379,6 +5398,8 @@ function App() {
                     setUsePullDownToUpdate={setUsePullDownToUpdate}
                     useSwipe={useSwipe}
                     setUseSwipe={setUseSwipe}
+                    useScrollMemory={useScrollMemory}
+                    setUseScrollMemory={setUseScrollMemory}
                     eventLabel={eventLabel}
                     setEventLabel={setEventLabel}
                     showInspection={showInspection}
@@ -5451,6 +5472,7 @@ function App() {
                     hidePracticeSchedule={hidePracticeSchedule}
                     ftcMode={ftcMode}
                     remapNumberToString={remapNumberToString}
+                    useScrollMemory={useScrollMemory}
                   />
                 }
               />
@@ -5486,6 +5508,7 @@ function App() {
                     eventLabel={eventLabel}
                     ftcMode={ftcMode}
                     remapNumberToString={remapNumberToString}
+                    useScrollMemory={useScrollMemory}
                   />
                 }
               />
@@ -5514,6 +5537,7 @@ function App() {
                     ftcMode={ftcMode}
                     remapNumberToString={remapNumberToString}
                     remapStringToNumber={remapStringToNumber}
+                    useScrollMemory={useScrollMemory}
                   />
                 }
               />
@@ -5575,6 +5599,7 @@ function App() {
                     ftcMode={ftcMode}
                     remapNumberToString={remapNumberToString}
                     remapStringToNumber={remapStringToNumber}
+                    useScrollMemory={useScrollMemory}
                   />
                 }
               />
@@ -5629,6 +5654,7 @@ function App() {
                     ftcMode={ftcMode}
                     remapNumberToString={remapNumberToString}
                     remapStringToNumber={remapStringToNumber}
+                    useScrollMemory={useScrollMemory}
                   />
                 }
               />
@@ -5669,6 +5695,7 @@ function App() {
                     ftcMode={ftcMode}
                     remapNumberToString={remapNumberToString}
                     useFourTeamAlliances={useFourTeamAlliances}
+                    useScrollMemory={useScrollMemory}
                   />
                 }
               />

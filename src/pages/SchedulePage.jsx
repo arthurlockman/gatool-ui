@@ -21,6 +21,7 @@ import { useState } from "react";
 import { playoffOverrideMenu } from "components/Constants";
 import { CheckCircleFill, XCircleFill } from "react-bootstrap-icons";
 import Handshake from "components/Handshake";
+import useScrollPosition from "../hooks/useScrollPosition";
 
 function SchedulePage({
   selectedEvent,
@@ -51,12 +52,16 @@ function SchedulePage({
   hidePracticeSchedule,
   ftcMode,
   remapNumberToString,
+  useScrollMemory,
 }) {
   const [showAdjustAlliances, setShowAdjustAlliances] = useState(false);
   const [showScores, setShowScores] = useState(false);
   const [scoresMatch, setScoresMatch] = useState(null);
 
   const [formData, setFormData] = useState(null);
+
+  // Remember scroll position for Schedule page
+  useScrollPosition('schedule', true, false, useScrollMemory);
 
   const byeCount = [
     {

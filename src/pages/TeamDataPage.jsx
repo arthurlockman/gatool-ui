@@ -18,12 +18,16 @@ import ReactQuill from "react-quill";
 import 'react-quill/dist/quill.snow.css';
 import TeamTimer from "components/TeamTimer";
 import { useInterval } from "react-interval-hook";
+import useScrollPosition from "../hooks/useScrollPosition";
 
-function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSort, setTeamSort, communityUpdates, setCommunityUpdates, allianceCount, lastVisit, setLastVisit, putTeamData, localUpdates, setLocalUpdates, qualSchedule, playoffSchedule, originalAndSustaining, monthsWarning, user, isAuthenticated, getTeamHistory, timeFormat, getCommunityUpdates, getTeamList, eventLabel, ftcMode, remapNumberToString }) {
+function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSort, setTeamSort, communityUpdates, setCommunityUpdates, allianceCount, lastVisit, setLastVisit, putTeamData, localUpdates, setLocalUpdates, qualSchedule, playoffSchedule, originalAndSustaining, monthsWarning, user, isAuthenticated, getTeamHistory, timeFormat, getCommunityUpdates, getTeamList, eventLabel, ftcMode, remapNumberToString, useScrollMemory }) {
     const [currentTime, setCurrentTime] = useState(moment());
     const [clockRunning, setClockRunning] = useState(true);
     const { disableScope, enableScope } = useHotkeysContext();
     const isOnline = useOnlineStatus();
+
+    // Remember scroll position for Teams page
+    useScrollPosition('teams', true, false, useScrollMemory);
 
     /**
      * Display the delay on the Announce Screen if we have a schedule

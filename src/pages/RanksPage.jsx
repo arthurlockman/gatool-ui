@@ -18,6 +18,7 @@ import { toast } from "react-toastify";
 import _ from "lodash";
 import moment from "moment";
 import { rankHighlight } from "../components/HelperFunctions";
+import useScrollPosition from "../hooks/useScrollPosition";
 
 function RanksPage({
   selectedEvent,
@@ -40,7 +41,11 @@ function RanksPage({
   ftcMode,
   remapNumberToString,
   remapStringToNumber,
+  useScrollMemory,
 }) {
+  // Remember scroll position for Ranks page
+  useScrollPosition('ranks', true, false, useScrollMemory);
+
   // This function clicks the hidden file upload button
   function clickLoadRanks() {
     document.getElementById("RankingsFiles").click();
