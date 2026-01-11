@@ -1,17 +1,16 @@
 export const commonFouls = [
   {
-    year: 2025,
+    year: 2026,
     code: "G101",
-    name: "Humans, stay off the FIELD until green",
+    name: "Humans, remain outside the FIELD.",
     level: "verbal",
     card: "yellow",
     rp: false,
     text: (
       <>
         <p>
-          A team member may only enter the FIELD if FIELD lighting (FIELD facing
-          side of the team signs and timers) is green, unless explicitly
-          instructed by a REFEREE or an FTA.
+          A team member may not reach into the FIELD with any part of their body
+          during a MATCH.
         </p>
       </>
     ),
@@ -22,7 +21,7 @@ export const commonFouls = [
     ),
   },
   {
-    year: 2025,
+    year: 2026,
     code: "G102",
     name: "Never step over the guardrail",
     level: "verbal",
@@ -31,7 +30,9 @@ export const commonFouls = [
     text: (
       <>
         <p>
-          A team member may only enter or exit the FIELD through open gates.
+          A team member may only enter or exit the FIELD through open gates and
+          only enter if FIELD lighting (FIELD facing side of the team signs and
+          timers) is green, unless explicitly instructed by a REFEREE or an FTA.
         </p>
       </>
     ),
@@ -42,9 +43,9 @@ export const commonFouls = [
     ),
   },
   {
-    year: 2025,
+    year: 2026,
     code: "G103",
-    name: "Be careful what you interact with",
+    name: "Be careful what you interact with.",
     level: "verbal",
     card: "yellow",
     rp: false,
@@ -72,7 +73,7 @@ export const commonFouls = [
     ),
   },
   {
-    year: 2025,
+    year: 2026,
     code: "G104",
     name: "Teams may not enable their ROBOTS on the FIELD",
     level: "verbal",
@@ -95,7 +96,7 @@ export const commonFouls = [
     ),
   },
   {
-    year: 2025,
+    year: 2026,
     code: "G201",
     name: "Be a good person",
     level: "verbal",
@@ -104,7 +105,8 @@ export const commonFouls = [
     text: (
       <>
         <p>
-          All teams must be civil toward everyone and respectful of team and event equipment while at a FIRST Robotics Competition event. Please review the FIRST Code of Conduct and Core Values for more information.
+          All teams must be civil toward everyone and respectful of team and
+          event equipment while at a FIRST Robotics Competition event.
         </p>
       </>
     ),
@@ -115,7 +117,7 @@ export const commonFouls = [
     ),
   },
   {
-    year: 2025,
+    year: 2026,
     code: "G202",
     name: "Don’t bang on the glass",
     level: "verbal",
@@ -136,7 +138,75 @@ export const commonFouls = [
     ),
   },
   {
-    year: 2025,
+    year: 2026,
+    code: "G203",
+    name: "Asking other teams to throw a MATCH – not cool.",
+    level: "verbal",
+    card: "red",
+    rp: false,
+    text: (
+      <>
+        <p>
+          A team may not encourage an ALLIANCE of which it is not a member to
+          play beneath its ability.
+        </p>
+        <p>
+          Note: This rule is not intended to prevent an ALLIANCE from planning
+          and/or executing its own strategy in a specific MATCH in which all the
+          teams are members of the ALLIANCE.
+        </p>
+      </>
+    ),
+    violation: (
+      <>VERBAL WARNING. RED CARD if subsequent violations during the event.</>
+    ),
+  },
+  {
+    year: 2026,
+    code: "G204",
+    name: "Letting someone coerce you into throwing a MATCH – also not cool.",
+    level: "verbal",
+    card: "red",
+    rp: false,
+    text: (
+      <>
+        <p>
+          A team, as the result of encouragement by a team not on their
+          ALLIANCE, may not play beneath its ability.
+        </p>
+        <p>
+          Note: This rule is not intended to prevent an ALLIANCE from planning
+          and/or executing its own strategy in a specific MATCH in which all the
+          ALLIANCE members are participants.
+        </p>
+      </>
+    ),
+    violation: (
+      <>VERBAL WARNING. RED CARD if subsequent violations during the event.</>
+    ),
+  },
+  {
+    year: 2026,
+    code: "G205",
+    name: "Throwing your own MATCH is bad.",
+    level: "verbal",
+    card: "red",
+    rp: false,
+    text: (
+      <>
+        <p>
+          A team may not intentionally lose a MATCH or sacrifice Ranking Points
+          in an effort to lower their own ranking or manipulate the rankings of
+          other teams.
+        </p>
+      </>
+    ),
+    violation: (
+      <>VERBAL WARNING. RED CARD if subsequent violations during the event.</>
+    ),
+  },
+  {
+    year: 2026,
     code: "G206",
     name: "Don’t violate rules for RP",
     level: "verbal",
@@ -151,7 +221,7 @@ export const commonFouls = [
       </>
     ),
     violation: (
-      <>YELLOW CARD and the ALLIANCE is ineligible for CORAL and BARGE RPs</>
+      <>YELLOW CARD and the ALLIANCE is ineligible for the BONUS RPs.</>
     ),
   },
   {
@@ -261,19 +331,30 @@ export const commonFouls = [
   {
     year: 3000,
     code: "G302",
-    name: "You can’t bring/use anything you want",
+    name: "Limit what you use during a MATCH.",
     level: null,
     card: "yellow",
     rp: null,
     text: (
       <>
         <p>
-          The only equipment that may be brought to the ARENA for use during a
-          MATCH is listed below. Regardless of if equipment fits criteria below,
-          it may not be employed in a way that breaks any other rules,
-          introduces a safety hazard, blocks visibility for FIELD STAFF or
-          audience members, or jams or interferes with the remote sensing
-          capabilities of another team or the FIELD.
+          Items used during a match must fit on your team’s DRIVER STATION
+          shelf, be worn or held by members from your DRIVE TEAM, or be an item
+          used as an accommodation (e.g. stools, crutches, etc.). Regardless of
+          if the equipment fits the criteria above, it may not:
+          <ol type="A">
+            <li>be employed in a way that introduces a safety hazard,</li>
+            <li>extend more than 78.0in (1.981m) above the floor,</li>
+            <li>
+              communicate with anything or anyone outside of the ARENA with the
+              exception of medically required equipment,
+            </li>
+            <li>block visibility for FIELD STAFF or audience members, or</li>
+            <li>
+              jam or interfere with the remote sensing capabilities of another
+              team or the FIELD.
+            </li>
+          </ol>
         </p>
       </>
     ),
@@ -285,7 +366,7 @@ export const commonFouls = [
     ),
   },
   {
-    year: 3000,
+    year: 2026,
     code: "G303",
     name: "Start your robots",
     level: null,
@@ -309,6 +390,7 @@ export const commonFouls = [
               if modified after initial Inspection, it’s compliant with I104,
             </li>
             <li>its BUMPERS overlap their ROBOT STARTING LINE,</li>
+            <li>it’s not contacting the BUMP,</li>
             <li>it’s the only team-provided item left on the FIELD,</li>
             <li>
               it’s not attached to, entangled with, or suspended from any FIELD
@@ -319,8 +401,8 @@ export const commonFouls = [
               R104), and
             </li>
             <li>
-              it fully and solely supports not more than 1 CORAL (as described
-              in section 6.3.4 SCORING ELEMENTS).
+              it fully and solely supports not more than 8 FUEL (as described in
+              section 6.3.4 SCORING ELEMENTS).
             </li>
           </ol>
         </p>
@@ -336,7 +418,7 @@ export const commonFouls = [
     ),
   },
   {
-    year: 2025,
+    year: 2026,
     code: "G402",
     name: "Let the ROBOT do its thing",
     level: "minor",
@@ -348,132 +430,43 @@ export const commonFouls = [
           In AUTO, a DRIVE TEAM member may not directly or indirectly interact
           with a ROBOT or an OPERATOR CONSOLE unless for personal safety,
           OPERATOR CONSOLE safety, or pressing an E-Stop or A-Stop. A HUMAN
-          PLAYER feeding CORAL to a ROBOT is an exception to this rule.
+          PLAYER entering FUEL onto the FIELD is an exception to this rule.
         </p>
       </>
     ),
     violation: <>MINOR FOUL and YELLOW CARD.</>,
   },
   {
-    year: 2025,
-    code: "G403",
-    name: "Limited AUTO opponent interaction",
-    level: "major",
-    card: "yellow",
-    rp: null,
-    text: (
-      <>
-        <p>
-          In AUTO, a ROBOT whose BUMPERS are completely across the BARGE ZONE
-          (i.e. to the opposite side of the BARGE ZONE from its ROBOT STARTING
-          LINE) may not contact an opponent ROBOT (either directly or
-          transitively through a SCORING ELEMENT CONTROLLED by either ROBOT and
-          regardless of who initiates contact).
-        </p>
-      </>
-    ),
-    violation: (
-      <>
-        MAJOR FOUL and VERBAL WARNING. YELLOW CARD if subsequent violations
-        during the event.
-      </>
-    ),
-  },
-  {
-    year: 2025,
-    code: "G409",
-    name: "1 of each at a time",
+    year: 2026,
+    code: "G408",
+    name: "Don’t catch FUEL.",
     level: "minor",
     card: "yellow",
     rp: null,
     text: (
       <>
         <p>
-          A ROBOT may not simultaneously CONTROL more than 1 CORAL and 1 ALGAE
-          either directly or transitively through other objects. A ROBOT is in
-          CONTROL of a SCORING ELEMENT if
+          A ROBOT may not do either of the following with FUEL released by the
+          HUB unless and until that FUEL contacts anything else besides that
+          ROBOT or FUEL CONTROLLED by that ROBOT:
           <ol type="A">
+            <li>gain greater than MOMENTARY CONTROL of FUEL, or</li>
             <li>
-              the SCORING ELEMENT is fully supported by or stuck in, on, or
-              under the ROBOT or
-            </li>
-            <li>
-              the ROBOT intentionally pushes a SCORING ELEMENT to a desired
-              location or in a preferred direction (i.e. herding).
+              push or redirect FUEL to a desired location or in a preferred
+              direction.
             </li>
           </ol>
-          A ROBOT pushing scored CORAL on level 1 while attempting to score
-          other CORAL is an exception to this rule.
+          A ROBOT is in CONTROL of a SCORING ELEMENT if the SCORING ELEMENT is
+          fully supported by or stuck in, on, or under the ROBOT.
         </p>
       </>
     ),
-    violation: (
-      <>MINOR FOUL per additional SCORING ELEMENT. YELLOW CARD if excessive.</>
-    ),
+    violation: <>MINOR FOUL. If strategic, MAJOR FOUL and YELLOW CARD.</>,
   },
   {
-    year: 2025,
-    code: "G410",
-    name: "No de-scoring",
-    level: "major",
-    card: null,
-    rp: true,
-    text: (
-      <>
-        <p>A ROBOT may not de-score a CORAL scored on the opponent’s REEF.</p>
-      </>
-    ),
-    violation: (
-      <>
-        MAJOR FOUL per de-scored CORAL and the{" "}
-        <b>opposing ALLIANCE is awarded the CORAL RP.</b>
-      </>
-    ),
-  },
-  {
-    year: 2025,
+    year: 2026,
     code: "G411",
-    name: "Don’t put ALGAE on their REEF",
-    level: "major",
-    card: "yellow",
-    rp: null,
-    text: (
-      <>
-        <p>A ROBOT may not deliberately put ALGAE on their opponent’s REEF.</p>
-      </>
-    ),
-    violation: <>MAJOR FOUL and YELLOW CARD.</>,
-  },
-  {
-    year: 3000,
-    code: "G415",
-    name: "Expansion limits",
-    level: "minor",
-    card: null,
-    rp: null,
-    text: (
-      <>
-        <p>
-          A ROBOT may not extend more than 1 ft. 6 in. (~45 cm) beyond the
-          vertical projection of its ROBOT PERIMETER.
-        </p>
-        <p>
-          If the over-expansion is due to damage and not used for strategic
-          benefit, it is an exception to this rule, and no penalty is imposed.
-        </p>
-      </>
-    ),
-    violation: (
-      <>
-        MINOR FOUL, or MAJOR FOUL if the over-expansion is used for strategic
-        benefit, including if it impedes or enables a scoring action.
-      </>
-    ),
-  },
-  {
-    year: 3000,
-    code: "G416",
-    name: "Don’t damage the FIELD",
+    name: "Don’t damage the FIELD.",
     level: "verbal",
     card: "yellow",
     rp: null,
@@ -486,15 +479,17 @@ export const commonFouls = [
       <>
         VERBAL WARNING. If the Head REFEREE infers that additional damage is
         likely, DISABLED. YELLOW CARD for any subsequent damage during the
-        event. Corrective action (such as eliminating sharp edges, removing the
+        event.
+        <br />
+        Corrective action (such as eliminating sharp edges, removing the
         damaging MECHANISM, and/or re-inspection) may be required before the
         ROBOT will be allowed to compete in subsequent MATCHES.
       </>
     ),
   },
   {
-    year: 3000,
-    code: "G417",
+    year: 2026,
+    code: "G412",
     name: "Watch your FIELD interaction",
     level: "major",
     card: "yellow",
@@ -503,7 +498,7 @@ export const commonFouls = [
       <>
         <p>
           A ROBOT is prohibited from the following interactions with FIELD
-          elements with the exception of CAGES.
+          elements (with the exception of the RUNGS and UPRIGHTS):
         </p>
         <ol type="A">
           <li>grabbing,</li>
@@ -528,92 +523,8 @@ export const commonFouls = [
     ),
   },
   {
-    year: 2025,
-    code: "G418",
-    name: "An Opponent’s CAGES are off-limits in TELEOP",
-    level: "major",
-    card: null,
-    rp: true,
-    text: (
-      <>
-        <p>In TELEOP, A ROBOT may not contact an opponent’s CAGE.</p>
-      </>
-    ),
-    violation: (
-      <>
-        MAJOR FOUL and{" "}
-        <b>
-          opposing ALLIANCE is awarded the BARGE RP if a Qualification MATCH
-        </b>
-        .
-      </>
-    ),
-  },
-  {
-    year: 2025,
-    code: "G419",
-    name: "ANCHORS are off-limits",
-    level: "major",
-    card: null,
-    rp: true,
-    text: (
-      <>
-        <p>
-          A ROBOT may not contact the ANCHORS. Exceptions are granted for
-          actions that are, MOMENTARY, and inconsequential.
-        </p>
-      </>
-    ),
-    violation: (
-      <>
-        MAJOR FOUL and the{" "}
-        <b>
-          ALLIANCE is <b>ineligible for the BARGE RP</b> if a Qualification
-          MATCH
-        </b>
-        .
-      </>
-    ),
-  },
-  {
-    year: 2025,
-    code: "G420",
-    name: "NET and contents are off-limits",
-    level: "major",
-    card: null,
-    rp: null,
-    text: (
-      <>
-        <p>A ROBOT may not contact either NET or any ALGAE scored in a NET.</p>
-      </>
-    ),
-    violation: <>MAJOR FOUL. Additional MAJOR FOUL for each ALGAE de-scored.</>,
-  },
-  {
-    year: 2025,
-    code: "G422",
-    name: (
-      <i>
-        <b>Stay out of other ROBOTS</b>
-      </i>
-    ),
-    level: "minor",
-    card: null,
-    rp: null,
-    text: (
-      <>
-        <p>
-          A ROBOT may not use a COMPONENT outside its ROBOT PERIMETER (except
-          its BUMPERS) to initiate contact with an opponent ROBOT inside the
-          vertical projection of the opponent’s ROBOT PERIMETER.
-        </p>
-      </>
-    ),
-    violation: <>MINOR FOUL.</>,
-  },
-  {
-    year: 2025,
-    code: "G423",
+    year: 2026,
+    code: "G416",
     name: (
       <i>
         <b>This isn’t combat robotics</b>
@@ -630,14 +541,9 @@ export const commonFouls = [
           <ol type="A">
             <li>deliberately.</li>
             <li>
-              <u>
-                <b>
-                  regardless of intent, by initiating contact, either directly
-                  or transitively via a SCORING ELEMENT CONTROLLED by the ROBOT,
-                  inside the vertical projection of an opponent’s ROBOT
-                  PERIMETER.
-                </b>
-              </u>
+              regardless of intent, by initiating contact, either directly or
+              transitively via a SCORING ELEMENT CONTROLLED by the ROBOT, inside
+              the vertical projection of an opponent’s ROBOT PERIMETER.
             </li>
           </ol>
         </p>
@@ -656,8 +562,8 @@ export const commonFouls = [
     ),
   },
   {
-    year: 2025,
-    code: "G424",
+    year: 2026,
+    code: "G417",
     name: "Don’t tip or entangle",
     level: "major",
     card: "yellow",
@@ -678,9 +584,9 @@ export const commonFouls = [
     ),
   },
   {
-    year: 2025,
-    code: "G428",
-    name: "CAGE protection.",
+    year: 2026,
+    code: "G420",
+    name: "TOWER protection.",
     level: "major",
     card: null,
     rp: true,
@@ -688,21 +594,22 @@ export const commonFouls = [
       <>
         <p>
           A ROBOT may not contact, directly or transitively through a SCORING
-          ELEMENT, an opponent ROBOT in contact with an opponent CAGE during the
-          last 20 seconds regardless of who initiates contact.
+          ELEMENT, an opponent ROBOT in contact with an opponent TOWER during
+          the last 30 seconds of the MATCH regardless of who initiates contact.
         </p>
       </>
     ),
     violation: (
       <>
-        MAJOR FOUL and the <b>opponent ALLIANCE is awarded the BARGE RP</b>
+        MAJOR FOUL and if the opponent ROBOT is off the ground the opponent
+        ROBOT is awarded LEVEL 3 TOWER points.
       </>
     ),
   },
   {
-    year: 2025,
-    code: "G430",
-    name: "COACHES and other teams: hands off the controls",
+    year: 2026,
+    code: "G422",
+    name: "DRIVE COACHES and other teams: hands off the controls",
     level: "major",
     card: "red",
     rp: null,
@@ -710,15 +617,15 @@ export const commonFouls = [
       <>
         <p>
           A ROBOT shall be operated only by the DRIVERS and/or HUMAN PLAYERS of
-          that team. A COACH activating their E-Stop or A-Stop is the exception
-          to this rule.
+          that team. A DRIVE COACH activating their E-Stop or A-Stop is the
+          exception to this rule.
         </p>
       </>
     ),
     violation: <>MAJOR FOUL. RED CARD if greater-than-MOMENTARY.</>,
   },
   {
-    year: 2025,
+    year: 2026,
     code: "G501",
     name: "Leave promptly",
     level: "verbal",
@@ -765,20 +672,29 @@ export const commonFouls = [
     ),
   },
   {
-    year: 2025,
+    year: 2026,
     code: "T301",
-    name: "Freeze, ROBOT",
+    name: "Measurement, not practice.",
     level: "verbal",
     card: "yellow",
     rp: null,
     text: (
       <>
         <p>
-          During the period when the ARENA is open for measurement, ROBOTS can
-          be enabled, but may neither drive, extend outside their ROBOT
-          PERIMETER, nor interact with (e.g. score, push, pickup, etc.) SCORING
-          ELEMENTS, a CAGE, PROCESSOR, REEF, CORAL STATION, or other FIELD
-          elements.
+          During the period when the ARENA is open for measurement:
+          <ol type="A">
+            <li>
+              ROBOTS can be enabled, but may neither drive, extend outside their
+              ROBOT PERIMETER, nor interact with (e.g. score, push, pickup,
+              etc.) SCORING ELEMENTS (or anything resembling SCORING ELEMENTS),
+              a HUB, BUMP, TRENCH, OUTPOST, or other FIELD elements.
+            </li>
+            <li>
+              Humans may touch a SCORING ELEMENT but may not practice with it
+              (e.g. throw FUEL, or anything resembling FUEL, or use the
+              OUTPOST).
+            </li>
+          </ol>
         </p>
       </>
     ),
@@ -789,4 +705,4 @@ export const commonFouls = [
       </>
     ),
   },
-]
+];
