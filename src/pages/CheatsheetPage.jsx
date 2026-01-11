@@ -134,7 +134,7 @@ function CheatsheetPage({
       {!ftcMode && (
         <>
           <img
-            src="/cheatsheet/reefscape-cheat-sheet-v4_02.png"
+            src="/cheatsheet/rebuilt-cheat-sheet-01102026.png"
             width="100%"
             alt="Cheatsheet"
           ></img>
@@ -144,7 +144,7 @@ function CheatsheetPage({
               <span
                 style={{ cursor: "pointer", color: "blue" }}
                 onClick={() => {
-                  downloadPDF("/cheatsheet/reefscape-cheat-sheet-v4.pdf");
+                  downloadPDF("/cheatsheet/rebuilt-cheat-sheet-01102026.pdf");
                 }}
               >
                 Download the Cheat Sheet
