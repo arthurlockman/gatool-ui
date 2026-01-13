@@ -14,6 +14,24 @@ import { OnlineStatusProvider } from './contextProviders/OnlineContext';
 import { HotkeysProvider } from 'react-hotkeys-hook'
 import { SnackbarProvider } from 'notistack';
 
+// Suppress findDOMNode deprecation warnings from react-quill
+// This is a known issue with react-quill library that uses deprecated findDOMNode internally
+if (process.env.NODE_ENV === 'development') {
+    const originalError = console.error;
+    console.error = (...args) => {
+        // Check if the warning is about findDOMNode and ReactQuill
+        const message = args[0];
+        if (
+            (typeof message === 'string' && message.includes('findDOMNode is deprecated')) ||
+            (typeof message === 'string' && message.includes('ReactQuill') && message.includes('findDOMNode'))
+        ) {
+            // Suppress this specific warning from react-quill
+            return;
+        }
+        originalError.apply(console, args);
+    };
+}
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>

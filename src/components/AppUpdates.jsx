@@ -1,5 +1,21 @@
 export const appUpdates = [
   {
+    date: "January 12, 2026",
+    message: (
+      <ul>
+        <li>FTC: </li>
+        <ul>
+          <li>Fixed an issue where updates to team data were not being saved correctly and causing the app to crash</li>
+        </ul>
+        
+        <li>FRC:</li>
+        <ul>
+        <li>Updated fouls to match REBUILT™ game rules</li>
+        <li>Updated cheat sheet to match REBUILT™ game</li>
+        </ul>
+      </ul>
+    ),
+  },{
     date: "December 16, 2025",
     message: (
       <ul>

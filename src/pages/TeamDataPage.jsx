@@ -14,7 +14,7 @@ import PizZip from "pizzip";
 import PizZipUtils from "pizzip/utils/index.js";
 import { saveAs } from "file-saver";
 import { useHotkeysContext } from "react-hotkeys-hook";
-import ReactQuill from "react-quill";
+import ReactQuillWrapper from "../components/ReactQuillWrapper";
 import 'react-quill/dist/quill.snow.css';
 import TeamTimer from "components/TeamTimer";
 import { useInterval } from "react-interval-hook";
@@ -212,18 +212,45 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
             resp.push(putTeamData(updateTeam.teamNumber, update.updates));
             Promise.all(resp).then(async (response) => {
                 if (response[0].status !== 204) {
+                    // Update failed - save locally
+                    var failedItemIndex = _.findIndex(localUpdatesTemp, { "teamNumber": updateTeam.teamNumber });
+                    if (failedItemIndex >= 0) {
+                        localUpdatesTemp.splice(failedItemIndex, 1);
+                    }
+                    localUpdatesTemp.push({ "teamNumber": updateTeam.teamNumber, "update": update.updates });
+                    await setLocalUpdates(localUpdatesTemp);
+                    
                     var errorText = `Your update for team ${updateTeam.teamNumber} was not successful. We have saved the change locally, and you can send it later from here or the Settings page.`;
                     toast.error(errorText);
-                    throw new Error(errorText);
                 } else {
-                    var itemExists = _.findIndex(localUpdatesTemp, { "teamNumber": updateTeam.teamNumber });
-                    if (itemExists >= 0) {
-                        localUpdatesTemp.splice(itemExists, 1);
+                    // Update succeeded - remove from local updates
+                    var successItemIndex = _.findIndex(localUpdatesTemp, { "teamNumber": updateTeam.teamNumber });
+                    if (successItemIndex >= 0) {
+                        localUpdatesTemp.splice(successItemIndex, 1);
                     }
+                    await setLocalUpdates(localUpdatesTemp);
+                    // Refresh community updates from server to show the latest data
+                    // The local update is already in communityUpdates, so it will show immediately
+                    // Refreshing ensures we have the authoritative version from the server
+                    getCommunityUpdates(false, null).catch((err) => {
+                        console.error('Error refreshing community updates:', err);
+                        // If refresh fails, the local update in communityUpdates will still be visible
+                    });
                     toast.success(`Your update for team ${updateTeam.teamNumber} was successful. Thank you for helping keep the team data current.`)
                 }
+            }).catch(async (error) => {
+                // Handle network errors or other failures - save locally
+                var errorItemIndex = _.findIndex(localUpdatesTemp, { "teamNumber": updateTeam.teamNumber });
+                if (errorItemIndex >= 0) {
+                    localUpdatesTemp.splice(errorItemIndex, 1);
+                }
+                localUpdatesTemp.push({ "teamNumber": updateTeam.teamNumber, "update": update.updates });
                 await setLocalUpdates(localUpdatesTemp);
-            })
+                
+                var errorText = `Your update for team ${updateTeam.teamNumber} was not successful. We have saved the change locally, and you can send it later from here or the Settings page.`;
+                toast.error(errorText);
+                console.error('Error updating team data:', error);
+            });
 
         } else {
             var itemExists = _.findIndex(localUpdatesTemp, { "teamNumber": updateTeam.teamNumber });
@@ -832,7 +859,8 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                         </Form.Group>
                         <Form.Group controlId="teamNotesLocal">
                             <Form.Label className={"formLabel"}><b>Team Notes for Announce and Play-by-Play Screens (These notes are local notes and do not come from <i>FIRST</i>)</b></Form.Label>
-                            <ReactQuill className={teamNotesLocal.replace(/<(.|\n)*?>/g, '').trim().length === 0 ? "" : "formHighlight"} theme="snow" modules={modules2} formats={formats2} value={teamNotesLocal} placeholder={"Enter some new notes you would like to appear on the Announce Screen"} onChange={(e) => setTeamNotesLocal(e)} />
+                            {/* @ts-expect-error - ReactQuillWrapper accepts all ReactQuill props including className */}
+                            <ReactQuillWrapper className={teamNotesLocal.replace(/<(.|\n)*?>/g, '').trim().length === 0 ? "" : "formHighlight"} theme="snow" modules={modules2} formats={formats2} value={teamNotesLocal} placeholder={"Enter some new notes you would like to appear on the Announce Screen"} onChange={(e) => setTeamNotesLocal(e)} />
                         </Form.Group>
                         <Form.Group controlId="teamNotes">
                             <Form.Label className={"formLabel"}><b>Team Notes for the Team Data Screen (These notes are local notes and do not come from <i>FIRST</i>)</b></Form.Label>
@@ -846,7 +874,8 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                                 <Button className={"TBAButton"} onClick={() => { window.open(`https://ftc-events.firstinspires.org/${selectedYear.value}/team/${updateTeam.teamNumber}`) }}>{`FIRST Season details ${selectedYear.value}`}</Button>
                                 <Button className={"TBAButton"} onClick={() => { window.open(`https://ftc-events.firstinspires.org/${selectedYear.value - 1}/team/${updateTeam.teamNumber}`) }}>{`FIRST Season details ${selectedYear.value - 1}`}</Button>
                             </ButtonToolbar>}
-                            <ReactQuill className={teamNotes.replace(/<(.|\n)*?>/g, '').trim().length === 0 ? "" : "formHighlight"} theme="snow" modules={modules} formats={formats} value={teamNotes} placeholder={"Enter some new notes you would like to appear on the Team Data Screen"} onChange={(e) => setTeamNotes(e)} />
+                            {/* @ts-expect-error - ReactQuillWrapper accepts all ReactQuill props including className */}
+                            <ReactQuillWrapper className={teamNotes.replace(/<(.|\n)*?>/g, '').trim().length === 0 ? "" : "formHighlight"} theme="snow" modules={modules} formats={formats} value={teamNotes} placeholder={"Enter some new notes you would like to appear on the Team Data Screen"} onChange={(e) => setTeamNotes(e)} />
                         </Form.Group>
                         {(selectedEvent?.value?.type === "Championship" || selectedEvent?.value?.type === "ChampionshipDivision") ?
                             <Form.Group controlId="topSponsors">
@@ -922,7 +951,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                                 <td>{updateTeam?.updates?.teamNotes}</td>
                                 <td>{updateTeam?.updates?.teamNotesLocal}</td>
                                 <td>{updateTeam?.updates?.topSponsorsLocal}</td>
-                                <td><td>{updateTeam?.updates?.sayNumber}</td></td>
+                                <td>{updateTeam?.updates?.sayNumber}</td>
                                 {(isAuthenticated && user["https://gatool.org/roles"] && user["https://gatool.org/roles"].indexOf("admin") >= 0) && <td>
                                     {updateTeam?.updates?.source}</td>}
                                 <td>Current Value</td>
