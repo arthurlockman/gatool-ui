@@ -6,6 +6,7 @@ import ReactQuill from 'react-quill';
  * This component forwards a ref to the underlying ReactQuill component.
  * All props are passed through to ReactQuill.
  */
+// @ts-ignore - forwardRef with spread props causes TypeScript issues in JSX files
 const ReactQuillWrapper = forwardRef((props, ref) => {
     return <ReactQuill ref={ref} {...props} />;
 });
