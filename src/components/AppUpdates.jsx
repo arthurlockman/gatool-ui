@@ -1,5 +1,15 @@
 export const appUpdates = [
   {
+    date: "January 14, 2026",
+    message: (
+      <ul>
+        <li>ALL PROGRAMS:</li>
+        <ul>
+          <li>Added button on Team List screento reset sponsors, robot names and optionally team notes for teams that have not been updated since the start of the season</li>
+        </ul>
+      </ul>
+    ),
+  },{
     date: "January 12, 2026",
     message: (
       <ul>

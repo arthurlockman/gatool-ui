@@ -65,7 +65,11 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
     const [teamNotesLocal, setTeamNotesLocal] = useState("");
     const [teamNotes, setTeamNotes] = useState("");
     const [topSponsorsLocal, setTopSponsorsLocal] = useState("");
-    const [topSponsorLocal, setTopSponsorLocal] = useState("")
+    const [topSponsorLocal, setTopSponsorLocal] = useState("");
+    const [showResetConfirm, setShowResetConfirm] = useState(false);
+    const [showSaveToCloud, setShowSaveToCloud] = useState(false);
+    const [teamsToReset, setTeamsToReset] = useState([]);
+    const [resetNotes, setResetNotes] = useState(false);
 
     const { start, stop } = useInterval(
         () => {
@@ -220,7 +224,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                     }
                     localUpdatesTemp.push({ "teamNumber": updateTeam.teamNumber, "update": update.updates });
                     await setLocalUpdates(localUpdatesTemp);
-                    
+
                     var errorText = `Your update for team ${updateTeam.teamNumber} was not successful. We have saved the change locally, and you can send it later from here or the Settings page.`;
                     toast.error(errorText);
                 } else {
@@ -247,7 +251,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                 }
                 localUpdatesTemp.push({ "teamNumber": updateTeam.teamNumber, "update": update.updates });
                 await setLocalUpdates(localUpdatesTemp);
-                
+
                 var errorText = `Your update for team ${updateTeam.teamNumber} was not successful. We have saved the change locally, and you can send it later from here or the Settings page.`;
                 toast.error(errorText);
                 console.error('Error updating team data:', error);
@@ -662,11 +666,242 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         getTeamList();
     }
 
+    /**
+     * Gets the season start date based on the program type
+     * @returns {moment.Moment} The season start date
+     */
+    const getSeasonStartDate = () => {
+        const year = parseInt(selectedYear?.value || moment().year());
+        // FRC: January 1 of the selected year
+        // FTC: September 1 of the selected year
+        if (ftcMode) {
+            return moment(`${year}-09-01`, 'YYYY-MM-DD');
+        } else {
+            return moment(`${year}-01-01`, 'YYYY-MM-DD');
+        }
+    }
+
+    /**
+     * Finds teams that have no updates or updates before the season start
+     * @returns {Array} Array of team numbers that should be reset
+     */
+    const findTeamsToReset = () => {
+        const seasonStart = getSeasonStartDate();
+        const teamsToResetList = [];
+
+        // Check all teams in the team list
+        if (teamList?.teams) {
+            teamList.teams.forEach((team) => {
+                // Check if team has updates in communityUpdates or localUpdates
+                const communityUpdate = find(communityUpdates, { "teamNumber": team.teamNumber });
+                const localUpdate = _.find(localUpdates, { "teamNumber": team.teamNumber });
+
+                // Get the update object (local takes precedence)
+                const update = localUpdate ? localUpdate.update : communityUpdate?.updates;
+
+                // Check if team has sponsor or robot name updates
+                // Check for non-empty values (not just existence, as empty strings should be ignored)
+                const hasSponsorOrRobotUpdate = update && (
+                    (update.topSponsorsLocal && update.topSponsorsLocal.trim() !== "") ||
+                    (update.topSponsorLocal && update.topSponsorLocal.trim() !== "") ||
+                    (update.robotNameLocal && update.robotNameLocal.trim() !== "")
+                );
+
+                if (hasSponsorOrRobotUpdate) {
+                    // Check if the lastUpdate is before season start or doesn't exist
+                    const lastUpdate = update.lastUpdate ? moment(update.lastUpdate) : null;
+
+                    // Include team if:
+                    // 1. No lastUpdate timestamp exists, OR
+                    // 2. lastUpdate is before season start
+                    if (!lastUpdate || lastUpdate.isBefore(seasonStart)) {
+                        teamsToResetList.push(team.teamNumber);
+                    }
+                }
+            });
+        }
+
+        return teamsToResetList;
+    }
+
+    /**
+     * Handles the reset button click - finds teams to reset and shows confirmation dialog
+     */
+    const handleResetClick = () => {
+        const teamsToResetList = findTeamsToReset();
+        setTeamsToReset(teamsToResetList);
+        setResetNotes(false); // Reset the checkbox to default
+        setShowResetConfirm(true);
+        disableScope('tabNavigation');
+    }
+
+    /**
+     * Handles the confirmation to proceed with reset
+     */
+    const handleResetProceed = async () => {
+        setShowResetConfirm(false);
+        
+        // Clone local updates and remove sponsor and robot name fields
+        var localUpdatesTemp = _.cloneDeep(localUpdates);
+        // Don't modify communityUpdates - it represents server state
+        // We'll only modify localUpdates, which take precedence when displaying
+
+        // Only process teams that are in the teamsToReset list
+        const teamsToResetSet = new Set(teamsToReset);
+
+        // Process local updates - remove sponsor/robot name fields (and notes if option selected) for teams in the reset list
+        localUpdatesTemp = localUpdatesTemp.map((localUpdate) => {
+            if (teamsToResetSet.has(localUpdate.teamNumber) && localUpdate.update) {
+                delete localUpdate.update.topSponsorsLocal;
+                delete localUpdate.update.topSponsorLocal;
+                delete localUpdate.update.robotNameLocal;
+                if (resetNotes) {
+                    delete localUpdate.update.teamNotesLocal;
+                    delete localUpdate.update.teamNotes;
+                }
+                localUpdate.update.lastUpdate = moment().format();
+            }
+            return localUpdate;
+        });
+
+        // For teams that are in communityUpdates but not in localUpdates,
+        // we need to create local updates that override the community updates
+        // by explicitly removing the sponsor/robot name fields
+        teamsToReset.forEach((teamNumber) => {
+            const existsInLocalUpdates = _.findIndex(localUpdatesTemp, { "teamNumber": teamNumber }) >= 0;
+            
+            if (!existsInLocalUpdates) {
+                // Get the community update for this team
+                const communityUpdate = find(communityUpdates, { "teamNumber": teamNumber });
+                
+                if (communityUpdate && communityUpdate.updates) {
+                    // Create a local update that removes the sponsor/robot name fields
+                    // Start with a copy of the community update
+                    const resetUpdate = _.cloneDeep(communityUpdate.updates);
+                    
+                    // Remove sponsor/robot name fields
+                    delete resetUpdate.topSponsorsLocal;
+                    delete resetUpdate.topSponsorLocal;
+                    delete resetUpdate.robotNameLocal;
+                    if (resetNotes) {
+                        delete resetUpdate.teamNotesLocal;
+                        delete resetUpdate.teamNotes;
+                    }
+                    resetUpdate.lastUpdate = moment().format();
+                    
+                    // Add to localUpdates so Setup page can detect it
+                    localUpdatesTemp.push({
+                        teamNumber: teamNumber,
+                        update: resetUpdate
+                    });
+                } else {
+                    // Team has no updates at all, but was in teamsToReset
+                    // This shouldn't happen, but create a minimal update entry
+                    localUpdatesTemp.push({
+                        teamNumber: teamNumber,
+                        update: {
+                            lastUpdate: moment().format()
+                        }
+                    });
+                }
+            }
+        });
+
+        // Save changes locally (don't modify communityUpdates)
+        await setLocalUpdates(localUpdatesTemp);
+
+        enableScope('tabNavigation');
+
+        // Show second dialog asking about saving to cloud
+        setShowSaveToCloud(true);
+        disableScope('tabNavigation');
+    }
+
+    /**
+     * Handles canceling the reset
+     */
+    const handleResetCancel = () => {
+        setShowResetConfirm(false);
+        enableScope('tabNavigation');
+    }
+
+    /**
+     * Handles saving changes to gatool Cloud
+     */
+    const handleSaveToCloud = async () => {
+        setShowSaveToCloud(false);
+        enableScope('tabNavigation');
+
+        var localUpdatesTemp = _.cloneDeep(localUpdates);
+        var communityUpdatesTemp = _.cloneDeep(communityUpdates);
+        var errors = [];
+        var successes = [];
+
+        // Only push updates for teams that were reset
+        // First, get all updates (local and community) for reset teams
+        const updatesToPush = [];
+
+        teamsToReset.forEach((teamNumber) => {
+            const localUpdate = _.find(localUpdatesTemp, { "teamNumber": teamNumber });
+            const communityUpdate = find(communityUpdatesTemp, { "teamNumber": teamNumber });
+
+            // Use local update if it exists, otherwise use community update
+            const update = localUpdate ? localUpdate.update : communityUpdate?.updates;
+
+            if (update) {
+                updatesToPush.push({
+                    teamNumber: teamNumber,
+                    update: update
+                });
+            }
+        });
+
+        // Push each update to gatool Cloud
+        for (const updateData of updatesToPush) {
+            try {
+                var response = await putTeamData(updateData.teamNumber, updateData.update);
+                if (response.status !== 204) {
+                    errors.push(updateData.teamNumber);
+                } else {
+                    successes.push(updateData.teamNumber);
+                    // Remove from localUpdates if successfully saved
+                    var itemExists = _.findIndex(localUpdatesTemp, { "teamNumber": updateData.teamNumber });
+                    if (itemExists >= 0) {
+                        localUpdatesTemp.splice(itemExists, 1);
+                    }
+                }
+            } catch (error) {
+                errors.push(updateData.teamNumber);
+            }
+        }
+
+        await setLocalUpdates(localUpdatesTemp);
+
+        if (successes.length > 0) {
+            toast.success(`Successfully saved changes to gatool Cloud for ${successes.length} team(s).`);
+        }
+        if (errors.length > 0) {
+            toast.error(`Failed to save changes for ${errors.length} team(s). Changes are still saved locally.`);
+        }
+
+        // Refresh community updates
+        await getCommunityUpdates(false, null);
+    }
+
+    /**
+     * Handles canceling the save to cloud dialog
+     */
+    const handleSaveToCloudCancel = () => {
+        setShowSaveToCloud(false);
+        enableScope('tabNavigation');
+        toast.success("Changes have been saved locally. You can upload them to gatool Cloud later from the Setup page.");
+    }
+
 
     // Memoize teamListExtended to avoid recalculating on every render
     const teamListExtended = useMemo(() => {
         if (!teamList?.teams) return [];
-        
+
         let extended = teamList.teams.map((teamRow) => {
             const teamRowCopy = { ...teamRow };
             // Calculate rank inline to avoid dependency on getTeamRank function
@@ -684,7 +919,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         } else {
             extended = orderBy(extended, teamSort, 'asc');
         }
-        
+
         return extended;
     }, [teamList?.teams, communityUpdates, localUpdates, teamSort, rankings?.ranks, remapNumberToString]);
 
@@ -748,6 +983,9 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                         </tr>
                     </tbody>
                 </Table>
+                {isAuthenticated && <><Button variant="warning" size="sm" onClick={handleResetClick} style={{ marginRight: "10px" }}>Reset sponsors and robot names</Button>
+                    <Button variant="success" size="sm" onClick={(e) => { clearVisits(false, e) }}>Reset visit times. Use at the start of each day.</Button><br /><br /></>}
+
                 <Table responsive striped bordered size="sm" className={"teamTable"}>
                     <thead className="thead-default">
                         <tr className={"teamTableHeader"}>
@@ -790,6 +1028,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                         })}
                     </tbody>
                 </Table>
+                {isAuthenticated && <Button variant="warning" size="sm" onClick={handleResetClick} style={{ marginRight: "10px" }}>Reset sponsors and robot names</Button>}
                 <Button variant="success" size="sm" onClick={(e) => { clearVisits(false, e) }}>Reset visit times. Use at the start of each day.</Button><br /><br /><br />
             </div></>}
             <Modal centered={true} show={showDownload} onHide={handleCloseDownload}>
@@ -813,7 +1052,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                 </Modal.Header>
                 <Modal.Body>
                     <p>Use this form to update team information for <b>Team {updateTeam.teamNumber}.</b> Editable fields are shown below. Your changes will be stored locally on your machine and should not be erased if you close your browser. We do recommend using the Save to Home Screen feature on Android and iOS, and the Save App feature from Chrome on desktop, if you are offline.</p>
-                    <p>Tap on each item to update its value. Tap <b>DONE</b> when you're finished editing, or browse to another tab to cancel editing. Items <span className={"teamTableHighlight"}><b>highlighted in green</b></span> have local changes. <b>Motto</b> and <b>Notes</b> do not exist in TIMS, so they are always local. To reset any value to the TIMS value, simply delete it here and tap DONE.</p>
+                    <p>Items <span className={"teamTableHighlight"}><b>highlighted in green</b></span> have local changes. <b>Motto</b>, {ftcMode ? <></> : <><b>Robot Name</b>,</>} <b>pronounciation guides</b> and <b>Notes</b> do not exist in TIMS, so they are always local. To reset any value to the TIMS value, simply delete it here and tap DONE.</p>
                     <p>You can upload this form to gatool Cloud, or keep the values locally for later upload, using the buttons at the bottom of this screen.</p>
                     <p onClick={(e) => handleHistory(updateTeam, e)}><b><CalendarPlusFill /> Tap here to see prior team data updates.</b></p>
                     <div className={updateClass(updateTeam?.lastUpdate)}><p>Last updated in gatool Cloud: {moment(updateTeam?.lastUpdate).fromNow()}</p></div>
@@ -986,6 +1225,61 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="success" size="sm" onClick={handleCloseHistory}>close</Button>
+                </Modal.Footer>
+            </Modal>
+
+            <Modal centered={true} show={showResetConfirm} onHide={handleResetCancel}>
+                <Modal.Header className={"allianceChoice"} closeVariant={"white"} closeButton>
+                    <Modal.Title>Reset Sponsors and Robot Names</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>You are about to remove local updates to sponsors and robot names for teams at <b>{eventLabel || selectedEvent?.label}</b> that have not been updated since the start of the season.</p>
+                    <p>This action will remove all local changes to:</p>
+                    <ul>
+                        <li>Top Sponsors / Top Sponsor</li>
+                        <li>Robot Names</li>
+                        {resetNotes && <li>Team Notes (both Announce Screen and Team Data Screen notes)</li>}
+                    </ul>
+                    <p>Other local updates {resetNotes ? "(team names, organization, etc.)" : "(team names, organization, notes, etc.)"} will be preserved.</p>
+                    <Form.Group style={{ backgroundColor: "#d4edda", padding: "10px", borderRadius: "4px" }}>
+                        <Form.Check
+                            type="checkbox"
+                            id="resetNotes"
+                            label={<strong>Also reset Team Notes fields (Announce Screen and Team Data Screen notes)</strong>}
+                            checked={resetNotes}
+                            onChange={(e) => setResetNotes(e.target.checked)}
+                        />
+                    </Form.Group>
+                    {teamsToReset.length > 0 ? (
+                        <>
+                            <p><b>The following {teamsToReset.length} team{teamsToReset.length === 1 ? "" : "s"} will be reset:</b></p>
+                            <div style={{ maxHeight: "200px", overflowY: "auto", border: "1px solid #ccc", padding: "10px", borderRadius: "4px" }}>
+                                <p style={{ margin: 0, fontFamily: "monospace" }}>
+                                    {teamsToReset.sort((a, b) => a - b).join(", ")}
+                                </p>
+                            </div>
+                        </>
+                    ) : (
+                        <p><b>No teams found that match the reset criteria.</b></p>
+                    )}
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleResetCancel}>Cancel</Button>
+                    <Button variant="warning" onClick={handleResetProceed} disabled={teamsToReset.length === 0}>Proceed</Button>
+                </Modal.Footer>
+            </Modal>
+
+            <Modal centered={true} show={showSaveToCloud} onHide={handleSaveToCloudCancel}>
+                <Modal.Header className={"allianceChoice"} closeVariant={"white"} closeButton>
+                    <Modal.Title>Save Changes to gatool Cloud?</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>The local updates have been removed. Would you like to save these changes to gatool Cloud now?</p>
+                    <p>If you choose to save now, the changes will be pushed to gatool Cloud immediately. If you choose to save later, the changes will remain local and you can upload them from the Setup page.</p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleSaveToCloudCancel}>I'll update them in gatool Cloud later</Button>
+                    <Button variant="success" onClick={handleSaveToCloud} disabled={!isOnline}>Yes, I want to save to gatool Cloud</Button>
                 </Modal.Footer>
             </Modal>
 
