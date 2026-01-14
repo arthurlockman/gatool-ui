@@ -2,7 +2,7 @@ import { Alert, Button, Container, Form, InputGroup, Modal, Table, ButtonToolbar
 import { CalendarPlusFill, SortAlphaDown, SortAlphaUp, SortNumericDown, SortNumericUp } from 'react-bootstrap-icons';
 import { orderBy, find } from "lodash";
 import { rankHighlight } from "../components/HelperFunctions";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import moment from "moment";
 import _ from "lodash";
 import { toast } from "react-toastify";
@@ -88,7 +88,8 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         if (teamList?.teams?.length > 0 && clockRunning) {
             start()
         } else { stop() }
-    }, [teamList?.teams, clockRunning, start, stop]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [teamList?.teams?.length, clockRunning]);
 
     /**
      * Quill Modules
@@ -348,10 +349,6 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
     }
 
 
-    function getTeamRank(teamNumber) {
-        var team = find(rankings?.ranks, { "teamNumber": remapNumberToString(teamNumber) });
-        return team?.rank;
-    }
 
     function updateHighlight(update) {
         var style = {
@@ -666,20 +663,30 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
     }
 
 
-    var teamListExtended = teamList?.teams?.map((teamRow) => {
-        teamRow.rank = getTeamRank(teamRow?.teamNumber);
-        teamRow.citySort = teamRow?.country + teamRow?.stateProv + teamRow?.city;
-        var update = find(communityUpdates, { "teamNumber": teamRow.teamNumber });
-        var localUpdate = _.find(localUpdates, { "teamNumber": teamRow?.teamNumber });
-        teamRow.updates = localUpdate ? localUpdate.update : update?.updates;
-        return teamRow;
-    })
+    // Memoize teamListExtended to avoid recalculating on every render
+    const teamListExtended = useMemo(() => {
+        if (!teamList?.teams) return [];
+        
+        let extended = teamList.teams.map((teamRow) => {
+            const teamRowCopy = { ...teamRow };
+            // Calculate rank inline to avoid dependency on getTeamRank function
+            var team = find(rankings?.ranks, { "teamNumber": remapNumberToString(teamRowCopy?.teamNumber) });
+            teamRowCopy.rank = team?.rank;
+            teamRowCopy.citySort = teamRowCopy?.country + teamRowCopy?.stateProv + teamRowCopy?.city;
+            var update = find(communityUpdates, { "teamNumber": teamRowCopy.teamNumber });
+            var localUpdate = _.find(localUpdates, { "teamNumber": teamRowCopy?.teamNumber });
+            teamRowCopy.updates = localUpdate ? localUpdate.update : update?.updates;
+            return teamRowCopy;
+        });
 
-    if (teamSort.charAt(0) === "-") {
-        teamListExtended = orderBy(teamListExtended, teamSort.slice(1), 'desc');
-    } else {
-        teamListExtended = orderBy(teamListExtended, teamSort, 'asc');
-    }
+        if (teamSort.charAt(0) === "-") {
+            extended = orderBy(extended, teamSort.slice(1), 'desc');
+        } else {
+            extended = orderBy(extended, teamSort, 'asc');
+        }
+        
+        return extended;
+    }, [teamList?.teams, communityUpdates, localUpdates, teamSort, rankings?.ranks, remapNumberToString]);
 
     function resetToTIMS() {
         setNameShortLocal("");
@@ -895,7 +902,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                         <Form.Group controlId="sponsors">
                             <Form.Label className={"formLabel"}><b>Full list of Sponsors <i>(For reference only. This field is not editable, does not appear in the UI, and any changes here will not be saved.)</i></b></Form.Label>
                             <Form.Control as="textarea"
-                                placeholder={updateTeam?.sponsors} defaultValue={updateTeam?.sponsors} disabled />
+                                placeholder={updateTeam?.topSponsors} defaultValue={updateTeam?.topSponsors} disabled />
                         </Form.Group>
                         <br />
                     </Form>
