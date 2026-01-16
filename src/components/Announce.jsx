@@ -122,10 +122,10 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
                         let formattedAward = <></>;
                         if (award.year > selectedYear.value - (awardsMenu?.value || 3)) {
                             if (!award.highlight && (showMinorAwards || _.isNull(showMinorAwards))) {
-                                formattedAward = <span key={award?.year + award?.eventName + award?.name + award?.person + team?.teamNumber + index} >{award.year} {_.findIndex(eventNamesCY[award.eventName]) >= 0 ? eventNamesCY[award.eventName] : award.eventName} : {award.name}{award.person ? ` : ${award.person}` : ""}<br /></span>
+                                formattedAward = <span key={award?.year + award?.eventCode + award?.name + award?.person + team?.teamNumber + index} >{award.year} {_.findIndex(eventNamesCY[award.eventCode]) >= 0 ? eventNamesCY[award.eventCode] : award?.eventName ? award?.eventName : award.code} : {award.name}{award.person ? ` : ${award.person}` : ""}<br /></span>
                             } else {
                                 if (award.highlight) {
-                                    formattedAward = <span key={award?.year + award?.eventName + award?.name + award?.person + team?.teamNumber + index} className={"awardHilight"}>{award.year} {_.findIndex(eventNamesCY[award.eventName]) >= 0 ? eventNamesCY[award.eventName] : award.eventName} : {award.name}{award.person ? ` : ${award.person}` : ""}<br /></span>
+                                    formattedAward = <span key={award?.year + award?.eventCode + award?.name + award?.person + team?.teamNumber + index} className={"awardHilight"}>{award.year} {_.findIndex(eventNamesCY[award.eventCode]) >= 0 ? eventNamesCY[award.eventCode] : award?.eventName ? award?.eventName : award.code} : {award.name}{award.person ? ` : ${award.person}` : ""}<br /></span>
                                 }
                             }
                         }
