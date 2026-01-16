@@ -164,7 +164,9 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
         setLocalUpdates([]);
         await setLoadingCommunityUpdates(false);
         handleClose();
-        getCommunityUpdates(false, null);
+        // Refresh community updates from server, ignoring local updates to get pure server state
+        // This ensures the reset button can find teams again after deletion
+        getCommunityUpdates(false, null, true);
     }
 
     function handleClose() {
