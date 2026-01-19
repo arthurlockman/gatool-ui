@@ -3370,6 +3370,21 @@ function App() {
       delete ranks.ranks.rankings;
     }
 
+    // Filter out FTC rankings entries that haven't played any matches yet
+    // In FTC, rankings are published before matches start (ordered by team number)
+    // We only want to show teams that have actually played matches
+    if (ftcMode && ranks?.ranks && Array.isArray(ranks.ranks)) {
+      const originalCount = ranks.ranks.length;
+      ranks.ranks = ranks.ranks.filter((rank) => {
+        // Keep entries that have matchesCounted defined and greater than 0
+        return rank.matchesCounted !== undefined && rank.matchesCounted !== null && rank.matchesCounted > 0;
+      });
+      const filteredCount = ranks.ranks.length;
+      if (originalCount !== filteredCount) {
+        console.log(`Filtered FTC rankings: ${originalCount} -> ${filteredCount} (removed ${originalCount - filteredCount} teams with no matches played)`);
+      }
+    }
+
     // fix FTC online rankings
     const teamResults = teamList?.teams.map((team) => {
       return {
