@@ -1,5 +1,16 @@
 export const appUpdates = [
   {
+    date: "January 18, 2026",
+    message: (
+      <ul>
+        <li>FTC:</li>
+        <ul>
+          <li>Fixed a bug that prevented awards for some events from displaying correctly on the Awards page</li>
+          <li>Added a routine to filter out ranks for teams that have not played any matches yet. This will ensure that Sponsors appear correctly on the Awards page</li>
+        </ul>
+      </ul>
+    ),
+  },{
     date: "January 16, 2026",
     message: (
       <ul>

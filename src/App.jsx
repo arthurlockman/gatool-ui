@@ -2553,41 +2553,70 @@ function App() {
       teams.teams = teamListSponsorsFixed;
 
       //fetch awards for the current teams
-      var newTeams = [];
+      // Initialize newTeams with current teams as fallback to ensure we always have teams data
+      // Create new team objects to avoid mutating originals
+      var newTeams = teams.teams.map((team) => {
+        // Preserve existing awards if they exist, otherwise initialize empty object
+        const awards = (team.awards && typeof team.awards === 'object') ? team.awards : {};
+        return {
+          ...team,
+          awards: awards
+        };
+      });
+      
       // Skip external API calls when in FTC offline mode without internet
       if (useFTCOffline && (!isOnline || manualOfflineMode)) {
         console.log("FTC Offline mode: Skipping queryAwards API call while offline" + (manualOfflineMode ? " (manual override)" : "") + " - using cached awards");
-        // Skip awards fetching, use cached data
-        // Ensure teams have at least empty awards objects if they don't have any
-        newTeams = teams.teams.map((team) => {
-          if (!team.awards || typeof team.awards !== 'object') {
-            team.awards = {};
-          }
-          return team;
-        });
+        // Awards already initialized above, just use cached data
       } else if (teams?.teams.length > 0) {
-        var req = await httpClient.postNoAuth(
-          `${selectedYear?.value}/queryAwards`,
-          {
-            teams: teams.teams.map((t) => t?.teamNumber),
-          },
-          ftcMode ? ftcBaseURL : undefined
-        );
-        if (req.status === 200) {
-          // @ts-ignore
-          var awards = await req.json();
+        try {
+          const teamNumbers = teams.teams.map((t) => t?.teamNumber);
+          const baseURL = ftcMode ? ftcBaseURL : undefined;
+          
+          var req = await httpClient.postNoAuth(
+            `${selectedYear?.value}/queryAwards`,
+            {
+              teams: teamNumbers,
+            },
+            baseURL
+          );
+          
+          if (req.status === 200) {
+            // @ts-ignore
+            var awards = await req.json();
 
-          newTeams = teams.teams.map((team) => {
-            team.awards = awards[`${team?.teamNumber}`] || {};
-            return team;
-          });
+            // Merge awards into teams - ensure all teams get awards data
+            // Try both string and number keys since API might return different formats
+            // Create new team objects to avoid mutating originals
+            newTeams = teams.teams.map((team) => {
+              const teamNum = team?.teamNumber;
+              // Try multiple key formats to handle different API response structures
+              const teamAwards = awards[`${teamNum}`] || awards[teamNum] || awards[String(teamNum)] || {};
+              
+              // Create a new team object with awards merged in
+              return {
+                ...team,
+                awards: teamAwards
+              };
+            });
+            
+            const teamsWithAwards = newTeams.filter(t => t.awards && Object.keys(t.awards).length > 0).length;
+            if (teamsWithAwards > 0) {
+              console.log(`Awards loaded: ${teamsWithAwards} of ${newTeams.length} teams have awards data`);
+            }
+          } else {
+            console.warn(`Awards API returned status ${req.status} for event ${selectedEvent?.value?.code}, using teams without awards update`);
+          }
+        } catch (error) {
+          console.error(`Error fetching awards for event ${selectedEvent?.value?.code}:`, error);
+          // newTeams already initialized with teams above, so we'll use those
         }
       }
 
       // Parse awards to ensure we highlight them properly and remove extraneous text i.e. FIRST CHampionship from name
-
-      var formattedAwards = newTeams
-        ? newTeams.map((team) => {
+      // newTeams is guaranteed to have data at this point (initialized above)
+      var formattedAwards = newTeams.map((team) => {
+        try {
           // Add in special awards not reported by FIRST APIs (from 2021 season)
           for (var index = 0; index < 3; index++) {
             const targetYear = parseInt(selectedYear?.value) - index;
@@ -2599,35 +2628,56 @@ function App() {
                 (item) => item.teamNumber === team.teamNumber
               );
               if (teamAwards.length > 0) {
-                team.awards[`${selectedYear?.value - index}`].awards =
-                  _.concat(
-                    team.awards[`${selectedYear?.value - index}`].awards,
-                    teamAwards
-                  );
+                const yearKey = `${selectedYear?.value - index}`;
+                // Ensure the year key exists in awards before accessing it
+                if (!team.awards[yearKey]) {
+                  team.awards[yearKey] = { awards: [] };
+                }
+                // Ensure awards array exists
+                if (!team.awards[yearKey].awards) {
+                  team.awards[yearKey].awards = [];
+                }
+                team.awards[yearKey].awards = _.concat(
+                  team.awards[yearKey].awards,
+                  teamAwards
+                );
               }
             }
           }
-          var awardYears = Object.keys(team?.awards);
+          var awardYears = Object.keys(team?.awards || {});
 
           awardYears?.forEach((year) => {
-            if (team?.awards[`${year}`] !== null) {
-              if (team.awards[`${year}`]?.awards) {
-                team.awards[`${year}`] = {
-                  awards: team.awards[`${year}`].awards,
+            const yearKey = `${year}`;
+            const yearAwards = team?.awards[yearKey];
+            
+            if (yearAwards !== null && yearAwards !== undefined) {
+              // Normalize the structure - ensure it has an awards array
+              if (!yearAwards.awards || !Array.isArray(yearAwards.awards)) {
+                // If awards property doesn't exist or isn't an array, initialize it
+                team.awards[yearKey] = {
+                  awards: Array.isArray(yearAwards) ? yearAwards : []
+                };
+              } else {
+                // Ensure structure is correct
+                team.awards[yearKey] = {
+                  awards: yearAwards.awards
                 };
               }
-              team.awards[`${year}`].awards = team?.awards[
-                `${year}`
-              ]?.awards?.map((award) => {
-                award.highlight = awardsHilight(award.name);
-                award.eventName = eventnames[`${year}`]
-                  ? eventnames[`${year}`][award.eventCode]
-                  : award.eventCode;
-                award.year = year;
-                return award;
-              });
+              
+              // Map over awards to add highlight, eventName, and year properties
+              if (team.awards[yearKey].awards && Array.isArray(team.awards[yearKey].awards)) {
+                team.awards[yearKey].awards = team.awards[yearKey].awards.map((award) => {
+                  award.highlight = awardsHilight(award.name);
+                  award.eventName = eventnames[`${year}`]
+                    ? eventnames[`${year}`][award.eventCode]
+                    : award.eventCode;
+                  award.year = year;
+                  return award;
+                });
+              }
             } else {
-              team.awards[`${year}`] = { awards: [] };
+              // Initialize empty awards array for this year
+              team.awards[yearKey] = { awards: [] };
             }
           });
           team.hallOfFame = [];
@@ -2727,9 +2777,16 @@ function App() {
           );
 
           return team;
-        })
-        : null;
-      teams.teams = formattedAwards ? formattedAwards : teams.teams;
+        } catch (error) {
+          console.error(`Error processing awards for team ${team?.teamNumber}:`, error);
+          // Return team with existing awards data even if processing failed
+          return team;
+        }
+        });
+      
+      // Update teams.teams with formatted awards before proceeding to champs data
+      // This ensures awards are always merged before state is updated
+      teams.teams = formattedAwards;
 
       var champsTeams = [];
       // When online and in FRC mode, always check for blue banners if showBlueBanners is enabled
@@ -3311,6 +3368,21 @@ function App() {
     } else {
       ranks.ranks = ranks.ranks.rankings;
       delete ranks.ranks.rankings;
+    }
+
+    // Filter out FTC rankings entries that haven't played any matches yet
+    // In FTC, rankings are published before matches start (ordered by team number)
+    // We only want to show teams that have actually played matches
+    if (ftcMode && ranks?.ranks && Array.isArray(ranks.ranks)) {
+      const originalCount = ranks.ranks.length;
+      ranks.ranks = ranks.ranks.filter((rank) => {
+        // Keep entries that have matchesCounted defined and greater than 0
+        return rank.matchesCounted !== undefined && rank.matchesCounted !== null && rank.matchesCounted > 0;
+      });
+      const filteredCount = ranks.ranks.length;
+      if (originalCount !== filteredCount) {
+        console.log(`Filtered FTC rankings: ${originalCount} -> ${filteredCount} (removed ${originalCount - filteredCount} teams with no matches played)`);
+      }
     }
 
     // fix FTC online rankings
