@@ -4237,9 +4237,26 @@ function App() {
     );
 
     if (result.status === 200) {
-      // @ts-ignore
-      var notifications = await result.json();
-      return notifications;
+      // Check if there's content before trying to parse JSON
+      // result might be a Response object or a plain object, so check for headers
+      if ('headers' in result && result.headers) {
+        const contentLength = result.headers.get('content-length');
+        if (contentLength === '0' || contentLength === null) {
+          // No content, return empty array
+          return [];
+        }
+      }
+      try {
+        // @ts-ignore
+        var notifications = await result.json();
+        return notifications;
+      } catch (e) {
+        // If JSON parsing fails (e.g., empty body), return empty array
+        return [];
+      }
+    } else if (result.status === 204) {
+      // No Content status, return empty array
+      return [];
     } else if (result.status === 404) {
       return [
         {

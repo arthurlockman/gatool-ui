@@ -36,7 +36,7 @@ function PlayByPlay({ station, team, inPlayoffs, selectedEvent, showNotes, showM
                 {team?.teamNumber && (team?.teamNumber !== 0) &&
                     <>
                         <p className={`playByPlayTeamName ${(inPlayoffs && showQualsStats) ? "playByPlayTeamNameStats" : ""} ${team?.updates?.nameShortLocal ? (team?.updates?.nameShortLocal?.length > 60 ? " narrowFont" : "") : (team?.nameShort?.length > 60 ? " narrowFont" : "")}`}>{team?.updates?.nameShortLocal ? team?.updates?.nameShortLocal : team?.nameShort}</p>
-                        <p className={"playByPlayRobotName"}>{team?.updates?.robotNameLocal}</p>
+                        <p className={"playByPlayRobotName"}>{team?.updates?.robotNameLocal ? team?.updates?.robotNameLocal : team?.robotName}</p>
                         {((!inPlayoffs && (_.isNull(showQualsStatsQuals) || showQualsStatsQuals)) || (inPlayoffs && showQualsStats)) && team?.rank &&
                             <div className={"playByPlayWinLossTie text-center"}>
                                 <table className={"wltTable"}>
