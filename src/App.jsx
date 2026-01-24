@@ -390,6 +390,10 @@ function App() {
     "setting:screenMode",
     false
   );
+  const [screenModeSyncFrequency, setScreenModeSyncFrequency] = usePersistentState(
+    "setting:screenModeSyncFrequency",
+    10
+  ); // Frequency in seconds (5-10)
   const [screenModeStatus, setScreenModeStatus] = useState(null); // null = unknown, true = valid data, false = invalid/malformed
 
   // Enforce mutual exclusivity between syncEvent and screenMode
@@ -4329,7 +4333,8 @@ function App() {
       FTCKey: FTCKey,
       FTCServerURL: FTCServerURL,
       manualOfflineMode: manualOfflineMode,
-      currentMatch: currentMatch
+      currentMatch: currentMatch,
+      screenModeSyncFrequency: screenModeSyncFrequency
     }
     var result = await httpClient.put(`user/preferences`, userPrefs);
     // @ts-ignore
@@ -5670,6 +5675,14 @@ function App() {
         if (userPrefs.manualOfflineMode !== undefined && userPrefs.manualOfflineMode !== manualOfflineMode) {
           setManualOfflineMode(userPrefs.manualOfflineMode);
         }
+        if (userPrefs.screenModeSyncFrequency !== undefined && userPrefs.screenModeSyncFrequency !== screenModeSyncFrequency) {
+          // Clamp value between 5 and 10
+          const newFrequency = Math.max(5, Math.min(10, userPrefs.screenModeSyncFrequency));
+          if (newFrequency !== screenModeSyncFrequency) {
+            setScreenModeSyncFrequency(newFrequency);
+            // Polling will restart automatically via useEffect when frequency changes
+          }
+        }
         if (userPrefs.currentMatch !== undefined && userPrefs.currentMatch !== null && userPrefs.currentMatch !== currentMatch) {
           setCurrentMatch(userPrefs.currentMatch);
         }
@@ -5683,19 +5696,26 @@ function App() {
     }
   };
 
-  // Screen Mode: Poll user preferences every 10 seconds and update local state
-  const { start: startScreenModePoll, stop: stopScreenModePoll } = useInterval(
-    fetchAndProcessUserPrefs,
-    10000, // 10 seconds
-    {
-      autoStart: false,
-      immediate: false,
-      selfCorrecting: true,
-      onFinish: () => {
-        console.log("Screen Mode polling stopped.");
-      },
+  // Screen Mode: Poll user preferences at configured frequency and update local state
+  // Note: useInterval doesn't support dynamic intervals, so we'll recreate it when frequency changes
+  const screenModePollIntervalRef = useRef(null);
+  const startScreenModePoll = () => {
+    if (screenModePollIntervalRef.current) {
+      clearInterval(screenModePollIntervalRef.current);
     }
-  );
+    const frequency = (screenModeSyncFrequency || 10) * 1000; // Convert seconds to milliseconds
+    screenModePollIntervalRef.current = setInterval(() => {
+      if (screenMode && isAuthenticated) {
+        fetchAndProcessUserPrefs();
+      }
+    }, frequency);
+  };
+  const stopScreenModePoll = () => {
+    if (screenModePollIntervalRef.current) {
+      clearInterval(screenModePollIntervalRef.current);
+      screenModePollIntervalRef.current = null;
+    }
+  };
 
   const screenModeInitializedRef = useRef(false);
   const previousScreenModeRef = useRef(screenMode);
@@ -5718,7 +5738,8 @@ function App() {
         console.log("Screen Mode active - disabling Sync Event");
         setSyncEvent(false);
       }
-      // Screen mode already enabled, just ensure polling is running
+      // Screen mode already enabled, restart polling to pick up any frequency changes
+      stopScreenModePoll();
       startScreenModePoll();
     } else {
       // Screen mode disabled
@@ -5730,7 +5751,20 @@ function App() {
     }
     previousScreenModeRef.current = screenMode;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [screenMode, isAuthenticated, syncEvent, setSyncEvent]);
+  }, [screenMode, isAuthenticated, syncEvent, setSyncEvent, screenModeSyncFrequency]);
+  
+  // Restart polling when frequency changes (if Screen Mode is active)
+  useEffect(() => {
+    if (screenMode && isAuthenticated) {
+      stopScreenModePoll();
+      startScreenModePoll();
+    }
+    // Cleanup on unmount or when screenMode/frequency changes
+    return () => {
+      stopScreenModePoll();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [screenModeSyncFrequency]);
 
   // Debounce putUserPrefs to prevent rapid successive calls
   const syncDebounceTimeoutRef = useRef(null);
@@ -5869,6 +5903,7 @@ function App() {
     FTCKey,
     FTCServerURL,
     manualOfflineMode,
+    screenModeSyncFrequency,
   });
 
   useEffect(() => {
@@ -5915,6 +5950,7 @@ function App() {
         FTCKey,
         FTCServerURL,
         manualOfflineMode,
+        screenModeSyncFrequency,
       };
 
       // Compare current preferences with previous (skip if syncEvent just changed or event is loading)
@@ -5967,6 +6003,7 @@ function App() {
     FTCKey,
     FTCServerURL,
     manualOfflineMode,
+    screenModeSyncFrequency,
     syncEvent,
     isAuthenticated,
   ]);
@@ -6125,6 +6162,8 @@ function App() {
                     setSyncEvent={setSyncEvent}
                     screenMode={screenMode}
                     setScreenMode={setScreenMode}
+                    screenModeSyncFrequency={screenModeSyncFrequency}
+                    setScreenModeSyncFrequency={setScreenModeSyncFrequency}
                     eventLabel={eventLabel}
                     setEventLabel={setEventLabel}
                     showInspection={showInspection}
