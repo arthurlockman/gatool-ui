@@ -86,6 +86,9 @@ function MainNavigation({
   allianceSelection,
   systemBell,
   systemMessage,
+  screenMode = false,
+  screenModeStatus = null,
+  syncEvent = false,
 }) {
   const [scheduleTabReady, setScheduleTabReady] = useState(TabStates.NotReady);
   const [teamDataTabReady, setTeamDataTabReady] = useState(TabStates.NotReady);
@@ -390,7 +393,7 @@ function MainNavigation({
             }}
           />
         )}
-        <AuthWidget />
+        <AuthWidget screenMode={screenMode} screenModeStatus={screenModeStatus} syncEvent={syncEvent} />
       </Navbar>
     </>
   );

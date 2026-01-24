@@ -23,6 +23,8 @@ function Developer({
   systemBell,
   setSystemBell,
   resetCache,
+  putUserPrefs,
+  getUserPrefs,
 }) {
   const { user, getAccessTokenSilently } = useAuth0();
 
@@ -53,6 +55,9 @@ function Developer({
     readOnlyUsers: null,
     deletedUsers: null,
   });
+
+  const [userPrefsResult, setUserPrefsResult] = useState(null);
+  const [userPrefsLoading, setUserPrefsLoading] = useState(false);
 
   useEffect(() => {
     async function getToken() {
@@ -234,6 +239,36 @@ function Developer({
     resetCache();
   };
 
+  const handlePutUserPrefs = async () => {
+    setUserPrefsLoading(true);
+    try {
+      const result = await putUserPrefs();
+      setUserPrefsResult(result);
+      setUserPrefsLoading(false);
+    } catch (error) {
+      setUserPrefsResult({
+        status: "error",
+        message: error.message || "Unknown error occurred",
+      });
+      setUserPrefsLoading(false);
+    }
+  };
+
+  const handleGetUserPrefs = async () => {
+    setUserPrefsLoading(true);
+    try {
+      const result = await getUserPrefs();
+      setUserPrefsResult(result);
+      setUserPrefsLoading(false);
+    } catch (error) {
+      setUserPrefsResult({
+        status: "error",
+        message: error.message || "Unknown error occurred",
+      });
+      setUserPrefsLoading(false);
+    }
+  };
+
   return (
     <>
       <br />
@@ -263,6 +298,43 @@ function Developer({
               <Button variant="danger" onClick={handleResetCache}>
                 Clear Cache
               </Button>
+            </Container>
+            <Container>
+              <br />
+              <h5>User Preferences</h5>
+              <p>Save or retrieve user preferences from gatool Cloud.</p>
+              <Button
+                variant="primary"
+                onClick={handlePutUserPrefs}
+                disabled={userPrefsLoading}
+                className="me-2"
+              >
+                {userPrefsLoading ? "Saving..." : "Save User Preferences"}
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={handleGetUserPrefs}
+                disabled={userPrefsLoading}
+              >
+                {userPrefsLoading ? "Loading..." : "Get User Preferences"}
+              </Button>
+              {userPrefsResult && (
+                <div className="mt-3">
+                  <Alert
+                    variant={
+                      userPrefsResult.status === "ok" ||
+                      userPrefsResult.status === 200
+                        ? "success"
+                        : "danger"
+                    }
+                  >
+                    <strong>Result:</strong>
+                    <pre style={{ whiteSpace: "pre-wrap", marginTop: "10px" }}>
+                      {JSON.stringify(userPrefsResult, null, 2)}
+                    </pre>
+                  </Alert>
+                </div>
+              )}
             </Container>
           </Tab>
           <Tab eventKey="users" title="User Management">
