@@ -392,6 +392,27 @@ function App() {
   );
   const [screenModeStatus, setScreenModeStatus] = useState(null); // null = unknown, true = valid data, false = invalid/malformed
 
+  // Enforce mutual exclusivity between syncEvent and screenMode
+  // Use a ref to prevent infinite loops when disabling one or the other
+  const enforcingMutualExclusivityRef = useRef(false);
+  useEffect(() => {
+    // Skip if we're already in the process of enforcing mutual exclusivity
+    if (enforcingMutualExclusivityRef.current) {
+      return;
+    }
+    
+    if (screenMode && syncEvent) {
+      // If both are enabled, disable syncEvent (screenMode takes priority)
+      console.log("Screen Mode and Sync Event both enabled - disabling Sync Event");
+      enforcingMutualExclusivityRef.current = true;
+      setSyncEvent(false);
+      // Reset flag after state update
+      setTimeout(() => {
+        enforcingMutualExclusivityRef.current = false;
+      }, 100);
+    }
+  }, [screenMode, syncEvent, setSyncEvent]);
+
   const [ftcMode, setFTCMode] = usePersistentState("setting:ftcMode", null);
 
   const [ftcLeagues, setFTCLeagues] = usePersistentState(
@@ -5360,6 +5381,24 @@ function App() {
     selectedEvent?.value.name,
   ]);
 
+  // Update eventLabel when selectedEvent changes
+  useEffect(() => {
+    if (selectedEvent) {
+      // Prefer label if available (formatted), otherwise use name
+      const newLabel = selectedEvent.label || selectedEvent.value?.name;
+      if (newLabel) {
+        setEventLabel(newLabel);
+      } else {
+        // Clear eventLabel if selectedEvent has no name/label
+        setEventLabel(null);
+      }
+    } else {
+      // Clear eventLabel if selectedEvent is null
+      setEventLabel(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedEvent?.label, selectedEvent?.value?.name, selectedEvent?.value?.code]);
+
   // Retrieve schedule, team list, community updates, high scores and rankings when event selection changes
   useEffect(() => {
     if (events.length > 0 && selectedEvent?.value) {
@@ -5663,12 +5702,22 @@ function App() {
   useEffect(() => {
     // Only reset status when screenMode changes from false to true (first enable)
     if (screenMode && isAuthenticated && !previousScreenModeRef.current) {
+      // Ensure syncEvent is disabled when Screen Mode is enabled
+      if (syncEvent) {
+        console.log("Screen Mode enabled - disabling Sync Event");
+        setSyncEvent(false);
+      }
       setScreenModeStatus(null);
       screenModeInitializedRef.current = true;
       // Fetch immediately when Screen Mode is enabled
       fetchAndProcessUserPrefs();
       startScreenModePoll();
     } else if (screenMode && isAuthenticated) {
+      // Screen mode already enabled, ensure syncEvent is still disabled
+      if (syncEvent) {
+        console.log("Screen Mode active - disabling Sync Event");
+        setSyncEvent(false);
+      }
       // Screen mode already enabled, just ensure polling is running
       startScreenModePoll();
     } else {
@@ -5681,14 +5730,43 @@ function App() {
     }
     previousScreenModeRef.current = screenMode;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [screenMode, isAuthenticated]);
+  }, [screenMode, isAuthenticated, syncEvent, setSyncEvent]);
+
+  // Debounce putUserPrefs to prevent rapid successive calls
+  const syncDebounceTimeoutRef = useRef(null);
+  const pendingSyncRef = useRef(false);
+  const debouncedPutUserPrefs = () => {
+    // Clear any existing timeout
+    if (syncDebounceTimeoutRef.current) {
+      clearTimeout(syncDebounceTimeoutRef.current);
+    }
+    
+    // Set pending flag
+    pendingSyncRef.current = true;
+    
+    // Set new timeout
+    syncDebounceTimeoutRef.current = setTimeout(() => {
+      if (pendingSyncRef.current && syncEvent && isAuthenticated) {
+        pendingSyncRef.current = false;
+        putUserPrefs().catch((error) => {
+          console.error("Error syncing user preferences:", error);
+        });
+      }
+    }, 1000); // 1 second debounce
+  };
 
   // Sync user preferences when syncEvent is enabled
   const syncEventEnabledRef = useRef(false);
   const previousSyncEventRef = useRef(syncEvent);
   const initialSyncAttemptedRef = useRef(false);
+  const isEventLoadingRef = useRef(false);
   useEffect(() => {
     if (syncEvent && isAuthenticated && !syncEventEnabledRef.current) {
+      // Ensure screenMode is disabled when Sync Event is enabled
+      if (screenMode) {
+        console.log("Sync Event enabled - disabling Screen Mode");
+        setScreenMode(false);
+      }
       // Call putUserPrefs once when syncEvent is enabled (only if authenticated)
       syncEventEnabledRef.current = true;
       previousSyncEventRef.current = syncEvent;
@@ -5711,18 +5789,37 @@ function App() {
       syncEventEnabledRef.current = false;
       previousSyncEventRef.current = syncEvent;
       initialSyncAttemptedRef.current = false; // Reset on disable
+      // Clear any pending syncs
+      if (syncDebounceTimeoutRef.current) {
+        clearTimeout(syncDebounceTimeoutRef.current);
+        syncDebounceTimeoutRef.current = null;
+      }
+      pendingSyncRef.current = false;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [syncEvent, isAuthenticated]);
+  }, [syncEvent, isAuthenticated, screenMode, setScreenMode]);
+
+  // Track when event is loading to skip syncing during transitions
+  const previousEventCodeRef = useRef(selectedEvent?.value?.code);
+  useEffect(() => {
+    const currentEventCode = selectedEvent?.value?.code;
+    if (currentEventCode !== previousEventCodeRef.current) {
+      isEventLoadingRef.current = true;
+      previousEventCodeRef.current = currentEventCode;
+      // Reset loading flag after a delay to allow event to finish loading
+      setTimeout(() => {
+        isEventLoadingRef.current = false;
+      }, 2000); // 2 seconds should be enough for event to load
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedEvent?.value?.code]);
 
   // Sync user preferences when currentMatch changes (if syncEvent is enabled and user is authenticated)
   const previousMatchRef = useRef(currentMatch);
   useEffect(() => {
-    if (syncEvent && isAuthenticated && currentMatch !== null && previousMatchRef.current !== currentMatch && previousMatchRef.current !== null) {
+    if (syncEvent && isAuthenticated && currentMatch !== null && previousMatchRef.current !== currentMatch && previousMatchRef.current !== null && !isEventLoadingRef.current) {
       previousMatchRef.current = currentMatch;
-      putUserPrefs().catch((error) => {
-        console.error("Error syncing user preferences after match change:", error);
-      });
+      debouncedPutUserPrefs();
     } else if (currentMatch !== null) {
       previousMatchRef.current = currentMatch;
     }
@@ -5820,12 +5917,10 @@ function App() {
         manualOfflineMode,
       };
 
-      // Compare current preferences with previous (skip if syncEvent just changed)
-      if (previousSyncEventRef.current === syncEvent && !_.isEqual(preferencesRef.current, currentPrefs)) {
+      // Compare current preferences with previous (skip if syncEvent just changed or event is loading)
+      if (previousSyncEventRef.current === syncEvent && !_.isEqual(preferencesRef.current, currentPrefs) && !isEventLoadingRef.current) {
         preferencesRef.current = currentPrefs;
-        putUserPrefs().catch((error) => {
-          console.error("Error syncing user preferences after preference change:", error);
-        });
+        debouncedPutUserPrefs();
       } else {
         preferencesRef.current = currentPrefs;
       }
