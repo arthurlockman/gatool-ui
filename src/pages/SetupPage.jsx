@@ -661,8 +661,9 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                                     
                                                 </td>
                                                     <td>
-                                                    <b>Screen Mode Sync Frequency (seconds)</b><br />
-                                                    <div style={{ padding: "20px 10px" }}>
+                                                    <b>Client Sync Frequency<br />(affects all Screens in Screen Mode)</b><br />
+                                                    <div style={{ padding: "5px 10px", display: "flex", alignItems: "center", gap: "10px" }}>
+                                                        <span style={{ fontSize: "28px" }}>🐇&nbsp;</span>
                                                         <Range
                                                             values={[screenModeSyncFrequency || 10]}
                                                             step={1}
@@ -720,6 +721,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                                                 </div>
                                                             )}
                                                         />
+                                                        <span style={{ fontSize: "28px" }}>🐢</span>
                                                     </div>
                                                     </td>
                                                 </tr>
