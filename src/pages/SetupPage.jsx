@@ -634,7 +634,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                             <label><b>Set your time format</b><Select options={timeFormatMenu} value={timeFormat} onChange={setTimeFormat} /></label>
                                         </td>
                                     </tr>
-                                    <tr className={"UISettings"}>
+                                    <tr className={"UISettings"} id="Aucoin-Bradshaw-1">
                                         <td>
                                             <Switch checked={syncEvent === null ? false : syncEvent} onChange={(checked) => { setSyncEvent(checked); if (checked) setScreenMode(false); }} disabled={!isAuthenticated || screenMode} />
                                         </td>
@@ -656,7 +656,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                             </td>
                                     </tr>
                                             {syncEvent && isAuthenticated && (
-                                                <tr className={"UISettings"}>
+                                                <tr className={"UISettings"}  id="Aucoin-Bradshaw-2">
                                                 <td>
                                                     
                                                 </td>
@@ -728,7 +728,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                             )}
                                         
 
-                                    <tr className={"UISettings"}>
+                                    <tr className={"UISettings"} id="Aucoin-Bradshaw-3">
                                         <td>
                                             <Switch checked={screenMode === null ? false : screenMode} onChange={(checked) => { setScreenMode(checked); if (checked) setSyncEvent(false); }} disabled={!isAuthenticated || syncEvent} />
                                         </td>
