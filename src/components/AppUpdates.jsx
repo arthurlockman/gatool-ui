@@ -1,12 +1,13 @@
 export const appUpdates = [
   {
-    date: "January 23, 2026",
+    date: "January 25, 2026",
     message: (
       <ul>
         <li>ALL PROGRAMS:</li>
         <ul>
           <li>Added Screen Mode. When Sync Event is enabled, other devices in Screen Mode will automatically follow the current match and event settings from this device. Requires login.</li>
           <li>Fixed a bug that prevented team-entered robot names from displaying correctly on the Play-By-Play page</li>
+          <li>Fixed a server-side bug that prevented awards from displaying correctly</li>
         </ul>
       </ul>
     ),
