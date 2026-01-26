@@ -14,6 +14,7 @@ import Contenteditable from "components/ContentEditable";
 import { ArrowClockwise, Trash, Copy, Plus, BellFill, CaretUpFill, CaretDownFill } from 'react-bootstrap-icons';
 import NotificationBanner from "components/NotificationBanner";
 import { Link } from "react-router-dom";
+import { Range } from "react-range";
 
 
 const filterTime = [
@@ -75,7 +76,7 @@ const ftcModeOptions = [
 
 
 
-function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, regionFilters, setRegionFilters, districts, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showNotesAnnounce, setShowNotesAnnounce, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, autoUpdate, setAutoUpdate, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, showQualsStatsQuals, setShowQualsStatsQuals, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee, showDistrictChampsStats, setShowDistrictChampsStats, monthsWarning, setMonthsWarning, user, isAuthenticated, adHocMode, setAdHocMode, supportedYears, FTCSupportedYears, reloadPage, autoHideSponsors, setAutoHideSponsors, setLoadingCommunityUpdates, hidePracticeSchedule, setHidePracticeSchedule, systemMessage, setTeamListLoading, getTeamList, getAlliances, setHaveChampsTeams, appUpdates, usePullDownToUpdate, setUsePullDownToUpdate, useSwipe, setUseSwipe, eventLabel, setEventLabel, showInspection, setShowInspection, showMinorAwards, setShowMinorAwards, highScoreMode, setHighScoreMode, systemBell, setSystemBell, eventBell, setEventBell, eventMessage, setEventMessage, putEventNotifications, useCheesyArena, setUseCheesyArena, useFourTeamAlliances, setUseFourTeamAlliances, ftcLeagues, ftcRegions, ftcMode, setFTCMode, ftcTypes, useFTCOffline, setUseFTCOffline, FTCServerURL, setFTCServerURL, FTCKey, requestFTCKey, checkFTCKey, FTCOfflineAvailable, getFTCOfflineStatus, getCheesyStatus, showBlueBanners, setShowBlueBanners, manualOfflineMode, setManualOfflineMode, useScrollMemory, setUseScrollMemory }) {
+function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, regionFilters, setRegionFilters, districts, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showNotesAnnounce, setShowNotesAnnounce, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, autoUpdate, setAutoUpdate, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, showQualsStatsQuals, setShowQualsStatsQuals, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee, showDistrictChampsStats, setShowDistrictChampsStats, monthsWarning, setMonthsWarning, user, isAuthenticated, adHocMode, setAdHocMode, supportedYears, FTCSupportedYears, reloadPage, autoHideSponsors, setAutoHideSponsors, setLoadingCommunityUpdates, hidePracticeSchedule, setHidePracticeSchedule, systemMessage, setTeamListLoading, getTeamList, getAlliances, setHaveChampsTeams, appUpdates, usePullDownToUpdate, setUsePullDownToUpdate, useSwipe, setUseSwipe, eventLabel, setEventLabel, showInspection, setShowInspection, showMinorAwards, setShowMinorAwards, highScoreMode, setHighScoreMode, systemBell, setSystemBell, eventBell, setEventBell, eventMessage, setEventMessage, putEventNotifications, useCheesyArena, setUseCheesyArena, useFourTeamAlliances, setUseFourTeamAlliances, ftcLeagues, ftcRegions, ftcMode, setFTCMode, ftcTypes, useFTCOffline, setUseFTCOffline, FTCServerURL, setFTCServerURL, FTCKey, requestFTCKey, checkFTCKey, FTCOfflineAvailable, getFTCOfflineStatus, getCheesyStatus, showBlueBanners, setShowBlueBanners, manualOfflineMode, setManualOfflineMode, useScrollMemory, setUseScrollMemory, syncEvent, setSyncEvent, screenMode, setScreenMode, screenModeSyncFrequency, setScreenModeSyncFrequency }) {
     const isOnline = useOnlineStatus();
     const PWASupported = (isChrome && Number(browserVersion) >= 76) || (isSafari && Number(browserVersion) >= 15 && Number(fullBrowserVersion.split(".")[1]) >= 4);
 
@@ -277,10 +278,10 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                 <Col sm={3}><b>Choose a year...</b><br /><Select options={ftcMode === false ? supportedYears : (ftcMode ? FTCSupportedYears : [])} value={selectedYear} onChange={setSelectedYear} isDisabled={!isOnline || ftcMode === null} placeholder={ftcMode === null ? "Select program first" : "Select a year"} />
                 </Col>
                 <Col sm={7}>
-                    {eventList && <span><b>...then choose an event.</b><br /><Select 
-                        options={filterEvents(eventList)} 
-                        placeholder={ftcMode === null ? "Select program first" : !selectedYear ? "Select season first" : (eventList?.length > 0 ? "Select an event" : "Loading event list")} 
-                        value={selectedEvent} 
+                    {eventList && <span><b>...then choose an event.</b><br /><Select
+                        options={filterEvents(eventList)}
+                        placeholder={ftcMode === null ? "Select program first" : !selectedYear ? "Select season first" : (eventList?.length > 0 ? "Select an event" : "Loading event list")}
+                        value={selectedEvent}
                         onChange={handleEventSelection}
                         getOptionValue={(option) => option?.value?.code}
                         getOptionLabel={(option) => option?.label}
@@ -304,7 +305,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                     borderRadius: "3px"
                                 };
                             },
-                        }} 
+                        }}
                         isDisabled={!isOnline || ftcMode === null || !selectedYear} /></span>}
                 </Col>
             </Row>
@@ -346,7 +347,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                         <tbody>
                             <tr className="UISettings">
                                 <td><Switch checked={manualOfflineMode === null ? false : manualOfflineMode} onChange={setManualOfflineMode} /></td>
-                                <td><b>I have no Internet connection on the FTC Local Server network.</b><br/>Enable this when you're connected to the FTC Local Server network but don't have internet access.</td>
+                                <td><b>I have no Internet connection on the FTC Local Server network.</b><br />Enable this when you're connected to the FTC Local Server network but don't have internet access.</td>
                             </tr>
                         </tbody>
                     </table>}
@@ -631,6 +632,121 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                     <tr className={"UISettings"}>
                                         <td colSpan={2}>
                                             <label><b>Set your time format</b><Select options={timeFormatMenu} value={timeFormat} onChange={setTimeFormat} /></label>
+                                        </td>
+                                    </tr>
+                                    <tr className={"UISettings"} id="Aucoin-Bradshaw-1">
+                                        <td>
+                                            <Switch checked={syncEvent === null ? false : syncEvent} onChange={(checked) => { setSyncEvent(checked); if (checked) setScreenMode(false); }} disabled={!isAuthenticated || screenMode} />
+                                        </td>
+                                        <td>
+                                            <b>Sync Event</b><br />
+                                            <i>When enabled, your settings and current match will be automatically synced to gatool Cloud. Devices in Screen Mode will follow this device's settings and current match.</i>
+                                            {!isAuthenticated && (
+                                                <>
+                                                    <br />
+                                                    <b style={{ color: "red" }}>You must be logged in to use this feature.</b>
+                                                </>
+                                            )}
+                                            {screenMode && (
+                                                <>
+                                                    <br />
+                                                    <b style={{ color: "orange" }}>Disabled when Screen Mode is enabled.</b>
+                                                </>
+                                            )}
+                                            </td>
+                                    </tr>
+                                            {syncEvent && isAuthenticated && (
+                                                <tr className={"UISettings"}  id="Aucoin-Bradshaw-2">
+                                                <td>
+                                                    
+                                                </td>
+                                                    <td>
+                                                    <b>Client Sync Frequency<br />(affects all Screens in Screen Mode)</b><br />
+                                                    <div style={{ padding: "5px 10px", display: "flex", alignItems: "center", gap: "10px" }}>
+                                                        <span style={{ fontSize: "28px" }}>🐇&nbsp;</span>
+                                                        <Range
+                                                            values={[screenModeSyncFrequency || 10]}
+                                                            step={1}
+                                                            min={5}
+                                                            max={30}
+                                                            onChange={(values) => setScreenModeSyncFrequency(values[0])}
+                                                            renderTrack={({ props, children }) => (
+                                                                <div
+                                                                    {...props}
+                                                                    style={{
+                                                                        ...props.style,
+                                                                        height: '6px',
+                                                                        width: '100%',
+                                                                        backgroundColor: '#ccc',
+                                                                        borderRadius: '3px'
+                                                                    }}
+                                                                >
+                                                                    {children}
+                                                                </div>
+                                                            )}
+                                                            renderThumb={({ props, isDragged }) => (
+                                                                <div
+                                                                    {...props}
+                                                                    style={{
+                                                                        ...props.style,
+                                                                        height: '24px',
+                                                                        width: '24px',
+                                                                        backgroundColor: '#007bff',
+                                                                        borderRadius: '50%',
+                                                                        display: 'flex',
+                                                                        alignItems: 'center',
+                                                                        justifyContent: 'center',
+                                                                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                                                                        outline: 'none'
+                                                                    }}
+                                                                >
+                                                                    {isDragged && (
+                                                                        <div
+                                                                            style={{
+                                                                                position: 'absolute',
+                                                                                top: '-28px',
+                                                                                color: '#007bff',
+                                                                                fontWeight: 'bold',
+                                                                                fontSize: '12px',
+                                                                                backgroundColor: 'white',
+                                                                                padding: '2px 6px',
+                                                                                borderRadius: '4px',
+                                                                                whiteSpace: 'nowrap',
+                                                                                boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
+                                                                            }}
+                                                                        >
+                                                                            {screenModeSyncFrequency || 10}s
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                        />
+                                                        <span style={{ fontSize: "28px" }}>🐢</span>
+                                                    </div>
+                                                    </td>
+                                                </tr>
+                                            )}
+                                        
+
+                                    <tr className={"UISettings"} id="Aucoin-Bradshaw-3">
+                                        <td>
+                                            <Switch checked={screenMode === null ? false : screenMode} onChange={(checked) => { setScreenMode(checked); if (checked) setSyncEvent(false); }} disabled={!isAuthenticated || syncEvent} />
+                                        </td>
+                                        <td>
+                                            <b>Screen Mode</b><br />
+                                            <i>When enabled, this screen will automatically follow the current match and event settings from another device with Sync Event enabled.</i>
+                                            {!isAuthenticated && (
+                                                <>
+                                                    <br />
+                                                    <b style={{ color: "red" }}>You must be logged in to use this feature.</b>
+                                                </>
+                                            )}
+                                            {syncEvent && (
+                                                <>
+                                                    <br />
+                                                    <b style={{ color: "orange" }}>Disabled when Sync Event is enabled.</b>
+                                                </>
+                                            )}
                                         </td>
                                     </tr>
                                 </>}

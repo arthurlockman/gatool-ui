@@ -101,9 +101,12 @@ function LayoutsWithNavbar({
   systemBell,
   systemMessage,
   ftcMode,
+  screenMode,
+  screenModeStatus,
+  syncEvent,
 }) {
   const location = useLocation();
-  
+
   // Scroll to top for pages that don't have scroll memory
   useEffect(() => {
     const currentPath = location.pathname.replace('/', '') || '';
@@ -129,6 +132,9 @@ function LayoutsWithNavbar({
         practiceSchedule={practiceSchedule}
         systemBell={systemBell}
         systemMessage={systemMessage}
+        screenMode={screenMode}
+        screenModeStatus={screenModeStatus}
+        syncEvent={syncEvent}
       />
       <Outlet />
       <BottomNavigation ftcMode={ftcMode} />
@@ -166,7 +172,7 @@ function App() {
     checkLogin();
   }, [getAccessTokenSilently, isAuthenticated, loginWithRedirect]);
 
-  const [httpClient] = UseAuthClient();
+  const [httpClient, operationsInProgress] = UseAuthClient();
   const [selectedEvent, setSelectedEvent] = usePersistentState(
     "setting:selectedEvent",
     null
@@ -376,6 +382,40 @@ function App() {
     "setting:useScrollMemory",
     true
   );
+  const [syncEvent, setSyncEvent] = usePersistentState(
+    "setting:syncEvent",
+    false
+  );
+  const [screenMode, setScreenMode] = usePersistentState(
+    "setting:screenMode",
+    false
+  );
+  const [screenModeSyncFrequency, setScreenModeSyncFrequency] = usePersistentState(
+    "setting:screenModeSyncFrequency",
+    10
+  ); // Frequency in seconds (5-10)
+  const [screenModeStatus, setScreenModeStatus] = useState(null); // null = unknown, true = valid data, false = invalid/malformed
+
+  // Enforce mutual exclusivity between syncEvent and screenMode
+  // Use a ref to prevent infinite loops when disabling one or the other
+  const enforcingMutualExclusivityRef = useRef(false);
+  useEffect(() => {
+    // Skip if we're already in the process of enforcing mutual exclusivity
+    if (enforcingMutualExclusivityRef.current) {
+      return;
+    }
+    
+    if (screenMode && syncEvent) {
+      // If both are enabled, disable syncEvent (screenMode takes priority)
+      console.log("Screen Mode and Sync Event both enabled - disabling Sync Event");
+      enforcingMutualExclusivityRef.current = true;
+      setSyncEvent(false);
+      // Reset flag after state update
+      setTimeout(() => {
+        enforcingMutualExclusivityRef.current = false;
+      }, 100);
+    }
+  }, [screenMode, syncEvent, setSyncEvent]);
 
   const [ftcMode, setFTCMode] = usePersistentState("setting:ftcMode", null);
 
@@ -1474,7 +1514,7 @@ function App() {
     qualschedule.completedMatchCount = completedMatchCount;
 
     qualschedule.lastUpdate = moment().format();
-    
+
     // For OFFLINE events, only update qualSchedule if there's no uploaded schedule already
     const isOfflineEvent = selectedEvent?.value?.code === "OFFLINE";
     if (!isOfflineEvent || !qualSchedule || qualSchedule?.schedule?.length === 0) {
@@ -1482,7 +1522,7 @@ function App() {
     } else {
       console.log("OFFLINE event - preserving uploaded qual schedule");
     }
-    
+
     if (
       practiceschedule?.schedule?.length > 0 &&
       qualschedule?.schedule?.length === 0
@@ -1831,7 +1871,7 @@ function App() {
     console.log(
       `There are ${playoffschedule?.schedule.length} playoff matches loaded.`
     );
-    
+
     // For OFFLINE events, only update playoffSchedule if there's no uploaded schedule already
     if (!isOfflineEvent || !playoffSchedule || playoffSchedule?.schedule?.length === 0) {
       setPlayoffSchedule(playoffschedule);
@@ -2563,7 +2603,7 @@ function App() {
           awards: awards
         };
       });
-      
+
       // Skip external API calls when in FTC offline mode without internet
       if (useFTCOffline && (!isOnline || manualOfflineMode)) {
         console.log("FTC Offline mode: Skipping queryAwards API call while offline" + (manualOfflineMode ? " (manual override)" : "") + " - using cached awards");
@@ -2572,7 +2612,7 @@ function App() {
         try {
           const teamNumbers = teams.teams.map((t) => t?.teamNumber);
           const baseURL = ftcMode ? ftcBaseURL : undefined;
-          
+
           var req = await httpClient.postNoAuth(
             `${selectedYear?.value}/queryAwards`,
             {
@@ -2580,7 +2620,7 @@ function App() {
             },
             baseURL
           );
-          
+
           if (req.status === 200) {
             // @ts-ignore
             var awards = await req.json();
@@ -2592,14 +2632,14 @@ function App() {
               const teamNum = team?.teamNumber;
               // Try multiple key formats to handle different API response structures
               const teamAwards = awards[`${teamNum}`] || awards[teamNum] || awards[String(teamNum)] || {};
-              
+
               // Create a new team object with awards merged in
               return {
                 ...team,
                 awards: teamAwards
               };
             });
-            
+
             const teamsWithAwards = newTeams.filter(t => t.awards && Object.keys(t.awards).length > 0).length;
             if (teamsWithAwards > 0) {
               console.log(`Awards loaded: ${teamsWithAwards} of ${newTeams.length} teams have awards data`);
@@ -2649,7 +2689,7 @@ function App() {
           awardYears?.forEach((year) => {
             const yearKey = `${year}`;
             const yearAwards = team?.awards[yearKey];
-            
+
             if (yearAwards !== null && yearAwards !== undefined) {
               // Normalize the structure - ensure it has an awards array
               if (!yearAwards.awards || !Array.isArray(yearAwards.awards)) {
@@ -2663,7 +2703,7 @@ function App() {
                   awards: yearAwards.awards
                 };
               }
-              
+
               // Map over awards to add highlight, eventName, and year properties
               if (team.awards[yearKey].awards && Array.isArray(team.awards[yearKey].awards)) {
                 team.awards[yearKey].awards = team.awards[yearKey].awards.map((award) => {
@@ -2782,8 +2822,8 @@ function App() {
           // Return team with existing awards data even if processing failed
           return team;
         }
-        });
-      
+      });
+
       // Update teams.teams with formatted awards before proceeding to champs data
       // This ensures awards are always merged before state is updated
       teams.teams = formattedAwards;
@@ -3437,7 +3477,7 @@ function App() {
       ? moment(ranks?.headers["last-modified"]).format()
       : moment().format();
     ranks.lastUpdate = moment().format();
-    
+
     // For OFFLINE events, only update rankings if there's no uploaded rankings already
     const isOfflineEvent = selectedEvent?.value?.code === "OFFLINE";
     if (!isOfflineEvent || !rankings || rankings?.ranks?.length === 0) {
@@ -3445,7 +3485,7 @@ function App() {
     } else {
       console.log("OFFLINE event - preserving uploaded rankings");
     }
-    
+
     if (ranks?.ranks?.length > 0 || (isOfflineEvent && rankings?.ranks?.length > 0)) {
       if (!ftcMode) {
         getEPA();
@@ -3586,7 +3626,7 @@ function App() {
         var seasonResult = await httpClient.getNoAuth(
           `${selectedYear?.value}/ftcscout/events/${team?.teamNumber}`,
           ftcMode ? ftcBaseURL : undefined
-        ); 
+        );
         // var seasonResult = await httpClient.getNoAuth(
         //   `teams/${team?.teamNumber}/events/${selectedYear?.value}`,
         //   "https://api.ftcscout.org/rest/v1/",
@@ -4226,6 +4266,102 @@ function App() {
   }
 
   /**
+   * This function fetches the logged-in user's preferences from gatool Cloud.
+   * @async
+   * @function getUserPrefs
+   * @returns {Promise<object>} User preferences saved for the logged-in user
+   */
+  async function getUserPrefs() {
+    var result = await httpClient.get(`user/preferences`);
+    // @ts-ignore
+    if (result.status === 200) {
+      // @ts-ignore
+      var userPrefs = await result.json();
+      return userPrefs;
+    } else {
+      return {
+      };
+    }
+  }
+
+  /**
+   * This function saves the logged-in user's preferences to gatool Cloud.
+   * @async
+   * @function putUserPrefs
+   * @returns {Promise<object>} Result code for writing the user preferences
+   */
+  async function putUserPrefs() {
+    // Skip sync if other network operations are in progress
+    // Set pending flag so useEffect can retry when operations complete
+    // @ts-ignore - operationsInProgress is a number from AuthClientContext
+    if (operationsInProgress > 0) {
+      console.log("Skipping sync - network operations in progress");
+      pendingSyncRef.current = true;
+      return;
+    }
+    
+    // Clear pending flag since we're proceeding with sync
+    pendingSyncRef.current = false;
+    
+    // gather user preferences from the UI
+    var userPrefs = {
+      selectedEvent: selectedEvent,
+      selectedYear: selectedYear,
+      rankingsOverride: rankingsOverride,
+      eventFilters: eventFilters,
+      regionFilters: regionFilters,
+      timeFilter: timeFilter,
+      timeFormat: timeFormat,
+      showSponsors: showSponsors,
+      autoHideSponsors: autoHideSponsors,
+      showAwards: showAwards,
+      showMinorAwards: showMinorAwards,
+      showNotes: showNotes,
+      showNotesAnnounce: showNotesAnnounce,
+      showMottoes: showMottoes,
+      showChampsStats: showChampsStats,
+      showDistrictChampsStats: showDistrictChampsStats,
+      showBlueBanners: showBlueBanners,
+      hidePracticeSchedule: hidePracticeSchedule,
+      monthsWarning: monthsWarning,
+      showInspection: showInspection,
+      swapScreen: swapScreen,
+      autoAdvance: autoAdvance,
+      highScoreMode: highScoreMode,
+      autoUpdate: autoUpdate,
+      awardsMenu: awardsMenu,
+      showQualsStats: showQualsStats,
+      showQualsStatsQuals: showQualsStatsQuals,
+      teamReduction: teamReduction,
+      playoffCountOverride: playoffCountOverride,
+      allianceCount: allianceCount,
+      reverseEmcee: reverseEmcee,
+      usePullDownToUpdate: usePullDownToUpdate,
+      useScrollMemory: useScrollMemory,
+      ftcMode: ftcMode,
+      useCheesyArena: useCheesyArena,
+      useFourTeamAlliances: useFourTeamAlliances,
+      useFTCOffline: useFTCOffline,
+      FTCKey: FTCKey,
+      FTCServerURL: FTCServerURL,
+      manualOfflineMode: manualOfflineMode,
+      currentMatch: currentMatch,
+      screenModeSyncFrequency: screenModeSyncFrequency
+    }
+    var result = await httpClient.put(`user/preferences`, userPrefs);
+    // @ts-ignore
+    if (result.status === 200 || result.status === 204) {
+      // @ts-ignore
+      return {status: "ok"};
+    } else {
+      return {
+        status: "error",
+        message: `**Error** ${result?.statusText || "unknown"}`,
+      };
+    }
+  }
+
+  /**
    * This function fetches event specific notifications from gatool Cloud.
    * @async
    * @function getEventNotifications
@@ -4468,11 +4604,11 @@ function App() {
       const isOfflineEvent = selectedEvent?.value?.code === "OFFLINE";
       const previousWasOffline = previousEventRef.current?.code === "OFFLINE";
       const isSameEvent = previousEventRef.current?.code === selectedEvent?.value?.code;
-      
+
       // For OFFLINE events, only preserve uploaded data if we're staying on the same OFFLINE event
       // (e.g., page reload). If switching TO OFFLINE from another event, clear everything.
       const shouldPreserveOfflineData = isOfflineEvent && previousWasOffline && isSameEvent;
-      
+
       if (!shouldPreserveOfflineData) {
         await setPracticeSchedule(null);
         setPracticeFileUploaded(false);
@@ -4487,17 +4623,17 @@ function App() {
       } else {
         console.log("Reloading same OFFLINE event - preserving uploaded schedules, rankings, and team list");
       }
-      
+
       // Update the ref to track current event for next time
       previousEventRef.current = selectedEvent?.value;
-      
+
       await setCommunityUpdates([]);
       setLoadingCommunityUpdates(false);
       setEITeams([]);
       await setRobotImages(null);
       await setEventHighScores(null);
       await setPlayoffs(false);
-      
+
       // For OFFLINE events, preserve alliance-related settings only if reloading same event
       if (!shouldPreserveOfflineData) {
         await setAllianceCount(null);
@@ -4509,7 +4645,7 @@ function App() {
       } else {
         console.log("Reloading same OFFLINE event - preserving alliance count and settings");
       }
-      
+
       setCurrentMatch(1);
       await setDistrictRankings(null);
       setAdHocMatch([
@@ -5088,12 +5224,12 @@ function App() {
     if (hasRunOfflineCheck.current) {
       return; // Already ran, don't run again
     }
-    
+
     // If a training/OFFLINE event is selected but ftcMode is null, set it to FRC mode (false)
     // This handles the edge case where page reloads with OFFLINE event selected
     if (selectedEvent?.value?.code && ftcMode === null && selectedYear) {
-      const isTrainingEvent = selectedEvent.value.code === "OFFLINE" || 
-                             selectedEvent.value.code.includes("PRACTICE");
+      const isTrainingEvent = selectedEvent.value.code === "OFFLINE" ||
+        selectedEvent.value.code.includes("PRACTICE");
       if (isTrainingEvent) {
         console.log("OFFLINE/training event detected on load, setting program to FRC mode");
         setFTCMode(false);
@@ -5150,16 +5286,16 @@ function App() {
       var matchesPerTeam = 0;
       // FTC has 4 teams per match (2 per alliance), FRC has 6 teams per match (3 per alliance)
       const teamsPerMatch = ftcMode ? 4 : 6;
-      
+
       // Get the actual schedule array - handle both nested (API) and flat (upload) structures
       const scheduleArray = qualSchedule?.schedule?.schedule || qualSchedule?.schedule;
-      
+
       // Extract unique team numbers that actually competed from the schedule
       // This is especially important for FTC where registered teams may not compete
       // Cross-reference with rankings to ensure we only count teams that actually played
       const competingTeamNumbers = new Set();
       const teamsInSchedule = new Set();
-      
+
       scheduleArray?.forEach((match) => {
         match?.teams?.forEach((team) => {
           if (team?.teamNumber) {
@@ -5167,7 +5303,7 @@ function App() {
           }
         });
       });
-      
+
       // Cross-reference with rankings: only count teams that are in schedule AND have matchesPlayed > 0
       teamsInSchedule.forEach((teamNumber) => {
         const teamRanking = _.find(rankings?.ranks, { teamNumber: teamNumber });
@@ -5175,29 +5311,29 @@ function App() {
           competingTeamNumbers.add(teamNumber);
         }
       });
-      
+
       const actualCompetingTeamsCount = competingTeamNumbers.size;
-      
+
       const totalMatches = scheduleArray?.length || 0;
-      
+
       // Calculate expected matches per team based on actual competing teams
       // Use Math.round for better accuracy with uneven distributions
       const calculatedMatchesPerTeam = actualCompetingTeamsCount > 0
         ? Math.round((teamsPerMatch * totalMatches) / actualCompetingTeamsCount)
         : 0;
-      
+
       // For additional accuracy, check the actual matchesPlayed from rankings
       const teamsWithMatches = _.filter(rankings?.ranks, (team) => team.matchesPlayed > 0);
-      const actualMatchesPerTeam = teamsWithMatches.length > 0 
-        ? _.maxBy(teamsWithMatches, 'matchesPlayed')?.matchesPlayed 
+      const actualMatchesPerTeam = teamsWithMatches.length > 0
+        ? _.maxBy(teamsWithMatches, 'matchesPlayed')?.matchesPlayed
         : calculatedMatchesPerTeam;
-      
+
       // Use the actual matches played if it's close to calculated (within 1 match)
       // Otherwise fall back to calculated value
       matchesPerTeam = Math.abs(actualMatchesPerTeam - calculatedMatchesPerTeam) <= 1
         ? actualMatchesPerTeam
         : calculatedMatchesPerTeam;
-      
+
       // In order to start Alliance Selection, we need the following conditions to be true:
       // All matches must have been completed
       // All teams that participated must have completed their scheduled matches
@@ -5208,7 +5344,7 @@ function App() {
       // For FRC: Use the traditional team list count minus reductions
       const expectedTeamCount = ftcMode ? actualCompetingTeamsCount : (teamList?.teamCountTotal - teamReduction);
       const teamsWithExpectedMatches = _.filter(rankings?.ranks, { matchesPlayed: matchesPerTeam }).length;
-      
+
       // Additional check: all competing teams have at least the expected matches
       const allCompetingTeamsComplete = teamsWithMatches.length > 0 &&
         _.every(teamsWithMatches, (team) => team.matchesPlayed >= matchesPerTeam) &&
@@ -5217,7 +5353,7 @@ function App() {
       if (
         qualSchedule?.schedule?.length === qualSchedule?.completedMatchCount &&
         (teamsWithExpectedMatches >= expectedTeamCount ||
-         (ftcMode && allCompetingTeamsComplete))
+          (ftcMode && allCompetingTeamsComplete))
       ) {
         asReady = true;
       }
@@ -5262,6 +5398,53 @@ function App() {
     selectedEvent?.value.name,
   ]);
 
+  // Update eventLabel when selectedEvent changes
+  useEffect(() => {
+    if (selectedEvent) {
+      // Prefer label if available (formatted), otherwise use name
+      const newLabel = selectedEvent.label || selectedEvent.value?.name;
+      if (newLabel) {
+        setEventLabel(newLabel);
+      } else {
+        // Clear eventLabel if selectedEvent has no name/label
+        setEventLabel(null);
+      }
+    } else {
+      // Clear eventLabel if selectedEvent is null
+      setEventLabel(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedEvent?.label, selectedEvent?.value?.name, selectedEvent?.value?.code]);
+
+  // Track current state values in refs so Screen Mode sync can always read latest values
+  // This prevents stale closure values when reading state in async callbacks
+  const currentEventCodeRef = useRef(null);
+  const currentMatchRef = useRef(null);
+  
+  // Update refs whenever state changes so we always have current values
+  useEffect(() => {
+    currentEventCodeRef.current = selectedEvent?.value?.code;
+  }, [selectedEvent?.value?.code]);
+  
+  useEffect(() => {
+    currentMatchRef.current = currentMatch;
+  }, [currentMatch]);
+
+  // Reset lastSyncedEventCodeRef when event changes manually (not from Screen Mode sync)
+  // This ensures manual changes can be overridden by server
+  useEffect(() => {
+    if (screenMode && selectedEvent?.value?.code && !isScreenModeSyncRef.current) {
+      // Event changed but not from Screen Mode sync - user manually changed it
+      // Reset lastSyncedEventCodeRef so server can override it
+      const currentCode = selectedEvent.value.code;
+      if (lastSyncedEventCodeRef.current !== currentCode) {
+        console.log(`Screen Mode: Detected manual event change to ${currentCode}, resetting lastSyncedEventCodeRef`);
+        lastSyncedEventCodeRef.current = null; // Reset so server can override
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedEvent?.value?.code, screenMode]);
+
   // Retrieve schedule, team list, community updates, high scores and rankings when event selection changes
   useEffect(() => {
     if (events.length > 0 && selectedEvent?.value) {
@@ -5300,6 +5483,7 @@ function App() {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [httpClient, teamList?.lastUpdate]);
+
 
   // Timer to autmatically refresh event data
   // This will run every refreshRate seconds, which is set in the settings.
@@ -5341,6 +5525,598 @@ function App() {
       stop();
     }
   }, [autoUpdate, start, stop]);
+
+  // Track last event code we attempted to sync in Screen Mode
+  // This prevents reloading the same event when React state hasn't updated yet
+  const lastSyncedEventCodeRef = useRef(null);
+  // Track if we're currently processing a Screen Mode sync to distinguish from manual changes
+  const isScreenModeSyncRef = useRef(false);
+
+  // Screen Mode: Function to fetch and process user preferences
+  const fetchAndProcessUserPrefs = async () => {
+    if (!screenMode || !isAuthenticated) {
+      return;
+    }
+    
+    // Skip refresh if other network operations are in progress
+    // @ts-ignore - operationsInProgress is a number from AuthClientContext
+    if (operationsInProgress > 0) {
+      return;
+    }
+    
+    try {
+      const userPrefs = await getUserPrefs();
+      
+      // Check if response has error status
+      if (userPrefs && userPrefs.status && userPrefs.status !== "ok" && userPrefs.status !== 200) {
+        setScreenModeStatus(false);
+        return;
+      }
+      
+      // Check if data is properly formed - validate structure
+      // The main check is to ensure it's NOT the malformed structure with "preferences" array
+      // We don't require all properties to exist since some may legitimately be missing
+      const hasValidStructure = userPrefs && 
+                                typeof userPrefs === 'object' && 
+                                !Array.isArray(userPrefs) &&
+                                Object.keys(userPrefs).length > 0 &&
+                                !userPrefs.preferences; // Reject if it has a "preferences" array property
+      
+      // Check that it has at least some of the core expected properties (not all are required)
+      // This ensures we have actual preference data, not just an empty object
+      const coreProperties = ['selectedEvent', 'selectedYear', 'currentMatch'];
+      const hasCoreProperties = hasValidStructure && coreProperties.some(prop => prop in userPrefs);
+      
+      // Data is valid if structure is correct and has at least some core properties
+      const isValidData = hasValidStructure && hasCoreProperties;
+      
+      if (!isValidData) {
+        // Explicitly set to false for malformed data
+        setScreenModeStatus(false);
+      } else {
+        // Data is valid
+        setScreenModeStatus(true);
+      }
+      
+      if (isValidData && typeof userPrefs === 'object') {
+        // In Screen Mode, compare server values to current client state to ensure we always apply server values
+        // Read state values from refs (always current) to avoid stale closure values
+        const currentMatchFromRef = currentMatchRef.current;
+        
+        if (userPrefs.selectedEvent !== undefined && userPrefs.selectedEvent !== null) {
+          // Use ref value (always current) for accurate comparison
+          const serverEventCode = userPrefs.selectedEvent?.value?.code;
+          const lastSyncedCode = lastSyncedEventCodeRef.current;
+          
+          // Only update if server differs from what we last synced
+          // This prevents reloading the same event when React state hasn't updated yet
+          // Manual changes are handled by resetting lastSyncedEventCodeRef in the useEffect
+          if (lastSyncedCode !== serverEventCode) {
+            isScreenModeSyncRef.current = true; // Mark that this is a Screen Mode sync
+            setSelectedEvent(userPrefs.selectedEvent);
+            // Update ref immediately to prevent reloading on next sync
+            lastSyncedEventCodeRef.current = serverEventCode;
+            // Reset flag after a short delay to allow state update to complete
+            setTimeout(() => {
+              isScreenModeSyncRef.current = false;
+            }, 100);
+          }
+        } else if (userPrefs.selectedEvent === null) {
+          // Server wants to clear the event
+          if (lastSyncedEventCodeRef.current !== null || selectedEvent !== null) {
+            setSelectedEvent(null);
+            lastSyncedEventCodeRef.current = null;
+          }
+        }
+        // Only update selectedYear if server value differs from current client state
+        if (userPrefs.selectedYear !== undefined) {
+          const currentYear = selectedYear?.value;
+          const serverYear = userPrefs.selectedYear?.value;
+          if (currentYear !== serverYear) {
+            setSelectedYear(userPrefs.selectedYear);
+          }
+        }
+        // Update other preference values only if they've changed
+        if (userPrefs.rankingsOverride !== undefined && !_.isEqual(userPrefs.rankingsOverride, rankingsOverride)) {
+          setRankingsOverride(userPrefs.rankingsOverride);
+        }
+        if (userPrefs.eventFilters !== undefined && !_.isEqual(userPrefs.eventFilters, eventFilters)) {
+          setEventFilters(userPrefs.eventFilters);
+        }
+        if (userPrefs.regionFilters !== undefined && !_.isEqual(userPrefs.regionFilters, regionFilters)) {
+          setRegionFilters(userPrefs.regionFilters);
+        }
+        if (userPrefs.timeFilter !== undefined && !_.isEqual(userPrefs.timeFilter, timeFilter)) {
+          setTimeFilter(userPrefs.timeFilter);
+        }
+        if (userPrefs.timeFormat !== undefined && !_.isEqual(userPrefs.timeFormat, timeFormat)) {
+          setTimeFormat(userPrefs.timeFormat);
+        }
+        if (userPrefs.showSponsors !== undefined && userPrefs.showSponsors !== showSponsors) {
+          setShowSponsors(userPrefs.showSponsors);
+        }
+        if (userPrefs.autoHideSponsors !== undefined && userPrefs.autoHideSponsors !== autoHideSponsors) {
+          setAutoHideSponsors(userPrefs.autoHideSponsors);
+        }
+        if (userPrefs.showAwards !== undefined && userPrefs.showAwards !== showAwards) {
+          setShowAwards(userPrefs.showAwards);
+        }
+        if (userPrefs.showMinorAwards !== undefined && userPrefs.showMinorAwards !== showMinorAwards) {
+          setShowMinorAwards(userPrefs.showMinorAwards);
+        }
+        if (userPrefs.showNotes !== undefined && userPrefs.showNotes !== showNotes) {
+          setShowNotes(userPrefs.showNotes);
+        }
+        if (userPrefs.showNotesAnnounce !== undefined && userPrefs.showNotesAnnounce !== showNotesAnnounce) {
+          setShowNotesAnnounce(userPrefs.showNotesAnnounce);
+        }
+        if (userPrefs.showMottoes !== undefined && userPrefs.showMottoes !== showMottoes) {
+          setShowMottoes(userPrefs.showMottoes);
+        }
+        if (userPrefs.showChampsStats !== undefined && userPrefs.showChampsStats !== showChampsStats) {
+          setShowChampsStats(userPrefs.showChampsStats);
+        }
+        if (userPrefs.showDistrictChampsStats !== undefined && userPrefs.showDistrictChampsStats !== showDistrictChampsStats) {
+          setShowDistrictChampsStats(userPrefs.showDistrictChampsStats);
+        }
+        if (userPrefs.showBlueBanners !== undefined && userPrefs.showBlueBanners !== showBlueBanners) {
+          setShowBlueBanners(userPrefs.showBlueBanners);
+        }
+        if (userPrefs.hidePracticeSchedule !== undefined && userPrefs.hidePracticeSchedule !== hidePracticeSchedule) {
+          setHidePracticeSchedule(userPrefs.hidePracticeSchedule);
+        }
+        if (userPrefs.monthsWarning !== undefined && !_.isEqual(userPrefs.monthsWarning, monthsWarning)) {
+          setMonthsWarning(userPrefs.monthsWarning);
+        }
+        if (userPrefs.showInspection !== undefined && userPrefs.showInspection !== showInspection) {
+          setShowInspection(userPrefs.showInspection);
+        }
+        if (userPrefs.swapScreen !== undefined && userPrefs.swapScreen !== swapScreen) {
+          setSwapScreen(userPrefs.swapScreen);
+        }
+        if (userPrefs.autoAdvance !== undefined && userPrefs.autoAdvance !== autoAdvance) {
+          setAutoAdvance(userPrefs.autoAdvance);
+        }
+        if (userPrefs.highScoreMode !== undefined && userPrefs.highScoreMode !== highScoreMode) {
+          setHighScoreMode(userPrefs.highScoreMode);
+        }
+        if (userPrefs.autoUpdate !== undefined && userPrefs.autoUpdate !== autoUpdate) {
+          setAutoUpdate(userPrefs.autoUpdate);
+        }
+        if (userPrefs.awardsMenu !== undefined && userPrefs.awardsMenu !== awardsMenu) {
+          setAwardsMenu(userPrefs.awardsMenu);
+        }
+        if (userPrefs.showQualsStats !== undefined && userPrefs.showQualsStats !== showQualsStats) {
+          setShowQualsStats(userPrefs.showQualsStats);
+        }
+        if (userPrefs.showQualsStatsQuals !== undefined && userPrefs.showQualsStatsQuals !== showQualsStatsQuals) {
+          setShowQualsStatsQuals(userPrefs.showQualsStatsQuals);
+        }
+        if (userPrefs.teamReduction !== undefined && userPrefs.teamReduction !== teamReduction) {
+          setTeamReduction(userPrefs.teamReduction);
+        }
+        if (userPrefs.playoffCountOverride !== undefined && !_.isEqual(userPrefs.playoffCountOverride, playoffCountOverride)) {
+          setPlayoffCountOverride(userPrefs.playoffCountOverride);
+        }
+        if (userPrefs.allianceCount !== undefined && !_.isEqual(userPrefs.allianceCount, allianceCount)) {
+          setAllianceCount(userPrefs.allianceCount);
+        }
+        if (userPrefs.reverseEmcee !== undefined && userPrefs.reverseEmcee !== reverseEmcee) {
+          setReverseEmcee(userPrefs.reverseEmcee);
+        }
+        if (userPrefs.usePullDownToUpdate !== undefined && userPrefs.usePullDownToUpdate !== usePullDownToUpdate) {
+          setUsePullDownToUpdate(userPrefs.usePullDownToUpdate);
+        }
+        if (userPrefs.useScrollMemory !== undefined && userPrefs.useScrollMemory !== useScrollMemory) {
+          setUseScrollMemory(userPrefs.useScrollMemory);
+        }
+        if (userPrefs.ftcMode !== undefined && !_.isEqual(userPrefs.ftcMode, ftcMode)) {
+          setFTCMode(userPrefs.ftcMode);
+        }
+        if (userPrefs.useCheesyArena !== undefined && userPrefs.useCheesyArena !== useCheesyArena) {
+          setUseCheesyArena(userPrefs.useCheesyArena);
+        }
+        if (userPrefs.useFourTeamAlliances !== undefined && userPrefs.useFourTeamAlliances !== useFourTeamAlliances) {
+          setUseFourTeamAlliances(userPrefs.useFourTeamAlliances);
+        }
+        if (userPrefs.useFTCOffline !== undefined && userPrefs.useFTCOffline !== useFTCOffline) {
+          setUseFTCOffline(userPrefs.useFTCOffline);
+        }
+        if (userPrefs.FTCKey !== undefined && !_.isEqual(userPrefs.FTCKey, FTCKey)) {
+          setFTCKey(userPrefs.FTCKey);
+        }
+        if (userPrefs.FTCServerURL !== undefined && userPrefs.FTCServerURL !== FTCServerURL) {
+          setFTCServerURL(userPrefs.FTCServerURL);
+        }
+        if (userPrefs.manualOfflineMode !== undefined && userPrefs.manualOfflineMode !== manualOfflineMode) {
+          setManualOfflineMode(userPrefs.manualOfflineMode);
+        }
+        if (userPrefs.screenModeSyncFrequency !== undefined && userPrefs.screenModeSyncFrequency !== screenModeSyncFrequency) {
+          // Clamp value between 5 and 10
+          const newFrequency = Math.max(5, Math.min(10, userPrefs.screenModeSyncFrequency));
+          if (newFrequency !== screenModeSyncFrequency) {
+            setScreenModeSyncFrequency(newFrequency);
+            // Polling will restart automatically via useEffect when frequency changes
+          }
+        }
+        // Only update currentMatch if server value differs from current client state
+        // Use ref value (always current) for accurate comparison
+        if (userPrefs.currentMatch !== undefined && userPrefs.currentMatch !== null) {
+          // Compare against ref value (always current) not closure value (may be stale)
+          if (currentMatchFromRef !== userPrefs.currentMatch) {
+            setCurrentMatch(userPrefs.currentMatch);
+          }
+        }
+      } else {
+        // Data is malformed or empty
+        setScreenModeStatus(false);
+      }
+    } catch (error) {
+      console.error("Error fetching user preferences in Screen Mode:", error);
+      setScreenModeStatus(false);
+    }
+  };
+
+  // Screen Mode: Poll user preferences at configured frequency and update local state
+  // Note: useInterval doesn't support dynamic intervals, so we'll recreate it when frequency changes
+  const screenModePollIntervalRef = useRef(null);
+  const startScreenModePoll = () => {
+    if (screenModePollIntervalRef.current) {
+      clearInterval(screenModePollIntervalRef.current);
+    }
+    const frequency = (screenModeSyncFrequency || 10) * 1000; // Convert seconds to milliseconds
+    screenModePollIntervalRef.current = setInterval(() => {
+      if (screenMode && isAuthenticated) {
+        fetchAndProcessUserPrefs();
+      }
+    }, frequency);
+  };
+  const stopScreenModePoll = () => {
+    if (screenModePollIntervalRef.current) {
+      clearInterval(screenModePollIntervalRef.current);
+      screenModePollIntervalRef.current = null;
+    }
+  };
+
+  const screenModeInitializedRef = useRef(false);
+  const previousScreenModeRef = useRef(screenMode);
+  useEffect(() => {
+    // Only reset status when screenMode changes from false to true (first enable)
+    if (screenMode && isAuthenticated && !previousScreenModeRef.current) {
+      // Ensure syncEvent is disabled when Screen Mode is enabled
+      if (syncEvent) {
+        console.log("Screen Mode enabled - disabling Sync Event");
+        setSyncEvent(false);
+      }
+      setScreenModeStatus(null);
+      screenModeInitializedRef.current = true;
+      // Reset lastSyncedEventCodeRef when Screen Mode is first enabled
+      lastSyncedEventCodeRef.current = null;
+      // Fetch immediately when Screen Mode is enabled
+      fetchAndProcessUserPrefs();
+      startScreenModePoll();
+    } else if (screenMode && isAuthenticated) {
+      // Screen mode already enabled, ensure syncEvent is still disabled
+      if (syncEvent) {
+        console.log("Screen Mode active - disabling Sync Event");
+        setSyncEvent(false);
+      }
+      // Screen mode already enabled, restart polling to pick up any frequency changes
+      stopScreenModePoll();
+      startScreenModePoll();
+    } else {
+      // Screen mode disabled
+      stopScreenModePoll();
+      screenModeInitializedRef.current = false;
+      if (!screenMode) {
+        setScreenModeStatus(null);
+      }
+    }
+    previousScreenModeRef.current = screenMode;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [screenMode, isAuthenticated, syncEvent, setSyncEvent, screenModeSyncFrequency]);
+  
+  // Restart polling when frequency changes (if Screen Mode is active)
+  useEffect(() => {
+    if (screenMode && isAuthenticated) {
+      stopScreenModePoll();
+      startScreenModePoll();
+    }
+    // Cleanup on unmount or when screenMode/frequency changes
+    return () => {
+      stopScreenModePoll();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [screenModeSyncFrequency]);
+
+  // Debounce putUserPrefs to prevent rapid successive calls
+  const syncDebounceTimeoutRef = useRef(null);
+  const pendingSyncRef = useRef(false);
+  const debouncedPutUserPrefs = () => {
+    // Clear any existing timeout
+    if (syncDebounceTimeoutRef.current) {
+      clearTimeout(syncDebounceTimeoutRef.current);
+    }
+    
+    // Set pending flag
+    pendingSyncRef.current = true;
+    
+    // Set new timeout
+    syncDebounceTimeoutRef.current = setTimeout(() => {
+      if (pendingSyncRef.current && syncEvent && isAuthenticated) {
+        // Don't clear pendingSyncRef here - let putUserPrefs handle it
+        // If it skips due to operations in progress, it will set pendingSyncRef to true
+        putUserPrefs().catch((error) => {
+          console.error("Error syncing user preferences:", error);
+          pendingSyncRef.current = false; // Clear on error
+        });
+      }
+    }, 1000); // 1 second debounce
+  };
+
+  // Sync user preferences when syncEvent is enabled
+  const syncEventEnabledRef = useRef(false);
+  const previousSyncEventRef = useRef(syncEvent);
+  const initialSyncAttemptedRef = useRef(false);
+  const isEventLoadingRef = useRef(false);
+  useEffect(() => {
+    if (syncEvent && isAuthenticated && !syncEventEnabledRef.current) {
+      // Ensure screenMode is disabled when Sync Event is enabled
+      if (screenMode) {
+        console.log("Sync Event enabled - disabling Screen Mode");
+        setScreenMode(false);
+      }
+      // Call putUserPrefs once when syncEvent is enabled (only if authenticated)
+      syncEventEnabledRef.current = true;
+      previousSyncEventRef.current = syncEvent;
+      // Add a small delay for initial sync to ensure backend is ready
+      const syncTimeout = setTimeout(() => {
+        putUserPrefs().catch((error) => {
+          // Log error but don't prevent sync from being enabled
+          // The initial sync failure is often due to backend initialization
+          if (!initialSyncAttemptedRef.current) {
+            console.log("Initial sync attempt failed (this is often expected):", error.message);
+            initialSyncAttemptedRef.current = true;
+          } else {
+            console.error("Error syncing user preferences:", error);
+          }
+        });
+      }, 500); // 500ms delay for initial sync
+      
+      return () => clearTimeout(syncTimeout);
+    } else if (!syncEvent || !isAuthenticated) {
+      syncEventEnabledRef.current = false;
+      previousSyncEventRef.current = syncEvent;
+      initialSyncAttemptedRef.current = false; // Reset on disable
+      // Clear any pending syncs
+      if (syncDebounceTimeoutRef.current) {
+        clearTimeout(syncDebounceTimeoutRef.current);
+        syncDebounceTimeoutRef.current = null;
+      }
+      pendingSyncRef.current = false;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [syncEvent, isAuthenticated, screenMode, setScreenMode]);
+
+  // Retry pending sync when network operations complete
+  useEffect(() => {
+    // @ts-ignore - operationsInProgress is a number from AuthClientContext
+    if (operationsInProgress === 0 && syncEvent && isAuthenticated) {
+      // Retry pending sync if we have one
+      if (pendingSyncRef.current) {
+        console.log("Retrying sync - network operations completed");
+        putUserPrefs().catch((error) => {
+          console.error("Error syncing user preferences on retry:", error);
+          pendingSyncRef.current = false; // Clear on error
+        });
+      }
+      // Also check if we have a pending event sync that was waiting for operations to complete
+      if (pendingEventSyncRef.current && !isEventLoadingRef.current) {
+        console.log("Event sync pending - network operations completed, triggering sync");
+        pendingEventSyncRef.current = false;
+        debouncedPutUserPrefs();
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [operationsInProgress, syncEvent, isAuthenticated]);
+
+  // Track when event is loading to skip syncing during transitions
+  const previousEventCodeRef = useRef(selectedEvent?.value?.code);
+  const pendingEventSyncRef = useRef(false);
+  useEffect(() => {
+    const currentEventCode = selectedEvent?.value?.code;
+    if (currentEventCode !== previousEventCodeRef.current) {
+      isEventLoadingRef.current = true;
+      previousEventCodeRef.current = currentEventCode;
+      // Mark that we need to sync after event loads (if syncEvent is enabled)
+      if (syncEvent && isAuthenticated) {
+        pendingEventSyncRef.current = true;
+      }
+      // Reset loading flag after a delay to allow event to finish loading
+      setTimeout(() => {
+        isEventLoadingRef.current = false;
+        // If we have a pending event sync and no network operations, trigger sync
+        if (pendingEventSyncRef.current && syncEvent && isAuthenticated) {
+          // @ts-ignore - operationsInProgress is a number from AuthClientContext
+          if (operationsInProgress === 0) {
+            console.log("Event loading complete - triggering sync");
+            pendingEventSyncRef.current = false;
+            debouncedPutUserPrefs();
+          }
+        }
+      }, 2000); // 2 seconds should be enough for event to load
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedEvent?.value?.code, syncEvent, isAuthenticated]);
+
+  // Sync user preferences when currentMatch changes (if syncEvent is enabled and user is authenticated)
+  const previousMatchRef = useRef(currentMatch);
+  useEffect(() => {
+    if (syncEvent && isAuthenticated && currentMatch !== null && previousMatchRef.current !== currentMatch && previousMatchRef.current !== null && !isEventLoadingRef.current) {
+      previousMatchRef.current = currentMatch;
+      debouncedPutUserPrefs();
+    } else if (currentMatch !== null) {
+      previousMatchRef.current = currentMatch;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentMatch, syncEvent, isAuthenticated]);
+
+  // Sync user preferences when any preference changes (if syncEvent is enabled)
+  // Use a ref to track if we should skip the first sync (when syncEvent is first enabled)
+  const preferencesRef = useRef({
+    selectedEvent,
+    selectedYear,
+    rankingsOverride,
+    eventFilters,
+    regionFilters,
+    timeFilter,
+    timeFormat,
+    showSponsors,
+    autoHideSponsors,
+    showAwards,
+    showMinorAwards,
+    showNotes,
+    showNotesAnnounce,
+    showMottoes,
+    showChampsStats,
+    showDistrictChampsStats,
+    showBlueBanners,
+    hidePracticeSchedule,
+    monthsWarning,
+    showInspection,
+    swapScreen,
+    autoAdvance,
+    highScoreMode,
+    autoUpdate,
+    awardsMenu,
+    showQualsStats,
+    showQualsStatsQuals,
+    teamReduction,
+    playoffCountOverride,
+    allianceCount,
+    reverseEmcee,
+    usePullDownToUpdate,
+    useScrollMemory,
+    ftcMode,
+    useCheesyArena,
+    useFourTeamAlliances,
+    useFTCOffline,
+    FTCKey,
+    FTCServerURL,
+    manualOfflineMode,
+    screenModeSyncFrequency,
+  });
+
+  useEffect(() => {
+    if (syncEvent && isAuthenticated && syncEventEnabledRef.current) {
+      // Check if any preference actually changed
+      const currentPrefs = {
+        selectedEvent,
+        selectedYear,
+        rankingsOverride,
+        eventFilters,
+        regionFilters,
+        timeFilter,
+        timeFormat,
+        showSponsors,
+        autoHideSponsors,
+        showAwards,
+        showMinorAwards,
+        showNotes,
+        showNotesAnnounce,
+        showMottoes,
+        showChampsStats,
+        showDistrictChampsStats,
+        showBlueBanners,
+        hidePracticeSchedule,
+        monthsWarning,
+        showInspection,
+        swapScreen,
+        autoAdvance,
+        highScoreMode,
+        autoUpdate,
+        awardsMenu,
+        showQualsStats,
+        showQualsStatsQuals,
+        teamReduction,
+        playoffCountOverride,
+        allianceCount,
+        reverseEmcee,
+        usePullDownToUpdate,
+        useScrollMemory,
+        ftcMode,
+        useCheesyArena,
+        useFourTeamAlliances,
+        useFTCOffline,
+        FTCKey,
+        FTCServerURL,
+        manualOfflineMode,
+        screenModeSyncFrequency,
+      };
+
+      // Compare current preferences with previous (skip if syncEvent just changed or event is loading)
+      // If event is loading, mark that we need to sync after it completes
+      if (previousSyncEventRef.current === syncEvent && !_.isEqual(preferencesRef.current, currentPrefs)) {
+        if (!isEventLoadingRef.current) {
+          // Event not loading, sync immediately
+          preferencesRef.current = currentPrefs;
+          debouncedPutUserPrefs();
+        } else {
+          // Event is loading, mark for sync after loading completes
+          console.log("Event is loading - marking for sync after load completes");
+          pendingEventSyncRef.current = true;
+          preferencesRef.current = currentPrefs;
+        }
+      } else {
+        preferencesRef.current = currentPrefs;
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    selectedEvent,
+    selectedYear,
+    rankingsOverride,
+    eventFilters,
+    regionFilters,
+    timeFilter,
+    timeFormat,
+    showSponsors,
+    autoHideSponsors,
+    showAwards,
+    showMinorAwards,
+    showNotes,
+    showNotesAnnounce,
+    showMottoes,
+    showChampsStats,
+    showDistrictChampsStats,
+    showBlueBanners,
+    hidePracticeSchedule,
+    monthsWarning,
+    showInspection,
+    swapScreen,
+    autoAdvance,
+    highScoreMode,
+    autoUpdate,
+    awardsMenu,
+    showQualsStats,
+    showQualsStatsQuals,
+    teamReduction,
+    playoffCountOverride,
+    allianceCount,
+    reverseEmcee,
+    usePullDownToUpdate,
+    useScrollMemory,
+    ftcMode,
+    useCheesyArena,
+    useFourTeamAlliances,
+    useFTCOffline,
+    FTCKey,
+    FTCServerURL,
+    manualOfflineMode,
+    screenModeSyncFrequency,
+    syncEvent,
+    isAuthenticated,
+  ]);
 
   // controllers for tab navigation
   //const navigate = useNavigate();
@@ -5398,6 +6174,9 @@ function App() {
                   systemBell={systemBell}
                   systemMessage={systemMessage}
                   ftcMode={ftcMode}
+                  screenMode={screenMode}
+                  screenModeStatus={screenModeStatus}
+                  syncEvent={syncEvent}
                 />
               }
             >
@@ -5489,6 +6268,12 @@ function App() {
                     setUseSwipe={setUseSwipe}
                     useScrollMemory={useScrollMemory}
                     setUseScrollMemory={setUseScrollMemory}
+                    syncEvent={syncEvent}
+                    setSyncEvent={setSyncEvent}
+                    screenMode={screenMode}
+                    setScreenMode={setScreenMode}
+                    screenModeSyncFrequency={screenModeSyncFrequency}
+                    setScreenModeSyncFrequency={setScreenModeSyncFrequency}
                     eventLabel={eventLabel}
                     setEventLabel={setEventLabel}
                     showInspection={showInspection}
@@ -5869,6 +6654,8 @@ function App() {
                     systemBell={systemBell}
                     setSystemBell={setSystemBell}
                     resetCache={resetCache}
+                    putUserPrefs={putUserPrefs}
+                    getUserPrefs={getUserPrefs}
                   />
                 }
               />
