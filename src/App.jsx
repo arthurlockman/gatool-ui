@@ -172,7 +172,7 @@ function App() {
     checkLogin();
   }, [getAccessTokenSilently, isAuthenticated, loginWithRedirect]);
 
-  const [httpClient] = UseAuthClient();
+  const [httpClient, operationsInProgress] = UseAuthClient();
   const [selectedEvent, setSelectedEvent] = usePersistentState(
     "setting:selectedEvent",
     null
@@ -4291,6 +4291,18 @@ function App() {
    * @returns {Promise<object>} Result code for writing the user preferences
    */
   async function putUserPrefs() {
+    // Skip sync if other network operations are in progress
+    // Set pending flag so useEffect can retry when operations complete
+    // @ts-ignore - operationsInProgress is a number from AuthClientContext
+    if (operationsInProgress > 0) {
+      console.log("Skipping sync - network operations in progress");
+      pendingSyncRef.current = true;
+      return;
+    }
+    
+    // Clear pending flag since we're proceeding with sync
+    pendingSyncRef.current = false;
+    
     // gather user preferences from the UI
     var userPrefs = {
       selectedEvent: selectedEvent,
@@ -5404,6 +5416,35 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedEvent?.label, selectedEvent?.value?.name, selectedEvent?.value?.code]);
 
+  // Track current state values in refs so Screen Mode sync can always read latest values
+  // This prevents stale closure values when reading state in async callbacks
+  const currentEventCodeRef = useRef(null);
+  const currentMatchRef = useRef(null);
+  
+  // Update refs whenever state changes so we always have current values
+  useEffect(() => {
+    currentEventCodeRef.current = selectedEvent?.value?.code;
+  }, [selectedEvent?.value?.code]);
+  
+  useEffect(() => {
+    currentMatchRef.current = currentMatch;
+  }, [currentMatch]);
+
+  // Reset lastSyncedEventCodeRef when event changes manually (not from Screen Mode sync)
+  // This ensures manual changes can be overridden by server
+  useEffect(() => {
+    if (screenMode && selectedEvent?.value?.code && !isScreenModeSyncRef.current) {
+      // Event changed but not from Screen Mode sync - user manually changed it
+      // Reset lastSyncedEventCodeRef so server can override it
+      const currentCode = selectedEvent.value.code;
+      if (lastSyncedEventCodeRef.current !== currentCode) {
+        console.log(`Screen Mode: Detected manual event change to ${currentCode}, resetting lastSyncedEventCodeRef`);
+        lastSyncedEventCodeRef.current = null; // Reset so server can override
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedEvent?.value?.code, screenMode]);
+
   // Retrieve schedule, team list, community updates, high scores and rankings when event selection changes
   useEffect(() => {
     if (events.length > 0 && selectedEvent?.value) {
@@ -5442,6 +5483,7 @@ function App() {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [httpClient, teamList?.lastUpdate]);
+
 
   // Timer to autmatically refresh event data
   // This will run every refreshRate seconds, which is set in the settings.
@@ -5484,27 +5526,29 @@ function App() {
     }
   }, [autoUpdate, start, stop]);
 
+  // Track last event code we attempted to sync in Screen Mode
+  // This prevents reloading the same event when React state hasn't updated yet
+  const lastSyncedEventCodeRef = useRef(null);
+  // Track if we're currently processing a Screen Mode sync to distinguish from manual changes
+  const isScreenModeSyncRef = useRef(false);
+
   // Screen Mode: Function to fetch and process user preferences
   const fetchAndProcessUserPrefs = async () => {
     if (!screenMode || !isAuthenticated) {
       return;
     }
     
+    // Skip refresh if other network operations are in progress
+    // @ts-ignore - operationsInProgress is a number from AuthClientContext
+    if (operationsInProgress > 0) {
+      return;
+    }
+    
     try {
       const userPrefs = await getUserPrefs();
       
-      console.log("Screen Mode: Received userPrefs", {
-        userPrefs,
-        type: typeof userPrefs,
-        isArray: Array.isArray(userPrefs),
-        keys: userPrefs ? Object.keys(userPrefs) : [],
-        hasStatus: userPrefs?.status !== undefined,
-        status: userPrefs?.status
-      });
-      
       // Check if response has error status
       if (userPrefs && userPrefs.status && userPrefs.status !== "ok" && userPrefs.status !== 200) {
-        console.log("Screen Mode: Error status in response", userPrefs.status);
         setScreenModeStatus(false);
         return;
       }
@@ -5526,39 +5570,51 @@ function App() {
       // Data is valid if structure is correct and has at least some core properties
       const isValidData = hasValidStructure && hasCoreProperties;
       
-      console.log("Screen Mode: Validation results", {
-        hasValidStructure,
-        hasCoreProperties,
-        isValidData: isValidData,
-        userPrefsKeys: userPrefs ? Object.keys(userPrefs) : [],
-        userPrefsType: typeof userPrefs,
-        isArray: Array.isArray(userPrefs),
-        hasPreferences: userPrefs?.preferences !== undefined,
-        keyCount: userPrefs ? Object.keys(userPrefs).length : 0
-      });
-      
       if (!isValidData) {
         // Explicitly set to false for malformed data
-        console.log("Setting screenModeStatus to false due to invalid data");
         setScreenModeStatus(false);
       } else {
         // Data is valid
-        console.log("Setting screenModeStatus to true - data is valid");
         setScreenModeStatus(true);
       }
       
       if (isValidData && typeof userPrefs === 'object') {
-        // Only update selectedEvent if it's actually different (compare event codes to avoid reloading)
-        if (userPrefs.selectedEvent !== undefined) {
-          const currentEventCode = selectedEvent?.value?.code;
-          const newEventCode = userPrefs.selectedEvent?.value?.code;
-          if (currentEventCode !== newEventCode) {
+        // In Screen Mode, compare server values to current client state to ensure we always apply server values
+        // Read state values from refs (always current) to avoid stale closure values
+        const currentMatchFromRef = currentMatchRef.current;
+        
+        if (userPrefs.selectedEvent !== undefined && userPrefs.selectedEvent !== null) {
+          // Use ref value (always current) for accurate comparison
+          const serverEventCode = userPrefs.selectedEvent?.value?.code;
+          const lastSyncedCode = lastSyncedEventCodeRef.current;
+          
+          // Only update if server differs from what we last synced
+          // This prevents reloading the same event when React state hasn't updated yet
+          // Manual changes are handled by resetting lastSyncedEventCodeRef in the useEffect
+          if (lastSyncedCode !== serverEventCode) {
+            isScreenModeSyncRef.current = true; // Mark that this is a Screen Mode sync
             setSelectedEvent(userPrefs.selectedEvent);
+            // Update ref immediately to prevent reloading on next sync
+            lastSyncedEventCodeRef.current = serverEventCode;
+            // Reset flag after a short delay to allow state update to complete
+            setTimeout(() => {
+              isScreenModeSyncRef.current = false;
+            }, 100);
+          }
+        } else if (userPrefs.selectedEvent === null) {
+          // Server wants to clear the event
+          if (lastSyncedEventCodeRef.current !== null || selectedEvent !== null) {
+            setSelectedEvent(null);
+            lastSyncedEventCodeRef.current = null;
           }
         }
-        // Only update selectedYear if it's actually different
-        if (userPrefs.selectedYear !== undefined && userPrefs.selectedYear?.value !== selectedYear?.value) {
-          setSelectedYear(userPrefs.selectedYear);
+        // Only update selectedYear if server value differs from current client state
+        if (userPrefs.selectedYear !== undefined) {
+          const currentYear = selectedYear?.value;
+          const serverYear = userPrefs.selectedYear?.value;
+          if (currentYear !== serverYear) {
+            setSelectedYear(userPrefs.selectedYear);
+          }
         }
         // Update other preference values only if they've changed
         if (userPrefs.rankingsOverride !== undefined && !_.isEqual(userPrefs.rankingsOverride, rankingsOverride)) {
@@ -5683,8 +5739,13 @@ function App() {
             // Polling will restart automatically via useEffect when frequency changes
           }
         }
-        if (userPrefs.currentMatch !== undefined && userPrefs.currentMatch !== null && userPrefs.currentMatch !== currentMatch) {
-          setCurrentMatch(userPrefs.currentMatch);
+        // Only update currentMatch if server value differs from current client state
+        // Use ref value (always current) for accurate comparison
+        if (userPrefs.currentMatch !== undefined && userPrefs.currentMatch !== null) {
+          // Compare against ref value (always current) not closure value (may be stale)
+          if (currentMatchFromRef !== userPrefs.currentMatch) {
+            setCurrentMatch(userPrefs.currentMatch);
+          }
         }
       } else {
         // Data is malformed or empty
@@ -5729,6 +5790,8 @@ function App() {
       }
       setScreenModeStatus(null);
       screenModeInitializedRef.current = true;
+      // Reset lastSyncedEventCodeRef when Screen Mode is first enabled
+      lastSyncedEventCodeRef.current = null;
       // Fetch immediately when Screen Mode is enabled
       fetchAndProcessUserPrefs();
       startScreenModePoll();
@@ -5781,9 +5844,11 @@ function App() {
     // Set new timeout
     syncDebounceTimeoutRef.current = setTimeout(() => {
       if (pendingSyncRef.current && syncEvent && isAuthenticated) {
-        pendingSyncRef.current = false;
+        // Don't clear pendingSyncRef here - let putUserPrefs handle it
+        // If it skips due to operations in progress, it will set pendingSyncRef to true
         putUserPrefs().catch((error) => {
           console.error("Error syncing user preferences:", error);
+          pendingSyncRef.current = false; // Clear on error
         });
       }
     }, 1000); // 1 second debounce
@@ -5833,20 +5898,56 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [syncEvent, isAuthenticated, screenMode, setScreenMode]);
 
+  // Retry pending sync when network operations complete
+  useEffect(() => {
+    // @ts-ignore - operationsInProgress is a number from AuthClientContext
+    if (operationsInProgress === 0 && syncEvent && isAuthenticated) {
+      // Retry pending sync if we have one
+      if (pendingSyncRef.current) {
+        console.log("Retrying sync - network operations completed");
+        putUserPrefs().catch((error) => {
+          console.error("Error syncing user preferences on retry:", error);
+          pendingSyncRef.current = false; // Clear on error
+        });
+      }
+      // Also check if we have a pending event sync that was waiting for operations to complete
+      if (pendingEventSyncRef.current && !isEventLoadingRef.current) {
+        console.log("Event sync pending - network operations completed, triggering sync");
+        pendingEventSyncRef.current = false;
+        debouncedPutUserPrefs();
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [operationsInProgress, syncEvent, isAuthenticated]);
+
   // Track when event is loading to skip syncing during transitions
   const previousEventCodeRef = useRef(selectedEvent?.value?.code);
+  const pendingEventSyncRef = useRef(false);
   useEffect(() => {
     const currentEventCode = selectedEvent?.value?.code;
     if (currentEventCode !== previousEventCodeRef.current) {
       isEventLoadingRef.current = true;
       previousEventCodeRef.current = currentEventCode;
+      // Mark that we need to sync after event loads (if syncEvent is enabled)
+      if (syncEvent && isAuthenticated) {
+        pendingEventSyncRef.current = true;
+      }
       // Reset loading flag after a delay to allow event to finish loading
       setTimeout(() => {
         isEventLoadingRef.current = false;
+        // If we have a pending event sync and no network operations, trigger sync
+        if (pendingEventSyncRef.current && syncEvent && isAuthenticated) {
+          // @ts-ignore - operationsInProgress is a number from AuthClientContext
+          if (operationsInProgress === 0) {
+            console.log("Event loading complete - triggering sync");
+            pendingEventSyncRef.current = false;
+            debouncedPutUserPrefs();
+          }
+        }
       }, 2000); // 2 seconds should be enough for event to load
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedEvent?.value?.code]);
+  }, [selectedEvent?.value?.code, syncEvent, isAuthenticated]);
 
   // Sync user preferences when currentMatch changes (if syncEvent is enabled and user is authenticated)
   const previousMatchRef = useRef(currentMatch);
@@ -5954,9 +6055,18 @@ function App() {
       };
 
       // Compare current preferences with previous (skip if syncEvent just changed or event is loading)
-      if (previousSyncEventRef.current === syncEvent && !_.isEqual(preferencesRef.current, currentPrefs) && !isEventLoadingRef.current) {
-        preferencesRef.current = currentPrefs;
-        debouncedPutUserPrefs();
+      // If event is loading, mark that we need to sync after it completes
+      if (previousSyncEventRef.current === syncEvent && !_.isEqual(preferencesRef.current, currentPrefs)) {
+        if (!isEventLoadingRef.current) {
+          // Event not loading, sync immediately
+          preferencesRef.current = currentPrefs;
+          debouncedPutUserPrefs();
+        } else {
+          // Event is loading, mark for sync after loading completes
+          console.log("Event is loading - marking for sync after load completes");
+          pendingEventSyncRef.current = true;
+          preferencesRef.current = currentPrefs;
+        }
       } else {
         preferencesRef.current = currentPrefs;
       }
