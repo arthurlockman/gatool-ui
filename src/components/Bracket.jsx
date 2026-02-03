@@ -343,19 +343,99 @@ function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMat
 		} else if (matches[14]?.actualStartTime) {
 			overtimeOffset = 15;
 		}
-
+	}
 
 	// 8-Alliance Finals: series 14-18 are displayed as match numbers 14-18 in the bracket
 	// Access by array index (series - 1), so indices 13-18 for display matches 14-19
-	for (var finalsMatchIndex = 13; finalsMatchIndex < 19; finalsMatchIndex++) {
-		const finalsMatch = matches[finalsMatchIndex];
-		if (finalsMatch?.winner?.winner === "red") {
-			tournamentWinner.red += 1
-		}
-		if (finalsMatch?.winner?.winner === "blue") {
-			tournamentWinner.blue += 1
+	
+	// In FTC mode, find the final series (highest series number in finals range)
+	let finalSeries = 18; // Default to highest series in finals range
+	if (ftcMode) {
+		const scheduleToCheck = offlinePlayoffSchedule?.schedule || matches;
+		const finalsSeriesNumbers = scheduleToCheck
+			.filter((m) => m.series >= 14 && m.series <= 18)
+			.map((m) => m.series);
+		if (finalsSeriesNumbers.length > 0) {
+			finalSeries = Math.max(...finalsSeriesNumbers);
 		}
 	}
+	
+	// In FTC mode, get all matches from the final series sorted by match number
+	const scheduleToCheckForFinals = offlinePlayoffSchedule?.schedule || matches;
+	const finalSeriesMatchesForDisplay = ftcMode ? scheduleToCheckForFinals
+		.filter((m) => m.series === finalSeries)
+		.sort((a, b) => {
+			const aMatchNum = a.originalMatchNumber || a.matchNumber;
+			const bMatchNum = b.originalMatchNumber || b.matchNumber;
+			return aMatchNum - bMatchNum;
+		}) : [];
+	
+	// Helper function to check if a bracket match number should be displayed in FTC mode
+	const shouldDisplayFinalsMatch = (bracketMatchNumber) => {
+		if (!ftcMode) return true; // In FRC mode, show all finals matches
+		// In FTC mode, only show matches from final series
+		// Map bracket position to match index: match 14 = index 0, match 15 = index 1, etc.
+		const positionIndex = bracketMatchNumber - 14;
+		return positionIndex < finalSeriesMatchesForDisplay.length;
+	};
+	
+	// Helper function to get score for a finals match position in FTC mode
+	const getFinalsMatchScoreForDisplay = (bracketMatchNumber, alliance) => {
+		if (!ftcMode) {
+			return getMatchScoreForDisplay(bracketMatchNumber, alliance);
+		}
+		// Map bracket position to match index: match 14 = index 0, match 15 = index 1, etc.
+		const positionIndex = bracketMatchNumber - 14;
+		const match = finalSeriesMatchesForDisplay[positionIndex];
+		if (!match) return null;
+		
+		if (alliance === "red") {
+			return match.scoreRedFinal;
+		} else if (alliance === "blue") {
+			return match.scoreBlueFinal;
+		}
+		return null;
+	};
+	
+	// Helper function to get winner for a finals match position in FTC mode
+	const getFinalsMatchWinnerForDisplay = (bracketMatchNumber) => {
+		if (!ftcMode) {
+			return getMatchWinnerForDisplay(bracketMatchNumber);
+		}
+		// Map bracket position to match index: match 14 = index 0, match 15 = index 1, etc.
+		const positionIndex = bracketMatchNumber - 14;
+		const match = finalSeriesMatchesForDisplay[positionIndex];
+		if (!match) return null;
+		return match.winner;
+	};
+	
+	// Only calculate tournament winner from matches in the final series (or all finals matches in FRC mode)
+	if (ftcMode) {
+		// In FTC mode, only count matches from the final series
+		const scheduleToCheck = offlinePlayoffSchedule?.schedule || matches;
+		const finalSeriesMatches = scheduleToCheck.filter((m) => m.series === finalSeries);
+		
+		for (const finalsMatch of finalSeriesMatches) {
+			if (finalsMatch?.winner?.winner === "red") {
+				tournamentWinner.red += 1;
+			}
+			if (finalsMatch?.winner?.winner === "blue") {
+				tournamentWinner.blue += 1;
+			}
+		}
+	} else {
+		// In FRC mode, count all finals matches (series 14-18)
+		for (var finalsMatchIndex = 13; finalsMatchIndex < 19; finalsMatchIndex++) {
+			const finalsMatch = matches[finalsMatchIndex];
+			if (finalsMatch?.winner?.winner === "red") {
+				tournamentWinner.red += 1;
+			}
+			if (finalsMatch?.winner?.winner === "blue") {
+				tournamentWinner.blue += 1;
+			}
+		}
+	}
+	
 	// FTC: Red (higher seed) wins with 1 victory, Blue (lower seed) needs 2 victories
 	// FRC: Both alliances need 2 victories (best of 3)
 	if (ftcMode) {
@@ -371,13 +451,36 @@ function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMat
 			tournamentWinner.winner = "blue";
 		}
 	}
-	if (matches[18]?.winner?.tieWinner === "red") {
-		tournamentWinner.winner = "red";
-		tournamentWinner.level = matches[18]?.winner?.level;
-	} else if (matches[18]?.winner?.tieWinner === "blue") {
-		tournamentWinner.winner = "blue";
-		tournamentWinner.level = matches[18]?.winner?.level;
-	}
+	
+	// Check for tiebreaker winner from the final series
+	if (ftcMode) {
+		const scheduleToCheck = offlinePlayoffSchedule?.schedule || matches;
+		const finalSeriesMatches = scheduleToCheck.filter((m) => m.series === finalSeries);
+		if (finalSeriesMatches.length > 0) {
+			// Find the last match in the final series
+			const lastFinalMatch = finalSeriesMatches.reduce((prev, current) => {
+				const prevMatchNum = prev.originalMatchNumber || prev.matchNumber;
+				const currentMatchNum = current.originalMatchNumber || current.matchNumber;
+				return (currentMatchNum > prevMatchNum) ? current : prev;
+			});
+			
+			if (lastFinalMatch?.winner?.tieWinner === "red") {
+				tournamentWinner.winner = "red";
+				tournamentWinner.level = lastFinalMatch?.winner?.level;
+			} else if (lastFinalMatch?.winner?.tieWinner === "blue") {
+				tournamentWinner.winner = "blue";
+				tournamentWinner.level = lastFinalMatch?.winner?.level;
+			}
+		}
+	} else {
+		// FRC mode: check match 19 (index 18)
+		if (matches[18]?.winner?.tieWinner === "red") {
+			tournamentWinner.winner = "red";
+			tournamentWinner.level = matches[18]?.winner?.level;
+		} else if (matches[18]?.winner?.tieWinner === "blue") {
+			tournamentWinner.winner = "blue";
+			tournamentWinner.level = matches[18]?.winner?.level;
+		}
 	}
 
 	const setMatchWinner = (matchNumber) => {
@@ -664,96 +767,120 @@ function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMat
 								<path fill="#FEE79B" d="M1208.61,362.82h-2.18c0,15.56,5.01,28.17,11.19,28.17C1212.64,390.99,1208.61,378.38,1208.61,362.82z" />
 							</g>
 
-							<circle id="winnerMatch1Dot" fill={(getMatchWinnerForDisplay(14)?.winner === "red") ? RED : (getMatchWinnerForDisplay(14)?.winner === "blue") ? BLUE : (getMatchWinnerForDisplay(14)?.winner === "tie") ? GREEN : "none"} cx={`${1132 - overtimeOffset}`} cy="451" r="8" />
-							<text id="finalsM1Scores" transform={`matrix(1 0 0 1 ${1132 - overtimeOffset} 477.5537)`}>
-								<tspan x="0" y="0" fill={RED} fontFamily="'myriad-pro'"
-									fontWeight={(getMatchWinnerForDisplay(14)?.winner === "red") ? black : semibold}
-									fontStyle={"normal"}
-									fontSize="14px" textAnchor="middle">{getMatchScoreForDisplay(14, "red")}</tspan>
-								<tspan x="0" y="14" fill={BLUE} fontFamily="'myriad-pro'"
-									fontWeight={(getMatchWinnerForDisplay(14)?.winner === "blue") ? black : semibold}
-									fontStyle={"normal"}
-									fontSize="14px" textAnchor="middle">{getMatchScoreForDisplay(14, "blue")}</tspan>
-							</text>
+							{shouldDisplayFinalsMatch(14) && (
+								<>
+									<circle id="winnerMatch1Dot" fill={(getFinalsMatchWinnerForDisplay(14)?.winner === "red") ? RED : (getFinalsMatchWinnerForDisplay(14)?.winner === "blue") ? BLUE : (getFinalsMatchWinnerForDisplay(14)?.winner === "tie") ? GREEN : "none"} cx={`${1132 - overtimeOffset}`} cy="451" r="8" />
+									<text id="finalsM1Scores" transform={`matrix(1 0 0 1 ${1132 - overtimeOffset} 477.5537)`}>
+										<tspan x="0" y="0" fill={RED} fontFamily="'myriad-pro'"
+											fontWeight={(getFinalsMatchWinnerForDisplay(14)?.winner === "red") ? black : semibold}
+											fontStyle={"normal"}
+											fontSize="14px" textAnchor="middle">{getFinalsMatchScoreForDisplay(14, "red")}</tspan>
+										<tspan x="0" y="14" fill={BLUE} fontFamily="'myriad-pro'"
+											fontWeight={(getFinalsMatchWinnerForDisplay(14)?.winner === "blue") ? black : semibold}
+											fontStyle={"normal"}
+											fontSize="14px" textAnchor="middle">{getFinalsMatchScoreForDisplay(14, "blue")}</tspan>
+									</text>
+								</>
+							)}
 
-							<circle id="winnerMatch2Dot" fill={(getMatchWinnerForDisplay(15)?.winner === "red") ? RED : (getMatchWinnerForDisplay(15)?.winner === "blue") ? BLUE : (getMatchWinnerForDisplay(15)?.winner === "tie") ? GREEN : "none"} cx={`${1162 - overtimeOffset}`} cy="451" r="8" />
-							<text id="finalsM2Scores" transform={`matrix(1 0 0 1 ${1162 - overtimeOffset} 477.5537)`}>
-								<tspan x="0" y="0"
-									fill={RED}
-									fontFamily="'myriad-pro'"
-									fontWeight={(getMatchWinnerForDisplay(15)?.winner === "red") ? black : semibold}
-									fontStyle={"normal"}
-									fontSize="14px" textAnchor="middle">{getMatchScoreForDisplay(15, "red")}</tspan>
-								<tspan x="0" y="14" fill={BLUE}
-									fontFamily="'myriad-pro'"
-									fontWeight={(getMatchWinnerForDisplay(15)?.winner === "blue") ? black : semibold}
-									fontStyle={"normal"}
-									fontSize="14px" textAnchor="middle">{getMatchScoreForDisplay(15, "blue")}</tspan>
-							</text>
+							{shouldDisplayFinalsMatch(15) && (
+								<>
+									<circle id="winnerMatch2Dot" fill={(getFinalsMatchWinnerForDisplay(15)?.winner === "red") ? RED : (getFinalsMatchWinnerForDisplay(15)?.winner === "blue") ? BLUE : (getFinalsMatchWinnerForDisplay(15)?.winner === "tie") ? GREEN : "none"} cx={`${1162 - overtimeOffset}`} cy="451" r="8" />
+									<text id="finalsM2Scores" transform={`matrix(1 0 0 1 ${1162 - overtimeOffset} 477.5537)`}>
+										<tspan x="0" y="0"
+											fill={RED}
+											fontFamily="'myriad-pro'"
+											fontWeight={(getFinalsMatchWinnerForDisplay(15)?.winner === "red") ? black : semibold}
+											fontStyle={"normal"}
+											fontSize="14px" textAnchor="middle">{getFinalsMatchScoreForDisplay(15, "red")}</tspan>
+										<tspan x="0" y="14" fill={BLUE}
+											fontFamily="'myriad-pro'"
+											fontWeight={(getFinalsMatchWinnerForDisplay(15)?.winner === "blue") ? black : semibold}
+											fontStyle={"normal"}
+											fontSize="14px" textAnchor="middle">{getFinalsMatchScoreForDisplay(15, "blue")}</tspan>
+									</text>
+								</>
+							)}
 
-							<circle id="winnerMatch3Dot" fill={(getMatchWinnerForDisplay(16)?.winner === "red") ? RED : (getMatchWinnerForDisplay(16)?.winner === "blue") ? BLUE : (getMatchWinnerForDisplay(16)?.winner === "tie") ? GREEN : "none"} cx={`${1192 - overtimeOffset}`} cy="451" r="8" />
-							<text id="finalsM3Scores"
-								transform={`matrix(1 0 0 1 ${1192 - overtimeOffset} 477.5537)`}>
-								<tspan x="0" y="0"
-									fill={RED}
-									fontFamily="'myriad-pro'"
-									fontWeight={(getMatchWinnerForDisplay(16)?.winner === "red") ? black : semibold}
-									fontStyle={"normal"}
-									fontSize="14px" textAnchor="middle">{getMatchScoreForDisplay(16, "red")}</tspan>
-								<tspan x="0" y="14" fill={BLUE}
-									fontFamily="'myriad-pro'"
-									fontWeight={(getMatchWinnerForDisplay(16)?.winner === "blue") ? black : semibold}
-									fontStyle={"normal"}
-									fontSize="14px" textAnchor="middle">{getMatchScoreForDisplay(16, "blue")}</tspan>
-							</text>
+							{shouldDisplayFinalsMatch(16) && (
+								<>
+									<circle id="winnerMatch3Dot" fill={(getFinalsMatchWinnerForDisplay(16)?.winner === "red") ? RED : (getFinalsMatchWinnerForDisplay(16)?.winner === "blue") ? BLUE : (getFinalsMatchWinnerForDisplay(16)?.winner === "tie") ? GREEN : "none"} cx={`${1192 - overtimeOffset}`} cy="451" r="8" />
+									<text id="finalsM3Scores"
+										transform={`matrix(1 0 0 1 ${1192 - overtimeOffset} 477.5537)`}>
+										<tspan x="0" y="0"
+											fill={RED}
+											fontFamily="'myriad-pro'"
+											fontWeight={(getFinalsMatchWinnerForDisplay(16)?.winner === "red") ? black : semibold}
+											fontStyle={"normal"}
+											fontSize="14px" textAnchor="middle">{getFinalsMatchScoreForDisplay(16, "red")}</tspan>
+										<tspan x="0" y="14" fill={BLUE}
+											fontFamily="'myriad-pro'"
+											fontWeight={(getFinalsMatchWinnerForDisplay(16)?.winner === "blue") ? black : semibold}
+											fontStyle={"normal"}
+											fontSize="14px" textAnchor="middle">{getFinalsMatchScoreForDisplay(16, "blue")}</tspan>
+									</text>
+								</>
+							)}
 
-							<circle id="winnerMatch4Dot" fill={(getMatchWinnerForDisplay(17)?.winner === "red") ? RED : (getMatchWinnerForDisplay(17)?.winner === "blue") ? BLUE : (getMatchWinnerForDisplay(17)?.winner === "tie") ? GREEN : "none"} cx={`${1222 - overtimeOffset}`} cy="451" r="8" />
-							<text id="finalsM4Scores"
-								transform={`matrix(1 0 0 1 ${1222 - overtimeOffset} 477.5537)`}>
-								<tspan x="0" y="0"
-									fill={RED}
-									fontFamily="'myriad-pro'"
-									fontWeight={(getMatchWinnerForDisplay(17)?.winner === "red") ? black : semibold}
-									fontStyle={"normal"}
-									fontSize="14px" textAnchor="middle">{getMatchScoreForDisplay(17, "red")}</tspan>
-								<tspan x="0" y="14" fill={BLUE}
-									fontFamily="'myriad-pro'"
-									fontWeight={(getMatchWinnerForDisplay(17)?.winner === "blue") ? black : semibold}
-									fontStyle={"normal"}
-									fontSize="14px" textAnchor="middle">{getMatchScoreForDisplay(17, "blue")}</tspan>
-							</text>
+							{shouldDisplayFinalsMatch(17) && (
+								<>
+									<circle id="winnerMatch4Dot" fill={(getFinalsMatchWinnerForDisplay(17)?.winner === "red") ? RED : (getFinalsMatchWinnerForDisplay(17)?.winner === "blue") ? BLUE : (getFinalsMatchWinnerForDisplay(17)?.winner === "tie") ? GREEN : "none"} cx={`${1222 - overtimeOffset}`} cy="451" r="8" />
+									<text id="finalsM4Scores"
+										transform={`matrix(1 0 0 1 ${1222 - overtimeOffset} 477.5537)`}>
+										<tspan x="0" y="0"
+											fill={RED}
+											fontFamily="'myriad-pro'"
+											fontWeight={(getFinalsMatchWinnerForDisplay(17)?.winner === "red") ? black : semibold}
+											fontStyle={"normal"}
+											fontSize="14px" textAnchor="middle">{getFinalsMatchScoreForDisplay(17, "red")}</tspan>
+										<tspan x="0" y="14" fill={BLUE}
+											fontFamily="'myriad-pro'"
+											fontWeight={(getFinalsMatchWinnerForDisplay(17)?.winner === "blue") ? black : semibold}
+											fontStyle={"normal"}
+											fontSize="14px" textAnchor="middle">{getFinalsMatchScoreForDisplay(17, "blue")}</tspan>
+									</text>
+								</>
+							)}
 
-							<circle id="winnerMatch5Dot" fill={(getMatchWinnerForDisplay(18)?.winner === "red") ? RED : (getMatchWinnerForDisplay(18)?.winner === "blue") ? BLUE : (getMatchWinnerForDisplay(18)?.winner === "tie") ? GREEN : "none"} cx={`${1252 - overtimeOffset}`} cy="451" r="8" />
-							<text id="finalsM5Scores"
-								transform={`matrix(1 0 0 1 ${1252 - overtimeOffset} 477.5537)`}>
-								<tspan x="0" y="0"
-									fill={RED}
-									fontFamily="'myriad-pro'"
-									fontWeight={(getMatchWinnerForDisplay(18)?.winner === "red") ? black : semibold}
-									fontStyle={"normal"}
-									fontSize="14px" textAnchor="middle">{getMatchScoreForDisplay(18, "red")}</tspan>
-								<tspan x="0" y="14" fill={BLUE}
-									fontFamily="'myriad-pro'"
-									fontWeight={(getMatchWinnerForDisplay(18)?.winner === "blue") ? black : semibold}
-									fontStyle={"normal"}
-									fontSize="14px" textAnchor="middle">{getMatchScoreForDisplay(18, "blue")}</tspan>
-							</text>
+							{shouldDisplayFinalsMatch(18) && (
+								<>
+									<circle id="winnerMatch5Dot" fill={(getFinalsMatchWinnerForDisplay(18)?.winner === "red") ? RED : (getFinalsMatchWinnerForDisplay(18)?.winner === "blue") ? BLUE : (getFinalsMatchWinnerForDisplay(18)?.winner === "tie") ? GREEN : "none"} cx={`${1252 - overtimeOffset}`} cy="451" r="8" />
+									<text id="finalsM5Scores"
+										transform={`matrix(1 0 0 1 ${1252 - overtimeOffset} 477.5537)`}>
+										<tspan x="0" y="0"
+											fill={RED}
+											fontFamily="'myriad-pro'"
+											fontWeight={(getFinalsMatchWinnerForDisplay(18)?.winner === "red") ? black : semibold}
+											fontStyle={"normal"}
+											fontSize="14px" textAnchor="middle">{getFinalsMatchScoreForDisplay(18, "red")}</tspan>
+										<tspan x="0" y="14" fill={BLUE}
+											fontFamily="'myriad-pro'"
+											fontWeight={(getFinalsMatchWinnerForDisplay(18)?.winner === "blue") ? black : semibold}
+											fontStyle={"normal"}
+											fontSize="14px" textAnchor="middle">{getFinalsMatchScoreForDisplay(18, "blue")}</tspan>
+									</text>
+								</>
+							)}
 
-							<circle id="winnerMatch6Dot" fill={(getMatchWinnerForDisplay(19)?.winner === "red") ? RED : (getMatchWinnerForDisplay(19)?.winner === "blue") ? BLUE : (getMatchWinnerForDisplay(19)?.winner === "tie") ? GREEN : "none"} cx={`${1282 - overtimeOffset}`} cy="451" r="8" />
-							<text id="finalsM5Scores"
-								transform={`matrix(1 0 0 1 ${1282 - overtimeOffset} 477.5537)`}>
-								<tspan x="0" y="0"
-									fill={RED}
-									fontFamily="'myriad-pro'"
-									fontWeight={(getMatchWinnerForDisplay(19)?.winner === "red") ? black : semibold}
-									fontStyle={"normal"}
-									fontSize="14px" textAnchor="middle">{getMatchScoreForDisplay(19, "red")}</tspan>
-								<tspan x="0" y="14" fill={BLUE}
-									fontFamily="'myriad-pro'"
-									fontWeight={(getMatchWinnerForDisplay(19)?.winner === "blue") ? black : semibold}
-									fontStyle={"normal"}
-									fontSize="14px" textAnchor="middle">{getMatchScoreForDisplay(19, "blue")}</tspan>
-							</text>
+							{shouldDisplayFinalsMatch(19) && (
+								<>
+									<circle id="winnerMatch6Dot" fill={(getFinalsMatchWinnerForDisplay(19)?.winner === "red") ? RED : (getFinalsMatchWinnerForDisplay(19)?.winner === "blue") ? BLUE : (getFinalsMatchWinnerForDisplay(19)?.winner === "tie") ? GREEN : "none"} cx={`${1282 - overtimeOffset}`} cy="451" r="8" />
+									<text id="finalsM5Scores"
+										transform={`matrix(1 0 0 1 ${1282 - overtimeOffset} 477.5537)`}>
+										<tspan x="0" y="0"
+											fill={RED}
+											fontFamily="'myriad-pro'"
+											fontWeight={(getFinalsMatchWinnerForDisplay(19)?.winner === "red") ? black : semibold}
+											fontStyle={"normal"}
+											fontSize="14px" textAnchor="middle">{getFinalsMatchScoreForDisplay(19, "red")}</tspan>
+										<tspan x="0" y="14" fill={BLUE}
+											fontFamily="'myriad-pro'"
+											fontWeight={(getFinalsMatchWinnerForDisplay(19)?.winner === "blue") ? black : semibold}
+											fontStyle={"normal"}
+											fontSize="14px" textAnchor="middle">{getFinalsMatchScoreForDisplay(19, "blue")}</tspan>
+									</text>
+								</>
+							)}
 						</g>
 
 
