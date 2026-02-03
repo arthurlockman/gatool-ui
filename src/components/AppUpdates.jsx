@@ -1,5 +1,15 @@
 export const appUpdates = [
   {
+    date: "February 2, 2026",
+    message: (
+      <ul>
+        <li>FTC:</li>
+        <ul>
+          <li>Fixed a bug that prevented proper display of tiebreakers in the Playoff Brackets</li>
+        </ul>
+      </ul>
+    ),
+  },{
     date: "January 25, 2026",
     message: (
       <ul>

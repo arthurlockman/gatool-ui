@@ -1794,6 +1794,10 @@ function App() {
           match.winner = winner(match);
           //fix the match number fro FTC matches
           if (ftcMode) {
+            // Preserve original matchNumber before overwriting (needed for tiebreaker detection)
+            if (!match.originalMatchNumber) {
+              match.originalMatchNumber = match.matchNumber;
+            }
             match.matchNumber = index + 1;
           }
           //figure out how to match scores to match
