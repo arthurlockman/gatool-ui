@@ -6,7 +6,8 @@ export const appUpdates = [
         <li>ALL PROGRAMS:</li>
         <ul>
           <li>Refactored the Playoff Brackets to use reusable components for each match and finals match.</li>
-          <li>Tuned playoff match and finals match display to improve readability and consistency.</li>
+          <li>Tuned match display to improve readability and consistency on Playoff screen.</li>
+          <li>Tuned Emcee screen for readability.</li>
         </ul>
         <li>FTC:</li>
         <ul>

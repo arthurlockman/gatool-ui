@@ -42,6 +42,33 @@ function EmceePage({
     return team?.teamNumber || null;
   };
 
+  /**
+   * This function determines which alliance number a set of team numbers belongs to
+   * by comparing against all alliance rosters
+   * @param teamNumbers sorted array of team numbers
+   * @param alliancesData the alliances data object
+   * @returns alliance display string (e.g., "A1", "A2") or null if not found
+   */
+  const getAllianceNumberByTeams = (teamNumbers, alliancesData) => {
+    if (!teamNumbers || teamNumbers.length === 0 || !alliancesData?.List) return null;
+    
+    // Iterate through all alliances and compare team rosters
+    for (const alliance of alliancesData.List) {
+      if (alliance?.teams) {
+        const allianceTeamNumbers = alliance.teams
+          .map((t) => t.teamNumber)
+          .sort();
+        
+        // If the team numbers match, we found the alliance
+        if (JSON.stringify(teamNumbers) === JSON.stringify(allianceTeamNumbers)) {
+          return alliance.name ? alliance.name.replace("Alliance ", "A") : null;
+        }
+      }
+    }
+    
+    return null;
+  };
+
   const formatMatchClasses = (baseClasses) => {
     const newClasses = baseClasses.map((match) => {
       return {
@@ -205,6 +232,306 @@ function EmceePage({
         shortName: allianceShortName,
       };
     }
+  }
+
+  // Function to generate "Lost to..." and "Won..." text dynamically
+  // Shows both upper bracket losses and lower bracket wins
+  // Uses Series numbers in FTC mode to handle tiebreakers correctly
+  function getLostToText(matchNumber, allianceColor) {
+    // In FTC mode, matchClasses uses Series numbers, not matchNumber
+    // Get the actual match to find its series
+    let matchNumberToUse = matchNumber;
+    if (ftcMode) {
+      // Find the match by matchNumber first, then get its series
+      const currentMatchData = matches.find((m) => m.matchNumber === matchNumber);
+      if (currentMatchData?.series) {
+        matchNumberToUse = currentMatchData.series;
+      }
+    }
+    
+    const currentMatchClass = _.filter(matchClasses, {
+      matchNumber: matchNumberToUse,
+    })[0];
+    
+    if (!currentMatchClass) return "";
+    
+    // Get the "from" field which tells us which match they came from
+    const fromText = allianceColor === "red" 
+      ? currentMatchClass?.red?.from 
+      : currentMatchClass?.blue?.from;
+    
+    const currentMatch = matches.find((m) => m.matchNumber === matchNumber);
+    const currentTeamNumbers = currentMatch?.teams
+      ?.filter((t) => t.station?.startsWith(allianceColor === "red" ? "Red" : "Blue"))
+      .map((t) => t.teamNumber)
+      .sort() || [];
+    
+    // Find upper bracket match they lost (if any)
+    let upperBracketLossMatch = null;
+    // Find lower bracket match they won (if any)
+    let lowerBracketWinMatch = null;
+    
+    // First, try to parse the "from" field as a fallback for when teams aren't assigned yet
+    if (fromText) {
+      if (fromText.includes("Lost M")) {
+        const lostMatchNum = parseInt(fromText.replace("Lost M", ""));
+        if (lostMatchNum) {
+          upperBracketLossMatch = lostMatchNum;
+        }
+      } else if (fromText.includes("Won M")) {
+        const wonMatchNum = parseInt(fromText.replace("Won M", ""));
+        if (wonMatchNum) {
+          lowerBracketWinMatch = wonMatchNum;
+        }
+      }
+    }
+    
+    // Then try to determine dynamically by searching backwards through matches
+    // This will override the fromText if we can find better data
+    if (currentTeamNumbers.length > 0) {
+      // Search backwards to find where these teams played previously
+      if (ftcMode) {
+        // In FTC mode, search by series starting from current match's series - 1
+        const currentSeries = currentMatch?.series || matchNumberToUse;
+        const searchStart = currentSeries - 1;
+        for (let series = searchStart; series > 0; series--) {
+          const seriesMatches = matches.filter((m) => m.series === series);
+          const prevMatch = seriesMatches.length > 0
+            ? seriesMatches.sort((a, b) => {
+                const aMatchNum = a.originalMatchNumber || a.matchNumber;
+                const bMatchNum = b.originalMatchNumber || b.matchNumber;
+                return bMatchNum - aMatchNum;
+              })[0]
+            : null;
+          
+          if (prevMatch?.teams) {
+            const redTeamNumbers = prevMatch.teams
+              .filter((t) => t.station?.startsWith("Red"))
+              .map((t) => t.teamNumber)
+              .sort();
+            const blueTeamNumbers = prevMatch.teams
+              .filter((t) => t.station?.startsWith("Blue"))
+              .map((t) => t.teamNumber)
+              .sort();
+            
+            if (prevMatch?.winner?.winner) {
+              const winningAlliance = prevMatch.winner.winner;
+              const losingAlliance = winningAlliance === "red" ? "blue" : "red";
+              const winningTeamNumbers = winningAlliance === "red" ? redTeamNumbers : blueTeamNumbers;
+              const losingTeamNumbers = losingAlliance === "red" ? redTeamNumbers : blueTeamNumbers;
+              
+              // Check if they won this match
+              if (JSON.stringify(currentTeamNumbers) === JSON.stringify(winningTeamNumbers)) {
+                lowerBracketWinMatch = series;
+                break;
+              }
+              // Check if they lost this match
+              else if (JSON.stringify(currentTeamNumbers) === JSON.stringify(losingTeamNumbers)) {
+                upperBracketLossMatch = series;
+                break;
+              }
+            } else if (
+              JSON.stringify(currentTeamNumbers) === JSON.stringify(redTeamNumbers) ||
+              JSON.stringify(currentTeamNumbers) === JSON.stringify(blueTeamNumbers)
+            ) {
+              // Teams match but no winner yet
+              upperBracketLossMatch = series;
+              break;
+            }
+          }
+        }
+      } else {
+        // In FRC mode, search by match number starting from current match - 1
+        const searchStart = matchNumber - 1;
+        for (let i = searchStart; i > 0; i--) {
+          const prevMatch = matches.find((m) => m.matchNumber === i);
+          if (prevMatch?.teams) {
+            const redTeamNumbers = prevMatch.teams
+              .filter((t) => t.station?.startsWith("Red"))
+              .map((t) => t.teamNumber)
+              .sort();
+            const blueTeamNumbers = prevMatch.teams
+              .filter((t) => t.station?.startsWith("Blue"))
+              .map((t) => t.teamNumber)
+              .sort();
+            
+            if (prevMatch?.winner?.winner) {
+              const winningAlliance = prevMatch.winner.winner;
+              const losingAlliance = winningAlliance === "red" ? "blue" : "red";
+              const winningTeamNumbers = winningAlliance === "red" ? redTeamNumbers : blueTeamNumbers;
+              const losingTeamNumbers = losingAlliance === "red" ? redTeamNumbers : blueTeamNumbers;
+              
+              // Check if they won this match
+              if (JSON.stringify(currentTeamNumbers) === JSON.stringify(winningTeamNumbers)) {
+                lowerBracketWinMatch = i;
+                break;
+              }
+              // Check if they lost this match
+              else if (JSON.stringify(currentTeamNumbers) === JSON.stringify(losingTeamNumbers)) {
+                upperBracketLossMatch = i;
+                break;
+              }
+            } else if (
+              JSON.stringify(currentTeamNumbers) === JSON.stringify(redTeamNumbers) ||
+              JSON.stringify(currentTeamNumbers) === JSON.stringify(blueTeamNumbers)
+            ) {
+              // Teams match but no winner yet
+              upperBracketLossMatch = i;
+              break;
+            }
+          }
+        }
+      }
+    }
+    
+    // Build the display text
+    const parts = [];
+    
+    // If they won a lower bracket match, only show that (don't show upper bracket loss)
+    if (lowerBracketWinMatch) {
+      let wonMatch;
+      if (ftcMode) {
+        // In FTC mode, find all matches in this series and get the last one (handles tiebreakers)
+        const seriesMatches = matches.filter((m) => m.series === lowerBracketWinMatch);
+        if (seriesMatches.length > 0) {
+          wonMatch = seriesMatches.sort((a, b) => {
+            const aMatchNum = a.originalMatchNumber || a.matchNumber;
+            const bMatchNum = b.originalMatchNumber || b.matchNumber;
+            return bMatchNum - aMatchNum;
+          })[0];
+        }
+      } else {
+        wonMatch = matches.find((m) => m.matchNumber === lowerBracketWinMatch);
+      }
+      
+      let losingTeamNumbers = [];
+      
+      if (wonMatch?.teams) {
+        if (wonMatch.winner?.winner) {
+          // If we have an explicit winner, use that
+          const losingAlliance = wonMatch.winner.winner === "red" ? "blue" : "red";
+          losingTeamNumbers = wonMatch.teams
+            ?.filter((t) => t.station?.startsWith(losingAlliance === "red" ? "Red" : "Blue"))
+            .map((t) => t.teamNumber)
+            .sort() || [];
+        } else {
+          // If no explicit winner, determine by figuring out which team is NOT the current team
+          const redTeamNumbers = wonMatch.teams
+            .filter((t) => t.station?.startsWith("Red"))
+            .map((t) => t.teamNumber)
+            .sort();
+          const blueTeamNumbers = wonMatch.teams
+            .filter((t) => t.station?.startsWith("Blue"))
+            .map((t) => t.teamNumber)
+            .sort();
+          
+          // The losing team is the one that ISN'T the current team
+          if (JSON.stringify(currentTeamNumbers) === JSON.stringify(redTeamNumbers)) {
+            losingTeamNumbers = blueTeamNumbers;
+          } else if (JSON.stringify(currentTeamNumbers) === JSON.stringify(blueTeamNumbers)) {
+            losingTeamNumbers = redTeamNumbers;
+          } else {
+            // Couldn't determine, try both and see if we can find an alliance
+            const redAlliance = getAllianceNumberByTeams(redTeamNumbers, alliances);
+            const blueAlliance = getAllianceNumberByTeams(blueTeamNumbers, alliances);
+            // Use whichever is found (prefer the one that's not the current team's alliance)
+            const currentAlliance = getAllianceNumberByTeams(currentTeamNumbers, alliances);
+            if (redAlliance && redAlliance !== currentAlliance) {
+              losingTeamNumbers = redTeamNumbers;
+            } else if (blueAlliance && blueAlliance !== currentAlliance) {
+              losingTeamNumbers = blueTeamNumbers;
+            }
+          }
+        }
+      }
+      
+      // Always try to display alliance info, use fallback if needed
+      let allianceDisplay = getAllianceNumberByTeams(losingTeamNumbers, alliances);
+      if (!allianceDisplay) {
+        allianceDisplay = `A${lowerBracketWinMatch}`;
+      }
+      parts.push(`Won M${lowerBracketWinMatch} against ${allianceDisplay}`);
+    } else if (upperBracketLossMatch) {
+      // Only show upper bracket loss if they didn't win a lower bracket match
+      let lostMatch;
+      if (ftcMode) {
+        // In FTC mode, find all matches in this series and get the last one (handles tiebreakers)
+        const seriesMatches = matches.filter((m) => m.series === upperBracketLossMatch);
+        if (seriesMatches.length > 0) {
+          lostMatch = seriesMatches.sort((a, b) => {
+            const aMatchNum = a.originalMatchNumber || a.matchNumber;
+            const bMatchNum = b.originalMatchNumber || b.matchNumber;
+            return bMatchNum - aMatchNum;
+          })[0];
+        }
+      } else {
+        lostMatch = matches.find((m) => m.matchNumber === upperBracketLossMatch);
+      }
+      
+      let winningTeamNumbers = [];
+      
+      if (lostMatch?.teams) {
+        if (lostMatch.winner?.winner) {
+          // If we have an explicit winner, use that
+          const winningAlliance = lostMatch.winner.winner;
+          winningTeamNumbers = lostMatch.teams
+            ?.filter((t) => t.station?.startsWith(winningAlliance === "red" ? "Red" : "Blue"))
+            .map((t) => t.teamNumber)
+            .sort() || [];
+        } else {
+          // If no explicit winner, determine by figuring out which team is NOT the current team
+          const redTeamNumbers = lostMatch.teams
+            .filter((t) => t.station?.startsWith("Red"))
+            .map((t) => t.teamNumber)
+            .sort();
+          const blueTeamNumbers = lostMatch.teams
+            .filter((t) => t.station?.startsWith("Blue"))
+            .map((t) => t.teamNumber)
+            .sort();
+          
+          // The winning team is the one that ISN'T the current team
+          if (JSON.stringify(currentTeamNumbers) === JSON.stringify(redTeamNumbers)) {
+            winningTeamNumbers = blueTeamNumbers;
+          } else if (JSON.stringify(currentTeamNumbers) === JSON.stringify(blueTeamNumbers)) {
+            winningTeamNumbers = redTeamNumbers;
+          } else {
+            // Couldn't determine, try both and see if we can find an alliance
+            const redAlliance = getAllianceNumberByTeams(redTeamNumbers, alliances);
+            const blueAlliance = getAllianceNumberByTeams(blueTeamNumbers, alliances);
+            // Use whichever is found (prefer the one that's not the current team's alliance)
+            const currentAlliance = getAllianceNumberByTeams(currentTeamNumbers, alliances);
+            if (redAlliance && redAlliance !== currentAlliance) {
+              winningTeamNumbers = redTeamNumbers;
+            } else if (blueAlliance && blueAlliance !== currentAlliance) {
+              winningTeamNumbers = blueTeamNumbers;
+            }
+          }
+        }
+      }
+      
+      // Always try to display alliance info, use fallback if needed
+      let allianceDisplay = getAllianceNumberByTeams(winningTeamNumbers, alliances);
+      if (!allianceDisplay) {
+        allianceDisplay = `A${upperBracketLossMatch}`;
+      }
+      parts.push(`Lost to ${allianceDisplay} in M${upperBracketLossMatch}`);
+    }
+    
+    // If no parts found, return original text or empty
+    if (parts.length === 0) {
+      return fromText || "";
+    }
+    
+    return (
+      <>
+        {parts.map((part, index) => (
+          <span key={index}>
+            {index > 0 && <br />}
+            {part}
+          </span>
+        ))}
+      </>
+    );
   }
 
   var advantage = {};
@@ -393,13 +720,7 @@ function EmceePage({
                     xs={2}
                     className={`davidPriceDetail${smallScreen}${portrait} redAllianceTeam`}
                   >
-                    {_.filter(matchClasses, {
-                      matchNumber: playoffMatchNumber,
-                    })[0]?.red?.from
-                      ? _.filter(matchClasses, {
-                          matchNumber: playoffMatchNumber,
-                        })[0]?.red?.from
-                      : ""}
+                    {getLostToText(playoffMatchNumber, "red")}
                   </Col>
                 )}
                 <Col
@@ -451,13 +772,7 @@ function EmceePage({
                     xs={2}
                     className={`davidPriceDetail${smallScreen}${portrait} blueAllianceTeam`}
                   >
-                    {_.filter(matchClasses, {
-                      matchNumber: playoffMatchNumber,
-                    })[0]?.blue?.from
-                      ? _.filter(matchClasses, {
-                          matchNumber: playoffMatchNumber,
-                        })[0]?.blue?.from
-                      : ""}
+                    {getLostToText(playoffMatchNumber, "blue")}
                   </Col>
                 )}
               </Row>
@@ -470,13 +785,7 @@ function EmceePage({
                     xs={2}
                     className={`davidPriceDetail${smallScreen}${portrait} blueAllianceTeam`}
                   >
-                    {_.filter(matchClasses, {
-                      matchNumber: playoffMatchNumber,
-                    })[0]?.blue?.from
-                      ? _.filter(matchClasses, {
-                          matchNumber: playoffMatchNumber,
-                        })[0]?.blue?.from
-                      : ""}
+                    {getLostToText(playoffMatchNumber, "blue")}
                   </Col>
                 )}
                 <Col
@@ -528,13 +837,7 @@ function EmceePage({
                     xs={2}
                     className={`davidPriceDetail${smallScreen}${portrait} redAllianceTeam`}
                   >
-                    {_.filter(matchClasses, {
-                      matchNumber: playoffMatchNumber,
-                    })[0]?.red?.from
-                      ? _.filter(matchClasses, {
-                          matchNumber: playoffMatchNumber,
-                        })[0]?.red?.from
-                      : ""}
+                    {getLostToText(playoffMatchNumber, "red")}
                   </Col>
                 )}
               </Row>

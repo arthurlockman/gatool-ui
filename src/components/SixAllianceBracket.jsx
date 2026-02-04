@@ -30,6 +30,7 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 
 
 	const currentPlayoffMatch = currentMatch - qualsLength;
+	const finalsStartMatch = 10; // First finals match for 6-alliance bracket
 	
 	// Helper function to check if a bracket match should be highlighted as the current match
 	// In FTC mode, highlights all matches in the same series as the current match
@@ -53,6 +54,9 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 		// Highlight if the current match's series matches the bracket match's series
 		return currentMatchObj.series === bracketMatchNumber;
 	};
+	
+	// Check if we're viewing any finals match (for gold background on "FINALS"/"BEST 2 of 3")
+	const isInFinalsView = currentPlayoffMatch >= finalsStartMatch;
 
 	/**
 	 * This function finds a team by their station assignment
@@ -760,7 +764,8 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 							y={343.4}
 							matchNumber={10}
 							onClick={() => setMatchWinner(10)}
-							isCurrentMatch={ftcMode ? (isCurrentMatch(10) || isCurrentMatch(11) || isCurrentMatch(12) || isCurrentMatch(13) || isCurrentMatch(14) || isCurrentMatch(15)) : currentPlayoffMatch >= 10}
+							isCurrentMatch={isCurrentMatch(10)}
+							isInFinalsView={isInFinalsView}
 							getAllianceNameForDisplay={getAllianceNameForDisplay}
 							getAllianceNumbersForDisplay={getAllianceNumbersForDisplay}
 							tournamentWinner={tournamentWinner}

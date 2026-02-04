@@ -8,6 +8,7 @@ function PlayoffMatch({
 	matchNumber,
 	onClick,
 	isCurrentMatch,
+	isInFinalsView,
 	getAllianceNameForDisplay,
 	getAllianceNumbersForDisplay,
 	tournamentWinner,
@@ -96,12 +97,12 @@ function PlayoffMatch({
 					y={matchBoxY}
 					width={matchBoxWidth}
 					height={matchBoxHeight}
-					fill={isCurrentMatch ? GOLD : BLACK}
+					fill={(isCurrentMatch || isInFinalsView) ? GOLD : BLACK}
 				/>
 				{/* Match label (rotated) */}
 				<text
 					transform={`matrix(0 -1.0059 1 0 ${matchLabelX} ${matchLabelY})`}
-					fill={isCurrentMatch ? BLACK : WHITE}
+					fill={(isCurrentMatch || isInFinalsView) ? BLACK : WHITE}
 					fontFamily="'myriad-pro'"
 					fontWeight={bold}
 					fontStyle="normal"

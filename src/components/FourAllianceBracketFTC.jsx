@@ -29,6 +29,7 @@ function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previous
 	//const normal = "400";
 
 	const currentPlayoffMatch = currentMatch - qualsLength;
+	const finalsStartMatch = 6; // First finals match for 4-alliance bracket
 	
 	// Helper function to check if a bracket match should be highlighted as the current match
 	// In FTC mode, highlights all matches in the same series as the current match
@@ -52,6 +53,9 @@ function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previous
 		// Highlight if the current match's series matches the bracket match's series
 		return currentMatchObj.series === bracketMatchNumber;
 	};
+	
+	// Check if we're viewing any finals match (for gold background on "FINALS"/"BEST 2 of 3")
+	const isInFinalsView = currentPlayoffMatch >= finalsStartMatch;
 
 	/**
 	 * This function finds a team by their station assignment
@@ -678,6 +682,7 @@ function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previous
 							matchNumber={6}
 							onClick={() => setMatchWinner(6)}
 							isCurrentMatch={isCurrentMatch(6)}
+							isInFinalsView={isInFinalsView}
 							getAllianceNameForDisplay={getAllianceNameForDisplay}
 							getAllianceNumbersForDisplay={getAllianceNumbersForDisplay}
 							tournamentWinner={tournamentWinner}

@@ -108,11 +108,12 @@ function TwoAllianceBracket({ nextMatch, previousMatch, getSchedule, useSwipe, u
 				</g>
 
 				<PlayoffMatch
-					x={363.69}
-					y={166.55}
+					x={425}
+					y={220}
 					matchNumber={1}
 					onClick={() => {}}
 					isCurrentMatch={false}
+					isInFinalsView={true}
 					getAllianceNameForDisplay={getAllianceNameForDisplay}
 					getAllianceNumbersForDisplay={getAllianceNumbersForDisplay}
 					tournamentWinner={tournamentWinner}
@@ -122,7 +123,7 @@ function TwoAllianceBracket({ nextMatch, previousMatch, getSchedule, useSwipe, u
 				/>
 				<FinalsMatchIndicator
 					x={dotStart}
-					y={334.13}
+					y={320}
 					matchNumber={1}
 					getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
 					getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
@@ -132,7 +133,7 @@ function TwoAllianceBracket({ nextMatch, previousMatch, getSchedule, useSwipe, u
 				/>
 				<FinalsMatchIndicator
 					x={dotStart + 42}
-					y={334.13}
+					y={320}
 					matchNumber={2}
 					getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
 					getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
@@ -142,7 +143,7 @@ function TwoAllianceBracket({ nextMatch, previousMatch, getSchedule, useSwipe, u
 				/>
 				<FinalsMatchIndicator
 					x={dotStart + 84}
-					y={334.13}
+					y={320}
 					matchNumber={3}
 					getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
 					getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
@@ -152,7 +153,7 @@ function TwoAllianceBracket({ nextMatch, previousMatch, getSchedule, useSwipe, u
 				/>
 				<FinalsMatchIndicator
 					x={dotStart + 126}
-					y={334.13}
+					y={320}
 					matchNumber={4}
 					getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
 					getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
@@ -162,7 +163,7 @@ function TwoAllianceBracket({ nextMatch, previousMatch, getSchedule, useSwipe, u
 				/>
 				<FinalsMatchIndicator
 					x={dotStart + 168}
-					y={334.13}
+					y={320}
 					matchNumber={5}
 					getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
 					getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
@@ -172,7 +173,7 @@ function TwoAllianceBracket({ nextMatch, previousMatch, getSchedule, useSwipe, u
 				/>
 				<FinalsMatchIndicator
 					x={dotStart + 210}
-					y={334.13}
+					y={320}
 					matchNumber={6}
 					getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
 					getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}

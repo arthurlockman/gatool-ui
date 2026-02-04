@@ -29,6 +29,7 @@ function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMat
 	//const normal = "400";
 
 	const currentPlayoffMatch = currentMatch - qualsLength;
+	const finalsStartMatch = 6; // First finals match for 4-alliance bracket
 
 	/**
 	 * This function finds a team by their station assignment
@@ -41,6 +42,9 @@ function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMat
 		const team = teams.find((t) => t?.station?.toLowerCase() === station?.toLowerCase());
 		return team?.teamNumber || null;
 	};
+	
+	// Check if we're viewing any finals match (for gold background on "FINALS"/"BEST 2 of 3")
+	const isInFinalsView = currentPlayoffMatch >= finalsStartMatch;
 
 	var overtimeOffset = 0;
 	var tournamentWinner = {
@@ -351,6 +355,7 @@ function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMat
 							matchNumber={6}
 							onClick={() => setMatchWinner(6)}
 							isCurrentMatch={isCurrentMatch(6)}
+							isInFinalsView={isInFinalsView}
 							getAllianceNameForDisplay={getAllianceNameForDisplay}
 							getAllianceNumbersForDisplay={getAllianceNumbersForDisplay}
 							tournamentWinner={tournamentWinner}
