@@ -5,11 +5,13 @@ export const appUpdates = [
       <ul>
         <li>ALL PROGRAMS:</li>
         <ul>
-          <li>Refactored </li>
+          <li>Refactored the Playoff Brackets to use reusable components for each match and finals match.</li>
+          <li>Tuned playoff match and finals match display to improve readability and consistency.</li>
         </ul>
         <li>FTC:</li>
         <ul>
           <li>Fixed a bug that prevented proper display of tiebreakers in the Playoff Brackets</li>
+          <li>Fixed the match results guidance on Announce, Play-By-Play and Emcee pages to account for ties in FTC</li>
         </ul>
       </ul>
     ),
