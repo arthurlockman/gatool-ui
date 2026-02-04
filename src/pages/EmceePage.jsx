@@ -450,7 +450,7 @@ function EmceePage({
       if (!allianceDisplay) {
         allianceDisplay = `A${lowerBracketWinMatch}`;
       }
-      parts.push(`Won M${lowerBracketWinMatch} against ${allianceDisplay}`);
+      parts.push(`Won M${lowerBracketWinMatch} vs ${allianceDisplay}`);
     } else if (upperBracketLossMatch) {
       // Only show upper bracket loss if they didn't win a lower bracket match
       let lostMatch;

@@ -260,7 +260,7 @@ function PlayoffDetails({
             {currentMatchClass?.winnerTo <= finalsStart - 1
               ? `M${currentMatchClass?.winnerTo}${
                   opponent?.winner
-                    ? ` against ${opponent?.winner.replace(" ", " ")}`
+                    ? ` vs ${opponent?.winner.replace(" ", " ")}`
                     : ""
                 }`
               : "Finals"}
@@ -270,7 +270,7 @@ function PlayoffDetails({
               <>
                 <ArrowRight /> M{currentMatchClass?.loserTo}
                 {opponent?.loser
-                  ? ` against ${opponent?.loser.replace(" ", " ")}`
+                  ? ` vs ${opponent?.loser.replace(" ", " ")}`
                   : ""}{" "}
               </>
             ) : (

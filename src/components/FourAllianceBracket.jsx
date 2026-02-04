@@ -44,7 +44,19 @@ function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMat
 	};
 	
 	// Check if we're viewing any finals match (for gold background on "FINALS"/"BEST 2 of 3")
-	const isInFinalsView = currentPlayoffMatch >= finalsStartMatch;
+	// In FTC mode, use series number comparison to handle tiebreakers correctly
+	let isInFinalsView = false;
+	if (ftcMode) {
+		const scheduleToCheck = offlinePlayoffSchedule?.schedule || matches;
+		const currentMatchObj = scheduleToCheck[currentPlayoffMatch - 1];
+		if (currentMatchObj?.series) {
+			isInFinalsView = currentMatchObj.series >= finalsStartMatch;
+		} else {
+			isInFinalsView = currentPlayoffMatch >= finalsStartMatch;
+		}
+	} else {
+		isInFinalsView = currentPlayoffMatch >= finalsStartMatch;
+	}
 
 	var overtimeOffset = 0;
 	var tournamentWinner = {
