@@ -3,6 +3,10 @@ export const appUpdates = [
     date: "February 2, 2026",
     message: (
       <ul>
+        <li>ALL PROGRAMS:</li>
+        <ul>
+          <li>Refactored </li>
+        </ul>
         <li>FTC:</li>
         <ul>
           <li>Fixed a bug that prevented proper display of tiebreakers in the Playoff Brackets</li>

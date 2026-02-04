@@ -9,15 +9,21 @@ function FinalsMatchIndicator({
 	getFinalsMatchWinnerForDisplay,
 	getFinalsMatchScoreForDisplay,
 	overtimeOffset = 0,
-	colors = {},
-	fontWeights = {},
+	colors = {
+		RED: "#FF0000",
+		BLUE: "#0000FF",
+		GREEN: "#09BA48",
+	},
+	fontWeights = {
+		black: "900",
+		semibold: "600",
+	},
 }) {
-	const RED = colors.RED || "#FF0000";
-	const BLUE = colors.BLUE || "#0000FF";
-	const GOLD = colors.GOLD || "#FFCA10";
-	const GREEN = colors.GREEN || "#09BA48";
-	const black = fontWeights.black || "900";
-	const semibold = fontWeights.semibold || "600";
+	const RED = colors.RED;
+	const BLUE = colors.BLUE;
+	const GREEN = colors.GREEN;
+	const black = fontWeights.black;
+	const semibold = fontWeights.semibold;
 
 	const winner = getFinalsMatchWinnerForDisplay(matchNumber);
 	const winnerColor = winner?.winner === "red" ? RED : winner?.winner === "blue" ? BLUE : winner?.winner === "tie" ? GREEN : "none";
