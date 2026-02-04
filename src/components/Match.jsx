@@ -13,8 +13,17 @@ function Match({
 	getAllianceNumbersForDisplay,
 	getMatchWinnerForDisplay,
 	getMatchScoreForDisplay,
-	colors = {},
-	fontWeights = {},
+	colors = {
+		RED: "#FF0000",
+		BLUE: "#0000FF",
+		GOLD: "#FFCA10",
+		GREEN: "#09BA48",
+		BLACK: "#000000",
+		WHITE: "#FFFFFF",
+	},
+	fontWeights = {
+		bold: "700",
+	},
 }) {
 	const RED = colors?.RED || "#FF0000";
 	const BLUE = colors?.BLUE || "#0000FF";

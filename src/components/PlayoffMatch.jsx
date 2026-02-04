@@ -12,15 +12,23 @@ function PlayoffMatch({
 	getAllianceNumbersForDisplay,
 	tournamentWinner,
 	ftcMode,
-	colors = {},
-	fontWeights = {},
+	colors = {
+		RED: "#FF0000",
+		BLUE: "#0000FF",
+		GOLD: "#FFCA10",
+		BLACK: "#000000",
+		WHITE: "#FFFFFF",
+	},
+	fontWeights = {
+		bold: "700",
+	},
 }) {
-	const RED = colors.RED || "#FF0000";
-	const BLUE = colors.BLUE || "#0000FF";
-	const GOLD = colors.GOLD || "#FFCA10";
-	const BLACK = colors.BLACK || "#000000";
-	const WHITE = colors.WHITE || "#FFFFFF";
-	const bold = fontWeights.bold || "700";
+	const RED = colors.RED;
+	const BLUE = colors.BLUE;
+	const GOLD = colors.GOLD;
+	const BLACK = colors.BLACK;
+	const WHITE = colors.WHITE;
+	const bold = fontWeights.bold;
 
 	// Relative coordinates within the playoff match component
 	// These are relative to (0,0) at the top-left of the match box
