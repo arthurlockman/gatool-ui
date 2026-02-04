@@ -26,6 +26,29 @@ function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMat
 	//const normal = "400";
 
 	const currentPlayoffMatch = currentMatch - qualsLength;
+	
+	// Helper function to check if a bracket match should be highlighted as the current match
+	// In FTC mode, highlights all matches in the same series as the current match
+	const isCurrentMatch = (bracketMatchNumber) => {
+		if (!ftcMode) {
+			// In FRC mode, use ordinal match number comparison
+			return currentPlayoffMatch === bracketMatchNumber;
+		}
+		
+		// In FTC mode, compare series numbers
+		// Get the current match object
+		const scheduleToCheck = offlinePlayoffSchedule?.schedule || matches;
+		const currentMatchObj = scheduleToCheck[currentPlayoffMatch - 1];
+		
+		if (!currentMatchObj || !currentMatchObj.series) {
+			// Fallback to ordinal comparison if series is not available
+			return currentPlayoffMatch === bracketMatchNumber;
+		}
+		
+		// In FTC mode, bracket match number equals series number
+		// Highlight if the current match's series matches the bracket match's series
+		return currentMatchObj.series === bracketMatchNumber;
+	};
 
 	/**
 	 * This function finds a team by their station assignment
@@ -889,7 +912,7 @@ function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMat
 								<polygon fill={RED} points="984.7,504.56 848.43,504.56 848.43,468.54 984.7,468.54 997.64,486.55 		" stroke={(getMatchWinnerForDisplay(13)?.winner === "red" || getMatchWinnerForDisplay(13)?.tieWinner === "red") ? GOLD : "none"} strokeWidth="5" />
 								<polygon fill={BLUE} points="984.7,541 848.43,541 848.43,504.99 984.7,504.99 997.64,522.99 		" stroke={(getMatchWinnerForDisplay(13)?.winner === "blue" || getMatchWinnerForDisplay(13)?.tieWinner === "blue") ? GOLD : "none"} strokeWidth="5" />
 								<line fill="none" stroke="#FFFFFF" strokeMiterlimit="10" x1="984.7" y1="504.75" x2="826" y2="504.75" />
-								<rect x="826" y="468.54" width="22.43" height="72.46" fill={currentPlayoffMatch === 13 ? GOLD : BLACK} />
+								<rect x="826" y="468.54" width="22.43" height="72.46" fill={isCurrentMatch(13) ? GOLD : BLACK} />
 								<text transform="matrix(0 -1.0059 1 0 841.7773 532.333)" fill={currentPlayoffMatch === 13 ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{getMatchLabel(13)}</text>
 								<text transform="matrix(0.9941 0 0 1 906.5 483.1807)" textAnchor="middle">
 									<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{getAllianceNameForDisplay(13, "red") ? getAllianceNameForDisplay(13, "red") : "Losing Alliance of M11"}</tspan>
@@ -910,8 +933,8 @@ function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMat
 								<polygon fill={RED} points="802.7,574.56 666.43,574.56 666.43,538.54 802.7,538.54 815.64,556.55 		" stroke={(getMatchWinnerForDisplay(12)?.winner === "red" || getMatchWinnerForDisplay(12)?.tieWinner === "red") ? GOLD : "none"} strokeWidth="5" />
 								<polygon fill={BLUE} points="802.7,611 666.43,611 666.43,574.99 802.7,574.99 815.64,592.99 		" stroke={(getMatchWinnerForDisplay(12)?.winner === "blue" || getMatchWinnerForDisplay(12)?.tieWinner === "blue") ? GOLD : "none"} strokeWidth="5" />
 								<line fill="none" stroke="#FFFFFF" strokeMiterlimit="10" x1="802.7" y1="574.75" x2="644" y2="574.75" />
-								<rect x="644" y="538.54" width="22.43" height="72.46" fill={currentPlayoffMatch === 12 ? GOLD : BLACK} />
-								<text transform="matrix(0 -1.0059 1 0 659.7773 602.333)" fill={currentPlayoffMatch === 12 ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{getMatchLabel(12)}</text>
+								<rect x="644" y="538.54" width="22.43" height="72.46" fill={isCurrentMatch(12) ? GOLD : BLACK} />
+								<text transform="matrix(0 -1.0059 1 0 659.7773 602.333)" fill={isCurrentMatch(12) ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{getMatchLabel(12)}</text>
 								<text transform="matrix(0.9941 0 0 1 725 553.1807)" textAnchor="middle">
 									<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{getAllianceNameForDisplay(12, "red") ? getAllianceNameForDisplay(12, "red") : "Winner of M10"}</tspan>
 									<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={getAllianceNumbersForDisplay(12, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{getAllianceNumbersForDisplay(12, "red")}</tspan></text>
@@ -931,8 +954,8 @@ function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMat
 								<polygon fill={RED} points="802.7,254.56 666.43,254.56 666.43,218.54 802.7,218.54 815.64,236.55 		" stroke={(getMatchWinnerForDisplay(11)?.winner === "red" || getMatchWinnerForDisplay(11)?.tieWinner === "red") ? GOLD : "none"} strokeWidth="5" />
 								<polygon fill={BLUE} points="802.7,291 666.43,291 666.43,254.99 802.7,254.99 815.64,272.99 		" stroke={(getMatchWinnerForDisplay(11)?.winner === "blue" || getMatchWinnerForDisplay(11)?.tieWinner === "blue") ? GOLD : "none"} strokeWidth="5" />
 								<line fill="none" stroke="#FFFFFF" strokeMiterlimit="10" x1="802.7" y1="254.75" x2="644" y2="254.75" />
-								<rect x="644" y="218.54" width="22.43" height="72.46" fill={currentPlayoffMatch === 11 ? GOLD : BLACK} />
-								<text transform="matrix(0 -1.0059 1 0 659.7764 282.332)" fill={currentPlayoffMatch === 11 ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{getMatchLabel(11)}</text>
+								<rect x="644" y="218.54" width="22.43" height="72.46" fill={isCurrentMatch(11) ? GOLD : BLACK} />
+								<text transform="matrix(0 -1.0059 1 0 659.7764 282.332)" fill={isCurrentMatch(11) ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{getMatchLabel(11)}</text>
 								<text transform="matrix(0.9941 0 0 1 725 233.1807)" textAnchor="middle">
 									<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{getAllianceNameForDisplay(11, "red") ? getAllianceNameForDisplay(11, "red") : "Winner of M7"}</tspan>
 									<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={getAllianceNumbersForDisplay(11, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{getAllianceNumbersForDisplay(11, "red")}</tspan></text>
@@ -952,8 +975,8 @@ function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMat
 								<polygon fill={RED} points="611.7,508.56 475.43,508.56 475.43,472.54 611.7,472.54 624.64,490.55 		" stroke={(getMatchWinnerForDisplay(10)?.winner === "red" || getMatchWinnerForDisplay(10)?.tieWinner === "red") ? GOLD : "none"} strokeWidth="5" />
 								<polygon fill={BLUE} points="611.7,545 475.43,545 475.43,508.99 611.7,508.99 624.64,526.99 		" stroke={(getMatchWinnerForDisplay(10)?.winner === "blue" || getMatchWinnerForDisplay(10)?.tieWinner === "blue") ? GOLD : "none"} strokeWidth="5" />
 								<line fill="none" stroke="#FFFFFF" strokeMiterlimit="10" x1="611.7" y1="508.75" x2="453" y2="508.75" />
-								<rect x="453" y="472.54" width="22.43" height="72.46" fill={currentPlayoffMatch === 10 ? GOLD : BLACK} />
-								<text transform="matrix(0 -1.0059 1 0 468.7769 536.333)" fill={currentPlayoffMatch === 10 ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{getMatchLabel(10)}</text>
+								<rect x="453" y="472.54" width="22.43" height="72.46" fill={isCurrentMatch(10) ? GOLD : BLACK} />
+								<text transform="matrix(0 -1.0059 1 0 468.7769 536.333)" fill={isCurrentMatch(10) ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{getMatchLabel(10)}</text>
 								<text transform="matrix(0.9941 0 0 1 533 487.1807)" textAnchor="middle">
 									<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{getAllianceNameForDisplay(10, "red") ? getAllianceNameForDisplay(10, "red") : "Losing Alliance of M8"}</tspan>
 									<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={getAllianceNumbersForDisplay(10, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{getAllianceNumbersForDisplay(10, "red")}</tspan></text>
@@ -973,8 +996,8 @@ function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMat
 								<polygon fill={RED} points="611.7,647.56 475.43,647.56 475.43,611.54 611.7,611.54 624.64,629.55 		" stroke={(getMatchWinnerForDisplay(9)?.winner === "red" || getMatchWinnerForDisplay(9)?.tieWinner === "red") ? GOLD : "none"} strokeWidth="5" />
 								<polygon fill={BLUE} points="611.7,684 475.43,684 475.43,647.99 611.7,647.99 624.64,665.99 		" stroke={(getMatchWinnerForDisplay(9)?.winner === "blue" || getMatchWinnerForDisplay(9)?.tieWinner === "blue") ? GOLD : "none"} strokeWidth="5" />
 								<line fill="none" stroke="#FFFFFF" strokeMiterlimit="10" x1="611.7" y1="647.75" x2="453" y2="647.75" />
-								<rect x="453" y="611.54" width="22.43" height="72.46" fill={currentPlayoffMatch === 9 ? GOLD : BLACK} />
-								<text transform="matrix(0 -1.0059 1 0 468.7773 671.9619)" fill={currentPlayoffMatch === 9 ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{getMatchLabel(9)}</text>
+								<rect x="453" y="611.54" width="22.43" height="72.46" fill={isCurrentMatch(9) ? GOLD : BLACK} />
+								<text transform="matrix(0 -1.0059 1 0 468.7773 671.9619)" fill={isCurrentMatch(9) ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{getMatchLabel(9)}</text>
 								<text transform="matrix(0.9941 0 0 1 533 626.1807)" textAnchor="middle">
 									<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{getAllianceNameForDisplay(9, "red") ? getAllianceNameForDisplay(9, "red") : "Losing Alliance of M7"}</tspan>
 									<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={getAllianceNumbersForDisplay(9, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{getAllianceNumbersForDisplay(9, "red")}</tspan></text>
@@ -994,8 +1017,8 @@ function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMat
 								<polygon fill={RED} points="412.7,328.56 276.43,328.56 276.43,292.54 412.7,292.54 425.64,310.55 		" stroke={(getMatchWinnerForDisplay(8)?.winner === "red" || getMatchWinnerForDisplay(8)?.tieWinner === "red") ? GOLD : "none"} strokeWidth="5" />
 								<polygon fill={BLUE} points="412.7,365 276.43,365 276.43,328.99 412.7,328.99 425.64,346.99 		" stroke={(getMatchWinnerForDisplay(8)?.winner === "blue" || getMatchWinnerForDisplay(8)?.tieWinner === "blue") ? GOLD : "none"} strokeWidth="5" />
 								<line fill="none" stroke="#FFFFFF" strokeMiterlimit="10" x1="412.7" y1="328.75" x2="254" y2="328.75" />
-								<rect x="254" y="292.54" width="22.43" height="72.46" fill={currentPlayoffMatch === 8 ? GOLD : BLACK} />
-								<text transform="matrix(0 -1.0059 1 0 269.7769 352.9624)" fill={currentPlayoffMatch === 8 ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{getMatchLabel(8)}</text>
+								<rect x="254" y="292.54" width="22.43" height="72.46" fill={isCurrentMatch(8) ? GOLD : BLACK} />
+								<text transform="matrix(0 -1.0059 1 0 269.7769 352.9624)" fill={isCurrentMatch(8) ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{getMatchLabel(8)}</text>
 								<text transform="matrix(0.9941 0 0 1 334.6 307.1807)" textAnchor="middle">
 									<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{getAllianceNameForDisplay(8, "red") ? getAllianceNameForDisplay(8, "red") : "Winner of M3"}</tspan>
 									<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={getAllianceNumbersForDisplay(8, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{getAllianceNumbersForDisplay(8, "red")}</tspan></text>
@@ -1015,8 +1038,8 @@ function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMat
 								<polygon fill={RED} points="412.7,174.56 276.43,174.56 276.43,138.54 412.7,138.54 425.64,156.55 		" stroke={(getMatchWinnerForDisplay(7)?.winner === "red" || getMatchWinnerForDisplay(7)?.tieWinner === "red") ? GOLD : "none"} strokeWidth="5" />
 								<polygon fill={BLUE} points="412.7,211 276.43,211 276.43,174.99 412.7,174.99 425.64,192.99 		" stroke={(getMatchWinnerForDisplay(7)?.winner === "blue" || getMatchWinnerForDisplay(7)?.tieWinner === "blue") ? GOLD : "none"} strokeWidth="5" />
 								<line fill="none" stroke="#FFFFFF" strokeMiterlimit="10" x1="412.7" y1="174.75" x2="254" y2="174.75" />
-								<rect x="254" y="138.54" width="22.43" height="72.46" fill={currentPlayoffMatch === 7 ? GOLD : BLACK} />
-								<text transform="matrix(0 -1.0059 1 0 269.7769 198.9624)" fill={currentPlayoffMatch === 7 ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{getMatchLabel(7)}</text>
+								<rect x="254" y="138.54" width="22.43" height="72.46" fill={isCurrentMatch(7) ? GOLD : BLACK} />
+								<text transform="matrix(0 -1.0059 1 0 269.7769 198.9624)" fill={isCurrentMatch(7) ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{getMatchLabel(7)}</text>
 								<text transform="matrix(0.9941 0 0 1 334.6 153.1807)" textAnchor="middle">
 									<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{getAllianceNameForDisplay(7, "red") ? getAllianceNameForDisplay(7, "red") : "Winner of M1"}</tspan>
 									<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={getAllianceNumbersForDisplay(7, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{getAllianceNumbersForDisplay(7, "red")}</tspan></text>
@@ -1036,8 +1059,8 @@ function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMat
 								<polygon fill={RED} points="412.7,721.56 276.43,721.56 276.43,685.54 412.7,685.54 425.64,703.55 		" stroke={(getMatchWinnerForDisplay(6)?.winner === "red" || getMatchWinnerForDisplay(6)?.tieWinner === "red") ? GOLD : "none"} strokeWidth="5" />
 								<polygon fill={BLUE} points="412.7,758 276.43,758 276.43,721.99 412.7,721.99 425.64,739.99 		" stroke={(getMatchWinnerForDisplay(6)?.winner === "blue" || getMatchWinnerForDisplay(6)?.tieWinner === "blue") ? GOLD : "none"} strokeWidth="5" />
 								<line fill="none" stroke="#FFFFFF" strokeMiterlimit="10" x1="412.7" y1="721.75" x2="254" y2="721.75" />
-								<rect x="254" y="685.54" width="22.43" height="72.46" fill={currentPlayoffMatch === 6 ? GOLD : BLACK} />
-								<text transform="matrix(0 -1.0059 1 0 269.7773 745.9619)" fill={currentPlayoffMatch === 6 ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{getMatchLabel(6)}</text>
+								<rect x="254" y="685.54" width="22.43" height="72.46" fill={isCurrentMatch(6) ? GOLD : BLACK} />
+								<text transform="matrix(0 -1.0059 1 0 269.7773 745.9619)" fill={isCurrentMatch(6) ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{getMatchLabel(6)}</text>
 								<text transform="matrix(0.9941 0 0 1 334.6 700.1807)" textAnchor="middle">
 									<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{getAllianceNameForDisplay(6, "red") ? getAllianceNameForDisplay(6, "red") : "Losing Alliance of M3"}</tspan>
 									<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={getAllianceNumbersForDisplay(6, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{getAllianceNumbersForDisplay(6, "red")}</tspan></text>
@@ -1057,8 +1080,8 @@ function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMat
 								<polygon fill={RED} points="412.7,567.56 276.43,567.56 276.43,531.54 412.7,531.54 425.64,549.55 		" stroke={(getMatchWinnerForDisplay(5)?.winner === "red" || getMatchWinnerForDisplay(5)?.tieWinner === "red") ? GOLD : "none"} strokeWidth="5" />
 								<polygon fill={BLUE} points="412.7,604 276.43,604 276.43,567.99 412.7,567.99 425.64,585.99 		" stroke={(getMatchWinnerForDisplay(5)?.winner === "blue" || getMatchWinnerForDisplay(5)?.tieWinner === "blue") ? GOLD : "none"} strokeWidth="5" />
 								<line fill="none" stroke="#FFFFFF" strokeMiterlimit="10" x1="412.7" y1="567.75" x2="254" y2="567.75" />
-								<rect x="254" y="531.54" width="22.43" height="72.46" fill={currentPlayoffMatch === 5 ? GOLD : BLACK} />
-								<text transform="matrix(0 -1.0059 1 0 269.7773 591.9619)" fill={currentPlayoffMatch === 5 ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{getMatchLabel(5)}</text>
+								<rect x="254" y="531.54" width="22.43" height="72.46" fill={isCurrentMatch(5) ? GOLD : BLACK} />
+								<text transform="matrix(0 -1.0059 1 0 269.7773 591.9619)" fill={isCurrentMatch(5) ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{getMatchLabel(5)}</text>
 								<text transform="matrix(0.9941 0 0 1 334.6 546.1807)" textAnchor="middle">
 									<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px" textAnchor="middle">{getAllianceNameForDisplay(5, "red") ? getAllianceNameForDisplay(5, "red") : "Losing Alliance of M1"}</tspan>
 									<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={getAllianceNumbersForDisplay(5, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{getAllianceNumbersForDisplay(5, "red")}</tspan></text>
@@ -1078,8 +1101,8 @@ function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMat
 								<polygon fill={RED} points="223.7,367.56 87.43,367.56 87.43,331.54 223.7,331.54 236.64,349.55 		" stroke={(getMatchWinnerForDisplay(4)?.winner === "red" || getMatchWinnerForDisplay(4)?.tieWinner === "red") ? GOLD : "none"} strokeWidth="5" />
 								<polygon fill={BLUE} points="223.7,404 87.43,404 87.43,367.99 223.7,367.99 236.64,385.99 		" stroke={(getMatchWinnerForDisplay(4)?.winner === "blue" || getMatchWinnerForDisplay(4)?.tieWinner === "blue") ? GOLD : "none"} strokeWidth="5" />
 								<line fill="none" stroke="#FFFFFF" strokeMiterlimit="10" x1="223.7" y1="367.75" x2="65" y2="367.75" />
-								<rect x="65" y="331.54" width="22.43" height="72.46" fill={currentPlayoffMatch === 4 ? GOLD : BLACK} />
-								<text transform="matrix(0 -1.0059 1 0 80.7769 391.9619)" fill={currentPlayoffMatch === 4 ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{getMatchLabel(4)}</text>
+								<rect x="65" y="331.54" width="22.43" height="72.46" fill={isCurrentMatch(4) ? GOLD : BLACK} />
+								<text transform="matrix(0 -1.0059 1 0 80.7769 391.9619)" fill={isCurrentMatch(4) ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{getMatchLabel(4)}</text>
 								<text transform="matrix(0.9941 0 0 1 145.6 346.1807)" textAnchor="middle">
 									<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{getAllianceNameForDisplay(4, "red") ? getAllianceNameForDisplay(4, "red") : "Alliance 3"}</tspan>
 									<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={getAllianceNumbersForDisplay(4, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{getAllianceNumbersForDisplay(4, "red")}</tspan></text>
@@ -1099,8 +1122,8 @@ function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMat
 								<polygon fill={RED} points="223.7,290.56 87.43,290.56 87.43,254.54 223.7,254.54 236.64,272.55 		" stroke={(getMatchWinnerForDisplay(3)?.winner === "red" || getMatchWinnerForDisplay(3)?.tieWinner === "red") ? GOLD : "none"} strokeWidth="5" />
 								<polygon fill={BLUE} points="223.7,327 87.43,327 87.43,290.99 223.7,290.99 236.64,308.99 		" stroke={(getMatchWinnerForDisplay(3)?.winner === "blue" || getMatchWinnerForDisplay(3)?.tieWinner === "blue") ? GOLD : "none"} strokeWidth="5" />
 								<line fill="none" stroke="#FFFFFF" strokeMiterlimit="10" x1="223.7" y1="290.75" x2="65" y2="290.75" />
-								<rect x="65" y="254.54" width="22.43" height="72.46" fill={currentPlayoffMatch === 3 ? GOLD : BLACK} />
-								<text transform="matrix(0 -1.0059 1 0 80.7769 314.9624)" fill={currentPlayoffMatch === 3 ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{getMatchLabel(3)}</text>
+								<rect x="65" y="254.54" width="22.43" height="72.46" fill={isCurrentMatch(3) ? GOLD : BLACK} />
+								<text transform="matrix(0 -1.0059 1 0 80.7769 314.9624)" fill={isCurrentMatch(3) ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{getMatchLabel(3)}</text>
 								<text transform="matrix(0.9941 0 0 1 145.6 269.1807)" textAnchor="middle">
 									<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{getAllianceNameForDisplay(3, "red") ? getAllianceNameForDisplay(3, "red") : "Alliance 2"}</tspan>
 									<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={getAllianceNumbersForDisplay(3, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{getAllianceNumbersForDisplay(3, "red")}</tspan></text>
@@ -1120,8 +1143,8 @@ function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMat
 								<polygon fill={RED} points="223.7,213.56 87.43,213.56 87.43,177.54 223.7,177.54 236.64,195.55 		" stroke={(getMatchWinnerForDisplay(2)?.winner === "red" || getMatchWinnerForDisplay(2)?.tieWinner === "red") ? GOLD : "none"} strokeWidth="5" />
 								<polygon fill={BLUE} points="223.7,250 87.43,250 87.43,213.99 223.7,213.99 236.64,231.99 		" stroke={(getMatchWinnerForDisplay(2)?.winner === "blue" || getMatchWinnerForDisplay(2)?.tieWinner === "blue") ? GOLD : "none"} strokeWidth="5" />
 								<line fill="none" stroke="#FFFFFF" strokeMiterlimit="10" x1="223.7" y1="213.75" x2="65" y2="213.75" />
-								<rect x="65" y="177.54" width="22.43" height="72.46" fill={currentPlayoffMatch === 2 ? GOLD : BLACK} />
-								<text transform="matrix(0 -1.0059 1 0 80.7769 237.9624)" fill={currentPlayoffMatch === 2 ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{getMatchLabel(2)}</text>
+								<rect x="65" y="177.54" width="22.43" height="72.46" fill={isCurrentMatch(2) ? GOLD : BLACK} />
+								<text transform="matrix(0 -1.0059 1 0 80.7769 237.9624)" fill={isCurrentMatch(2) ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{getMatchLabel(2)}</text>
 								<text transform="matrix(0.9941 0 0 1 145.6 192.1807)" textAnchor="middle">
 									<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{getAllianceNameForDisplay(2, "red") ? getAllianceNameForDisplay(2, "red") : "Alliance 4"}</tspan><tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={getAllianceNumbersForDisplay(2, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{getAllianceNumbersForDisplay(2, "red")}</tspan></text>
 								<text transform="matrix(0.9941 0 0 1 145.6 228.6221)" textAnchor="middle">
@@ -1139,8 +1162,8 @@ function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMat
 								<polygon fill={RED} points="223.7,136.56 87.43,136.56 87.43,100.54 223.7,100.54 236.64,118.55 		" stroke={(getMatchWinnerForDisplay(1)?.winner === "red" || getMatchWinnerForDisplay(1)?.tieWinner === "red") ? GOLD : "none"} strokeWidth="5" />
 								<polygon fill={BLUE} points="223.7,173 87.43,173 87.43,136.99 223.7,136.99 236.64,154.99 		" stroke={(getMatchWinnerForDisplay(1)?.winner === "blue" || getMatchWinnerForDisplay(1)?.tieWinner === "blue") ? GOLD : "none"} strokeWidth="5" />
 								<line fill="none" stroke="#FFFFFF" strokeMiterlimit="10" x1="223.7" y1="136.75" x2="65" y2="136.75" />
-								<rect x="65" y="100.54" width="22.43" height="72.46" fill={currentPlayoffMatch === 1 ? GOLD : BLACK} />
-								<text transform="matrix(0 -1.0059 1 0 80.7769 160.9624)" fill={currentPlayoffMatch === 1 ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{getMatchLabel(1)}</text>
+								<rect x="65" y="100.54" width="22.43" height="72.46" fill={isCurrentMatch(1) ? GOLD : BLACK} />
+								<text transform="matrix(0 -1.0059 1 0 80.7769 160.9624)" fill={isCurrentMatch(1) ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{getMatchLabel(1)}</text>
 								<text transform="matrix(0.9941 0 0 1 145.6 115.1807)" textAnchor="middle">
 									<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{getAllianceNameForDisplay(1, "red") ? getAllianceNameForDisplay(1, "red") : "Alliance 1"}</tspan>
 									<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={getAllianceNumbersForDisplay(1, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{getAllianceNumbersForDisplay(1, "red")}</tspan></text>

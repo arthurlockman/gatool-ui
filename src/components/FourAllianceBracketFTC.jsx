@@ -26,6 +26,29 @@ function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previous
 	//const normal = "400";
 
 	const currentPlayoffMatch = currentMatch - qualsLength;
+	
+	// Helper function to check if a bracket match should be highlighted as the current match
+	// In FTC mode, highlights all matches in the same series as the current match
+	const isCurrentMatch = (bracketMatchNumber) => {
+		if (!ftcMode) {
+			// In FRC mode, use ordinal match number comparison
+			return currentPlayoffMatch === bracketMatchNumber;
+		}
+		
+		// In FTC mode, compare series numbers
+		// Get the current match object
+		const scheduleToCheck = offlinePlayoffSchedule?.schedule || matches;
+		const currentMatchObj = scheduleToCheck[currentPlayoffMatch - 1];
+		
+		if (!currentMatchObj || !currentMatchObj.series) {
+			// Fallback to ordinal comparison if series is not available
+			return currentPlayoffMatch === bracketMatchNumber;
+		}
+		
+		// In FTC mode, bracket match number equals series number
+		// Highlight if the current match's series matches the bracket match's series
+		return currentMatchObj.series === bracketMatchNumber;
+	};
 
 	/**
 	 * This function finds a team by their station assignment
@@ -805,8 +828,8 @@ function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previous
 								<polygon fill={RED} points="691.7 504.56 555.43 504.56 555.43 468.54 691.7 468.54 704.64 486.55 691.7 504.56" stroke={(getMatchWinnerForDisplay(5)?.winner === "red" || getMatchWinnerForDisplay(5)?.tieWinner === "red") ? GOLD : "none"} strokeWidth="5" />
 								<polygon fill={BLUE} points="691.7 541 555.43 541 555.43 504.99 691.7 504.99 704.64 522.99 691.7 541" stroke={(getMatchWinnerForDisplay(5)?.winner === "blue" || getMatchWinnerForDisplay(5)?.tieWinner === "blue") ? GOLD : "none"} strokeWidth="5" />
 								<line fill="none" stroke="#FFFFFF" strokeMiterlimit="10" x1="691.7" y1="504.75" x2="533" y2="504.75" />
-								<rect x="533" y="468.54" width="22.43" height="72.46" fill={currentPlayoffMatch === 5 ? GOLD : BLACK} />
-								<text transform="matrix(0 -1.0059 1 0 548.78 528.26)" fill={currentPlayoffMatch === 5 ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{getMatchLabel(5)}</text>
+								<rect x="533" y="468.54" width="22.43" height="72.46" fill={isCurrentMatch(5) ? GOLD : BLACK} />
+								<text transform="matrix(0 -1.0059 1 0 548.78 528.26)" fill={isCurrentMatch(5) ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{getMatchLabel(5)}</text>
 								<text transform="matrix(0.9941 0 0 1 608 483.18)" textAnchor="middle">
 									<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px" textAnchor="middle">{getAllianceNameForDisplay(5, "red") ? getAllianceNameForDisplay(5, "red") : "Losing Alliance of M3"}</tspan>
 									<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={getAllianceNumbersForDisplay(5, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{getAllianceNumbersForDisplay(5, "red")}</tspan></text>
@@ -828,8 +851,8 @@ function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previous
 								<polygon fill={RED} points="449.7 574.56 313.43 574.56 313.43 538.54 449.7 538.54 462.64 556.55 449.7 574.56" stroke={(getMatchWinnerForDisplay(3)?.winner === "red" || getMatchWinnerForDisplay(3)?.tieWinner === "red") ? GOLD : "none"} strokeWidth="5" />
 								<polygon fill={BLUE} points="449.7 611 313.43 611 313.43 574.99 449.7 574.99 462.64 592.99 449.7 611" stroke={(getMatchWinnerForDisplay(3)?.winner === "blue" || getMatchWinnerForDisplay(3)?.tieWinner === "blue") ? GOLD : "none"} strokeWidth="5" />
 								<line fill="none" stroke="#FFFFFF" strokeMiterlimit="10" x1="449.7" y1="574.75" x2="291" y2="574.75" />
-								<rect x="291" y="538.54" width="22.43" height="72.46" fill={currentPlayoffMatch === 3 ? GOLD : BLACK} />
-								<text transform="matrix(0 -1.0059 1 0 306.78 598.26)" fill={currentPlayoffMatch === 3 ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{getMatchLabel(3)}</text>
+								<rect x="291" y="538.54" width="22.43" height="72.46" fill={isCurrentMatch(3) ? GOLD : BLACK} />
+								<text transform="matrix(0 -1.0059 1 0 306.78 598.26)" fill={isCurrentMatch(3) ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{getMatchLabel(3)}</text>
 								<text transform="matrix(0.9941 0 0 1 370 553.18)" textAnchor="middle">
 									<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{getAllianceNameForDisplay(4, "red") ? getAllianceNameForDisplay(3, "red") : "TBD"}</tspan>
 									<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={getAllianceNumbersForDisplay(3, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{getAllianceNumbersForDisplay(3, "red")}</tspan></text>
@@ -851,8 +874,8 @@ function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previous
 								<polygon fill={RED} points="447.7 174.56 311.43 174.56 311.43 138.54 447.7 138.54 460.64 156.55 447.7 174.56" stroke={(getMatchWinnerForDisplay(34)?.winner === "red" || getMatchWinnerForDisplay(4)?.tieWinner === "red") ? GOLD : "none"} strokeWidth="5" />
 								<polygon fill={BLUE} points="447.7 211 311.43 211 311.43 174.99 447.7 174.99 460.64 192.99 447.7 211" stroke={(getMatchWinnerForDisplay(4)?.winner === "blue" || getMatchWinnerForDisplay(4)?.tieWinner === "blue") ? GOLD : "none"} strokeWidth="5" />
 								<line fill="none" stroke="#FFFFFF" strokeMiterlimit="10" x1="447.7" y1="174.75" x2="289" y2="174.75" />
-								<rect x="289" y="138.54" width="22.43" height="72.46" fill={currentPlayoffMatch === 4 ? GOLD : BLACK} />
-								<text transform="matrix(0 -1.0059 1 0 304.78 198.26)" fill={currentPlayoffMatch === 4 ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{getMatchLabel(4)}</text>
+								<rect x="289" y="138.54" width="22.43" height="72.46" fill={isCurrentMatch(4) ? GOLD : BLACK} />
+								<text transform="matrix(0 -1.0059 1 0 304.78 198.26)" fill={isCurrentMatch(4) ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{getMatchLabel(4)}</text>
 								<text transform="matrix(0.9941 0 0 1 370 153.18)" textAnchor="middle">
 									<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{getAllianceNameForDisplay(4, "red") ? getAllianceNameForDisplay(4, "red") : "TBD"}</tspan>
 									<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={getAllianceNumbersForDisplay(4, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{getAllianceNumbersForDisplay(4, "red")}</tspan></text>
@@ -873,8 +896,8 @@ function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previous
 								<polygon fill={RED} points="222.7 213.56 86.43 213.56 86.43 177.54 222.7 177.54 235.64 195.55 222.7 213.56" stroke={(getMatchWinnerForDisplay(2)?.winner === "red" || getMatchWinnerForDisplay(2)?.tieWinner === "red") ? GOLD : "none"} strokeWidth="5" />
 								<polygon fill={BLUE} points="222.7 250 86.43 250 86.43 213.99 222.7 213.99 235.64 231.99 222.7 250" stroke={(getMatchWinnerForDisplay(2)?.winner === "blue" || getMatchWinnerForDisplay(2)?.tieWinner === "blue") ? GOLD : "none"} strokeWidth="5" />
 								<line x1="222.7" y1="213.75" x2="64" y2="213.75" fill="none" stroke="#fff" strokeMiterlimit="10" />
-								<rect x="64" y="177.54" width="22.43" height="72.46" fill={currentPlayoffMatch === 2 ? GOLD : BLACK} />
-								<text transform="matrix(0 -1.0059 1 0 79.78 237.26)" fill={currentPlayoffMatch === 2 ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{getMatchLabel(2)}</text>
+								<rect x="64" y="177.54" width="22.43" height="72.46" fill={isCurrentMatch(2) ? GOLD : BLACK} />
+								<text transform="matrix(0 -1.0059 1 0 79.78 237.26)" fill={isCurrentMatch(2) ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{getMatchLabel(2)}</text>
 								<text transform="matrix(0.9941 0 0 1 145 192.18)" textAnchor="middle">
 									<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{getAllianceNameForDisplay(2, "red") ? getAllianceNameForDisplay(2, "red") : "DIVISION C"}</tspan><tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={getAllianceNumbersForDisplay(2, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{getAllianceNumbersForDisplay(2, "red")}</tspan></text>
 								<text transform="matrix(0.9941 0 0 1 145 228.62)" textAnchor="middle">
@@ -893,8 +916,8 @@ function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previous
 								<polygon fill={RED} points="222.7 136.56 86.43 136.56 86.43 100.54 222.7 100.54 235.64 118.55 222.7 136.56" stroke={(getMatchWinnerForDisplay(1)?.winner === "red" || getMatchWinnerForDisplay(1)?.tieWinner === "red") ? GOLD : "none"} strokeWidth="5" />
 								<polygon fill={BLUE} points="222.7 173 86.43 173 86.43 136.99 222.7 136.99 235.64 154.99 222.7 173" stroke={(getMatchWinnerForDisplay(1)?.winner === "blue" || getMatchWinnerForDisplay(1)?.tieWinner === "blue") ? GOLD : "none"} strokeWidth="5" />
 								<line x1="222.7" y1="136.75" x2="64" y2="136.75" fill="none" stroke="#fff" strokeMiterlimit="10" />
-								<rect x="64" y="100.54" width="22.43" height="72.46" fill={currentPlayoffMatch === 1 ? GOLD : BLACK} />
-								<text transform="matrix(0 -1.0059 1 0 79.78 160.26)" fill={currentPlayoffMatch === 1 ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{getMatchLabel(1)}</text>
+								<rect x="64" y="100.54" width="22.43" height="72.46" fill={isCurrentMatch(1) ? GOLD : BLACK} />
+								<text transform="matrix(0 -1.0059 1 0 79.78 160.26)" fill={isCurrentMatch(1) ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">{getMatchLabel(1)}</text>
 								<text transform="matrix(0.9941 0 0 1 145 115.18)" textAnchor="middle">
 									<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{getAllianceNameForDisplay(1, "red") ? getAllianceNameForDisplay(1, "red") : "DIVISION A"}</tspan>
 									<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={getAllianceNumbersForDisplay(1, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{getAllianceNumbersForDisplay(1, "red")}</tspan></text>
