@@ -372,7 +372,7 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 		} else if (matches[14]?.actualStartTime) {
 			overtimeOffset = 15;
 		}
-	}
+		}
 
 	// 6-Alliance Finals: series 10-15 are displayed as match numbers 10-15 in the bracket
 	// Access by array index (series - 1), so indices 9-14 for display matches 10-15
@@ -454,15 +454,15 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 		}
 	} else {
 		// In FRC mode, count all finals matches (series 10-15)
-		for (var finalsMatchIndex = 9; finalsMatchIndex < 15; finalsMatchIndex++) {
-			const finalsMatch = matches[finalsMatchIndex];
-			if (finalsMatch?.winner?.winner === "red") {
+	for (var finalsMatchIndex = 9; finalsMatchIndex < 15; finalsMatchIndex++) {
+		const finalsMatch = matches[finalsMatchIndex];
+		if (finalsMatch?.winner?.winner === "red") {
 				tournamentWinner.red += 1;
-			}
-			if (finalsMatch?.winner?.winner === "blue") {
-				tournamentWinner.blue += 1;
-			}
 		}
+		if (finalsMatch?.winner?.winner === "blue") {
+				tournamentWinner.blue += 1;
+		}
+	}
 	}
 	
 	// FTC: Red (higher seed) wins with 1 victory, Blue (lower seed) needs 2 victories
@@ -503,13 +503,13 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 		}
 	} else {
 		// FRC mode: check match 15 (index 14)
-		if (matches[14]?.winner?.tieWinner === "red") {
-			tournamentWinner.winner = "red";
-			tournamentWinner.level = matches[14]?.winner?.level;
-		} else if (matches[14]?.winner?.tieWinner === "blue") {
-			tournamentWinner.winner = "blue";
-			tournamentWinner.level = matches[14]?.winner?.level;
-		}
+	if (matches[14]?.winner?.tieWinner === "red") {
+		tournamentWinner.winner = "red";
+		tournamentWinner.level = matches[14]?.winner?.level;
+	} else if (matches[14]?.winner?.tieWinner === "blue") {
+		tournamentWinner.winner = "blue";
+		tournamentWinner.level = matches[14]?.winner?.level;
+	}
 	}
 
 	const setMatchWinner = (matchNumber) => {

@@ -677,7 +677,7 @@ function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previous
 							y={272.45}
 							matchNumber={6}
 							onClick={() => setMatchWinner(6)}
-							isCurrentMatch={currentPlayoffMatch >= 6}
+							isCurrentMatch={isCurrentMatch(6)}
 							getAllianceNameForDisplay={getAllianceNameForDisplay}
 							getAllianceNumbersForDisplay={getAllianceNumbersForDisplay}
 							tournamentWinner={tournamentWinner}
@@ -688,7 +688,7 @@ function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previous
 						{shouldDisplayFinalsMatch(6) && (
 							<FinalsMatchIndicator
 								x={910}
-								y={390}
+								y={370}
 								matchNumber={6}
 								getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
 								getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
@@ -700,7 +700,7 @@ function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previous
 						{shouldDisplayFinalsMatch(7) && (
 							<FinalsMatchIndicator
 								x={940}
-								y={390}
+								y={370}
 								matchNumber={7}
 								getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
 								getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
@@ -712,7 +712,7 @@ function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previous
 						{shouldDisplayFinalsMatch(8) && (
 							<FinalsMatchIndicator
 								x={970}
-								y={390}
+								y={370}
 								matchNumber={8}
 								getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
 								getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
@@ -724,7 +724,7 @@ function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previous
 						{shouldDisplayFinalsMatch(9) && (
 							<FinalsMatchIndicator
 								x={1000}
-								y={390}
+								y={370}
 								matchNumber={9}
 								getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
 								getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
@@ -736,7 +736,7 @@ function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previous
 						{shouldDisplayFinalsMatch(10) && (
 							<FinalsMatchIndicator
 								x={1030}
-								y={390}
+								y={370}
 								matchNumber={10}
 								getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
 								getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
@@ -748,7 +748,7 @@ function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previous
 						{shouldDisplayFinalsMatch(11) && (
 							<FinalsMatchIndicator
 								x={1070}
-								y={390}
+								y={370}
 								matchNumber={11}
 								getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
 								getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}

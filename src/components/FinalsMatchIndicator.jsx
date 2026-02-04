@@ -12,6 +12,7 @@ function FinalsMatchIndicator({
 	colors = {
 		RED: "#FF0000",
 		BLUE: "#0000FF",
+		GOLD: "#FFCA10",
 		GREEN: "#09BA48",
 	},
 	fontWeights = {
@@ -41,7 +42,7 @@ function FinalsMatchIndicator({
 				cy="0"
 				r="8"
 			/>
-			<text id={`finalsM${matchNumber - 9}Scores`} transform="matrix(1 0 0 1 0 26.5537)">
+			<text id={`finalsM${matchNumber - 9}Scores`} transform="matrix(1 0 0 1 0 26)">
 				<tspan
 					x="0"
 					y="0"

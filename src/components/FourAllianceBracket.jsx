@@ -288,13 +288,30 @@ function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMat
 	useHotkeys('right', () => nextMatch(), { scopes: 'matchNavigation' });
 	useHotkeys('left', () => previousMatch(), { scopes: 'matchNavigation' });
 
+	// Helper function to check if a bracket match should be highlighted as the current match
+	// Handles tiebreakers by comparing series numbers
+	const isCurrentMatch = (bracketMatchNumber) => {
+		// Get the current match object
+		const scheduleToCheck = offlinePlayoffSchedule?.schedule || matches;
+		const currentMatchObj = scheduleToCheck[currentPlayoffMatch - 1];
+		
+		if (!currentMatchObj || !currentMatchObj.series) {
+			// Fallback to ordinal comparison if series is not available
+			return currentPlayoffMatch === bracketMatchNumber;
+		}
+		
+		// In bracket display, match number equals series number
+		// Highlight if the current match's series matches the bracket match's series
+		// This ensures tiebreakers still highlight the original match
+		return currentMatchObj.series === bracketMatchNumber;
+	};
+
 	// Wrapper functions for Match component
 	const getMatchLabel = (matchNumber) => `MATCH ${matchNumber}`;
 	const getAllianceNameForDisplay = (matchNumber, alliance) => allianceName(matchNumber, alliance);
 	const getAllianceNumbersForDisplay = (matchNumber, alliance) => allianceNumbers(matchNumber, alliance);
 	const getMatchWinnerForDisplay = (matchNumber) => matchWinner(matchNumber);
 	const getMatchScoreForDisplay = (matchNumber, alliance) => matchScore(matchNumber, alliance);
-	const isCurrentMatch = (matchNumber) => currentPlayoffMatch === matchNumber;
 	// Wrapper functions for FinalsMatchIndicator component
 	const getFinalsMatchWinnerForDisplay = (matchNumber) => matchWinner(matchNumber);
 	const getFinalsMatchScoreForDisplay = (matchNumber, alliance) => matchScore(matchNumber, alliance);
@@ -333,7 +350,7 @@ function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMat
 							y={272.45}
 							matchNumber={6}
 							onClick={() => setMatchWinner(6)}
-							isCurrentMatch={currentPlayoffMatch >= 6}
+							isCurrentMatch={isCurrentMatch(6)}
 							getAllianceNameForDisplay={getAllianceNameForDisplay}
 							getAllianceNumbersForDisplay={getAllianceNumbersForDisplay}
 							tournamentWinner={tournamentWinner}
@@ -343,7 +360,7 @@ function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMat
 						/>
 						<FinalsMatchIndicator
 							x={910}
-							y={390}
+							y={370}
 							matchNumber={6}
 							getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
 							getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
@@ -353,7 +370,7 @@ function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMat
 						/>
 						<FinalsMatchIndicator
 							x={940}
-							y={390}
+							y={370}
 							matchNumber={7}
 							getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
 							getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
@@ -363,7 +380,7 @@ function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMat
 						/>
 						<FinalsMatchIndicator
 							x={970}
-							y={390}
+							y={370}
 							matchNumber={8}
 							getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
 							getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
@@ -373,7 +390,7 @@ function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMat
 						/>
 						<FinalsMatchIndicator
 							x={1000}
-							y={390}
+							y={370}
 							matchNumber={9}
 							getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
 							getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
@@ -383,7 +400,7 @@ function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMat
 						/>
 						<FinalsMatchIndicator
 							x={1030}
-							y={390}
+							y={370}
 							matchNumber={10}
 							getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
 							getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
@@ -393,7 +410,7 @@ function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMat
 						/>
 						<FinalsMatchIndicator
 							x={1070}
-							y={390}
+							y={370}
 							matchNumber={11}
 							getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
 							getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
