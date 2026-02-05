@@ -576,10 +576,18 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         backupTeams = asArrays?.rankedTeams.slice(allianceCount?.count, allianceCount?.count + 8);
 
 
-        // set up the available teams block
-        var rows = asArrays.availableTeams?.length;
+        // set up the available teams block - filter out the current captain whose turn it is
+        const currentCaptainTeamNumber = asArrays?.alliances[
+            _.findIndex(asArrays.alliances, { "number": asArrays?.allianceSelectionOrder?.[asArrays.nextChoice]?.number })
+        ]?.captain?.teamNumber;
+        
+        const displayAvailableTeams = asArrays.availableTeams?.filter(team => 
+            team.teamNumber !== currentCaptainTeamNumber
+        ) || [];
+        
+        var rows = displayAvailableTeams.length;
         if (rows > 0) {
-            asArrays.availableTeams?.forEach((team, index) => {
+            displayAvailableTeams.forEach((team, index) => {
                 if (index <= 1 * rows / colCount - 1) {
                     availColumns[0].push(team);
                 } else if (index <= 2 * rows / colCount - 1) {
@@ -614,9 +622,13 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
 
         // Check if this captain has already made their first pick
         const hasFirstPick = isAllianceCaptain && asArrays?.alliances[allianceIndex]?.round1 !== null;
+        
+        // Check if it's currently this captain's turn to pick
+        const isCurrentCaptain = isAllianceCaptain && 
+            asArrays?.alliances[allianceIndex]?.number === asArrays?.allianceSelectionOrder?.[asArrays.nextChoice]?.number;
 
-        // A captain is unavailable if they're Alliance 1 captain OR if they've made their first pick
-        const isUnavailableCaptain = isAlliance1Captain || (isAllianceCaptain && hasFirstPick);
+        // A captain is unavailable if they're Alliance 1 captain OR if they've made their first pick OR if it's currently their turn
+        const isUnavailableCaptain = isAlliance1Captain || (isAllianceCaptain && hasFirstPick) || isCurrentCaptain;
 
         return (
             <>
