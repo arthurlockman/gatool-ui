@@ -8,9 +8,11 @@ export const appUpdates = [
           <li>Refactored the Playoff Brackets to use reusable components for each match and finals match.</li>
           <li>Tuned match display to improve readability and consistency on Playoff screen.</li>
           <li>Tuned Emcee screen for readability.</li>
+          <li>Improved handling of case when Top Seeded Alliance declines to play in the Playoffs.</li>
         </ul>
         <li>FTC:</li>
         <ul>
+          <li>Removed Skip Alliance option from Alliance Selection for FTC.</li>
           <li>Fixed a bug that prevented proper display of tiebreakers in the Playoff Brackets</li>
           <li>Fixed the match results guidance on Announce, Play-By-Play and Emcee pages to account for ties in FTC</li>
         </ul>
