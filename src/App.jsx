@@ -1794,6 +1794,10 @@ function App() {
           match.winner = winner(match);
           //fix the match number fro FTC matches
           if (ftcMode) {
+            // Preserve original matchNumber before overwriting (needed for tiebreaker detection)
+            if (!match.originalMatchNumber) {
+              match.originalMatchNumber = match.matchNumber;
+            }
             match.matchNumber = index + 1;
           }
           //figure out how to match scores to match
@@ -2412,17 +2416,25 @@ function App() {
         });
         // get awards for those filtered events
         var districtEITeams = districtEvents.map(async (event) => {
-          var request = await httpClient.getNoAuth(
-            `${selectedYear?.value}/awards/event/${event?.value?.code}`,
-            ftcMode ? ftcBaseURL : undefined
-          );
-          if (request.status === 200) {
-            // @ts-ignore
-            var eventDetails = await request.json();
-            // filter that list by EI {awardId: "633"} {name: "District Engineering Inspiration Award"} and {awardID: "417"} {name:"Rookie All Star Award"}
-            return _.filter(eventDetails?.awards, (award) => {
-              return award.awardId === 633 || award.awardId === 417;
-            });
+          try {
+            var request = await httpClient.getNoAuth(
+              `${selectedYear?.value}/awards/event/${event?.value?.code}`,
+              ftcMode ? ftcBaseURL : undefined
+            );
+            if (request.status === 200) {
+              // @ts-ignore
+              var eventDetails = await request.json();
+              // filter that list by EI {awardId: "633"} {name: "District Engineering Inspiration Award"} and {awardID: "417"} {name:"Rookie All Star Award"}
+              return _.filter(eventDetails?.awards, (award) => {
+                return award.awardId === 633 || award.awardId === 417;
+              });
+            }
+            // Return empty array if request failed
+            return [];
+          } catch (error) {
+            // Return empty array on error to prevent undefined values
+            console.error(`Error fetching awards for event ${event?.value?.code}:`, error);
+            return [];
           }
         });
 
@@ -2430,7 +2442,8 @@ function App() {
           var tempTeams = [];
           values.forEach((value) => {
             // @ts-ignore
-            if (value[0]?.teamNumber) {
+            // Check if value exists and is an array before accessing [0]
+            if (value && Array.isArray(value) && value[0]?.teamNumber) {
               if (
                 _.findIndex(teams.teams, { teamNumber: value[0]?.teamNumber }) <
                 0

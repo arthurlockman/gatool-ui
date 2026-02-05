@@ -133,117 +133,144 @@ function PlayoffDetails({
   advantage.blue = 0;
   var opponent = { winner: null, loser: null };
 
+  // In FTC mode, use series number; otherwise use matchNumber
+  const currentMatchIdentifier = ftcMode ? matchDetails?.series : matchDetails?.matchNumber;
+  const currentMatchClass = currentMatchIdentifier ? _.filter(matchClasses, {
+    matchNumber: currentMatchIdentifier,
+  })[0] : null;
+
   if (matchDetails?.tournamentLevel.toLowerCase() === "playoff") {
-    if (matchDetails?.matchNumber > finalsStart) {
-      for (
-        var finalsMatches = finalsStart;
-        finalsMatches < matchDetails?.matchNumber;
-        finalsMatches++
-      ) {
-        if (
-          matches[_.findIndex(matches, { matchNumber: finalsMatches })]?.winner
-            .winner === "red"
-        ) {
-          advantage.red += 1;
+    // In FTC mode, Red (higher seed) starts with an advantage: Red has 0 losses, Blue has 1 loss
+    // This means Red needs 1 win to win the series, Blue needs 2 wins
+    // Initialize: Red starts with advantage of 1 (equivalent to Blue having 1 loss)
+    if (ftcMode && currentMatchIdentifier >= finalsStart) {
+      advantage.red = 1;
+      advantage.blue = 0;
+    }
+    
+    if (currentMatchIdentifier > finalsStart) {
+      if (ftcMode) {
+        // Count wins from all matches in series up to (but not including) the current series
+        // Note: We already set advantage.red = 1 above, so we're adding to that base
+        const seriesNumbers = [];
+        for (var seriesNum = finalsStart; seriesNum < currentMatchIdentifier; seriesNum++) {
+          seriesNumbers.push(seriesNum);
         }
-        if (
-          matches[_.findIndex(matches, { matchNumber: finalsMatches })]?.winner
-            .winner === "blue"
+        seriesNumbers.forEach((seriesNum) => {
+          const seriesMatches = matches.filter((m) => m.series === seriesNum);
+          if (seriesMatches.length > 0) {
+            // Find the last match in the series (highest matchNumber)
+            const lastMatch = seriesMatches.reduce((prev, current) => {
+              const prevMatchNum = prev.originalMatchNumber || prev.matchNumber;
+              const currentMatchNum = current.originalMatchNumber || current.matchNumber;
+              return (currentMatchNum > prevMatchNum) ? current : prev;
+            });
+            if (lastMatch?.winner?.winner === "red") {
+              advantage.red += 1;
+            }
+            if (lastMatch?.winner?.winner === "blue") {
+              advantage.blue += 1;
+            }
+          }
+        });
+      } else {
+        // FRC mode: use ordinal match numbers
+        for (
+          var finalsMatches = finalsStart;
+          finalsMatches < currentMatchIdentifier;
+          finalsMatches++
         ) {
-          advantage.blue += 1;
+          if (
+            matches[_.findIndex(matches, { matchNumber: finalsMatches })]?.winner
+              .winner === "red"
+          ) {
+            advantage.red += 1;
+          }
+          if (
+            matches[_.findIndex(matches, { matchNumber: finalsMatches })]?.winner
+              .winner === "blue"
+          ) {
+            advantage.blue += 1;
+          }
         }
       }
     }
 
-    if (matchDetails?.matchNumber < finalsStart) {
-      var winnerMatch =
-        matches[
-          _.findIndex(matches, {
-            matchNumber: _.filter(matchClasses, {
-              matchNumber: matchDetails?.matchNumber,
-            })[0]?.winnerTo,
-          })
-        ];
-      var winnerOpponent = {};
-      winnerOpponent.alliance = _.filter(matchClasses, {
-        matchNumber: matchDetails?.matchNumber,
-      })[0]?.winnerVs;
-      if (winnerOpponent.alliance === "blue") {
-        winnerOpponent.lookup = 3;
-      } else if (winnerOpponent.alliance === "red") {
-        winnerOpponent.lookup = 0;
-      } else {
-        winnerOpponent.lookup = -1;
-      }
-      var loserMatch =
-        matches[
-          _.findIndex(matches, {
-            matchNumber: _.filter(matchClasses, {
-              matchNumber: matchDetails?.matchNumber,
-            })[0]?.loserTo,
-          })
-        ];
-      var loserOpponent = {};
-      loserOpponent.alliance = _.filter(matchClasses, {
-        matchNumber: matchDetails?.matchNumber,
-      })[0]?.loserVs;
-      if (loserOpponent.alliance === "blue") {
-        loserOpponent.lookup = 3;
-      } else if (loserOpponent.alliance === "red") {
-        loserOpponent.lookup = 0;
-      } else {
-        loserOpponent.lookup = -1;
-      }
+    if (currentMatchIdentifier < finalsStart) {
+      if (currentMatchClass) {
+        var winnerMatch;
+        var loserMatch;
+        
+        if (ftcMode) {
+          // In FTC mode, find matches by series number
+          winnerMatch = matches.find((m) => m.series === currentMatchClass?.winnerTo);
+          loserMatch = matches.find((m) => m.series === currentMatchClass?.loserTo);
+        } else {
+          // FRC mode: find matches by matchNumber
+          winnerMatch = matches[_.findIndex(matches, {
+            matchNumber: currentMatchClass?.winnerTo,
+          })];
+          loserMatch = matches[_.findIndex(matches, {
+            matchNumber: currentMatchClass?.loserTo,
+          })];
+        }
+        
+        var winnerOpponent = {};
+        winnerOpponent.alliance = currentMatchClass?.winnerVs;
+        if (winnerOpponent.alliance === "blue") {
+          winnerOpponent.lookup = 3;
+        } else if (winnerOpponent.alliance === "red") {
+          winnerOpponent.lookup = 0;
+        } else {
+          winnerOpponent.lookup = -1;
+        }
+        
+        var loserOpponent = {};
+        loserOpponent.alliance = currentMatchClass?.loserVs;
+        if (loserOpponent.alliance === "blue") {
+          loserOpponent.lookup = 3;
+        } else if (loserOpponent.alliance === "red") {
+          loserOpponent.lookup = 0;
+        } else {
+          loserOpponent.lookup = -1;
+        }
 
-      if (winnerOpponent.lookup >= 0) {
-        opponent.winner =
-          alliances?.Lookup[
-            `${winnerMatch?.teams[winnerOpponent.lookup].teamNumber}`
-          ]?.alliance;
-      }
-      if (loserOpponent.lookup >= 0) {
-        opponent.loser =
-          alliances?.Lookup[
-            `${loserMatch?.teams[loserOpponent.lookup].teamNumber}`
-          ]?.alliance;
+        if (winnerOpponent.lookup >= 0 && winnerMatch) {
+          opponent.winner =
+            alliances?.Lookup[
+              `${winnerMatch?.teams[winnerOpponent.lookup]?.teamNumber}`
+            ]?.alliance;
+        }
+        if (loserOpponent.lookup >= 0 && loserMatch) {
+          opponent.loser =
+            alliances?.Lookup[
+              `${loserMatch?.teams[loserOpponent.lookup]?.teamNumber}`
+            ]?.alliance;
+        }
       }
     }
   }
 
   return (
     <>
-      {matchDetails?.matchNumber &&
-        matchDetails?.matchNumber <= finalsStart - 1 && (
+      {currentMatchIdentifier &&
+        currentMatchIdentifier <= finalsStart - 1 && (
           <>
             Winner <ArrowRight />{" "}
-            {_.filter(matchClasses, {
-              matchNumber: matchDetails?.matchNumber,
-            })[0]?.winnerTo <=
-            finalsStart - 1
-              ? `M${
-                  _.filter(matchClasses, {
-                    matchNumber: matchDetails?.matchNumber,
-                  })[0]?.winnerTo
-                }${
+            {currentMatchClass?.winnerTo <= finalsStart - 1
+              ? `M${currentMatchClass?.winnerTo}${
                   opponent?.winner
-                    ? ` against ${opponent?.winner.replace(" ", " ")}`
+                    ? ` vs ${opponent?.winner.replace(" ", " ")}`
                     : ""
                 }`
               : "Finals"}
             <br />
             Losing Alliance{" "}
-            {_.filter(matchClasses, {
-              matchNumber: matchDetails?.matchNumber,
-            })[0]?.loserTo ? (
+            {currentMatchClass?.loserTo ? (
               <>
-                <ArrowRight /> M
-                {
-                  _.filter(matchClasses, {
-                    matchNumber: matchDetails?.matchNumber,
-                  })[0]?.loserTo
-                }
+                <ArrowRight /> M{currentMatchClass?.loserTo}
                 {opponent?.loser
-                  ? ` against ${opponent?.loser.replace(" ", " ")}`
+                  ? ` vs ${opponent?.loser.replace(" ", " ")}`
                   : ""}{" "}
               </>
             ) : (
@@ -251,17 +278,43 @@ function PlayoffDetails({
             )}{" "}
           </>
         )}
-      {matchDetails?.matchNumber &&
-        matchDetails?.matchNumber === finalsStart && <>FINALS MATCH 1</>}
-      {matchDetails?.matchNumber &&
-        matchDetails?.matchNumber === finalsStart + 1 && (
+      {currentMatchIdentifier &&
+        currentMatchIdentifier === finalsStart && (
+          <>
+            {ftcMode ? (
+              <span className="redAllianceTeam">
+                FINALS MATCH 1<br />
+                ADVANTAGE RED
+              </span>
+            ) : (
+              <>FINALS MATCH 1</>
+            )}
+          </>
+        )}
+      {currentMatchIdentifier &&
+        currentMatchIdentifier === finalsStart + 1 && (
           <span
             className={`${
-              matches[
-                _.findIndex(matches, {
-                  matchNumber: matchDetails?.matchNumber - 1,
-                })
-              ]?.winner.winner
+              ftcMode
+                ? (() => {
+                    // In FTC mode, find the previous series' last match
+                    const prevSeries = currentMatchIdentifier - 1;
+                    const prevSeriesMatches = matches.filter((m) => m.series === prevSeries);
+                    if (prevSeriesMatches.length > 0) {
+                      const lastMatch = prevSeriesMatches.reduce((prev, current) => {
+                        const prevMatchNum = prev.originalMatchNumber || prev.matchNumber;
+                        const currentMatchNum = current.originalMatchNumber || current.matchNumber;
+                        return (currentMatchNum > prevMatchNum) ? current : prev;
+                      });
+                      return lastMatch?.winner?.winner || "";
+                    }
+                    return "";
+                  })()
+                : matches[
+                    _.findIndex(matches, {
+                      matchNumber: currentMatchIdentifier - 1,
+                    })
+                  ]?.winner.winner
             }AllianceTeam`}
           >
             FINALS MATCH 2<br />
@@ -270,8 +323,8 @@ function PlayoffDetails({
             {advantage.blue > advantage.red && "ADVANTAGE BLUE"}
           </span>
         )}
-      {matchDetails?.matchNumber &&
-        matchDetails?.matchNumber >= finalsStart + 2 && (
+      {currentMatchIdentifier &&
+        currentMatchIdentifier >= finalsStart + 2 && (
           <span
             className={
               advantage?.red > advantage?.blue

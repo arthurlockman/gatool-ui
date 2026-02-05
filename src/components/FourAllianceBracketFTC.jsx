@@ -5,8 +5,11 @@ import moment from "moment";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useSwipeable } from "react-swipeable";
 import { matchClassesBase } from "./Constants";
+import Match from "./Match";
+import PlayoffMatch from "./PlayoffMatch";
+import FinalsMatchIndicator from "./FinalsMatchIndicator";
 
-function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previousMatch, getSchedule, useSwipe, usePullDownToUpdate, offlinePlayoffSchedule, setOfflinePlayoffSchedule, eventLabel, ftcMode,matches,allianceNumbers, allianceName, matchScore,matchWinner }) {
+function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previousMatch, getSchedule, useSwipe, usePullDownToUpdate, offlinePlayoffSchedule, setOfflinePlayoffSchedule, eventLabel, ftcMode,matches,allianceNumbers, allianceName, matchScore,matchWinner, alliances, remapNumberToString }) {
 	const [showSelectWinner, setShowSelectWinner] = useState(false);
 	const [showConfirmWinner, setShowConfirmWinner] = useState(false);
 	const [winningAlliance, setWinningAlliance] = useState(null);
@@ -26,6 +29,45 @@ function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previous
 	//const normal = "400";
 
 	const currentPlayoffMatch = currentMatch - qualsLength;
+	const finalsStartMatch = 6; // First finals match for 4-alliance bracket
+	
+	// Helper function to check if a bracket match should be highlighted as the current match
+	// In FTC mode, highlights all matches in the same series as the current match
+	const isCurrentMatch = (bracketMatchNumber) => {
+		if (!ftcMode) {
+			// In FRC mode, use ordinal match number comparison
+			return currentPlayoffMatch === bracketMatchNumber;
+		}
+		
+		// In FTC mode, compare series numbers
+		// Get the current match object
+		const scheduleToCheck = offlinePlayoffSchedule?.schedule || matches;
+		const currentMatchObj = scheduleToCheck[currentPlayoffMatch - 1];
+		
+		if (!currentMatchObj || !currentMatchObj.series) {
+			// Fallback to ordinal comparison if series is not available
+			return currentPlayoffMatch === bracketMatchNumber;
+		}
+		
+		// In FTC mode, bracket match number equals series number
+		// Highlight if the current match's series matches the bracket match's series
+		return currentMatchObj.series === bracketMatchNumber;
+	};
+	
+	// Check if we're viewing any finals match (for gold background on "FINALS"/"BEST 2 of 3")
+	// In FTC mode, use series number comparison to handle tiebreakers correctly
+	let isInFinalsView = false;
+	if (ftcMode) {
+		const scheduleToCheck = offlinePlayoffSchedule?.schedule || matches;
+		const currentMatchObj = scheduleToCheck[currentPlayoffMatch - 1];
+		if (currentMatchObj?.series) {
+			isInFinalsView = currentMatchObj.series >= finalsStartMatch;
+		} else {
+			isInFinalsView = currentPlayoffMatch >= finalsStartMatch;
+		}
+	} else {
+		isInFinalsView = currentPlayoffMatch >= finalsStartMatch;
+	}
 
 	/**
 	 * This function finds a team by their station assignment
@@ -37,6 +79,270 @@ function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previous
 		if (!teams || !Array.isArray(teams)) return null;
 		const team = teams.find((t) => t?.station?.toLowerCase() === station?.toLowerCase());
 		return team?.teamNumber || null;
+	};
+
+	/**
+	 * Counts tiebreaker matches for a given bracket match number in FTC mode
+	 * @param bracketMatchNumber The match number displayed on the bracket (1-5 for regular matches)
+	 * @returns The number of tiebreaker matches for this series, or 0 if none
+	 */
+	const getTiebreakerCount = (bracketMatchNumber) => {
+		if (!ftcMode) return 0;
+		
+		// In FTC mode, bracket match number equals series number
+		const series = bracketMatchNumber;
+		
+		// Try offlinePlayoffSchedule first (original uploaded schedule), then fall back to matches array
+		// Use originalMatchNumber if available (preserved before transformation), otherwise use matchNumber
+		const scheduleToCheck = offlinePlayoffSchedule?.schedule || matches;
+		
+		// Find all matches in this series
+		const seriesMatches = scheduleToCheck.filter(
+			(m) => m.series === series
+		);
+		
+		if (seriesMatches.length === 0) return 0;
+		
+		// Find the last match in the series (highest originalMatchNumber or matchNumber)
+		const lastMatch = seriesMatches.reduce((prev, current) => {
+			const prevMatchNum = prev.originalMatchNumber || prev.matchNumber;
+			const currentMatchNum = current.originalMatchNumber || current.matchNumber;
+			return (currentMatchNum > prevMatchNum) ? current : prev;
+		});
+		
+		// Use originalMatchNumber if available, otherwise matchNumber
+		const lastMatchNumber = lastMatch.originalMatchNumber || lastMatch.matchNumber;
+		
+		// If the last match's matchNumber > 1, there were tiebreakers
+		// The count is matchNumber - 1 (number of additional matches beyond the first)
+		if (lastMatchNumber > 1) {
+			return lastMatchNumber - 1;
+		}
+		
+		return 0;
+	};
+
+	/**
+	 * Formats the match label with tiebreaker indicator for FTC mode
+	 * @param bracketMatchNumber The match number displayed on the bracket
+	 * @returns Formatted match label (e.g., "MATCH 8" or "MATCH 8+1")
+	 */
+	const getMatchLabel = (bracketMatchNumber) => {
+		const baseLabel = `MATCH ${bracketMatchNumber}`;
+		if (!ftcMode) return baseLabel;
+		
+		const tiebreakerCount = getTiebreakerCount(bracketMatchNumber);
+		return tiebreakerCount > 0 ? `${baseLabel}+${tiebreakerCount}` : baseLabel;
+	};
+
+	// Store original functions before we replace them
+	const originalMatchScore = matchScore;
+	const originalMatchWinner = matchWinner;
+	const originalAllianceNumbers = allianceNumbers;
+	const originalAllianceName = allianceName;
+
+	/**
+	 * Gets the match to use for displaying teams/alliances for a bracket match
+	 * In FTC mode with tiebreakers, returns the last match in the series
+	 * Otherwise returns the match found by the original functions
+	 * @param bracketMatchNumber The match number displayed on the bracket
+	 * @returns The match object to use for team display
+	 */
+	const getMatchForTeamDisplay = (bracketMatchNumber) => {
+		if (!ftcMode) {
+			// In non-FTC mode, find match by matchNumber
+			const matchIndex = _.findIndex(matches, { "matchNumber": bracketMatchNumber });
+			return matches?.[matchIndex];
+		}
+		
+		// In FTC mode, bracket match number equals series number
+		const series = bracketMatchNumber;
+		const scheduleToCheck = offlinePlayoffSchedule?.schedule || matches;
+		
+		// Find all matches in this series
+		const seriesMatches = scheduleToCheck.filter(
+			(m) => m.series === series
+		);
+		
+		if (seriesMatches.length === 0) {
+			// Fallback to original lookup
+			const matchIndex = _.findIndex(matches, { "matchNumber": bracketMatchNumber });
+			return matches?.[matchIndex];
+		}
+		
+		// Find the last match in the series (highest originalMatchNumber or matchNumber)
+		const lastMatch = seriesMatches.reduce((prev, current) => {
+			const prevMatchNum = prev.originalMatchNumber || prev.matchNumber;
+			const currentMatchNum = current.originalMatchNumber || current.matchNumber;
+			return (currentMatchNum > prevMatchNum) ? current : prev;
+		});
+		
+		return lastMatch;
+	};
+
+	/**
+	 * Wrapper for allianceNumbers that uses the correct match from the series
+	 * @param bracketMatchNumber The match number displayed on the bracket
+	 * @param allianceColor The alliance color ("red" or "blue")
+	 * @returns The alliance numbers string
+	 */
+	const getAllianceNumbersForDisplay = (bracketMatchNumber, allianceColor) => {
+		if (!ftcMode) {
+			return originalAllianceNumbers(bracketMatchNumber, allianceColor);
+		}
+		
+		const match = getMatchForTeamDisplay(bracketMatchNumber);
+		if (!match) {
+			return originalAllianceNumbers(bracketMatchNumber, allianceColor);
+		}
+		
+		// Extract teams from the match and format them
+		if (match?.description?.includes("Bye Match")) {
+			return "Bye Match";
+		}
+		
+		if (!match?.teams || !alliances?.Lookup) {
+			return originalAllianceNumbers(bracketMatchNumber, allianceColor);
+		}
+		
+		const lookupTeam = getTeamByStation(match.teams, allianceColor === "red" ? "Red1" : "Blue1");
+		if (!lookupTeam) {
+			return originalAllianceNumbers(bracketMatchNumber, allianceColor);
+		}
+		
+		const targetAlliance = alliances.Lookup[`${remapNumberToString ? remapNumberToString(lookupTeam) : lookupTeam}`];
+		if (!targetAlliance) {
+			return originalAllianceNumbers(bracketMatchNumber, allianceColor);
+		}
+		
+		const allianceMembers = _.compact([
+			targetAlliance?.captain,
+			targetAlliance?.round1,
+			targetAlliance?.round2,
+			targetAlliance?.round3,
+			targetAlliance?.backup
+		]);
+		
+		return allianceMembers.join("  ");
+	};
+
+	/**
+	 * Wrapper for allianceName that uses the correct match from the series
+	 * @param bracketMatchNumber The match number displayed on the bracket
+	 * @param allianceColor The alliance color ("red" or "blue")
+	 * @returns The alliance name string
+	 */
+	const getAllianceNameForDisplay = (bracketMatchNumber, allianceColor) => {
+		if (!ftcMode) {
+			return originalAllianceName(bracketMatchNumber, allianceColor);
+		}
+		
+		const match = getMatchForTeamDisplay(bracketMatchNumber);
+		if (!match) {
+			return originalAllianceName(bracketMatchNumber, allianceColor);
+		}
+		
+		// Extract team from the match and get alliance name
+		if (!match?.teams || !alliances?.Lookup) {
+			return originalAllianceName(bracketMatchNumber, allianceColor);
+		}
+		
+		const lookupTeam = getTeamByStation(match.teams, allianceColor === "red" ? "Red1" : "Blue1");
+		if (!lookupTeam) {
+			return originalAllianceName(bracketMatchNumber, allianceColor);
+		}
+		
+		const targetAlliance = alliances.Lookup[`${remapNumberToString ? remapNumberToString(lookupTeam) : lookupTeam}`];
+		if (!targetAlliance) {
+			return originalAllianceName(bracketMatchNumber, allianceColor);
+		}
+		
+		let allianceNameStr = targetAlliance?.alliance || "";
+		
+		// Add tiebreaker indicator if applicable (for finals matches)
+		const tieLevel = 6; // For four-alliance bracket
+		if (bracketMatchNumber <= tieLevel || bracketMatchNumber === tieLevel + 6) {
+			if (match?.winner?.tieWinner === "red" && allianceColor === "red") {
+				allianceNameStr += ` (L${match.winner.level} WIN)`;
+			}
+		}
+		
+		return allianceNameStr;
+	};
+
+	/**
+	 * Wrapper for matchScore that returns the score from the last match in series if tiebreakers exist
+	 * @param bracketMatchNumber The match number displayed on the bracket
+	 * @param alliance The alliance color ("red" or "blue")
+	 * @returns The score for the alliance
+	 */
+	const getMatchScoreForDisplay = (bracketMatchNumber, alliance) => {
+		if (!ftcMode) {
+			return originalMatchScore(bracketMatchNumber, alliance);
+		}
+		
+		// In FTC mode, bracket match number equals series number
+		const series = bracketMatchNumber;
+		const scheduleToCheck = offlinePlayoffSchedule?.schedule || matches;
+		
+		// Find all matches in this series
+		const seriesMatches = scheduleToCheck.filter(
+			(m) => m.series === series
+		);
+		
+		if (seriesMatches.length === 0) {
+			return originalMatchScore(bracketMatchNumber, alliance);
+		}
+		
+		// Find the last match in the series (highest originalMatchNumber or matchNumber)
+		const lastMatch = seriesMatches.reduce((prev, current) => {
+			const prevMatchNum = prev.originalMatchNumber || prev.matchNumber;
+			const currentMatchNum = current.originalMatchNumber || current.matchNumber;
+			return (currentMatchNum > prevMatchNum) ? current : prev;
+		});
+		
+		// Always use the last match's score (even if no tiebreakers, lastMatch is still the correct match)
+		if (alliance === "red") {
+			return lastMatch.scoreRedFinal;
+		} else if (alliance === "blue") {
+			return lastMatch.scoreBlueFinal;
+		}
+		
+		return originalMatchScore(bracketMatchNumber, alliance);
+	};
+
+	/**
+	 * Wrapper for matchWinner that returns the winner from the last match in series if tiebreakers exist
+	 * @param bracketMatchNumber The match number displayed on the bracket
+	 * @returns The winner object
+	 */
+	const getMatchWinnerForDisplay = (bracketMatchNumber) => {
+		if (!ftcMode) {
+			return originalMatchWinner(bracketMatchNumber);
+		}
+		
+		// In FTC mode, bracket match number equals series number
+		const series = bracketMatchNumber;
+		const scheduleToCheck = offlinePlayoffSchedule?.schedule || matches;
+		
+		// Find all matches in this series
+		const seriesMatches = scheduleToCheck.filter(
+			(m) => m.series === series
+		);
+		
+		if (seriesMatches.length === 0) {
+			return originalMatchWinner(bracketMatchNumber);
+		}
+		
+		// Find the last match in the series (highest originalMatchNumber or matchNumber)
+		const lastMatch = seriesMatches.reduce((prev, current) => {
+			const prevMatchNum = prev.originalMatchNumber || prev.matchNumber;
+			const currentMatchNum = current.originalMatchNumber || current.matchNumber;
+			return (currentMatchNum > prevMatchNum) ? current : prev;
+		});
+		
+		// Always use the last match's winner (even if no tiebreakers, lastMatch is still the correct match)
+		return lastMatch.winner || originalMatchWinner(bracketMatchNumber);
 	};
 
 	var overtimeOffset = 0;
@@ -65,13 +371,66 @@ function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previous
 	// FTC Finals: series 6-11 are displayed as match numbers 6-11 in the bracket
 	// Access by array index (series - 1), so indices 5-10 for display matches 6-11
 	// Red (higher seed) wins with 1 victory, Blue (lower seed) needs 2 victories
-	for (var finalsMatchIndex = 5; finalsMatchIndex < 11; finalsMatchIndex++) {
-		const finalsMatch = matches[finalsMatchIndex];
+	
+	// Find the final series (highest series number in finals range)
+	let finalSeries = 11; // Default to highest series in finals range
+	const scheduleToCheck = offlinePlayoffSchedule?.schedule || matches;
+	const finalsSeriesNumbers = scheduleToCheck
+		.filter((m) => m.series >= 6 && m.series <= 11)
+		.map((m) => m.series);
+	if (finalsSeriesNumbers.length > 0) {
+		finalSeries = Math.max(...finalsSeriesNumbers);
+	}
+	
+	// Get all matches from the final series sorted by match number
+	const finalSeriesMatchesForDisplay = scheduleToCheck
+		.filter((m) => m.series === finalSeries)
+		.sort((a, b) => {
+			const aMatchNum = a.originalMatchNumber || a.matchNumber;
+			const bMatchNum = b.originalMatchNumber || b.matchNumber;
+			return aMatchNum - bMatchNum;
+		});
+	
+	// Helper function to check if a bracket match number should be displayed
+	const shouldDisplayFinalsMatch = (bracketMatchNumber) => {
+		// Map bracket position to match index: match 6 = index 0, match 7 = index 1, etc.
+		const positionIndex = bracketMatchNumber - 6;
+		return positionIndex < finalSeriesMatchesForDisplay.length;
+	};
+	
+	// Helper function to get score for a finals match position
+	const getFinalsMatchScoreForDisplay = (bracketMatchNumber, alliance) => {
+		// Map bracket position to match index: match 6 = index 0, match 7 = index 1, etc.
+		const positionIndex = bracketMatchNumber - 6;
+		const match = finalSeriesMatchesForDisplay[positionIndex];
+		if (!match) return null;
+		
+		if (alliance === "red") {
+			return match.scoreRedFinal;
+		} else if (alliance === "blue") {
+			return match.scoreBlueFinal;
+		}
+		return null;
+	};
+	
+	// Helper function to get winner for a finals match position
+	const getFinalsMatchWinnerForDisplay = (bracketMatchNumber) => {
+		// Map bracket position to match index: match 6 = index 0, match 7 = index 1, etc.
+		const positionIndex = bracketMatchNumber - 6;
+		const match = finalSeriesMatchesForDisplay[positionIndex];
+		if (!match) return null;
+		return match.winner;
+	};
+	
+	// Only count matches from the final series
+	const finalSeriesMatches = scheduleToCheck.filter((m) => m.series === finalSeries);
+	
+	for (const finalsMatch of finalSeriesMatches) {
 		if (finalsMatch?.winner?.winner === "red") {
-			tournamentWinner.red += 1
+			tournamentWinner.red += 1;
 		}
 		if (finalsMatch?.winner?.winner === "blue") {
-			tournamentWinner.blue += 1
+			tournamentWinner.blue += 1;
 		}
 	}
 	
@@ -79,12 +438,21 @@ function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previous
 		tournamentWinner.winner = "red";
 	} else if (tournamentWinner?.blue >= 2) {
 		tournamentWinner.winner = "blue";
-	} else if (matchWinner(11)?.tieWinner === "red") {
-		tournamentWinner.winner = "red";
-		tournamentWinner.level = matchWinner(11)?.level;
-	} else if (matchWinner(11)?.tieWinner === "blue") {
-		tournamentWinner.winner = "blue";
-		tournamentWinner.level = matchWinner(11)?.level;
+	} else if (finalSeriesMatches.length > 0) {
+		// Find the last match in the final series
+		const lastFinalMatch = finalSeriesMatches.reduce((prev, current) => {
+			const prevMatchNum = prev.originalMatchNumber || prev.matchNumber;
+			const currentMatchNum = current.originalMatchNumber || current.matchNumber;
+			return (currentMatchNum > prevMatchNum) ? current : prev;
+		});
+		
+		if (lastFinalMatch?.winner?.tieWinner === "red") {
+			tournamentWinner.winner = "red";
+			tournamentWinner.level = lastFinalMatch?.winner?.level;
+		} else if (lastFinalMatch?.winner?.tieWinner === "blue") {
+			tournamentWinner.winner = "blue";
+			tournamentWinner.level = lastFinalMatch?.winner?.level;
+		}
 	}
 
 	const setMatchWinner = (matchNumber) => {
@@ -320,246 +688,166 @@ function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previous
 							<text transform="translate(870 84.26)" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="26px">FINALS</text>
 							<text id="playoffBracket" transform="matrix(1 0 0 1 538 47.6909)" dominantBaseline="middle" textAnchor="middle" fontFamily={eventLabel.length > 50 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={black} fontStyle={"normal"} fontSize="38px">{eventLabel}</text>
 						</g>
-						<g id="finals" onClick={() => { setMatchWinner(6) }}>
+						<PlayoffMatch
+							x={784}
+							y={272.45}
+							matchNumber={6}
+							onClick={() => setMatchWinner(6)}
+							isCurrentMatch={isCurrentMatch(6)}
+							isInFinalsView={isInFinalsView}
+							getAllianceNameForDisplay={getAllianceNameForDisplay}
+							getAllianceNumbersForDisplay={getAllianceNumbersForDisplay}
+							tournamentWinner={tournamentWinner}
+							ftcMode={ftcMode}
+							colors={{ RED, BLUE, GOLD, BLACK, WHITE }}
+							fontWeights={{ bold }}
+						/>
+						{shouldDisplayFinalsMatch(6) && (
+							<FinalsMatchIndicator
+								x={910}
+								y={370}
+								matchNumber={6}
+								getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
+								getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
+								overtimeOffset={overtimeOffset}
+								colors={{ RED, BLUE, GOLD, GREEN }}
+								fontWeights={{ black, semibold }}
+							/>
+						)}
+						{shouldDisplayFinalsMatch(7) && (
+							<FinalsMatchIndicator
+								x={940}
+								y={370}
+								matchNumber={7}
+								getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
+								getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
+								overtimeOffset={overtimeOffset}
+								colors={{ RED, BLUE, GOLD, GREEN }}
+								fontWeights={{ black, semibold }}
+							/>
+						)}
+						{shouldDisplayFinalsMatch(8) && (
+							<FinalsMatchIndicator
+								x={970}
+								y={370}
+								matchNumber={8}
+								getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
+								getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
+								overtimeOffset={overtimeOffset}
+								colors={{ RED, BLUE, GOLD, GREEN }}
+								fontWeights={{ black, semibold }}
+							/>
+						)}
+						{shouldDisplayFinalsMatch(9) && (
+							<FinalsMatchIndicator
+								x={1000}
+								y={370}
+								matchNumber={9}
+								getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
+								getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
+								overtimeOffset={overtimeOffset}
+								colors={{ RED, BLUE, GOLD, GREEN }}
+								fontWeights={{ black, semibold }}
+							/>
+						)}
+						{shouldDisplayFinalsMatch(10) && (
+							<FinalsMatchIndicator
+								x={1030}
+								y={370}
+								matchNumber={10}
+								getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
+								getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
+								overtimeOffset={overtimeOffset}
+								colors={{ RED, BLUE, GOLD, GREEN }}
+								fontWeights={{ black, semibold }}
+							/>
+						)}
+						{shouldDisplayFinalsMatch(11) && (
+							<FinalsMatchIndicator
+								x={1070}
+								y={370}
+								matchNumber={11}
+								getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
+								getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
+								overtimeOffset={overtimeOffset}
+								colors={{ RED, BLUE, GOLD, GREEN }}
+								fontWeights={{ black, semibold }}
+							/>
+						)}
 
-							<g id="finalsContainer">
-								<rect id="finalsBackground" x="784" y="272.45" width="250.49" height="178.1" rx="10" ry="10" fill="#C1C1C1" stroke="#000" strokeMiterlimit="10" strokeWidth="2" />
-								<polygon points="934.7 328.56 818.43 328.56 818.43 292.54 934.7 292.54 947.64 310.55 934.7 328.56" fill={RED} stroke={(tournamentWinner?.winner === "red") ? GOLD : "none"} strokeWidth="5" />
-								<polygon points="934.7 365 818.43 365 818.43 328.99 934.7 328.99 947.64 346.99 934.7 365" fill={BLUE} stroke={(tournamentWinner?.winner === "blue") ? GOLD : "none"} strokeWidth="5" />
-								<line x1="934.7" y1="328.75" x2="796" y2="328.75" fill="none" stroke="#fff" strokeMiterlimit="10" />
-							<rect x="796" y="292.54" width="22.43" height="72.46" fill={currentPlayoffMatch >= 6 ? GOLD : BLACK} />
-							<text transform="translate(811.78 350.63) rotate(-90)" fill={currentPlayoffMatch >= 6 ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12px">FINALS</text>
-
-								<text transform="matrix(0.9941 0 0 1 880 307)" textAnchor="middle">
-									<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(6, "red") ? allianceName(6, "red") : "Winner of M3"}</tspan>
-									<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(6, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(6, "red")}</tspan></text>
-
-								<text transform="matrix(0.9941 0 0 1 880 343)" textAnchor="middle">
-									<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(6, "blue") ? allianceName(6, "blue") : "Winner of M13"}</tspan>
-									<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(6, "blue").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(6, "blue")}</tspan></text>
-							</g>
-
-							<g id="trophy">
-								<rect x="974.36" y="353.19" width="26.51" height="1.66" fill="#4a4f5d" />
-								<rect x="977.68" y="353.19" width="1.66" height="1.66" fill="#626775" />
-								<rect x="995.91" y="353.19" width="4.97" height="1.66" fill="#343845" />
-								<rect x="976.02" y="343.25" width="23.2" height="9.94" fill="#4a4f5d" />
-								<rect x="979.34" y="343.25" width="1.66" height="9.94" fill="#626775" />
-								<rect x="994.25" y="343.25" width="4.97" height="9.94" fill="#343845" />
-								<path d="m989.28,329.16c0,6.11,3.9,11.31,9.35,13.26l.6.83h-23.2l.59-.83c5.45-1.94,9.35-7.14,9.35-13.26h3.31Z" fill="#f0c833" />
-								<path d="m986.79,329.16h-.41c0,6.12-2.93,11.31-7.01,13.26l-.44.83h2.9l.3-.83c2.73-1.94,4.68-7.14,4.68-13.26Z" fill="#f6e59d" />
-								<path d="m998.62,342.42c-5.45-1.95-9.35-7.14-9.35-13.26h-.83c0,6.11,1.95,11.31,4.67,13.26l.3.83h5.8l-.6-.83Z" fill="#e8a026" />
-								<path d="m964.42,305.13c0,11.89,10.39,21.54,23.2,21.54s23.2-9.65,23.2-21.54h-46.4Zm23.2,19.06c-10.51,0-19.21-7.23-20.54-16.57h41.08c-1.32,9.34-10.03,16.57-20.53,16.57Z" fill="#f0c833" />
-								<path d="m1002.54,301.82h-29.83c0,15.56,6.68,28.17,14.91,28.17s14.91-12.61,14.91-28.17Z" fill="#f0c833" />
-								<path d="m995.08,301.82c0,15.56-3.34,28.17-7.46,28.17,8.24,0,14.91-12.61,14.91-28.17h-7.46Z" fill="#e8a026" />
-								<path d="m978.61,301.82h-2.18c0,15.56,5.01,28.17,11.19,28.17-4.98,0-9.01-12.61-9.01-28.17Z" fill="#f6e59d" />
-							</g>
-
-
-							<circle id="winnerMatch1Dot" fill={(matchWinner(6)?.winner === "red") ? RED : (matchWinner(6)?.winner === "blue") ? BLUE : (matchWinner(6)?.winner === "tie") ? GREEN : "none"} cx={`${910 - overtimeOffset}`} cy="390" r="8" />
-							<text id="finalsM1Scores" transform={`matrix(1 0 0 1 ${910 - overtimeOffset} 416)`}>
-								<tspan x="0" y="0" fill={RED} fontFamily="'myriad-pro'"
-									fontWeight={(matchWinner(6)?.winner === "red") ? black : semibold}
-									fontStyle={"normal"}
-									fontSize="14px" textAnchor="middle">{matchScore(6, "red")}</tspan>
-								<tspan x="0" y="14" fill={BLUE} fontFamily="'myriad-pro'"
-									fontWeight={(matchWinner(6)?.winner === "blue") ? black : semibold}
-									fontStyle={"normal"}
-									fontSize="14px" textAnchor="middle">{matchScore(6, "blue")}</tspan>
-							</text>
-
-							<circle id="winnerMatch2Dot" fill={(matchWinner(7)?.winner === "red") ? RED : (matchWinner(7)?.winner === "blue") ? BLUE : (matchWinner(7)?.winner === "tie") ? GREEN : "none"} cx={`${940 - overtimeOffset}`} cy="390" r="8" />
-							<text id="finalsM2Scores" transform={`matrix(1 0 0 1 ${940 - overtimeOffset} 416)`}>
-								<tspan x="0" y="0"
-									fill={RED}
-									fontFamily="'myriad-pro'"
-									fontWeight={(matchWinner(7)?.winner === "red") ? black : semibold}
-									fontStyle={"normal"}
-									fontSize="14px" textAnchor="middle">{matchScore(7, "red")}</tspan>
-								<tspan x="0" y="14" fill={BLUE}
-									fontFamily="'myriad-pro'"
-									fontWeight={(matchWinner(7)?.winner === "blue") ? black : semibold}
-									fontStyle={"normal"}
-									fontSize="14px" textAnchor="middle">{matchScore(7, "blue")}</tspan>
-							</text>
-
-							<circle id="winnerMatch3Dot" fill={(matchWinner(8)?.winner === "red") ? RED : (matchWinner(8)?.winner === "blue") ? BLUE : (matchWinner(8)?.winner === "tie") ? GREEN : "none"} cx={`${970 - overtimeOffset}`} cy="390" r="8" />
-							<text id="finalsM3Scores"
-								transform={`matrix(1 0 0 1 ${970 - overtimeOffset} 416)`}>
-								<tspan x="0" y="0"
-									fill={RED}
-									fontFamily="'myriad-pro'"
-									fontWeight={(matchWinner(8)?.winner === "red") ? black : semibold}
-									fontStyle={"normal"}
-									fontSize="14px" textAnchor="middle">{matchScore(8, "red")}</tspan>
-								<tspan x="0" y="14" fill={BLUE}
-									fontFamily="'myriad-pro'"
-									fontWeight={(matchWinner(8)?.winner === "blue") ? black : semibold}
-									fontStyle={"normal"}
-									fontSize="14px" textAnchor="middle">{matchScore(8, "blue")}</tspan>
-							</text>
-
-							<circle id="winnerMatch4Dot" fill={(matchWinner(9)?.winner === "red") ? RED : (matchWinner(9)?.winner === "blue") ? BLUE : (matchWinner(9)?.winner === "tie") ? GREEN : "none"} cx={`${1000 - overtimeOffset}`} cy="390" r="8" />
-							<text id="finalsM4Scores"
-								transform={`matrix(1 0 0 1 ${1000 - overtimeOffset} 416)`}>
-								<tspan x="0" y="0"
-									fill={RED}
-									fontFamily="'myriad-pro'"
-									fontWeight={(matchWinner(9)?.winner === "red") ? black : semibold}
-									fontStyle={"normal"}
-									fontSize="14px" textAnchor="middle">{matchScore(9, "red")}</tspan>
-								<tspan x="0" y="14" fill={BLUE}
-									fontFamily="'myriad-pro'"
-									fontWeight={(matchWinner(9)?.winner === "blue") ? black : semibold}
-									fontStyle={"normal"}
-									fontSize="14px" textAnchor="middle">{matchScore(9, "blue")}</tspan>
-							</text>
-
-							<circle id="winnerMatch5Dot" fill={(matches[10]?.winner.winner === "red") ? RED : (matches[10]?.winner.winner === "blue") ? BLUE : (matches[10]?.winner.winner === "tie") ? GREEN : "none"} cx={`${1030 - overtimeOffset}`} cy="390" r="8" />
-							<text id="finalsM5Scores"
-								transform={`matrix(1 0 0 1 ${1030 - overtimeOffset} 416)`}>
-								<tspan x="0" y="0"
-									fill={RED}
-									fontFamily="'myriad-pro'"
-									fontWeight={(matches[10]?.winner.winner === "red") ? black : semibold}
-									fontStyle={"normal"}
-									fontSize="14px" textAnchor="middle">{matchScore(10, "red")}</tspan>
-								<tspan x="0" y="14" fill={BLUE}
-									fontFamily="'myriad-pro'"
-									fontWeight={(matches[10]?.winner.winner === "blue") ? black : semibold}
-									fontStyle={"normal"}
-									fontSize="14px" textAnchor="middle">{matchScore(10, "blue")}</tspan>
-							</text>
-
-							<circle id="winnerMatch6Dot" fill={(matchWinner(11)?.winner === "red") ? RED : (matchWinner(11)?.winner === "blue") ? BLUE : (matches[10]?.winner.winner === "tie") ? GREEN : "none"} cx={`${1070 - overtimeOffset}`} cy="390" r="8" />
-							<text id="finalsM5Scores"
-								transform={`matrix(1 0 0 1 ${1070 - overtimeOffset} 416)`}>
-								<tspan x="0" y="0"
-									fill={RED}
-									fontFamily="'myriad-pro'"
-									fontWeight={(matchWinner(11)?.winner === "red") ? black : semibold}
-									fontStyle={"normal"}
-									fontSize="14px" textAnchor="middle">{matchScore(11, "red")}</tspan>
-								<tspan x="0" y="14" fill={BLUE}
-									fontFamily="'myriad-pro'"
-									fontWeight={(matchWinner(11)?.winner === "blue") ? black : semibold}
-									fontStyle={"normal"}
-									fontSize="14px" textAnchor="middle">{matchScore(11, "blue")}</tspan>
-							</text>
-
-
-						</g>
-
-						<g id="match5" onClick={() => { setMatchWinner(5) }}>
-							<g>
-								<polygon fill={RED} points="691.7 504.56 555.43 504.56 555.43 468.54 691.7 468.54 704.64 486.55 691.7 504.56" stroke={(matchWinner(5)?.winner === "red" || matchWinner(5)?.tieWinner === "red") ? GOLD : "none"} strokeWidth="5" />
-								<polygon fill={BLUE} points="691.7 541 555.43 541 555.43 504.99 691.7 504.99 704.64 522.99 691.7 541" stroke={(matchWinner(5)?.winner === "blue" || matchWinner(5)?.tieWinner === "blue") ? GOLD : "none"} strokeWidth="5" />
-								<line fill="none" stroke="#FFFFFF" strokeMiterlimit="10" x1="691.7" y1="504.75" x2="533" y2="504.75" />
-								<rect x="533" y="468.54" width="22.43" height="72.46" fill={currentPlayoffMatch === 5 ? GOLD : BLACK} />
-								<text transform="matrix(0 -1.0059 1 0 548.78 528.26)" fill={currentPlayoffMatch === 5 ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">MATCH 5</text>
-								<text transform="matrix(0.9941 0 0 1 608 483.18)" textAnchor="middle">
-									<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px" textAnchor="middle">{allianceName(5, "red") ? allianceName(5, "red") : "Losing Alliance of M3"}</tspan>
-									<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(5, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(5, "red")}</tspan></text>
-								<text transform="matrix(0.9941 0 0 1 608 519.62)" textAnchor="middle">
-									<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(5, "blue") ? allianceName(5, "blue") : "Winning Alliance of M4"}</tspan>
-									<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(5, "blue").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(5, "blue")}</tspan></text>
-								<circle id="match5RedDot" fill={(matchWinner(5)?.winner === "red") ? GOLD : ((matchWinner(5)?.winner === "tie") ? GREEN : "none")} cx="705" cy="485" r="8" />
-								<circle id="match5BlueDot" fill={(matchWinner(5)?.winner === "blue") ? GOLD : ((matchWinner(5)?.winner === "tie") ? GREEN : "none")} cx="705" cy="522" r="8" />
-
-								<text id="M5BlueScore" transform="matrix(1 0 0 1 675 525.63)" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="15px" textAnchor="middle">{matchScore(5, "blue")}</text>
-
-								<text id="M5RedScore" transform="matrix(1 0 0 1 675 489.63)" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="15px" textAnchor="middle">{matchScore(5, "red")}</text>
-							</g>
-						</g>
-
+						<Match
+							x={533}
+							y={468.54}
+							matchNumber={5}
+							onClick={() => setMatchWinner(5)}
+							isCurrentMatch={isCurrentMatch(5)}
+							getMatchLabel={getMatchLabel}
+							getAllianceNameForDisplay={getAllianceNameForDisplay}
+							getAllianceNumbersForDisplay={getAllianceNumbersForDisplay}
+							getMatchWinnerForDisplay={getMatchWinnerForDisplay}
+							getMatchScoreForDisplay={getMatchScoreForDisplay}
+							colors={{ RED, BLUE, GOLD, GREEN, BLACK, WHITE }}
+							fontWeights={{ bold }}
+						/>
 						{/* FTC reverses Match 3 and 4 when compared to FRC. */}
-						<g id="match3" onClick={() => { setMatchWinner(3) }}>
-							<g>
-								<polygon fill={RED} points="449.7 574.56 313.43 574.56 313.43 538.54 449.7 538.54 462.64 556.55 449.7 574.56" stroke={(matchWinner(3)?.winner === "red" || matchWinner(3)?.tieWinner === "red") ? GOLD : "none"} strokeWidth="5" />
-								<polygon fill={BLUE} points="449.7 611 313.43 611 313.43 574.99 449.7 574.99 462.64 592.99 449.7 611" stroke={(matchWinner(3)?.winner === "blue" || matchWinner(3)?.tieWinner === "blue") ? GOLD : "none"} strokeWidth="5" />
-								<line fill="none" stroke="#FFFFFF" strokeMiterlimit="10" x1="449.7" y1="574.75" x2="291" y2="574.75" />
-								<rect x="291" y="538.54" width="22.43" height="72.46" fill={currentPlayoffMatch === 3 ? GOLD : BLACK} />
-								<text transform="matrix(0 -1.0059 1 0 306.78 598.26)" fill={currentPlayoffMatch === 3 ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">MATCH 3</text>
-								<text transform="matrix(0.9941 0 0 1 370 553.18)" textAnchor="middle">
-									<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(4, "red") ? allianceName(3, "red") : "TBD"}</tspan>
-									<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(3, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(3, "red")}</tspan></text>
-								<text transform="matrix(0.9941 0 0 1 370 589.62)" textAnchor="middle">
-									<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(3, "blue") ? allianceName(3, "blue") : "TBD"}</tspan>
-									<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(3, "blue").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(3, "blue")}</tspan></text>
-								<circle id="match3RedDot" fill={(matchWinner(3)?.winner === "red") ? GOLD : ((matchWinner(3)?.winner === "tie") ? GREEN : "none")} cx="464" cy="556" r="8" />
-								<circle id="match3BlueDot" fill={(matchWinner(3)?.winner === "blue") ? GOLD : ((matchWinner(3)?.winner === "tie") ? GREEN : "none")} cx="464" cy="593" r="8" />
-
-								<text id="M3BlueScore" transform="matrix(1 0 0 1 435 595.63)" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="15px" textAnchor="middle">{matchScore(3, "blue")}</text>
-
-								<text id="M3RedScore" transform="matrix(1 0 0 1 435 559.63)" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="15px" textAnchor="middle">{matchScore(3, "red")}</text>
-							</g>
-						</g>
-
+						<Match
+							x={291}
+							y={538.54}
+							matchNumber={3}
+							onClick={() => setMatchWinner(3)}
+							isCurrentMatch={isCurrentMatch(3)}
+							getMatchLabel={getMatchLabel}
+							getAllianceNameForDisplay={getAllianceNameForDisplay}
+							getAllianceNumbersForDisplay={getAllianceNumbersForDisplay}
+							getMatchWinnerForDisplay={getMatchWinnerForDisplay}
+							getMatchScoreForDisplay={getMatchScoreForDisplay}
+							colors={{ RED, BLUE, GOLD, GREEN, BLACK, WHITE }}
+							fontWeights={{ bold }}
+						/>
 						{/* FTC reverses Match 3 and 4 when compared to FRC. */}
-						<g id="match4" onClick={() => { setMatchWinner(4) }}>
-							<g>
-								<polygon fill={RED} points="447.7 174.56 311.43 174.56 311.43 138.54 447.7 138.54 460.64 156.55 447.7 174.56" stroke={(matchWinner(34)?.winner === "red" || matchWinner(4)?.tieWinner === "red") ? GOLD : "none"} strokeWidth="5" />
-								<polygon fill={BLUE} points="447.7 211 311.43 211 311.43 174.99 447.7 174.99 460.64 192.99 447.7 211" stroke={(matchWinner(4)?.winner === "blue" || matchWinner(4)?.tieWinner === "blue") ? GOLD : "none"} strokeWidth="5" />
-								<line fill="none" stroke="#FFFFFF" strokeMiterlimit="10" x1="447.7" y1="174.75" x2="289" y2="174.75" />
-								<rect x="289" y="138.54" width="22.43" height="72.46" fill={currentPlayoffMatch === 4 ? GOLD : BLACK} />
-								<text transform="matrix(0 -1.0059 1 0 304.78 198.26)" fill={currentPlayoffMatch === 4 ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">MATCH 4</text>
-								<text transform="matrix(0.9941 0 0 1 370 153.18)" textAnchor="middle">
-									<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(4, "red") ? allianceName(4, "red") : "TBD"}</tspan>
-									<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(4, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(4, "red")}</tspan></text>
-								<text transform="matrix(0.9941 0 0 1 370 189.62)" textAnchor="middle">
-									<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(3, "blue") ? allianceName(4, "blue") : "TBD"}</tspan>
-									<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(4, "blue").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(4, "blue")}</tspan></text>
-								<circle id="match4RedDot" fill={(matchWinner(4)?.winner === "red") ? GOLD : ((matchWinner(4)?.winner === "tie") ? GREEN : "none")} cx="464" cy="156" r="8" />
-								<circle id="match4BlueDot" fill={(matchWinner(4)?.winner === "blue") ? GOLD : ((matchWinner(4)?.winner === "tie") ? GREEN : "none")} cx="464" cy="193" r="8" />
+						<Match
+							x={289}
+							y={138.54}
+							matchNumber={4}
+							onClick={() => setMatchWinner(4)}
+							isCurrentMatch={isCurrentMatch(4)}
+							getMatchLabel={getMatchLabel}
+							getAllianceNameForDisplay={getAllianceNameForDisplay}
+							getAllianceNumbersForDisplay={getAllianceNumbersForDisplay}
+							getMatchWinnerForDisplay={getMatchWinnerForDisplay}
+							getMatchScoreForDisplay={getMatchScoreForDisplay}
+							colors={{ RED, BLUE, GOLD, GREEN, BLACK, WHITE }}
+							fontWeights={{ bold }}
+						/>
+						<Match
+							x={64}
+							y={177.54}
+							matchNumber={2}
+							onClick={() => setMatchWinner(2)}
+							isCurrentMatch={isCurrentMatch(2)}
+							getMatchLabel={getMatchLabel}
+							getAllianceNameForDisplay={getAllianceNameForDisplay}
+							getAllianceNumbersForDisplay={getAllianceNumbersForDisplay}
+							getMatchWinnerForDisplay={getMatchWinnerForDisplay}
+							getMatchScoreForDisplay={getMatchScoreForDisplay}
+							colors={{ RED, BLUE, GOLD, GREEN, BLACK, WHITE }}
+							fontWeights={{ bold }}
+						/>
+						<Match
+							x={64}
+							y={100.54}
+							matchNumber={1}
+							onClick={() => setMatchWinner(1)}
+							isCurrentMatch={isCurrentMatch(1)}
+							getMatchLabel={getMatchLabel}
+							getAllianceNameForDisplay={getAllianceNameForDisplay}
+							getAllianceNumbersForDisplay={getAllianceNumbersForDisplay}
+							getMatchWinnerForDisplay={getMatchWinnerForDisplay}
+							getMatchScoreForDisplay={getMatchScoreForDisplay}
+							colors={{ RED, BLUE, GOLD, GREEN, BLACK, WHITE }}
+							fontWeights={{ bold }}
+						/>
 
-								<text id="43BlueScore" transform="matrix(1 0 0 1 435 196.63)" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="15px" textAnchor="middle">{matchScore(4, "blue")}</text>
-
-								<text id="M4RedScore" transform="matrix(1 0 0 1 435 160.63)" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="15px" textAnchor="middle">{matchScore(4, "red")}</text>
-							</g>
-						</g>
-
-						<g id="match2" onClick={() => { setMatchWinner(2) }}>
-							<g>
-								<polygon fill={RED} points="222.7 213.56 86.43 213.56 86.43 177.54 222.7 177.54 235.64 195.55 222.7 213.56" stroke={(matchWinner(2)?.winner === "red" || matchWinner(2)?.tieWinner === "red") ? GOLD : "none"} strokeWidth="5" />
-								<polygon fill={BLUE} points="222.7 250 86.43 250 86.43 213.99 222.7 213.99 235.64 231.99 222.7 250" stroke={(matchWinner(2)?.winner === "blue" || matchWinner(2)?.tieWinner === "blue") ? GOLD : "none"} strokeWidth="5" />
-								<line x1="222.7" y1="213.75" x2="64" y2="213.75" fill="none" stroke="#fff" strokeMiterlimit="10" />
-								<rect x="64" y="177.54" width="22.43" height="72.46" fill={currentPlayoffMatch === 2 ? GOLD : BLACK} />
-								<text transform="matrix(0 -1.0059 1 0 79.78 237.26)" fill={currentPlayoffMatch === 2 ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">MATCH 2</text>
-								<text transform="matrix(0.9941 0 0 1 145 192.18)" textAnchor="middle">
-									<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(2, "red") ? allianceName(2, "red") : "DIVISION C"}</tspan><tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(2, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(2, "red")}</tspan></text>
-								<text transform="matrix(0.9941 0 0 1 145 228.62)" textAnchor="middle">
-									<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(2, "blue") ? allianceName(2, "blue") : "DIVISION D"}</tspan><tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(2, "blue").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(2, "blue")}</tspan></text>
-								<circle id="match2RedDot" fill={(matchWinner(2)?.winner === "red") ? GOLD : ((matchWinner(2)?.winner === "tie") ? GREEN : "none")} cx="236" cy="195" r="8" />
-								<circle id="match2BlueDot" fill={(matchWinner(2)?.winner === "blue") ? GOLD : ((matchWinner(2)?.winner === "tie") ? GREEN : "none")} cx="237" cy="232" r="8" />
-
-								<text id="M2BlueScore" transform="matrix(1 0 0 1 210 236.63)" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="15px" textAnchor="middle">{matchScore(2, "blue")}</text>
-
-								<text id="M2RedScore" transform="matrix(1 0 0 1 210 200.63)" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="15px" textAnchor="middle">{matchScore(2, "red")}</text>
-							</g>
-						</g>
-
-						<g id="match1" onClick={() => { setMatchWinner(1) }}>
-							<g>
-								<polygon fill={RED} points="222.7 136.56 86.43 136.56 86.43 100.54 222.7 100.54 235.64 118.55 222.7 136.56" stroke={(matchWinner(1)?.winner === "red" || matchWinner(1)?.tieWinner === "red") ? GOLD : "none"} strokeWidth="5" />
-								<polygon fill={BLUE} points="222.7 173 86.43 173 86.43 136.99 222.7 136.99 235.64 154.99 222.7 173" stroke={(matchWinner(1)?.winner === "blue" || matchWinner(1)?.tieWinner === "blue") ? GOLD : "none"} strokeWidth="5" />
-								<line x1="222.7" y1="136.75" x2="64" y2="136.75" fill="none" stroke="#fff" strokeMiterlimit="10" />
-								<rect x="64" y="100.54" width="22.43" height="72.46" fill={currentPlayoffMatch === 1 ? GOLD : BLACK} />
-								<text transform="matrix(0 -1.0059 1 0 79.78 160.26)" fill={currentPlayoffMatch === 1 ? BLACK : WHITE} fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.076px">MATCH 1</text>
-								<text transform="matrix(0.9941 0 0 1 145 115.18)" textAnchor="middle">
-									<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(1, "red") ? allianceName(1, "red") : "DIVISION A"}</tspan>
-									<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(1, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(1, "red")}</tspan></text>
-								<text transform="matrix(0.9941 0 0 1 145 151.62)" textAnchor="middle">
-									<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceName(1, "blue") ? allianceName(1, "blue") : "DIVISION B"}</tspan>
-									<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={allianceNumbers(1, "blue").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle={"normal"} fontSize="12.1471px">{allianceNumbers(1, "blue")}</tspan>
-								</text>
-								<circle id="match1RedDot" fill={(matchWinner(1)?.winner === "red") ? GOLD : ((matchWinner(1)?.winner === "tie") ? GREEN : "none")} cx="236" cy="118" r="8" />
-								<circle id="match1BlueDot" fill={(matchWinner(1)?.winner === "blue") ? GOLD : ((matchWinner(1)?.winner === "tie") ? GREEN : "none")} cx="236" cy="155" r="8" />
-
-								<text id="M1BlueScore" transform="matrix(1 0 0 1 210 159.63)" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="15px" textAnchor="middle">{matchScore(1, "blue")}</text>
-
-								<text id="M1RedScore" transform="matrix(1 0 0 1 210 123.63)" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle={"normal"} fontSize="15px" textAnchor="middle">{matchScore(1, "red")}</text>
-							</g>
-						</g>
 					</svg>
 					<Modal centered={true} show={showSelectWinner} size="lg" onHide={handleClose}>
 						<Modal.Header className={"allianceAccept"} closeVariant={"white"} closeButton>
@@ -568,7 +856,7 @@ function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previous
 						<Modal.Body>
 							<Container fluid>
 								<Row>
-									<Col style={{ backgroundColor: "red", color: "white", fontWeight: "bold", fontSize: "40px", textAlign: "center", padding: "50px 0" }} xs={(winnerMatch < 14) ? 5 : 4} onClick={() => { handleChooseWinner("red") }} variant="danger">{allianceName(winnerMatch, "red")}</Col>
+									<Col style={{ backgroundColor: "red", color: "white", fontWeight: "bold", fontSize: "40px", textAlign: "center", padding: "50px 0" }} xs={(winnerMatch < 14) ? 5 : 4} onClick={() => { handleChooseWinner("red") }} variant="danger">{getAllianceNameForDisplay(winnerMatch, "red")}</Col>
 									{(winnerMatch < 14) &&
 										<Col xs={2}></Col>}
 									{((offlinePlayoffSchedule?.schedule?.length > 14) && (winnerMatch >= 14)) &&
@@ -578,7 +866,7 @@ function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previous
 											<Col xs={1}></Col>
 										</>
 									}
-									<Col style={{ backgroundColor: "blue", color: "white", fontWeight: "bold", fontSize: "40px", textAlign: "center", padding: "50px 0" }} xs={(winnerMatch < 14) ? 5 : 4} onClick={() => { handleChooseWinner("blue") }}>{allianceName(winnerMatch, "blue")}</Col>
+									<Col style={{ backgroundColor: "blue", color: "white", fontWeight: "bold", fontSize: "40px", textAlign: "center", padding: "50px 0" }} xs={(winnerMatch < 14) ? 5 : 4} onClick={() => { handleChooseWinner("blue") }}>{getAllianceNameForDisplay(winnerMatch, "blue")}</Col>
 								</Row>
 							</Container>
 						</Modal.Body>
@@ -594,7 +882,7 @@ function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previous
 							<Container fluid>
 								<Row>
 									<Col xs={4}></Col>
-									<Col style={{ backgroundColor: winningAlliance === "blue" ? "blue" : winningAlliance === "red" ? "red" : "green", color: "white", fontWeight: "bold", fontSize: "40px", textAlign: "center", padding: "50px 0" }} xs={4} onClick={handleConfirmWinner}>{winningAlliance === "tie" ? "It's a tie!" : allianceName(winnerMatch, winningAlliance)}</Col>
+									<Col style={{ backgroundColor: winningAlliance === "blue" ? "blue" : winningAlliance === "red" ? "red" : "green", color: "white", fontWeight: "bold", fontSize: "40px", textAlign: "center", padding: "50px 0" }} xs={4} onClick={handleConfirmWinner}>{winningAlliance === "tie" ? "It's a tie!" : getAllianceNameForDisplay(winnerMatch, winningAlliance)}</Col>
 									<Col xs={4}></Col>
 								</Row>
 							</Container>
