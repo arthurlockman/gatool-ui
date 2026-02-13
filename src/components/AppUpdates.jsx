@@ -1,5 +1,15 @@
 export const appUpdates = [
   {
+    date: "February 13, 2026",
+    message: (
+      <ul>
+        <li>FTC:</li>
+        <ul>
+          <li>Fixed a bug where team avatars were not displaying correctly on Team Data and Cheat Sheet pages</li>
+        </ul>
+      </ul>
+    ),
+  },{
     date: "February 2, 2026",
     message: (
       <ul>

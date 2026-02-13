@@ -740,7 +740,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
      */
     const handleResetProceed = async () => {
         setShowResetConfirm(false);
-        
+
         // Clone local updates and remove sponsor and robot name fields
         var localUpdatesTemp = _.cloneDeep(localUpdates);
         // Don't modify communityUpdates - it represents server state
@@ -769,16 +769,16 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         // by explicitly removing the sponsor/robot name fields
         teamsToReset.forEach((teamNumber) => {
             const existsInLocalUpdates = _.findIndex(localUpdatesTemp, { "teamNumber": teamNumber }) >= 0;
-            
+
             if (!existsInLocalUpdates) {
                 // Get the community update for this team
                 const communityUpdate = find(communityUpdates, { "teamNumber": teamNumber });
-                
+
                 if (communityUpdate && communityUpdate.updates) {
                     // Create a local update that removes the sponsor/robot name fields
                     // Start with a copy of the community update
                     const resetUpdate = _.cloneDeep(communityUpdate.updates);
-                    
+
                     // Remove sponsor/robot name fields
                     delete resetUpdate.topSponsorsLocal;
                     delete resetUpdate.topSponsorLocal;
@@ -788,7 +788,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                         delete resetUpdate.teamNotes;
                     }
                     resetUpdate.lastUpdate = moment().format();
-                    
+
                     // Add to localUpdates so Setup page can detect it
                     localUpdatesTemp.push({
                         teamNumber: teamNumber,
@@ -1006,15 +1006,15 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                     <tbody>
                         {teamList && teamList?.teams && teamListExtended.map((team) => {
                             var cityState = `${team?.city}, ${team?.stateProv}${(team?.country !== "USA") ? ", " + team?.country : ""}`;
-                            var avatar = `<img src='${apiBaseUrl}${selectedYear.value}/avatars/team/${team?.teamNumber}/avatar.png' onerror="this.style.display='none'">&nbsp`;
+                            var avatar = ftcMode ? `<span class="team-avatar team-${team?.teamNumber}"></span>` : `<img src='${apiBaseUrl}${selectedYear.value}/avatars/team/${team?.teamNumber}/avatar.png' onerror="this.style.display='none'">&nbsp`;
                             var teamNameWithAvatar = team?.updates?.nameShortLocal ? team?.updates?.nameShortLocal : team?.nameShort;
-                            teamNameWithAvatar = !ftcMode ? avatar + "<br />" + teamNameWithAvatar : teamNameWithAvatar;
+                            teamNameWithAvatar = avatar + "<br />" + teamNameWithAvatar;
 
                             return <tr key={`teamDataRow${team?.teamNumber}`}>
                                 <TeamTimer team={team} lastVisit={lastVisit} monthsWarning={monthsWarning} handleShow={handleShow} currentTime={currentTime} />
                                 <td style={rankHighlight(team?.rank ? team?.rank : 100, allianceCount || { "count": 8 })}>{team?.rank}</td>
-                                {ftcMode && <td style={updateHighlight(team?.updates?.nameShortLocal)}>{teamNameWithAvatar}</td>}
-                                {!ftcMode && <td dangerouslySetInnerHTML={{ __html: teamNameWithAvatar }} style={updateHighlight(team?.updates?.nameShortLocal)}></td>}
+                                
+                                <td dangerouslySetInnerHTML={{ __html: teamNameWithAvatar }} style={updateHighlight(team?.updates?.nameShortLocal)}></td>
                                 <td style={updateHighlight(team?.updates?.cityStateLocal)}>{team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : cityState} </td>
                                 {(selectedEvent?.value?.type === "Championship" || selectedEvent?.value?.type === "ChampionshipDivision") ?
                                     <td style={updateHighlight(team?.updates?.topSponsorLocal)}>{team?.updates?.topSponsorLocal ? team?.updates?.topSponsorLocal : team?.topSponsor}</td> :

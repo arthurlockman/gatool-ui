@@ -5278,6 +5278,32 @@ function App() {
     }
   }, [ftcMode, manualOfflineMode, setManualOfflineMode]);
 
+  // Load FTC avatars composed CSS when in ftcMode (season+1 for next-season avatar styles)
+  useEffect(() => {
+    const linkId = "ftc-avatars-composed-css";
+    if (!ftcMode || !selectedYear?.value) {
+      const existing = document.getElementById(linkId);
+      if (existing) existing.remove();
+      return;
+    }
+    const seasonPlusOne = Number(selectedYear.value) + 1;
+    const href = `https://ftc-scoring.firstinspires.org/avatars/composed/${seasonPlusOne}.css`;
+    const existingLink = document.getElementById(linkId);
+    if (existingLink) {
+      if (existingLink.getAttribute("href") === href) return;
+      existingLink.remove();
+    }
+    const linkEl = document.createElement("link");
+    linkEl.id = linkId;
+    linkEl.rel = "stylesheet";
+    linkEl.href = href;
+    document.head.appendChild(linkEl);
+    return () => {
+      const el = document.getElementById(linkId);
+      if (el) el.remove();
+    };
+  }, [ftcMode, selectedYear?.value]);
+
   // Refresh team list when showBlueBanners is enabled to fetch blue banner data
   useEffect(() => {
     if (showBlueBanners === true && !ftcMode && selectedEvent && teamList?.teams?.length > 0 && isOnline) {
