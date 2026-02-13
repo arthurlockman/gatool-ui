@@ -27,7 +27,7 @@ function CheatsheetPage({
       backHTML: "",
       style: { width: "500px", height: "300px" },
     };
-    var avatar = `<img src="${apiBaseUrl}${selectedYear.value}/avatars/team/${team?.teamNumber}/avatar.png" onerror="this.style.display='none'">&nbsp`;
+    var avatar = ftcMode?`<span class="team-avatar team-${team?.teamNumber}"></span>`:`<img src="${apiBaseUrl}${selectedYear.value}/avatars/team/${team?.teamNumber}/avatar.png" onerror="this.style.display='none'">&nbsp`;
     var robotImage = _.filter(robotImages, { teamNumber: team?.teamNumber })[0]
       ?.imageUrl
       ? `<img height="225px" src="${
