@@ -148,6 +148,10 @@ class AuthClient {
       errorText +=
         " Your session may have expired. Please log out and log in again.";
     }
+    if (response.status === 403) {
+      errorText +=
+        " You don't have permission to perform this action. You may need to be an event admin or have a specific role to update event notifications.";
+    }
     if (response.status === 500) {
       errorText +=
         " Something happened in the backend that we don't understand. We have logged the request and will investigate soon.";

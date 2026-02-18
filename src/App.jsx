@@ -1058,7 +1058,10 @@ function App() {
       if (result.status === 200) {
         // @ts-ignore
         const eventData = await result.json();
-        const remappedTeams = eventData?.remapTeams || null;
+        const remappedTeams = eventData?.remapTeams ?? null;
+        if (remappedTeams == null || typeof remappedTeams !== "object") {
+          return null;
+        }
         const keys = Object.keys(remappedTeams);
         const remappedTeamsObject = { numbers: {}, strings: {} };
         keys.forEach((key, index) => {
@@ -4381,6 +4384,9 @@ function App() {
    * @returns {Promise<object>} The team's update history array
    */
   async function getEventNotifications() {
+    if (!selectedEvent?.value?.code) {
+      return [];
+    }
     var result = await httpClient.getNoAuth(
       `announcements/${selectedEvent?.value?.code}`
     );
@@ -4388,17 +4394,27 @@ function App() {
     if (result.status === 200) {
       // Check if there's content before trying to parse JSON
       // result might be a Response object or a plain object, so check for headers
-      if ('headers' in result && result.headers) {
-        const contentLength = result.headers.get('content-length');
-        if (contentLength === '0' || contentLength === null) {
-          // No content, return empty array
-          return [];
-        }
-      }
+      // if ('headers' in result && result.headers) {
+      //   const contentLength = result.headers.get('content-length');
+      //   if (contentLength === '0' || contentLength === null) {
+      //     // No content, return empty array
+      //     return [];
+      //   }
+      // }
       try {
         // @ts-ignore
         var notifications = await result.json();
-        return notifications;
+        // API may return array or wrapped object (e.g. { announcements: [...] })
+        if (Array.isArray(notifications)) {
+          return notifications;
+        }
+        if (notifications && Array.isArray(notifications.announcements)) {
+          return notifications.announcements;
+        }
+        if (notifications && typeof notifications === 'object') {
+          return [notifications];
+        }
+        return [];
       } catch (e) {
         // If JSON parsing fails (e.g., empty body), return empty array
         return [];
@@ -4418,6 +4434,9 @@ function App() {
           user: null,
         },
       ];
+    } else if (result.status === 408) {
+      // Request timeout - return empty so we don't show an error banner; leave event list unchanged
+      return [];
     } else {
       return [
         {
@@ -4474,20 +4493,31 @@ function App() {
     }
 
     var message = await getEventNotifications();
-    if (Array.isArray(message) && message[0]?.message.includes("**Error**")) {
+    const list = Array.isArray(message) ? message : [];
+    const isErrorResponse = list.length > 0 && list[0]?.message?.includes?.("**Error**");
+    if (isErrorResponse) {
       console.log(`No Event Messages found for ${selectedEvent?.label}`);
-    } else {
-      var formattedMessage = message.map((item) => {
-        return {
-          message: item?.message,
-          expiry: moment(`${item?.offDate} ${item?.offTime}`),
-          onTime: moment(`${item?.onDate} ${item?.onTime}`),
-          variant: item?.variant || "",
-          user: item?.user || null,
-        };
-      });
-      setEventMessage(formattedMessage);
+      setEventMessage([]);
+      return;
     }
+
+    var formattedMessage = list.map((item) => {
+      const onM = item?.onDate != null && item?.onTime != null
+        ? moment(`${item.onDate} ${item.onTime}`)
+        : moment();
+      const offM = item?.offDate != null && item?.offTime != null
+        ? moment(`${item.offDate} ${item.offTime}`)
+        : moment().add(1, "days");
+      return {
+        message: item?.message ?? "",
+        expiry: offM,
+        onTime: onM,
+        variant: item?.variant || "primary",
+        user: item?.user ?? null,
+        link: item?.link ?? "",
+      };
+    });
+    setEventMessage(formattedMessage);
   };
 
   /**
@@ -4694,7 +4724,7 @@ function App() {
       getTeamList();
       await getSchedule(true);
       getSystemMessages();
-      getEventMessages();
+      await getEventMessages();
       getWorldStats();
     }
   };

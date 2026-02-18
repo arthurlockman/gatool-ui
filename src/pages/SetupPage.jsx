@@ -231,24 +231,33 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
         setManageAnnouncements(false);
     }
 
-    const handleEventNotificationSave = () => {
-        setEventMessage(_.filter(eventMessageFormData, function (o) {
-            return (o.message !== "")
+    const handleEventNotificationSave = async () => {
+        if (!selectedEvent?.value?.code) {
+            toast.error("Please select an event before saving event notifications.");
+            return;
+        }
+        const filteredMessages = _.filter(eventMessageFormData, (o) => o.message !== "");
+        const eventMessageFormDataTemp = eventMessageFormData.map((message) => ({
+            ...message,
+            onDate: moment(message.onTime).format("YYYY-MM-DD"),
+            onTime: moment(message.onTime).format("HH:mm:ss"),
+            offDate: moment(message.expiry).format("YYYY-MM-DD"),
+            offTime: moment(message.expiry).format("HH:mm:ss"),
         }));
-        let eventMessageFormDataTemp = eventMessageFormData.map((message) => {
-            return {
-                ...message,
-                onDate: moment(message.onTime).format("YYYY-MM-DD"),
-                onTime: moment(message.onTime).format("HH:mm:ss"),
-                offDate: moment(message.expiry).format("YYYY-MM-DD"),
-                offTime: moment(message.expiry).format("HH:mm:ss"),
+
+        try {
+            const result = await putEventNotifications(eventMessageFormDataTemp);
+            if (result?.status === 200 || result?.status === 204) {
+                setEventMessage(filteredMessages);
+                setEventMessageFormData(null);
+                setManageAnnouncements(false);
+                toast.success("Event notifications saved successfully.");
+            } else {
+                toast.error(`Save failed: ${result?.statusText || "Unknown error"}. Please try again.`);
             }
-        });
-
-        putEventNotifications(eventMessageFormDataTemp);
-
-        setEventMessageFormData(null);
-        setManageAnnouncements(false);
+        } catch (e) {
+            // Error toast already shown by httpClient; keep modal open so user can retry or fix
+        }
     }
 
     const handleUseCheesy = async (checked) => {
@@ -850,7 +859,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                             <Form.Control
                                                 size="sm"
                                                 type="datetime-local"
-                                                value={moment(message?.onTime).format("YYYY-MM-DDTHH:mm")}
+                                                value={message?.onTime && moment(message.onTime).isValid() ? moment(message.onTime).format("YYYY-MM-DDTHH:mm") : ""}
                                                 onChange={(e) =>
                                                     handleEventNotification("onTime", index, e.target.value, user)
                                                 }
@@ -862,7 +871,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                             <Form.Control
                                                 size="sm"
                                                 type="datetime-local"
-                                                value={moment(message?.expiry).format("YYYY-MM-DDTHH:mm")}
+                                                value={message?.expiry && moment(message.expiry).isValid() ? moment(message.expiry).format("YYYY-MM-DDTHH:mm") : ""}
                                                 onChange={(e) =>
                                                     handleEventNotification("expiry", index, e.target.value, user)
                                                 }
