@@ -22,7 +22,7 @@ const NotificationBanner = ({
             setSystemBell(JSON.stringify(notification));
           }}
           variant={notification?.variant ? notification?.variant : "primary"}
-          style={{ padding: "6px", marginBottom: "2px" }}
+          style={{ padding: "6px", marginBottom: "10px", fontSize: "1.5em" }}
         >
           <b>{notification?.message}</b>
           {notification?.link ? (

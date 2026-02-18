@@ -13,6 +13,7 @@ import {
 } from "react-bootstrap";
 import moment from "moment";
 import _ from "lodash";
+import { toast } from "react-toastify";
 import NotificationBanner from "components/NotificationBanner";
 
 function Developer({
@@ -204,7 +205,6 @@ function Developer({
   };
 
   const handleMessage = async () => {
-    console.log(formValue);
     const submission = {
       message: formValue.message,
       onTime: formValue.onTime,
@@ -214,24 +214,50 @@ function Developer({
       variant: formValue.variant,
       link: formValue.link,
     };
-    const result = await putNotifications(submission);
-    if (result.status === 200) {
-      console.log("message set.");
-    } else {
-      console.log("message not set.");
+    try {
+      const result = await putNotifications(submission);
+      if (result?.status === 200 || result?.status === 204) {
+        toast.success("System message saved successfully.");
+      } else {
+        toast.error(`Save failed: ${result?.statusText || "Unknown error"}. Please try again.`);
+      }
+    } catch (e) {
+      // Error toast already shown by httpClient (e.g. 403)
     }
   };
 
   const handleGetMessage = async () => {
     const message = await getNotifications();
-    console.log(message);
-    setFormValue(message);
+    if (message?.message?.includes?.("**Error**")) {
+      toast.error("Could not load system message.");
+      return;
+    }
+    const formData = {
+      message: message?.message ?? "",
+      onTime: message?.onTime ?? "",
+      offTime: message?.offTime ?? "",
+      onDate: message?.onDate ?? "",
+      offDate: message?.offDate ?? "",
+      variant: message?.variant ?? "",
+      link: message?.link ?? "",
+    };
+    setFormValue(formData);
+    const offDate = message?.offDate;
+    const offTime = message?.offTime;
+    const onDate = message?.onDate;
+    const onTime = message?.onTime;
+    const expiry = offDate != null && offTime != null && String(offDate) && String(offTime)
+      ? moment(`${offDate} ${offTime}`)
+      : null;
+    const onTimeMoment = onDate != null && onTime != null && String(onDate) && String(onTime)
+      ? moment(`${onDate} ${onTime}`)
+      : null;
     setFormattedMessage({
-      message: formValue?.message,
-      expiry: moment(`${formValue?.offDate} ${formValue?.offTime}`),
-      onTime: moment(`${formValue?.onDate} ${formValue?.onTime}`),
-      variant: formValue?.variant || "",
-      link: formValue?.link,
+      message: formData.message,
+      expiry: expiry ?? moment(),
+      onTime: onTimeMoment ?? moment(),
+      variant: formData.variant,
+      link: formData.link,
     });
   };
 
