@@ -1,5 +1,15 @@
 export const appUpdates = [
   {
+    date: "February 16, 2026",
+    message: (
+      <ul>
+        <li>ALL PROGRAMS:</li>
+        <ul>
+          <li>Fixed a bug which prevented event notifications from displaying correctly</li>
+        </ul>
+      </ul>
+    ),
+  },{
     date: "February 13, 2026",
     message: (
       <ul>
