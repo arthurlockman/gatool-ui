@@ -1,11 +1,13 @@
 export const appUpdates = [
   {
-    date: "February 16, 2026",
+    date: "February 18, 2026",
     message: (
       <ul>
         <li>ALL PROGRAMS:</li>
         <ul>
           <li>Fixed a bug which prevented event notifications from displaying correctly</li>
+          <li>Cosmetic updates to System Notification banner</li>
+          <li>Made Refresh Schedule button more visible on Setup page</li>
         </ul>
       </ul>
     ),

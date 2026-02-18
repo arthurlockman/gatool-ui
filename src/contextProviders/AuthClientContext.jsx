@@ -149,8 +149,9 @@ class AuthClient {
         " Your session may have expired. Please log out and log in again.";
     }
     if (response.status === 403) {
-      errorText +=
-        " You don't have permission to perform this action. You may need to be an event admin or have a specific role to update event notifications.";
+      errorText += path === "system/announcements"
+        ? " You need to be a system admin to update system announcements."
+        : " You don't have permission to perform this action. You may need to be an event admin or have a specific role to update event notifications.";
     }
     if (response.status === 500) {
       errorText +=

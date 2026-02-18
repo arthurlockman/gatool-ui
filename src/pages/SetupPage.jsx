@@ -367,12 +367,13 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                     {!isAuthenticated && <LoginButton disabled={!isOnline} />}</Alert>
 
             </div>}
-            {selectedEvent && <div>
-                {systemBell !== JSON.stringify(systemMessage) &&
+            {systemBell !== JSON.stringify(systemMessage) &&
                     <Row><NotificationBanner notification={systemMessage} systemBell={systemBell} setSystemBell={setSystemBell} />
                     </Row>}
+            {selectedEvent && <div>
+                
                 <Row>
-                    <Button size="lg" onClick={getSchedule} variant="outline-success" disabled={!isOnline}><b><ArrowClockwise /> Tap to refresh Schedule.</b> <br />Use after Alliance Selection to load Playoffs.</Button>
+                    <Button size="lg" onClick={getSchedule} variant="success" disabled={!isOnline}><b><ArrowClockwise /> Tap to refresh Schedule.</b> <br />Use after Alliance Selection to load Playoffs.</Button>
                 </Row>
                 <br />
                 <h4>{eventLabel}</h4>

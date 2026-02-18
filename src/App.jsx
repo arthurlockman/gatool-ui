@@ -404,7 +404,7 @@ function App() {
     if (enforcingMutualExclusivityRef.current) {
       return;
     }
-    
+
     if (screenMode && syncEvent) {
       // If both are enabled, disable syncEvent (screenMode takes priority)
       console.log("Screen Mode and Sync Event both enabled - disabling Sync Event");
@@ -1890,7 +1890,7 @@ function App() {
       getAlliances();
     }
     getRanks();
-    getSystemMessages();
+    // System messages are fetched by callers (loadEvent, useInterval, nextMatch, etc.) to avoid double-fetch
 
     // Calculate event high scores after schedule is loaded
     getEventStats(selectedYear?.value, selectedEvent?.value?.code);
@@ -4247,7 +4247,7 @@ function App() {
   }
 
   /**
-   * This function forces a user sync with mailchimp. This wil take a long time.
+   * This function forces a user sync with mailchimp. This will take a long time.
    * @returns {Promise<{ok}|void|undefined>}
    */
   async function forceUserSync() {
@@ -4265,10 +4265,15 @@ function App() {
     var result = await httpClient.getNoAuth(`announcements`);
     // @ts-ignore
     if (result.status === 200) {
-      // @ts-ignore
-      var notifications = await result.json();
-
-      return notifications;
+      try {
+        // @ts-ignore
+        var notifications = await result.json();
+        return notifications != null ? notifications : { message: "", onTime: "", offTime: "", onDate: "", offDate: "", variant: "", link: "" };
+      } catch (e) {
+        return { message: "", onTime: "", offTime: "", onDate: "", offDate: "", variant: "", link: "" };
+      }
+    } else if (result.status === 204) {
+      return { message: "", onTime: "", offTime: "", onDate: "", offDate: "", variant: "", link: "" };
     } else {
       return {
         message: `**Error** ${result?.statusText || "unknown"}`,
@@ -4315,10 +4320,10 @@ function App() {
       pendingSyncRef.current = true;
       return;
     }
-    
+
     // Clear pending flag since we're proceeding with sync
     pendingSyncRef.current = false;
-    
+
     // gather user preferences from the UI
     var userPrefs = {
       selectedEvent: selectedEvent,
@@ -4368,7 +4373,7 @@ function App() {
     // @ts-ignore
     if (result.status === 200 || result.status === 204) {
       // @ts-ignore
-      return {status: "ok"};
+      return { status: "ok" };
     } else {
       return {
         status: "error",
@@ -4392,15 +4397,6 @@ function App() {
     );
 
     if (result.status === 200) {
-      // Check if there's content before trying to parse JSON
-      // result might be a Response object or a plain object, so check for headers
-      // if ('headers' in result && result.headers) {
-      //   const contentLength = result.headers.get('content-length');
-      //   if (contentLength === '0' || contentLength === null) {
-      //     // No content, return empty array
-      //     return [];
-      //   }
-      // }
       try {
         // @ts-ignore
         var notifications = await result.json();
@@ -5489,12 +5485,12 @@ function App() {
   // This prevents stale closure values when reading state in async callbacks
   const currentEventCodeRef = useRef(null);
   const currentMatchRef = useRef(null);
-  
+
   // Update refs whenever state changes so we always have current values
   useEffect(() => {
     currentEventCodeRef.current = selectedEvent?.value?.code;
   }, [selectedEvent?.value?.code]);
-  
+
   useEffect(() => {
     currentMatchRef.current = currentMatch;
   }, [currentMatch]);
@@ -5606,39 +5602,39 @@ function App() {
     if (!screenMode || !isAuthenticated) {
       return;
     }
-    
+
     // Skip refresh if other network operations are in progress
     // @ts-ignore - operationsInProgress is a number from AuthClientContext
     if (operationsInProgress > 0) {
       return;
     }
-    
+
     try {
       const userPrefs = await getUserPrefs();
-      
+
       // Check if response has error status
       if (userPrefs && userPrefs.status && userPrefs.status !== "ok" && userPrefs.status !== 200) {
         setScreenModeStatus(false);
         return;
       }
-      
+
       // Check if data is properly formed - validate structure
       // The main check is to ensure it's NOT the malformed structure with "preferences" array
       // We don't require all properties to exist since some may legitimately be missing
-      const hasValidStructure = userPrefs && 
-                                typeof userPrefs === 'object' && 
-                                !Array.isArray(userPrefs) &&
-                                Object.keys(userPrefs).length > 0 &&
-                                !userPrefs.preferences; // Reject if it has a "preferences" array property
-      
+      const hasValidStructure = userPrefs &&
+        typeof userPrefs === 'object' &&
+        !Array.isArray(userPrefs) &&
+        Object.keys(userPrefs).length > 0 &&
+        !userPrefs.preferences; // Reject if it has a "preferences" array property
+
       // Check that it has at least some of the core expected properties (not all are required)
       // This ensures we have actual preference data, not just an empty object
       const coreProperties = ['selectedEvent', 'selectedYear', 'currentMatch'];
       const hasCoreProperties = hasValidStructure && coreProperties.some(prop => prop in userPrefs);
-      
+
       // Data is valid if structure is correct and has at least some core properties
       const isValidData = hasValidStructure && hasCoreProperties;
-      
+
       if (!isValidData) {
         // Explicitly set to false for malformed data
         setScreenModeStatus(false);
@@ -5646,17 +5642,17 @@ function App() {
         // Data is valid
         setScreenModeStatus(true);
       }
-      
+
       if (isValidData && typeof userPrefs === 'object') {
         // In Screen Mode, compare server values to current client state to ensure we always apply server values
         // Read state values from refs (always current) to avoid stale closure values
         const currentMatchFromRef = currentMatchRef.current;
-        
+
         if (userPrefs.selectedEvent !== undefined && userPrefs.selectedEvent !== null) {
           // Use ref value (always current) for accurate comparison
           const serverEventCode = userPrefs.selectedEvent?.value?.code;
           const lastSyncedCode = lastSyncedEventCodeRef.current;
-          
+
           // Only update if server differs from what we last synced
           // This prevents reloading the same event when React state hasn't updated yet
           // Manual changes are handled by resetting lastSyncedEventCodeRef in the useEffect
@@ -5884,7 +5880,7 @@ function App() {
     previousScreenModeRef.current = screenMode;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [screenMode, isAuthenticated, syncEvent, setSyncEvent, screenModeSyncFrequency]);
-  
+
   // Restart polling when frequency changes (if Screen Mode is active)
   useEffect(() => {
     if (screenMode && isAuthenticated) {
@@ -5906,10 +5902,10 @@ function App() {
     if (syncDebounceTimeoutRef.current) {
       clearTimeout(syncDebounceTimeoutRef.current);
     }
-    
+
     // Set pending flag
     pendingSyncRef.current = true;
-    
+
     // Set new timeout
     syncDebounceTimeoutRef.current = setTimeout(() => {
       if (pendingSyncRef.current && syncEvent && isAuthenticated) {
@@ -5951,7 +5947,7 @@ function App() {
           }
         });
       }, 500); // 500ms delay for initial sync
-      
+
       return () => clearTimeout(syncTimeout);
     } else if (!syncEvent || !isAuthenticated) {
       syncEventEnabledRef.current = false;
