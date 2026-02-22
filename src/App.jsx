@@ -325,6 +325,7 @@ function App() {
     "cache:eventHighScores",
     null
   );
+  const [ftcRegionHighScores, setFtcRegionHighScores] = useState(null);
   const [teamReduction, setTeamReduction] = usePersistentState(
     "setting:teamReduction",
     0
@@ -3743,7 +3744,12 @@ function App() {
           //  details.eventName = score?.matchData?.event?.eventCode;
           //}
           details.alliance = _.upperFirst(score?.matchData?.highScoreAlliance);
-          details.scoreType = score?.yearType;
+          // FTC API returns yearType like "2025FTCpenaltyFreequal"; normalize to "2025penaltyFreequal" so StatsPage matchTypes match
+          let scoreType = score?.yearType;
+          if (scoreType && typeof scoreType === "string" && scoreType.includes("FTC")) {
+            scoreType = scoreType.replace("FTC", "");
+          }
+          details.scoreType = scoreType;
           details.matchName = score?.matchData?.match?.description;
           details.allianceMembers = _.filter(
             score?.matchData?.match?.teams,
@@ -3762,6 +3768,85 @@ function App() {
       scores.highscores = reducedScores;
 
       setWorldStats(scores);
+    }
+  }
+
+  /** Known FTC score type suffixes used by StatsPage Region table matchTypes */
+  const FTC_SCORE_TYPE_SUFFIXES = /(penaltyFreequal|penaltyFreeplayoff|TBAPenaltyFreequal|TBAPenaltyFreeplayoff|offsettingqual|offsettingplayoff|overallqual|overallplayoff)$/;
+
+  /**
+   * Normalizes FTC high scores API response (array) to the same shape as worldStats.highscores.
+   * @param {Array} highscores - Array of score objects with matchData and scoreType/yearType
+   * @param {string} year - Year for event name lookup
+   * @param {string} [regionCode] - When present (region high scores), yearType is like "2025FTCRegionUSTXpenaltyFreequal"; we extract the suffix to match StatsPage matchTypes
+   * @returns {{ year: string, lastUpdate: string, highscores: Object }}
+   */
+  function normalizeFTCHighScores(highscores, year, regionCode) {
+    if (!Array.isArray(highscores)) return null;
+    var scores = { year, lastUpdate: moment().format(), highscores: {} };
+    var reducedScores = {};
+    highscores.forEach((score) => {
+      if (score?.matchData?.match) {
+        var details = {};
+        details.eventName = !_.isEmpty(eventnames[year])
+          ? (eventnames[year][score?.matchData?.event?.eventCode] || score?.matchData?.event?.eventCode)
+          : score?.matchData?.event?.eventCode;
+        details.alliance = _.upperFirst(score?.matchData?.highScoreAlliance);
+        let scoreType = score?.yearType || score?.scoreType;
+        // Region API returns e.g. "2025FTCRegionUSTXpenaltyFreequal" or "2025FTCRegionUSTXHOoffsettingqual" - extract suffix to match StatsPage matchTypes
+        if (regionCode && scoreType && typeof scoreType === "string") {
+          const match = scoreType.match(FTC_SCORE_TYPE_SUFFIXES);
+          if (match) scoreType = match[1];
+        } else if (scoreType && year && String(scoreType).indexOf(year) === 0) {
+          // World: strip leading year prefix (and "FTC" if present, handled in getWorldStats)
+          scoreType = scoreType.slice(String(year).length);
+        }
+        details.scoreType = scoreType;
+        details.matchName = score?.matchData?.match?.description;
+        details.allianceMembers = _.filter(
+          score?.matchData?.match?.teams,
+          (o) => _.startsWith(o.station, details.alliance)
+        )
+          .map((team) => team.teamNumber)
+          .join(" ");
+        details.score = score.matchData.match[`score${details.alliance}Final`];
+        if (details.scoreType) reducedScores[details.scoreType] = details;
+      }
+    });
+    scores.highscores = reducedScores;
+    return scores;
+  }
+
+  /**
+   * Fetches FTC Region High Scores from gatool API for the selected event's region.
+   */
+  async function getFTCRegionHighScores() {
+    if (!ftcMode || !selectedYear?.value || !selectedEvent?.value?.regionCode) {
+      setFtcRegionHighScores(null);
+      return;
+    }
+    const regionCode = selectedEvent.value.regionCode;
+    if (useFTCOffline && (!isOnline || manualOfflineMode)) {
+      setFtcRegionHighScores(null);
+      return;
+    }
+    try {
+      const regionCodeEncoded = encodeURIComponent(regionCode);
+      const result = await httpClient.getNoAuth(
+        `${selectedYear.value}/highscores/region/${regionCodeEncoded}`,
+        ftcBaseURL
+      );
+      if (result.status === 200) {
+        // @ts-ignore - result may be Response or timeout object
+        const data = await result.json();
+        const list = Array.isArray(data) ? data : (data?.highscores || data?.HighScores || []);
+        const scores = normalizeFTCHighScores(list, selectedYear.value, regionCode);
+        setFtcRegionHighScores(scores);
+      } else {
+        setFtcRegionHighScores(null);
+      }
+    } catch (e) {
+      setFtcRegionHighScores(null);
     }
   }
 
@@ -4722,6 +4807,9 @@ function App() {
       getSystemMessages();
       await getEventMessages();
       getWorldStats();
+      if (ftcMode) {
+        getFTCRegionHighScores();
+      }
     }
   };
 
@@ -5519,9 +5607,10 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [httpClient, selectedEvent]);
 
-  // Reset event high scores when FTC mode changes to prevent showing stale data from the previous mode
+  // Reset event high scores and FTC region high scores when FTC mode changes to prevent showing stale data
   useEffect(() => {
     setEventHighScores(null);
+    setFtcRegionHighScores(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ftcMode]);
 
@@ -5570,6 +5659,9 @@ function App() {
       getSystemMessages();
       getEventMessages();
       getWorldStats();
+      if (ftcMode) {
+        getFTCRegionHighScores();
+      }
     },
     refreshRate * 1000,
     {
@@ -6664,6 +6756,8 @@ function App() {
                     eventLabel={eventLabel}
                     districts={districts}
                     selectedYear={selectedYear}
+                    ftcMode={ftcMode}
+                    ftcRegionHighScores={ftcRegionHighScores}
                   />
                 }
               />

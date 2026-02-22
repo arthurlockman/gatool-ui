@@ -10,10 +10,21 @@ function StatsPage({
   eventLabel,
   districts,
   selectedYear,
+  ftcMode,
+  ftcRegionHighScores,
 }) {
   const eventDistrict = _.filter(districts, {
     value: selectedEvent?.value?.districtCode,
   })[0];
+  const hasAnyStats =
+    worldStats ||
+    eventHighScores ||
+    ftcRegionHighScores;
+  const isFTC = !!ftcMode;
+  const ftcRegionLabel = selectedEvent?.value?.regionCode
+    ? `Region ${selectedEvent.value.regionCode}`
+    : "Region";
+
   return (
     <Container fluid>
       {!selectedEvent && (
@@ -23,7 +34,7 @@ function StatsPage({
           </Alert>
         </div>
       )}
-      {selectedEvent && !worldStats && !eventHighScores && (
+      {selectedEvent && !hasAnyStats && (
         <div>
           <Alert variant="warning">
             <Alert variant="warning">
@@ -35,10 +46,11 @@ function StatsPage({
           </Alert>
         </div>
       )}
-      {selectedEvent && (worldStats || eventHighScores) && (
+      {selectedEvent && hasAnyStats && (
         <Container fluid>
           <Row>
-            {worldStats && <Col xs={"12"} sm={selectedEvent?.value?.districtCode ? "4" : "6"}>
+            {/* World High Scores (FRC and FTC use same endpoint: {{apiBase}}/{{season}}/highscores) */}
+            {worldStats && <Col xs={"12"} sm={((selectedEvent?.value?.districtCode && !isFTC) || (isFTC && ftcRegionHighScores)) ? "4" : "6"}>
               <table className="table table-condensed gatool-highScores-Table gatool-worldHighScores">
                 <thead>
                   <tr>
@@ -119,7 +131,8 @@ function StatsPage({
                 </tbody>
               </table>
             </Col>}
-            {selectedEvent?.value?.districtCode && (
+            {/* FRC District High Scores */}
+            {selectedEvent?.value?.districtCode && !isFTC && (
               <Col xs={"12"} sm={"4"}>
                 <table className="table table-condensed gatool-highScores-Table gatool-districtHighScores">
                   <thead>
@@ -202,7 +215,52 @@ function StatsPage({
                 </table>
               </Col>
             )}
-            <Col xs={"12"} sm={selectedEvent?.value?.districtCode && worldStats ? "4" : worldStats ? "6" : "12"}>
+            {/* FTC Region High Scores */}
+            {ftcRegionHighScores && isFTC && (
+              <Col xs={"12"} sm={"4"}>
+                <table className="table table-condensed gatool-highScores-Table gatool-districtHighScores">
+                  <thead>
+                    <tr>
+                      <td className={"statsMatchHeader"} colSpan={2} style={{ backgroundColor: "#fff5ce" }}>
+                        {ftcRegionLabel} High Scores {ftcRegionHighScores?.year}
+                      </td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td style={{ backgroundColor: "#fff5ce" }}>Qualification</td>
+                      <td style={{ backgroundColor: "#fff5ce" }}>Playoff</td>
+                    </tr>
+                    <tr>
+                      <StatsMatch highScores={ftcRegionHighScores?.highscores} matchType={"penaltyFreequal"} matchName={"No penalties in match"} eventNamesCY={eventNamesCY} tableType={"district"} />
+                      <StatsMatch highScores={ftcRegionHighScores?.highscores} matchType={"penaltyFreeplayoff"} matchName={"No penalties in match"} eventNamesCY={eventNamesCY} tableType={"district"} />
+                    </tr>
+                    <tr>
+                      <StatsMatch highScores={ftcRegionHighScores?.highscores} matchType={"TBAPenaltyFreequal"} matchName={"No penalties to winner"} eventNamesCY={eventNamesCY} tableType={"district"} />
+                      <StatsMatch highScores={ftcRegionHighScores?.highscores} matchType={"TBAPenaltyFreeplayoff"} matchName={"No penalties to winner"} eventNamesCY={eventNamesCY} tableType={"district"} />
+                    </tr>
+                    <tr>
+                      <StatsMatch highScores={ftcRegionHighScores?.highscores} matchType={"offsettingqual"} matchName={"Offsetting penalties"} eventNamesCY={eventNamesCY} tableType={"district"} />
+                      <StatsMatch highScores={ftcRegionHighScores?.highscores} matchType={"offsettingplayoff"} matchName={"Offsetting penalties"} eventNamesCY={eventNamesCY} tableType={"district"} />
+                    </tr>
+                    <tr>
+                      <StatsMatch highScores={ftcRegionHighScores?.highscores} matchType={"overallqual"} matchName={"Incl. penalties"} eventNamesCY={eventNamesCY} tableType={"district"} />
+                      <StatsMatch highScores={ftcRegionHighScores?.highscores} matchType={"overallplayoff"} matchName={"Incl. penalties"} eventNamesCY={eventNamesCY} tableType={"district"} />
+                    </tr>
+                  </tbody>
+                </table>
+              </Col>
+            )}
+            <Col
+              xs={"12"}
+              sm={
+                (isFTC && (worldStats || ftcRegionHighScores)) || (!isFTC && selectedEvent?.value?.districtCode && worldStats)
+                  ? "4"
+                  : worldStats
+                  ? "6"
+                  : "12"
+              }
+            >
               <table className="table table-condensed gatool-highScores-Table gatool-eventHighScores">
                 <thead>
                   <tr>
