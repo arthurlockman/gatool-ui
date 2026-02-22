@@ -750,6 +750,9 @@ function SchedulePage({
   };
 
   const addScoreType = (scores) => {
+    if (scores == null || typeof scores !== "object" || Array.isArray(scores)) {
+      return [];
+    }
     return Object.keys(scores).map((key) => {
       if (key.toLowerCase().includes("alliance")) return { type: 1, key: key };
       else if (
@@ -772,29 +775,36 @@ function SchedulePage({
   };
 
   const scoresRow = (key) => {
+    const redAlliance = scoresMatch?.scores?.alliances?.[1];
+    const blueAlliance = scoresMatch?.scores?.alliances?.[0];
+    const redVal = redAlliance?.[key.key];
+    const blueVal = blueAlliance?.[key.key];
     return (
       <tr>
         <td>
           <b>{key.key}</b>
         </td>
         <td className="scheduleTablered">
-          {typeof scoresMatch?.scores.alliances[1][key.key] === "boolean"
-            ? scoreAchieved(scoresMatch?.scores.alliances[1][key.key])
-            : scoresMatch?.scores.alliances[1][key.key]}
+          {typeof redVal === "boolean"
+            ? scoreAchieved(redVal)
+            : redVal}
         </td>
-
         <td className="scheduleTableblue">
-          {typeof scoresMatch?.scores.alliances[1][key.key] === "boolean"
-            ? scoreAchieved(scoresMatch?.scores.alliances[0][key.key])
-            : scoresMatch?.scores.alliances[0][key.key]}
+          {typeof blueVal === "boolean"
+            ? scoreAchieved(blueVal)
+            : blueVal}
         </td>
       </tr>
     );
   };
 
   const expandScoresRow = (key) => {
-    const redRow = scoresMatch?.scores.alliances[1][key.key];
-    const blueRow = scoresMatch?.scores.alliances[0][key.key];
+    const redAlliance = scoresMatch?.scores?.alliances?.[1];
+    const blueAlliance = scoresMatch?.scores?.alliances?.[0];
+    const redRow = redAlliance?.[key.key];
+    const blueRow = blueAlliance?.[key.key];
+    const safeRedRow = redRow != null && typeof redRow === "object" && !Array.isArray(redRow) ? redRow : {};
+    const safeBlueRow = blueRow != null && typeof blueRow === "object" && !Array.isArray(blueRow) ? blueRow : {};
     return (
       <>
         <tr>
@@ -805,9 +815,11 @@ function SchedulePage({
           <td className="scheduleTableblue"></td>
         </tr>
 
-        {Object.keys(redRow).map((itemKey, itemIndex) => {
-          if (typeof redRow[itemKey] === "object") {
-            const redRowKeys = Object.keys(redRow[itemKey]);
+        {Object.keys(safeRedRow).map((itemKey, itemIndex) => {
+          const redItem = safeRedRow[itemKey];
+          const blueItem = safeBlueRow[itemKey];
+          if (redItem != null && typeof redItem === "object" && !Array.isArray(redItem)) {
+            const redRowKeys = Object.keys(redItem);
             return (
               <React.Fragment key={`redrow-${itemKey}-${itemIndex}`}>
                 <tr>
@@ -834,10 +846,11 @@ function SchedulePage({
                         </tr>
                         <tr>
                           {redRowKeys.map((score, scoreIndex) => {
+                            const redVal = redItem[score];
                             const writingMode =
-                              typeof redRow[itemKey][score] === "string"
+                              typeof redVal === "string"
                                 ? "vertical-rl"
-                                : Array.isArray(redRow[itemKey][score])
+                                : Array.isArray(redVal)
                                 ? "vertical-rl"
                                 : "horizontal-tb";
                             return (
@@ -848,11 +861,11 @@ function SchedulePage({
                                   padding: "5px 0px 0px 5px",
                                 }}
                               >
-                                {typeof redRow[itemKey][score] === "string"
-                                  ? redRow[itemKey][score]
-                                  : Array.isArray(redRow[itemKey][score])
-                                  ? redRow[itemKey][score].join(",")
-                                  : scoreAchieved(redRow[itemKey][score])}
+                                {typeof redVal === "string"
+                                  ? redVal
+                                  : Array.isArray(redVal)
+                                  ? redVal.join(",")
+                                  : scoreAchieved(redVal)}
                               </td>
                             );
                           })}
@@ -880,10 +893,11 @@ function SchedulePage({
                         </tr>
                         <tr>
                           {redRowKeys.map((score, scoreIndex) => {
+                            const blueVal = (blueItem != null && typeof blueItem === "object") ? blueItem[score] : undefined;
                             const writingMode =
-                              typeof redRow[itemKey][score] === "string"
+                              typeof blueVal === "string"
                                 ? "vertical-rl"
-                                : Array.isArray(redRow[itemKey][score])
+                                : Array.isArray(blueVal)
                                 ? "vertical-rl"
                                 : "horizontal-tb";
                             return (
@@ -894,11 +908,11 @@ function SchedulePage({
                                   padding: "5px 0px 0px 5px",
                                 }}
                               >
-                                {typeof blueRow[itemKey][score] === "string"
-                                  ? blueRow[itemKey][score]
-                                  : Array.isArray(blueRow[itemKey][score])
-                                  ? blueRow[itemKey][score].join(",")
-                                  : scoreAchieved(blueRow[itemKey][score])}
+                                {typeof blueVal === "string"
+                                  ? blueVal
+                                  : Array.isArray(blueVal)
+                                  ? blueVal.join(",")
+                                  : scoreAchieved(blueVal)}
                               </td>
                             );
                           })}
@@ -915,8 +929,8 @@ function SchedulePage({
                 <td>
                   <b>     {itemKey}</b>
                 </td>
-                <td className="scheduleTablered">{redRow[itemKey]}</td>
-                <td className="scheduleTableblue">{blueRow[itemKey]}</td>
+                <td className="scheduleTablered">{redItem}</td>
+                <td className="scheduleTableblue">{safeBlueRow[itemKey]}</td>
               </tr>
             );
           }
@@ -1784,7 +1798,7 @@ function SchedulePage({
                   <Col>Round 2</Col>
                   <Col>Round 3</Col>
                 </Row>
-                {formData?.alliances.map((alliance, allianceIndex) => {
+                {(Array.isArray(formData?.alliances) ? formData.alliances : []).map((alliance, allianceIndex) => {
                   return (
                     <Row key={`alliance-${alliance.number}-${allianceIndex}`}>
                       <Col>{alliance.number}</Col>
@@ -1906,25 +1920,25 @@ function SchedulePage({
                 <tr>
                   <td>Winner:</td>
                   <td colSpan={2}>
-                    {scoresMatch?.winner.winner === "red" ? (
+                    {scoresMatch?.winner?.winner === "red" ? (
                       <span style={{ color: "red" }}>
                         <b>Red Alliance</b>
                       </span>
-                    ) : scoresMatch?.winner.winner === "blue" ? (
+                    ) : scoresMatch?.winner?.winner === "blue" ? (
                       <span style={{ color: "blue" }}>
                         <b>Blue Alliance</b>
                       </span>
-                    ) : scoresMatch?.winner.tieWinner === "red" ? (
+                    ) : scoresMatch?.winner?.tieWinner === "red" ? (
                       <span style={{ color: "red" }}>
-                        <b>{scoresMatch?.winner.tieDetail}</b>
+                        <b>{scoresMatch?.winner?.tieDetail}</b>
                       </span>
-                    ) : scoresMatch?.winner.tieWinner === "blue" ? (
+                    ) : scoresMatch?.winner?.tieWinner === "blue" ? (
                       <span style={{ color: "blue" }}>
-                        <b>{scoresMatch?.winner.tieDetail}</b>
+                        <b>{scoresMatch?.winner?.tieDetail}</b>
                       </span>
-                    ) : scoresMatch?.winner.tieWinner === "tie" ? (
+                    ) : scoresMatch?.winner?.tieWinner === "tie" ? (
                       <span style={{ color: "green" }}>
-                        <b>{scoresMatch?.winner.tieDetail}</b>
+                        <b>{scoresMatch?.winner?.tieDetail}</b>
                       </span>
                     ) : (
                       <span style={{ color: "green" }}>
@@ -1939,7 +1953,7 @@ function SchedulePage({
                     <Handshake
                       result={
                         scoresMatch?.scores?.coopertitionBonusAchieved ||
-                        scoresMatch?.scores.alliances[0]
+                        scoresMatch?.scores?.alliances?.[0]
                           ?.coopertitionCriteriaMet
                       }
                     />
@@ -1956,14 +1970,14 @@ function SchedulePage({
                     <b>Blue Alliance Results</b>
                   </td>
                 </tr>
-                {scoresMatch?.scores.alliances[0] ? (
+                {(scoresMatch?.scores?.alliances?.[0] != null && typeof scoresMatch.scores.alliances[0] === "object") ? (
                   _.orderBy(
-                    addScoreType(scoresMatch?.scores.alliances[0]),
+                    addScoreType(scoresMatch.scores.alliances[0]),
                     ["type", "key"],
                     ["asc", "asc"]
                   ).map((key) => {
                     if (
-                      typeof scoresMatch?.scores.alliances[0][key.key] ===
+                      typeof scoresMatch?.scores?.alliances?.[0]?.[key.key] ===
                       "object"
                     ) {
                       return expandScoresRow(key);
