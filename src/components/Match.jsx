@@ -13,6 +13,8 @@ function Match({
 	getAllianceNumbersForDisplay,
 	getMatchWinnerForDisplay,
 	getMatchScoreForDisplay,
+	redPlaceHolder = "Red Alliance",
+	bluePlaceHolder = "Blue Alliance",
 	colors = {
 		RED: "#FF0000",
 		BLUE: "#0000FF",
@@ -127,7 +129,7 @@ function Match({
 				{/* Red alliance name and numbers */}
 				<text transform={`matrix(0.9941 0 0 1 ${allianceTextX} ${redAllianceTextY})`} textAnchor="middle">
 					<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle="normal" fontSize="12.1471px">
-						{getAllianceNameForDisplay(matchNumber, "red") || `Alliance ${matchNumber}`}
+						{getAllianceNameForDisplay(matchNumber, "red") || `${redPlaceHolder}`}
 					</tspan>
 					<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={getAllianceNumbersForDisplay(matchNumber, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle="normal" fontSize="12.1471px">
 						{getAllianceNumbersForDisplay(matchNumber, "red")}
@@ -136,7 +138,7 @@ function Match({
 				{/* Blue alliance name and numbers */}
 				<text transform={`matrix(0.9941 0 0 1 ${allianceTextX} ${blueAllianceTextY})`} textAnchor="middle">
 					<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle="normal" fontSize="12.1471px">
-						{getAllianceNameForDisplay(matchNumber, "blue") || `Alliance ${matchNumber}`}
+						{getAllianceNameForDisplay(matchNumber, "blue") || `${bluePlaceHolder}`}
 					</tspan>
 					<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={getAllianceNumbersForDisplay(matchNumber, "blue").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle="normal" fontSize="12.1471px">
 						{getAllianceNumbersForDisplay(matchNumber, "blue")}

@@ -1,5 +1,21 @@
 export const appUpdates = [
   {
+    date: "February 22, 2026",
+    message: (
+      <ul>
+        <li>ALL PROGRAMS:</li>
+        <ul>
+          <li>Fixed a bug which crashed the app when displaying score details on the Schedule page</li>
+        </ul>
+        <li>FTC:</li>
+        <ul>
+          <li>Added World and Regional High Scores to Stats page</li>
+          <li>Fixed a bug which caused the event high score (no penalties to winner) to be displayed incorrectly on the Stats page</li>
+          <li>Updated Playoffs Brackets to properly display Alliances in future matches, based on results from previous matches</li>
+        </ul>
+      </ul>
+    ),
+  },{
     date: "February 18, 2026",
     message: (
       <ul>
