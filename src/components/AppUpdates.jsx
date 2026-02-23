@@ -9,7 +9,9 @@ export const appUpdates = [
         </ul>
         <li>FTC:</li>
         <ul>
-          <li>Added World High Scores to Stats page</li>
+          <li>Added World and Regional High Scores to Stats page</li>
+          <li>Fixed a bug which caused the event high score (no penalties to winner) to be displayed incorrectly on the Stats page</li>
+          <li>Updated Playoffs Brackets to properly display Alliances in future matches, based on results from previous matches</li>
         </ul>
       </ul>
     ),

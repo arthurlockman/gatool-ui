@@ -1464,13 +1464,13 @@ function App() {
           match.scores = matchResults;
           match.scoreRedFinal = matchResults.alliances?.[1]?.totalPoints;
           match.scoreBlueFinal = matchResults.alliances?.[0]?.totalPoints;
-          // @ts-ignore
+          // @ts-ignore - FRC may use "BonusAchieved" or "Achieved" in key names for ranking points
           match.redRP = _.pickBy(matchResults.alliances[1], (value, key) => {
-            return key.endsWith("BonusAchieved") || key.endsWith("RP");
+            return key.endsWith("BonusAchieved") || key.endsWith("Achieved") || key.endsWith("RP");
           });
           // @ts-ignore
           match.blueRP = _.pickBy(matchResults.alliances[0], (value, key) => {
-            return key.endsWith("BonusAchieved") || key.endsWith("RP");
+            return key.endsWith("BonusAchieved") || key.endsWith("Achieved") || key.endsWith("RP");
           });
         }
       } else if (selectedEvent?.value?.type === "OffSeason") {
@@ -1480,13 +1480,13 @@ function App() {
         }
         if (match.scores?.alliances?.[1]) {
           match.redRP = _.pickBy(match.scores.alliances[1], (value, key) => {
-            return key.endsWith("BonusAchieved") || key.endsWith("RP");
+            return key.endsWith("BonusAchieved") || key.endsWith("Achieved") || key.endsWith("RP");
           });
         }
         // @ts-ignore
         if (match.scores?.alliances?.[0]) {
           match.blueRP = _.pickBy(match.scores.alliances[0], (value, key) => {
-            return key.endsWith("BonusAchieved") || key.endsWith("RP");
+            return key.endsWith("BonusAchieved") || key.endsWith("Achieved") || key.endsWith("RP");
           });
         }
       }
@@ -3886,8 +3886,9 @@ function App() {
 
       const redScore = match.scoreRedFinal || 0;
       const blueScore = match.scoreBlueFinal || 0;
-      const redFoul = match.scoreRedFoul || 0;
-      const blueFoul = match.scoreBlueFoul || 0;
+      // FTC uses fouls to represent points commmitted, not earned, by each Alliance.
+      const redFoul = ftcMode ? match.scoreBlueFoul : match.scoreRedFoul || 0;
+      const blueFoul = ftcMode ? match.scoreRedFoul : match.scoreBlueFoul || 0;
 
       // Determine which alliance has the high score
       const highScoreAlliance = redScore >= blueScore ? "red" : "blue";
@@ -4022,7 +4023,7 @@ function App() {
       highscores.forEach((score) => {
         if (score?.matchData?.match) {
           var details = {};
-          if (!_.isEmpty(eventnames[worldStats?.year])) {
+          if (eventnames[year] && !_.isEmpty(eventnames[year])) {
             details.eventName = eventnames[year][code] || code;
           } else {
             details.eventName = code;

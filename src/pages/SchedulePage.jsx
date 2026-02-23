@@ -716,8 +716,14 @@ function SchedulePage({
   const rankPointDisplay = (rankPoints) => {
     var pointsDisplay = [];
     _.forEach(rankPoints, (value, key) => {
+      // FRC uses "BonusAchieved" or "Achieved" in key names; prefer stripping BonusAchieved first, then Achieved
+      const name = key.endsWith("BonusAchieved")
+        ? key.slice(0, -"BonusAchieved".length)
+        : key.endsWith("Achieved")
+          ? key.slice(0, -"Achieved".length)
+          : key;
       pointsDisplay.push({
-        bonus: _.startCase(key.replace("BonusAchieved", "")),
+        bonus: _.startCase(name),
         earned: value,
       });
     });
@@ -774,13 +780,13 @@ function SchedulePage({
     });
   };
 
-  const scoresRow = (key) => {
+  const scoresRow = (key, rowKey) => {
     const redAlliance = scoresMatch?.scores?.alliances?.[1];
     const blueAlliance = scoresMatch?.scores?.alliances?.[0];
     const redVal = redAlliance?.[key.key];
     const blueVal = blueAlliance?.[key.key];
     return (
-      <tr>
+      <tr key={rowKey}>
         <td>
           <b>{key.key}</b>
         </td>
@@ -1975,15 +1981,19 @@ function SchedulePage({
                     addScoreType(scoresMatch.scores.alliances[0]),
                     ["type", "key"],
                     ["asc", "asc"]
-                  ).map((key) => {
+                  ).map((key, keyIndex) => {
+                    const rowKey = `score-row-${key?.type ?? ""}-${key?.key ?? ""}-${keyIndex}`;
                     if (
                       typeof scoresMatch?.scores?.alliances?.[0]?.[key.key] ===
                       "object"
                     ) {
-                      return expandScoresRow(key);
-                      // return null
+                      return (
+                        <React.Fragment key={rowKey}>
+                          {expandScoresRow(key)}
+                        </React.Fragment>
+                      );
                     } else {
-                      return scoresRow(key);
+                      return scoresRow(key, rowKey);
                     }
                   })
                 ) : (

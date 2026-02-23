@@ -447,6 +447,8 @@ function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMat
 							getAllianceNumbersForDisplay={getAllianceNumbersForDisplay}
 							getMatchWinnerForDisplay={getMatchWinnerForDisplay}
 							getMatchScoreForDisplay={getMatchScoreForDisplay}
+							redPlaceHolder="Loser of M4"
+							bluePlaceHolder="Winner of M3"
 							colors={{ RED, BLUE, GOLD, GREEN, BLACK, WHITE }}
 							fontWeights={{ bold }}
 						/>
@@ -461,6 +463,8 @@ function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMat
 							getAllianceNumbersForDisplay={getAllianceNumbersForDisplay}
 							getMatchWinnerForDisplay={getMatchWinnerForDisplay}
 							getMatchScoreForDisplay={getMatchScoreForDisplay}
+							redPlaceHolder="Loser of M1"
+							bluePlaceHolder="Loser of M2"
 							colors={{ RED, BLUE, GOLD, GREEN, BLACK, WHITE }}
 							fontWeights={{ bold }}
 						/>
@@ -475,6 +479,8 @@ function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMat
 							getAllianceNumbersForDisplay={getAllianceNumbersForDisplay}
 							getMatchWinnerForDisplay={getMatchWinnerForDisplay}
 							getMatchScoreForDisplay={getMatchScoreForDisplay}
+							redPlaceHolder="Winner of M1"
+							bluePlaceHolder="Winner of M2"
 							colors={{ RED, BLUE, GOLD, GREEN, BLACK, WHITE }}
 							fontWeights={{ bold }}
 						/>
@@ -489,6 +495,8 @@ function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMat
 							getAllianceNumbersForDisplay={getAllianceNumbersForDisplay}
 							getMatchWinnerForDisplay={getMatchWinnerForDisplay}
 							getMatchScoreForDisplay={getMatchScoreForDisplay}
+							redPlaceHolder="Alliance 2"
+							bluePlaceHolder="Alliance 3"
 							colors={{ RED, BLUE, GOLD, GREEN, BLACK, WHITE }}
 							fontWeights={{ bold }}
 						/>
@@ -503,6 +511,8 @@ function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMat
 							getAllianceNumbersForDisplay={getAllianceNumbersForDisplay}
 							getMatchWinnerForDisplay={getMatchWinnerForDisplay}
 							getMatchScoreForDisplay={getMatchScoreForDisplay}
+							redPlaceHolder="Alliance 1"
+							bluePlaceHolder="Alliance 4"
 							colors={{ RED, BLUE, GOLD, GREEN, BLACK, WHITE }}
 							fontWeights={{ bold }}
 						/>

@@ -870,6 +870,8 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 							getAllianceNumbersForDisplay={getAllianceNumbersForDisplay}
 							getMatchWinnerForDisplay={getMatchWinnerForDisplay}
 							getMatchScoreForDisplay={getMatchScoreForDisplay}
+							redPlaceHolder="Loser of M7"
+							bluePlaceHolder="Winner of M8"
 							colors={{ RED, BLUE, GOLD, GREEN, BLACK, WHITE }}
 							fontWeights={{ bold }}
 						/>
@@ -884,6 +886,8 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 							getAllianceNumbersForDisplay={getAllianceNumbersForDisplay}
 							getMatchWinnerForDisplay={getMatchWinnerForDisplay}
 							getMatchScoreForDisplay={getMatchScoreForDisplay}
+							redPlaceHolder="Winner of M6"
+							bluePlaceHolder="Winner of M5"
 							colors={{ RED, BLUE, GOLD, GREEN, BLACK, WHITE }}
 							fontWeights={{ bold }}
 						/>
@@ -898,6 +902,8 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 							getAllianceNumbersForDisplay={getAllianceNumbersForDisplay}
 							getMatchWinnerForDisplay={getMatchWinnerForDisplay}
 							getMatchScoreForDisplay={getMatchScoreForDisplay}
+							redPlaceHolder="Winner of M3"
+							bluePlaceHolder="Winner of M4"
 							colors={{ RED, BLUE, GOLD, GREEN, BLACK, WHITE }}
 							fontWeights={{ bold }}
 						/>
@@ -912,6 +918,8 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 							getAllianceNumbersForDisplay={getAllianceNumbersForDisplay}
 							getMatchWinnerForDisplay={getMatchWinnerForDisplay}
 							getMatchScoreForDisplay={getMatchScoreForDisplay}
+							redPlaceHolder="Loser of M4"
+							bluePlaceHolder="Loser of M1"
 							colors={{ RED, BLUE, GOLD, GREEN, BLACK, WHITE }}
 							fontWeights={{ bold }}
 						/>
@@ -926,6 +934,8 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 							getAllianceNumbersForDisplay={getAllianceNumbersForDisplay}
 							getMatchWinnerForDisplay={getMatchWinnerForDisplay}
 							getMatchScoreForDisplay={getMatchScoreForDisplay}
+							redPlaceHolder="Loser of M3"
+							bluePlaceHolder="Loser of M2"
 							colors={{ RED, BLUE, GOLD, GREEN, BLACK, WHITE }}
 							fontWeights={{ bold }}
 						/>
@@ -940,6 +950,8 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 							getAllianceNumbersForDisplay={getAllianceNumbersForDisplay}
 							getMatchWinnerForDisplay={getMatchWinnerForDisplay}
 							getMatchScoreForDisplay={getMatchScoreForDisplay}
+							redPlaceHolder="Alliance 2"
+							bluePlaceHolder="Winner of M2"
 							colors={{ RED, BLUE, GOLD, GREEN, BLACK, WHITE }}
 							fontWeights={{ bold }}
 						/>
@@ -954,6 +966,8 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 							getAllianceNumbersForDisplay={getAllianceNumbersForDisplay}
 							getMatchWinnerForDisplay={getMatchWinnerForDisplay}
 							getMatchScoreForDisplay={getMatchScoreForDisplay}
+							redPlaceHolder="Alliance 1"
+							bluePlaceHolder="Winner of M1"
 							colors={{ RED, BLUE, GOLD, GREEN, BLACK, WHITE }}
 							fontWeights={{ bold }}
 						/>
@@ -968,6 +982,8 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 							getAllianceNumbersForDisplay={getAllianceNumbersForDisplay}
 							getMatchWinnerForDisplay={getMatchWinnerForDisplay}
 							getMatchScoreForDisplay={getMatchScoreForDisplay}
+							redPlaceHolder="Alliance 3"
+							bluePlaceHolder="Alliance 6"
 							colors={{ RED, BLUE, GOLD, GREEN, BLACK, WHITE }}
 							fontWeights={{ bold }}
 						/>
@@ -982,6 +998,8 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 							getAllianceNumbersForDisplay={getAllianceNumbersForDisplay}
 							getMatchWinnerForDisplay={getMatchWinnerForDisplay}
 							getMatchScoreForDisplay={getMatchScoreForDisplay}
+							redPlaceHolder="Alliance 4"
+							bluePlaceHolder="Alliance 5"
 							colors={{ RED, BLUE, GOLD, GREEN, BLACK, WHITE }}
 							fontWeights={{ bold }}
 						/>
