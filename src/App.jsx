@@ -772,6 +772,7 @@ function App() {
   const conformCFTCOfflineScheduleMatch = (match, level) => {
     return {
       description: match?.matchName,
+      matchName: match?.matchName,
       tournamentLevel: level,
       field: match?.field,
       matchNumber: match?.matchNumber,
@@ -1644,6 +1645,7 @@ function App() {
           if (matchScores) {
             match = {
               ...match,
+              scores: matchScores,
               scoreRedFinal: matchScores?.redScore,
               scoreBlueFinal: matchScores?.blueScore,
               scoreRedAuto: matchScores?.redAuto,
@@ -1811,13 +1813,17 @@ function App() {
           ) {
             const matchResults = playoffScores.MatchScores.filter(
               (scoreMatch) => {
-                return scoreMatch.matchNumber === match.matchNumber;
+                const foundMatch = !ftcMode ? scoreMatch.matchNumber === match.matchNumber : (scoreMatch.matchNumber === match.originalMatchNumber) && (scoreMatch.matchSeries === match.series);
+                return foundMatch
               }
             )[0];
-            if (matchResults) {
-              match.scores = matchResults;
-              match.scoreRedFinal = matchResults.alliances?.[1]?.totalPoints;
-              match.scoreBlueFinal = matchResults.alliances?.[0]?.totalPoints;
+            // FTC offline: scores are in same order as schedule; use index if matchNumber doesn't align
+            const ftcMatchResults = useFTCOffline && playoffScores.MatchScores[index];
+            const results = matchResults || (ftcMatchResults && (ftcMatchResults.redScore != null || ftcMatchResults.blueScore != null) ? ftcMatchResults : null);
+            if (results) {
+              match.scores = results;
+              match.scoreRedFinal = results.alliances?.[1]?.totalPoints ?? results.redScore;
+              match.scoreBlueFinal = results.alliances?.[0]?.totalPoints ?? results.blueScore;
             }
           } else if (selectedEvent?.value?.type === "OffSeason") {
             match.scores = match?.matchScores || [];
