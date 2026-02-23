@@ -53,6 +53,7 @@ export const appUpdates = [
           <li>Removed Skip Alliance option from Alliance Selection for FTC.</li>
           <li>Fixed a bug that prevented proper display of tiebreakers in the Playoff Brackets</li>
           <li>Fixed the match results guidance on Announce, Play-By-Play and Emcee pages to account for ties in FTC</li>
+          <li>Fixed a bug that prevented proper display of match results in the Playoff Brackets for FTC</li>
         </ul>
       </ul>
     ),
