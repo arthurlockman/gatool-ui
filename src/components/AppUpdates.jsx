@@ -11,6 +11,7 @@ export const appUpdates = [
         <ul>
           <li>Added League High Scores to Stats page</li>
           <li>Restored school/organization name to Play-By-Play</li>
+          <li>Restored finals match results in 4-alliance Brackets for FTC</li>
           <li>Updated Playoffs Brackets to properly display Alliances in future matches, based on results from previous matches</li>
         </ul>
       </ul>
