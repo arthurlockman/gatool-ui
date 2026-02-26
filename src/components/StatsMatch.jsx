@@ -6,9 +6,12 @@ function StatsMatch({
   matchName,
   eventNamesCY,
   tableType,
+  backgroundColorOverride = undefined,
 }) {
   const style =
-    tableType === "world"
+    backgroundColorOverride != null
+      ? { backgroundColor: backgroundColorOverride }
+      : tableType === "world"
       ? { backgroundColor: "#f2dede" }
       : tableType === "event"
       ? { backgroundColor: "#d9edf7" }

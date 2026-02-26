@@ -292,6 +292,11 @@ function App() {
     false
   );
 
+  const [showWorldAndStatsOnAnnouncePlayByPlay, setShowWorldAndStatsOnAnnouncePlayByPlay] = usePersistentState(
+    "setting:showWorldAndStatsOnAnnouncePlayByPlay",
+    true
+  );
+
   const [swapScreen, setSwapScreen] = usePersistentState(
     "setting:swapScreen",
     null
@@ -327,6 +332,7 @@ function App() {
     null
   );
   const [ftcRegionHighScores, setFtcRegionHighScores] = useState(null);
+  const [ftcLeagueHighScores, setFtcLeagueHighScores] = useState(null);
   const [teamReduction, setTeamReduction] = usePersistentState(
     "setting:teamReduction",
     0
@@ -3876,6 +3882,42 @@ function App() {
   }
 
   /**
+   * Fetches FTC League High Scores from gatool API for the selected event's league.
+   * Endpoint: {{apiBase}}/{{season}}/highscores/league/{{regionCode}}/{{leagueCode}}
+   */
+  async function getFTCLeagueHighScores() {
+    if (!ftcMode || !selectedYear?.value || !selectedEvent?.value?.regionCode || !selectedEvent?.value?.leagueCode) {
+      setFtcLeagueHighScores(null);
+      return;
+    }
+    const regionCode = selectedEvent.value.regionCode;
+    const leagueCode = selectedEvent.value.leagueCode;
+    if (useFTCOffline && (!isOnline || manualOfflineMode)) {
+      setFtcLeagueHighScores(null);
+      return;
+    }
+    try {
+      const regionCodeEncoded = encodeURIComponent(regionCode);
+      const leagueCodeEncoded = encodeURIComponent(leagueCode);
+      const result = await httpClient.getNoAuth(
+        `${selectedYear.value}/highscores/league/${regionCodeEncoded}/${leagueCodeEncoded}`,
+        ftcBaseURL
+      );
+      if (result.status === 200) {
+        // @ts-ignore - result may be Response or timeout object
+        const data = await result.json();
+        const list = Array.isArray(data) ? data : (data?.highscores || data?.HighScores || []);
+        const scores = normalizeFTCHighScores(list, selectedYear.value, leagueCode);
+        setFtcLeagueHighScores(scores);
+      } else {
+        setFtcLeagueHighScores(null);
+      }
+    } catch (e) {
+      setFtcLeagueHighScores(null);
+    }
+  }
+
+  /**
    * This function calculates event high scores from local match data.
    * Tracks 4 categories: overall, penaltyFree, TBAPenaltyFree, and offsetting
    * For both qualification and playoff matches.
@@ -4457,6 +4499,7 @@ function App() {
       hidePracticeSchedule: hidePracticeSchedule,
       monthsWarning: monthsWarning,
       showInspection: showInspection,
+      showWorldAndStatsOnAnnouncePlayByPlay: showWorldAndStatsOnAnnouncePlayByPlay,
       swapScreen: swapScreen,
       autoAdvance: autoAdvance,
       highScoreMode: highScoreMode,
@@ -4835,6 +4878,11 @@ function App() {
       getWorldStats();
       if (ftcMode) {
         getFTCRegionHighScores();
+        if (selectedEvent?.value?.leagueCode) {
+          getFTCLeagueHighScores();
+        } else {
+          setFtcLeagueHighScores(null);
+        }
       }
     }
   };
@@ -5633,10 +5681,11 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [httpClient, selectedEvent]);
 
-  // Reset event high scores and FTC region high scores when FTC mode changes to prevent showing stale data
+  // Reset event high scores and FTC region/league high scores when FTC mode changes to prevent showing stale data
   useEffect(() => {
     setEventHighScores(null);
     setFtcRegionHighScores(null);
+    setFtcLeagueHighScores(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ftcMode]);
 
@@ -5687,6 +5736,11 @@ function App() {
       getWorldStats();
       if (ftcMode) {
         getFTCRegionHighScores();
+        if (selectedEvent?.value?.leagueCode) {
+          getFTCLeagueHighScores();
+        } else {
+          setFtcLeagueHighScores(null);
+        }
       }
     },
     refreshRate * 1000,
@@ -5853,6 +5907,9 @@ function App() {
         }
         if (userPrefs.showInspection !== undefined && userPrefs.showInspection !== showInspection) {
           setShowInspection(userPrefs.showInspection);
+        }
+        if (userPrefs.showWorldAndStatsOnAnnouncePlayByPlay !== undefined && userPrefs.showWorldAndStatsOnAnnouncePlayByPlay !== showWorldAndStatsOnAnnouncePlayByPlay) {
+          setShowWorldAndStatsOnAnnouncePlayByPlay(userPrefs.showWorldAndStatsOnAnnouncePlayByPlay);
         }
         if (userPrefs.swapScreen !== undefined && userPrefs.swapScreen !== swapScreen) {
           setSwapScreen(userPrefs.swapScreen);
@@ -6461,6 +6518,8 @@ function App() {
                     setEventLabel={setEventLabel}
                     showInspection={showInspection}
                     setShowInspection={setShowInspection}
+                    showWorldAndStatsOnAnnouncePlayByPlay={showWorldAndStatsOnAnnouncePlayByPlay}
+                    setShowWorldAndStatsOnAnnouncePlayByPlay={setShowWorldAndStatsOnAnnouncePlayByPlay}
                     showMinorAwards={showMinorAwards}
                     setShowMinorAwards={setShowMinorAwards}
                     highScoreMode={highScoreMode}
@@ -6605,6 +6664,11 @@ function App() {
                   <AnnouncePage
                     selectedEvent={selectedEvent}
                     selectedYear={selectedYear}
+                    worldStats={worldStats}
+                    ftcRegionHighScores={ftcRegionHighScores}
+                    ftcLeagueHighScores={ftcLeagueHighScores}
+                    districts={districts}
+                    ftcLeagues={ftcLeagues}
                     teamList={teamList}
                     rankings={rankings}
                     communityUpdates={communityUpdates}
@@ -6649,6 +6713,7 @@ function App() {
                     eventLabel={eventLabel}
                     playoffCountOverride={playoffCountOverride}
                     showInspection={showInspection}
+                    showWorldAndStatsOnAnnouncePlayByPlay={showWorldAndStatsOnAnnouncePlayByPlay}
                     highScoreMode={highScoreMode}
                     eventMessage={eventMessage}
                     eventBell={eventBell}
@@ -6666,6 +6731,13 @@ function App() {
                 element={
                   <PlayByPlayPage
                     selectedEvent={selectedEvent}
+                    selectedYear={selectedYear}
+                    worldStats={worldStats}
+                    ftcRegionHighScores={ftcRegionHighScores}
+                    ftcLeagueHighScores={ftcLeagueHighScores}
+                    districts={districts}
+                    ftcLeagues={ftcLeagues}
+                    eventNamesCY={eventNamesCY}
                     teamList={teamList}
                     rankings={rankings}
                     communityUpdates={communityUpdates}
@@ -6703,6 +6775,7 @@ function App() {
                     eventLabel={eventLabel}
                     playoffCountOverride={playoffCountOverride}
                     showInspection={showInspection}
+                    showWorldAndStatsOnAnnouncePlayByPlay={showWorldAndStatsOnAnnouncePlayByPlay}
                     highScoreMode={highScoreMode}
                     EPA={EPA}
                     eventMessage={eventMessage}
@@ -6784,6 +6857,8 @@ function App() {
                     selectedYear={selectedYear}
                     ftcMode={ftcMode}
                     ftcRegionHighScores={ftcRegionHighScores}
+                    ftcLeagueHighScores={ftcLeagueHighScores}
+                    ftcLeagues={ftcLeagues}
                   />
                 }
               />

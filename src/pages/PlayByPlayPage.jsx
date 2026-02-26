@@ -16,6 +16,13 @@ const paleGreen = "rgba(144, 238, 144, 0.5)";
 
 function PlayByPlayPage({
   selectedEvent,
+  selectedYear,
+  worldStats,
+  ftcRegionHighScores,
+  ftcLeagueHighScores,
+  districts,
+  ftcLeagues,
+  eventNamesCY,
   teamList,
   rankings,
   communityUpdates,
@@ -53,6 +60,7 @@ function PlayByPlayPage({
   eventLabel,
   playoffCountOverride,
   showInspection,
+  showWorldAndStatsOnAnnouncePlayByPlay,
   highScoreMode,
   EPA,
   eventMessage,
@@ -663,8 +671,16 @@ function PlayByPlayPage({
               selectedEvent={selectedEvent}
               adHocMode={adHocMode}
               playoffCountOverride={playoffCountOverride}
+              showWorldAndStatsOnAnnouncePlayByPlay={showWorldAndStatsOnAnnouncePlayByPlay}
               highScoreMode={highScoreMode}
               ftcMode={ftcMode}
+              worldStats={worldStats}
+              ftcRegionHighScores={ftcRegionHighScores}
+              ftcLeagueHighScores={ftcLeagueHighScores}
+              selectedYear={selectedYear}
+              eventNamesCY={eventNamesCY}
+              districts={districts}
+              ftcLeagues={ftcLeagues}
             />
           </Container>
         )}
