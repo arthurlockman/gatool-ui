@@ -21,7 +21,7 @@ function PlayByPlay({ station, team, inPlayoffs, selectedEvent, showNotes, showM
                     <>
                         <p className={"playByPlayteamNumber"}>{displayTeamNumber}</p>
                         <p className={"playByPlaysayNumber"} >{team?.updates?.sayNumber}</p>
-                        <p className={team?.updates?.organizationLocal ? (team?.updates?.organizationLocal?.length > 60 ? "playByPlayOrganization narrowFont" : "playByPlayOrganization") : (team?.schoolName?.length > 60 ? "playByPlayOrganization narrowFont" : "playByPlayOrganization")}>{team?.updates?.organizationLocal ? team?.updates?.organizationLocal : team?.schoolName}</p>
+                        <p className={team?.updates?.organizationLocal ? (team?.updates?.organizationLocal?.length > 60 ? "playByPlayOrganization narrowFont" : "playByPlayOrganization") : (team?.organization?.length > 60 ? "playByPlayOrganization narrowFont" : "playByPlayOrganization")}>{team?.updates?.organizationLocal ? team?.updates?.organizationLocal : team?.organization}</p>
                         <p className={"playByPlayCity"}>{team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : `${team?.city}, ${team?.stateProv}${team?.country !== "USA" ? `, ${team?.country}` : ""}`}</p>
                         {(showMottoes || _.isNull(showMottoes)) && <p className={"playByPlayCity mottoes"}>{team?.updates?.teamMottoLocal}</p>}
                         {inPlayoffs && width < height && <p className={"playByPlayAlliance"}>{team?.alliance}{(selectedEvent?.value?.name.includes("OFFLINE") && !playoffOnly) ? <></> : <><br />{team.allianceRole}</>}</p>}
