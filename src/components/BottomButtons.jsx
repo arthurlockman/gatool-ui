@@ -1,10 +1,31 @@
 import { Row, Col, Button } from "react-bootstrap";
 import FoulButtons from "./FoulButtons";
+import HighScoresSummary from "./HighScoresSummary";
 import { CaretLeftFill, CaretRightFill } from "react-bootstrap-icons";
 import PlayoffDetails from "../components/PlayoffDetails";
 
 
-function BottomButtons({ previousMatch, nextMatch, matchDetails, playoffSchedule, eventHighScores, alliances, selectedEvent, adHocMode, playoffCountOverride, highScoreMode,ftcMode }) {
+function BottomButtons({
+  previousMatch,
+  nextMatch,
+  matchDetails,
+  playoffSchedule,
+  eventHighScores,
+  alliances,
+  selectedEvent,
+  adHocMode,
+  playoffCountOverride,
+  highScoreMode,
+  ftcMode,
+  showWorldAndStatsOnAnnouncePlayByPlay,
+  worldStats,
+  ftcRegionHighScores,
+  ftcLeagueHighScores,
+  selectedYear,
+  eventNamesCY,
+  districts,
+  ftcLeagues,
+}) {
     var matches = playoffSchedule?.schedule;
     var eventHighScore = eventHighScores?.highscores?.overallqual;
     if (!highScoreMode) {
@@ -40,6 +61,18 @@ function BottomButtons({ previousMatch, nextMatch, matchDetails, playoffSchedule
                     {!adHocMode && <Button size="lg" variant="outline-success" className={"gatool-button buttonNoWrap"} onClick={nextMatch}><span className={"d-none d-lg-block"}>Next Match <CaretRightFill /></span><span className={"d-block d-lg-none"}><CaretRightFill /> <CaretRightFill /></span></Button>}
                 </Col>
             </Row>
+            {showWorldAndStatsOnAnnouncePlayByPlay !== false && (
+              <HighScoresSummary
+                worldStats={worldStats}
+                ftcRegionHighScores={ftcRegionHighScores}
+                ftcLeagueHighScores={ftcLeagueHighScores}
+                selectedEvent={selectedEvent}
+                selectedYear={selectedYear}
+                eventNamesCY={eventNamesCY}
+                districts={districts}
+                ftcLeagues={ftcLeagues}
+              />
+            )}
             <Row><FoulButtons currentYear={selectedEvent?.year} ftcMode={ftcMode}/></Row>
             <Row> <br /><br /><br /></Row>
         </>

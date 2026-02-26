@@ -1,6 +1,7 @@
 import { Alert, Container, Row, Col } from "react-bootstrap";
 import StatsMatch from "../components/StatsMatch";
 import _ from "lodash";
+import { useState } from "react";
 
 function StatsPage({
   worldStats,
@@ -12,6 +13,8 @@ function StatsPage({
   selectedYear,
   ftcMode,
   ftcRegionHighScores,
+  ftcLeagueHighScores,
+  ftcLeagues,
 }) {
   const eventDistrict = _.filter(districts, {
     value: selectedEvent?.value?.districtCode,
@@ -19,11 +22,19 @@ function StatsPage({
   const hasAnyStats =
     worldStats ||
     eventHighScores ||
-    ftcRegionHighScores;
+    ftcRegionHighScores ||
+    ftcLeagueHighScores;
   const isFTC = !!ftcMode;
+  const hasLeague = !!(isFTC && selectedEvent?.value?.leagueCode);
+  const [useLeagueHighScores, setUseLeagueHighScores] = useState(false);
   const ftcRegionLabel = selectedEvent?.value?.regionCode
     ? `Region ${selectedEvent.value.regionCode}`
     : "Region";
+  const leagueOption = _.find(ftcLeagues || [], { value: selectedEvent?.value?.leagueCode });
+  const ftcLeagueLabel = leagueOption?.label || (selectedEvent?.value?.leagueCode ? `League ${selectedEvent.value.leagueCode}` : "League");
+  const ftcRegionOrLeagueScores = hasLeague && useLeagueHighScores ? ftcLeagueHighScores : ftcRegionHighScores;
+  const ftcRegionOrLeagueLabel = hasLeague && useLeagueHighScores ? ftcLeagueLabel : ftcRegionLabel;
+  const ftcRegionOrLeagueHeaderBg = hasLeague && useLeagueHighScores ? "#eff9ee" : "#fff5ce";
 
   return (
     <Container fluid>
@@ -50,7 +61,7 @@ function StatsPage({
         <Container fluid>
           <Row>
             {/* World High Scores (FRC and FTC use same endpoint: {{apiBase}}/{{season}}/highscores) */}
-            {worldStats && <Col xs={"12"} sm={((selectedEvent?.value?.districtCode && !isFTC) || (isFTC && ftcRegionHighScores)) ? "4" : "6"}>
+            {worldStats && <Col xs={"12"} sm={((selectedEvent?.value?.districtCode && !isFTC) || (isFTC && (ftcRegionHighScores || ftcLeagueHighScores))) ? "4" : "6"}>
               <table className="table table-condensed gatool-highScores-Table gatool-worldHighScores">
                 <thead>
                   <tr>
@@ -215,37 +226,57 @@ function StatsPage({
                 </table>
               </Col>
             )}
-            {/* FTC Region High Scores */}
-            {ftcRegionHighScores && isFTC && (
+            {/* FTC Region / League High Scores */}
+            {(ftcRegionHighScores || ftcLeagueHighScores) && isFTC && (
               <Col xs={"12"} sm={"4"}>
-                <table className="table table-condensed gatool-highScores-Table gatool-districtHighScores">
+                <table className="table table-condensed gatool-highScores-Table gatool-districtHighScores" style={{ tableLayout: "fixed", width: "100%", backgroundColor: ftcRegionOrLeagueHeaderBg }}>
                   <thead>
                     <tr>
-                      <td className={"statsMatchHeader"} colSpan={2} style={{ backgroundColor: "#fff5ce" }}>
-                        {ftcRegionLabel} High Scores {ftcRegionHighScores?.year}
+                      <td className={"statsMatchHeader"} colSpan={2} style={{ backgroundColor: ftcRegionOrLeagueHeaderBg }}>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.5rem", minHeight: "2rem" }}>
+                          <span style={{ flex: "1 1 auto", minWidth: 0 }}>{ftcRegionOrLeagueLabel} High Scores {ftcRegionOrLeagueScores?.year}</span>
+                          {hasLeague && (
+                            <span style={{ flex: "0 0 auto", minWidth: "11rem" }}>
+                              <button
+                                type="button"
+                                className={`btn btn-sm ${!useLeagueHighScores ? "btn-primary" : "btn-outline-primary"}`}
+                                onClick={() => setUseLeagueHighScores(false)}
+                              >
+                                Region
+                              </button>
+                              <button
+                                type="button"
+                                className={`btn btn-sm ms-1 ${useLeagueHighScores ? "btn-primary" : "btn-outline-primary"}`}
+                                onClick={() => setUseLeagueHighScores(true)}
+                              >
+                                League
+                              </button>
+                            </span>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
-                      <td style={{ backgroundColor: "#fff5ce" }}>Qualification</td>
-                      <td style={{ backgroundColor: "#fff5ce" }}>Playoff</td>
+                      <td style={{ backgroundColor: ftcRegionOrLeagueHeaderBg }}>Qualification</td>
+                      <td style={{ backgroundColor: ftcRegionOrLeagueHeaderBg }}>Playoff</td>
                     </tr>
                     <tr>
-                      <StatsMatch highScores={ftcRegionHighScores?.highscores} matchType={"penaltyFreequal"} matchName={"No penalties in match"} eventNamesCY={eventNamesCY} tableType={"district"} />
-                      <StatsMatch highScores={ftcRegionHighScores?.highscores} matchType={"penaltyFreeplayoff"} matchName={"No penalties in match"} eventNamesCY={eventNamesCY} tableType={"district"} />
+                      <StatsMatch highScores={ftcRegionOrLeagueScores?.highscores} matchType={"penaltyFreequal"} matchName={"No penalties in match"} eventNamesCY={eventNamesCY} tableType={"district"} backgroundColorOverride={ftcRegionOrLeagueHeaderBg} />
+                      <StatsMatch highScores={ftcRegionOrLeagueScores?.highscores} matchType={"penaltyFreeplayoff"} matchName={"No penalties in match"} eventNamesCY={eventNamesCY} tableType={"district"} backgroundColorOverride={ftcRegionOrLeagueHeaderBg} />
                     </tr>
                     <tr>
-                      <StatsMatch highScores={ftcRegionHighScores?.highscores} matchType={"TBAPenaltyFreequal"} matchName={"No penalties to winner"} eventNamesCY={eventNamesCY} tableType={"district"} />
-                      <StatsMatch highScores={ftcRegionHighScores?.highscores} matchType={"TBAPenaltyFreeplayoff"} matchName={"No penalties to winner"} eventNamesCY={eventNamesCY} tableType={"district"} />
+                      <StatsMatch highScores={ftcRegionOrLeagueScores?.highscores} matchType={"TBAPenaltyFreequal"} matchName={"No penalties to winner"} eventNamesCY={eventNamesCY} tableType={"district"} backgroundColorOverride={ftcRegionOrLeagueHeaderBg} />
+                      <StatsMatch highScores={ftcRegionOrLeagueScores?.highscores} matchType={"TBAPenaltyFreeplayoff"} matchName={"No penalties to winner"} eventNamesCY={eventNamesCY} tableType={"district"} backgroundColorOverride={ftcRegionOrLeagueHeaderBg} />
                     </tr>
                     <tr>
-                      <StatsMatch highScores={ftcRegionHighScores?.highscores} matchType={"offsettingqual"} matchName={"Offsetting penalties"} eventNamesCY={eventNamesCY} tableType={"district"} />
-                      <StatsMatch highScores={ftcRegionHighScores?.highscores} matchType={"offsettingplayoff"} matchName={"Offsetting penalties"} eventNamesCY={eventNamesCY} tableType={"district"} />
+                      <StatsMatch highScores={ftcRegionOrLeagueScores?.highscores} matchType={"offsettingqual"} matchName={"Offsetting penalties"} eventNamesCY={eventNamesCY} tableType={"district"} backgroundColorOverride={ftcRegionOrLeagueHeaderBg} />
+                      <StatsMatch highScores={ftcRegionOrLeagueScores?.highscores} matchType={"offsettingplayoff"} matchName={"Offsetting penalties"} eventNamesCY={eventNamesCY} tableType={"district"} backgroundColorOverride={ftcRegionOrLeagueHeaderBg} />
                     </tr>
                     <tr>
-                      <StatsMatch highScores={ftcRegionHighScores?.highscores} matchType={"overallqual"} matchName={"Incl. penalties"} eventNamesCY={eventNamesCY} tableType={"district"} />
-                      <StatsMatch highScores={ftcRegionHighScores?.highscores} matchType={"overallplayoff"} matchName={"Incl. penalties"} eventNamesCY={eventNamesCY} tableType={"district"} />
+                      <StatsMatch highScores={ftcRegionOrLeagueScores?.highscores} matchType={"overallqual"} matchName={"Incl. penalties"} eventNamesCY={eventNamesCY} tableType={"district"} backgroundColorOverride={ftcRegionOrLeagueHeaderBg} />
+                      <StatsMatch highScores={ftcRegionOrLeagueScores?.highscores} matchType={"overallplayoff"} matchName={"Incl. penalties"} eventNamesCY={eventNamesCY} tableType={"district"} backgroundColorOverride={ftcRegionOrLeagueHeaderBg} />
                     </tr>
                   </tbody>
                 </table>
@@ -254,7 +285,7 @@ function StatsPage({
             <Col
               xs={"12"}
               sm={
-                (isFTC && (worldStats || ftcRegionHighScores)) || (!isFTC && selectedEvent?.value?.districtCode && worldStats)
+                (isFTC && (worldStats || ftcRegionHighScores || ftcLeagueHighScores)) || (!isFTC && selectedEvent?.value?.districtCode && worldStats)
                   ? "4"
                   : worldStats
                   ? "6"
