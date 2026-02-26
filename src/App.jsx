@@ -38,6 +38,7 @@ import { useOnlineStatus } from "./contextProviders/OnlineContext";
 import { toast } from "react-toastify";
 import { trainingData } from "components/TrainingMatches";
 import { timeZones } from "components/TimeZones";
+import { extendFTCPlayoffScheduleWithPartialMatches } from "./utils/ftcPlayoffSchedule";
 import { useInterval } from "react-interval-hook";
 
 import "./App.css";
@@ -1749,6 +1750,24 @@ function App() {
     playoffschedule.matchesLastModified = playoffschedule.schedule?.headers
       ? moment(playoffschedule.schedule?.headers.matches["last-modified"])
       : moment();
+
+    // FTC: extend schedule with partially populated matches from bracket propagation (winners/losers to downstream series)
+    if (ftcMode && playoffschedule?.schedule?.length > 0 && Array.isArray(playoffschedule.schedule)) {
+      let allianceCountForPlayoff = 6;
+      if (playoffCountOverride?.value != null) {
+        allianceCountForPlayoff = parseInt(playoffCountOverride.value, 10);
+      } else if (teamList?.teamCountTotal != null) {
+        if (teamList.teamCountTotal <= 10) allianceCountForPlayoff = 2;
+        else if (teamList.teamCountTotal <= 20) allianceCountForPlayoff = 4;
+        else if (teamList.teamCountTotal <= 40) allianceCountForPlayoff = 6;
+        else allianceCountForPlayoff = 8;
+      }
+      playoffschedule.schedule = extendFTCPlayoffScheduleWithPartialMatches(
+        playoffschedule.schedule,
+        allianceCountForPlayoff,
+        true
+      );
+    }
 
     if (playoffschedule?.schedule?.length > 0) {
       completedMatchCount =
