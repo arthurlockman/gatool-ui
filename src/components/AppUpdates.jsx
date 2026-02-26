@@ -1,5 +1,21 @@
 export const appUpdates = [
   {
+    date: "February 26, 2026",
+    message: (
+      <ul>
+        <li>ALL PROGRAMS:</li>
+        <ul>
+          <li>Added World and District/Regional/League high scores to Announce, Play-By-Play</li>
+        </ul>
+        <li>FTC:</li>
+        <ul>
+          <li>Added League High Scores to Stats page</li>
+          <li>Restored school/organization name to Play-By-Play</li>
+          <li>Updated Playoffs Brackets to properly display Alliances in future matches, based on results from previous matches</li>
+        </ul>
+      </ul>
+    ),
+  },{
     date: "February 22, 2026",
     message: (
       <ul>
