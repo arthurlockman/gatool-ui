@@ -368,70 +368,58 @@ function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previous
 		overtimeOffset = 15;
 	}
 
-	// FTC Finals: series 6-11 are displayed as match numbers 6-11 in the bracket
-	// Access by array index (series - 1), so indices 5-10 for display matches 6-11
-	// Red (higher seed) wins with 1 victory, Blue (lower seed) needs 2 victories
-	
-	// Find the final series (highest series number in finals range)
-	let finalSeries = 11; // Default to highest series in finals range
+	// FTC Finals: bracket match numbers 6, 7, 8, ... correspond to series 6, 7, 8, ...
+	// Each slot shows the (last) match in that series. Red (higher seed) wins with 1 victory, Blue needs 2.
 	const scheduleToCheck = offlinePlayoffSchedule?.schedule || matches;
-	const finalsSeriesNumbers = scheduleToCheck
-		.filter((m) => m.series >= 6 && m.series <= 11)
-		.map((m) => m.series);
-	if (finalsSeriesNumbers.length > 0) {
-		finalSeries = Math.max(...finalsSeriesNumbers);
-	}
 	
-	// Get all matches from the final series sorted by match number
-	const finalSeriesMatchesForDisplay = scheduleToCheck
-		.filter((m) => m.series === finalSeries)
-		.sort((a, b) => {
-			const aMatchNum = a.originalMatchNumber || a.matchNumber;
-			const bMatchNum = b.originalMatchNumber || b.matchNumber;
-			return aMatchNum - bMatchNum;
+	// Helper: get the last (deciding) match for a given series
+	const getLastMatchInSeries = (seriesNum) => {
+		const seriesMatches = scheduleToCheck.filter((m) => m.series === seriesNum);
+		if (seriesMatches.length === 0) return null;
+		return seriesMatches.reduce((prev, current) => {
+			const prevMatchNum = prev.originalMatchNumber ?? prev.matchNumber ?? 0;
+			const currentMatchNum = current.originalMatchNumber ?? current.matchNumber ?? 0;
+			return currentMatchNum > prevMatchNum ? current : prev;
 		});
-	
-	// Helper function to check if a bracket match number should be displayed
-	const shouldDisplayFinalsMatch = (bracketMatchNumber) => {
-		// Map bracket position to match index: match 6 = index 0, match 7 = index 1, etc.
-		const positionIndex = bracketMatchNumber - 6;
-		return positionIndex < finalSeriesMatchesForDisplay.length;
 	};
 	
-	// Helper function to get score for a finals match position
+	// Helper function to check if a bracket match number should be displayed (series has at least one match)
+	const shouldDisplayFinalsMatch = (bracketMatchNumber) => {
+		const seriesNum = bracketMatchNumber;
+		return scheduleToCheck.some((m) => m.series === seriesNum);
+	};
+	
+	// Helper function to get score for a finals match: bracket N → series N, use last match in that series
 	const getFinalsMatchScoreForDisplay = (bracketMatchNumber, alliance) => {
-		// Map bracket position to match index: match 6 = index 0, match 7 = index 1, etc.
-		const positionIndex = bracketMatchNumber - 6;
-		const match = finalSeriesMatchesForDisplay[positionIndex];
+		const match = getLastMatchInSeries(bracketMatchNumber);
 		if (!match) return null;
-		
-		if (alliance === "red") {
-			return match.scoreRedFinal;
-		} else if (alliance === "blue") {
-			return match.scoreBlueFinal;
-		}
+		if (alliance === "red") return match.scoreRedFinal;
+		if (alliance === "blue") return match.scoreBlueFinal;
 		return null;
 	};
 	
-	// Helper function to get winner for a finals match position
+	// Helper function to get winner for a finals match: derive from redWins/blueWins (FTC API) or match.winner
 	const getFinalsMatchWinnerForDisplay = (bracketMatchNumber) => {
-		// Map bracket position to match index: match 6 = index 0, match 7 = index 1, etc.
-		const positionIndex = bracketMatchNumber - 6;
-		const match = finalSeriesMatchesForDisplay[positionIndex];
+		const match = getLastMatchInSeries(bracketMatchNumber);
 		if (!match) return null;
-		return match.winner;
+		if (match.winner?.winner) return match.winner;
+		if (match.redWins === true && match.blueWins === false) return { winner: "red" };
+		if (match.blueWins === true && match.redWins === false) return { winner: "blue" };
+		if (match.redWins === false && match.blueWins === false) return { winner: "tie" };
+		return null;
 	};
 	
-	// Only count matches from the final series
-	const finalSeriesMatches = scheduleToCheck.filter((m) => m.series === finalSeries);
+	// Tournament winner: count wins in finals series (6 and 7 for 4-alliance). Red wins with 1, Blue with 2.
+	const finalsSeriesNumbers = [...new Set(scheduleToCheck.filter((m) => m.series >= 6).map((m) => m.series))].sort((a, b) => a - b);
+	const finalSeriesMatches = scheduleToCheck.filter((m) => m.series >= 6);
 	
-	for (const finalsMatch of finalSeriesMatches) {
-		if (finalsMatch?.winner?.winner === "red") {
-			tournamentWinner.red += 1;
-		}
-		if (finalsMatch?.winner?.winner === "blue") {
-			tournamentWinner.blue += 1;
-		}
+	// Count series wins in finals (each series 6, 7, ... has one outcome: last match winner)
+	for (const seriesNum of finalsSeriesNumbers) {
+		const lastMatch = getLastMatchInSeries(seriesNum);
+		if (!lastMatch) continue;
+		const winner = lastMatch.winner?.winner ?? (lastMatch.redWins ? "red" : lastMatch.blueWins ? "blue" : null);
+		if (winner === "red") tournamentWinner.red += 1;
+		if (winner === "blue") tournamentWinner.blue += 1;
 	}
 	
 	if (tournamentWinner?.red >= 1) {
@@ -439,11 +427,14 @@ function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previous
 	} else if (tournamentWinner?.blue >= 2) {
 		tournamentWinner.winner = "blue";
 	} else if (finalSeriesMatches.length > 0) {
-		// Find the last match in the final series
+		// Find the last match in the finals (highest series, then highest matchNumber)
 		const lastFinalMatch = finalSeriesMatches.reduce((prev, current) => {
-			const prevMatchNum = prev.originalMatchNumber || prev.matchNumber;
-			const currentMatchNum = current.originalMatchNumber || current.matchNumber;
-			return (currentMatchNum > prevMatchNum) ? current : prev;
+			const prevSeries = prev.series ?? 0;
+			const currentSeries = current.series ?? 0;
+			if (currentSeries !== prevSeries) return currentSeries > prevSeries ? current : prev;
+			const prevMatchNum = prev.originalMatchNumber ?? prev.matchNumber ?? 0;
+			const currentMatchNum = current.originalMatchNumber ?? current.matchNumber ?? 0;
+			return currentMatchNum > prevMatchNum ? current : prev;
 		});
 		
 		if (lastFinalMatch?.winner?.tieWinner === "red") {

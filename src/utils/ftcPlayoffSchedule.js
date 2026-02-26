@@ -149,6 +149,9 @@ export function extendFTCPlayoffScheduleWithPartialMatches(
   // Map: series number -> array of matches (only from existing schedule; we add matches only when propagating)
   const bySeries = _.groupBy(schedule, "series");
 
+  // Do not add matches for series beyond the maximum in the original schedule (e.g. 4-alliance FTC has series 1–7; no series 8).
+  const maxSeriesInSchedule = Math.max(...schedule.map((m) => m.series ?? 0), 0);
+
   // Only propagate from a series when the *last* match in that series has a result (decides the outcome).
   // Multiple matches in a series indicate ties/tiebreakers; we don't know the winner until the last match is played.
   const seriesNumbersWithMatches = _.keys(bySeries).map(Number).filter((s) => bySeries[s]?.length > 0);
@@ -174,20 +177,26 @@ export function extendFTCPlayoffScheduleWithPartialMatches(
     const loserTeams = getTeamsForAlliance(lastMatchInSeries, loserColor);
     if (winnerTeams.length === 0 && loserTeams.length === 0) continue;
 
-    // Propagate winner to winnerTo (add target match only if we have teams and need to fill that series)
+    // Propagate winner to winnerTo. Do not create a new match for series beyond max in schedule (avoids extra finals tiebreaker slot when API only has 1–7).
     if (mc.winnerTo?.matchNumber != null && mc.winnerTo?.station && winnerTeams.length > 0) {
       const targetSeries = mc.winnerTo.matchNumber;
-      const targetStation = mc.winnerTo.station.toLowerCase();
-      const targetMatch = ensureMatchForSeries(bySeries, targetSeries, matchClasses);
-      setTeamsForStation(targetMatch, targetStation, winnerTeams);
+      const mayCreate = targetSeries <= maxSeriesInSchedule || (bySeries[targetSeries]?.length > 0);
+      if (mayCreate) {
+        const targetStation = mc.winnerTo.station.toLowerCase();
+        const targetMatch = ensureMatchForSeries(bySeries, targetSeries, matchClasses);
+        setTeamsForStation(targetMatch, targetStation, winnerTeams);
+      }
     }
 
-    // Propagate loser to loserTo
+    // Propagate loser to loserTo (same: do not create series beyond max in schedule)
     if (mc.loserTo?.matchNumber != null && mc.loserTo?.station && loserTeams.length > 0) {
       const targetSeries = mc.loserTo.matchNumber;
-      const targetStation = mc.loserTo.station.toLowerCase();
-      const targetMatch = ensureMatchForSeries(bySeries, targetSeries, matchClasses);
-      setTeamsForStation(targetMatch, targetStation, loserTeams);
+      const mayCreate = targetSeries <= maxSeriesInSchedule || (bySeries[targetSeries]?.length > 0);
+      if (mayCreate) {
+        const targetStation = mc.loserTo.station.toLowerCase();
+        const targetMatch = ensureMatchForSeries(bySeries, targetSeries, matchClasses);
+        setTeamsForStation(targetMatch, targetStation, loserTeams);
+      }
     }
   }
 
