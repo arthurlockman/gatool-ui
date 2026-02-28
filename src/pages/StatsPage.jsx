@@ -139,6 +139,22 @@ function StatsPage({
                       tableType={"world"}
                     />
                   </tr>
+                  <tr>
+                    <StatsMatch
+                      highScores={worldStats?.highscores}
+                      matchType={`${selectedYear.value}allianceContributionqual`}
+                      matchName={"Score minus penalties"}
+                      eventNamesCY={eventNamesCY}
+                      tableType={"world"}
+                    />
+                    <StatsMatch
+                      highScores={worldStats?.highscores}
+                      matchType={`${selectedYear.value}allianceContributionplayoff`}
+                      matchName={"Score minus penalties"}
+                      eventNamesCY={eventNamesCY}
+                      tableType={"world"}
+                    />
+                  </tr>
                 </tbody>
               </table>
             </Col>}
@@ -222,6 +238,22 @@ function StatsPage({
                         tableType={"district"}
                       />
                     </tr>
+                    <tr>
+                      <StatsMatch
+                        highScores={worldStats?.highscores}
+                        matchType={`${selectedYear.value}District${selectedEvent?.value?.districtCode}allianceContributionqual`}
+                        matchName={"Score minus penalties"}
+                        eventNamesCY={eventNamesCY}
+                        tableType={"district"}
+                      />
+                      <StatsMatch
+                        highScores={worldStats?.highscores}
+                        matchType={`${selectedYear.value}District${selectedEvent?.value?.districtCode}allianceContributionplayoff`}
+                        matchName={"Score minus penalties"}
+                        eventNamesCY={eventNamesCY}
+                        tableType={"district"}
+                      />
+                    </tr>
                   </tbody>
                 </table>
               </Col>
@@ -277,6 +309,10 @@ function StatsPage({
                     <tr>
                       <StatsMatch highScores={ftcRegionOrLeagueScores?.highscores} matchType={"overallqual"} matchName={"Incl. penalties"} eventNamesCY={eventNamesCY} tableType={"district"} backgroundColorOverride={ftcRegionOrLeagueHeaderBg} />
                       <StatsMatch highScores={ftcRegionOrLeagueScores?.highscores} matchType={"overallplayoff"} matchName={"Incl. penalties"} eventNamesCY={eventNamesCY} tableType={"district"} backgroundColorOverride={ftcRegionOrLeagueHeaderBg} />
+                    </tr>
+                    <tr>
+                      <StatsMatch highScores={ftcRegionOrLeagueScores?.highscores} matchType={"allianceContributionqual"} matchName={"Score minus penalties"} eventNamesCY={eventNamesCY} tableType={"district"} backgroundColorOverride={ftcRegionOrLeagueHeaderBg} />
+                      <StatsMatch highScores={ftcRegionOrLeagueScores?.highscores} matchType={"allianceContributionplayoff"} matchName={"Score minus penalties"} eventNamesCY={eventNamesCY} tableType={"district"} backgroundColorOverride={ftcRegionOrLeagueHeaderBg} />
                     </tr>
                   </tbody>
                 </table>
@@ -365,6 +401,22 @@ function StatsPage({
                       highScores={eventHighScores?.highscores}
                       matchType={"overallplayoff"}
                       matchName={"Incl. penalties"}
+                      eventNamesCY={eventNamesCY}
+                      tableType={"event"}
+                    />
+                  </tr>
+                  <tr>
+                    <StatsMatch
+                      highScores={eventHighScores?.highscores}
+                      matchType={"allianceContributionqual"}
+                      matchName={"Score minus penalties"}
+                      eventNamesCY={eventNamesCY}
+                      tableType={"event"}
+                    />
+                    <StatsMatch
+                      highScores={eventHighScores?.highscores}
+                      matchType={"allianceContributionplayoff"}
+                      matchName={"Score minus penalties"}
                       eventNamesCY={eventNamesCY}
                       tableType={"event"}
                     />

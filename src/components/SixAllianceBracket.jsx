@@ -391,27 +391,16 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 		}
 
 	// 6-Alliance Finals: series 10-15 are displayed as match numbers 10-15 in the bracket
-	// Access by array index (series - 1), so indices 9-14 for display matches 10-15
-	
-	// In FTC mode, find the final series (highest series number in finals range)
-	let finalSeries = 15; // Default to highest series in finals range
-	if (ftcMode) {
-		const scheduleToCheck = offlinePlayoffSchedule?.schedule || matches;
-		const finalsSeriesNumbers = scheduleToCheck
-			.filter((m) => m.series >= 10 && m.series <= 15)
-			.map((m) => m.series);
-		if (finalsSeriesNumbers.length > 0) {
-			finalSeries = Math.max(...finalsSeriesNumbers);
-		}
-	}
-	
-	// In FTC mode, get all matches from the final series sorted by match number
+	// In FTC mode, get all finals matches (series 10–15) sorted by series then match number, so bracket slots 10, 11, … map to Final 1, Final 2, …
 	const scheduleToCheckForFinals = offlinePlayoffSchedule?.schedule || matches;
 	const finalSeriesMatchesForDisplay = ftcMode ? scheduleToCheckForFinals
-		.filter((m) => m.series === finalSeries)
+		.filter((m) => m.series >= 10 && m.series <= 15)
 		.sort((a, b) => {
-			const aMatchNum = a.originalMatchNumber || a.matchNumber;
-			const bMatchNum = b.originalMatchNumber || b.matchNumber;
+			const aSeries = a.series ?? 0;
+			const bSeries = b.series ?? 0;
+			if (aSeries !== bSeries) return aSeries - bSeries;
+			const aMatchNum = a.originalMatchNumber ?? a.matchNumber ?? 0;
+			const bMatchNum = b.originalMatchNumber ?? b.matchNumber ?? 0;
 			return aMatchNum - bMatchNum;
 		}) : [];
 	
@@ -456,11 +445,8 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 	
 	// Only calculate tournament winner from matches in the final series (or all finals matches in FRC mode)
 	if (ftcMode) {
-		// In FTC mode, only count matches from the final series
-		const scheduleToCheck = offlinePlayoffSchedule?.schedule || matches;
-		const finalSeriesMatches = scheduleToCheck.filter((m) => m.series === finalSeries);
-		
-		for (const finalsMatch of finalSeriesMatches) {
+		// In FTC mode, count all finals matches (series 10–15), e.g. Final 1 and Final 2
+		for (const finalsMatch of finalSeriesMatchesForDisplay) {
 			if (finalsMatch?.winner?.winner === "red") {
 				tournamentWinner.red += 1;
 			}
@@ -499,16 +485,9 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 	
 	// Check for tiebreaker winner from the final series
 	if (ftcMode) {
-		const scheduleToCheck = offlinePlayoffSchedule?.schedule || matches;
-		const finalSeriesMatches = scheduleToCheck.filter((m) => m.series === finalSeries);
-		if (finalSeriesMatches.length > 0) {
-			// Find the last match in the final series
-			const lastFinalMatch = finalSeriesMatches.reduce((prev, current) => {
-				const prevMatchNum = prev.originalMatchNumber || prev.matchNumber;
-				const currentMatchNum = current.originalMatchNumber || current.matchNumber;
-				return (currentMatchNum > prevMatchNum) ? current : prev;
-			});
-			
+		if (finalSeriesMatchesForDisplay.length > 0) {
+			// Last finals match (already sorted by series then matchNumber)
+			const lastFinalMatch = finalSeriesMatchesForDisplay[finalSeriesMatchesForDisplay.length - 1];
 			if (lastFinalMatch?.winner?.tieWinner === "red") {
 				tournamentWinner.winner = "red";
 				tournamentWinner.level = lastFinalMatch?.winner?.level;

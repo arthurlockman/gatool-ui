@@ -89,13 +89,71 @@ function getMatchClassesForBracket(allianceCount, ftcMode) {
 }
 
 /**
+ * Infer FTC alliance count from schedule when it clearly matches 4-alliance bracket:
+ * two round-1 series (1, 2), then lower/upper round 2 (3, 4), then finals buildup (5, 6).
+ * Used when app default is 6 but schedule shape indicates 4-alliance (e.g. no teamList yet).
+ * @param {Array<object>} schedule - Playoff schedule with series numbers
+ * @returns {number|null} 4 if schedule looks like 4-alliance, else null
+ */
+function inferAllianceCountFromSchedule(schedule) {
+  if (!schedule?.length) return null;
+  const seriesNumbers = _.uniq(schedule.map((m) => m.series).filter((s) => s != null));
+  const maxSeries = Math.max(...seriesNumbers, 0);
+  const hasSeries1And2 = seriesNumbers.includes(1) && seriesNumbers.includes(2);
+  const hasSeries4 = seriesNumbers.includes(4);
+  // 4-alliance: round 1 = series 1, 2; round 2 = 3, 4; then 5, 6 (finals). Use maxSeries <= 6 to avoid confusing with 6-alliance or tiebreakers.
+  if (hasSeries1And2 && hasSeries4 && maxSeries <= 6) return 4;
+  return null;
+}
+
+/** Typical minutes between FTC playoff matches for predicted start time */
+const DEFAULT_MATCH_INTERVAL_MINUTES = 6;
+
+/**
+ * Get the latest timestamp from the schedule (startTime, actualStartTime, or postResultTime).
+ * @param {Array<object>} schedule - Matches with optional time fields
+ * @returns {number|null} Latest time as ms since epoch, or null
+ */
+function getLatestScheduleTimeMs(schedule) {
+  let latest = null;
+  schedule.forEach((m) => {
+    for (const key of ["postResultTime", "actualStartTime", "startTime"]) {
+      const v = m?.[key];
+      if (v != null && v !== "") {
+        const ms = new Date(v).getTime();
+        if (!Number.isNaN(ms) && (latest == null || ms > latest)) latest = ms;
+      }
+    }
+  });
+  return latest;
+}
+
+/**
+ * Predict start time for a new match in a series that comes after the existing schedule.
+ * @param {Array<object>} schedule - Original schedule (with series numbers and times)
+ * @param {number} targetSeries - Series number of the new match
+ * @param {number} intervalMinutes - Minutes to add per series step
+ * @returns {string|null} ISO start time string or null
+ */
+function getPredictedStartTime(schedule, targetSeries, intervalMinutes = DEFAULT_MATCH_INTERVAL_MINUTES) {
+  const maxSeriesInSchedule = Math.max(...schedule.map((m) => m.series ?? 0), 0);
+  if (targetSeries <= maxSeriesInSchedule) return null;
+  const latestMs = getLatestScheduleTimeMs(schedule);
+  if (latestMs == null) return null;
+  const steps = targetSeries - maxSeriesInSchedule;
+  const predictedMs = latestMs + steps * intervalMinutes * 60 * 1000;
+  return new Date(predictedMs).toISOString();
+}
+
+/**
  * Ensures there is at least one match for the given series in bySeries; if not, creates
  * one partial match and adds it. Returns the first match for that series.
  * @param {object} bySeries - Map series number -> array of matches (mutated)
  * @param {number} targetSeries - Series number
  * @param {Array<object>} matchClasses - Bracket match classes
+ * @param {string|null} predictedStartTime - Optional ISO start time for new match
  */
-function ensureMatchForSeries(bySeries, targetSeries, matchClasses) {
+function ensureMatchForSeries(bySeries, targetSeries, matchClasses, predictedStartTime = null) {
   let arr = bySeries[targetSeries];
   if (arr && arr.length > 0) return arr[0];
   const matchClass = matchClasses.find((mc) => mc.matchNumber === targetSeries);
@@ -104,7 +162,7 @@ function ensureMatchForSeries(bySeries, targetSeries, matchClasses) {
     tournamentLevel: "PLAYOFF",
     series: targetSeries,
     matchNumber: 1,
-    startTime: null,
+    startTime: predictedStartTime ?? null,
     actualStartTime: null,
     postResultTime: null,
     scoreRedFinal: null,
@@ -143,18 +201,24 @@ export function extendFTCPlayoffScheduleWithPartialMatches(
     return schedule;
   }
 
-  const matchClasses = getMatchClassesForBracket(allianceCount, ftcMode);
+  // If app defaulted to 6-alliance (e.g. no teamList yet), infer 4-alliance from schedule shape so we propagate to finals (series 6) correctly
+  let effectiveAllianceCount = allianceCount;
+  if (allianceCount === 6 && inferAllianceCountFromSchedule(schedule) === 4) {
+    effectiveAllianceCount = 4;
+  }
+
+  const matchClasses = getMatchClassesForBracket(effectiveAllianceCount, ftcMode);
   if (!matchClasses || matchClasses.length === 0) return schedule;
 
   // Map: series number -> array of matches (only from existing schedule; we add matches only when propagating)
   const bySeries = _.groupBy(schedule, "series");
 
-  // Do not add matches for series beyond the maximum in the original schedule (e.g. 4-alliance FTC has series 1–7; no series 8).
-  const maxSeriesInSchedule = Math.max(...schedule.map((m) => m.series ?? 0), 0);
-
   // Only propagate from a series when the *last* match in that series has a result (decides the outcome).
   // Multiple matches in a series indicate ties/tiebreakers; we don't know the winner until the last match is played.
-  const seriesNumbersWithMatches = _.keys(bySeries).map(Number).filter((s) => bySeries[s]?.length > 0);
+  const seriesNumbersWithMatches = _.keys(bySeries)
+    .map(Number)
+    .filter((s) => bySeries[s]?.length > 0)
+    .sort((a, b) => a - b);
 
   for (const seriesNum of seriesNumbersWithMatches) {
     const matchesInSeries = bySeries[seriesNum];
@@ -177,26 +241,22 @@ export function extendFTCPlayoffScheduleWithPartialMatches(
     const loserTeams = getTeamsForAlliance(lastMatchInSeries, loserColor);
     if (winnerTeams.length === 0 && loserTeams.length === 0) continue;
 
-    // Propagate winner to winnerTo. Do not create a new match for series beyond max in schedule (avoids extra finals tiebreaker slot when API only has 1–7).
+    // Propagate winner to winnerTo (create target series match if not present – e.g. Series 5 when API only has 1–4)
     if (mc.winnerTo?.matchNumber != null && mc.winnerTo?.station && winnerTeams.length > 0) {
       const targetSeries = mc.winnerTo.matchNumber;
-      const mayCreate = targetSeries <= maxSeriesInSchedule || (bySeries[targetSeries]?.length > 0);
-      if (mayCreate) {
-        const targetStation = mc.winnerTo.station.toLowerCase();
-        const targetMatch = ensureMatchForSeries(bySeries, targetSeries, matchClasses);
-        setTeamsForStation(targetMatch, targetStation, winnerTeams);
-      }
+      const targetStation = mc.winnerTo.station.toLowerCase();
+      const predictedStartTime = getPredictedStartTime(schedule, targetSeries);
+      const targetMatch = ensureMatchForSeries(bySeries, targetSeries, matchClasses, predictedStartTime);
+      setTeamsForStation(targetMatch, targetStation, winnerTeams);
     }
 
-    // Propagate loser to loserTo (same: do not create series beyond max in schedule)
+    // Propagate loser to loserTo
     if (mc.loserTo?.matchNumber != null && mc.loserTo?.station && loserTeams.length > 0) {
       const targetSeries = mc.loserTo.matchNumber;
-      const mayCreate = targetSeries <= maxSeriesInSchedule || (bySeries[targetSeries]?.length > 0);
-      if (mayCreate) {
-        const targetStation = mc.loserTo.station.toLowerCase();
-        const targetMatch = ensureMatchForSeries(bySeries, targetSeries, matchClasses);
-        setTeamsForStation(targetMatch, targetStation, loserTeams);
-      }
+      const targetStation = mc.loserTo.station.toLowerCase();
+      const predictedStartTime = getPredictedStartTime(schedule, targetSeries);
+      const targetMatch = ensureMatchForSeries(bySeries, targetSeries, matchClasses, predictedStartTime);
+      setTeamsForStation(targetMatch, targetStation, loserTeams);
     }
   }
 

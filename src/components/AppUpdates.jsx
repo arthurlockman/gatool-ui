@@ -1,5 +1,20 @@
 export const appUpdates = [
   {
+    date: "February 28, 2026",
+    message: (
+      <ul>
+        <li>ALL PROGRAMS:</li>
+        <ul>
+          <li>Introducing a new high score category: <b>score minus penalties,</b> which shows the Alliance's contribution to the finalscore.</li>
+        </ul>
+        <li>FTC:</li>
+        <ul>
+          <li>Updated Playoffs Brackets to properly display Alliances in future matches, based on results from previous matches</li>
+          <li>Restoring scores for finals matches in 6-Alliance Brackets</li>
+        </ul>
+      </ul>
+    ),
+  },{
     date: "February 26, 2026",
     message: (
       <ul>
