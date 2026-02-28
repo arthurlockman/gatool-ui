@@ -183,6 +183,16 @@ function HighScoresSummary({
 
   const isFRCRegionalOnly = !isFTC && !districtCode && sections.length === 1;
   const colSize = sections.length > 0 ? Math.floor(12 / sections.length) : 12;
+  const borderColor = (bg) => {
+    if (bg === "#f2dede") return "rgba(169, 68, 66, 0.6)";
+    if (bg === "#fff5ce") return "rgba(193, 154, 65, 0.6)";
+    if (bg === "#eff9ee") return "rgba(76, 134, 73, 0.5)";
+    return "rgba(0, 0, 0, 0.15)";
+  };
+
+  const scoreBlockStyle = (sec, isFirst) =>
+    isFirst ? {} : { borderTop: "2px solid " + borderColor(sec.bg), paddingTop: "0.5rem", marginTop: "0.5rem" };
+
   const renderColumn = (sec) => (
     <Col key={sec.label} xs={12} md={colSize}>
       <div
@@ -190,12 +200,18 @@ function HighScoresSummary({
         style={{ fontSize: "0.9rem", backgroundColor: sec.bg }}
       >
         <div className="fw-bold mb-2">{sec.label}</div>
-        <div className="text-muted small">No penalties to winner</div>
-        {renderEntry(sec.penaltyFree)}
-        <div className="text-muted small">Incl. penalties</div>
-        {renderEntry(sec.overall)}
-        <div className="text-muted small">Score minus penalties</div>
-        {renderEntry(sec.allianceContribution)}
+        <div style={scoreBlockStyle(sec, true)}>
+          <div className="text-muted small">No penalties to winner</div>
+          {renderEntry(sec.penaltyFree)}
+        </div>
+        <div style={scoreBlockStyle(sec, false)}>
+          <div className="text-muted small">Incl. penalties</div>
+          {renderEntry(sec.overall)}
+        </div>
+        <div style={scoreBlockStyle(sec, false)}>
+          <div className="text-muted small">Score minus penalties</div>
+          {renderEntry(sec.allianceContribution)}
+        </div>
       </div>
     </Col>
   );
