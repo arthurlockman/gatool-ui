@@ -3793,6 +3793,13 @@ function App() {
             })
             .join(" ");
           details.score = score.matchData.match[`score${details.alliance}Final`];
+          if (scoreType && typeof scoreType === "string" && scoreType.includes("allianceContribution")) {
+            const m = score.matchData.match;
+            const redF = m.scoreRedFinal ?? 0, blueF = m.scoreBlueFinal ?? 0, redFoul = m.scoreRedFoul ?? 0, blueFoul = m.scoreBlueFoul ?? 0;
+            details.score = details.alliance === "Red"
+              ? (ftcMode ? redF - blueFoul : redF - redFoul)
+              : (ftcMode ? blueF - redFoul : blueF - blueFoul);
+          }
           reducedScores[details.scoreType] = details;
         }
       });
@@ -3803,7 +3810,7 @@ function App() {
   }
 
   /** Known FTC score type suffixes used by StatsPage Region table matchTypes */
-  const FTC_SCORE_TYPE_SUFFIXES = /(penaltyFreequal|penaltyFreeplayoff|TBAPenaltyFreequal|TBAPenaltyFreeplayoff|offsettingqual|offsettingplayoff|overallqual|overallplayoff)$/;
+  const FTC_SCORE_TYPE_SUFFIXES = /(penaltyFreequal|penaltyFreeplayoff|TBAPenaltyFreequal|TBAPenaltyFreeplayoff|offsettingqual|offsettingplayoff|overallqual|overallplayoff|allianceContributionqual|allianceContributionplayoff)$/;
 
   /**
    * Normalizes FTC high scores API response (array) to the same shape as worldStats.highscores.
@@ -3841,6 +3848,13 @@ function App() {
           .map((team) => team.teamNumber)
           .join(" ");
         details.score = score.matchData.match[`score${details.alliance}Final`];
+        if (details.scoreType && details.scoreType.includes("allianceContribution")) {
+          const m = score?.matchData?.match || {};
+          const redF = m.scoreRedFinal ?? 0, blueF = m.scoreBlueFinal ?? 0, redFoul = m.scoreRedFoul ?? 0, blueFoul = m.scoreBlueFoul ?? 0;
+          details.score = details.alliance === "Red"
+            ? redF - blueFoul
+            : blueF - redFoul;
+        }
         if (details.scoreType) reducedScores[details.scoreType] = details;
       }
     });
@@ -3919,7 +3933,7 @@ function App() {
 
   /**
    * This function calculates event high scores from local match data.
-   * Tracks 4 categories: overall, penaltyFree, TBAPenaltyFree, and offsetting
+   * Tracks 5 categories: overall, penaltyFree, TBAPenaltyFree, offsetting, and allianceContribution
    * For both qualification and playoff matches.
    * @function calculateEventHighScores
    * @param qualSchedule The qualification schedule
@@ -3935,13 +3949,15 @@ function App() {
         overall: null,
         penaltyFree: null,
         TBAPenaltyFree: null,
-        offsetting: null
+        offsetting: null,
+        allianceContribution: null
       },
       playoff: {
         overall: null,
         penaltyFree: null,
         TBAPenaltyFree: null,
-        offsetting: null
+        offsetting: null,
+        allianceContribution: null
       }
     };
 
@@ -4022,6 +4038,28 @@ function App() {
           highScores[level].offsetting = { matchData, score: highScore };
         }
       }
+
+      // Category 5: Alliance contribution - highest score after deducting penalties.
+      // FRC: penalties RECEIVED (same side): contribution = final - sameSideFoul.
+      // FTC: penalties CREDITED TO OTHER (other side): contribution = final - otherSideFoul.
+      const redFoulRaw = match.scoreRedFoul || 0;
+      const blueFoulRaw = match.scoreBlueFoul || 0;
+      const redContribution = ftcMode ? redScore - blueFoulRaw : redScore - redFoulRaw;
+      const blueContribution = ftcMode ? blueScore - redFoulRaw : blueScore - blueFoulRaw;
+      const contributionAlliance = redContribution >= blueContribution ? "red" : "blue";
+      const contributionScore = Math.max(redContribution, blueContribution);
+      const contributionMatchData = {
+        ...matchData,
+        highScoreAlliance: contributionAlliance,
+        match: {
+          ...matchData.match,
+          scoreRedFoul: redFoulRaw,
+          scoreBlueFoul: blueFoulRaw
+        }
+      };
+      if (!highScores[level].allianceContribution || contributionScore > highScores[level].allianceContribution.score) {
+        highScores[level].allianceContribution = { matchData: contributionMatchData, score: contributionScore };
+      }
     }
 
     // Process qualification matches
@@ -4041,7 +4079,7 @@ function App() {
     // Convert to the desired output format
     const result = [];
     ['qual', 'playoff'].forEach(level => {
-      ['overall', 'penaltyFree', 'TBAPenaltyFree', 'offsetting'].forEach(type => {
+      ['overall', 'penaltyFree', 'TBAPenaltyFree', 'offsetting', 'allianceContribution'].forEach(type => {
         if (highScores[level][type]) {
           result.push({
             level: level,
@@ -4109,8 +4147,15 @@ function App() {
               return team.teamNumber;
             })
             .join(" ");
-          details.score =
-            score.matchData.match[`score${details.alliance}Final`];
+          if (score?.type === "allianceContribution") {
+            const m = score.matchData.match;
+            const redF = m.scoreRedFinal ?? 0, blueF = m.scoreBlueFinal ?? 0, redFoul = m.scoreRedFoul ?? 0, blueFoul = m.scoreBlueFoul ?? 0;
+            details.score = details.alliance === "Red"
+              ? (ftcMode ? redF - blueFoul : redF - redFoul)
+              : (ftcMode ? blueF - redFoul : blueF - blueFoul);
+          } else {
+            details.score = score.matchData.match[`score${details.alliance}Final`];
+          }
           reducedScores[details.scoreType] = details;
         }
       });

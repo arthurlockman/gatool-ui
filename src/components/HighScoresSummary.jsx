@@ -41,7 +41,7 @@ function HighScoresSummary({
 
   const sections = [];
 
-  // World: two results (penalty-free best, overall best)
+  // World: penalty-free best, overall best, alliance contribution
   if (worldStats?.highscores && year) {
     const penaltyFree = bestOfQualPlayoff(
       worldStats.highscores,
@@ -53,12 +53,18 @@ function HighScoresSummary({
       `${year}overallqual`,
       `${year}overallplayoff`
     );
-    if (penaltyFree || overall) {
+    const allianceContribution = bestOfQualPlayoff(
+      worldStats.highscores,
+      `${year}allianceContributionqual`,
+      `${year}allianceContributionplayoff`
+    );
+    if (penaltyFree || overall || allianceContribution) {
       sections.push({
         label: "World",
         bg: "#f2dede",
         penaltyFree,
         overall,
+        allianceContribution,
       });
     }
   }
@@ -75,12 +81,18 @@ function HighScoresSummary({
       "overallqual",
       "overallplayoff"
     );
-    if (penaltyFree || overall) {
+    const allianceContribution = bestOfQualPlayoff(
+      ftcRegionHighScores.highscores,
+      "allianceContributionqual",
+      "allianceContributionplayoff"
+    );
+    if (penaltyFree || overall || allianceContribution) {
       sections.push({
         label: regionCode ? `Region ${regionCode}` : "Region",
         bg: "#fff5ce",
         penaltyFree,
         overall,
+        allianceContribution,
       });
     }
   }
@@ -97,7 +109,12 @@ function HighScoresSummary({
       "overallqual",
       "overallplayoff"
     );
-    if (penaltyFree || overall) {
+    const allianceContribution = bestOfQualPlayoff(
+      ftcLeagueHighScores.highscores,
+      "allianceContributionqual",
+      "allianceContributionplayoff"
+    );
+    if (penaltyFree || overall || allianceContribution) {
       const leagueOption = _.find(ftcLeagues || [], { value: leagueCode });
       const leagueLabel = leagueOption?.label || `League ${leagueCode}`;
       sections.push({
@@ -105,6 +122,7 @@ function HighScoresSummary({
         bg: "#eff9ee",
         penaltyFree,
         overall,
+        allianceContribution,
       });
     }
   }
@@ -122,7 +140,12 @@ function HighScoresSummary({
       `${prefix}overallqual`,
       `${prefix}overallplayoff`
     );
-    if (penaltyFree || overall) {
+    const allianceContribution = bestOfQualPlayoff(
+      worldStats.highscores,
+      `${prefix}allianceContributionqual`,
+      `${prefix}allianceContributionplayoff`
+    );
+    if (penaltyFree || overall || allianceContribution) {
       const districtOption = _.filter(districts || [], {
         value: districtCode,
       })[0];
@@ -132,6 +155,7 @@ function HighScoresSummary({
         bg: "#fff5ce",
         penaltyFree,
         overall,
+        allianceContribution,
       });
     }
   }
@@ -159,6 +183,16 @@ function HighScoresSummary({
 
   const isFRCRegionalOnly = !isFTC && !districtCode && sections.length === 1;
   const colSize = sections.length > 0 ? Math.floor(12 / sections.length) : 12;
+  const borderColor = (bg) => {
+    if (bg === "#f2dede") return "rgba(169, 68, 66, 0.6)";
+    if (bg === "#fff5ce") return "rgba(193, 154, 65, 0.6)";
+    if (bg === "#eff9ee") return "rgba(76, 134, 73, 0.5)";
+    return "rgba(0, 0, 0, 0.15)";
+  };
+
+  const scoreBlockStyle = (sec, isFirst) =>
+    isFirst ? {} : { borderTop: "2px solid " + borderColor(sec.bg), paddingTop: "0.5rem", marginTop: "0.5rem" };
+
   const renderColumn = (sec) => (
     <Col key={sec.label} xs={12} md={colSize}>
       <div
@@ -166,20 +200,28 @@ function HighScoresSummary({
         style={{ fontSize: "0.9rem", backgroundColor: sec.bg }}
       >
         <div className="fw-bold mb-2">{sec.label}</div>
-        <div className="text-muted small">No penalties to winner</div>
-        {renderEntry(sec.penaltyFree)}
-        <div className="text-muted small">Incl. penalties</div>
-        {renderEntry(sec.overall)}
+        <div style={scoreBlockStyle(sec, true)}>
+          <div className="text-muted small">No penalties to winner</div>
+          {renderEntry(sec.penaltyFree)}
+        </div>
+        <div style={scoreBlockStyle(sec, false)}>
+          <div className="text-muted small">Incl. penalties</div>
+          {renderEntry(sec.overall)}
+        </div>
+        <div style={scoreBlockStyle(sec, false)}>
+          <div className="text-muted small">Score minus penalties</div>
+          {renderEntry(sec.allianceContribution)}
+        </div>
       </div>
     </Col>
   );
 
-  // FRC Regionals (World only): show as two columns (No penalties to winner | Incl. penalties)
+  // FRC Regionals (World only): show as three columns (No penalties to winner | Incl. penalties | Score minus penalties)
   if (isFRCRegionalOnly) {
     const sec = sections[0];
     return (
       <Row className="mb-2">
-        <Col xs={12} md={6}>
+        <Col xs={12} md={4}>
           <div
             className="border rounded p-2 h-100"
             style={{ fontSize: "0.9rem", backgroundColor: sec.bg }}
@@ -188,13 +230,22 @@ function HighScoresSummary({
             {renderEntry(sec.penaltyFree)}
           </div>
         </Col>
-        <Col xs={12} md={6}>
+        <Col xs={12} md={4}>
           <div
             className="border rounded p-2 h-100"
             style={{ fontSize: "0.9rem", backgroundColor: sec.bg }}
           >
             <div className="fw-bold mb-2">{sec.label} — Incl. penalties</div>
             {renderEntry(sec.overall)}
+          </div>
+        </Col>
+        <Col xs={12} md={4}>
+          <div
+            className="border rounded p-2 h-100"
+            style={{ fontSize: "0.9rem", backgroundColor: sec.bg }}
+          >
+            <div className="fw-bold mb-2">{sec.label} — Score minus penalties</div>
+            {renderEntry(sec.allianceContribution)}
           </div>
         </Col>
       </Row>
