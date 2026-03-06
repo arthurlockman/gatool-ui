@@ -6792,6 +6792,8 @@ function App() {
                     practiceSchedule={practiceSchedule}
                     eventNamesCY={eventNamesCY}
                     districtRankings={districtRankings}
+                    regionalEventDetail={regionalEventDetail}
+                    getRegionalEventDetail={getRegionalEventDetail}
                     showDistrictChampsStats={showDistrictChampsStats}
                     showBlueBanners={showBlueBanners}
                     adHocMatch={adHocMatch}
@@ -6858,6 +6860,8 @@ function App() {
                     setMatchFromMenu={setMatchFromMenu}
                     practiceSchedule={practiceSchedule}
                     districtRankings={districtRankings}
+                    regionalEventDetail={regionalEventDetail}
+                    getRegionalEventDetail={getRegionalEventDetail}
                     adHocMatch={adHocMatch}
                     setAdHocMatch={setAdHocMatch}
                     adHocMode={adHocMode}

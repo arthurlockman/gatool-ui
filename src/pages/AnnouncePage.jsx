@@ -48,6 +48,8 @@ function AnnouncePage({
   practiceSchedule,
   eventNamesCY,
   districtRankings,
+  regionalEventDetail,
+  getRegionalEventDetail,
   showDistrictChampsStats,
   showBlueBanners,
   adHocMatch,
@@ -78,6 +80,14 @@ function AnnouncePage({
 }) {
   // Remember scroll position for Announce page
   useScrollPosition('announce', true, false, useScrollMemory);
+
+  const isRegionalEvent = !ftcMode && !selectedEvent?.value?.districtCode;
+  const regionalDetailForSeason = regionalEventDetail?.season === selectedYear?.value ? regionalEventDetail : null;
+  useEffect(() => {
+    if (isRegionalEvent && selectedEvent?.value?.code && !selectedEvent?.value?.code.includes("OFFLINE") && !regionalDetailForSeason && getRegionalEventDetail) {
+      getRegionalEventDetail();
+    }
+  }, [isRegionalEvent, selectedEvent?.value?.code, regionalDetailForSeason, getRegionalEventDetail]);
 
   // Reset scroll position when navigating to a different match
   // Reset both Announce and Play By Play scroll positions when match changes
@@ -168,6 +178,24 @@ function AnnouncePage({
       team.districtRanking = teamDistrictRanks?.rank;
       team.qualifiedDistrictCmp = teamDistrictRanks?.qualifiedDistrictCmp;
       team.qualifiedFirstCmp = teamDistrictRanks?.qualifiedFirstCmp;
+      // Regional event: set World Champs qualification from regional advancement (main teams Red1–Red3, Blue1–Blue3)
+      if (
+        !ftcMode &&
+        !selectedEvent?.value?.districtCode &&
+        selectedEvent?.value?.code &&
+        !selectedEvent?.value?.code.includes("OFFLINE") &&
+        regionalEventDetail?.teams?.length > 0 &&
+        (regionalEventDetail?.season == null || regionalEventDetail?.season === selectedYear?.value || String(regionalEventDetail?.season) === String(selectedYear?.value))
+      ) {
+        const lookupNumber = remapStringToNumber ? remapStringToNumber(team?.teamNumber) : team?.teamNumber;
+        const num = lookupNumber != null ? Number(lookupNumber) : NaN;
+        const regionalAdvancement = _.find(regionalEventDetail.teams, (t) =>
+          Number(t.teamNumber) === num || String(t.teamNumber) === String(lookupNumber)
+        );
+        if (regionalAdvancement) {
+          team.qualifiedFirstCmp = Boolean(regionalAdvancement.qualifiedFirstCmp);
+        }
+      }
     }
 
     if (station?.slice(-1) === "4") {
@@ -231,13 +259,30 @@ function AnnouncePage({
           team.allianceRole =
             alliances?.Lookup[`${lookupRemainingTeam}`]?.role || null;
 
-          teamDistrictRanks =
-            _.filter(districtRankings?.districtRanks, {
-              teamNumber: lookupRemainingTeam,
-            })[0] || null;
-          team.districtRanking = teamDistrictRanks?.rank;
-          team.qualifiedDistrictCmp = teamDistrictRanks?.qualifiedDistrictCmp;
-          team.qualifiedFirstCmp = teamDistrictRanks?.qualifiedFirstCmp;
+          if (selectedEvent?.value?.districtCode) {
+            teamDistrictRanks =
+              _.filter(districtRankings?.districtRanks, {
+                teamNumber: lookupRemainingTeam,
+              })[0] || null;
+            team.districtRanking = teamDistrictRanks?.rank;
+            team.qualifiedDistrictCmp = teamDistrictRanks?.qualifiedDistrictCmp;
+            team.qualifiedFirstCmp = teamDistrictRanks?.qualifiedFirstCmp;
+          } else if (
+            !ftcMode &&
+            selectedEvent?.value?.code &&
+            !selectedEvent?.value?.code.includes("OFFLINE") &&
+            regionalEventDetail?.teams?.length > 0 &&
+            (regionalEventDetail?.season == null || regionalEventDetail?.season === selectedYear?.value || String(regionalEventDetail?.season) === String(selectedYear?.value))
+          ) {
+            const lookupNumber = remapStringToNumber ? remapStringToNumber(lookupRemainingTeam) : lookupRemainingTeam;
+            const num = lookupNumber != null ? Number(lookupNumber) : NaN;
+            const regionalAdvancement = _.find(regionalEventDetail.teams, (t) =>
+              Number(t.teamNumber) === num || String(t.teamNumber) === String(lookupNumber)
+            );
+            if (regionalAdvancement) {
+              team.qualifiedFirstCmp = Boolean(regionalAdvancement.qualifiedFirstCmp);
+            }
+          }
         }
       }
     }

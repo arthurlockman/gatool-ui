@@ -241,6 +241,7 @@ function RanksPage({
       teamRow.regionalAdvancement = _.find(regionalDetailForThisEvent.teams, {
         teamNumber: lookupNumber,
       });
+      teamRow.regionalRanking = teamRow.regionalAdvancement?.rank ?? 99999;
     }
     return teamRow;
   });
@@ -696,8 +697,26 @@ function RanksPage({
                     </th>
                   )}
                   {isRegionalEvent && (
-                    <th>
-                      <b>World Ranking</b>
+                    <th
+                      onClick={() =>
+                        rankSort === "regionalRanking"
+                          ? setRankSort("-regionalRanking")
+                          : setRankSort("regionalRanking")
+                      }
+                    >
+                      <b>
+                        World Ranking
+                        {rankSort === "regionalRanking" ? (
+                          <SortNumericUp />
+                        ) : (
+                          ""
+                        )}
+                        {rankSort === "-regionalRanking" ? (
+                          <SortNumericDown />
+                        ) : (
+                          ""
+                        )}
+                      </b>
                     </th>
                   )}
                 </tr>
