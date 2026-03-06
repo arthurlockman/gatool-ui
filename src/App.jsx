@@ -365,6 +365,8 @@ function App() {
     "cache:districtRankings",
     null
   );
+  // Live data: changes after every match; do not persist
+  const [regionalEventDetail, setRegionalEventDetail] = useState(null);
   const [adHocMatch, setAdHocMatch] = useState([
     { teamNumber: null, station: "Red1", surrogate: false, dq: false },
     { teamNumber: null, station: "Red2", surrogate: false, dq: false },
@@ -3544,6 +3546,10 @@ function App() {
         getDistrictRanks();
       }
     }
+      // FRC Regional event: fetch championship advancement per team (live data — changes after every match)
+    if (!ftcMode && !selectedEvent?.value?.districtCode && selectedEvent?.value?.code && !selectedEvent?.value?.code.includes("OFFLINE")) {
+      getRegionalEventDetail(ranks?.ranks);
+    }
   }
 
   /** This function retrieves the ranking data for a specific District from FIRST
@@ -3564,6 +3570,48 @@ function App() {
     districtranks = await result.json();
     districtranks.lastUpdate = moment().format();
     setDistrictRankings(districtranks);
+  }
+
+  /** Fetches regional championship advancement per team (teamdetail/teamNumber); backend is paged so we fetch each event team individually.
+   * @param ranksOverride - optional array of rank rows (e.g. from getRanks) to use for team list; each must have teamNumber.
+   */
+  async function getRegionalEventDetail(ranksOverride) {
+    if (!selectedYear?.value) return;
+    const teamNumbers = (ranksOverride?.map((r) => r.teamNumber)) ?? teamList?.teams?.map((t) => t.teamNumber) ?? rankings?.ranks?.map((r) => r.teamNumber) ?? [];
+    if (teamNumbers.length === 0) {
+      setRegionalEventDetail(null);
+      return;
+    }
+    try {
+      const responses = await Promise.allSettled(
+        teamNumbers.map((teamNumber) =>
+          httpClient.getNoAuth(`${selectedYear?.value}/regional/teamdetail/${teamNumber}`)
+        )
+      );
+      const teams = [];
+      for (let i = 0; i < responses.length; i++) {
+        const r = responses[i];
+        if (r.status === "fulfilled" && r.value && r.value.status === 200) {
+          try {
+            // @ts-ignore
+            const data = await r.value.json();
+            // Per-team endpoint returns { season, teams: [ singleTeam ], ... }
+            if (data.teams && Array.isArray(data.teams)) {
+              teams.push(...data.teams);
+            }
+          } catch (_) {
+            // skip failed parse
+          }
+        }
+      }
+      setRegionalEventDetail({
+        season: selectedYear?.value,
+        lastUpdate: moment().format(),
+        teams,
+      });
+    } catch (e) {
+      setRegionalEventDetail(null);
+    }
   }
 
   /** This function retrieves URLs for robot images from The Blue Alliance
@@ -4886,6 +4934,7 @@ function App() {
 
       setCurrentMatch(1);
       await setDistrictRankings(null);
+      setRegionalEventDetail(null);
       setAdHocMatch([
         { teamNumber: null, station: "Red1", surrogate: false, dq: false },
         { teamNumber: null, station: "Red2", surrogate: false, dq: false },
@@ -6692,6 +6741,9 @@ function App() {
                     setAllianceSelectionArrays={setAllianceSelectionArrays}
                     playoffs={playoffs}
                     districtRankings={districtRankings}
+                    regionalEventDetail={regionalEventDetail}
+                    getRegionalEventDetail={getRegionalEventDetail}
+                    selectedYear={selectedYear}
                     eventLabel={eventLabel}
                     communityUpdates={communityUpdates}
                     EPA={EPA}
