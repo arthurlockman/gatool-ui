@@ -1,4 +1,4 @@
-import { useEffect, useRef, useContext } from 'react';
+import { useEffect, useRef, useContext, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ScrollContainerContext } from '../contextProviders/ScrollContainerContext';
 
@@ -21,48 +21,53 @@ function useScrollPosition(pageKey, shouldRememberScroll = true, shouldScrollToT
   // If scroll memory is disabled globally, don't remember scroll
   const effectiveShouldRememberScroll = useScrollMemory && shouldRememberScroll;
 
-  const getScrollElement = () => scrollContainerRef?.current ?? null;
-
-  const getScrollTop = () => {
-    const el = getScrollElement();
+  const getScrollTop = useCallback(() => {
+    const el = scrollContainerRef?.current ?? null;
     return el ? el.scrollTop : window.scrollY;
-  };
+  }, [scrollContainerRef]);
 
-  const setScrollTop = (value) => {
-    const el = getScrollElement();
+  const setScrollTop = useCallback((value) => {
+    const el = scrollContainerRef?.current ?? null;
     if (el) el.scrollTo(0, value);
     else window.scrollTo(0, value);
-  };
+  }, [scrollContainerRef]);
 
-  // Save scroll position as user scrolls
+  // Save scroll position as user scrolls so it's correct when navigating away
+  // (saving only on navigate/unmount fails because the new page scrolls to top before we save)
   useEffect(() => {
     if (!effectiveShouldRememberScroll) return;
 
-    const el = getScrollElement();
+    const el = scrollContainerRef?.current ?? null;
+    let rafId = null;
     const handleScroll = () => {
-      scrollPositionRef.current = getScrollTop();
+      const top = getScrollTop();
+      scrollPositionRef.current = top;
+      if (rafId !== null) return;
+      rafId = requestAnimationFrame(() => {
+        sessionStorage.setItem(`scrollPosition_${pageKey}`, String(top));
+        rafId = null;
+      });
     };
 
     if (el) {
       el.addEventListener('scroll', handleScroll, { passive: true });
-      return () => el.removeEventListener('scroll', handleScroll);
+      return () => {
+        if (rafId !== null) cancelAnimationFrame(rafId);
+        el.removeEventListener('scroll', handleScroll);
+      };
     } else {
       window.addEventListener('scroll', handleScroll, { passive: true });
-      return () => window.removeEventListener('scroll', handleScroll);
+      return () => {
+        if (rafId !== null) cancelAnimationFrame(rafId);
+        window.removeEventListener('scroll', handleScroll);
+      };
     }
-  }, [effectiveShouldRememberScroll]);
+  }, [effectiveShouldRememberScroll, getScrollTop, scrollContainerRef, pageKey]);
 
-  // Save scroll position when navigating away from this page
+  // Keep previousPathnameRef in sync for restore logic
   useEffect(() => {
-    const previousPathname = previousPathnameRef.current;
     previousPathnameRef.current = location.pathname;
-
-    // If we're leaving this page, save the scroll position
-    if (previousPathname !== location.pathname && effectiveShouldRememberScroll) {
-      scrollPositionRef.current = getScrollTop();
-      sessionStorage.setItem(`scrollPosition_${pageKey}`, scrollPositionRef.current.toString());
-    }
-  }, [location.pathname, pageKey, effectiveShouldRememberScroll]);
+  }, [location.pathname]);
 
   // Restore scroll position on mount or when shouldScrollToTop changes
   useEffect(() => {
@@ -99,14 +104,13 @@ function useScrollPosition(pageKey, shouldRememberScroll = true, shouldScrollToT
       setScrollTop(0);
       hasRestoredRef.current = true;
     }
-  }, [location.pathname, pageKey, effectiveShouldRememberScroll, shouldScrollToTop]);
+  }, [location.pathname, pageKey, effectiveShouldRememberScroll, shouldScrollToTop, setScrollTop]);
 
-  // Save scroll position when component unmounts
+  // Save scroll position when component unmounts (use ref value; getScrollTop() would be 0 after new page scrolls)
   useEffect(() => {
     return () => {
       if (effectiveShouldRememberScroll) {
-        scrollPositionRef.current = getScrollTop();
-        sessionStorage.setItem(`scrollPosition_${pageKey}`, scrollPositionRef.current.toString());
+        sessionStorage.setItem(`scrollPosition_${pageKey}`, String(scrollPositionRef.current));
       }
     };
   }, [pageKey, effectiveShouldRememberScroll]);
