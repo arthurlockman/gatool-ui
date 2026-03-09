@@ -2,6 +2,7 @@ import MainNavigation from "./components/MainNavigation";
 import BottomNavigation from "./components/BottomNavigation";
 import { Outlet, Route, Routes } from "react-router";
 import { BrowserRouter, useLocation } from "react-router-dom";
+import { ScrollContainerContext } from "./contextProviders/ScrollContainerContext";
 import SetupPage from "./pages/SetupPage";
 import SchedulePage from "./pages/SchedulePage";
 import TeamDataPage from "./pages/TeamDataPage";
@@ -107,39 +108,65 @@ function LayoutsWithNavbar({
   syncEvent,
 }) {
   const location = useLocation();
+  const scrollContainerRef = useRef(null);
 
   // Scroll to top for pages that don't have scroll memory
   useEffect(() => {
     const currentPath = location.pathname.replace('/', '') || '';
-    // Only scroll to top if this page doesn't have scroll memory
-    // (Pages with scroll memory handle their own scrolling via useScrollPosition hook)
     if (!pagesWithScrollMemory.includes(currentPath)) {
-      window.scrollTo(0, 0);
+      const el = scrollContainerRef.current;
+      if (el) el.scrollTo(0, 0);
+      else window.scrollTo(0, 0);
     }
   }, [location.pathname]);
 
   return (
-    <>
-      <MainNavigation
-        selectedEvent={selectedEvent}
-        qualSchedule={qualSchedule}
-        playoffs={playoffs}
-        teamList={teamList}
-        communityUpdates={communityUpdates}
-        rankings={rankings}
-        eventHighScores={eventHighScores}
-        worldHighScores={worldHighScores}
-        allianceSelection={allianceSelection}
-        practiceSchedule={practiceSchedule}
-        systemBell={systemBell}
-        systemMessage={systemMessage}
-        screenMode={screenMode}
-        screenModeStatus={screenModeStatus}
-        syncEvent={syncEvent}
-      />
-      <Outlet />
-      <BottomNavigation ftcMode={ftcMode} />
-    </>
+    <ScrollContainerContext.Provider value={scrollContainerRef}>
+      <div
+        className="app-layout-fixed"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          height: "100dvh",
+          overflow: "hidden",
+        }}
+      >
+        <header className="app-layout-top" style={{ flexShrink: 0 }}>
+          <MainNavigation
+            selectedEvent={selectedEvent}
+            qualSchedule={qualSchedule}
+            playoffs={playoffs}
+            teamList={teamList}
+            communityUpdates={communityUpdates}
+            rankings={rankings}
+            eventHighScores={eventHighScores}
+            worldHighScores={worldHighScores}
+            allianceSelection={allianceSelection}
+            practiceSchedule={practiceSchedule}
+            systemBell={systemBell}
+            systemMessage={systemMessage}
+            screenMode={screenMode}
+            screenModeStatus={screenModeStatus}
+            syncEvent={syncEvent}
+          />
+        </header>
+        <main
+          ref={scrollContainerRef}
+          className="app-layout-main"
+          style={{
+            flex: "1 1 0",
+            minHeight: 0,
+            overflowY: "auto",
+            WebkitOverflowScrolling: "touch",
+          }}
+        >
+          <Outlet />
+        </main>
+        <footer className="app-layout-bottom" style={{ flexShrink: 0 }}>
+          <BottomNavigation ftcMode={ftcMode} />
+        </footer>
+      </div>
+    </ScrollContainerContext.Provider>
   );
 }
 
@@ -365,6 +392,8 @@ function App() {
     "cache:districtRankings",
     null
   );
+  // Live data: changes after every match; do not persist
+  const [regionalEventDetail, setRegionalEventDetail] = useState(null);
   const [adHocMatch, setAdHocMatch] = useState([
     { teamNumber: null, station: "Red1", surrogate: false, dq: false },
     { teamNumber: null, station: "Red2", surrogate: false, dq: false },
@@ -3166,10 +3195,11 @@ function App() {
               } else {
                 console.log("Teams List loaded. Update from the Community");
                 var adHocTeams = adHocTeamList.map(async (team) => {
-                  // Get effective team number (with event prefix for demo teams)
+                  // Always use event key for demo teams (9970-9999) so edits persist
                   const effectiveTeamNumber = await getEffectiveTeamNumber(
                     team?.teamNumber,
-                    selectedEvent?.value?.code
+                    selectedEvent?.value?.code ?? null,
+                    selectedEvent?.value?.tbaEventKey ?? null
                   );
                   var request = await httpClient.getNoAuth(
                     `/team/${effectiveTeamNumber}/updates`,
@@ -3244,6 +3274,59 @@ function App() {
                 ...team,
                 teamNumber: typeof team.teamNumber === 'string' ? parseInt(team.teamNumber) : team.teamNumber
               }));
+
+              // Demo teams (9970-9999) are always keyed by event in the API. Always fetch their
+              // community updates from the event-prefixed endpoint so edits don't get overwritten by bulk data.
+              const demoTeamNumbers = new Set();
+              const collectDemoTeams = (scheduleObj) => {
+                const matchList = Array.isArray(scheduleObj) ? scheduleObj : (scheduleObj?.schedule ?? []);
+                const arr = Array.isArray(matchList) ? matchList : (matchList?.schedule ?? []) || [];
+                arr.forEach((match) => {
+                  const list = match?.teams ?? match?.schedule?.teams ?? [];
+                  (Array.isArray(list) ? list : []).forEach((t) => {
+                    const num = t?.teamNumber;
+                    if (num != null && num >= 9970 && num <= 9999) demoTeamNumbers.add(num);
+                  });
+                });
+              };
+              collectDemoTeams(qualSchedule?.schedule ?? qualSchedule);
+              collectDemoTeams(playoffSchedule?.schedule ?? playoffSchedule);
+              (teamList?.teams ?? []).forEach((t) => {
+                const num = t?.teamNumber;
+                if (num != null && num >= 9970 && num <= 9999) demoTeamNumbers.add(num);
+              });
+              // Remove any demo teams from bulk response so we always use event-keyed data for them
+              const isDemoTeam = (n) => n >= 9970 && n <= 9999;
+              teams = (teams || []).filter((t) => !isDemoTeam(t.teamNumber));
+              if (demoTeamNumbers.size > 0) {
+                const eventCode = selectedEvent?.value?.code ?? null;
+                const tbaKey = selectedEvent?.value?.tbaEventKey ?? null;
+                const demoUpdates = await Promise.all(
+                  [...demoTeamNumbers].map(async (teamNumber) => {
+                    const effectiveTeamNumber = await getEffectiveTeamNumber(teamNumber, eventCode, tbaKey);
+                    const request = await httpClient.getNoAuth(
+                      `/team/${effectiveTeamNumber}/updates`,
+                      ftcMode ? ftcBaseURL : undefined
+                    );
+                    const teamDetails = { teamNumber };
+                    if (request.status === 200) {
+                      // httpClient.getNoAuth may return Response or { status, statusText }
+                      const teamUpdate =
+                        "json" in request && typeof request.json === "function"
+                          ? await /** @type { { json: () => Promise<{ updates?: object }> } } */ (request).json()
+                          : {};
+                      teamDetails.updates = _.merge(
+                        _.cloneDeep(communityUpdateTemplate),
+                        teamUpdate?.updates ?? {}
+                      );
+                    } else {
+                      teamDetails.updates = _.cloneDeep(communityUpdateTemplate);
+                    }
+                    return teamDetails;
+                  })
+                );
+                teams = (teams || []).concat(demoUpdates);
+              }
             } else {
               setCommunityUpdates([]);
               setLoadingCommunityUpdates(false);
@@ -3544,6 +3627,10 @@ function App() {
         getDistrictRanks();
       }
     }
+      // FRC Regional event: fetch championship advancement per team (live data — changes after every match)
+    if (!ftcMode && !selectedEvent?.value?.districtCode && selectedEvent?.value?.code && !selectedEvent?.value?.code.includes("OFFLINE")) {
+      getRegionalEventDetail(ranks?.ranks);
+    }
   }
 
   /** This function retrieves the ranking data for a specific District from FIRST
@@ -3564,6 +3651,48 @@ function App() {
     districtranks = await result.json();
     districtranks.lastUpdate = moment().format();
     setDistrictRankings(districtranks);
+  }
+
+  /** Fetches regional championship advancement per team (teamdetail/teamNumber); backend is paged so we fetch each event team individually.
+   * @param ranksOverride - optional array of rank rows (e.g. from getRanks) to use for team list; each must have teamNumber.
+   */
+  async function getRegionalEventDetail(ranksOverride) {
+    if (!selectedYear?.value) return;
+    const teamNumbers = (ranksOverride?.map((r) => r.teamNumber)) ?? teamList?.teams?.map((t) => t.teamNumber) ?? rankings?.ranks?.map((r) => r.teamNumber) ?? [];
+    if (teamNumbers.length === 0) {
+      setRegionalEventDetail(null);
+      return;
+    }
+    try {
+      const responses = await Promise.allSettled(
+        teamNumbers.map((teamNumber) =>
+          httpClient.getNoAuth(`${selectedYear?.value}/regional/teamdetail/${teamNumber}`)
+        )
+      );
+      const teams = [];
+      for (let i = 0; i < responses.length; i++) {
+        const r = responses[i];
+        if (r.status === "fulfilled" && r.value && r.value.status === 200) {
+          try {
+            // @ts-ignore
+            const data = await r.value.json();
+            // Per-team endpoint returns { season, teams: [ singleTeam ], ... }
+            if (data.teams && Array.isArray(data.teams)) {
+              teams.push(...data.teams);
+            }
+          } catch (_) {
+            // skip failed parse
+          }
+        }
+      }
+      setRegionalEventDetail({
+        season: selectedYear?.value,
+        lastUpdate: moment().format(),
+        teams,
+      });
+    } catch (e) {
+      setRegionalEventDetail(null);
+    }
   }
 
   /** This function retrieves URLs for robot images from The Blue Alliance
@@ -4404,10 +4533,11 @@ function App() {
    * @returns {Promise<object>} result
    */
   async function putTeamData(teamNumber, data) {
-    // Get effective team number (with event prefix for demo teams)
+    // Get effective team number (with event prefix for demo teams 9970-9999, same as Offseason/playoff bye)
     const effectiveTeamNumber = await getEffectiveTeamNumber(
       teamNumber,
-      selectedEvent?.value?.code
+      selectedEvent?.value?.code,
+      selectedEvent?.value?.tbaEventKey ?? null
     );
     var result = await httpClient.put(
       `team/${effectiveTeamNumber}/updates`,
@@ -4886,6 +5016,7 @@ function App() {
 
       setCurrentMatch(1);
       await setDistrictRankings(null);
+      setRegionalEventDetail(null);
       setAdHocMatch([
         { teamNumber: null, station: "Red1", surrogate: false, dq: false },
         { teamNumber: null, station: "Red2", surrogate: false, dq: false },
@@ -6692,6 +6823,9 @@ function App() {
                     setAllianceSelectionArrays={setAllianceSelectionArrays}
                     playoffs={playoffs}
                     districtRankings={districtRankings}
+                    regionalEventDetail={regionalEventDetail}
+                    getRegionalEventDetail={getRegionalEventDetail}
+                    selectedYear={selectedYear}
                     eventLabel={eventLabel}
                     communityUpdates={communityUpdates}
                     EPA={EPA}
@@ -6740,6 +6874,8 @@ function App() {
                     practiceSchedule={practiceSchedule}
                     eventNamesCY={eventNamesCY}
                     districtRankings={districtRankings}
+                    regionalEventDetail={regionalEventDetail}
+                    getRegionalEventDetail={getRegionalEventDetail}
                     showDistrictChampsStats={showDistrictChampsStats}
                     showBlueBanners={showBlueBanners}
                     adHocMatch={adHocMatch}
@@ -6806,6 +6942,8 @@ function App() {
                     setMatchFromMenu={setMatchFromMenu}
                     practiceSchedule={practiceSchedule}
                     districtRankings={districtRankings}
+                    regionalEventDetail={regionalEventDetail}
+                    getRegionalEventDetail={getRegionalEventDetail}
                     adHocMatch={adHocMatch}
                     setAdHocMatch={setAdHocMatch}
                     adHocMode={adHocMode}

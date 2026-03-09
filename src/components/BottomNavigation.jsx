@@ -16,20 +16,13 @@ function BottomNavigation({ ftcMode }) {
 
   return (
     <>
-      <Navbar 
-        fixed="bottom" 
+      <Navbar
         bg="light"
-        className="navbar-fixed-bottom-custom"
+        className="navbar-fixed-bottom-custom app-layout-bottom-bar"
         style={{
-          position: "fixed",
-          bottom: 0,
-          left: 0,
-          right: 0,
           width: "100%",
-          zIndex: 1030,
-          transform: "translateZ(0)",
-          WebkitTransform: "translateZ(0)",
-          margin: 0
+          margin: 0,
+          flexShrink: 0,
         }}
       >
         <span style={{ width: "100%", fontSize: "11px" }}>

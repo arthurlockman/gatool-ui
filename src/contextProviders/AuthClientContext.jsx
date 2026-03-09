@@ -6,6 +6,17 @@ import { useOnlineStatus } from "./OnlineContext";
 export const apiBaseUrl =
   process.env.REACT_APP_API_BASE || "https://api.gatool.org/v3/";
 
+const FIVE_O_THREE_TOAST_THROTTLE_MS = 10000; // Only show one 503 toast per 10s when many requests fail
+let last503ToastAt = 0;
+
+function show503ToastIfNotThrottled(errorText) {
+  const now = Date.now();
+  if (now - last503ToastAt > FIVE_O_THREE_TOAST_THROTTLE_MS) {
+    last503ToastAt = now;
+    toast.error(errorText);
+  }
+}
+
 class AuthClient {
   setOperationsInProgress = null;
   operationsInProgress = 0;
@@ -47,6 +58,13 @@ class AuthClient {
     if (response.status === 500) {
       errorText +=
         " Something happened in the backend that we don't understand. We have logged the request and will investigate soon.";
+    }
+    if (response.status === 503) {
+      console.error("503 Service Unavailable — GET", `${apiBaseUrl}${path}`);
+      errorText =
+        "The service is temporarily unavailable (server busy or updating). Please try again in a moment.";
+      show503ToastIfNotThrottled(errorText);
+      throw new Error(errorText);
     }
     toast.error(errorText);
     throw new Error(errorText);
@@ -105,11 +123,16 @@ class AuthClient {
     if (response.status === 503) {
       if (path.includes("/elim/alliances")) {
         return { status: 204, statusText: "No Alliances loaded" };
-      } else if (path.includes("/elims/")) {
-        return { status: 204, statusText: "No Playoff matches loaded" };
-      } else {
-        errorText += " The serice is currently unavailable.";
       }
+      if (path.includes("/elims/")) {
+        return { status: 204, statusText: "No Playoff matches loaded" };
+      }
+      const base = customAPIBaseUrl || apiBaseUrl;
+      console.error("503 Service Unavailable — GET (no auth)", `${base}${path}`);
+      errorText =
+        "The service is temporarily unavailable (server busy or updating). Please try again in a moment.";
+      show503ToastIfNotThrottled(errorText);
+      throw new Error(errorText);
     }
     toast.error(errorText);
     throw new Error(errorText);
@@ -157,6 +180,13 @@ class AuthClient {
       errorText +=
         " Something happened in the backend that we don't understand. We have logged the request and will investigate soon.";
     }
+    if (response.status === 503) {
+      console.error("503 Service Unavailable — PUT", `${customAPIBaseUrl || apiBaseUrl}${path}`);
+      errorText =
+        "The service is temporarily unavailable (server busy or updating). Please try again in a moment.";
+      show503ToastIfNotThrottled(errorText);
+      throw new Error(errorText);
+    }
     toast.error(errorText);
     throw new Error(errorText);
   }
@@ -198,6 +228,13 @@ class AuthClient {
       errorText +=
         " Something happened in the backend that we don't understand. We have logged the request and will investigate soon.";
     }
+    if (response.status === 503) {
+      console.error("503 Service Unavailable — POST", `${apiBaseUrl}${path}`);
+      errorText =
+        "The service is temporarily unavailable (server busy or updating). Please try again in a moment.";
+      show503ToastIfNotThrottled(errorText);
+      throw new Error(errorText);
+    }
     toast.error(errorText);
     throw new Error(errorText);
   }
@@ -234,6 +271,13 @@ class AuthClient {
     if (response.status === 500) {
       errorText +=
         " Something happened in the backend that we don't understand. We have logged the request and will investigate soon.";
+    }
+    if (response.status === 503) {
+      console.error("503 Service Unavailable — POST (no auth)", `${customAPIBaseUrl || apiBaseUrl}${path}`);
+      errorText =
+        "The service is temporarily unavailable (server busy or updating). Please try again in a moment.";
+      show503ToastIfNotThrottled(errorText);
+      throw new Error(errorText);
     }
     toast.error(errorText);
     throw new Error(errorText);
@@ -277,6 +321,13 @@ class AuthClient {
     if (response.status === 500) {
       errorText +=
         " Something happened in the backend that we don't understand. We have logged the request and will investigate soon.";
+    }
+    if (response.status === 503) {
+      console.error("503 Service Unavailable — DELETE", `${apiBaseUrl}${path}`);
+      errorText =
+        "The service is temporarily unavailable (server busy or updating). Please try again in a moment.";
+      show503ToastIfNotThrottled(errorText);
+      throw new Error(errorText);
     }
     toast.error(errorText);
     throw new Error(errorText);

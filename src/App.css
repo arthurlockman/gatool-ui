@@ -1,3 +1,21 @@
+/* Fixed layout: top and bottom bars always visible, middle section scrolls */
+#root {
+  height: 100%;
+  overflow: hidden;
+}
+
+.app-layout-fixed {
+  height: 100vh;
+  height: 100dvh;
+}
+
+/* Bottom bar is in the flex flow, not position fixed */
+.app-layout-bottom .navbar-fixed-bottom-custom,
+.app-layout-bottom .navbar {
+  position: static !important;
+  bottom: auto !important;
+}
+
 .App {
   text-align: center;
   font-size: 14px;
@@ -965,14 +983,18 @@ td {
   margin: 0 !important;
 }
 
-/* Ensure html and body don't interfere with fixed positioning */
+/* Ensure html and body don't interfere with fixed positioning; only main content area scrolls */
 html {
   position: relative;
   overflow-x: hidden;
+  overflow-y: hidden;
+  height: 100%;
 }
 
 body {
   position: relative;
+  height: 100%;
+  overflow: hidden;
   /* Prevent body from creating a new containing block */
   -webkit-transform: none;
   transform: none;

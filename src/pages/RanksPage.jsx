@@ -1,6 +1,8 @@
 import {
   Alert,
+  Button,
   Container,
+  Modal,
   Table,
   Row,
   Col,
@@ -17,6 +19,7 @@ import { utils, read } from "xlsx";
 import { toast } from "react-toastify";
 import _ from "lodash";
 import moment from "moment";
+import { useState, useEffect, useRef } from "react";
 import { rankHighlight } from "../components/HelperFunctions";
 import useScrollPosition from "../hooks/useScrollPosition";
 
@@ -35,6 +38,9 @@ function RanksPage({
   setAllianceSelectionArrays,
   playoffs,
   districtRankings,
+  regionalEventDetail,
+  getRegionalEventDetail,
+  selectedYear,
   eventLabel,
   communityUpdates,
   EPA,
@@ -45,6 +51,42 @@ function RanksPage({
 }) {
   // Remember scroll position for Ranks page
   useScrollPosition('ranks', true, false, useScrollMemory);
+
+  const isRegionalEvent = !ftcMode && !selectedEvent?.value?.districtCode;
+  // teamdetail returns the whole league; only use it when it's for the current season (cache is not keyed by event)
+  const regionalDetailForThisEvent =
+    regionalEventDetail?.season === selectedYear?.value
+      ? regionalEventDetail
+      : null;
+  const attemptedRegionalFetchRef = useRef(null);
+  // When viewing a regional event and we don't have league data for this season yet, trigger fetch once per season (avoid loop on API failure)
+  useEffect(() => {
+    const season = selectedYear?.value;
+    if (
+      isRegionalEvent &&
+      selectedEvent?.value?.code &&
+      !selectedEvent?.value?.code.includes("OFFLINE") &&
+      !regionalDetailForThisEvent &&
+      getRegionalEventDetail &&
+      season != null &&
+      attemptedRegionalFetchRef.current !== season
+    ) {
+      attemptedRegionalFetchRef.current = season;
+      getRegionalEventDetail();
+    }
+    if (regionalDetailForThisEvent) {
+      attemptedRegionalFetchRef.current = null;
+    }
+  }, [isRegionalEvent, selectedEvent?.value?.code, selectedYear?.value, regionalDetailForThisEvent, getRegionalEventDetail]);
+
+  // Modal state for Championship Advancement details (regional or district)
+  const [advancementDetailTeam, setAdvancementDetailTeam] = useState(null);
+  const [advancementDetailType, setAdvancementDetailType] = useState(null); // 'regional' | 'district'
+  const showAdvancementModal = advancementDetailTeam != null && advancementDetailType != null;
+  const handleCloseAdvancementModal = () => {
+    setAdvancementDetailTeam(null);
+    setAdvancementDetailType(null);
+  };
 
   // This function clicks the hidden file upload button
   function clickLoadRanks() {
@@ -174,21 +216,32 @@ function RanksPage({
     return team?.nameShortLocal ? team?.nameShortLocal : team?.nameShort;
   }
 
+  /** Per-team API sometimes returns totalPoints: 0; derive total from regional point fields when needed. */
+  function getRegionalAdvancementTotal(r) {
+    if (r.totalPoints != null && r.totalPoints > 0) return r.totalPoints;
+    return (r.regional1Points ?? 0) + (r.regional2Points ?? 0) + (r.regionalDirectPoints ?? 0);
+  }
+
   const isLeagueMeet = ftcMode && selectedEvent?.value?.type === "1";
 
   var rankingsList = rankings?.ranks?.map((teamRow) => {
     teamRow.teamName = getTeamName(teamRow.teamNumber);
+    const lookupNumber = remapStringToNumber
+      ? remapStringToNumber(teamRow.teamNumber)
+      : teamRow.teamNumber;
     if (selectedEvent?.value?.districtCode) {
-      // Use remapStringToNumber to get the lookup number for district rankings
-      const lookupNumber = remapStringToNumber
-        ? remapStringToNumber(teamRow.teamNumber)
-        : teamRow.teamNumber;
       teamRow.districtRankDetails = _.cloneDeep(
         _.filter(districtRankings?.districtRanks, {
           teamNumber: lookupNumber,
         })[0]
       );
       teamRow.districtRanking = teamRow.districtRankDetails?.rank;
+    }
+    if (isRegionalEvent && regionalDetailForThisEvent?.teams) {
+      teamRow.regionalAdvancement = _.find(regionalDetailForThisEvent.teams, {
+        teamNumber: lookupNumber,
+      });
+      teamRow.regionalRanking = teamRow.regionalAdvancement?.rank ?? 99999;
     }
     return teamRow;
   });
@@ -643,6 +696,29 @@ function RanksPage({
                       </b>
                     </th>
                   )}
+                  {isRegionalEvent && (
+                    <th
+                      onClick={() =>
+                        rankSort === "regionalRanking"
+                          ? setRankSort("-regionalRanking")
+                          : setRankSort("regionalRanking")
+                      }
+                    >
+                      <b>
+                        World Ranking
+                        {rankSort === "regionalRanking" ? (
+                          <SortNumericUp />
+                        ) : (
+                          ""
+                        )}
+                        {rankSort === "-regionalRanking" ? (
+                          <SortNumericDown />
+                        ) : (
+                          ""
+                        )}
+                      </b>
+                    </th>
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -711,7 +787,19 @@ function RanksPage({
                         <td>{rankRow.season}</td>
                         <td>{rankRow.epaVal}</td>
                         {selectedEvent?.value?.districtCode && (
-                          <td>
+                          <td
+                            style={
+                              rankRow?.districtRankDetails
+                                ? { cursor: "pointer" }
+                                : undefined
+                            }
+                            onClick={() => {
+                              if (rankRow?.districtRankDetails) {
+                                setAdvancementDetailTeam(rankRow);
+                                setAdvancementDetailType("district");
+                              }
+                            }}
+                          >
                             {rankRow?.districtRankDetails?.rank ? (
                               <OverlayTrigger
                                 delay={500}
@@ -759,6 +847,8 @@ function RanksPage({
                                       ) : (
                                         ""
                                       )}
+                                      <br />
+                                      <em>Click for full details</em>
                                     </>
                                   </Tooltip>
                                 }
@@ -792,6 +882,98 @@ function RanksPage({
                             )}
                           </td>
                         )}
+                        {isRegionalEvent && (
+                          <td
+                            style={
+                              rankRow?.regionalAdvancement
+                                ? { cursor: "pointer" }
+                                : undefined
+                            }
+                            onClick={() => {
+                              if (rankRow?.regionalAdvancement) {
+                                setAdvancementDetailTeam(rankRow);
+                                setAdvancementDetailType("regional");
+                              }
+                            }}
+                          >
+                            {!regionalDetailForThisEvent ? (
+                              <span className="text-muted small">Loading…</span>
+                            ) : rankRow?.regionalAdvancement ? (
+                              <>
+                                <OverlayTrigger
+                                  delay={500}
+                                  overlay={
+                                    <Tooltip>
+                                      <>
+                                        {rankRow.regionalAdvancement
+                                          .regional1Details && (
+                                          <>
+                                            Event 1 (
+                                            {
+                                              rankRow.regionalAdvancement
+                                                .regional1Details.tournamentCode
+                                            }
+                                            ):{" "}
+                                            {rankRow.regionalAdvancement
+                                              .regional1Points ?? rankRow.regionalAdvancement.regional1Details.totalPoints}
+                                            <br />
+                                          </>
+                                        )}
+                                        {rankRow.regionalAdvancement
+                                          .regional2Details && (
+                                          <>
+                                            Event 2 (
+                                            {
+                                              rankRow.regionalAdvancement
+                                                .regional2Details.tournamentCode
+                                            }
+                                            ):{" "}
+                                            {rankRow.regionalAdvancement
+                                              .regional2Points ?? rankRow.regionalAdvancement.regional2Details.totalPoints}
+                                            <br />
+                                          </>
+                                        )}
+                                        {rankRow.regionalAdvancement
+                                          .regionalDirectDetails && (
+                                          <>
+                                            Direct (
+                                            {
+                                              rankRow.regionalAdvancement
+                                                .regionalDirectDetails.tournamentCode
+                                            }
+                                            ):{" "}
+                                            {rankRow.regionalAdvancement
+                                              .regionalDirectPoints ?? rankRow.regionalAdvancement.regionalDirectDetails.totalPoints}
+                                          </>
+                                        )}
+                                        {rankRow?.regionalAdvancement && (
+                                          <>
+                                            <br />
+                                            <em>Click for full details</em>
+                                          </>
+                                        )}
+                                      </>
+                                    </Tooltip>
+                                  }
+                                >
+                                  <span>
+                                    {`${rankRow.regionalAdvancement.rank} (${getRegionalAdvancementTotal(rankRow.regionalAdvancement)} pts)`}
+                                  </span>
+                                </OverlayTrigger>
+                                {rankRow.regionalAdvancement
+                                  .qualifiedFirstCmp ? (
+                                  <span>
+                                    <b> W</b>
+                                  </span>
+                                ) : (
+                                  ""
+                                )}
+                              </>
+                            ) : (
+                              "—"
+                            )}
+                          </td>
+                        )}
                       </tr>
                     );
                   })}
@@ -802,6 +984,178 @@ function RanksPage({
             </div>
           </div>
         )}
+
+      {(() => {
+        const d = advancementDetailTeam?.districtRankDetails;
+        const r = advancementDetailTeam?.regionalAdvancement;
+        let headerClass = "bg-light text-dark";
+        let closeVariant = undefined;
+        if (advancementDetailType === "district") {
+          if (d?.qualifiedFirstCmp) {
+            headerClass = "bg-success text-white";
+            closeVariant = "white";
+          } else if (d?.qualifiedDistrictCmp) {
+            headerClass = "bg-info text-white";
+            closeVariant = "white";
+          } else {
+            headerClass = "bg-warning text-dark";
+          }
+        } else {
+          const qualified = r?.qualifiedFirstCmp;
+          const hasNotPlayedBoth = r && !r.regional2Details;
+          if (qualified) {
+            headerClass = "bg-success text-white";
+            closeVariant = "white";
+          } else if (hasNotPlayedBoth) {
+            headerClass = "bg-warning text-dark";
+          }
+        }
+        return (
+      <Modal
+        centered
+        show={showAdvancementModal}
+        onHide={handleCloseAdvancementModal}
+        size="lg"
+      >
+        <Modal.Header closeButton className={headerClass} closeVariant={closeVariant}>
+          <Modal.Title>
+            Championship Advancement — Team{" "}
+            {remapNumberToString
+              ? remapNumberToString(advancementDetailTeam?.teamNumber)
+              : advancementDetailTeam?.teamNumber}{" "}
+            ({advancementDetailType === "district" ? "District" : "World"})
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {advancementDetailType === "district" &&
+            advancementDetailTeam?.districtRankDetails && (
+              <Container fluid>
+                <p>
+                  <b>District Rank:</b>{" "}
+                  {advancementDetailTeam.districtRankDetails.rank} (
+                  {advancementDetailTeam.districtRankDetails.totalPoints} pts)
+                </p>
+                <p>
+                  <b>Age points:</b>{" "}
+                  {advancementDetailTeam.districtRankDetails.teamAgePoints ?? 0}
+                </p>
+                <p>
+                  <b>Event 1 ({advancementDetailTeam.districtRankDetails.event1Code}):</b>{" "}
+                  {advancementDetailTeam.districtRankDetails.event1Points ?? 0} pts
+                </p>
+                <p>
+                  <b>Event 2 ({advancementDetailTeam.districtRankDetails.event2Code}):</b>{" "}
+                  {advancementDetailTeam.districtRankDetails.event2Points ?? 0} pts
+                </p>
+                {advancementDetailTeam.districtRankDetails.districtCmpCode && (
+                  <p>
+                    <b>DCMP ({advancementDetailTeam.districtRankDetails.districtCmpCode}):</b>{" "}
+                    {advancementDetailTeam.districtRankDetails.districtCmpPoints ?? 0} pts
+                  </p>
+                )}
+                <p>
+                  <b>Qualified for District Championship:</b>{" "}
+                  {advancementDetailTeam.districtRankDetails.qualifiedDistrictCmp
+                    ? "Yes"
+                    : "No"}
+                </p>
+                <p>
+                  <b>Qualified for World Championship:</b>{" "}
+                  {advancementDetailTeam.districtRankDetails.qualifiedFirstCmp
+                    ? "Yes"
+                    : "No"}
+                </p>
+              </Container>
+            )}
+          {advancementDetailType === "regional" &&
+            advancementDetailTeam?.regionalAdvancement && (() => {
+              const r = advancementDetailTeam.regionalAdvancement;
+              return (
+                <Container fluid>
+                  <p>
+                    <b>World Rank:</b> {r.rank} ({getRegionalAdvancementTotal(r)} pts)
+                  </p>
+                  <p>
+                    <b>Championship Status:</b>{" "}
+                    {r.championshipStatus ?? "None"}
+                  </p>
+                  <p>
+                    <b>Qualified for World Championship:</b>{" "}
+                    {r.qualifiedFirstCmp ? "Yes" : "No"}
+                  </p>
+                  {r.qualifiedFirstCmpEventCode && (
+                    <p>
+                      <b>Qualified at event:</b> {r.qualifiedFirstCmpEventCode}
+                      {r.qualifiedFirstCmpDate && (
+                        <> ({moment(r.qualifiedFirstCmpDate).format("YYYY-MM-DD")})</>
+                      )}
+                    </p>
+                  )}
+                  <hr />
+                  <h6>Event breakdown</h6>
+                  {r.regional1Details && (
+                    <div className="mb-2">
+                      <b>Event 1 ({r.regional1Details.tournamentCode}):</b>{" "}
+                      {r.regional1Points ?? r.regional1Details.totalPoints} pts
+                      <ul className="small mb-0">
+                        <li>Qualification performance: {r.regional1Details.qualificationPerformancePoints}</li>
+                        <li>Alliance selection: {r.regional1Details.allianceSelectionPoints}</li>
+                        <li>Playoff advancement: {r.regional1Details.playoffAdvancementPoints}</li>
+                        <li>Award: {r.regional1Details.awardPoints}</li>
+                        <li>Team age: {r.regional1Details.teamAgePoints}</li>
+                      </ul>
+                    </div>
+                  )}
+                  {r.regional2Details && (
+                    <div className="mb-2">
+                      <b>Event 2 ({r.regional2Details.tournamentCode}):</b>{" "}
+                      {r.regional2Points ?? r.regional2Details.totalPoints} pts
+                      <ul className="small mb-0">
+                        <li>Qualification performance: {r.regional2Details.qualificationPerformancePoints}</li>
+                        <li>Alliance selection: {r.regional2Details.allianceSelectionPoints}</li>
+                        <li>Playoff advancement: {r.regional2Details.playoffAdvancementPoints}</li>
+                        <li>Award: {r.regional2Details.awardPoints}</li>
+                        <li>Team age: {r.regional2Details.teamAgePoints}</li>
+                      </ul>
+                    </div>
+                  )}
+                  {r.regionalDirectDetails && (
+                    <div className="mb-2">
+                      <b>Direct ({r.regionalDirectDetails.tournamentCode}):</b>{" "}
+                      {r.regionalDirectPoints ?? r.regionalDirectDetails.totalPoints} pts
+                    </div>
+                  )}
+                  {r.tiebreakers && (
+                    <>
+                      <hr />
+                      <h6>Tiebreakers</h6>
+                      <p className="small mb-0">
+                        Playoff: {r.tiebreakers.eventPlayoffPoints} · Alliance:{" "}
+                        {r.tiebreakers.eventAlliancePoints} · Qual:{" "}
+                        {r.tiebreakers.eventQualificationPoints}
+                        <br />
+                        Match high scores: {r.tiebreakers.matchHighScore1},{" "}
+                        {r.tiebreakers.matchHighScore2}, {r.tiebreakers.matchHighScore3}
+                      </p>
+                    </>
+                  )}
+                  {r.adjustPoints != null && r.adjustPoints !== 0 && (
+                    <p className="small mt-1">
+                      <b>Adjustment:</b> {r.adjustPoints} pts
+                    </p>
+                  )}
+                </Container>
+              );
+            })()}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseAdvancementModal}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+        );
+      })()}
     </Container>
   );
 }

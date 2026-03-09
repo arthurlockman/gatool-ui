@@ -1,5 +1,22 @@
 export const appUpdates = [
   {
+    date: "March 8, 2026",
+    message: (
+      <ul>
+        <li>ALL PROGRAMS:</li>
+        <ul>
+          <li>Changed how screens are displayed to ensure proper scrolling behavior, especially on tablets</li>
+          <li>Ensured that the top buttons are always visible when scrolling</li>
+        </ul>
+        <li>FRC:</li>
+        <ul>
+          <li>Added World rankings to Rankings page</li>
+          <li>Improved handling for offseason demo teams in 6 Alliance events with bye match filler Alliances</li>
+          <li>Updated Show Flow document for Leadership Awards</li>
+        </ul>
+      </ul>
+    ),
+  },{
     date: "February 28, 2026",
     message: (
       <ul>
