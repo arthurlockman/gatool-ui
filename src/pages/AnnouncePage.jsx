@@ -11,6 +11,7 @@ import { useEffect, useRef } from "react";
 import NotificationBanner from "components/NotificationBanner";
 import EventNotificationBanner from "components/EventNotificationBanner";
 import useScrollPosition from "../hooks/useScrollPosition";
+import { useScrollToTop } from "../contextProviders/ScrollContainerContext";
 
 const paleGreen = "rgba(144, 238, 144, 0.5)";
 
@@ -80,6 +81,7 @@ function AnnouncePage({
 }) {
   // Remember scroll position for Announce page
   useScrollPosition('announce', true, false, useScrollMemory);
+  const scrollToTop = useScrollToTop();
 
   const isRegionalEvent = !ftcMode && !selectedEvent?.value?.districtCode;
   const regionalDetailForSeason = regionalEventDetail?.season === selectedYear?.value ? regionalEventDetail : null;
@@ -94,13 +96,13 @@ function AnnouncePage({
   const previousMatchRef = useRef(currentMatch);
   useEffect(() => {
     if (previousMatchRef.current !== currentMatch && previousMatchRef.current !== undefined) {
-      window.scrollTo(0, 0);
+      scrollToTop();
       // Clear saved scroll position for both Announce and Play By Play when match changes
       sessionStorage.removeItem('scrollPosition_announce');
       sessionStorage.removeItem('scrollPosition_playbyplay');
     }
     previousMatchRef.current = currentMatch;
-  }, [currentMatch]);
+  }, [currentMatch, scrollToTop]);
 
   const matchesToNotify = _.toInteger(
     (teamList?.teams?.length - teamReduction) / 6

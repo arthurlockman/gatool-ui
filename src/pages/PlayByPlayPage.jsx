@@ -10,6 +10,7 @@ import NotificationBanner from "components/NotificationBanner";
 import EventNotificationBanner from "components/EventNotificationBanner";
 import moment from "moment";
 import useScrollPosition from "../hooks/useScrollPosition";
+import { useScrollToTop } from "../contextProviders/ScrollContainerContext";
 import { useEffect, useRef } from "react";
 
 const paleGreen = "rgba(144, 238, 144, 0.5)";
@@ -75,6 +76,7 @@ function PlayByPlayPage({
 }) {
   // Remember scroll position for Play by play page
   useScrollPosition('playbyplay', true, false, useScrollMemory);
+  const scrollToTop = useScrollToTop();
 
   const isRegionalEvent = !ftcMode && !selectedEvent?.value?.districtCode;
   const regionalDetailForSeason = regionalEventDetail?.season === selectedYear?.value ? regionalEventDetail : null;
@@ -89,13 +91,13 @@ function PlayByPlayPage({
   const previousMatchRef = useRef(currentMatch);
   useEffect(() => {
     if (previousMatchRef.current !== currentMatch && previousMatchRef.current !== undefined) {
-      window.scrollTo(0, 0);
+      scrollToTop();
       // Clear saved scroll position for both Announce and Play By Play when match changes
       sessionStorage.removeItem('scrollPosition_announce');
       sessionStorage.removeItem('scrollPosition_playbyplay');
     }
     previousMatchRef.current = currentMatch;
-  }, [currentMatch]);
+  }, [currentMatch, scrollToTop]);
 
   const matchesToNotify = _.toInteger(
     (teamList?.teams?.length - teamReduction) / 6

@@ -1000,8 +1000,8 @@ function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMat
 							getAllianceNumbersForDisplay={getAllianceNumbersForDisplay}
 							getMatchWinnerForDisplay={getMatchWinnerForDisplay}
 							getMatchScoreForDisplay={getMatchScoreForDisplay}
-							redPlaceHolder="Winner of M1"
-							bluePlaceHolder="Winner of M2"
+							redPlaceHolder="Loser of M1"
+							bluePlaceHolder="Loser of M2"
 							colors={{ RED, BLUE, GOLD, GREEN, BLACK, WHITE }}
 							fontWeights={{ bold }}
 						/>

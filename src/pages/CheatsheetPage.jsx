@@ -185,7 +185,7 @@ function CheatsheetPage({
                 style={{ cursor: "pointer", color: "blue" }}
                 onClick={() => {
                   downloadPDF(
-                    "/cheatsheet/2024_Run_of_Show_Playoffs_Awards.pdf"
+                    "/cheatsheet/2026_Run_of_Show_Playoffs_Awards.pdf"
                   );
                 }}
               >

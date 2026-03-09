@@ -1,8 +1,11 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useContext } from 'react';
 import { useLocation } from 'react-router-dom';
+import { ScrollContainerContext } from '../contextProviders/ScrollContainerContext';
 
 /**
- * Custom hook to manage scroll position for specific pages
+ * Custom hook to manage scroll position for specific pages.
+ * Uses the main scroll container (between top and bottom bars) when available,
+ * otherwise falls back to window.
  * @param {string} pageKey - Unique identifier for the page (e.g., 'schedule', 'teams', 'announce')
  * @param {boolean} shouldRememberScroll - Whether to remember scroll position (default: true)
  * @param {boolean} shouldScrollToTop - Whether to scroll to top when page loads (default: false)
@@ -10,6 +13,7 @@ import { useLocation } from 'react-router-dom';
  */
 function useScrollPosition(pageKey, shouldRememberScroll = true, shouldScrollToTop = false, useScrollMemory = true) {
   const location = useLocation();
+  const scrollContainerRef = useContext(ScrollContainerContext);
   const scrollPositionRef = useRef(0);
   const hasRestoredRef = useRef(false);
   const previousPathnameRef = useRef(location.pathname);
@@ -17,19 +21,35 @@ function useScrollPosition(pageKey, shouldRememberScroll = true, shouldScrollToT
   // If scroll memory is disabled globally, don't remember scroll
   const effectiveShouldRememberScroll = useScrollMemory && shouldRememberScroll;
 
+  const getScrollElement = () => scrollContainerRef?.current ?? null;
+
+  const getScrollTop = () => {
+    const el = getScrollElement();
+    return el ? el.scrollTop : window.scrollY;
+  };
+
+  const setScrollTop = (value) => {
+    const el = getScrollElement();
+    if (el) el.scrollTo(0, value);
+    else window.scrollTo(0, value);
+  };
+
   // Save scroll position as user scrolls
   useEffect(() => {
     if (!effectiveShouldRememberScroll) return;
 
+    const el = getScrollElement();
     const handleScroll = () => {
-      scrollPositionRef.current = window.scrollY;
+      scrollPositionRef.current = getScrollTop();
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
+    if (el) {
+      el.addEventListener('scroll', handleScroll, { passive: true });
+      return () => el.removeEventListener('scroll', handleScroll);
+    } else {
+      window.addEventListener('scroll', handleScroll, { passive: true });
+      return () => window.removeEventListener('scroll', handleScroll);
+    }
   }, [effectiveShouldRememberScroll]);
 
   // Save scroll position when navigating away from this page
@@ -39,6 +59,7 @@ function useScrollPosition(pageKey, shouldRememberScroll = true, shouldScrollToT
 
     // If we're leaving this page, save the scroll position
     if (previousPathname !== location.pathname && effectiveShouldRememberScroll) {
+      scrollPositionRef.current = getScrollTop();
       sessionStorage.setItem(`scrollPosition_${pageKey}`, scrollPositionRef.current.toString());
     }
   }, [location.pathname, pageKey, effectiveShouldRememberScroll]);
@@ -52,14 +73,10 @@ function useScrollPosition(pageKey, shouldRememberScroll = true, shouldScrollToT
 
     // If we should scroll to top, do it immediately
     if (shouldScrollToTop && !hasRestoredRef.current) {
-      // Use multiple attempts to ensure scroll happens
-      window.scrollTo(0, 0);
-      requestAnimationFrame(() => {
-        window.scrollTo(0, 0);
-      });
-      setTimeout(() => {
-        window.scrollTo(0, 0);
-      }, 0);
+      const scrollToTop = () => setScrollTop(0);
+      scrollToTop();
+      requestAnimationFrame(scrollToTop);
+      setTimeout(scrollToTop, 0);
       hasRestoredRef.current = true;
       return;
     }
@@ -69,10 +86,7 @@ function useScrollPosition(pageKey, shouldRememberScroll = true, shouldScrollToT
       const savedPosition = sessionStorage.getItem(`scrollPosition_${pageKey}`);
       if (savedPosition) {
         const position = parseInt(savedPosition, 10);
-        // Use multiple attempts to ensure scroll restoration happens after DOM is ready
-        const restoreScroll = () => {
-          window.scrollTo(0, position);
-        };
+        const restoreScroll = () => setScrollTop(position);
         restoreScroll();
         requestAnimationFrame(restoreScroll);
         setTimeout(restoreScroll, 0);
@@ -82,8 +96,7 @@ function useScrollPosition(pageKey, shouldRememberScroll = true, shouldScrollToT
         hasRestoredRef.current = true;
       }
     } else if (!effectiveShouldRememberScroll && !hasRestoredRef.current) {
-      // If we shouldn't remember scroll, scroll to top
-      window.scrollTo(0, 0);
+      setScrollTop(0);
       hasRestoredRef.current = true;
     }
   }, [location.pathname, pageKey, effectiveShouldRememberScroll, shouldScrollToTop]);
@@ -92,6 +105,7 @@ function useScrollPosition(pageKey, shouldRememberScroll = true, shouldScrollToT
   useEffect(() => {
     return () => {
       if (effectiveShouldRememberScroll) {
+        scrollPositionRef.current = getScrollTop();
         sessionStorage.setItem(`scrollPosition_${pageKey}`, scrollPositionRef.current.toString());
       }
     };
@@ -99,4 +113,3 @@ function useScrollPosition(pageKey, shouldRememberScroll = true, shouldScrollToT
 }
 
 export default useScrollPosition;
-
