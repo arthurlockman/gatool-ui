@@ -76,7 +76,7 @@ const ftcModeOptions = [
 
 
 
-function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, regionFilters, setRegionFilters, districts, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showNotesAnnounce, setShowNotesAnnounce, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, autoUpdate, setAutoUpdate, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, showQualsStatsQuals, setShowQualsStatsQuals, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee, showDistrictChampsStats, setShowDistrictChampsStats, monthsWarning, setMonthsWarning, user, isAuthenticated, adHocMode, setAdHocMode, supportedYears, FTCSupportedYears, reloadPage, autoHideSponsors, setAutoHideSponsors, setLoadingCommunityUpdates, hidePracticeSchedule, setHidePracticeSchedule, systemMessage, setTeamListLoading, getTeamList, getAlliances, setHaveChampsTeams, appUpdates, usePullDownToUpdate, setUsePullDownToUpdate, useSwipe, setUseSwipe, eventLabel, setEventLabel, showInspection, setShowInspection, showWorldAndStatsOnAnnouncePlayByPlay, setShowWorldAndStatsOnAnnouncePlayByPlay, showMinorAwards, setShowMinorAwards, highScoreMode, setHighScoreMode, systemBell, setSystemBell, eventBell, setEventBell, eventMessage, setEventMessage, putEventNotifications, useCheesyArena, setUseCheesyArena, useFourTeamAlliances, setUseFourTeamAlliances, ftcLeagues, ftcRegions, ftcMode, setFTCMode, ftcTypes, useFTCOffline, setUseFTCOffline, FTCServerURL, setFTCServerURL, FTCKey, requestFTCKey, checkFTCKey, FTCOfflineAvailable, getFTCOfflineStatus, getCheesyStatus, showBlueBanners, setShowBlueBanners, manualOfflineMode, setManualOfflineMode, useScrollMemory, setUseScrollMemory, syncEvent, setSyncEvent, screenMode, setScreenMode, screenModeSyncFrequency, setScreenModeSyncFrequency }) {
+function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, regionFilters, setRegionFilters, districts, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showNotesAnnounce, setShowNotesAnnounce, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, autoUpdate, setAutoUpdate, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, showQualsStatsQuals, setShowQualsStatsQuals, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee, showDistrictChampsStats, setShowDistrictChampsStats, monthsWarning, setMonthsWarning, user, isAuthenticated, adHocMode, setAdHocMode, supportedYears, FTCSupportedYears, reloadPage, autoHideSponsors, setAutoHideSponsors, setLoadingCommunityUpdates, hidePracticeSchedule, setHidePracticeSchedule, systemMessage, setTeamListLoading, getTeamList, getAlliances, setHaveChampsTeams, appUpdates, usePullDownToUpdate, setUsePullDownToUpdate, useSwipe, setUseSwipe, eventLabel, setEventLabel, showInspection, setShowInspection, showWorldAndStatsOnAnnouncePlayByPlay, setShowWorldAndStatsOnAnnouncePlayByPlay, showMinorAwards, setShowMinorAwards, highScoreMode, setHighScoreMode, systemBell, setSystemBell, eventBell, setEventBell, eventMessage, setEventMessage, putEventNotifications, useCheesyArena, setUseCheesyArena, useFourTeamAlliances, setUseFourTeamAlliances, ftcLeagues, ftcRegions, ftcMode, setFTCMode, ftcTypes, useFTCOffline, setUseFTCOffline, FTCServerURL, setFTCServerURL, FTCKey, requestFTCKey, checkFTCKey, FTCOfflineAvailable, getFTCOfflineStatus, getCheesyStatus, showBlueBanners, setShowBlueBanners, manualOfflineMode, setManualOfflineMode, useScrollMemory, setUseScrollMemory, syncEvent, setSyncEvent, screenMode, setScreenMode, screenModeSyncFrequency, setScreenModeSyncFrequency, backgroundDataRefresh, setBackgroundDataRefresh, backgroundDataRefreshFrequency, setBackgroundDataRefreshFrequency }) {
     const isOnline = useOnlineStatus();
     const PWASupported = (isChrome && Number(browserVersion) >= 76) || (isSafari && Number(browserVersion) >= 15 && Number(fullBrowserVersion.split(".")[1]) >= 4);
 
@@ -615,6 +615,85 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                             <b>Automatically track event progress, refreshing every 15 seconds <i style={{ "color": "red" }}>(will advance matches on all screens)</i></b>
                                         </td>
                                     </tr>
+                                    <tr className={"UISettings"}>
+                                        <td>
+                                            <Switch checked={backgroundDataRefresh === null ? false : backgroundDataRefresh} onChange={setBackgroundDataRefresh} />
+                                        </td>
+                                        <td>
+                                            <b>Refresh schedule, scores and rankings in background</b><br />
+                                            <i>When enabled, schedule, scores and rankings are updated periodically without changing the current match or your view. Use this to get ranking updates during matches while staying on the same match.</i>
+                                        </td>
+                                    </tr>
+                                    {backgroundDataRefresh && (
+                                        <tr className={"UISettings"}>
+                                            <td>
+                                            </td>
+                                            <td>
+                                                <b>Background refresh frequency</b><br />
+                                                <div style={{ padding: "5px 10px", display: "flex", alignItems: "center", gap: "10px" }}>
+                                                    <span style={{ fontSize: "28px" }}>🐇&nbsp;</span>
+                                                    <Range
+                                                        values={[backgroundDataRefreshFrequency || 15]}
+                                                        step={1}
+                                                        min={5}
+                                                        max={60}
+                                                        onChange={(values) => setBackgroundDataRefreshFrequency(values[0])}
+                                                        renderTrack={({ props, children }) => (
+                                                            <div
+                                                                {...props}
+                                                                style={{
+                                                                    ...props.style,
+                                                                    height: '6px',
+                                                                    width: '100%',
+                                                                    backgroundColor: '#ccc',
+                                                                    borderRadius: '3px'
+                                                                }}
+                                                            >
+                                                                {children}
+                                                            </div>
+                                                        )}
+                                                        renderThumb={({ props, isDragged }) => (
+                                                            <div
+                                                                {...props}
+                                                                style={{
+                                                                    ...props.style,
+                                                                    height: '24px',
+                                                                    width: '24px',
+                                                                    backgroundColor: '#007bff',
+                                                                    borderRadius: '50%',
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    justifyContent: 'center',
+                                                                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                                                                    outline: 'none'
+                                                                }}
+                                                            >
+                                                                {isDragged && (
+                                                                    <div
+                                                                        style={{
+                                                                            position: 'absolute',
+                                                                            top: '-28px',
+                                                                            color: '#007bff',
+                                                                            fontWeight: 'bold',
+                                                                            fontSize: '12px',
+                                                                            backgroundColor: 'white',
+                                                                            padding: '2px 6px',
+                                                                            borderRadius: '4px',
+                                                                            whiteSpace: 'nowrap',
+                                                                            boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
+                                                                        }}
+                                                                    >
+                                                                        {backgroundDataRefreshFrequency || 15}s
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                    />
+                                                    <span style={{ fontSize: "28px" }}>🐢</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    )}
                                     <tr className={"UISettings"}>
                                         <td>
                                             <Switch checked={(_.isNull(hidePracticeSchedule) || _.isUndefined(hidePracticeSchedule)) ? false : hidePracticeSchedule} onChange={setHidePracticeSchedule} />

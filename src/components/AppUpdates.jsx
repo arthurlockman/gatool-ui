@@ -1,5 +1,15 @@
 export const appUpdates = [
   {
+    date: "March 10, 2026",
+    message: (
+      <ul>
+        <li>ALL PROGRAMS:</li>
+        <ul>
+          <li>Added support for background data refresh. When enabled, schedule, scores and rankings are updated periodically without changing the current match or your view.</li>
+        </ul>
+      </ul>
+    ),
+  },{
     date: "March 8, 2026",
     message: (
       <ul>

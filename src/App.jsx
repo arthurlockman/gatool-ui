@@ -431,6 +431,14 @@ function App() {
     "setting:screenModeSyncFrequency",
     10
   ); // Frequency in seconds (5-10)
+  const [backgroundDataRefresh, setBackgroundDataRefresh] = usePersistentState(
+    "setting:backgroundDataRefresh",
+    false
+  );
+  const [backgroundDataRefreshFrequency, setBackgroundDataRefreshFrequency] = usePersistentState(
+    "setting:backgroundDataRefreshFrequency",
+    15
+  ); // Frequency in seconds (5-60)
   const [screenModeStatus, setScreenModeStatus] = useState(null); // null = unknown, true = valid data, false = invalid/malformed
 
   // Enforce mutual exclusivity between syncEvent and screenMode
@@ -1147,13 +1155,15 @@ function App() {
    * @async
    * @function getSchedule
    * @param loadingEvent Boolean to set the current match to the last match played when loading an event
+   * @param {object} [options] Options for the schedule fetch.
+   * @param {boolean} [options.updateCurrentMatch=true] If false, schedule/rankings are refreshed but current match is not updated (for background refresh).
    * @param selectedEvent The currently selected event, which is a persistent state variable
    * @param selectedYear The currently selected year, which is a persistent state variable
    *
    * @return Sets the event high scores, qual schedule and playoff
    */
   // @ts-ignore
-  async function getSchedule(loadingEvent) {
+  async function getSchedule(loadingEvent, options = {}) {
     console.log(`Fetching schedule for ${selectedEvent?.value?.name}...`);
 
     /**
@@ -1921,7 +1931,7 @@ function App() {
     if (playoffschedule?.completedMatchCount > 0) {
       lastMatchPlayed += playoffschedule?.completedMatchCount;
     }
-    if ((loadingEvent && autoAdvance) || autoUpdate) {
+    if (options.updateCurrentMatch !== false && ((loadingEvent && autoAdvance) || autoUpdate)) {
       if (
         lastMatchPlayed === qualschedule?.schedule.length + 1 ||
         lastMatchPlayed ===
@@ -5891,19 +5901,22 @@ function App() {
 
 
   // Timer to autmatically refresh event data
-  // This will run every refreshRate seconds, which is set in the settings.
-  // It will fetch the schedule, world stats, event stats, system messages and event messages
-  // It will also check if the event is online or offline, and fetch the schedule accordingly
+  // Runs at refreshRate (autoUpdate) or backgroundDataRefreshFrequency (background only); when both are on, uses the faster rate.
+  const effectiveRefreshSeconds = (autoUpdate && backgroundDataRefresh)
+    ? Math.min(refreshRate, backgroundDataRefreshFrequency)
+    : (autoUpdate ? refreshRate : backgroundDataRefreshFrequency);
+  const intervalDelayMs = (autoUpdate || backgroundDataRefresh) ? effectiveRefreshSeconds * 1000 : 999999;
 
   const { start, stop } = useInterval(
     () => {
       console.log("fetching event data now");
+      const updateCurrentMatch = !backgroundDataRefresh;
       if (!selectedEvent?.value?.code.includes("OFFLINE")) {
         console.log("Online event. Getting schedule and ranks");
         if (!ftcMode && useCheesyArena) {
           getCheesyStatus();
         }
-        getSchedule();
+        getSchedule(undefined, { updateCurrentMatch });
       } else {
         console.log("Offline event. Just get the world stats if you can");
       }
@@ -5919,7 +5932,7 @@ function App() {
         }
       }
     },
-    refreshRate * 1000,
+    intervalDelayMs,
     {
       autoStart: true,
       immediate: false,
@@ -5930,14 +5943,14 @@ function App() {
     }
   );
 
-  // Automatically keep event details up to date. Checks every 15 seconds if active.
+  // Automatically keep event details up to date when autoUpdate or backgroundDataRefresh is on.
   useEffect(() => {
-    if (autoUpdate) {
+    if (autoUpdate || backgroundDataRefresh) {
       start();
     } else {
       stop();
     }
-  }, [autoUpdate, start, stop]);
+  }, [autoUpdate, backgroundDataRefresh, backgroundDataRefreshFrequency, start, stop]);
 
   // Track last event code we attempted to sync in Screen Mode
   // This prevents reloading the same event when React state hasn't updated yet
@@ -6690,6 +6703,10 @@ function App() {
                     setScreenMode={setScreenMode}
                     screenModeSyncFrequency={screenModeSyncFrequency}
                     setScreenModeSyncFrequency={setScreenModeSyncFrequency}
+                    backgroundDataRefresh={backgroundDataRefresh}
+                    setBackgroundDataRefresh={setBackgroundDataRefresh}
+                    backgroundDataRefreshFrequency={backgroundDataRefreshFrequency}
+                    setBackgroundDataRefreshFrequency={setBackgroundDataRefreshFrequency}
                     eventLabel={eventLabel}
                     setEventLabel={setEventLabel}
                     showInspection={showInspection}
