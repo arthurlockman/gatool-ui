@@ -14,7 +14,7 @@ import AwardsPage from "./pages/AwardsPage";
 import StatsPage from "./pages/StatsPage";
 import CheatsheetPage from "./pages/CheatsheetPage";
 import EmceePage from "./pages/EmceePage";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { UseAuthClient } from "./contextProviders/AuthClientContext";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Blocks } from "react-loader-spinner";
@@ -40,6 +40,11 @@ import { toast } from "react-toastify";
 import { trainingData } from "components/TrainingMatches";
 import { timeZones } from "components/TimeZones";
 import { extendFTCPlayoffScheduleWithPartialMatches } from "./utils/ftcPlayoffSchedule";
+import {
+  getConnectionsEventKey,
+  fetchAllianceConnections,
+  allianceRosterToConnectionKey,
+} from "./utils/allianceConnectionsApi";
 import { useInterval } from "react-interval-hook";
 
 import "./App.css";
@@ -365,6 +370,9 @@ function App() {
     0
   );
   const [allianceSelection, setAllianceSelection] = useState(null);
+  /** Preloaded prior-partnership data per alliance roster (key = sorted team ids). */
+  const [alliancePartnerConnectionsCache, setAlliancePartnerConnectionsCache] =
+    useState({});
   const [playoffs, setPlayoffs] = usePersistentState("cache:playoffs", null);
   const [playoffCountOverride, setPlayoffCountOverride] = usePersistentState(
     "setting:playoffCountOverride",
@@ -601,6 +609,105 @@ function App() {
       getFTCOfflineStatus();
     }
   }, [FTCServerURL, ftcMode?.value]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const allianceConnectionsPrefetchSignature = useMemo(() => {
+    if (!alliances?.alliances?.length) return "";
+    const roster = alliances.alliances
+      .map((a) => allianceRosterToConnectionKey(a) || "")
+      .filter(Boolean)
+      .sort()
+      .join("|");
+    return `${selectedEvent?.value?.code || ""}@${selectedYear?.value || ""}@${roster}`;
+  }, [alliances?.alliances, selectedEvent?.value?.code, selectedYear?.value]);
+
+  useEffect(() => {
+    if (ftcMode !== false) {
+      setAlliancePartnerConnectionsCache({});
+      return;
+    }
+    const eventKey = getConnectionsEventKey(selectedEvent, selectedYear);
+    if (!eventKey || !alliances?.alliances?.length || !allianceConnectionsPrefetchSignature) {
+      setAlliancePartnerConnectionsCache({});
+      return;
+    }
+
+    const unique = [];
+    const seen = new Set();
+    for (const a of alliances.alliances) {
+      const key = allianceRosterToConnectionKey(a);
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      unique.push({
+        key,
+        nums: key.split(",").map((n) => Number(n)),
+      });
+    }
+    console.log(
+      `[Connections] Prefetch: ${alliances.alliances.length} alliances → ${unique.length} unique rosters`,
+      unique.map((u) => u.key)
+    );
+
+    const initial = {};
+    for (const { key } of unique) {
+      initial[key] = { loading: true, data: null, error: null };
+    }
+    setAlliancePartnerConnectionsCache(initial);
+
+    const ac = new AbortController();
+    Promise.all(
+      unique.map(async ({ key, nums }) => {
+        try {
+          const data = await fetchAllianceConnections(
+            eventKey,
+            nums,
+            ac.signal
+          );
+          return { key, loading: false, data, error: null };
+        } catch (e) {
+          if (e?.name === "AbortError") return null;
+          return { key, loading: false, data: null, error: e };
+        }
+      })
+    ).then((results) => {
+      if (ac.signal.aborted) return;
+      for (const r of results) {
+        if (r) {
+          const summary = {
+            loading: r.loading,
+            dataLength: Array.isArray(r.data) ? r.data.length : "not array",
+            error: r.error?.message ?? null,
+          };
+          if (Array.isArray(r.data) && r.data.length > 0) {
+            summary.sample = r.data[0];
+          }
+          console.log(`[Connections] Prefetch response for ${r.key}:`, summary);
+        }
+      }
+      setAlliancePartnerConnectionsCache((prev) => {
+        const next = { ...prev };
+        for (const r of results) {
+          if (r) next[r.key] = r;
+        }
+        console.log("[Connections] Prefetch cache updated:", {
+          keys: Object.keys(next),
+          entries: Object.fromEntries(
+            Object.entries(next).map(([k, v]) => [
+              k,
+              {
+                loading: v.loading,
+                dataLength: Array.isArray(v.data) ? v.data.length : "n/a",
+                hasError: !!v.error,
+              },
+            ])
+          ),
+        });
+        return next;
+      });
+    });
+
+    return () => ac.abort();
+    // allianceConnectionsPrefetchSignature encodes alliances.alliances rosters
+  }, [allianceConnectionsPrefetchSignature, ftcMode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Display an alert when there are updates to the app. This allows the user to update the cached code.
   useEffect(() => {
@@ -6920,6 +7027,9 @@ function App() {
                     remapNumberToString={remapNumberToString}
                     remapStringToNumber={remapStringToNumber}
                     useScrollMemory={useScrollMemory}
+                    alliancePartnerConnectionsCache={
+                      alliancePartnerConnectionsCache
+                    }
                   />
                 }
               />
