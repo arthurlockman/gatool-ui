@@ -20,6 +20,52 @@ import TeamTimer from "components/TeamTimer";
 import { useInterval } from "react-interval-hook";
 import useScrollPosition from "../hooks/useScrollPosition";
 
+/** Blue banner stats are a nested object; SheetJS leaves those cells blank unless stringified. */
+const BLUE_BANNER_EXPORT_ROWS = [
+    ["regionalWins", "regionalWinsYears", "Regional Win", "Regional Wins"],
+    ["regionalChairmans", "regionalChairmansYears", "Regional Chairman's Award", "Regional Chairman's Awards"],
+    ["regionalImpact", "regionalImpactYears", "Regional Impact Award", "Regional Impact Awards"],
+    ["regionalWoodieFlowers", "regionalWoodieFlowersYears", "Regional Woodie Flowers Finalist", "Regional Woodie Flowers Finalists"],
+    ["districtWins", "districtWinsYears", "District Win", "District Wins"],
+    ["districtChairmans", "districtChairmansYears", "District Chairman's Award", "District Chairman's Awards"],
+    ["districtImpact", "districtImpactYears", "District Impact Award", "District Impact Awards"],
+    ["districtWoodieFlowers", "districtWoodieFlowersYears", "District Woodie Flowers Finalist", "District Woodie Flowers Finalists"],
+    ["districtDivisionWins", "districtDivisionWinsYears", "District Championship Division Win", "District Championship Division Wins"],
+    ["districtDivisionChairmans", "districtDivisionChairmansYears", "District Championship Division Chairman's Award", "District Championship Division Chairman's Awards"],
+    ["districtDivisionImpact", "districtDivisionImpactYears", "District Championship Division Impact Award", "District Championship Division Impact Awards"],
+    ["districtChampionshipWins", "districtChampionshipWinsYears", "District Championship Win", "District Championship Wins"],
+    ["districtChampionshipChairmans", "districtChampionshipChairmansYears", "District Championship Chairman's Award", "District Championship Chairman's Awards"],
+    ["districtChampionshipImpact", "districtChampionshipImpactYears", "District Championship Impact Award", "District Championship Impact Awards"],
+    ["districtChampionshipWoodieFlowers", "districtChampionshipWoodieFlowersYears", "District Championship Woodie Flowers Finalist", "District Championship Woodie Flowers Finalists"],
+    ["championshipDivisionWins", "championshipDivisionWinsYears", "World Championship Division Win", "World Championship Division Wins"],
+    ["championshipDivisionChairmans", "championshipDivisionChairmansYears", "World Championship Division Chairman's Award", "World Championship Division Chairman's Awards"],
+    ["championshipDivisionImpact", "championshipDivisionImpactYears", "World Championship Division Impact Award", "World Championship Division Impact Awards"],
+    ["einsteinWins", "einsteinWinsYears", "Einstein Win", "Einstein Wins"],
+    ["einsteinChairmans", "einsteinChairmansYears", "Einstein Chairman's Award", "Einstein Chairman's Awards"],
+    ["einsteinImpact", "einsteinImpactYears", "Einstein Impact Award", "Einstein Impact Awards"],
+    ["einsteinChairmansFinalist", "einsteinChairmansFinalistYears", "Einstein Chairman's Award Finalist", "Einstein Chairman's Award Finalists"],
+    ["einsteinImpactFinalist", "einsteinImpactFinalistYears", "Einstein Impact Award Finalist", "Einstein Impact Award Finalists"],
+    ["championshipWoodieFlowers", "championshipWoodieFlowersYears", "World Championship Woodie Flowers Award", "World Championship Woodie Flowers Awards"],
+    ["festivalWins", "festivalWinsYears", "Festival of Champions Win", "Festival of Champions Wins"],
+];
+
+function formatBlueBannersForExport(bb) {
+    if (!bb || typeof bb !== "object" || !(Number(bb.blueBanners) > 0)) {
+        return "";
+    }
+    const parts = [`${bb.blueBanners} Blue Banner${bb.blueBanners > 1 ? "s" : ""}`];
+    BLUE_BANNER_EXPORT_ROWS.forEach(([countKey, yearsKey, singular, plural]) => {
+        const c = Number(bb[countKey]) || 0;
+        if (c <= 0) return;
+        const years = bb[yearsKey];
+        const yStr = Array.isArray(years) && years.length
+            ? ` (${_.uniq(years).slice().sort((a, b) => a - b).join(", ")})`
+            : "";
+        parts.push(`${c} ${c > 1 ? plural : singular}${yStr}`);
+    });
+    return parts.join("; ");
+}
+
 function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSort, setTeamSort, communityUpdates, setCommunityUpdates, allianceCount, lastVisit, setLastVisit, putTeamData, localUpdates, setLocalUpdates, qualSchedule, playoffSchedule, originalAndSustaining, monthsWarning, user, isAuthenticated, getTeamHistory, timeFormat, getCommunityUpdates, getTeamList, eventLabel, ftcMode, remapNumberToString, useScrollMemory }) {
     const [currentTime, setCurrentTime] = useState(moment());
     const [clockRunning, setClockRunning] = useState(true);
@@ -396,6 +442,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
             delete record.topSponsorsArray;
             delete record.awards;
             delete record.source;
+            record.blueBanners = formatBlueBannersForExport(record.blueBanners);
             return (record);
         })
 

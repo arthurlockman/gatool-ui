@@ -52,6 +52,7 @@ function AnnouncePage({
   regionalEventDetail,
   getRegionalEventDetail,
   showDistrictChampsStats,
+  showChampsStatsAtDistrictRegional,
   showBlueBanners,
   adHocMatch,
   setAdHocMatch,
@@ -587,6 +588,7 @@ function AnnouncePage({
                           showSponsors={showSponsors}
                           showMottoes={showMottoes}
                           showChampsStats={showChampsStats}
+                          showChampsStatsAtDistrictRegional={showChampsStatsAtDistrictRegional}
                           showBlueBanners={showBlueBanners}
                           eventNamesCY={eventNamesCY}
                           showDistrictChampsStats={showDistrictChampsStats}
