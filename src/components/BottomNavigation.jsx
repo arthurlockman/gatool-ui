@@ -45,8 +45,8 @@ function BottomNavigation({ ftcMode }) {
               setURL({ title: "GoFAR", url: "http://gofarmaine.org" });
             }}
           >
-            Gorham-Falmouth Alliance for Robotics.
-          </span>{" "}
+            Gorham-Falmouth Alliance for Robotics.<br/>
+          </span>{" Event Data provided by "}
           {!ftcMode && (
             <>
               <span
@@ -58,12 +58,13 @@ function BottomNavigation({ ftcMode }) {
                   });
                 }}
               >
-                Event Data provided by{" "}
+                
                 <i>
                   <b>FIRST</b>
                 </i>
                 .
               </span>{" "}
+              Additional Data provided by{" "}
               <span
                 style={{ cursor: "pointer", color: "blue" }}
                 onClick={() => {
@@ -73,11 +74,23 @@ function BottomNavigation({ ftcMode }) {
                   });
                 }}
               >
-                Additional Data provided by{" "}
                 <i>
                   <b>TBA</b>
-                </i>{" "}
-              </span>
+                </i>
+              </span>{", by "}
+              <span
+                style={{ cursor: "pointer", color: "blue" }}
+                onClick={() => {
+                  setURL({
+                    title: "Caster's Tool",
+                    url: "https://casterstool.com",
+                  });
+                }}
+              >
+                <i>
+                  <b>Caster's Tool</b>
+                </i>
+              </span>{", and by "}
               <span
                 style={{ cursor: "pointer", color: "blue" }}
                 onClick={() => {
@@ -87,7 +100,6 @@ function BottomNavigation({ ftcMode }) {
                   });
                 }}
               >
-                and by{" "}
                 <i>
                   <b>Statbotics.io</b>
                 </i>
@@ -106,13 +118,11 @@ function BottomNavigation({ ftcMode }) {
                   });
                 }}
               >
-                Event Data provided by{" "}
                 <i>
                   <b>FIRST</b>
                 </i>
                 .
-              </span>{" "}
-              <span>Additional Data provided by </span>
+              </span>{" Additional Data provided by "}
               <span
                 style={{ cursor: "pointer", color: "blue" }}
                 onClick={() => {
