@@ -1,8 +1,8 @@
 # GATool
 
-gatool is a tool to provide FIRST® Game Announcers with up to date information while announcing events during the FIRST Robotics season. As a web-based tool, it uses up-to-date information about the event to provide a comprehensive set of useful data to Game Announcers. It is designed to work on desktops, laptops and tablet devices. In a pinch, it can be used on a mobile phone.
+gatool is a tool to provide ***FIRST®*** Game Announcers with up to date information while announcing events during the ***FIRST*** Robotics Competition and ***FIRST*** Tech Challenge seasons. As a web-based tool, it uses up-to-date information about the event to provide a comprehensive set of useful data to Game Announcers. It is designed to work on desktops, laptops and tablet devices. In a pinch, it can be used on a mobile phone.
 
-You will need a login to access the tool. All registered GAs and MCs will receive an invitation with a login and password.
+Anyone can use the tool. Simply browse to [gatool.org](https://gatool.org) and go. However, you will need a login to access the team data editing features of the tool. See the Emcee and Game Announcer resource page and view the training presentations for instructions.
 
 [Watch an overview of gatool on YouTube to learn more!](https://youtu.be/-n96KgtgYF0)
 

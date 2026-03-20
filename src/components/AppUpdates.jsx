@@ -1,5 +1,17 @@
 export const appUpdates = [
   {
+    date: "March 19, 2026",
+    message: (
+      <ul>
+        <li>FRC:</li>
+        <ul>
+          <li>Added switch to enable Champs statistics visibility for District and Regional events</li>
+          <li>Restored Blue Banner stats on team export spreadsheet</li>
+          <li>Fixed a bug that prevented District Champs stats from displaying in non-District Champs events when the option was enabled</li>
+        </ul>
+      </ul>
+    ),
+  },{
     date: "March 10, 2026",
     message: (
       <ul>

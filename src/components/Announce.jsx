@@ -19,6 +19,7 @@ function Announce({
   showChampsStats,
   eventNamesCY,
   showDistrictChampsStats,
+  showChampsStatsAtDistrictRegional,
   playoffOnly,
   ftcMode,
   showBlueBanners,
@@ -61,7 +62,7 @@ function Announce({
                 <span>{team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : `${team?.city}, ${team?.stateProv}${team?.country !== "USA" ? `, ${team?.country}` : ""}`}</span><br />
                 {(team?.updates?.robotNameLocal || team?.robotName )&& <span className={"robotName"}>{team?.updates?.robotNameLocal?team?.updates?.robotNameLocal:team?.robotName}<br /></span>}
                 {team?.updates?.teamMottoLocal && (showMottoes || _.isNull(showMottoes)) && <span className={"mottoes"}>{team?.updates?.teamMottoLocal}<br /></span>}
-                {(selectedEvent?.value?.champLevel === "CHAMPS" || selectedEvent?.value?.champLevel === "CMPDIV" || selectedEvent?.value?.champLevel === "CMPSUB") && showChampsStats &&
+                {(((selectedEvent?.value?.champLevel === "CHAMPS" || selectedEvent?.value?.champLevel === "CMPDIV" || selectedEvent?.value?.champLevel === "CMPSUB") && showChampsStats) || (selectedEvent?.value?.champLevel === "" && showChampsStatsAtDistrictRegional)) &&
                     <span className={"champs"}>
                         {team?.champsAppearances?.champsAppearances > 0 && <span><b>{team?.champsAppearances?.champsAppearances} Champs Appearance{team?.champsAppearances?.champsAppearances > 1 ? "s" : ""}</b><br /></span>}
                         {team?.champsAppearances?.champsAppearances > 0 && <span>
@@ -73,7 +74,7 @@ function Announce({
                             <br /></span>}
                         {team?.champsAppearances?.FOCAppearances > 0 && <span><b>Festival of Champions Team</b><br />{team?.champsAppearances?.FOCAppearancesYears?.join(", ")}</span>}
                     </span>}
-                {(selectedEvent?.value?.champLevel === "DISTCHAMPS" || selectedEvent?.value?.champLevel === "DISTDIV" || (showDistrictChampsStats && inPlayoffs)) && showChampsStats && <span className={"champs"}>
+                {(((selectedEvent?.value?.champLevel === "DISTCHAMPS" || selectedEvent?.value?.champLevel === "DISTDIV") && showChampsStats) || (showDistrictChampsStats && inPlayoffs)) && <span className={"champs"}>
                     {team?.champsAppearances?.districtChampsAppearances > 0 && <span><b>{team?.champsAppearances?.districtChampsAppearances} District Champs Appearance{team?.champsAppearances?.districtChampsAppearances > 1 ? "s" : ""}</b><br /></span>}
                     {team?.champsAppearances?.districtChampsAppearances > 0 && <span>
                         {team?.champsAppearances?.districtChampsAppearancesYears?.join(", ")}
