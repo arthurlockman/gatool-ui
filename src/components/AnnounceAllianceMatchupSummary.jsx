@@ -77,27 +77,46 @@ function AnnounceAllianceMatchupSummary({ connections, loading, error }) {
   });
   const teamCount = teamIds.size;
 
+  /** Stable id for a pair edge (order-independent). */
+  const edgeId = (a, b) =>
+    [Number(a), Number(b)].sort((x, y) => x - y).join(",");
+
+  const expectedPairEdges = connections.length;
+  /** All pairs among teamCount teams (3 teams → 3 edges). */
+  const pairsInCompleteRoster =
+    teamCount >= 2 ? (teamCount * (teamCount - 1)) / 2 : 0;
+  const rosterPairsComplete =
+    teamCount >= 3 && expectedPairEdges === pairsInCompleteRoster;
+
   const eventKeyYearToEntry = {};
+  /** key -> Set of edge ids that include this event/year (each edge counted once) */
+  const eventKeyYearEdgeIds = {};
+
   connections.forEach((edge) => {
+    const eid = edgeId(edge.team_a, edge.team_b);
+    const seenEventKeysOnThisEdge = new Set();
     (edge.partnered_at || []).forEach((p) => {
       const key = `${p.event_key || ""}|${p.year ?? ""}`;
-      if (!eventKeyYearToEntry[key])
+      if (seenEventKeysOnThisEdge.has(key)) return;
+      seenEventKeysOnThisEdge.add(key);
+      if (!eventKeyYearToEntry[key]) {
         eventKeyYearToEntry[key] = {
           event_key: p.event_key,
           event_name: p.event_name,
           year: p.year,
           stage: p.stage,
           result: p.result,
-          edgeCount: 0,
         };
-      eventKeyYearToEntry[key].edgeCount += 1;
+      }
+      if (!eventKeyYearEdgeIds[key]) eventKeyYearEdgeIds[key] = new Set();
+      eventKeyYearEdgeIds[key].add(eid);
     });
   });
 
   const fullAllianceEventKeys = new Set();
-  if (teamCount >= 3 && connections.length >= 3) {
-    Object.entries(eventKeyYearToEntry).forEach(([key, entry]) => {
-      if (entry.edgeCount >= connections.length) fullAllianceEventKeys.add(key);
+  if (rosterPairsComplete) {
+    Object.entries(eventKeyYearEdgeIds).forEach(([key, edgeSet]) => {
+      if (edgeSet.size === expectedPairEdges) fullAllianceEventKeys.add(key);
     });
   }
 

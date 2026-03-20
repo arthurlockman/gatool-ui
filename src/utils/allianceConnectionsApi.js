@@ -88,6 +88,82 @@ export class ConnectionsApiError extends Error {
   }
 }
 
+/** Retries after first failure (4 attempts total). */
+const MATCHUPS_NETWORK_RETRIES = 3;
+const MATCHUPS_RETRY_DELAYS_MS = [400, 800, 1600];
+
+function sleep(ms, signal) {
+  return new Promise((resolve, reject) => {
+    if (signal?.aborted) {
+      reject(new DOMException("Aborted", "AbortError"));
+      return;
+    }
+    const id = setTimeout(() => {
+      signal?.removeEventListener("abort", onAbort);
+      resolve();
+    }, ms);
+    const onAbort = () => {
+      clearTimeout(id);
+      signal?.removeEventListener("abort", onAbort);
+      reject(new DOMException("Aborted", "AbortError"));
+    };
+    signal?.addEventListener("abort", onAbort, { once: true });
+  });
+}
+
+function isFetchNetworkFailure(e) {
+  return (
+    e instanceof TypeError &&
+    (e.message === "Failed to fetch" || e.message === "Load failed")
+  );
+}
+
+/** Fetch with retries on network errors and transient 502/503/504. */
+async function fetchMatchupsWithRetries(url, signal) {
+  let res;
+  for (let attempt = 0; attempt <= MATCHUPS_NETWORK_RETRIES; attempt++) {
+    try {
+      res = await fetch(url, { signal });
+    } catch (e) {
+      if (e?.name === "AbortError") throw e;
+      if (!isFetchNetworkFailure(e) || attempt === MATCHUPS_NETWORK_RETRIES) {
+        if (isFetchNetworkFailure(e)) {
+          throw new ConnectionsApiError(
+            "Network error — request could not reach the server. If the API works when you open it in the browser, CORS may be blocking requests from this app.",
+            null,
+            null
+          );
+        }
+        throw e;
+      }
+      console.log(
+        `[Connections API] network error, retry ${attempt + 1}/${MATCHUPS_NETWORK_RETRIES}…`
+      );
+      await sleep(
+        MATCHUPS_RETRY_DELAYS_MS[attempt] ??
+          MATCHUPS_RETRY_DELAYS_MS[MATCHUPS_RETRY_DELAYS_MS.length - 1],
+        signal
+      );
+      continue;
+    }
+
+    if (res.ok) return res;
+
+    const transient = [502, 503, 504].includes(res.status);
+    if (!transient || attempt === MATCHUPS_NETWORK_RETRIES) return res;
+
+    console.log(
+      `[Connections API] HTTP ${res.status}, retry ${attempt + 1}/${MATCHUPS_NETWORK_RETRIES}…`
+    );
+    await sleep(
+      MATCHUPS_RETRY_DELAYS_MS[attempt] ??
+        MATCHUPS_RETRY_DELAYS_MS[MATCHUPS_RETRY_DELAYS_MS.length - 1],
+      signal
+    );
+  }
+  return res;
+}
+
 function getErrorMessage(status, body) {
   if (body && typeof body === "object" && body.detail != null) {
     return typeof body.detail === "string" ? body.detail : String(body.detail);
@@ -124,22 +200,7 @@ export async function fetchAllianceConnections(eventKey, teamNumbers, signal) {
   const teamNumbersStr = nums.join(",");
   const url = `${base}/${year}/matchups/${encodeURIComponent(eventCode)}/${teamNumbersStr}`;
 
-  let res;
-  try {
-    res = await fetch(url, { signal });
-  } catch (e) {
-    const isNetworkFailure =
-      e instanceof TypeError &&
-      (e.message === "Failed to fetch" || e.message === "Load failed");
-    if (isNetworkFailure) {
-      throw new ConnectionsApiError(
-        "Network error — request could not reach the server. If the API works when you open it in the browser, CORS may be blocking requests from this app.",
-        null,
-        null
-      );
-    }
-    throw e;
-  }
+  const res = await fetchMatchupsWithRetries(url, signal);
 
   const contentType = res.headers.get("content-type") || "";
   const isJson = contentType.includes("application/json");
