@@ -631,7 +631,7 @@ function AnnouncePage({
                     <td>Organization, Sponsors & Awards</td>
                     <td>
                       {showPlayoffMatchupColumn
-                        ? "Prior partnerships"
+                        ? "Prior Partnerships"
                         : "Rank"}
                     </td>
                   </tr>

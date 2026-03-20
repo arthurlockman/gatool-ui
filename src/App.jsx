@@ -644,10 +644,6 @@ function App() {
         nums: key.split(",").map((n) => Number(n)),
       });
     }
-    console.log(
-      `[Connections] Prefetch: ${alliances.alliances.length} alliances → ${unique.length} unique rosters`,
-      unique.map((u) => u.key)
-    );
 
     const initial = {};
     for (const { key } of unique) {
@@ -672,37 +668,11 @@ function App() {
       })
     ).then((results) => {
       if (ac.signal.aborted) return;
-      for (const r of results) {
-        if (r) {
-          const summary = {
-            loading: r.loading,
-            dataLength: Array.isArray(r.data) ? r.data.length : "not array",
-            error: r.error?.message ?? null,
-          };
-          if (Array.isArray(r.data) && r.data.length > 0) {
-            summary.sample = r.data[0];
-          }
-          console.log(`[Connections] Prefetch response for ${r.key}:`, summary);
-        }
-      }
       setAlliancePartnerConnectionsCache((prev) => {
         const next = { ...prev };
         for (const r of results) {
           if (r) next[r.key] = r;
         }
-        console.log("[Connections] Prefetch cache updated:", {
-          keys: Object.keys(next),
-          entries: Object.fromEntries(
-            Object.entries(next).map(([k, v]) => [
-              k,
-              {
-                loading: v.loading,
-                dataLength: Array.isArray(v.data) ? v.data.length : "n/a",
-                hasError: !!v.error,
-              },
-            ])
-          ),
-        });
         return next;
       });
     });
@@ -3037,15 +3007,6 @@ function App() {
       );
 
       if (shouldFetchChampsData) {
-        console.log("Getting Champs stats", {
-          champLevel: selectedEvent?.value?.champLevel,
-          showDistrictChampsStats,
-          showChampsStatsAtDistrictRegional,
-          showBlueBanners,
-          isOnline,
-          eventType: selectedEvent?.value?.type,
-          shouldFetchChampsData
-        });
         champsTeams = teams.teams.map(async (team) => {
           // Initialize blueBanners outside the try-catch so it's always available
           var blueBanners = {
@@ -4626,7 +4587,6 @@ function App() {
 
       // If we are in World Champs, we need to determine the team list from the Alliances
       if (selectedEvent?.value?.type === "Championship" && alliances) {
-        console.log("Getting Champs teams from Alliances");
         var tempChampsTeamList = [];
         if (!haveChampsTeams) {
           alliances?.alliances.forEach((alliance) => {
@@ -5802,7 +5762,6 @@ function App() {
   // Refresh team list when local-event Champs stats are enabled so appearance data is loaded
   useEffect(() => {
     if (showChampsStatsAtDistrictRegional === true && !ftcMode && selectedEvent && teamList?.teams?.length > 0 && isOnline) {
-      console.log("Show Champs stats at District/Regional enabled, refreshing team list to fetch Champs data");
       getTeamList();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -5811,7 +5770,6 @@ function App() {
   // Refresh when District Champs playoff stats are enabled (otherwise list was built without history)
   useEffect(() => {
     if (showDistrictChampsStats === true && !ftcMode && selectedEvent && teamList?.teams?.length > 0 && isOnline) {
-      console.log("Show District Champs stats in playoffs enabled, refreshing team list to fetch history");
       getTeamList();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

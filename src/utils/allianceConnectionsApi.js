@@ -136,9 +136,6 @@ async function fetchMatchupsWithRetries(url, signal) {
         }
         throw e;
       }
-      console.log(
-        `[Connections API] network error, retry ${attempt + 1}/${MATCHUPS_NETWORK_RETRIES}…`
-      );
       await sleep(
         MATCHUPS_RETRY_DELAYS_MS[attempt] ??
           MATCHUPS_RETRY_DELAYS_MS[MATCHUPS_RETRY_DELAYS_MS.length - 1],
@@ -152,9 +149,6 @@ async function fetchMatchupsWithRetries(url, signal) {
     const transient = [502, 503, 504].includes(res.status);
     if (!transient || attempt === MATCHUPS_NETWORK_RETRIES) return res;
 
-    console.log(
-      `[Connections API] HTTP ${res.status}, retry ${attempt + 1}/${MATCHUPS_NETWORK_RETRIES}…`
-    );
     await sleep(
       MATCHUPS_RETRY_DELAYS_MS[attempt] ??
         MATCHUPS_RETRY_DELAYS_MS[MATCHUPS_RETRY_DELAYS_MS.length - 1],
@@ -212,7 +206,6 @@ export async function fetchAllianceConnections(eventKey, teamNumbers, signal) {
     } catch {
       body = null;
     }
-    console.log("[Connections API] error response:", { url, status: res.status, body });
     const detail = body && typeof body === "object" ? body.detail : body;
     const message = getErrorMessage(res.status, body);
     const err = new ConnectionsApiError(message, res.status, detail);
@@ -225,8 +218,6 @@ export async function fetchAllianceConnections(eventKey, teamNumbers, signal) {
   } catch {
     return [];
   }
-
-  console.log("[Connections API] response:", { url, status: res.status, data });
 
   let items = [];
   if (Array.isArray(data)) items = data;
