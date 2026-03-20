@@ -7,6 +7,7 @@ export const appUpdates = [
         <ul>
           <li>Added switch to enable Champs statistics visibility for District and Regional events</li>
           <li>Restored Blue Banner stats on team export spreadsheet</li>
+          <li>Fixed a bug that prevented District Champs stats from displaying in non-District Champs events when the option was enabled</li>
         </ul>
       </ul>
     ),
