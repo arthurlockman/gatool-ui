@@ -303,6 +303,8 @@ function App() {
   );
   const [showDistrictChampsStats, setShowDistrictChampsStats] =
     usePersistentState("setting:showDistrictChampsStats", null);
+  const [showChampsStatsAtDistrictRegional, setShowChampsStatsAtDistrictRegional] =
+    usePersistentState("setting:showChampsStatsAtDistrictRegional", null);
   const [showBlueBanners, setShowBlueBanners] = usePersistentState(
     "setting:showBlueBanners",
     null
@@ -2920,6 +2922,7 @@ function App() {
       const shouldFetchChampsData = !ftcMode && (
         selectedEvent?.value?.champLevel !== "" ||
         showDistrictChampsStats ||
+        showChampsStatsAtDistrictRegional === true ||
         (isOnline && showBlueBanners === true) ||
         (selectedEvent?.value?.code.includes("OFFLINE") &&
           playoffOnly &&
@@ -2930,6 +2933,7 @@ function App() {
         console.log("Getting Champs stats", {
           champLevel: selectedEvent?.value?.champLevel,
           showDistrictChampsStats,
+          showChampsStatsAtDistrictRegional,
           showBlueBanners,
           isOnline,
           eventType: selectedEvent?.value?.type,
@@ -4680,6 +4684,7 @@ function App() {
       showMottoes: showMottoes,
       showChampsStats: showChampsStats,
       showDistrictChampsStats: showDistrictChampsStats,
+      showChampsStatsAtDistrictRegional: showChampsStatsAtDistrictRegional,
       showBlueBanners: showBlueBanners,
       hidePracticeSchedule: hidePracticeSchedule,
       monthsWarning: monthsWarning,
@@ -5687,6 +5692,15 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showBlueBanners]);
 
+  // Refresh team list when local-event Champs stats are enabled so appearance data is loaded
+  useEffect(() => {
+    if (showChampsStatsAtDistrictRegional === true && !ftcMode && selectedEvent && teamList?.teams?.length > 0 && isOnline) {
+      console.log("Show Champs stats at District/Regional enabled, refreshing team list to fetch Champs data");
+      getTeamList();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showChampsStatsAtDistrictRegional]);
+
   // check to see if Alliance Selection is ready when QualSchedule and Ranks changes
   useEffect(() => {
     if (
@@ -6085,6 +6099,9 @@ function App() {
         if (userPrefs.showDistrictChampsStats !== undefined && userPrefs.showDistrictChampsStats !== showDistrictChampsStats) {
           setShowDistrictChampsStats(userPrefs.showDistrictChampsStats);
         }
+        if (userPrefs.showChampsStatsAtDistrictRegional !== undefined && userPrefs.showChampsStatsAtDistrictRegional !== showChampsStatsAtDistrictRegional) {
+          setShowChampsStatsAtDistrictRegional(userPrefs.showChampsStatsAtDistrictRegional);
+        }
         if (userPrefs.showBlueBanners !== undefined && userPrefs.showBlueBanners !== showBlueBanners) {
           setShowBlueBanners(userPrefs.showBlueBanners);
         }
@@ -6409,6 +6426,7 @@ function App() {
     showMottoes,
     showChampsStats,
     showDistrictChampsStats,
+    showChampsStatsAtDistrictRegional,
     showBlueBanners,
     hidePracticeSchedule,
     monthsWarning,
@@ -6456,6 +6474,7 @@ function App() {
         showMottoes,
         showChampsStats,
         showDistrictChampsStats,
+        showChampsStatsAtDistrictRegional,
         showBlueBanners,
         hidePracticeSchedule,
         monthsWarning,
@@ -6518,6 +6537,7 @@ function App() {
     showMottoes,
     showChampsStats,
     showDistrictChampsStats,
+    showChampsStatsAtDistrictRegional,
     showBlueBanners,
     hidePracticeSchedule,
     monthsWarning,
@@ -6669,6 +6689,8 @@ function App() {
                     setReverseEmcee={setReverseEmcee}
                     showDistrictChampsStats={showDistrictChampsStats}
                     setShowDistrictChampsStats={setShowDistrictChampsStats}
+                    showChampsStatsAtDistrictRegional={showChampsStatsAtDistrictRegional}
+                    setShowChampsStatsAtDistrictRegional={setShowChampsStatsAtDistrictRegional}
                     showBlueBanners={showBlueBanners}
                     setShowBlueBanners={setShowBlueBanners}
                     monthsWarning={monthsWarning}
@@ -6894,6 +6916,7 @@ function App() {
                     regionalEventDetail={regionalEventDetail}
                     getRegionalEventDetail={getRegionalEventDetail}
                     showDistrictChampsStats={showDistrictChampsStats}
+                    showChampsStatsAtDistrictRegional={showChampsStatsAtDistrictRegional}
                     showBlueBanners={showBlueBanners}
                     adHocMatch={adHocMatch}
                     setAdHocMatch={setAdHocMatch}
