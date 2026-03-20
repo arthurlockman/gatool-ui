@@ -2921,7 +2921,7 @@ function App() {
       // When online and in FRC mode, always check for blue banners if showBlueBanners is enabled
       const shouldFetchChampsData = !ftcMode && (
         selectedEvent?.value?.champLevel !== "" ||
-        showDistrictChampsStats ||
+        showDistrictChampsStats === true ||
         showChampsStatsAtDistrictRegional === true ||
         (isOnline && showBlueBanners === true) ||
         (selectedEvent?.value?.code.includes("OFFLINE") &&
@@ -5700,6 +5700,15 @@ function App() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showChampsStatsAtDistrictRegional]);
+
+  // Refresh when District Champs playoff stats are enabled (otherwise list was built without history)
+  useEffect(() => {
+    if (showDistrictChampsStats === true && !ftcMode && selectedEvent && teamList?.teams?.length > 0 && isOnline) {
+      console.log("Show District Champs stats in playoffs enabled, refreshing team list to fetch history");
+      getTeamList();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showDistrictChampsStats]);
 
   // check to see if Alliance Selection is ready when QualSchedule and Ranks changes
   useEffect(() => {
