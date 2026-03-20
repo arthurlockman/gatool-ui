@@ -3,7 +3,30 @@ import _ from "lodash";
 
 const announceBackground = { "red": "#F7B3B4", "blue": "#98B4F4" }
 
-function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selectedEvent, showNotesAnnounce, showAwards, showMinorAwards, showSponsors, autoHideSponsors, showMottoes, showChampsStats, eventNamesCY, showDistrictChampsStats, showChampsStatsAtDistrictRegional, playoffOnly, ftcMode, showBlueBanners, remapNumberToString }) {
+function Announce({
+  station,
+  team,
+  inPlayoffs,
+  awardsMenu,
+  selectedYear,
+  selectedEvent,
+  showNotesAnnounce,
+  showAwards,
+  showMinorAwards,
+  showSponsors,
+  autoHideSponsors,
+  showMottoes,
+  showChampsStats,
+  eventNamesCY,
+  showDistrictChampsStats,
+  showChampsStatsAtDistrictRegional,
+  playoffOnly,
+  ftcMode,
+  showBlueBanners,
+  remapNumberToString,
+  /** Fourth column: rank (quals) | matchup summary with rowspan (playoffs) | omit when rowspan continues */
+  column4,
+}) {
     const originalAndSustaining = ["20", "45", "126", "148", "151", "157", "190", "191", "250"];
     var allianceColor = station.slice(0, -1);
     var awardsYears = team?.awards ? Object.keys(team.awards) : []
@@ -137,9 +160,36 @@ function Announce({ station, team, inPlayoffs, awardsMenu, selectedYear, selecte
                 </p>}
                 {(showNotesAnnounce || _.isNull(showNotesAnnounce)) && <p className="teamNotes" dangerouslySetInnerHTML={{ __html: team?.updates?.teamNotesLocal }} />}
             </td>
-            <td className={"col1 ranking"} style={team?.rankStyle.backgroundColor === "" ? { backgroundColor: _.toLower(allianceColor) === "red" ? announceBackground.red : announceBackground.blue } : team?.rankStyle}>
-                {team?.rank ? team?.rank : ""}
-            </td>
+            {column4?.type === "omit" ? null : column4?.type === "matchup" ? (
+                <td
+                    className={"col1 announce-alliance-matchup-cell"}
+                    rowSpan={column4.rowSpan}
+                    style={{
+                        backgroundColor:
+                            _.toLower(allianceColor) === "red"
+                                ? announceBackground.red
+                                : announceBackground.blue,
+                    }}
+                >
+                    {column4.content}
+                </td>
+            ) : (
+                <td
+                    className={"col1 ranking"}
+                    style={
+                        team?.rankStyle.backgroundColor === ""
+                            ? {
+                                  backgroundColor:
+                                      _.toLower(allianceColor) === "red"
+                                          ? announceBackground.red
+                                          : announceBackground.blue,
+                              }
+                            : team?.rankStyle
+                    }
+                >
+                    {team?.rank ? team?.rank : ""}
+                </td>
+            )}
         </tr>
         </>
     )

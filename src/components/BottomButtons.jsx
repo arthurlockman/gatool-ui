@@ -62,7 +62,9 @@ function BottomButtons({
                 </Col>
             </Row>
             {showWorldAndStatsOnAnnouncePlayByPlay !== false && (
-              <HighScoresSummary
+              <>
+                <Row className="mt-3"><Col /></Row>
+                <HighScoresSummary
                 worldStats={worldStats}
                 ftcRegionHighScores={ftcRegionHighScores}
                 ftcLeagueHighScores={ftcLeagueHighScores}
@@ -72,6 +74,7 @@ function BottomButtons({
                 districts={districts}
                 ftcLeagues={ftcLeagues}
               />
+              </>
             )}
             <Row><FoulButtons currentYear={selectedEvent?.year} ftcMode={ftcMode}/></Row>
             <Row> <br /><br /><br /></Row>

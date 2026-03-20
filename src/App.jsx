@@ -14,7 +14,7 @@ import AwardsPage from "./pages/AwardsPage";
 import StatsPage from "./pages/StatsPage";
 import CheatsheetPage from "./pages/CheatsheetPage";
 import EmceePage from "./pages/EmceePage";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { UseAuthClient } from "./contextProviders/AuthClientContext";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Blocks } from "react-loader-spinner";
@@ -40,6 +40,11 @@ import { toast } from "react-toastify";
 import { trainingData } from "components/TrainingMatches";
 import { timeZones } from "components/TimeZones";
 import { extendFTCPlayoffScheduleWithPartialMatches } from "./utils/ftcPlayoffSchedule";
+import {
+  getConnectionsEventKey,
+  fetchAllianceConnections,
+  allianceRosterToConnectionKey,
+} from "./utils/allianceConnectionsApi";
 import { useInterval } from "react-interval-hook";
 
 import "./App.css";
@@ -367,6 +372,9 @@ function App() {
     0
   );
   const [allianceSelection, setAllianceSelection] = useState(null);
+  /** Preloaded prior-partnership data per alliance roster (key = sorted team ids). */
+  const [alliancePartnerConnectionsCache, setAlliancePartnerConnectionsCache] =
+    useState({});
   const [playoffs, setPlayoffs] = usePersistentState("cache:playoffs", null);
   const [playoffCountOverride, setPlayoffCountOverride] = usePersistentState(
     "setting:playoffCountOverride",
@@ -603,6 +611,75 @@ function App() {
       getFTCOfflineStatus();
     }
   }, [FTCServerURL, ftcMode?.value]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const allianceConnectionsPrefetchSignature = useMemo(() => {
+    if (!alliances?.alliances?.length) return "";
+    const roster = alliances.alliances
+      .map((a) => allianceRosterToConnectionKey(a) || "")
+      .filter(Boolean)
+      .sort()
+      .join("|");
+    return `${selectedEvent?.value?.code || ""}@${selectedYear?.value || ""}@${roster}`;
+  }, [alliances?.alliances, selectedEvent?.value?.code, selectedYear?.value]);
+
+  useEffect(() => {
+    if (ftcMode !== false) {
+      setAlliancePartnerConnectionsCache({});
+      return;
+    }
+    const eventKey = getConnectionsEventKey(selectedEvent, selectedYear);
+    if (!eventKey || !alliances?.alliances?.length || !allianceConnectionsPrefetchSignature) {
+      setAlliancePartnerConnectionsCache({});
+      return;
+    }
+
+    const unique = [];
+    const seen = new Set();
+    for (const a of alliances.alliances) {
+      const key = allianceRosterToConnectionKey(a);
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      unique.push({
+        key,
+        nums: key.split(",").map((n) => Number(n)),
+      });
+    }
+
+    const initial = {};
+    for (const { key } of unique) {
+      initial[key] = { loading: true, data: null, error: null };
+    }
+    setAlliancePartnerConnectionsCache(initial);
+
+    const ac = new AbortController();
+    Promise.all(
+      unique.map(async ({ key, nums }) => {
+        try {
+          const data = await fetchAllianceConnections(
+            eventKey,
+            nums,
+            ac.signal
+          );
+          return { key, loading: false, data, error: null };
+        } catch (e) {
+          if (e?.name === "AbortError") return null;
+          return { key, loading: false, data: null, error: e };
+        }
+      })
+    ).then((results) => {
+      if (ac.signal.aborted) return;
+      setAlliancePartnerConnectionsCache((prev) => {
+        const next = { ...prev };
+        for (const r of results) {
+          if (r) next[r.key] = r;
+        }
+        return next;
+      });
+    });
+
+    return () => ac.abort();
+    // allianceConnectionsPrefetchSignature encodes alliances.alliances rosters
+  }, [allianceConnectionsPrefetchSignature, ftcMode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Display an alert when there are updates to the app. This allows the user to update the cached code.
   useEffect(() => {
@@ -2930,15 +3007,6 @@ function App() {
       );
 
       if (shouldFetchChampsData) {
-        console.log("Getting Champs stats", {
-          champLevel: selectedEvent?.value?.champLevel,
-          showDistrictChampsStats,
-          showChampsStatsAtDistrictRegional,
-          showBlueBanners,
-          isOnline,
-          eventType: selectedEvent?.value?.type,
-          shouldFetchChampsData
-        });
         champsTeams = teams.teams.map(async (team) => {
           // Initialize blueBanners outside the try-catch so it's always available
           var blueBanners = {
@@ -4519,7 +4587,6 @@ function App() {
 
       // If we are in World Champs, we need to determine the team list from the Alliances
       if (selectedEvent?.value?.type === "Championship" && alliances) {
-        console.log("Getting Champs teams from Alliances");
         var tempChampsTeamList = [];
         if (!haveChampsTeams) {
           alliances?.alliances.forEach((alliance) => {
@@ -5695,7 +5762,6 @@ function App() {
   // Refresh team list when local-event Champs stats are enabled so appearance data is loaded
   useEffect(() => {
     if (showChampsStatsAtDistrictRegional === true && !ftcMode && selectedEvent && teamList?.teams?.length > 0 && isOnline) {
-      console.log("Show Champs stats at District/Regional enabled, refreshing team list to fetch Champs data");
       getTeamList();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -5704,7 +5770,6 @@ function App() {
   // Refresh when District Champs playoff stats are enabled (otherwise list was built without history)
   useEffect(() => {
     if (showDistrictChampsStats === true && !ftcMode && selectedEvent && teamList?.teams?.length > 0 && isOnline) {
-      console.log("Show District Champs stats in playoffs enabled, refreshing team list to fetch history");
       getTeamList();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -6952,6 +7017,9 @@ function App() {
                     remapNumberToString={remapNumberToString}
                     remapStringToNumber={remapStringToNumber}
                     useScrollMemory={useScrollMemory}
+                    alliancePartnerConnectionsCache={
+                      alliancePartnerConnectionsCache
+                    }
                   />
                 }
               />
