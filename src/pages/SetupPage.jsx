@@ -520,7 +520,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                             <Switch checked={showChampsStats === null ? false : showChampsStats} onChange={setShowChampsStats} />
                                         </td>
                                         <td>
-                                            <b>Show Champs Statistics on Announce in World and District Champs</b>
+                                            <b>Show teams' lifetime Champs Statistics on Announce in World and District Champs</b>
                                         </td>
                                     </tr>}
                                     {!ftcMode && <tr className={"statsSettings"}>
@@ -528,7 +528,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                             <Switch checked={showChampsStatsAtDistrictRegional === null ? false : showChampsStatsAtDistrictRegional} onChange={setShowChampsStatsAtDistrictRegional} />
                                         </td>
                                         <td>
-                                            <b>Show Champs Statistics on Announce at District and Regional Events</b>
+                                            <b>Show teams' lifetime Champs Statistics on Announce at District and Regional Events</b>
                                         </td>
                                     </tr>}
                                     {selectedEvent?.value?.districtCode && !ftcMode && <tr className={"statsSettings"}>
@@ -536,7 +536,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                             <Switch checked={showDistrictChampsStats === null ? false : showDistrictChampsStats} onChange={setShowDistrictChampsStats} />
                                         </td>
                                         <td>
-                                            <b>Show District Champs Statistics on Announce in Playoffs outside of District Champs</b>
+                                            <b>Show teams' lifetime District Champs Statistics on Announce in Playoffs outside of District Champs</b>
                                         </td>
                                     </tr>}
                                     {!ftcMode && <tr className={"statsSettings"}>
@@ -544,7 +544,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                             <Switch checked={showBlueBanners === null ? false : showBlueBanners} onChange={setShowBlueBanners} />
                                         </td>
                                         <td>
-                                            <b>Show Blue Banners Statistics on Announce.</b>
+                                            <b>Show teams' lifetime Blue Banners Statistics on Announce.</b>
                                         </td>
                                     </tr>}
                                     <tr className={"statsSettings"}>
@@ -588,7 +588,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                             <Switch checked={showWorldAndStatsOnAnnouncePlayByPlay === null ? true : showWorldAndStatsOnAnnouncePlayByPlay} onChange={setShowWorldAndStatsOnAnnouncePlayByPlay} />
                                         </td>
                                         <td>
-                                            <b>Show World and other stats on Announce and Play-by-Play</b>
+                                            <b>Show World and other high scores on Announce and Play-by-Play</b>
                                         </td>
                                     </tr>
                                     <tr className={"UISettings"}>
