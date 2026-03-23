@@ -72,12 +72,22 @@ export function applyPlayoffReserveEdits(alliancesData, eventCode, editsRoot) {
   return [...new Set(pruneKeys)];
 }
 
-/** True when the schedule row has a committed result (FMS / hybrid feed). */
+/**
+ * True when the schedule row has a committed / meaningful result for gating UI and reserve overlays.
+ * Do not treat `0–0` with both scores non-null as posted — hybrid feeds often expose placeholders before
+ * FMS commits, which incorrectly pruned local reserve edits and hid Remove after changing matches.
+ */
 export function matchHasPostedResult(m) {
   if (!m || typeof m !== "object") return false;
   if (m.postResultTime != null && m.postResultTime !== "") return true;
-  if (m.scoreRedFinal != null && m.scoreBlueFinal != null) return true;
-  return false;
+  const red = m.scoreRedFinal;
+  const blue = m.scoreBlueFinal;
+  if (red == null || blue == null) return false;
+  const r = Number(red);
+  const b = Number(blue);
+  if (Number.isNaN(r) || Number.isNaN(b)) return false;
+  // Non-zero total indicates a played match when postResultTime is missing (e.g. some secondary feeds).
+  return r !== 0 || b !== 0;
 }
 
 /**

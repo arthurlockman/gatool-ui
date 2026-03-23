@@ -6,14 +6,37 @@ import MatchClock from "../components/MatchClock";
 import _ from "lodash";
 import { useHotkeysContext } from "react-hotkeys-hook";
 import { roundThreeOrReserveRoleLabel } from "../utils/allianceRoleLabels";
-import { matchHasPostedResult } from "../utils/playoffReserveEdits";
+import {
+    compactReserveEditsForEvent,
+    matchHasPostedResult,
+} from "../utils/playoffReserveEdits";
 
-function apiSnapshotListsRound3ForAlliance(snapshot, allianceNumber) {
-    if (!snapshot || allianceNumber === undefined || allianceNumber === null) {
+/**
+ * True when this alliance has a persisted `op: 'set'` overlay (user-added reserve / round3 in gatool).
+ * Merged `alliances` alone mixes API + overlay; comparing to overrides on each render decides if Remove is allowed.
+ */
+function hasLocalPlayoffReserveSetOverride(playoffReserveEdits, eventCode, allianceNumber) {
+    if (
+        !eventCode ||
+        allianceNumber === undefined ||
+        allianceNumber === null ||
+        allianceNumber === ""
+    ) {
         return false;
     }
-    const v = snapshot[String(allianceNumber)];
-    return v !== undefined && v !== null && v !== "";
+    const raw = playoffReserveEdits?.[eventCode];
+    if (!raw || typeof raw !== "object") {
+        return false;
+    }
+    const e = compactReserveEditsForEvent(raw)[String(allianceNumber)];
+    if (!e || e.op !== "set") {
+        return false;
+    }
+    const hasRound3 =
+        e.round3 !== undefined && e.round3 !== null && e.round3 !== "";
+    const hasBackup =
+        e.backup !== undefined && e.backup !== null && e.backup !== "";
+    return hasRound3 || hasBackup;
 }
 
 /** Same alliance row as in App.jsx getAlliances — keeps Lookup and alliance.* fields consistent after local round3 edits. */
@@ -123,10 +146,16 @@ function getPlayoffReserveForSide(side, matchDetails, alliances, inPlayoffs) {
         return null;
     }
     const matchNums = new Set(matchDetails.teams.map((t) => String(t.teamNumber)));
-    const namesOnField = new Set();
+    /** Prefer alliance id from Lookup — name strings from API vs schedule can drift. */
+    const allianceNumbersOnField = new Set();
     matchDetails.teams.forEach((t) => {
         const lu = alliances.Lookup[String(t.teamNumber)];
-        if (lu?.alliance) namesOnField.add(lu.alliance);
+        if (lu?.number !== undefined && lu?.number !== null && lu?.number !== "") {
+            const n = Number(lu.number);
+            if (Number.isFinite(n)) {
+                allianceNumbersOnField.add(n);
+            }
+        }
     });
     for (const al of alliances.alliances) {
         const reserveNum =
@@ -136,10 +165,11 @@ function getPlayoffReserveForSide(side, matchDetails, alliances, inPlayoffs) {
                   ? al.backup
                   : null;
         if (reserveNum == null) continue;
-        if (!namesOnField.has(al.name)) continue;
+        const alNum = Number(al.number);
+        if (!Number.isFinite(alNum) || !allianceNumbersOnField.has(alNum)) continue;
         if (matchNums.has(String(reserveNum))) continue;
         const fielded = matchDetails.teams.find(
-            (t) => alliances.Lookup[String(t.teamNumber)]?.alliance === al.name
+            (t) => Number(alliances.Lookup[String(t.teamNumber)]?.number) === alNum
         );
         const alSide = fielded?.station?.startsWith("Blue") ? "Blue" : "Red";
         if (alSide !== side) continue;
@@ -154,7 +184,7 @@ function getPlayoffReserveForSide(side, matchDetails, alliances, inPlayoffs) {
     return null;
 }
 
-function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatchFromMenu, selectedEvent, matchDetails, timeFormat, alliances, setAlliances, rankings, inPlayoffs, backupTeam, setBackupTeam, upsertPlayoffReserveOverlay, removePlayoffReserveOverlay, teamList, adHocMatch, setAdHocMatch, adHocMode, swapScreen, playoffOnly, eventLabel, ftcMode, playoffAllianceRound3FromApi = {} }) {
+function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatchFromMenu, selectedEvent, matchDetails, timeFormat, alliances, setAlliances, rankings, inPlayoffs, backupTeam, setBackupTeam, upsertPlayoffReserveOverlay, removePlayoffReserveOverlay, playoffReserveEdits, teamList, adHocMatch, setAdHocMatch, adHocMode, swapScreen, playoffOnly, eventLabel, ftcMode }) {
 
     const [show, setShow] = useState(null);
     const [showAdHoc, setAdHoc] = useState(null);
@@ -280,7 +310,9 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
             handleClose();
             return;
         }
-        if (apiSnapshotListsRound3ForAlliance(playoffAllianceRound3FromApi, allianceNumber)) {
+        const eventCode = selectedEvent?.value?.code;
+        if (!hasLocalPlayoffReserveSetOverride(playoffReserveEdits, eventCode, allianceNumber)) {
+            handleClose();
             return;
         }
         var alliancesTemp = _.cloneDeep(alliances);
@@ -381,6 +413,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
 
     const redReserveCtx = getPlayoffReserveForSide("Red", matchDetails, alliances, inPlayoffs);
     const blueReserveCtx = getPlayoffReserveForSide("Blue", matchDetails, alliances, inPlayoffs);
+    const eventCodeForReserve = selectedEvent?.value?.code;
     const reserveSlotUiLabel = roundThreeOrReserveRoleLabel(selectedEvent?.value);
 
     const renderBackupModalFieldTile = (team, index) => {
@@ -398,10 +431,11 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
 
     const renderAllianceReserveColumn = (/** @type {'Red'|'Blue'} */ side, teams) => {
         const reserveCtx = side === "Red" ? redReserveCtx : blueReserveCtx;
-        const removeLockedByOfficialRound3 =
+        const reserveShownFromApiOnly =
             reserveCtx &&
-            apiSnapshotListsRound3ForAlliance(
-                playoffAllianceRound3FromApi,
+            !hasLocalPlayoffReserveSetOverride(
+                playoffReserveEdits,
+                eventCodeForReserve,
                 reserveCtx.allianceNumber
             );
         return (
@@ -436,7 +470,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
                 {(reserveAddSide !== side || confirmSelection) && (
                     <>
                         {reserveCtx ? (
-                            removeLockedByOfficialRound3 ? (
+                            reserveShownFromApiOnly ? (
                                 renderBackupModalFieldTile(
                                     { station: `${side}1`, teamNumber: reserveCtx.teamNumber },
                                     `reserve${side}`
@@ -475,8 +509,9 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
     const removeReserveConfirmBlockedByApi =
         Boolean(
             teamSelected?.isPlayoffReserve &&
-            apiSnapshotListsRound3ForAlliance(
-                playoffAllianceRound3FromApi,
+            !hasLocalPlayoffReserveSetOverride(
+                playoffReserveEdits,
+                eventCodeForReserve,
                 teamSelected.allianceNumber
             )
         );
@@ -526,7 +561,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
                 </Col>
                 <Modal centered={true} show={show} onHide={handleClose} size="lg" dialogClassName="alliance-backup-modal-dialog">
                     <Modal.Header className={"promoteBackup"} closeButton closeVariant="white">
-                        <Modal.Title>Call up reserve team</Modal.Title>
+                        <Modal.Title>{teamSelected?.isPlayoffReserve ? "Remove reserve team" : "Call up reserve team"}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body className={"backupDialog alliance-backup-modal-body"}>
                         <Container fluid>
@@ -545,7 +580,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
                             )}
 
                             {teamSelected?.isPlayoffReserve && <><Row>
-                                <Col>Remove team {teamSelected?.teamNumber} from the {teamSelected?.side} Alliance (<b>{reserveSlotUiLabel}</b>)? This clears the change in gatool until the match posts to FIRST (or you add a reserve again).</Col>
+                                <Col>Remove team {teamSelected?.teamNumber} from the {teamSelected?.side} Alliance?</Col>
                             </Row>
                                 <Row className="mt-2">
                                     <Col>

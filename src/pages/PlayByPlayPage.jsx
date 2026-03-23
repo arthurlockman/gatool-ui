@@ -44,6 +44,7 @@ function PlayByPlayPage({
   setBackupTeam,
   upsertPlayoffReserveOverlay,
   removePlayoffReserveOverlay,
+  playoffReserveEdits,
   nextMatch,
   previousMatch,
   setMatchFromMenu,
@@ -75,7 +76,6 @@ function PlayByPlayPage({
   remapNumberToString,
   remapStringToNumber,
   useScrollMemory,
-  playoffAllianceRound3FromApi,
 }) {
   // Remember scroll position for Play by play page
   useScrollPosition('playbyplay', true, false, useScrollMemory);
@@ -548,7 +548,7 @@ function PlayByPlayPage({
               setBackupTeam={setBackupTeam}
               upsertPlayoffReserveOverlay={upsertPlayoffReserveOverlay}
               removePlayoffReserveOverlay={removePlayoffReserveOverlay}
-              playoffAllianceRound3FromApi={playoffAllianceRound3FromApi}
+              playoffReserveEdits={playoffReserveEdits}
               teamList={teamList}
               adHocMatch={adHocMatch}
               setAdHocMatch={setAdHocMatch}

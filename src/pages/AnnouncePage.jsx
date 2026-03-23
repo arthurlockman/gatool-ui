@@ -50,6 +50,7 @@ function AnnouncePage({
   setBackupTeam,
   upsertPlayoffReserveOverlay,
   removePlayoffReserveOverlay,
+  playoffReserveEdits,
   nextMatch,
   previousMatch,
   setMatchFromMenu,
@@ -87,7 +88,6 @@ function AnnouncePage({
   remapStringToNumber,
   useScrollMemory,
   alliancePartnerConnectionsCache,
-  playoffAllianceRound3FromApi,
 }) {
   // Remember scroll position for Announce page
   useScrollPosition('announce', true, false, useScrollMemory);
@@ -612,7 +612,7 @@ function AnnouncePage({
               setBackupTeam={setBackupTeam}
               upsertPlayoffReserveOverlay={upsertPlayoffReserveOverlay}
               removePlayoffReserveOverlay={removePlayoffReserveOverlay}
-              playoffAllianceRound3FromApi={playoffAllianceRound3FromApi}
+              playoffReserveEdits={playoffReserveEdits}
               teamList={teamList}
               adHocMatch={adHocMatch}
               setAdHocMatch={setAdHocMatch}

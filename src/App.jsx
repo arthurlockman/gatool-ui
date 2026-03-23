@@ -275,9 +275,6 @@ function App() {
   }
   /** Drop stale getAlliances responses so an older fetch cannot overwrite newer alliance + overlay edits. */
   const getAlliancesEpochRef = useRef(0);
-  /** Per-alliance `round3` from the last raw API response (before local playoff edits merge). */
-  const [playoffAllianceRound3FromApi, setPlayoffAllianceRound3FromApi] =
-    useState({});
   const [teamRemappings, setTeamRemappings] = usePersistentState("cache:teamRemappings", null);
   const [communityUpdates, setCommunityUpdates] = usePersistentState(
     "cache:communityUpdates",
@@ -4629,39 +4626,18 @@ function App() {
       alliances.alliances = alliances.Alliances;
       delete alliances.Alliances;
     }
+    /** Reserve merge + prune must commit with setAlliances (same epoch) so stale fetches do not mutate edits without updating alliances. */
+    /** @type {{ code: string; pruneKeys: string[] } | null} */
+    let reserveEditsPruneForCommit = null;
     if (!allianceTemp && selectedEvent?.value?.code) {
       const code = selectedEvent.value.code;
-      const apiRound3Snapshot = {};
-      if (alliances?.alliances?.length) {
-        for (const a of alliances.alliances) {
-          if (a?.number === undefined || a?.number === null) continue;
-          const r3 = a.round3;
-          apiRound3Snapshot[String(a.number)] =
-            r3 !== undefined && r3 !== null && r3 !== "" ? r3 : null;
-        }
-      }
-      setPlayoffAllianceRound3FromApi(apiRound3Snapshot);
       const pruneKeys = applyPlayoffReserveEdits(
         alliances,
         code,
         playoffReserveEditsRef.current
       );
       if (pruneKeys.length > 0) {
-        setPlayoffReserveEdits((prev) => {
-          const forEv = compactReserveEditsForEvent({ ...(prev[code] || {}) });
-          for (const k of pruneKeys) {
-            delete forEv[k];
-          }
-          let next;
-          if (Object.keys(forEv).length === 0) {
-            const { [code]: _removed, ...rest } = prev;
-            next = rest;
-          } else {
-            next = { ...prev, [code]: forEv };
-          }
-          playoffReserveEditsRef.current = next;
-          return next;
-        });
+        reserveEditsPruneForCommit = { code, pruneKeys };
       }
     }
     var allianceLookup = {};
@@ -4736,6 +4712,24 @@ function App() {
     console.log(`${alliances?.alliances?.length} Alliances loaded.`);
     if (getAlliancesEpoch !== getAlliancesEpochRef.current) {
       return;
+    }
+    if (reserveEditsPruneForCommit) {
+      const { code, pruneKeys } = reserveEditsPruneForCommit;
+      setPlayoffReserveEdits((prev) => {
+        const forEv = compactReserveEditsForEvent({ ...(prev[code] || {}) });
+        for (const k of pruneKeys) {
+          delete forEv[k];
+        }
+        let next;
+        if (Object.keys(forEv).length === 0) {
+          const { [code]: _removed, ...rest } = prev;
+          next = rest;
+        } else {
+          next = { ...prev, [code]: forEv };
+        }
+        playoffReserveEditsRef.current = next;
+        return next;
+      });
     }
     setAlliances(alliances);
     if (alliances?.alliances?.length > 0) {
@@ -7181,7 +7175,7 @@ function App() {
                     }
                     upsertPlayoffReserveOverlay={upsertPlayoffReserveOverlay}
                     removePlayoffReserveOverlay={removePlayoffReserveOverlay}
-                    playoffAllianceRound3FromApi={playoffAllianceRound3FromApi}
+                    playoffReserveEdits={playoffReserveEdits}
                   />
                 }
               />
@@ -7249,7 +7243,7 @@ function App() {
                     useScrollMemory={useScrollMemory}
                     upsertPlayoffReserveOverlay={upsertPlayoffReserveOverlay}
                     removePlayoffReserveOverlay={removePlayoffReserveOverlay}
-                    playoffAllianceRound3FromApi={playoffAllianceRound3FromApi}
+                    playoffReserveEdits={playoffReserveEdits}
                   />
                 }
               />
