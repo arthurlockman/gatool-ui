@@ -444,7 +444,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
                 {reserveAddSide === side && !confirmSelection && (
                     <>
                         <div className="text-center small">
-                            Select the team to add as the <b>{reserveSlotUiLabel}</b> for this alliance.
+                            Select the team to add as the <b>{reserveSlotUiLabel}</b> for this Alliance.
                         </div>
                         <Select
                             placeholder="Choose team…"
@@ -590,7 +590,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
                                             disabled={removeReserveConfirmBlockedByApi}
                                             title={
                                                 removeReserveConfirmBlockedByApi
-                                                    ? "FIRST already lists a round 3 team for this alliance; remove is disabled."
+                                                    ? "FIRST already lists a round 3 team for this Alliance; remove is disabled."
                                                     : undefined
                                             }
                                             onClick={handleRemoveReserveConfirm}
@@ -602,7 +602,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
                                 </Row></>}
 
                             {!teamSelected && !(confirmSelection && backupTeam && reserveAddSide) && <><Row>
-                                <Col>Use <b>Add team to Alliance</b> to add the <b>{reserveSlotUiLabel}</b> for that alliance. They become a permanent alliance member after the match completes.</Col></Row>
+                                <Col>Use <b>Add team to Alliance</b> to add the <b>{reserveSlotUiLabel}</b> for that Alliance. They become a permanent Alliance member after the match completes.</Col></Row>
                                 <Row className="mt-3 g-3 alliance-backup-modal-columns">
                                     {renderAllianceReserveColumn(leftColumnSide, leftColumnTeams)}
                                     {renderAllianceReserveColumn(rightColumnSide, rightColumnTeams)}
