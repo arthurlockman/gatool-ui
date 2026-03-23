@@ -48,6 +48,9 @@ function AnnouncePage({
   eventHighScores,
   backupTeam,
   setBackupTeam,
+  upsertPlayoffReserveOverlay,
+  removePlayoffReserveOverlay,
+  playoffReserveEdits,
   nextMatch,
   previousMatch,
   setMatchFromMenu,
@@ -607,6 +610,9 @@ function AnnouncePage({
               rankings={rankings}
               backupTeam={backupTeam}
               setBackupTeam={setBackupTeam}
+              upsertPlayoffReserveOverlay={upsertPlayoffReserveOverlay}
+              removePlayoffReserveOverlay={removePlayoffReserveOverlay}
+              playoffReserveEdits={playoffReserveEdits}
               teamList={teamList}
               adHocMatch={adHocMatch}
               setAdHocMatch={setAdHocMatch}

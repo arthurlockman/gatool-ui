@@ -15,6 +15,12 @@ import StatsPage from "./pages/StatsPage";
 import CheatsheetPage from "./pages/CheatsheetPage";
 import EmceePage from "./pages/EmceePage";
 import { useEffect, useState, useRef, useMemo } from "react";
+import {
+  applyPlayoffReserveEdits,
+  compactReserveEditsForEvent,
+  prunePlayoffReserveSetsAfterPostedMatches,
+} from "./utils/playoffReserveEdits";
+import { roundThreeOrReserveRoleLabel } from "./utils/allianceRoleLabels";
 import { UseAuthClient } from "./contextProviders/AuthClientContext";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Blocks } from "react-loader-spinner";
@@ -253,6 +259,22 @@ function App() {
     null
   );
   const [alliances, setAlliances] = usePersistentState("cache:alliances", null);
+  /**
+   * Playoff reserve edits keyed only by event code then alliance **number** (string):
+   * { op: 'set', round3 } | legacy { op: 'set', backup, backupReplaced } | { op: 'clear' }.
+   */
+  const [playoffReserveEdits, setPlayoffReserveEdits] = usePersistentState(
+    "cache:playoffReserveEditsByAlliance",
+    {}
+  );
+  const playoffReserveEditsRef = useRef(playoffReserveEdits || {});
+  if (playoffReserveEdits && typeof playoffReserveEdits === "object") {
+    playoffReserveEditsRef.current = playoffReserveEdits;
+  } else {
+    playoffReserveEditsRef.current = {};
+  }
+  /** Drop stale getAlliances responses so an older fetch cannot overwrite newer alliance + overlay edits. */
+  const getAlliancesEpochRef = useRef(0);
   const [teamRemappings, setTeamRemappings] = usePersistentState("cache:teamRemappings", null);
   const [communityUpdates, setCommunityUpdates] = usePersistentState(
     "cache:communityUpdates",
@@ -414,6 +436,78 @@ function App() {
   ]);
   const [adHocMode, setAdHocMode] = useState(null);
   const [backupTeam, setBackupTeam] = useState(null);
+
+  function upsertPlayoffReserveOverlay({
+    allianceNumber,
+    round3,
+    pendingSourceMatch,
+  }) {
+    const code = selectedEvent?.value?.code;
+    if (
+      !code ||
+      allianceNumber === undefined ||
+      allianceNumber === null ||
+      allianceNumber === "" ||
+      round3 === undefined ||
+      round3 === null ||
+      round3 === ""
+    ) {
+      return;
+    }
+    const prev =
+      playoffReserveEditsRef.current &&
+      typeof playoffReserveEditsRef.current === "object"
+        ? playoffReserveEditsRef.current
+        : {};
+    const key = String(allianceNumber);
+    const forEv = compactReserveEditsForEvent({ ...(prev[code] || {}) });
+    const entry = { op: "set", round3 };
+    if (pendingSourceMatch && typeof pendingSourceMatch === "object") {
+      entry.pendingSourceMatch = {
+        tournamentLevel: pendingSourceMatch.tournamentLevel ?? null,
+        matchNumber:
+          pendingSourceMatch.matchNumber != null
+            ? Number(pendingSourceMatch.matchNumber)
+            : null,
+        originalMatchNumber:
+          pendingSourceMatch.originalMatchNumber != null
+            ? Number(pendingSourceMatch.originalMatchNumber)
+            : undefined,
+        series:
+          pendingSourceMatch.series != null
+            ? Number(pendingSourceMatch.series)
+            : undefined,
+      };
+    }
+    forEv[key] = entry;
+    const next = { ...prev, [code]: forEv };
+    playoffReserveEditsRef.current = next;
+    setPlayoffReserveEdits(next);
+  }
+
+  function removePlayoffReserveOverlay({ allianceNumber }) {
+    const code = selectedEvent?.value?.code;
+    if (
+      !code ||
+      allianceNumber === undefined ||
+      allianceNumber === null ||
+      allianceNumber === ""
+    ) {
+      return;
+    }
+    const prev =
+      playoffReserveEditsRef.current &&
+      typeof playoffReserveEditsRef.current === "object"
+        ? playoffReserveEditsRef.current
+        : {};
+    const key = String(allianceNumber);
+    const forEv = compactReserveEditsForEvent({ ...(prev[code] || {}) });
+    forEv[key] = { op: "clear" };
+    const next = { ...prev, [code]: forEv };
+    playoffReserveEditsRef.current = next;
+    setPlayoffReserveEdits(next);
+  }
+
   const [showReloaded, setShowReloaded] = usePersistentState(
     "cache:showReloaded",
     false
@@ -2028,6 +2122,25 @@ function App() {
     console.log(
       `There are ${playoffschedule?.schedule.length} playoff matches loaded.`
     );
+
+    const eventCodeForReservePrune = selectedEvent?.value?.code;
+    if (
+      eventCodeForReservePrune &&
+      Array.isArray(playoffschedule?.schedule) &&
+      playoffschedule.schedule.length > 0
+    ) {
+      const { nextRoot, prunedAllianceKeys } =
+        prunePlayoffReserveSetsAfterPostedMatches({
+          editsRoot: playoffReserveEditsRef.current,
+          eventCode: eventCodeForReservePrune,
+          playoffMatches: playoffschedule.schedule,
+          ftcMode: Boolean(ftcMode),
+        });
+      if (prunedAllianceKeys.length > 0) {
+        playoffReserveEditsRef.current = nextRoot;
+        setPlayoffReserveEdits(nextRoot);
+      }
+    }
 
     // For OFFLINE events, only update playoffSchedule if there's no uploaded schedule already
     if (!isOfflineEvent || !playoffSchedule || playoffSchedule?.schedule?.length === 0) {
@@ -4388,6 +4501,8 @@ function App() {
    */
   async function getAlliances(allianceTemp) {
     console.log("Getting Alliances");
+    getAlliancesEpochRef.current += 1;
+    const getAlliancesEpoch = getAlliancesEpochRef.current;
     var result = null;
     var alliances = allianceTemp || { Alliances: [] };
     if (
@@ -4511,6 +4626,20 @@ function App() {
       alliances.alliances = alliances.Alliances;
       delete alliances.Alliances;
     }
+    /** Reserve merge + prune must commit with setAlliances (same epoch) so stale fetches do not mutate edits without updating alliances. */
+    /** @type {{ code: string; pruneKeys: string[] } | null} */
+    let reserveEditsPruneForCommit = null;
+    if (!allianceTemp && selectedEvent?.value?.code) {
+      const code = selectedEvent.value.code;
+      const pruneKeys = applyPlayoffReserveEdits(
+        alliances,
+        code,
+        playoffReserveEditsRef.current
+      );
+      if (pruneKeys.length > 0) {
+        reserveEditsPruneForCommit = { code, pruneKeys };
+      }
+    }
     var allianceLookup = {};
     if (alliances?.alliances) {
       alliances?.alliances.forEach((alliance) => {
@@ -4551,7 +4680,7 @@ function App() {
         }
         if (alliance.round3) {
           allianceLookup[`${alliance.round3}`] = {
-            role: `Round 3 Selection`,
+            role: roundThreeOrReserveRoleLabel(selectedEvent?.value),
             alliance: alliance.name,
             number: alliance.number,
             captain: alliance.captain,
@@ -4564,7 +4693,7 @@ function App() {
         }
         if (alliance.backup) {
           allianceLookup[`${alliance.backup}`] = {
-            role: `Backup for ${alliance.backupReplaced}`,
+            role: `Reserve team`,
             alliance: alliance.name,
             number: alliance.number,
             captain: alliance.captain,
@@ -4581,6 +4710,27 @@ function App() {
 
     alliances.lastUpdate = moment().format();
     console.log(`${alliances?.alliances?.length} Alliances loaded.`);
+    if (getAlliancesEpoch !== getAlliancesEpochRef.current) {
+      return;
+    }
+    if (reserveEditsPruneForCommit) {
+      const { code, pruneKeys } = reserveEditsPruneForCommit;
+      setPlayoffReserveEdits((prev) => {
+        const forEv = compactReserveEditsForEvent({ ...(prev[code] || {}) });
+        for (const k of pruneKeys) {
+          delete forEv[k];
+        }
+        let next;
+        if (Object.keys(forEv).length === 0) {
+          const { [code]: _removed, ...rest } = prev;
+          next = rest;
+        } else {
+          next = { ...prev, [code]: forEv };
+        }
+        playoffReserveEditsRef.current = next;
+        return next;
+      });
+    }
     setAlliances(alliances);
     if (alliances?.alliances?.length > 0) {
       setPlayoffs(true);
@@ -4600,6 +4750,9 @@ function App() {
           // so we need to get the details now from this array of competing teams
           setHaveChampsTeams(true);
           await getTeamList(_.uniq(tempChampsTeamList));
+          if (getAlliancesEpoch !== getAlliancesEpochRef.current) {
+            return;
+          }
         }
       }
     }
@@ -7020,6 +7173,9 @@ function App() {
                     alliancePartnerConnectionsCache={
                       alliancePartnerConnectionsCache
                     }
+                    upsertPlayoffReserveOverlay={upsertPlayoffReserveOverlay}
+                    removePlayoffReserveOverlay={removePlayoffReserveOverlay}
+                    playoffReserveEdits={playoffReserveEdits}
                   />
                 }
               />
@@ -7085,6 +7241,9 @@ function App() {
                     remapNumberToString={remapNumberToString}
                     remapStringToNumber={remapStringToNumber}
                     useScrollMemory={useScrollMemory}
+                    upsertPlayoffReserveOverlay={upsertPlayoffReserveOverlay}
+                    removePlayoffReserveOverlay={removePlayoffReserveOverlay}
+                    playoffReserveEdits={playoffReserveEdits}
                   />
                 }
               />

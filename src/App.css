@@ -861,6 +861,53 @@ td {
   text-align: center;
 }
 
+.alliance-backup-modal-dialog {
+  max-width: min(960px, 96vw);
+}
+
+.alliance-backup-modal-body.backupDialog {
+  font-size: 22px;
+}
+
+.alliance-backup-modal-columns {
+  text-align: center;
+}
+
+.alliance-backup-modal-team-btn {
+  box-sizing: border-box;
+  padding: 12px 10px;
+  min-height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.alliance-backup-modal-reserve-btn {
+  font-size: clamp(0.95rem, 2.8vw, 1.35rem);
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: normal;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+/* On-field teams in reserve modal: same look as before but not clickable */
+.alliance-backup-modal-field-display {
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Add / Remove alliance actions: match RedReplace / BlueReplace tiles (not Bootstrap primary/danger) */
+button.alliance-backup-modal-alliance-action-btn {
+  cursor: pointer;
+  border: none;
+}
+
+button.alliance-backup-modal-alliance-action-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .navBarText {
   font-size: 12px;
   white-space: nowrap;

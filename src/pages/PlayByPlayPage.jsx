@@ -42,6 +42,9 @@ function PlayByPlayPage({
   eventHighScores,
   backupTeam,
   setBackupTeam,
+  upsertPlayoffReserveOverlay,
+  removePlayoffReserveOverlay,
+  playoffReserveEdits,
   nextMatch,
   previousMatch,
   setMatchFromMenu,
@@ -543,6 +546,9 @@ function PlayByPlayPage({
               rankings={rankings}
               backupTeam={backupTeam}
               setBackupTeam={setBackupTeam}
+              upsertPlayoffReserveOverlay={upsertPlayoffReserveOverlay}
+              removePlayoffReserveOverlay={removePlayoffReserveOverlay}
+              playoffReserveEdits={playoffReserveEdits}
               teamList={teamList}
               adHocMatch={adHocMatch}
               setAdHocMatch={setAdHocMatch}
