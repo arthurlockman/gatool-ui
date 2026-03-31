@@ -5,6 +5,7 @@ import moment from "moment";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useSwipeable } from "react-swipeable";
 import { matchClassesBase } from "./Constants";
+import { getAllianceLookupEntry } from "../utils/allianceLookup";
 import Match from "./Match";
 import PlayoffMatch from "./PlayoffMatch";
 import FinalsMatchIndicator from "./FinalsMatchIndicator";
@@ -78,7 +79,7 @@ function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMat
 	const getTeamByStation = (teams, station) => {
 		if (!teams || !Array.isArray(teams)) return null;
 		const team = teams.find((t) => t?.station?.toLowerCase() === station?.toLowerCase());
-		return team?.teamNumber || null;
+		return team?.teamNumber ?? team?.team ?? null;
 	};
 
 	/**
@@ -210,7 +211,11 @@ function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMat
 			return originalAllianceNumbers(bracketMatchNumber, allianceColor);
 		}
 		
-		const targetAlliance = alliances.Lookup[`${remapNumberToString ? remapNumberToString(lookupTeam) : lookupTeam}`];
+		const targetAlliance = getAllianceLookupEntry(
+			alliances?.Lookup,
+			lookupTeam,
+			remapNumberToString
+		);
 		if (!targetAlliance) {
 			return originalAllianceNumbers(bracketMatchNumber, allianceColor);
 		}
@@ -252,7 +257,11 @@ function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMat
 			return originalAllianceName(bracketMatchNumber, allianceColor);
 		}
 		
-		const targetAlliance = alliances.Lookup[`${remapNumberToString ? remapNumberToString(lookupTeam) : lookupTeam}`];
+		const targetAlliance = getAllianceLookupEntry(
+			alliances?.Lookup,
+			lookupTeam,
+			remapNumberToString
+		);
 		if (!targetAlliance) {
 			return originalAllianceName(bracketMatchNumber, allianceColor);
 		}

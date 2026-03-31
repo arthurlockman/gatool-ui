@@ -17,6 +17,7 @@ import {
   getConnectionsEventKey,
   allianceRosterToConnectionKey,
 } from "../utils/allianceConnectionsApi";
+import { getAllianceLookupEntry } from "../utils/allianceLookup";
 
 const paleGreen = "rgba(144, 238, 144, 0.5)";
 
@@ -176,12 +177,13 @@ function AnnouncePage({
         );
 
       team.rankStyle = rankHighlight(team?.rank, allianceCount || { count: 8 });
-      team.alliance = alliances?.Lookup[`${lookupTeamNumber}`]
-        ? alliances?.Lookup[`${lookupTeamNumber}`]?.alliance || null
-        : null;
-      team.allianceRole = alliances?.Lookup[`${lookupTeamNumber}`]
-        ? alliances?.Lookup[`${lookupTeamNumber}`]?.role || null
-        : null;
+      const announceAllianceEntry = getAllianceLookupEntry(
+        alliances?.Lookup,
+        team?.teamNumber,
+        remapNumberToString
+      );
+      team.alliance = announceAllianceEntry?.alliance ?? null;
+      team.allianceRole = announceAllianceEntry?.role ?? null;
 
       var teamDistrictRanks =
         _.filter(districtRankings?.districtRanks, {
@@ -266,10 +268,13 @@ function AnnouncePage({
             team?.rank,
             allianceCount || { count: 8 }
           );
-          team.alliance =
-            alliances?.Lookup[`${lookupRemainingTeam}`]?.alliance || null;
-          team.allianceRole =
-            alliances?.Lookup[`${lookupRemainingTeam}`]?.role || null;
+          const remEntry = getAllianceLookupEntry(
+            alliances?.Lookup,
+            lookupRemainingTeam,
+            remapNumberToString
+          );
+          team.alliance = remEntry?.alliance ?? null;
+          team.allianceRole = remEntry?.role ?? null;
 
           if (selectedEvent?.value?.districtCode) {
             teamDistrictRanks =
@@ -773,6 +778,7 @@ function AnnouncePage({
             <BottomButtons
               previousMatch={previousMatch}
               nextMatch={nextMatch}
+              currentMatch={currentMatch}
               matchDetails={matchDetails}
               playoffSchedule={playoffSchedule}
               eventHighScores={eventHighScores}

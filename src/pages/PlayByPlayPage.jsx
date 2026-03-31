@@ -12,6 +12,7 @@ import moment from "moment";
 import useScrollPosition from "../hooks/useScrollPosition";
 import { useScrollToTop } from "../contextProviders/ScrollContainerContext";
 import { useEffect, useRef } from "react";
+import { getAllianceLookupEntry } from "../utils/allianceLookup";
 
 const paleGreen = "rgba(144, 238, 144, 0.5)";
 
@@ -165,12 +166,13 @@ function PlayByPlayPage({
       );
 
       team.rankStyle = rankHighlight(team?.rank, allianceCount || { count: 8 });
-      team.alliance = alliances?.Lookup[`${lookupTeamNumber}`]
-        ? alliances?.Lookup[`${lookupTeamNumber}`]?.alliance || null
-        : null;
-      team.allianceRole = alliances?.Lookup[`${lookupTeamNumber}`]
-        ? alliances?.Lookup[`${lookupTeamNumber}`]?.role || null
-        : null;
+      const pbpAllianceEntry = getAllianceLookupEntry(
+        alliances?.Lookup,
+        team?.teamNumber,
+        remapNumberToString
+      );
+      team.alliance = pbpAllianceEntry?.alliance ?? null;
+      team.allianceRole = pbpAllianceEntry?.role ?? null;
 
       var teamDistrictRanks =
         _.filter(districtRankings?.districtRanks, {
@@ -246,10 +248,13 @@ function PlayByPlayPage({
             team?.rank,
             allianceCount || { count: 8 }
           );
-          team.alliance =
-            alliances?.Lookup[`${lookupRemainingTeam}`]?.alliance || null;
-          team.allianceRole =
-            alliances?.Lookup[`${lookupRemainingTeam}`]?.role || null;
+          const pbpRemEntry = getAllianceLookupEntry(
+            alliances?.Lookup,
+            lookupRemainingTeam,
+            remapNumberToString
+          );
+          team.alliance = pbpRemEntry?.alliance ?? null;
+          team.allianceRole = pbpRemEntry?.role ?? null;
 
           if (selectedEvent?.value?.districtCode) {
             teamDistrictRanks =
@@ -717,6 +722,7 @@ function PlayByPlayPage({
             <BottomButtons
               previousMatch={previousMatch}
               nextMatch={nextMatch}
+              currentMatch={currentMatch}
               matchDetails={matchDetails}
               playoffSchedule={playoffSchedule}
               eventHighScores={eventHighScores}

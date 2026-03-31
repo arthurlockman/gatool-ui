@@ -209,7 +209,7 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
                             <p>The Alliance Count determines how many alliances will participate in playoffs (typically 2, 4, 6, or 8 alliances).</p>
                         </Alert>
                     ) : (
-                        <AllianceSelection selectedYear={selectedYear} selectedEvent={selectedEvent} rankings={rankings} teamList={teamList} allianceCount={allianceCount} communityUpdates={communityUpdates} allianceSelectionArrays={allianceSelectionArrays} setAllianceSelectionArrays={setAllianceSelectionArrays} handleReset={handleReset} teamFilter={teamFilter} setTeamFilter={setTeamFilter} ftcMode={ftcMode} remapNumberToString={remapNumberToString} useFourTeamAlliances={useFourTeamAlliances} setResetAllianceSelection={setResetAllianceSelection}/>
+                        <AllianceSelection selectedYear={selectedYear} selectedEvent={selectedEvent} rankings={rankings} teamList={teamList} allianceCount={allianceCount} communityUpdates={communityUpdates} allianceSelectionArrays={allianceSelectionArrays} setAllianceSelectionArrays={setAllianceSelectionArrays} handleReset={handleReset} teamFilter={teamFilter} setTeamFilter={setTeamFilter} ftcMode={ftcMode} remapNumberToString={remapNumberToString} useFourTeamAlliances={useFourTeamAlliances} setResetAllianceSelection={setResetAllianceSelection} isResetModalOpen={resetAllianceSelection} />
                     )}
                 </div>}
 
@@ -236,7 +236,7 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
                     <Button id="resetAllianceSelection" variant="danger" size="sm" onClick={handleResetAllianceSelection}>
                         Yes
                     </Button>
-                    <Button id="resetAllianceSelection" size="sm" onClick={handleClose}>
+                    <Button id="cancelResetAllianceSelection" size="sm" onClick={handleClose}>
                         Cancel
                     </Button>
                 </Modal.Footer>

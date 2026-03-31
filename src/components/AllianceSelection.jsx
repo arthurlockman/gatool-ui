@@ -7,7 +7,7 @@ import { useEffect } from "react";
 import { originalAndSustaining, allianceSelectionBaseRounds } from "./Constants";
 import useWindowDimensions from "hooks/UseWindowDimensions";
 
-function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays, handleReset, teamFilter, setTeamFilter, ftcMode, remapNumberToString, useFourTeamAlliances, setResetAllianceSelection }) {
+function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays, handleReset, teamFilter, setTeamFilter, ftcMode, remapNumberToString, useFourTeamAlliances, setResetAllianceSelection, isResetModalOpen = false }) {
     const OriginalAndSustaining = _.cloneDeep(originalAndSustaining);
     const AllianceSelectionBaseRounds = _.cloneDeep(allianceSelectionBaseRounds);
 
@@ -87,8 +87,11 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
     } else { allianceDisplayOrder = [[1, 8], [2, 7], [3, 6], [4, 5]] }
 
     const resetFilter = () => {
-        // @ts-ignore
-        document.getElementById("filterControl").value = "";
+        const filterControl = document.getElementById("filterControl");
+        if (filterControl) {
+            // @ts-ignore
+            filterControl.value = "";
+        }
         setTeamFilter("")
     }
 
@@ -522,7 +525,17 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
     useHotkeys('d', () => document.getElementById("declineButton")?.click(), { scopes: 'allianceDecline' });
     useHotkeys('s', () => document.getElementById("skipButton")?.click(), { scopes: 'allianceSkip' });
     useHotkeys('meta+z, ctrl+z', () => document.getElementById("undoButton")?.click(), { scopes: 'undo' });
-    useHotkeys('esc', () => document.getElementById("resetFilter")?.click(), { scopes: 'allianceFilter' });
+    useHotkeys(
+        'esc',
+        () => {
+            // Let active modals own Escape.
+            if (!show && !isResetModalOpen) {
+                document.getElementById("resetFilter")?.click();
+            }
+        },
+        { scopes: 'allianceFilter' },
+        [show, isResetModalOpen]
+    );
     
     const currentRound = asArrays?.allianceSelectionOrder?.[asArrays.nextChoice]?.round || -1;
     

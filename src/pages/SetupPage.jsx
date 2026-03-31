@@ -998,11 +998,26 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                         </Form.Select>
                                     </Col>
                                     <Col xs={1}>
-                                        <InputGroup >
-                                            <Trash size={20} style={{ color: "red" }} onClick={() => handleEventNotification("delete", index)} />
-
-                                            <Copy size={20} onClick={() => handleEventNotification("duplicate", index, user)} />
-                                        </InputGroup>
+                                        <div
+                                            style={{
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                gap: "10px",
+                                                minHeight: "38px",
+                                            }}
+                                        >
+                                            <Trash
+                                                size={24}
+                                                style={{ color: "red", cursor: "pointer" }}
+                                                onClick={() => handleEventNotification("delete", index)}
+                                            />
+                                            <Copy
+                                                size={24}
+                                                style={{ cursor: "pointer" }}
+                                                onClick={() => handleEventNotification("duplicate", index, user)}
+                                            />
+                                        </div>
                                     </Col>
                                 </Row>
                             })}

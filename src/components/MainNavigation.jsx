@@ -1,6 +1,7 @@
 // @ts-nocheck
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
+import { Modal, Button } from "react-bootstrap";
 import AuthWidget from "./AuthWidget";
 import { NavLink } from "react-router-dom";
 import {
@@ -98,6 +99,7 @@ function MainNavigation({
   const [allianceSelectionTabReady, setAllianceSelectionTabReady] = useState(
     TabStates.NotReady
   );
+  const [helpModalOpen, setHelpModalOpen] = useState(false);
   const isOnline = useOnlineStatus();
 
   function getTabStyle(active, state) {
@@ -372,12 +374,10 @@ function MainNavigation({
             <div className="d-none d-md-block navBarText">Emcee #s</div>
           </Nav.Link>
           <Nav.Link
-            as={NavLink}
+            id={"helpPage"}
             className="d-none d-md-block navBarText"
-            style={({ isActive }) => getTabStyle(isActive, null)}
-            to="https://github.com/arthurlockman/gatool-ui/wiki"
-            target="_blank"
-            rel="noopener noreferrer"
+            style={getTabStyle(false, null)}
+            onClick={() => setHelpModalOpen(true)}
           >
             <QuestionOctagon />
             <div className="d-none d-md-block navBarText">Help</div>
@@ -395,6 +395,24 @@ function MainNavigation({
         )}
         <AuthWidget screenMode={screenMode} screenModeStatus={screenModeStatus} syncEvent={syncEvent} />
       </Navbar>
+      <Modal centered={true} show={helpModalOpen} onHide={() => setHelpModalOpen(false)} fullscreen>
+        <Modal.Header closeButton>
+          <Modal.Title>Help</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div style={{ height: "calc(100vh - 200px)" }}>
+            <iframe
+              width="100%"
+              height="100%"
+              src={`${process.env.PUBLIC_URL || ""}/help-docs.html`}
+              title="Help"
+            />
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={() => setHelpModalOpen(false)}>Close Help</Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 }

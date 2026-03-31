@@ -47,6 +47,12 @@ import { trainingData } from "components/TrainingMatches";
 import { timeZones } from "components/TimeZones";
 import { extendFTCPlayoffScheduleWithPartialMatches } from "./utils/ftcPlayoffSchedule";
 import {
+  normalizeFtcHybridMatch,
+  hydrateFtcPlayoffTeamsFromResults,
+  normalizePlayoffScheduleApiResponse,
+  normalizeFtcGatoolAllianceRow,
+} from "./utils/ftcHybridMatchTeams";
+import {
   getConnectionsEventKey,
   fetchAllianceConnections,
   allianceRosterToConnectionKey,
@@ -537,7 +543,7 @@ function App() {
   ); // Frequency in seconds (5-10)
   const [backgroundDataRefresh, setBackgroundDataRefresh] = usePersistentState(
     "setting:backgroundDataRefresh",
-    false
+    true
   );
   const [backgroundDataRefreshFrequency, setBackgroundDataRefreshFrequency] = usePersistentState(
     "setting:backgroundDataRefreshFrequency",
@@ -1347,7 +1353,21 @@ function App() {
      */
     function winner(match) {
       var winner = { winner: "", tieWinner: "", level: 0 };
-      if (match?.scoreRedFinal || match?.scoreBlueFinal) {
+      if (
+        ftcMode &&
+        (match?.redWins === true ||
+          match?.blueWins === true ||
+          match?.redWins === false ||
+          match?.blueWins === false)
+      ) {
+        if (match?.redWins === true) winner.winner = "red";
+        else if (match?.blueWins === true) winner.winner = "blue";
+        else if (match?.redWins === false && match?.blueWins === false) {
+          winner.winner = "tie";
+        } else winner.winner = "TBD";
+        return winner;
+      }
+      if (match?.scoreRedFinal != null || match?.scoreBlueFinal != null) {
         if (match?.scoreRedFinal < match?.scoreBlueFinal) {
           winner.winner = "blue";
         } else if (match?.scoreRedFinal > match?.scoreBlueFinal) {
@@ -1672,6 +1692,9 @@ function App() {
     }
 
     const qualMatches = qualschedule?.schedule?.schedule.map((match) => {
+      if (ftcMode) {
+        match = normalizeFtcHybridMatch(match);
+      }
       match.winner = winner(match);
       if (
         qualScores?.MatchScores &&
@@ -1949,6 +1972,9 @@ function App() {
         playoffschedule = { schedule: training.schedule.playoff.final };
       }
     }
+
+    playoffschedule = normalizePlayoffScheduleApiResponse(playoffschedule);
+
     if (typeof playoffschedule.Schedule !== "undefined") {
       playoffschedule.schedule = playoffschedule.Schedule;
       delete playoffschedule.Schedule;
@@ -1968,6 +1994,13 @@ function App() {
     playoffschedule.matchesLastModified = playoffschedule.schedule?.headers
       ? moment(playoffschedule.schedule?.headers.matches["last-modified"])
       : moment();
+
+    // FTC: normalize team rows (`team` -> teamNumber, station casing) before propagation and UI
+    if (ftcMode && playoffschedule?.schedule?.length > 0 && Array.isArray(playoffschedule.schedule)) {
+      playoffschedule.schedule = playoffschedule.schedule.map((m) =>
+        normalizeFtcHybridMatch(m)
+      );
+    }
 
     // FTC: extend schedule with partially populated matches from bracket propagation (winners/losers to downstream series)
     if (ftcMode && playoffschedule?.schedule?.length > 0 && Array.isArray(playoffschedule.schedule)) {
@@ -2061,6 +2094,9 @@ function App() {
               match.scores = results;
               match.scoreRedFinal = results.alliances?.[1]?.totalPoints ?? results.redScore;
               match.scoreBlueFinal = results.alliances?.[0]?.totalPoints ?? results.blueScore;
+              if (ftcMode) {
+                hydrateFtcPlayoffTeamsFromResults(match, results);
+              }
             }
           } else if (selectedEvent?.value?.type === "OffSeason") {
             match.scores = match?.matchScores || [];
@@ -2075,9 +2111,14 @@ function App() {
       if (playoffScores?.MatchScores) {
         _.forEach(playoffScores.MatchScores, (score) => {
           if (score.alliances[0].totalPoints === score.alliances[1].totalPoints) {
-            const matchIndex = _.findIndex(playoffschedule.schedule, {
-              matchNumber: score.matchNumber,
-            });
+            const matchIndex = _.findIndex(
+              playoffschedule.schedule,
+              (m) =>
+                ftcMode
+                  ? m.originalMatchNumber === score.matchNumber &&
+                    m.series === score.matchSeries
+                  : m.matchNumber === score.matchNumber
+            );
 
             if (matchIndex >= 0 && playoffschedule.schedule[matchIndex]?.winner) {
               playoffschedule.schedule[matchIndex].winner.tieWinner =
@@ -4602,10 +4643,16 @@ function App() {
         } else {
           // @ts-ignore
           alliances = await result.json();
+          if (typeof alliances.Alliances !== "undefined") {
+            alliances.alliances = alliances.Alliances;
+            delete alliances.Alliances;
+          }
           // remove "Seed" from FTC alliance names
-          if (ftcMode) {
+          if (ftcMode && Array.isArray(alliances.alliances)) {
             alliances.alliances = alliances.alliances.map((alliance) => {
-              alliance.name = alliance?.name.replace("Seed ", "");
+              if (alliance?.name && typeof alliance.name === "string") {
+                alliance.name = alliance.name.replace("Seed ", "");
+              }
               return alliance;
             });
           }
@@ -4626,6 +4673,12 @@ function App() {
       alliances.alliances = alliances.Alliances;
       delete alliances.Alliances;
     }
+    // FTC gatool (and some payloads) nest captain/round picks as { teamNumber, displayTeamNumber, teamName }
+    if (Array.isArray(alliances?.alliances)) {
+      alliances.alliances = alliances.alliances.map((a) =>
+        normalizeFtcGatoolAllianceRow(a)
+      );
+    }
     /** Reserve merge + prune must commit with setAlliances (same epoch) so stale fetches do not mutate edits without updating alliances. */
     /** @type {{ code: string; pruneKeys: string[] } | null} */
     let reserveEditsPruneForCommit = null;
@@ -4642,8 +4695,47 @@ function App() {
     }
     var allianceLookup = {};
     if (alliances?.alliances) {
-      alliances?.alliances.forEach((alliance) => {
-        allianceLookup[`${alliance.captain}`] = {
+      const setAllianceLookupEntry = (teamNumber, payload) => {
+        if (_.isNull(teamNumber) || _.isUndefined(teamNumber) || teamNumber === "") {
+          return;
+        }
+        const rawKey = `${teamNumber}`;
+        allianceLookup[rawKey] = payload;
+        const remappedKey = `${remapNumberToString(teamNumber)}`;
+        if (remappedKey && remappedKey !== rawKey) {
+          allianceLookup[remappedKey] = payload;
+        }
+      };
+
+      alliances?.alliances.forEach((rawAlliance) => {
+        const alliance = ftcMode
+          ? {
+              ...rawAlliance,
+              captain:
+                rawAlliance.captain ??
+                rawAlliance.captainTeam ??
+                rawAlliance.captainTeamNumber ??
+                null,
+              round1:
+                rawAlliance.round1 ??
+                rawAlliance.pick1 ??
+                null,
+              round2:
+                rawAlliance.round2 ??
+                rawAlliance.pick2 ??
+                null,
+              round3:
+                rawAlliance.round3 ??
+                rawAlliance.pick3 ??
+                null,
+              backup:
+                rawAlliance.backup ??
+                rawAlliance.backupTeam ??
+                null,
+            }
+          : rawAlliance;
+
+        setAllianceLookupEntry(alliance.captain, {
           role: `Captain`,
           alliance: alliance.name,
           number: alliance.number,
@@ -4653,8 +4745,8 @@ function App() {
           round3: alliance.round3,
           backup: alliance.backup,
           backupReplaced: alliance.backupReplaced,
-        };
-        allianceLookup[`${alliance.round1}`] = {
+        });
+        setAllianceLookupEntry(alliance.round1, {
           role: `Round 1 Selection`,
           alliance: alliance.name,
           number: alliance.number,
@@ -4664,9 +4756,9 @@ function App() {
           round3: alliance.round3,
           backup: alliance.backup,
           backupReplaced: alliance.backupReplaced,
-        };
+        });
         if (alliance.round2) {
-          allianceLookup[`${alliance.round2}`] = {
+          setAllianceLookupEntry(alliance.round2, {
             role: `Round 2 Selection`,
             alliance: alliance.name,
             number: alliance.number,
@@ -4676,10 +4768,10 @@ function App() {
             round3: alliance.round3,
             backup: alliance.backup,
             backupReplaced: alliance.backupReplaced,
-          };
+          });
         }
         if (alliance.round3) {
-          allianceLookup[`${alliance.round3}`] = {
+          setAllianceLookupEntry(alliance.round3, {
             role: roundThreeOrReserveRoleLabel(selectedEvent?.value),
             alliance: alliance.name,
             number: alliance.number,
@@ -4689,10 +4781,10 @@ function App() {
             round3: alliance.round3,
             backup: alliance.backup,
             backupReplaced: alliance.backupReplaced,
-          };
+          });
         }
         if (alliance.backup) {
-          allianceLookup[`${alliance.backup}`] = {
+          setAllianceLookupEntry(alliance.backup, {
             role: `Reserve team`,
             alliance: alliance.name,
             number: alliance.number,
@@ -4702,7 +4794,7 @@ function App() {
             round3: alliance.round3,
             backup: alliance.backup,
             backupReplaced: alliance.backupReplaced,
-          };
+          });
         }
       });
       alliances.Lookup = allianceLookup;
@@ -7359,6 +7451,7 @@ function App() {
                     eventLabel={eventLabel}
                     playoffCountOverride={playoffCountOverride}
                     ftcMode={ftcMode}
+                    remapNumberToString={remapNumberToString}
                   />
                 }
               />

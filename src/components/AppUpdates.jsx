@@ -1,5 +1,25 @@
 export const appUpdates = [
   {
+    date: "March 30, 2026",
+    message: (
+      <ul>
+        <li>ALL PROGRAMS:</li>
+        <ul>
+          <li>Fixed a bug that crashed the app when hitting "ESC" to close an Alliance Selection modal</li>
+          <li>Adjusted the spacing of the Event Notifications buttons on the Setup page to make them easier to click/tap</li>
+          <li>Fixed a display issue for the first match that displayed a "0" instead of the event high score</li>
+          <li>Help now renders within the app.</li>
+          <li>Fixed Emcee Screen guidance about how an Alliance got to the current match</li>
+          <li>Changed default behavior to always keep event details (team lists, schedule, rankings, scores, etc) up to date.</li>
+        </ul>
+        <li>FTC:</li>
+        <ul>
+          <li>Fixed a bug that prevented Alliance numbers from displaying correctly</li>
+          <li>Restoring Alliances to Playoffs Brackets and Emcee screens</li>
+        </ul>
+      </ul>
+    ),
+  },{
     date: "March 23, 2026",
     message: (
       <ul>
