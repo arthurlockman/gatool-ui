@@ -116,7 +116,7 @@ function CheatsheetPage({
             <h3>
               You can <br />
               <span
-                style={{ cursor: "pointer", color: "blue" }}
+                className="gatool-tap-link"
                 onClick={() => {
                   downloadPDF("/cheatsheet/decode_cheat_sheet_11282025.pdf");
                 }}
@@ -142,7 +142,7 @@ function CheatsheetPage({
             <h3>
               You can <br />
               <span
-                style={{ cursor: "pointer", color: "blue" }}
+                className="gatool-tap-link"
                 onClick={() => {
                   downloadPDF("/cheatsheet/rebuilt-cheat-sheet-01102026.pdf");
                 }}
@@ -162,7 +162,7 @@ function CheatsheetPage({
               and how skipping works, provided by FIRST.
               <br />
               <span
-                style={{ cursor: "pointer", color: "blue" }}
+                className="gatool-tap-link"
                 onClick={() => {
                   downloadPDF(
                     "/cheatsheet/alliance-selection-process-cheat-sheet.pdf"
@@ -182,7 +182,7 @@ function CheatsheetPage({
               provided by Matt Bisson.
               <br />
               <span
-                style={{ cursor: "pointer", color: "blue" }}
+                className="gatool-tap-link"
                 onClick={() => {
                   downloadPDF(
                     "/cheatsheet/2026_Run_of_Show_Playoffs_Awards.pdf"

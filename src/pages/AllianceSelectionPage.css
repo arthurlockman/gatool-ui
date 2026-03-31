@@ -1,3 +1,31 @@
+.alliance-selection-legend {
+  margin-top: 4px;
+  margin-bottom: 8px;
+  line-height: 1.35;
+  font-size: 0.8rem;
+}
+
+.alliance-selection-legend-decline {
+  color: #9f1239;
+  font-weight: 700;
+}
+
+.alliance-selection-legend-removed {
+  color: #e85d00;
+  font-weight: 700;
+}
+
+.allianceRemovedTeam {
+  background-color: #ff6600 !important;
+  color: #ffffff !important;
+  border-color: #cc5200 !important;
+}
+
+.allianceRemovedTeam:hover {
+  background-color: #ff8533 !important;
+  color: #1c1917 !important;
+}
+
 .allianceContainer {
   text-align: center;
   background: rgba(255, 187, 248, 1);
@@ -45,6 +73,16 @@
   margin: 0px;
   font-size: large;
   font-weight: 700;
+}
+
+/* Match vertical spacing between tiles to #backupTeamsDisplay (.allianceTeamChoice otherwise forces margin-bottom: 0) */
+#skippedTeamsDisplay .allianceTeam {
+  margin-bottom: 10px !important;
+}
+
+/* Blue alliances panel: space before page/footer edge (light + dark) */
+.alliancesTeamsTable.container-fluid {
+  padding-bottom: 1.5rem;
 }
 
 .dropzone {

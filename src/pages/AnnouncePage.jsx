@@ -18,8 +18,7 @@ import {
   allianceRosterToConnectionKey,
 } from "../utils/allianceConnectionsApi";
 import { getAllianceLookupEntry } from "../utils/allianceLookup";
-
-const paleGreen = "rgba(144, 238, 144, 0.5)";
+import { matchHasPostedResult } from "../utils/playoffReserveEdits";
 
 function AnnouncePage({
   selectedEvent,
@@ -457,7 +456,7 @@ function AnnouncePage({
     return {
       value: index + 1,
       label: tag,
-      color: !_.isNull(match?.scoreRedFinal) ? paleGreen : "",
+      matchCompleted: matchHasPostedResult(match),
     };
   });
 
@@ -566,14 +565,14 @@ function AnnouncePage({
     <Container fluid>
       {!selectedEvent && (
         <div>
-          <Alert variant="warning">
+          <Alert variant="warning" className="gatool-awaiting-message">
             You need to select an event before you can see anything here.
           </Alert>
         </div>
       )}
       {selectedEvent && (!teamList || teamList?.teams.length === 0) && (
         <div>
-          <Alert variant="warning">
+          <Alert variant="warning" className="gatool-awaiting-message">
             <div>
               <img src="loadingIcon.gif" alt="Loading data..." />
             </div>
@@ -586,7 +585,7 @@ function AnnouncePage({
         (!schedule || schedule?.length === 0) &&
         !adHocMode && (
           <div>
-            <Alert variant="warning">
+            <Alert variant="warning" className="gatool-awaiting-message">
               <div>
                 <img src="loadingIcon.gif" alt="Loading data..." />
               </div>

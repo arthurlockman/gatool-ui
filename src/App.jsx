@@ -422,6 +422,10 @@ function App() {
     "setting:reverseEmcee",
     null
   );
+  const [darkMode, setDarkMode] = usePersistentState(
+    "setting:darkMode",
+    false
+  );
   const [eventNamesCY, setEventNamesCY] = usePersistentState(
     "cache:eventNamesCY",
     []
@@ -5003,6 +5007,7 @@ function App() {
       showInspection: showInspection,
       showWorldAndStatsOnAnnouncePlayByPlay: showWorldAndStatsOnAnnouncePlayByPlay,
       swapScreen: swapScreen,
+      darkMode: darkMode,
       autoAdvance: autoAdvance,
       highScoreMode: highScoreMode,
       autoUpdate: autoUpdate,
@@ -5595,6 +5600,8 @@ function App() {
         var types = [];
         const events = result?.events.map((e) => {
           var color = "";
+          /** @type {null | 'offseasonAzure' | 'offseason'} */
+          var eventMenuTint = null;
           var optionPrefix = "";
           var optionPostfix = "";
           var filters = [];
@@ -5620,12 +5627,14 @@ function App() {
           }
           if (e.type === "OffSeasonWithAzureSync") {
             color = paleBlue;
+            eventMenuTint = "offseasonAzure";
             optionPrefix = "•• ";
             optionPostfix = " ••";
             filters.push("offseason");
           }
           if (e.type === "OffSeason" || e.type === "10") {
             color = paleYellow;
+            eventMenuTint = "offseason";
             optionPrefix = "•• ";
             optionPostfix = " ••";
             filters.push("offseason");
@@ -5695,6 +5704,7 @@ function App() {
             value: e,
             label: `${optionPrefix}${e.name}${optionPostfix}`,
             color: color,
+            eventMenuTint: eventMenuTint,
             filters: filters,
           };
         });
@@ -6285,6 +6295,13 @@ function App() {
     }
   }, [autoUpdate, backgroundDataRefresh, backgroundDataRefreshFrequency, start, stop]);
 
+  useEffect(() => {
+    document.documentElement.setAttribute(
+      "data-bs-theme",
+      darkMode ? "dark" : "light"
+    );
+  }, [darkMode]);
+
   // Track last event code we attempted to sync in Screen Mode
   // This prevents reloading the same event when React state hasn't updated yet
   const lastSyncedEventCodeRef = useRef(null);
@@ -6438,6 +6455,9 @@ function App() {
         }
         if (userPrefs.swapScreen !== undefined && userPrefs.swapScreen !== swapScreen) {
           setSwapScreen(userPrefs.swapScreen);
+        }
+        if (userPrefs.darkMode !== undefined && userPrefs.darkMode !== darkMode) {
+          setDarkMode(userPrefs.darkMode);
         }
         if (userPrefs.autoAdvance !== undefined && userPrefs.autoAdvance !== autoAdvance) {
           setAutoAdvance(userPrefs.autoAdvance);
@@ -6751,6 +6771,7 @@ function App() {
     monthsWarning,
     showInspection,
     swapScreen,
+    darkMode,
     autoAdvance,
     highScoreMode,
     autoUpdate,
@@ -6799,6 +6820,7 @@ function App() {
         monthsWarning,
         showInspection,
         swapScreen,
+        darkMode,
         autoAdvance,
         highScoreMode,
         autoUpdate,
@@ -6862,6 +6884,7 @@ function App() {
     monthsWarning,
     showInspection,
     swapScreen,
+    darkMode,
     autoAdvance,
     highScoreMode,
     autoUpdate,
@@ -7086,6 +7109,8 @@ function App() {
                     getCheesyStatus={getCheesyStatus}
                     manualOfflineMode={manualOfflineMode}
                     setManualOfflineMode={setManualOfflineMode}
+                    darkMode={darkMode}
+                    setDarkMode={setDarkMode}
                   />
                 }
               />

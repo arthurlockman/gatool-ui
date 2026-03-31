@@ -59,7 +59,7 @@ function BottomButtons({
 
                 {matchDetails?.tournamentLevel.toLowerCase() !== "playoff" && !hasEventHighScore && (
                     <Col xs={"8"} lg={"6"}>
-                        <h4>{currentMatch === 1 ? "Awaiting results from first match" : matchDetails?.description}</h4>
+                        <h4 className="gatool-awaiting-inline">{currentMatch === 1 ? "Awaiting results from first match" : matchDetails?.description}</h4>
                     </Col>
                 )}
 

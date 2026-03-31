@@ -261,7 +261,7 @@ function RanksPage({
     <Container fluid>
       {!selectedEvent && (
         <div>
-          <Alert variant="warning">
+          <Alert variant="warning" className="gatool-awaiting-message">
             You need to select an event before you can see anything here.
           </Alert>
         </div>
@@ -269,7 +269,7 @@ function RanksPage({
 
       {selectedEvent && (!teamList || teamList?.teams.length === 0) && (
         <div>
-          <Alert variant="warning">
+          <Alert variant="warning" className="gatool-awaiting-message">
             <div>
               <img src="loadingIcon.gif" alt="Loading data..." />
             </div>
@@ -282,7 +282,7 @@ function RanksPage({
         teamList?.teams.length > 0 &&
         (!rankings || rankings?.ranks.length === 0) && (
           <div>
-            <Alert variant="warning">
+            <Alert variant="warning" className="gatool-awaiting-message">
               <div>
                 <img src="loadingIcon.gif" alt="Loading data..." />
               </div>
@@ -300,8 +300,7 @@ function RanksPage({
               <Col xs={2}></Col>
               <Col
                 xs={8}
-                className={"leftTable"}
-                style={{ cursor: "pointer", color: "darkblue" }}
+                className="leftTable gatool-tap-link"
                 onClick={clickLoadRanks}
               >
                 <Alert variant={"danger"}>
@@ -345,8 +344,7 @@ function RanksPage({
                       <Col xs={2}></Col>
                       <Col
                         xs={8}
-                        className={"leftTable"}
-                        style={{ cursor: "pointer", color: "darkblue" }}
+                        className="leftTable gatool-tap-link"
                         onClick={clickLoadRanks}
                       >
                         <Alert variant={"danger"}>
@@ -394,8 +392,7 @@ function RanksPage({
                       <Col xs={2}></Col>
                       <Col
                         xs={8}
-                        className={"leftTable"}
-                        style={{ cursor: "pointer", color: "darkblue" }}
+                        className="leftTable gatool-tap-link"
                         onClick={clickRemoveRanks}
                       >
                         <Alert variant={"warning"}>
@@ -445,8 +442,7 @@ function RanksPage({
                       <Col xs={2}></Col>
                       <Col
                         xs={8}
-                        className={"leftTable"}
-                        style={{ cursor: "pointer", color: "darkblue" }}
+                        className="leftTable gatool-tap-link"
                         onClick={clickRemoveRanks}
                       >
                         <Alert variant={"warning"}>
@@ -494,8 +490,7 @@ function RanksPage({
                       <Col xs={2}></Col>
                       <Col
                         xs={8}
-                        className={"leftTable"}
-                        style={{ cursor: "pointer", color: "darkblue" }}
+                        className="leftTable gatool-tap-link"
                         onClick={clickRemoveRanks}
                       >
                         <Alert variant={"warning"}>

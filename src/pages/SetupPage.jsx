@@ -76,7 +76,7 @@ const ftcModeOptions = [
 
 
 
-function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, regionFilters, setRegionFilters, districts, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showNotesAnnounce, setShowNotesAnnounce, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, autoUpdate, setAutoUpdate, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, showQualsStatsQuals, setShowQualsStatsQuals, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee, showDistrictChampsStats, setShowDistrictChampsStats, showChampsStatsAtDistrictRegional, setShowChampsStatsAtDistrictRegional, monthsWarning, setMonthsWarning, user, isAuthenticated, adHocMode, setAdHocMode, supportedYears, FTCSupportedYears, reloadPage, autoHideSponsors, setAutoHideSponsors, setLoadingCommunityUpdates, hidePracticeSchedule, setHidePracticeSchedule, systemMessage, setTeamListLoading, getTeamList, getAlliances, setHaveChampsTeams, appUpdates, usePullDownToUpdate, setUsePullDownToUpdate, useSwipe, setUseSwipe, eventLabel, setEventLabel, showInspection, setShowInspection, showWorldAndStatsOnAnnouncePlayByPlay, setShowWorldAndStatsOnAnnouncePlayByPlay, showMinorAwards, setShowMinorAwards, highScoreMode, setHighScoreMode, systemBell, setSystemBell, eventBell, setEventBell, eventMessage, setEventMessage, putEventNotifications, useCheesyArena, setUseCheesyArena, useFourTeamAlliances, setUseFourTeamAlliances, ftcLeagues, ftcRegions, ftcMode, setFTCMode, ftcTypes, useFTCOffline, setUseFTCOffline, FTCServerURL, setFTCServerURL, FTCKey, requestFTCKey, checkFTCKey, FTCOfflineAvailable, getFTCOfflineStatus, getCheesyStatus, showBlueBanners, setShowBlueBanners, manualOfflineMode, setManualOfflineMode, useScrollMemory, setUseScrollMemory, syncEvent, setSyncEvent, screenMode, setScreenMode, screenModeSyncFrequency, setScreenModeSyncFrequency, backgroundDataRefresh, setBackgroundDataRefresh, backgroundDataRefreshFrequency, setBackgroundDataRefreshFrequency }) {
+function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, regionFilters, setRegionFilters, districts, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showNotesAnnounce, setShowNotesAnnounce, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, autoUpdate, setAutoUpdate, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, showQualsStatsQuals, setShowQualsStatsQuals, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee, showDistrictChampsStats, setShowDistrictChampsStats, showChampsStatsAtDistrictRegional, setShowChampsStatsAtDistrictRegional, monthsWarning, setMonthsWarning, user, isAuthenticated, adHocMode, setAdHocMode, supportedYears, FTCSupportedYears, reloadPage, autoHideSponsors, setAutoHideSponsors, setLoadingCommunityUpdates, hidePracticeSchedule, setHidePracticeSchedule, systemMessage, setTeamListLoading, getTeamList, getAlliances, setHaveChampsTeams, appUpdates, usePullDownToUpdate, setUsePullDownToUpdate, useSwipe, setUseSwipe, eventLabel, setEventLabel, showInspection, setShowInspection, showWorldAndStatsOnAnnouncePlayByPlay, setShowWorldAndStatsOnAnnouncePlayByPlay, showMinorAwards, setShowMinorAwards, highScoreMode, setHighScoreMode, systemBell, setSystemBell, eventBell, setEventBell, eventMessage, setEventMessage, putEventNotifications, useCheesyArena, setUseCheesyArena, useFourTeamAlliances, setUseFourTeamAlliances, ftcLeagues, ftcRegions, ftcMode, setFTCMode, ftcTypes, useFTCOffline, setUseFTCOffline, FTCServerURL, setFTCServerURL, FTCKey, requestFTCKey, checkFTCKey, FTCOfflineAvailable, getFTCOfflineStatus, getCheesyStatus, showBlueBanners, setShowBlueBanners, manualOfflineMode, setManualOfflineMode, useScrollMemory, setUseScrollMemory, syncEvent, setSyncEvent, screenMode, setScreenMode, screenModeSyncFrequency, setScreenModeSyncFrequency, backgroundDataRefresh, setBackgroundDataRefresh, backgroundDataRefreshFrequency, setBackgroundDataRefreshFrequency, darkMode, setDarkMode }) {
     const isOnline = useOnlineStatus();
     const PWASupported = (isChrome && Number(browserVersion) >= 76) || (isSafari && Number(browserVersion) >= 15 && Number(fullBrowserVersion.split(".")[1]) >= 4);
 
@@ -278,40 +278,81 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                 <Alert variant="danger"><b>You're offline. Only cached data is available. Some options may be unavailable. <br />Reconnect to the internet to choose a different event.</b></Alert>
             </Row>}
             {(ftcMode === null || !selectedYear) && <Row>
-                <Alert variant="danger"><b>Awaiting event list - {ftcMode === null ? "please select a program" : "please select a season"}</b></Alert>
+                <Alert variant="danger" className="gatool-awaiting-message"><b>Awaiting event list - {ftcMode === null ? "please select a program" : "please select a season"}</b></Alert>
             </Row>}
             <Row className={ftcMode ? "ftcSetupPageMenus" : "setupPageMenus"}>
                 <Col sm={2}>
-                    <b>Choose a program...</b><br /><Select options={ftcModeOptions} value={ftcMode === false ? { label: "FRC", value: "FRC" } : ftcMode} onChange={handleFTCMode} placeholder="Select a program" isDisabled={false} />
+                    <b>Choose a program...</b><br /><Select classNamePrefix="gatool-rs" options={ftcModeOptions} value={ftcMode === false ? { label: "FRC", value: "FRC" } : ftcMode} onChange={handleFTCMode} placeholder="Select a program" isDisabled={false} />
                 </Col>
-                <Col sm={3}><b>Choose a year...</b><br /><Select options={ftcMode === false ? supportedYears : (ftcMode ? FTCSupportedYears : [])} value={selectedYear} onChange={setSelectedYear} isDisabled={!isOnline || ftcMode === null} placeholder={ftcMode === null ? "Select program first" : "Select a year"} />
+                <Col sm={3}><b>Choose a year...</b><br /><Select classNamePrefix="gatool-rs" options={ftcMode === false ? supportedYears : (ftcMode ? FTCSupportedYears : [])} value={selectedYear} onChange={setSelectedYear} isDisabled={!isOnline || ftcMode === null} placeholder={ftcMode === null ? "Select program first" : "Select a year"} />
                 </Col>
                 <Col sm={7}>
-                    {eventList && <span><b>...then choose an event.</b><br /><Select
+                    {eventList && <span><b>...then choose an event.</b><br /><Select classNamePrefix="gatool-rs"
                         options={filterEvents(eventList)}
                         placeholder={ftcMode === null ? "Select program first" : !selectedYear ? "Select season first" : (eventList?.length > 0 ? "Select an event" : "Loading event list")}
                         value={selectedEvent}
                         onChange={handleEventSelection}
                         getOptionValue={(option) => option?.value?.code}
                         getOptionLabel={(option) => option?.label}
+                        classNames={{
+                            option: (optState) =>
+                                optState.data?.eventMenuTint === "offseasonAzure"
+                                    ? "gatool-event-option-offseason-azure"
+                                    : optState.data?.eventMenuTint === "offseason"
+                                      ? "gatool-event-option-offseason"
+                                      : "",
+                        }}
                         styles={{
                             // @ts-ignore
                             option: (styles, { data, isSelected }) => {
+                                if (isSelected) {
+                                    return {
+                                        ...styles,
+                                        backgroundColor: "#2684FF",
+                                        color: "white",
+                                        fontWeight: "bold",
+                                    };
+                                }
+                                if (data.eventMenuTint) {
+                                    return { ...styles, fontWeight: "normal" };
+                                }
                                 return {
                                     ...styles,
-                                    backgroundColor: isSelected ? '#2684FF' : data.color,
-                                    color: isSelected ? 'white' : 'black',
-                                    fontWeight: isSelected ? 'bold' : 'normal'
+                                    backgroundColor: data.color || styles.backgroundColor,
+                                    color: data.color ? "black" : styles.color,
+                                    fontWeight: "normal",
                                 };
                             },
                             // @ts-ignore
                             singleValue: (styles, { data }) => {
+                                if (data.eventMenuTint === "offseasonAzure") {
+                                    return {
+                                        ...styles,
+                                        backgroundColor: darkMode
+                                            ? "rgba(37, 99, 235, 0.42)"
+                                            : "rgba(191, 219, 254, 0.9)",
+                                        color: darkMode ? "#f1f5f9" : "#0c1929",
+                                        padding: "2px 6px",
+                                        borderRadius: "3px",
+                                    };
+                                }
+                                if (data.eventMenuTint === "offseason") {
+                                    return {
+                                        ...styles,
+                                        backgroundColor: darkMode
+                                            ? "rgba(161, 98, 7, 0.5)"
+                                            : "rgba(254, 229, 165, 0.95)",
+                                        color: darkMode ? "#fffbeb" : "#3d2914",
+                                        padding: "2px 6px",
+                                        borderRadius: "3px",
+                                    };
+                                }
                                 return {
                                     ...styles,
                                     backgroundColor: data.color,
                                     color: "black",
                                     padding: "2px 6px",
-                                    borderRadius: "3px"
+                                    borderRadius: "3px",
                                 };
                             },
                         }}
@@ -320,13 +361,13 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
             </Row>
             {eventList && !useFTCOffline && <Row className="setupPageFilters">
                 <Col sm={4}><b>Filter by event timeframe here...</b><br />
-                    <Select options={ftcMode ? filterTimeFTC : filterTime} value={timeFilter ? timeFilter : ftcMode ? filterTimeFTC[0] : filterTime[0]} onChange={setTimeFilter} isDisabled={!isOnline || ftcMode === null || !selectedYear} />
+                    <Select classNamePrefix="gatool-rs" options={ftcMode ? filterTimeFTC : filterTime} value={timeFilter ? timeFilter : ftcMode ? filterTimeFTC[0] : filterTime[0]} onChange={setTimeFilter} isDisabled={!isOnline || ftcMode === null || !selectedYear} />
                 </Col>
                 {ftcMode && <Col sm={4}><b>Filter by Event Type or Region here...</b><br />
-                    <Select isMulti options={regionFiltersMenu} value={regionFilters} onChange={setRegionFilters} isDisabled={!isOnline || ftcMode === null || !selectedYear} />
+                    <Select classNamePrefix="gatool-rs" isMulti options={regionFiltersMenu} value={regionFilters} onChange={setRegionFilters} isDisabled={!isOnline || ftcMode === null || !selectedYear} />
                 </Col>}
                 <Col sm={ftcMode ? 4 : 8}><b>Filter by  {ftcMode ? "League" : "event type or District"} here...</b><br />
-                    <Select isMulti options={ftcMode ? ftcFiltersMenu : filtersMenu} value={eventFilters} onChange={setEventFilters} isDisabled={!isOnline || ftcMode === null || !selectedYear} />
+                    <Select classNamePrefix="gatool-rs" isMulti options={ftcMode ? ftcFiltersMenu : filtersMenu} value={eventFilters} onChange={setEventFilters} isDisabled={!isOnline || ftcMode === null || !selectedYear} />
                 </Col>
             </Row>}
             {useFTCOffline && <Row className="ftcSetupPageMenus">
@@ -363,7 +404,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                 </Col>
             </Row>}
             {!selectedEvent && <div>
-                <Alert variant="warning" >You need to select an event before you can see anything here. {isAuthenticated && <LogoutButton disabled={!isOnline} />}
+                <Alert variant="warning" className="gatool-awaiting-message">You need to select an event before you can see anything here. {isAuthenticated && <LogoutButton disabled={!isOnline} />}
                     {!isAuthenticated && <LoginButton disabled={!isOnline} />}</Alert>
 
             </div>}
@@ -396,12 +437,32 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                         {teamList?.teams.length > 0 && <p><b>Number of Competing teams: </b>{teamList?.teams.length}</p>}
                         {selectedEvent?.value.dateStart && <p><b>Event Start: </b>{moment(selectedEvent?.value.dateStart, 'YYYY-MM-DDTHH:mm:ss').format('ddd, MMM Do YYYY')}</p>}
                         {selectedEvent?.value.dateEnd && <p><b>Event End: </b>{moment(selectedEvent?.value.dateEnd, 'YYYY-MM-DDTHH:mm:ss').format('ddd, MMM Do YYYY')}</p>}
-                        <Alert variant={"danger"}><b>ADVANCED EVENT SETTINGS:</b><br />If your event includes non-competing teams in the team list, indicate the number of non-competing teams here. <b>THIS IS A RARE CONDITION</b><Select options={teamReducer} value={teamReduction ? teamReduction : teamReducer[0]} onChange={setTeamReduction} isDisabled={!teamList?.teamCountTotal} /><br />
-                            If your event requires a reduced Alliance Count, you can override the Alliance Count here. <b>THIS SHOULD ONLY APPLY TO EVENTS WITH LESS THAN 26 TEAMS. </b><Select options={playoffOverrideMenu} value={playoffCountOverride ? playoffCountOverride : (allianceCount?.menu ? allianceCount.menu : playoffOverrideMenu[0])} onChange={setPlayoffCountOverride} />
+                        <Alert variant={"danger"}><b>ADVANCED EVENT SETTINGS:</b><br />If your event includes non-competing teams in the team list, indicate the number of non-competing teams here. <b>THIS IS A RARE CONDITION</b><Select classNamePrefix="gatool-rs" options={teamReducer} value={teamReduction ? teamReduction : teamReducer[0]} onChange={setTeamReduction} isDisabled={!teamList?.teamCountTotal} /><br />
+                            If your event requires a reduced Alliance Count, you can override the Alliance Count here. <b>THIS SHOULD ONLY APPLY TO EVENTS WITH LESS THAN 26 TEAMS. </b><Select classNamePrefix="gatool-rs" options={playoffOverrideMenu} value={playoffCountOverride ? playoffCountOverride : (allianceCount?.menu ? allianceCount.menu : playoffOverrideMenu[0])} onChange={setPlayoffCountOverride} />
                         </Alert>
                         <div>
-                            {!ftcMode && <img style={{ width: "100%" }} src="/images/first_age_frc_rebuilt_logo_vertical_rgb_fullcolor.gif" alt="REEFSCAPE℠ presented by Haas Logo" />}
-                            {ftcMode && <img style={{ width: "100%" }} src="/images/first_age_ftc_decode_logo_vertical_rgb_fullcolor.png" alt="DECODE℠ presented by RTX Logo" />}
+                            {!ftcMode && (
+                                <img
+                                    style={{ width: "100%" }}
+                                    src={
+                                        darkMode
+                                            ? "/images/first_age_frc_rebuilt_logo_vertical_rgb_fullcolorreverse.png"
+                                            : "/images/first_age_frc_rebuilt_logo_vertical_rgb_fullcolor.gif"
+                                    }
+                                    alt="REEFSCAPE℠ presented by Haas Logo"
+                                />
+                            )}
+                            {ftcMode && (
+                                <img
+                                    style={{ width: "100%" }}
+                                    src={
+                                        darkMode
+                                            ? "/images/first_age_ftc_decode_logo_vertical_rgb_fullcolorreverse.png"
+                                            : "/images/first_age_ftc_decode_logo_vertical_rgb_fullcolor.png"
+                                    }
+                                    alt="DECODE℠ presented by RTX Logo"
+                                />
+                            )}
                         </div>
                     </Col>
                     <Col sm={4}>
@@ -471,7 +532,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                     </tr>
                                     <tr className={"teamInfoSettings"}>
                                         <td colSpan={2}>
-                                            <label><b>For how many years should we display awards on the Announce Screen?</b><Select options={awardsMenuOptions} value={awardsMenu ? awardsMenu : awardsMenuOptions[0]} onChange={setAwardsMenu} /></label>
+                                            <label><b>For how many years should we display awards on the Announce Screen?</b><Select classNamePrefix="gatool-rs" options={awardsMenuOptions} value={awardsMenu ? awardsMenu : awardsMenuOptions[0]} onChange={setAwardsMenu} /></label>
                                         </td>
                                     </tr>
                                     <tr className={"teamInfoSettings"}>
@@ -507,7 +568,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                     </tr>
                                     <tr>
                                         <td colSpan={2} className={"teamInfoSettings"}>
-                                            <label><b>How many months before we consider a team's data to be stale? The default is 6 months.</b><Select options={monthsWarningMenu} value={monthsWarning ? monthsWarning : monthsWarningMenu[2]} onChange={setMonthsWarning} /></label>
+                                            <label><b>How many months before we consider a team's data to be stale? The default is 6 months.</b><Select classNamePrefix="gatool-rs" options={monthsWarningMenu} value={monthsWarning ? monthsWarning : monthsWarningMenu[2]} onChange={setMonthsWarning} /></label>
                                         </td>
                                     </tr>
                                 </>}
@@ -576,6 +637,15 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                     <td style={{ fontSize: "1.25em" }} colSpan={2}>{showUISettings ? <CaretUpFill /> : <CaretDownFill />} <b>{showUISettings ? "Hide" : "Show"} User Interface Settings</b></td>
                                 </tr>
                                 {showUISettings && <><tr className={"UISettings"}>
+                                    <td>
+                                        <Switch checked={darkMode === true} onChange={setDarkMode} />
+                                    </td>
+                                    <td>
+                                        <b>Dark mode</b><br />
+                                        <i>Uses a dark theme across the app (saved on this device; also syncs when Sync Event is enabled).</i>
+                                    </td>
+                                </tr>
+                                    <tr className={"UISettings"}>
                                     <td>
                                         <Switch checked={_.isNull(showInspection) || _.isUndefined(showInspection) ? false : showInspection} onChange={setShowInspection} />
                                     </td>
@@ -736,7 +806,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                     </tr>
                                     <tr className={"UISettings"}>
                                         <td colSpan={2}>
-                                            <label><b>Set your time format</b><Select options={timeFormatMenu} value={timeFormat} onChange={setTimeFormat} /></label>
+                                            <label><b>Set your time format</b><Select classNamePrefix="gatool-rs" options={timeFormatMenu} value={timeFormat} onChange={setTimeFormat} /></label>
                                         </td>
                                     </tr>
                                     <tr className={"UISettings"} id="Aucoin-Bradshaw-1">

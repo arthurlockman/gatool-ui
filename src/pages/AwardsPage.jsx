@@ -114,11 +114,11 @@ function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates, e
     return (
         <Container fluid style={{marginBottom: "20px"}}>
             {!selectedEvent && <div>
-                <Alert variant="warning" >You need to select an event before you can see anything here.</Alert>
+                <Alert variant="warning" className="gatool-awaiting-message">You need to select an event before you can see anything here.</Alert>
             </div>}
             {selectedEvent && (!teamList || teamList?.teams.length === 0) && <div>
                 <h4>{eventLabel}</h4>
-                <Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div><div>Awaiting team data for {eventLabel}</div></Alert>
+                <Alert variant="warning" className="gatool-awaiting-message"><div><img src="loadingIcon.gif" alt="Loading data..." /></div><div>Awaiting team data for {eventLabel}</div></Alert>
             </div>}
             {selectedEvent && teamList?.teams.length > 0 &&
                 <Container fluid>

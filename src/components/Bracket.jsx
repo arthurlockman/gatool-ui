@@ -742,7 +742,7 @@ function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMat
 			"width": "100%"
 		}}>
 			{!matches && <div>
-				<Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div><div>Waiting for Playoff Match Schedule</div></Alert>
+				<Alert variant="warning" className="gatool-awaiting-message"><div><img src="loadingIcon.gif" alt="Loading data..." /></div><div>Waiting for Playoff Match Schedule</div></Alert>
 			</div>}
 			{matches &&
 				<>

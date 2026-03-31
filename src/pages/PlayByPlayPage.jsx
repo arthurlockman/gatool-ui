@@ -13,8 +13,7 @@ import useScrollPosition from "../hooks/useScrollPosition";
 import { useScrollToTop } from "../contextProviders/ScrollContainerContext";
 import { useEffect, useRef } from "react";
 import { getAllianceLookupEntry } from "../utils/allianceLookup";
-
-const paleGreen = "rgba(144, 238, 144, 0.5)";
+import { matchHasPostedResult } from "../utils/playoffReserveEdits";
 
 function PlayByPlayPage({
   selectedEvent,
@@ -463,7 +462,7 @@ function PlayByPlayPage({
     return {
       value: index + 1,
       label: tag,
-      color: !_.isNull(match?.scoreRedFinal) ? paleGreen : "",
+      matchCompleted: matchHasPostedResult(match),
     };
   });
 
@@ -502,14 +501,14 @@ function PlayByPlayPage({
     <Container fluid>
       {!selectedEvent && (
         <div>
-          <Alert variant="warning">
+          <Alert variant="warning" className="gatool-awaiting-message">
             You need to select an event before you can see anything here.
           </Alert>
         </div>
       )}
       {selectedEvent && (!teamList || teamList?.teams.length === 0) && (
         <div>
-          <Alert variant="warning">
+          <Alert variant="warning" className="gatool-awaiting-message">
             <div>
               <img src="loadingIcon.gif" alt="Loading data..." />
             </div>
@@ -522,7 +521,7 @@ function PlayByPlayPage({
         (!schedule || schedule?.length === 0) &&
         !adHocMode && (
           <div>
-            <Alert variant="warning">
+            <Alert variant="warning" className="gatool-awaiting-message">
               <div>
                 <img src="loadingIcon.gif" alt="Loading data..." />
               </div>

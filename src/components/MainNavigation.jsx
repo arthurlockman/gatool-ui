@@ -250,7 +250,12 @@ function MainNavigation({
 
   return (
     <>
-      <Navbar bg="light" sticky="top" style={{ color: "black" }}>
+      <Navbar
+        bg="light"
+        sticky="top"
+        className="gatool-main-nav"
+        style={{ color: "black" }}
+      >
         <Nav className="me-auto">
           <Nav.Link
             id={"setupPage"}
@@ -260,6 +265,7 @@ function MainNavigation({
           >
             {moment().isBefore(systemMessage?.expiry) && moment().isAfter(systemMessage?.onTime) && (systemBell !== JSON.stringify(systemMessage)) ? (
               <BellFill
+                  className="gatool-nav-system-bell"
                   style={{
                     animationName: "throb",
                     animationDuration: "2s",

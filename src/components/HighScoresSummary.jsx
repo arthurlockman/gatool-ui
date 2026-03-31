@@ -196,7 +196,7 @@ function HighScoresSummary({
   const renderColumn = (sec) => (
     <Col key={sec.label} xs={12} md={colSize}>
       <div
-        className="border rounded p-2 h-100"
+        className="border rounded p-2 h-100 gatool-highscores-summary-panel"
         style={{ fontSize: "0.9rem", backgroundColor: sec.bg }}
       >
         <div className="fw-bold mb-2">{sec.label}</div>
@@ -223,7 +223,7 @@ function HighScoresSummary({
       <Row className="mb-2">
         <Col xs={12} md={4}>
           <div
-            className="border rounded p-2 h-100"
+            className="border rounded p-2 h-100 gatool-highscores-summary-panel"
             style={{ fontSize: "0.9rem", backgroundColor: sec.bg }}
           >
             <div className="fw-bold mb-2">{sec.label} — No penalties to winner</div>
@@ -232,7 +232,7 @@ function HighScoresSummary({
         </Col>
         <Col xs={12} md={4}>
           <div
-            className="border rounded p-2 h-100"
+            className="border rounded p-2 h-100 gatool-highscores-summary-panel"
             style={{ fontSize: "0.9rem", backgroundColor: sec.bg }}
           >
             <div className="fw-bold mb-2">{sec.label} — Incl. penalties</div>
@@ -241,7 +241,7 @@ function HighScoresSummary({
         </Col>
         <Col xs={12} md={4}>
           <div
-            className="border rounded p-2 h-100"
+            className="border rounded p-2 h-100 gatool-highscores-summary-panel"
             style={{ fontSize: "0.9rem", backgroundColor: sec.bg }}
           >
             <div className="fw-bold mb-2">{sec.label} — Score minus penalties</div>

@@ -447,6 +447,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
                             Select the team to add as the <b>{reserveSlotUiLabel}</b> for this Alliance.
                         </div>
                         <Select
+                            classNamePrefix="gatool-rs"
                             placeholder="Choose team…"
                             options={availableTeams}
                             onChange={(/** @type {{ value: object } | null} */ opt) => {
@@ -542,16 +543,19 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
                 </Col>
                 {!adHocMode && <MatchClock matchDetails={matchDetails} timeFormat={timeFormat} />}
                 <Col xs={topBarCenterColXs} lg={!ftcMode && (inPlayoffs || inPractice) ? "3" : "4"}><b>{eventLabel?.replace("FIRST Championship - ", "").replace("FIRST In Texas District Championship - ", "").replace("FIRST Ontario Provincial Championship - ", "").replace("New England FIRST District Championship - ", "")}</b><br />
-                    {!adHocMode && <Select options={matchMenu} value={currentMatch ? matchMenu[currentMatch - 1] : matchMenu[0]} onChange={handleMatchSelection} styles={{
-                        // @ts-ignore
-                        option: (styles, { data }) => {
-                            return {
-                                ...styles,
-                                backgroundColor: data.color,
-                                color: "black"
-                            };
-                        },
-                    }} ref={selectRef} />}
+                    {!adHocMode && (
+                        <Select
+                            classNamePrefix="gatool-rs"
+                            options={matchMenu}
+                            value={currentMatch ? matchMenu[currentMatch - 1] : matchMenu[0]}
+                            onChange={handleMatchSelection}
+                            classNames={{
+                                option: (props) =>
+                                    props.data?.matchCompleted ? "gatool-match-completed-option" : "",
+                            }}
+                            ref={selectRef}
+                        />
+                    )}
                     {adHocMode && <span className="announceOrganization">TEST MATCH</span>}
                 </Col>
                 {showTopBarAddTeamCol && <Col className="promoteBackup" xs={1} onClick={handleShow}>+<ArrowUpSquareFill />+<br />Add Team</Col>}
@@ -618,34 +622,34 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
                     <Modal.Body>
                         <Container>
                             {adHocMatch && <div>Select teams for each station below.</div>}
-                            {!adHocMatch && <div>Awaiting match data...</div>}
+                            {!adHocMatch && <div className="gatool-awaiting-inline">Awaiting match data...</div>}
                             {!swapScreen && adHocMatch && <Table>
                                 <Row>
-                                    <Col className="blueAlliance"><div style={{ backgroundColor: "#98B4F4" }}><b>Blue 1</b> <Select options={eventTeams} tabIndex={4} value={adHocMatch[3]?.teamNumber ? { "value": adHocMatch[3]?.teamNumber, "label": adHocMatch[3]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Blue1", e]) }} /></div></Col>
-                                    <Col className="redAlliance"><div style={{ backgroundColor: "#F7B3B4" }}><b>Red 3</b> <Select options={eventTeams} tabIndex={3} value={adHocMatch[2]?.teamNumber ? { "value": adHocMatch[2]?.teamNumber, "label": adHocMatch[2]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Red3", e]) }} /></div></Col>
+                                    <Col className="blueAlliance"><div style={{ backgroundColor: "#98B4F4" }}><b>Blue 1</b> <Select classNamePrefix="gatool-rs" options={eventTeams} tabIndex={4} value={adHocMatch[3]?.teamNumber ? { "value": adHocMatch[3]?.teamNumber, "label": adHocMatch[3]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Blue1", e]) }} /></div></Col>
+                                    <Col className="redAlliance"><div style={{ backgroundColor: "#F7B3B4" }}><b>Red 3</b> <Select classNamePrefix="gatool-rs" options={eventTeams} tabIndex={3} value={adHocMatch[2]?.teamNumber ? { "value": adHocMatch[2]?.teamNumber, "label": adHocMatch[2]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Red3", e]) }} /></div></Col>
                                 </Row>
                                 <Row>
-                                    <Col className="blueAlliance"><div style={{ backgroundColor: "#98B4F4" }}><b>Blue 2</b> <Select options={eventTeams} tabIndex={5} value={adHocMatch[4]?.teamNumber ? { "value": adHocMatch[4]?.teamNumber, "label": adHocMatch[4]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Blue2", e]) }} /></div></Col>
-                                    <Col className="redAlliance"><div style={{ backgroundColor: "#F7B3B4" }}><b>Red 2</b> <Select options={eventTeams} tabIndex={2} value={adHocMatch[1]?.teamNumber ? { "value": adHocMatch[1]?.teamNumber, "label": adHocMatch[1]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Red2", e]) }} /></div></Col>
+                                    <Col className="blueAlliance"><div style={{ backgroundColor: "#98B4F4" }}><b>Blue 2</b> <Select classNamePrefix="gatool-rs" options={eventTeams} tabIndex={5} value={adHocMatch[4]?.teamNumber ? { "value": adHocMatch[4]?.teamNumber, "label": adHocMatch[4]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Blue2", e]) }} /></div></Col>
+                                    <Col className="redAlliance"><div style={{ backgroundColor: "#F7B3B4" }}><b>Red 2</b> <Select classNamePrefix="gatool-rs" options={eventTeams} tabIndex={2} value={adHocMatch[1]?.teamNumber ? { "value": adHocMatch[1]?.teamNumber, "label": adHocMatch[1]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Red2", e]) }} /></div></Col>
                                 </Row>
                                 <Row>
-                                    <Col className="blueAlliance"><div style={{ backgroundColor: "#98B4F4" }}><b>Blue 3</b> <Select options={eventTeams} tabIndex={6} value={adHocMatch[5]?.teamNumber ? { "value": adHocMatch[5]?.teamNumber, "label": adHocMatch[5]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Blue3", e]) }} /></div></Col>
-                                    <Col className="redAlliance" ><div style={{ backgroundColor: "#F7B3B4" }}><b>Red 1</b><Select options={eventTeams} tabIndex={1} value={adHocMatch[0]?.teamNumber ? { "value": adHocMatch[0]?.teamNumber, "label": adHocMatch[0]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Red1", e]) }} /></div> </Col>
+                                    <Col className="blueAlliance"><div style={{ backgroundColor: "#98B4F4" }}><b>Blue 3</b> <Select classNamePrefix="gatool-rs" options={eventTeams} tabIndex={6} value={adHocMatch[5]?.teamNumber ? { "value": adHocMatch[5]?.teamNumber, "label": adHocMatch[5]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Blue3", e]) }} /></div></Col>
+                                    <Col className="redAlliance" ><div style={{ backgroundColor: "#F7B3B4" }}><b>Red 1</b><Select classNamePrefix="gatool-rs" options={eventTeams} tabIndex={1} value={adHocMatch[0]?.teamNumber ? { "value": adHocMatch[0]?.teamNumber, "label": adHocMatch[0]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Red1", e]) }} /></div> </Col>
 
                                 </Row>
                             </Table>}
                             {swapScreen && adHocMatch && <Table>
                                 <Row>
-                                    <Col className="redAlliance"><div style={{ backgroundColor: "#F7B3B4" }}><b>Red 3</b> <Select options={eventTeams} tabIndex={4} value={adHocMatch[2]?.teamNumber ? { "value": adHocMatch[2]?.teamNumber, "label": adHocMatch[2]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Red3", e]) }} /></div></Col>
-                                    <Col className="blueAlliance"><div style={{ backgroundColor: "#98B4F4" }}><b>Blue 1</b> <Select options={eventTeams} tabIndex={3} value={adHocMatch[3]?.teamNumber ? { "value": adHocMatch[3]?.teamNumber, "label": adHocMatch[3]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Blue1", e]) }} /></div></Col>
+                                    <Col className="redAlliance"><div style={{ backgroundColor: "#F7B3B4" }}><b>Red 3</b> <Select classNamePrefix="gatool-rs" options={eventTeams} tabIndex={4} value={adHocMatch[2]?.teamNumber ? { "value": adHocMatch[2]?.teamNumber, "label": adHocMatch[2]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Red3", e]) }} /></div></Col>
+                                    <Col className="blueAlliance"><div style={{ backgroundColor: "#98B4F4" }}><b>Blue 1</b> <Select classNamePrefix="gatool-rs" options={eventTeams} tabIndex={3} value={adHocMatch[3]?.teamNumber ? { "value": adHocMatch[3]?.teamNumber, "label": adHocMatch[3]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Blue1", e]) }} /></div></Col>
                                 </Row>
                                 <Row>
-                                    <Col className="redAlliance"><div style={{ backgroundColor: "#F7B3B4" }}><b>Red 2</b> <Select options={eventTeams} tabIndex={5} value={adHocMatch[1]?.teamNumber ? { "value": adHocMatch[1]?.teamNumber, "label": adHocMatch[1]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Red2", e]) }} /></div></Col>
-                                    <Col className="blueAlliance"><div style={{ backgroundColor: "#98B4F4" }}><b>Blue 2</b> <Select options={eventTeams} tabIndex={2} value={adHocMatch[4]?.teamNumber ? { "value": adHocMatch[4]?.teamNumber, "label": adHocMatch[4]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Blue2", e]) }} /></div></Col>
+                                    <Col className="redAlliance"><div style={{ backgroundColor: "#F7B3B4" }}><b>Red 2</b> <Select classNamePrefix="gatool-rs" options={eventTeams} tabIndex={5} value={adHocMatch[1]?.teamNumber ? { "value": adHocMatch[1]?.teamNumber, "label": adHocMatch[1]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Red2", e]) }} /></div></Col>
+                                    <Col className="blueAlliance"><div style={{ backgroundColor: "#98B4F4" }}><b>Blue 2</b> <Select classNamePrefix="gatool-rs" options={eventTeams} tabIndex={2} value={adHocMatch[4]?.teamNumber ? { "value": adHocMatch[4]?.teamNumber, "label": adHocMatch[4]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Blue2", e]) }} /></div></Col>
                                 </Row>
                                 <Row>
-                                    <Col className="redAlliance" ><div style={{ backgroundColor: "#F7B3B4" }}><b>Red 1</b><Select options={eventTeams} tabIndex={6} value={adHocMatch[0]?.teamNumber ? { "value": adHocMatch[0]?.teamNumber, "label": adHocMatch[0]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Red1", e]) }} /></div> </Col>
-                                    <Col className="blueAlliance"><div style={{ backgroundColor: "#98B4F4" }}><b>Blue 3</b> <Select options={eventTeams} tabIndex={1} value={adHocMatch[5]?.teamNumber ? { "value": adHocMatch[5]?.teamNumber, "label": adHocMatch[5]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Blue3", e]) }} /></div></Col>
+                                    <Col className="redAlliance" ><div style={{ backgroundColor: "#F7B3B4" }}><b>Red 1</b><Select classNamePrefix="gatool-rs" options={eventTeams} tabIndex={6} value={adHocMatch[0]?.teamNumber ? { "value": adHocMatch[0]?.teamNumber, "label": adHocMatch[0]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Red1", e]) }} /></div> </Col>
+                                    <Col className="blueAlliance"><div style={{ backgroundColor: "#98B4F4" }}><b>Blue 3</b> <Select classNamePrefix="gatool-rs" options={eventTeams} tabIndex={1} value={adHocMatch[5]?.teamNumber ? { "value": adHocMatch[5]?.teamNumber, "label": adHocMatch[5]?.teamNumber } : ""} onChange={(e) => { adHocStation(["Blue3", e]) }} /></div></Col>
                                 </Row>
                             </Table>}
                         </Container>

@@ -25,10 +25,11 @@ function BottomNavigation({ ftcMode }) {
           flexShrink: 0,
         }}
       >
-        <span style={{ width: "100%", fontSize: "11px" }}>
+        <span className="app-footer-copy" style={{ width: "100%", fontSize: "11px" }}>
           © 2017-{new Date().getFullYear()} Arthur Rosa &amp; James Lockman,{" "}
           <span
-            style={{ cursor: "pointer", color: "blue" }}
+            className="app-footer-link"
+            style={{ cursor: "pointer" }}
             onClick={() => {
               setURL({
                 title: "Northern Force",
@@ -40,7 +41,8 @@ function BottomNavigation({ ftcMode }) {
           </span>{" "}
           and the{" "}
           <span
-            style={{ cursor: "pointer", color: "blue" }}
+            className="app-footer-link"
+            style={{ cursor: "pointer" }}
             onClick={() => {
               setURL({ title: "GoFAR", url: "http://gofarmaine.org" });
             }}
@@ -50,7 +52,8 @@ function BottomNavigation({ ftcMode }) {
           {!ftcMode && (
             <>
               <span
-                style={{ cursor: "pointer", color: "blue" }}
+                className="app-footer-link"
+            style={{ cursor: "pointer" }}
                 onClick={() => {
                   setURL({
                     title: "FIRST API",
@@ -66,7 +69,8 @@ function BottomNavigation({ ftcMode }) {
               </span>{" "}
               Additional Data provided by{" "}
               <span
-                style={{ cursor: "pointer", color: "blue" }}
+                className="app-footer-link"
+            style={{ cursor: "pointer" }}
                 onClick={() => {
                   setURL({
                     title: "TBA API",
@@ -79,7 +83,8 @@ function BottomNavigation({ ftcMode }) {
                 </i>
               </span>{", by "}
               <span
-                style={{ cursor: "pointer", color: "blue" }}
+                className="app-footer-link"
+            style={{ cursor: "pointer" }}
                 onClick={() => {
                   setURL({
                     title: "Caster's Tool",
@@ -92,7 +97,8 @@ function BottomNavigation({ ftcMode }) {
                 </i>
               </span>{", and by "}
               <span
-                style={{ cursor: "pointer", color: "blue" }}
+                className="app-footer-link"
+            style={{ cursor: "pointer" }}
                 onClick={() => {
                   setURL({
                     title: "Statbotics API",
@@ -110,7 +116,8 @@ function BottomNavigation({ ftcMode }) {
           {ftcMode && (
             <>
               <span
-                style={{ cursor: "pointer", color: "blue" }}
+                className="app-footer-link"
+            style={{ cursor: "pointer" }}
                 onClick={() => {
                   setURL({
                     title: "FIRST API",
@@ -124,7 +131,8 @@ function BottomNavigation({ ftcMode }) {
                 .
               </span>{" Additional Data provided by "}
               <span
-                style={{ cursor: "pointer", color: "blue" }}
+                className="app-footer-link"
+            style={{ cursor: "pointer" }}
                 onClick={() => {
                   setURL({
                     title: "FTC Scout API",

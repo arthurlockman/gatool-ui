@@ -11,6 +11,7 @@ export const appUpdates = [
           <li>Help now renders within the app.</li>
           <li>Fixed Emcee Screen guidance about how an Alliance got to the current match</li>
           <li>Changed default behavior to always keep event details (team lists, schedule, rankings, scores, etc) up to date.</li>
+          <li>Dark mode. Yes, it's finally here!</li>
         </ul>
         <li>FTC:</li>
         <ul>
