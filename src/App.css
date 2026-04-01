@@ -837,8 +837,8 @@ td {
   padding: 0.12em 0.45em;
   border-radius: 4px;
   border: 1px solid rgba(22, 101, 52, 0.45);
-  box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
   line-height: 1.35;
 }
 
@@ -1639,22 +1639,32 @@ body {
   color: var(--bs-body-color);
 }
 
-/* Setup: three tinted bands (same families as light #dce5fa / #faecdc / #f4dcfa) */
+/* Setup: three tinted bands (same families as light #dce5fa / #faecdc / #f4dcfa).
+   Gradient + secondary-bg approximates color-mix without compat issues on older browsers. */
 [data-bs-theme="dark"] .teamInfoSettings {
-  background-color: rgba(110, 168, 254, 0.16);
-  background-color: color-mix(in srgb, var(--bs-secondary-bg) 78%, #6ea8fe 22%);
+  background: linear-gradient(
+      rgba(110, 168, 254, 0.22),
+      rgba(110, 168, 254, 0.22)
+    )
+    var(--bs-secondary-bg);
   color: var(--bs-body-color);
 }
 
 [data-bs-theme="dark"] .statsSettings {
-  background-color: rgba(240, 168, 104, 0.14);
-  background-color: color-mix(in srgb, var(--bs-secondary-bg) 78%, #f0a868 22%);
+  background: linear-gradient(
+      rgba(240, 168, 104, 0.2),
+      rgba(240, 168, 104, 0.2)
+    )
+    var(--bs-secondary-bg);
   color: var(--bs-body-color);
 }
 
 [data-bs-theme="dark"] .UISettings {
-  background-color: rgba(199, 143, 255, 0.14);
-  background-color: color-mix(in srgb, var(--bs-secondary-bg) 78%, #c78fff 22%);
+  background: linear-gradient(
+      rgba(199, 143, 255, 0.2),
+      rgba(199, 143, 255, 0.2)
+    )
+    var(--bs-secondary-bg);
   color: var(--bs-body-color);
 }
 

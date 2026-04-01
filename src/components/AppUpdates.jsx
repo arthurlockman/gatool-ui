@@ -1,6 +1,6 @@
 export const appUpdates = [
   {
-    date: "March 30, 2026",
+    date: "April 1, 2026",
     message: (
       <ul>
         <li>ALL PROGRAMS:</li>
@@ -17,6 +17,10 @@ export const appUpdates = [
         <ul>
           <li>Fixed a bug that prevented Alliance numbers from displaying correctly</li>
           <li>Restoring Alliances to Playoffs Brackets and Emcee screens</li>
+        </ul>
+        <li>FRC:</li>
+        <ul>
+          <li>Updated Cheat Sheet to include District Champs RP thresholds</li>
         </ul>
       </ul>
     ),
