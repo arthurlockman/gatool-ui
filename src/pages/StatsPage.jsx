@@ -40,20 +40,18 @@ function StatsPage({
     <Container fluid>
       {!selectedEvent && (
         <div>
-          <Alert variant="warning">
+          <Alert variant="warning" className="gatool-awaiting-message">
             You need to select an event before you can see anything here.
           </Alert>
         </div>
       )}
       {selectedEvent && !hasAnyStats && (
         <div>
-          <Alert variant="warning">
-            <Alert variant="warning">
-              <div>
-                <img src="loadingIcon.gif" alt="Loading data..." />
-              </div>
-              Awaiting stats data for {eventLabel}
-            </Alert>
+          <Alert variant="warning" className="gatool-awaiting-message">
+            <div>
+              <img src="loadingIcon.gif" alt="Loading data..." />
+            </div>
+            Awaiting stats data for {eventLabel}
           </Alert>
         </div>
       )}

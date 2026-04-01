@@ -411,6 +411,10 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
         return style;
     }
 
+    function updateHighlightClass(update) {
+        return update ? "gatool-teamdata-local-edit" : "";
+    }
+
 
     // The following section emits an Excel doc with two sheets:
     //   Team Table contains details about the teams at the event, including community updates;
@@ -989,10 +993,10 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
     return (
         <Container fluid>
             {!selectedEvent && <div>
-                <Alert variant="warning" >You need to select an event before you can see anything here.</Alert>
+                <Alert variant="warning" className="gatool-awaiting-message">You need to select an event before you can see anything here.</Alert>
             </div>}
             {selectedEvent && (!teamList || teamList?.teams.length === 0) && <div>
-                <Alert variant="warning" onClick={(e) => { handleGetTeamList() }}><div><img src="loadingIcon.gif" alt="Loading data..." /></div>
+                <Alert variant="warning" className="gatool-awaiting-message" onClick={(e) => { handleGetTeamList() }}><div><img src="loadingIcon.gif" alt="Loading data..." /></div>
                     <div>Awaiting team data for {eventLabel || selectedEvent?.label}</div>
                     {selectedEvent?.value?.code === "OFFLINE" && <div>Your OFFLINE Event team list is determined by the schedule. Upload a schedule on the Schedule tab to load teams.</div>}
                     {selectedEvent?.value?.code !== "OFFLINE" && <div>If your event has finished loading and you don't see a Team List, tap here to try loading your teams again.</div>}
@@ -1005,13 +1009,13 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                     <thead>
                         <tr>
                             <td>
-                                <span style={{ cursor: "pointer", color: "darkblue" }} onClick={exportXLSX}><b><img style={{ float: "left" }} width="30" src="images/excelicon.png" alt="Excel Logo" /> Tap to download this table as Excel</b></span>
+                                <span className="gatool-tap-link" onClick={exportXLSX}><b><img style={{ float: "left" }} width="30" src="images/excelicon.png" alt="Excel Logo" /> Tap to download this table as Excel</b></span>
                             </td>
                             <td>
-                                <span style={{ cursor: "pointer", color: "darkblue" }} onClick={downloadTeamInfoSheets}><img style={{ float: "left" }} width="30" src="images/wordicon.png" alt="Word Logo" /> <b>Tap here to download a merged document (docx).</b></span>
+                                <span className="gatool-tap-link" onClick={downloadTeamInfoSheets}><img style={{ float: "left" }} width="30" src="images/wordicon.png" alt="Word Logo" /> <b>Tap here to download a merged document (docx).</b></span>
                             </td>
                             {(isAuthenticated && user["https://gatool.org/roles"] && user["https://gatool.org/roles"].indexOf("user") >= 0) && <td>
-                                <span style={{ cursor: "pointer", color: "darkblue" }} onClick={clickRestoreBackup}><input type="file" id="BackupFiles" onChange={handleRestoreBackup} className={"hiddenInput"} /><b><img style={{ float: "left" }} width="30" src="images/excelicon.png" alt="Excel Logo" /> Tap here to restore team data from Excel</b></span>
+                                <span className="gatool-tap-link" onClick={clickRestoreBackup}><input type="file" id="BackupFiles" onChange={handleRestoreBackup} className={"hiddenInput"} /><b><img style={{ float: "left" }} width="30" src="images/excelicon.png" alt="Excel Logo" /> Tap here to restore team data from Excel</b></span>
                             </td>}
                         </tr>
                     </thead>
@@ -1061,16 +1065,16 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                                 <TeamTimer team={team} lastVisit={lastVisit} monthsWarning={monthsWarning} handleShow={handleShow} currentTime={currentTime} />
                                 <td style={rankHighlight(team?.rank ? team?.rank : 100, allianceCount || { "count": 8 })}>{team?.rank}</td>
                                 
-                                <td dangerouslySetInnerHTML={{ __html: teamNameWithAvatar }} style={updateHighlight(team?.updates?.nameShortLocal)}></td>
-                                <td style={updateHighlight(team?.updates?.cityStateLocal)}>{team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : cityState} </td>
+                                <td className={updateHighlightClass(team?.updates?.nameShortLocal)} dangerouslySetInnerHTML={{ __html: teamNameWithAvatar }} style={updateHighlight(team?.updates?.nameShortLocal)}></td>
+                                <td className={updateHighlightClass(team?.updates?.cityStateLocal)} style={updateHighlight(team?.updates?.cityStateLocal)}>{team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : cityState} </td>
                                 {(selectedEvent?.value?.type === "Championship" || selectedEvent?.value?.type === "ChampionshipDivision") ?
-                                    <td style={updateHighlight(team?.updates?.topSponsorLocal)}>{team?.updates?.topSponsorLocal ? team?.updates?.topSponsorLocal : team?.topSponsor}</td> :
-                                    <td style={updateHighlight(team?.updates?.topSponsorsLocal)}>{team?.updates?.topSponsorsLocal ? team?.updates?.topSponsorsLocal : team?.topSponsors}</td>
+                                    <td className={updateHighlightClass(team?.updates?.topSponsorLocal)} style={updateHighlight(team?.updates?.topSponsorLocal)}>{team?.updates?.topSponsorLocal ? team?.updates?.topSponsorLocal : team?.topSponsor}</td> :
+                                    <td className={updateHighlightClass(team?.updates?.topSponsorsLocal)} style={updateHighlight(team?.updates?.topSponsorsLocal)}>{team?.updates?.topSponsorsLocal ? team?.updates?.topSponsorsLocal : team?.topSponsors}</td>
                                 }
-                                <td style={updateHighlight(team?.updates?.organizationLocal)}>{team?.updates?.organizationLocal ? team?.updates?.organizationLocal : team?.organization}</td>
+                                <td className={updateHighlightClass(team?.updates?.organizationLocal)} style={updateHighlight(team?.updates?.organizationLocal)}>{team?.updates?.organizationLocal ? team?.updates?.organizationLocal : team?.organization}</td>
                                 <td>{team?.rookieYear}</td>
-                                <td style={updateHighlight(team?.updates?.robotNameLocal)}>{team?.updates?.robotNameLocal ? team?.updates?.robotNameLocal : team?.robotName}</td>
-                                <td align="left" style={updateHighlight(!_.isEmpty(team?.updates?.teamNotes))} className="teamNotes" dangerouslySetInnerHTML={{ __html: team?.updates?.teamNotes }}></td>
+                                <td className={updateHighlightClass(team?.updates?.robotNameLocal)} style={updateHighlight(team?.updates?.robotNameLocal)}>{team?.updates?.robotNameLocal ? team?.updates?.robotNameLocal : team?.robotName}</td>
+                                <td align="left" className={["teamNotes", updateHighlightClass(!_.isEmpty(team?.updates?.teamNotes))].filter(Boolean).join(" ")} style={updateHighlight(!_.isEmpty(team?.updates?.teamNotes))} dangerouslySetInnerHTML={{ __html: team?.updates?.teamNotes }}></td>
                             </tr>
                         })}
                     </tbody>
@@ -1093,7 +1097,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                 </Modal.Footer>
             </Modal>
 
-            {updateTeam && <Modal centered={true} fullscreen={true} show={show} size="lg" onHide={handleClose}>
+            {updateTeam && <Modal centered={true} fullscreen={true} show={show} size="lg" onHide={handleClose} contentClassName="gatool-team-edit-modal">
                 <Modal.Header className={_.find(localUpdates, { "teamNumber": updateTeam.teamNumber }) ? "redAlliance" : "allianceChoice"} closeVariant={"white"} closeButton>
                     <Modal.Title >{_.find(localUpdates, { "teamNumber": updateTeam.teamNumber }) ? <i> You have a locally saved update for Team {updateTeam.teamNumber}. Please upload to gatool Cloud{!isOnline ? <> when you are online again.</> : <>.</>}</i> : `Editing Team ${updateTeam.teamNumber}'s Details`}</Modal.Title>
                 </Modal.Header>

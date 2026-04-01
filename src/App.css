@@ -265,15 +265,18 @@ td {
   background-color: #98b4f4;
 }
 
-.teamInfoSettings {
+[data-bs-theme="light"] .teamInfoSettings,
+:root:not([data-bs-theme="dark"]) .teamInfoSettings {
   background-color: #dce5fa;
 }
 
-.statsSettings {
+[data-bs-theme="light"] .statsSettings,
+:root:not([data-bs-theme="dark"]) .statsSettings {
   background-color: #faecdc;
 }
 
-.UISettings {
+[data-bs-theme="light"] .UISettings,
+:root:not([data-bs-theme="dark"]) .UISettings {
   background-color: #f4dcfa;
 }
 
@@ -606,6 +609,119 @@ td {
   background-color: #d3ffe3 !important;
 }
 
+/* Schedule table (dark mode): station team #s on striped rows + score/RP cells */
+[data-bs-theme="dark"] .gatool-schedule-table .scheduleTablered {
+  background-color: rgba(127, 29, 29, 0.5) !important;
+}
+
+[data-bs-theme="dark"] .gatool-schedule-table .scheduleTableblue {
+  background-color: rgba(30, 58, 138, 0.5) !important;
+}
+
+[data-bs-theme="dark"] .gatool-schedule-table .scheduleTabletie {
+  background-color: rgba(6, 95, 70, 0.45) !important;
+}
+
+[data-bs-theme="dark"] .gatool-schedule-table .coopertition {
+  background-color: rgba(113, 63, 18, 0.45) !important;
+}
+
+/* Team stations & unscored match rows: light red/blue on dark background */
+[data-bs-theme="dark"] .gatool-schedule-table tbody td:not([class*="scheduleTable"]) span.red {
+  color: #f87171 !important;
+}
+
+[data-bs-theme="dark"] .gatool-schedule-table tbody td:not([class*="scheduleTable"]) span.blue {
+  color: #60a5fa !important;
+}
+
+/* Posted scores / RP: light text on tinted cells */
+[data-bs-theme="dark"] .gatool-schedule-table tbody td[class*="scheduleTable"] span.red {
+  color: #fecaca !important;
+}
+
+[data-bs-theme="dark"] .gatool-schedule-table tbody td[class*="scheduleTable"] span.blue {
+  color: #bfdbfe !important;
+}
+
+[data-bs-theme="dark"] .gatool-schedule-table tbody td[class*="scheduleTable"] span.red.bold {
+  color: #ffffff !important;
+}
+
+[data-bs-theme="dark"] .gatool-schedule-table tbody td[class*="scheduleTable"] span.blue.bold {
+  color: #ffffff !important;
+}
+
+[data-bs-theme="dark"] .gatool-schedule-table tbody td[class*="scheduleTable"] .rankPoints.unearned {
+  color: #d1d5db !important;
+  opacity: 0.85;
+}
+
+/* Score details modal: close button visible & tappable (dark theme can zero out btn-close) */
+.gatool-score-details-modal .modal-header .btn-close {
+  opacity: 1 !important;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0.5rem;
+  margin: -0.25rem -0.25rem -0.25rem auto;
+  flex-shrink: 0;
+  background: transparent
+    url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/%3e%3c/svg%3e")
+    center / 1.1em auto no-repeat !important;
+  filter: none !important;
+}
+
+.gatool-score-details-footer {
+  justify-content: center;
+}
+
+/* Score details table: readable text on red/blue columns (not inherited light body text) */
+.gatool-score-details-table td.scheduleTablered,
+.gatool-score-details-table th.scheduleTablered,
+.gatool-score-details-table td.scheduleTableblue,
+.gatool-score-details-table th.scheduleTableblue {
+  color: #1e293b !important;
+}
+
+[data-bs-theme="dark"] .gatool-score-details-table td.scheduleTablered,
+[data-bs-theme="dark"] .gatool-score-details-table th.scheduleTablered,
+[data-bs-theme="dark"] .gatool-score-details-table .scheduleTablered {
+  background-color: rgba(127, 29, 29, 0.55) !important;
+  color: #fecaca !important;
+}
+
+[data-bs-theme="dark"] .gatool-score-details-table td.scheduleTableblue,
+[data-bs-theme="dark"] .gatool-score-details-table th.scheduleTableblue,
+[data-bs-theme="dark"] .gatool-score-details-table .scheduleTableblue {
+  background-color: rgba(30, 58, 138, 0.55) !important;
+  color: #bfdbfe !important;
+}
+
+/* Winner line in score header: avoid low-contrast named colors on grey */
+.gatool-score-winner-red {
+  color: #b91c1c;
+}
+
+.gatool-score-winner-blue {
+  color: #1d4ed8;
+}
+
+.gatool-score-winner-tie {
+  color: #047857;
+}
+
+[data-bs-theme="dark"] .gatool-score-winner-red {
+  color: #fca5a5;
+}
+
+[data-bs-theme="dark"] .gatool-score-winner-blue {
+  color: #93c5fd;
+}
+
+[data-bs-theme="dark"] .gatool-score-winner-tie {
+  color: #6ee7b7;
+}
+
 .buttonNoWrap {
   white-space: nowrap;
 }
@@ -669,19 +785,23 @@ td {
   font-size: 1.2em;
 }
 
-.alert-warning {
+/* Pastel alerts: light theme only so dark mode can use its own surfaces + text */
+[data-bs-theme="light"] .alert-warning,
+:root:not([data-bs-theme="dark"]) .alert-warning {
   color: #8a6d3b;
   background-color: #fcf8e3;
   border-color: #faebcc;
 }
 
-.alert-danger {
+[data-bs-theme="light"] .alert-danger,
+:root:not([data-bs-theme="dark"]) .alert-danger {
   color: #a94442;
   background-color: #f2dede;
   border-color: #ebccd1;
 }
 
-.alert-success {
+[data-bs-theme="light"] .alert-success,
+:root:not([data-bs-theme="dark"]) .alert-success {
   color: #3c763d;
   background-color: #dff0d8;
   border-color: #d6e9c6;
@@ -709,8 +829,23 @@ td {
   line-height: 1.3;
 }
 
+/* Legend + inline cue: always light green chip — force dark text so it stays readable in dark theme */
 .teamTableHighlight {
+  display: inline-block;
   background-color: rgb(195, 244, 199) !important;
+  color: #14532d !important;
+  padding: 0.12em 0.45em;
+  border-radius: 4px;
+  border: 1px solid rgba(22, 101, 52, 0.45);
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  line-height: 1.35;
+}
+
+[data-bs-theme="dark"] .teamTableHighlight {
+  background-color: rgb(167, 230, 178) !important;
+  color: #052e16 !important;
+  border-color: rgba(34, 197, 94, 0.55);
 }
 
 .teamTableButtonHighlight {
@@ -732,6 +867,140 @@ td {
   outline: green;
   outline-style: solid;
   background: #f2fff1;
+}
+
+/* Dark mode: single fill for every “local edit” control (inputs + Quill) */
+[data-bs-theme="dark"] {
+  --gatool-local-edit-surface: #d1fae5;
+  --gatool-local-edit-border: #10b981;
+  --gatool-local-edit-text: #0f172a;
+}
+
+/* Light-background “local edit” fields: Bootstrap dark theme leaves light text → unreadable on #f2fff1 */
+[data-bs-theme="dark"] .form-control.formHighlight,
+[data-bs-theme="dark"] textarea.form-control.formHighlight {
+  color: var(--gatool-local-edit-text) !important;
+  background-color: var(--gatool-local-edit-surface) !important;
+  border-color: var(--gatool-local-edit-border) !important;
+}
+
+[data-bs-theme="dark"] .form-control.formHighlight:focus {
+  color: var(--gatool-local-edit-text) !important;
+  background-color: var(--gatool-local-edit-surface) !important;
+  border-color: #059669 !important;
+  box-shadow: 0 0 0 0.2rem rgba(16, 185, 129, 0.35);
+}
+
+[data-bs-theme="dark"] .form-control.formHighlight::placeholder {
+  color: #475569 !important;
+  opacity: 1;
+}
+
+/* ReactQuill roots as div.quill.formHighlight — same surface as .form-control.formHighlight */
+[data-bs-theme="dark"] .quill.formHighlight .ql-container {
+  background-color: var(--gatool-local-edit-surface) !important;
+  border-color: var(--gatool-local-edit-border) !important;
+}
+
+[data-bs-theme="dark"] .quill.formHighlight .ql-editor {
+  color: var(--gatool-local-edit-text) !important;
+  background-color: var(--gatool-local-edit-surface) !important;
+}
+
+[data-bs-theme="dark"] .quill.formHighlight .ql-editor.ql-blank::before {
+  color: #64748b !important;
+}
+
+[data-bs-theme="dark"] .quill.formHighlight .ql-toolbar {
+  background-color: var(--gatool-local-edit-surface) !important;
+  border-color: var(--gatool-local-edit-border) !important;
+}
+
+[data-bs-theme="dark"] .quill.formHighlight .ql-toolbar .ql-stroke {
+  stroke: #334155 !important;
+}
+
+[data-bs-theme="dark"] .quill.formHighlight .ql-toolbar .ql-fill {
+  fill: #334155 !important;
+}
+
+[data-bs-theme="dark"] .quill.formHighlight .ql-toolbar .ql-picker-label {
+  color: var(--gatool-local-edit-text) !important;
+}
+
+[data-bs-theme="dark"] .quill.formHighlight .ql-toolbar .ql-picker-options {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+/*
+ * Quill “snow” has no dark theme: toolbar is transparent, icons are #444, so on a dark modal body they vanish.
+ * When the editor is not “formHighlight”, give the toolbar an explicit light strip; editor matches body + readable placeholder.
+ */
+[data-bs-theme="dark"] .quill:not(.formHighlight) .ql-toolbar.ql-snow {
+  background-color: #e2e8f0 !important;
+  border-color: #64748b !important;
+}
+
+[data-bs-theme="dark"] .quill:not(.formHighlight) .ql-container.ql-snow {
+  background-color: var(--bs-body-bg) !important;
+  border-color: #64748b !important;
+}
+
+[data-bs-theme="dark"] .quill:not(.formHighlight) .ql-editor {
+  color: var(--bs-body-color) !important;
+  background-color: var(--bs-body-bg) !important;
+}
+
+[data-bs-theme="dark"] .quill:not(.formHighlight) .ql-editor.ql-blank::before {
+  color: #94a3b8 !important;
+}
+
+[data-bs-theme="dark"] .quill:not(.formHighlight) .ql-toolbar .ql-picker {
+  color: #334155 !important;
+}
+
+[data-bs-theme="dark"] .quill:not(.formHighlight) .ql-toolbar .ql-picker.ql-expanded .ql-picker-label {
+  color: #475569 !important;
+}
+
+[data-bs-theme="dark"] .quill:not(.formHighlight) .ql-toolbar .ql-picker.ql-expanded .ql-picker-label .ql-stroke {
+  stroke: #475569 !important;
+}
+
+[data-bs-theme="dark"] .quill:not(.formHighlight) .ql-toolbar .ql-picker.ql-expanded .ql-picker-label .ql-fill {
+  fill: #475569 !important;
+}
+
+[data-bs-theme="dark"] .quill:not(.formHighlight) .ql-tooltip {
+  background-color: #f8fafc !important;
+  color: #1e293b !important;
+  border-color: #94a3b8 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+[data-bs-theme="dark"] .quill:not(.formHighlight) .ql-tooltip a {
+  color: #0369a1 !important;
+}
+
+/*
+ * Fullscreen team editor: snow.css / browser defaults can leave a second Quill editor white.
+ * Tie non-highlight editors to the modal surface (higher specificity than generic .quill rules).
+ */
+[data-bs-theme="dark"] .gatool-team-edit-modal .quill:not(.formHighlight) .ql-container.ql-snow,
+[data-bs-theme="dark"] .gatool-team-edit-modal .quill:not(.formHighlight) .ql-snow .ql-editor {
+  background-color: var(--bs-modal-bg, var(--bs-body-bg)) !important;
+  color: var(--bs-body-color) !important;
+}
+
+/* Team edit modal: default inputs read clearly against dark body (not only Quill) */
+[data-bs-theme="dark"] .gatool-team-edit-modal .form-control:not(.formHighlight):not(:disabled) {
+  border-color: #64748b !important;
+}
+
+[data-bs-theme="dark"] .gatool-team-edit-modal .form-control:not(.formHighlight):not(:disabled)::placeholder {
+  color: #94a3b8 !important;
+  opacity: 1;
 }
 
 .formLabel {
@@ -923,6 +1192,11 @@ button.alliance-backup-modal-alliance-action-btn:disabled {
   border-top: 2px darkblue solid;
 }
 
+[data-bs-theme="dark"] .topBorderLine {
+  border-top-color: #38bdf8;
+  border-top-width: 2px;
+}
+
 .tbd {
   text-align: center;
   font-weight: bold;
@@ -953,6 +1227,56 @@ button.alliance-backup-modal-alliance-action-btn:disabled {
   align-content: center;
   flex-flow: column;
   align-items: center;
+}
+
+/* react-quizlet-flashcard: prev/next use transparent buttons + #1c1b1e SVG fill (invisible on dark bg) */
+.flashCards .FlashcardArrayWrapper__controls {
+  gap: 1.5rem;
+  min-height: 3.5rem;
+  margin-top: 0.5rem;
+}
+
+.flashCards .FlashcardArrayWrapper__controls button {
+  min-width: 3.25rem;
+  min-height: 3.25rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: 0.65rem;
+  background-color: var(--bs-tertiary-bg);
+  border: 1px solid var(--bs-border-color);
+  color: var(--bs-emphasis-color);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.flashCards .FlashcardArrayWrapper__controls button:hover {
+  background-color: var(--bs-secondary-bg);
+  border-color: var(--bs-primary);
+  color: var(--bs-primary);
+}
+
+.flashCards .FlashcardArrayWrapper__controls button:focus-visible {
+  outline: 2px solid var(--bs-primary);
+  outline-offset: 2px;
+}
+
+.flashCards .FlashcardArrayWrapper__controls button svg {
+  width: 2rem !important;
+  height: 2rem !important;
+}
+
+.flashCards .FlashcardArrayWrapper__controls button svg path {
+  fill: currentColor !important;
+}
+
+.flashCards .FlashcardArrayWrapper__controls--count {
+  font-size: 1.05rem !important;
+  font-weight: 600;
+  color: var(--bs-emphasis-color);
+  min-width: 3.5ch;
+  text-align: center;
+}
+
+[data-bs-theme="dark"] .flashCards .FlashcardArrayWrapper__controls button {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
 }
 
 .teamNotes p {
@@ -1202,4 +1526,529 @@ body {
     -webkit-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);
   }
+}
+
+/* Bootstrap 5.3 color mode (data-bs-theme set from Settings → Dark mode) */
+[data-bs-theme="dark"] .app-layout-main {
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
+}
+
+[data-bs-theme="dark"] .Toastify__toast {
+  background: var(--bs-tertiary-bg);
+  color: var(--bs-body-color);
+}
+
+[data-bs-theme="dark"] .Toastify__toast-body {
+  color: var(--bs-body-color);
+}
+
+[data-bs-theme="dark"] .Toastify__close-button {
+  color: var(--bs-body-color);
+  opacity: 0.8;
+}
+
+/* --- Dark mode: legibility (contrast on custom panels, nav, selects, tables) --- */
+
+/* "Awaiting …" / loading callouts (className gatool-awaiting-message on Alert) */
+[data-bs-theme="dark"] .alert-warning.gatool-awaiting-message {
+  color: #fefce8 !important;
+}
+
+[data-bs-theme="dark"] .alert-danger.gatool-awaiting-message {
+  color: #fecaca !important;
+}
+
+/* Inline “Awaiting …” (not inside Alert), e.g. announce/play-by-play footer */
+[data-bs-theme="dark"] .gatool-awaiting-inline {
+  color: #f1f5f9 !important;
+}
+
+/* Replaces inline color:darkblue for tappable hints — readable on dark panels */
+.gatool-tap-link {
+  cursor: pointer;
+  color: #0c2461;
+}
+
+[data-bs-theme="dark"] .gatool-tap-link {
+  color: #7dd3fc !important;
+}
+
+[data-bs-theme="dark"] .gatool-tap-link:hover {
+  color: #bae6fd !important;
+}
+
+.gatool-tap-link-text {
+  color: #0c2461;
+}
+
+[data-bs-theme="dark"] .gatool-tap-link-text {
+  color: #e0f2fe !important;
+}
+
+[data-bs-theme="dark"] a:not(.nav-link):not(.btn):not(.page-link) {
+  color: #7dd3fc;
+}
+
+[data-bs-theme="dark"] a:not(.nav-link):not(.btn):not(.page-link):hover {
+  color: #bae6fd;
+}
+
+[data-bs-theme="dark"] .navbar.bg-light {
+  background-color: var(--bs-dark) !important;
+  color: var(--bs-body-color);
+}
+
+/* Inactive tabs: light label/icon on dark bar or tinted chip */
+[data-bs-theme="dark"] .gatool-main-nav .nav-link:not(.active):not([aria-current="page"]),
+[data-bs-theme="dark"] .gatool-main-nav .nav-link:not(.active):not([aria-current="page"]) .navBarText {
+  color: #f1f5f9 !important;
+}
+
+[data-bs-theme="dark"] .gatool-main-nav .nav-link:not(.active):not([aria-current="page"]) svg:not(.gatool-nav-system-bell) {
+  color: #f1f5f9 !important;
+}
+
+/* Active tab: keep dark text on bright green / gray / orange / red chips */
+[data-bs-theme="dark"] .gatool-main-nav .nav-link.active,
+[data-bs-theme="dark"] .gatool-main-nav .nav-link[aria-current="page"],
+[data-bs-theme="dark"] .gatool-main-nav .nav-link.active .navBarText,
+[data-bs-theme="dark"] .gatool-main-nav .nav-link[aria-current="page"] .navBarText {
+  color: #0f172a !important;
+}
+
+[data-bs-theme="dark"] .gatool-main-nav .nav-link.active svg:not(.gatool-nav-system-bell),
+[data-bs-theme="dark"] .gatool-main-nav .nav-link[aria-current="page"] svg:not(.gatool-nav-system-bell) {
+  color: #0f172a !important;
+}
+
+[data-bs-theme="dark"] .app-footer-link {
+  color: #93c5fd;
+}
+
+[data-bs-theme="dark"] .app-footer-link:hover {
+  color: #bfdbfe;
+}
+
+/* Setup / filters: pastel boxes → dark surfaces + light text */
+[data-bs-theme="dark"] .setupPageMenus,
+[data-bs-theme="dark"] .ftcSetupPageMenus,
+[data-bs-theme="dark"] .setupPageFilters {
+  background-color: var(--bs-secondary-bg);
+  border-color: var(--bs-border-color);
+  color: var(--bs-body-color);
+}
+
+/* Setup: three tinted bands (same families as light #dce5fa / #faecdc / #f4dcfa) */
+[data-bs-theme="dark"] .teamInfoSettings {
+  background-color: rgba(110, 168, 254, 0.16);
+  background-color: color-mix(in srgb, var(--bs-secondary-bg) 78%, #6ea8fe 22%);
+  color: var(--bs-body-color);
+}
+
+[data-bs-theme="dark"] .statsSettings {
+  background-color: rgba(240, 168, 104, 0.14);
+  background-color: color-mix(in srgb, var(--bs-secondary-bg) 78%, #f0a868 22%);
+  color: var(--bs-body-color);
+}
+
+[data-bs-theme="dark"] .UISettings {
+  background-color: rgba(199, 143, 255, 0.14);
+  background-color: color-mix(in srgb, var(--bs-secondary-bg) 78%, #c78fff 22%);
+  color: var(--bs-body-color);
+}
+
+[data-bs-theme="dark"] .switchLabel,
+[data-bs-theme="dark"] .UISettings td,
+[data-bs-theme="dark"] .teamInfoSettings td,
+[data-bs-theme="dark"] .statsSettings td {
+  color: var(--bs-body-color);
+}
+
+/* react-select (classNamePrefix gatool-rs) */
+[data-bs-theme="dark"] .gatool-rs__control {
+  background-color: var(--bs-secondary-bg) !important;
+  border-color: var(--bs-border-color) !important;
+}
+
+[data-bs-theme="dark"] .gatool-rs__single-value,
+[data-bs-theme="dark"] .gatool-rs__input-container,
+[data-bs-theme="dark"] .gatool-rs__multi-value__label {
+  color: var(--bs-body-color) !important;
+}
+
+[data-bs-theme="dark"] .gatool-rs__placeholder {
+  color: var(--bs-secondary-color) !important;
+}
+
+[data-bs-theme="dark"] .gatool-rs__menu {
+  background-color: var(--bs-body-bg) !important;
+  border: 1px solid var(--bs-border-color) !important;
+}
+
+/* Default menu rows (event list tints use classes below) */
+[data-bs-theme="dark"]
+  .gatool-rs__option:not(.gatool-event-option-offseason-azure):not(.gatool-event-option-offseason):not(.gatool-match-completed-option) {
+  background-color: var(--bs-body-bg) !important;
+  color: var(--bs-body-color) !important;
+}
+
+[data-bs-theme="dark"]
+  .gatool-rs__option--is-focused:not(.gatool-event-option-offseason-azure):not(.gatool-event-option-offseason):not(
+    .gatool-match-completed-option
+  ):not(.gatool-rs__option--is-selected) {
+  background-color: var(--bs-secondary-bg) !important;
+}
+
+/* Announce / Play-by-Play match menu: posted matches (see matchHasPostedResult + TopButtons classNames) */
+.gatool-rs__option.gatool-match-completed-option {
+  background-color: #bbf7d0 !important;
+  color: #14532d !important;
+}
+
+.gatool-rs__option.gatool-match-completed-option.gatool-rs__option--is-focused:not(.gatool-rs__option--is-selected),
+.gatool-rs__option.gatool-match-completed-option.gatool-rs__option--is-selected {
+  background-color: #86efac !important;
+  color: #052e16 !important;
+}
+
+[data-bs-theme="dark"] .gatool-rs__option.gatool-match-completed-option {
+  background-color: #166534 !important;
+  color: #ecfdf5 !important;
+}
+
+[data-bs-theme="dark"] .gatool-rs__option.gatool-match-completed-option.gatool-rs__option--is-focused:not(.gatool-rs__option--is-selected),
+[data-bs-theme="dark"] .gatool-rs__option.gatool-match-completed-option.gatool-rs__option--is-selected {
+  background-color: #15803d !important;
+  color: #f0fdf4 !important;
+}
+
+/* Setup event list: offseason row backgrounds (menu) */
+.gatool-rs__option.gatool-event-option-offseason-azure:not(.gatool-rs__option--is-selected) {
+  background-color: rgba(191, 219, 254, 0.92) !important;
+  color: #0c1929 !important;
+}
+
+.gatool-rs__option.gatool-event-option-offseason:not(.gatool-rs__option--is-selected) {
+  background-color: rgba(254, 229, 165, 0.95) !important;
+  color: #3d2914 !important;
+}
+
+[data-bs-theme="dark"] .gatool-rs__option.gatool-event-option-offseason-azure:not(.gatool-rs__option--is-selected) {
+  background-color: rgba(37, 99, 235, 0.42) !important;
+  color: #eff6ff !important;
+}
+
+[data-bs-theme="dark"] .gatool-rs__option.gatool-event-option-offseason:not(.gatool-rs__option--is-selected) {
+  background-color: rgba(161, 98, 7, 0.5) !important;
+  color: #fffbeb !important;
+}
+
+.gatool-rs__option--is-focused.gatool-event-option-offseason-azure:not(.gatool-rs__option--is-selected) {
+  background-color: rgba(147, 197, 253, 0.98) !important;
+  color: #0c1929 !important;
+}
+
+[data-bs-theme="dark"] .gatool-rs__option--is-focused.gatool-event-option-offseason-azure:not(.gatool-rs__option--is-selected) {
+  background-color: rgba(59, 130, 246, 0.58) !important;
+  color: #ffffff !important;
+}
+
+.gatool-rs__option--is-focused.gatool-event-option-offseason:not(.gatool-rs__option--is-selected) {
+  background-color: rgba(253, 224, 138, 0.98) !important;
+  color: #422006 !important;
+}
+
+[data-bs-theme="dark"] .gatool-rs__option--is-focused.gatool-event-option-offseason:not(.gatool-rs__option--is-selected) {
+  background-color: rgba(202, 138, 4, 0.58) !important;
+  color: #fffbeb !important;
+}
+
+[data-bs-theme="dark"] .gatool-rs__multi-value {
+  background-color: var(--bs-tertiary-bg) !important;
+}
+
+/* Stats high-score tables (pastel cells + Bootstrap table vars) */
+[data-bs-theme="dark"] .gatool-highScores-Table,
+[data-bs-theme="dark"] .gatool-highScores-Table td,
+[data-bs-theme="dark"] .gatool-highScores-Table th {
+  color: #1c1917 !important;
+}
+
+[data-bs-theme="dark"] .gatool-worldHighScores {
+  color: #5c2a2a !important;
+}
+
+[data-bs-theme="dark"] .gatool-districtHighScores {
+  color: #5c4a00 !important;
+}
+
+[data-bs-theme="dark"] .gatool-eventHighScores {
+  color: #164e63 !important;
+}
+
+/* High score summary strips on Announce / Play-by-Play */
+[data-bs-theme="dark"] .gatool-highscores-summary-panel {
+  color: #1c1917 !important;
+}
+
+[data-bs-theme="dark"] .gatool-highscores-summary-panel .text-muted {
+  color: #44403c !important;
+}
+
+/* Teams table: locally edited cells (light green fill) */
+[data-bs-theme="dark"] .gatool-teamdata-local-edit {
+  color: #0f172a !important;
+}
+
+/* Awards grid */
+[data-bs-theme="dark"] .awardsButton .btn-outline-success {
+  color: #86efac !important;
+  border-color: #4ade80 !important;
+}
+
+[data-bs-theme="dark"] .awardsButton .btn-outline-success:hover {
+  color: #052e16 !important;
+  background-color: #4ade80 !important;
+}
+
+/* Announce: override inline pastel TDs — dark alliance tint + light text */
+[data-bs-theme="dark"] .gatool-announce.redAlliance td.col1,
+[data-bs-theme="dark"] .gatool-announce.redAlliance td.col2,
+[data-bs-theme="dark"] .gatool-announce.redAlliance td.col7,
+[data-bs-theme="dark"] .gatool-announce.redAlliance td.announce-alliance-matchup-cell {
+  background-color: rgba(95, 26, 32, 0.92) !important;
+  color: #f1f5f9 !important;
+}
+
+[data-bs-theme="dark"] .gatool-announce.blueAlliance td.col1,
+[data-bs-theme="dark"] .gatool-announce.blueAlliance td.col2,
+[data-bs-theme="dark"] .gatool-announce.blueAlliance td.col7,
+[data-bs-theme="dark"] .gatool-announce.blueAlliance td.announce-alliance-matchup-cell {
+  background-color: rgba(28, 52, 108, 0.92) !important;
+  color: #f1f5f9 !important;
+}
+
+/* Prior partnerships: base rule sets .announce-alliance-matchup-line { color: #222 }, which wins over inherited cell text */
+[data-bs-theme="dark"] .gatool-announce .announce-alliance-matchup-line {
+  color: #e2e8f0 !important;
+}
+
+[data-bs-theme="dark"] .gatool-announce .announce-alliance-matchup-summary--status .text-muted {
+  color: #cbd5e1 !important;
+  opacity: 1;
+}
+
+[data-bs-theme="dark"] .gatool-announce .announceTeamNumber,
+[data-bs-theme="dark"] .gatool-announce .teamName {
+  color: #f8fafc !important;
+}
+
+[data-bs-theme="dark"] .gatool-announce .champs {
+  color: #93c5fd !important;
+}
+
+[data-bs-theme="dark"] .gatool-announce .HOFRed {
+  color: #93c5fd !important;
+}
+
+[data-bs-theme="dark"] .gatool-announce .HOFBlue {
+  color: #fca5a5 !important;
+}
+
+/* Robot name: was #fdba74 (orange-300) — bump saturation so it doesn’t read “muddy” on tinted rows */
+[data-bs-theme="dark"] .gatool-announce .robotName {
+  color: #fb923c !important;
+}
+
+/* Award wins: was #6ee7b7 — less pastel, still bold/large; revert if contrast feels low on blue rows */
+[data-bs-theme="dark"] .gatool-announce .awardHilight {
+  color: #34d399 !important;
+}
+
+[data-bs-theme="dark"] .gatool-announce .champsQualifiedAnnounce {
+  color: #a7f3d0 !important;
+}
+
+[data-bs-theme="dark"] .gatool-announce .ranking {
+  color: #f8fafc;
+}
+
+/* Play-by-Play: score strip contrast */
+[data-bs-theme="dark"] .redAlliancePlayByPlay .playByPlayRobotName {
+  color: #fef08a !important;
+}
+
+[data-bs-theme="dark"] .redAlliancePlayByPlay .playByPlayAlliance {
+  color: #fde047 !important;
+}
+
+/* Emcee / PlayoffDetails: alliance colors on dark page bg (deeper / more saturated than red-400 / blue-400) */
+[data-bs-theme="dark"] .redAllianceTeam {
+  color: #ef4444 !important;
+}
+
+[data-bs-theme="dark"] .blueAllianceTeam {
+  color: #3b82f6 !important;
+}
+
+[data-bs-theme="dark"] .davidPriceCaptain {
+  /* Emcee captain line: drop harsh white stroke; subtle dark halo keeps red/blue readable */
+  text-shadow:
+    0 0 4px rgba(0, 0, 0, 0.65),
+    0 1px 3px rgba(0, 0, 0, 0.45);
+}
+
+/* Dark mode: alerts must set BOTH surface and text (pastels are light-theme-only above) */
+[data-bs-theme="dark"] .alert-success {
+  background-color: rgba(20, 60, 40, 0.55) !important;
+  border-color: rgba(52, 211, 153, 0.45) !important;
+  color: #d1fae5 !important;
+}
+
+[data-bs-theme="dark"] .alert-warning {
+  background-color: rgba(55, 48, 20, 0.75) !important;
+  border-color: rgba(250, 204, 21, 0.45) !important;
+  color: #fef9c3 !important;
+}
+
+[data-bs-theme="dark"] .alert-danger {
+  background-color: rgba(60, 24, 28, 0.75) !important;
+  border-color: rgba(248, 113, 113, 0.5) !important;
+  color: #fecaca !important;
+}
+
+[data-bs-theme="dark"] .alert-info {
+  background-color: rgba(20, 45, 65, 0.75) !important;
+  border-color: rgba(56, 189, 248, 0.45) !important;
+  color: #e0f2fe !important;
+}
+
+[data-bs-theme="dark"] .alert-primary {
+  background-color: rgba(30, 40, 70, 0.75) !important;
+  border-color: rgba(129, 140, 248, 0.45) !important;
+  color: #e0e7ff !important;
+}
+
+[data-bs-theme="dark"] .alert-secondary {
+  background-color: var(--bs-secondary-bg) !important;
+  border-color: var(--bs-border-color) !important;
+  color: var(--bs-body-color) !important;
+}
+
+/* Setup: settings table rows + nested labels (Team Info / UI / Stats) */
+[data-bs-theme="dark"] .UISettings label,
+[data-bs-theme="dark"] .teamInfoSettings label,
+[data-bs-theme="dark"] .statsSettings label {
+  color: var(--bs-body-color);
+}
+
+[data-bs-theme="dark"] .UISettings .form-check-label,
+[data-bs-theme="dark"] .teamInfoSettings .form-check-label,
+[data-bs-theme="dark"] .statsSettings .form-check-label {
+  color: var(--bs-body-color);
+}
+
+/* Bottom bar: plain copyright text (links use .app-footer-link) */
+[data-bs-theme="dark"] .app-footer-copy {
+  color: #cbd5e1;
+}
+
+/*
+ * Alliance Selection: pastel columns (AllianceSelectionPage.css) inherit light body text in dark theme.
+ * Force dark text on light panels; keep white-on-red/green chosen states.
+ */
+[data-bs-theme="dark"] .gatool-alliance-selection .allianceContainer,
+[data-bs-theme="dark"] .gatool-alliance-selection .backupAlliancesTable,
+[data-bs-theme="dark"] .gatool-alliance-selection .skippedAlliancesTable {
+  color: #0f172a !important;
+}
+
+[data-bs-theme="dark"] .gatool-alliance-selection .alliancesTeamsTable,
+[data-bs-theme="dark"] .gatool-alliance-selection .alliancesTeamsTableHeader {
+  color: #0f172a !important;
+}
+
+[data-bs-theme="dark"] .gatool-alliance-selection .fullAlliance {
+  color: #14532d !important;
+}
+
+[data-bs-theme="dark"] .gatool-alliance-selection .allianceTeam:not(.allianceDecline):not(.captainDecline):not(.allianceTeamChosen):not(
+    .allianceRemovedTeam
+  ),
+[data-bs-theme="dark"] .gatool-alliance-selection .availableTeam:not(.allianceDecline):not(.allianceRemovedTeam) {
+  color: #0f172a !important;
+  background-color: #ffffff !important;
+}
+
+[data-bs-theme="dark"]
+  .gatool-alliance-selection
+  .allianceTeam:not(.allianceDecline):not(.captainDecline):not(.allianceTeamChosen):not(.allianceRemovedTeam):hover,
+[data-bs-theme="dark"]
+  .gatool-alliance-selection
+  .availableTeam:not(.allianceDecline):not(.allianceRemovedTeam):hover {
+  background-color: #ccfbf1 !important;
+  color: #0f172a !important;
+}
+
+[data-bs-theme="dark"] .gatool-alliance-selection .allianceRemovedTeam {
+  background-color: #ff7700 !important;
+  color: #ffffff !important;
+  border: 1px solid #ffb347 !important;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
+}
+
+[data-bs-theme="dark"] .gatool-alliance-selection .allianceRemovedTeam:hover {
+  background-color: #ff9933 !important;
+  color: #1c1917 !important;
+}
+
+[data-bs-theme="dark"] .gatool-alliance-selection .alliance.dropzone {
+  background-color: rgba(248, 113, 113, 0.12) !important;
+  box-shadow: inset 0 0 0 1px rgba(248, 113, 113, 0.35);
+}
+
+[data-bs-theme="dark"] .gatool-alliance-selection .alliance-selection-legend {
+  color: #334155 !important;
+}
+
+[data-bs-theme="dark"] .gatool-alliance-selection .alliance-selection-legend-decline {
+  color: #991b1b;
+  font-weight: 700;
+}
+
+[data-bs-theme="dark"] .gatool-alliance-selection .alliance-selection-legend-removed {
+  color: #ff7700;
+  font-weight: 700;
+}
+
+[data-bs-theme="dark"] .gatool-alliance-selection .alliancedrop {
+  color: #0f172a !important;
+  background-color: #e2e8f0 !important;
+  border-color: #64748b !important;
+}
+
+[data-bs-theme="dark"] .gatool-alliance-selection .allianceCaptain {
+  color: #422006 !important;
+  background: rgba(253, 224, 71, 0.95) !important;
+}
+
+[data-bs-theme="dark"] .gatool-alliance-selection .nextAllianceChoice {
+  background-color: rgba(254, 243, 199, 0.98) !important;
+  color: #422006 !important;
+  border-color: #dc2626 !important;
+}
+
+[data-bs-theme="dark"] .gatool-alliance-selection .allianceSkip {
+  color: #422006 !important;
+}
+
+[data-bs-theme="dark"] .gatool-alliance-selection .allianceDecline,
+[data-bs-theme="dark"] .gatool-alliance-selection .captainDecline {
+  color: #ffffff !important;
+}
+
+[data-bs-theme="dark"] .gatool-alliance-selection .allianceTeamChosen,
+[data-bs-theme="dark"] .gatool-alliance-selection .allianceTeamChosen b {
+  color: #ffffff !important;
 }

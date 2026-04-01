@@ -8,6 +8,7 @@ import PlayoffDetails from "../components/PlayoffDetails";
 function BottomButtons({
   previousMatch,
   nextMatch,
+  currentMatch,
   matchDetails,
   playoffSchedule,
   eventHighScores,
@@ -36,6 +37,7 @@ function BottomButtons({
         if (eventHighScores?.highscores?.overallqual?.score < eventHighScores?.highscores?.overallplayoff?.score) {
             eventHighScore = eventHighScores?.highscores?.overallplayoff;
         }
+    const hasEventHighScore = Number(eventHighScore?.score) > 0;
 
 
     return (
@@ -44,18 +46,22 @@ function BottomButtons({
                 <Col xs={"2"} lg={"3"}>
                     {!adHocMode && <Button size="lg" variant="outline-success" className={"gatool-button buttonNoWrap"} onClick={previousMatch}><span className={"d-none d-lg-block"}><CaretLeftFill /> Previous Match</span><span className={"d-block d-lg-none"}><CaretLeftFill /> <CaretLeftFill /></span></Button>}
                 </Col>
-                {matchDetails?.tournamentLevel.toLowerCase() === "playoff" && <Col xs={eventHighScore?.score ? "5" : "8"} lg={eventHighScore?.score ? "4" : "6"} className={"playoffDetails"}>
+                {matchDetails?.tournamentLevel.toLowerCase() === "playoff" && <Col xs={hasEventHighScore ? "5" : "8"} lg={hasEventHighScore ? "4" : "6"} className={"playoffDetails"}>
                     <PlayoffDetails matchDetails={matchDetails} alliances={alliances} matches={matches} playoffCountOverride={playoffCountOverride} ftcMode={ftcMode}/>
                 </Col>}
 
-                {eventHighScore?.score && <Col xs={matchDetails?.tournamentLevel.toLowerCase() !== "playoff" ? "8" : "3"} lg={matchDetails?.tournamentLevel.toLowerCase() !== "playoff" ? "6" : "2"}>
+                {hasEventHighScore && <Col xs={matchDetails?.tournamentLevel.toLowerCase() !== "playoff" ? "8" : "3"} lg={matchDetails?.tournamentLevel.toLowerCase() !== "playoff" ? "6" : "2"}>
                     <p><b>{highScoreMode ? 'Event' : matchDetails?.tournamentLevel.toLowerCase() === "playoff" ? 'Playoffs' : 'Quals'} High Score: {eventHighScore?.score}<br />
                         in {eventHighScore?.matchName}<br />
                         ({eventHighScore?.allianceMembers})</b>
                     </p>
                 </Col>}
 
-                {matchDetails?.tournamentLevel.toLowerCase() !== "playoff" && !eventHighScore && <Col xs={"8"} lg={"6"}><h4>{matchDetails?.description}</h4></Col>}
+                {matchDetails?.tournamentLevel.toLowerCase() !== "playoff" && !hasEventHighScore && (
+                    <Col xs={"8"} lg={"6"}>
+                        <h4 className="gatool-awaiting-inline">{currentMatch === 1 ? "Awaiting results from first match" : matchDetails?.description}</h4>
+                    </Col>
+                )}
 
                 <Col xs={"2"} lg={"3"}>
                     {!adHocMode && <Button size="lg" variant="outline-success" className={"gatool-button buttonNoWrap"} onClick={nextMatch}><span className={"d-none d-lg-block"}>Next Match <CaretRightFill /></span><span className={"d-block d-lg-none"}><CaretRightFill /> <CaretRightFill /></span></Button>}

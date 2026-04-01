@@ -12,8 +12,8 @@ import moment from "moment";
 import useScrollPosition from "../hooks/useScrollPosition";
 import { useScrollToTop } from "../contextProviders/ScrollContainerContext";
 import { useEffect, useRef } from "react";
-
-const paleGreen = "rgba(144, 238, 144, 0.5)";
+import { getAllianceLookupEntry } from "../utils/allianceLookup";
+import { matchHasPostedResult } from "../utils/playoffReserveEdits";
 
 function PlayByPlayPage({
   selectedEvent,
@@ -165,12 +165,13 @@ function PlayByPlayPage({
       );
 
       team.rankStyle = rankHighlight(team?.rank, allianceCount || { count: 8 });
-      team.alliance = alliances?.Lookup[`${lookupTeamNumber}`]
-        ? alliances?.Lookup[`${lookupTeamNumber}`]?.alliance || null
-        : null;
-      team.allianceRole = alliances?.Lookup[`${lookupTeamNumber}`]
-        ? alliances?.Lookup[`${lookupTeamNumber}`]?.role || null
-        : null;
+      const pbpAllianceEntry = getAllianceLookupEntry(
+        alliances?.Lookup,
+        team?.teamNumber,
+        remapNumberToString
+      );
+      team.alliance = pbpAllianceEntry?.alliance ?? null;
+      team.allianceRole = pbpAllianceEntry?.role ?? null;
 
       var teamDistrictRanks =
         _.filter(districtRankings?.districtRanks, {
@@ -246,10 +247,13 @@ function PlayByPlayPage({
             team?.rank,
             allianceCount || { count: 8 }
           );
-          team.alliance =
-            alliances?.Lookup[`${lookupRemainingTeam}`]?.alliance || null;
-          team.allianceRole =
-            alliances?.Lookup[`${lookupRemainingTeam}`]?.role || null;
+          const pbpRemEntry = getAllianceLookupEntry(
+            alliances?.Lookup,
+            lookupRemainingTeam,
+            remapNumberToString
+          );
+          team.alliance = pbpRemEntry?.alliance ?? null;
+          team.allianceRole = pbpRemEntry?.role ?? null;
 
           if (selectedEvent?.value?.districtCode) {
             teamDistrictRanks =
@@ -458,7 +462,7 @@ function PlayByPlayPage({
     return {
       value: index + 1,
       label: tag,
-      color: !_.isNull(match?.scoreRedFinal) ? paleGreen : "",
+      matchCompleted: matchHasPostedResult(match),
     };
   });
 
@@ -497,14 +501,14 @@ function PlayByPlayPage({
     <Container fluid>
       {!selectedEvent && (
         <div>
-          <Alert variant="warning">
+          <Alert variant="warning" className="gatool-awaiting-message">
             You need to select an event before you can see anything here.
           </Alert>
         </div>
       )}
       {selectedEvent && (!teamList || teamList?.teams.length === 0) && (
         <div>
-          <Alert variant="warning">
+          <Alert variant="warning" className="gatool-awaiting-message">
             <div>
               <img src="loadingIcon.gif" alt="Loading data..." />
             </div>
@@ -517,7 +521,7 @@ function PlayByPlayPage({
         (!schedule || schedule?.length === 0) &&
         !adHocMode && (
           <div>
-            <Alert variant="warning">
+            <Alert variant="warning" className="gatool-awaiting-message">
               <div>
                 <img src="loadingIcon.gif" alt="Loading data..." />
               </div>
@@ -717,6 +721,7 @@ function PlayByPlayPage({
             <BottomButtons
               previousMatch={previousMatch}
               nextMatch={nextMatch}
+              currentMatch={currentMatch}
               matchDetails={matchDetails}
               playoffSchedule={playoffSchedule}
               eventHighScores={eventHighScores}

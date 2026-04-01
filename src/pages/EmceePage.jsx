@@ -27,8 +27,43 @@ function EmceePage({
   eventLabel,
   playoffCountOverride,
   ftcMode,
+  remapNumberToString,
 }) {
   const { height, width } = useWindowDimensions();
+
+  const lookupAllianceEntryWithData = (teamNumber, alliancesData) => {
+    if (
+      _.isNull(teamNumber) ||
+      teamNumber === undefined ||
+      teamNumber === ""
+    ) {
+      return null;
+    }
+    const L = alliancesData?.Lookup;
+    if (!L) return null;
+    const k1 = `${teamNumber}`;
+    if (L[k1]) return L[k1];
+    if (remapNumberToString) {
+      const k2 = `${remapNumberToString(teamNumber)}`;
+      if (k2 && L[k2]) return L[k2];
+    }
+    return null;
+  };
+
+  const lookupAllianceEntry = (teamNumber) =>
+    lookupAllianceEntryWithData(teamNumber, alliances);
+
+  const expandTeamIdStrings = (teamIds) =>
+    _.uniq(
+      _.compact(teamIds).flatMap((n) => {
+        const out = [`${n}`];
+        if (remapNumberToString) {
+          const r = remapNumberToString(n);
+          if (r != null && r !== "") out.push(`${r}`);
+        }
+        return out;
+      })
+    );
   
   /**
    * This function finds a team by their station assignment
@@ -39,7 +74,7 @@ function EmceePage({
   const getTeamByStation = (teams, station) => {
     if (!teams || !Array.isArray(teams)) return null;
     const team = teams.find((t) => t?.station?.toLowerCase() === station?.toLowerCase());
-    return team?.teamNumber || null;
+    return team?.teamNumber ?? team?.team ?? null;
   };
 
   /**
@@ -50,22 +85,45 @@ function EmceePage({
    * @returns alliance display string (e.g., "A1", "A2") or null if not found
    */
   const getAllianceNumberByTeams = (teamNumbers, alliancesData) => {
-    if (!teamNumbers || teamNumbers.length === 0 || !alliancesData?.List) return null;
-    
-    // Iterate through all alliances and compare team rosters
-    for (const alliance of alliancesData.List) {
-      if (alliance?.teams) {
-        const allianceTeamNumbers = alliance.teams
-          .map((t) => t.teamNumber)
-          .sort();
-        
-        // If the team numbers match, we found the alliance
-        if (JSON.stringify(teamNumbers) === JSON.stringify(allianceTeamNumbers)) {
-          return alliance.name ? alliance.name.replace("Alliance ", "A") : null;
-        }
+    if (!teamNumbers || teamNumbers.length === 0 || !alliancesData) return null;
+
+    // First choice: use Lookup, which already maps team -> alliance and handles reserves.
+    const lookupAlliances = _.uniq(
+      teamNumbers
+        .flatMap((teamNumber) => {
+          const e = lookupAllianceEntryWithData(teamNumber, alliancesData);
+          return e?.alliance ? [e.alliance] : [];
+        })
+        .filter(Boolean)
+    );
+    if (lookupAlliances.length === 1) {
+      return lookupAlliances[0].replace("Alliance ", "A");
+    }
+
+    // Fallback: match as a subset of an alliance roster (not strict equality),
+    // because alliance rosters can include reserves/round3 teams not on the field.
+    const targetExpanded = expandTeamIdStrings(teamNumbers).sort();
+    const rosterList = alliancesData.alliances || alliancesData.List || [];
+    for (const alliance of rosterList) {
+      const slots = [
+        alliance?.captain,
+        alliance?.round1,
+        alliance?.round2,
+        alliance?.round3,
+        alliance?.backup,
+      ].filter((t) => t != null && t !== "");
+
+      const allianceTeamNumbers = expandTeamIdStrings(slots).sort();
+
+      const isSubset = targetExpanded.every((id) =>
+        allianceTeamNumbers.includes(id)
+      );
+
+      if (isSubset) {
+        return alliance.name ? alliance.name.replace("Alliance ", "A") : null;
       }
     }
-    
+
     return null;
   };
 
@@ -181,17 +239,17 @@ function EmceePage({
     
     if (red1Team) {
       allianceName = ftcMode
-        ? alliances?.Lookup[`${red1Team}`]?.alliance ||
-          alliances?.Lookup[`${red2Team}`]?.alliance
-        : alliances?.Lookup[`${red1Team}`]?.alliance ||
-          alliances?.Lookup[`${red2Team}`]?.alliance ||
-          alliances?.Lookup[`${red3Team}`]?.alliance;
+        ? lookupAllianceEntry(red1Team)?.alliance ||
+          lookupAllianceEntry(red2Team)?.alliance
+        : lookupAllianceEntry(red1Team)?.alliance ||
+          lookupAllianceEntry(red2Team)?.alliance ||
+          lookupAllianceEntry(red3Team)?.alliance;
       captain = ftcMode
-        ? alliances?.Lookup[`${red1Team}`]?.captain ||
-          alliances?.Lookup[`${red2Team}`]?.captain
-        : alliances?.Lookup[`${red1Team}`]?.captain ||
-          alliances?.Lookup[`${red2Team}`]?.captain ||
-          alliances?.Lookup[`${red3Team}`]?.captain;
+        ? lookupAllianceEntry(red1Team)?.captain ||
+          lookupAllianceEntry(red2Team)?.captain
+        : lookupAllianceEntry(red1Team)?.captain ||
+          lookupAllianceEntry(red2Team)?.captain ||
+          lookupAllianceEntry(red3Team)?.captain;
       if (matchNumber < finalsStart) {
         if (match?.winner?.tieWinner === "red") {
           allianceName += ` (L${match?.winner.level})`;
@@ -199,17 +257,17 @@ function EmceePage({
       }
       if (allianceColor === "blue") {
         allianceName = ftcMode
-          ? alliances?.Lookup[`${blue1Team}`]?.alliance ||
-            alliances?.Lookup[`${blue2Team}`]?.alliance
-          : alliances?.Lookup[`${blue1Team}`]?.alliance ||
-            alliances?.Lookup[`${blue2Team}`]?.alliance ||
-            alliances?.Lookup[`${blue3Team}`]?.alliance;
+          ? lookupAllianceEntry(blue1Team)?.alliance ||
+            lookupAllianceEntry(blue2Team)?.alliance
+          : lookupAllianceEntry(blue1Team)?.alliance ||
+            lookupAllianceEntry(blue2Team)?.alliance ||
+            lookupAllianceEntry(blue3Team)?.alliance;
         captain = ftcMode
-          ? alliances?.Lookup[`${blue1Team}`]?.captain ||
-            alliances?.Lookup[`${blue2Team}`]?.captain
-          : alliances?.Lookup[`${blue1Team}`]?.captain ||
-            alliances?.Lookup[`${blue2Team}`]?.captain ||
-            alliances?.Lookup[`${blue3Team}`]?.captain;
+          ? lookupAllianceEntry(blue1Team)?.captain ||
+            lookupAllianceEntry(blue2Team)?.captain
+          : lookupAllianceEntry(blue1Team)?.captain ||
+            lookupAllianceEntry(blue2Team)?.captain ||
+            lookupAllianceEntry(blue3Team)?.captain;
         if (matchNumber < finalsStart) {
           if (match?.winner?.tieWinner === "blue") {
             allianceName += ` (L${match?.winner.level} WIN)`;
@@ -386,30 +444,42 @@ function EmceePage({
     
     // Build the display text
     const parts = [];
+
+    const getSourceMatch = (sourceRef) => {
+      if (!sourceRef) return null;
+      if (ftcMode) {
+        const seriesMatches = matches.filter((m) => m.series === sourceRef);
+        if (seriesMatches.length === 0) return null;
+        return seriesMatches.sort((a, b) => {
+          const aMatchNum = a.originalMatchNumber || a.matchNumber;
+          const bMatchNum = b.originalMatchNumber || b.matchNumber;
+          return bMatchNum - aMatchNum;
+        })[0];
+      }
+      return matches.find((m) => m.matchNumber === sourceRef) || null;
+    };
+
+    const getAllianceDisplayForSide = (sourceMatch, side) => {
+      if (!sourceMatch || !side) return null;
+      const shortName = allianceName(sourceMatch.matchNumber, side)?.shortName;
+      if (!shortName || shortName === "?") return null;
+      return `A${shortName}`;
+    };
+
+    const currentAllianceDisplay = getAllianceNumberByTeams(currentTeamNumbers, alliances);
     
     // If they won a lower bracket match, only show that (don't show upper bracket loss)
     if (lowerBracketWinMatch) {
-      let wonMatch;
-      if (ftcMode) {
-        // In FTC mode, find all matches in this series and get the last one (handles tiebreakers)
-        const seriesMatches = matches.filter((m) => m.series === lowerBracketWinMatch);
-        if (seriesMatches.length > 0) {
-          wonMatch = seriesMatches.sort((a, b) => {
-            const aMatchNum = a.originalMatchNumber || a.matchNumber;
-            const bMatchNum = b.originalMatchNumber || b.matchNumber;
-            return bMatchNum - aMatchNum;
-          })[0];
-        }
-      } else {
-        wonMatch = matches.find((m) => m.matchNumber === lowerBracketWinMatch);
-      }
+      const wonMatch = getSourceMatch(lowerBracketWinMatch);
       
       let losingTeamNumbers = [];
+      let allianceDisplay = null;
       
       if (wonMatch?.teams) {
         if (wonMatch.winner?.winner) {
-          // If we have an explicit winner, use that
+          // If winner is known, opponent is the losing side in that source match.
           const losingAlliance = wonMatch.winner.winner === "red" ? "blue" : "red";
+          allianceDisplay = getAllianceDisplayForSide(wonMatch, losingAlliance);
           losingTeamNumbers = wonMatch.teams
             ?.filter((t) => t.station?.startsWith(losingAlliance === "red" ? "Red" : "Blue"))
             .map((t) => t.teamNumber)
@@ -446,34 +516,37 @@ function EmceePage({
       }
       
       // Always try to display alliance info, use fallback if needed
-      let allianceDisplay = getAllianceNumberByTeams(losingTeamNumbers, alliances);
+      if (!allianceDisplay) {
+        allianceDisplay = getAllianceNumberByTeams(losingTeamNumbers, alliances);
+      }
+      if (
+        allianceDisplay &&
+        currentAllianceDisplay &&
+        allianceDisplay === currentAllianceDisplay &&
+        wonMatch?.winner?.winner
+      ) {
+        const oppositeSide = wonMatch.winner.winner;
+        const oppositeDisplay = getAllianceDisplayForSide(wonMatch, oppositeSide);
+        if (oppositeDisplay && oppositeDisplay !== currentAllianceDisplay) {
+          allianceDisplay = oppositeDisplay;
+        }
+      }
       if (!allianceDisplay) {
         allianceDisplay = `A${lowerBracketWinMatch}`;
       }
       parts.push(`Won M${lowerBracketWinMatch} vs ${allianceDisplay}`);
     } else if (upperBracketLossMatch) {
       // Only show upper bracket loss if they didn't win a lower bracket match
-      let lostMatch;
-      if (ftcMode) {
-        // In FTC mode, find all matches in this series and get the last one (handles tiebreakers)
-        const seriesMatches = matches.filter((m) => m.series === upperBracketLossMatch);
-        if (seriesMatches.length > 0) {
-          lostMatch = seriesMatches.sort((a, b) => {
-            const aMatchNum = a.originalMatchNumber || a.matchNumber;
-            const bMatchNum = b.originalMatchNumber || b.matchNumber;
-            return bMatchNum - aMatchNum;
-          })[0];
-        }
-      } else {
-        lostMatch = matches.find((m) => m.matchNumber === upperBracketLossMatch);
-      }
+      const lostMatch = getSourceMatch(upperBracketLossMatch);
       
       let winningTeamNumbers = [];
+      let allianceDisplay = null;
       
       if (lostMatch?.teams) {
         if (lostMatch.winner?.winner) {
-          // If we have an explicit winner, use that
+          // If winner is known, opponent is the winning side in that source match.
           const winningAlliance = lostMatch.winner.winner;
+          allianceDisplay = getAllianceDisplayForSide(lostMatch, winningAlliance);
           winningTeamNumbers = lostMatch.teams
             ?.filter((t) => t.station?.startsWith(winningAlliance === "red" ? "Red" : "Blue"))
             .map((t) => t.teamNumber)
@@ -510,7 +583,21 @@ function EmceePage({
       }
       
       // Always try to display alliance info, use fallback if needed
-      let allianceDisplay = getAllianceNumberByTeams(winningTeamNumbers, alliances);
+      if (!allianceDisplay) {
+        allianceDisplay = getAllianceNumberByTeams(winningTeamNumbers, alliances);
+      }
+      if (
+        allianceDisplay &&
+        currentAllianceDisplay &&
+        allianceDisplay === currentAllianceDisplay &&
+        lostMatch?.winner?.winner
+      ) {
+        const oppositeSide = lostMatch.winner.winner === "red" ? "blue" : "red";
+        const oppositeDisplay = getAllianceDisplayForSide(lostMatch, oppositeSide);
+        if (oppositeDisplay && oppositeDisplay !== currentAllianceDisplay) {
+          allianceDisplay = oppositeDisplay;
+        }
+      }
       if (!allianceDisplay) {
         allianceDisplay = `A${upperBracketLossMatch}`;
       }
@@ -607,16 +694,14 @@ function EmceePage({
       }
 
       if (winnerOpponent.lookup >= 0) {
-        opponent.winner =
-          alliances?.Lookup[
-            `${winnerMatch?.teams[winnerOpponent.lookup].teamNumber}`
-          ]?.alliance;
+        opponent.winner = lookupAllianceEntry(
+          winnerMatch?.teams[winnerOpponent.lookup]?.teamNumber
+        )?.alliance;
       }
       if (loserOpponent.lookup >= 0) {
-        opponent.loser =
-          alliances?.Lookup[
-            `${loserMatch?.teams[loserOpponent.lookup].teamNumber}`
-          ]?.alliance;
+        opponent.loser = lookupAllianceEntry(
+          loserMatch?.teams[loserOpponent.lookup]?.teamNumber
+        )?.alliance;
       }
     }
   }
@@ -670,14 +755,14 @@ function EmceePage({
     <Container fluid>
       {!selectedEvent && (
         <div>
-          <Alert variant="warning">
+          <Alert variant="warning" className="gatool-awaiting-message">
             You need to select an event before you can see anything here.
           </Alert>
         </div>
       )}
       {selectedEvent && (!schedule || schedule?.length === 0) && (
         <div>
-          <Alert variant="warning">
+          <Alert variant="warning" className="gatool-awaiting-message">
             <div>
               <img src="loadingIcon.gif" alt="Loading data..." />
             </div>

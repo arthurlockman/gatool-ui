@@ -17,8 +17,8 @@ import {
   getConnectionsEventKey,
   allianceRosterToConnectionKey,
 } from "../utils/allianceConnectionsApi";
-
-const paleGreen = "rgba(144, 238, 144, 0.5)";
+import { getAllianceLookupEntry } from "../utils/allianceLookup";
+import { matchHasPostedResult } from "../utils/playoffReserveEdits";
 
 function AnnouncePage({
   selectedEvent,
@@ -176,12 +176,13 @@ function AnnouncePage({
         );
 
       team.rankStyle = rankHighlight(team?.rank, allianceCount || { count: 8 });
-      team.alliance = alliances?.Lookup[`${lookupTeamNumber}`]
-        ? alliances?.Lookup[`${lookupTeamNumber}`]?.alliance || null
-        : null;
-      team.allianceRole = alliances?.Lookup[`${lookupTeamNumber}`]
-        ? alliances?.Lookup[`${lookupTeamNumber}`]?.role || null
-        : null;
+      const announceAllianceEntry = getAllianceLookupEntry(
+        alliances?.Lookup,
+        team?.teamNumber,
+        remapNumberToString
+      );
+      team.alliance = announceAllianceEntry?.alliance ?? null;
+      team.allianceRole = announceAllianceEntry?.role ?? null;
 
       var teamDistrictRanks =
         _.filter(districtRankings?.districtRanks, {
@@ -266,10 +267,13 @@ function AnnouncePage({
             team?.rank,
             allianceCount || { count: 8 }
           );
-          team.alliance =
-            alliances?.Lookup[`${lookupRemainingTeam}`]?.alliance || null;
-          team.allianceRole =
-            alliances?.Lookup[`${lookupRemainingTeam}`]?.role || null;
+          const remEntry = getAllianceLookupEntry(
+            alliances?.Lookup,
+            lookupRemainingTeam,
+            remapNumberToString
+          );
+          team.alliance = remEntry?.alliance ?? null;
+          team.allianceRole = remEntry?.role ?? null;
 
           if (selectedEvent?.value?.districtCode) {
             teamDistrictRanks =
@@ -452,7 +456,7 @@ function AnnouncePage({
     return {
       value: index + 1,
       label: tag,
-      color: !_.isNull(match?.scoreRedFinal) ? paleGreen : "",
+      matchCompleted: matchHasPostedResult(match),
     };
   });
 
@@ -561,14 +565,14 @@ function AnnouncePage({
     <Container fluid>
       {!selectedEvent && (
         <div>
-          <Alert variant="warning">
+          <Alert variant="warning" className="gatool-awaiting-message">
             You need to select an event before you can see anything here.
           </Alert>
         </div>
       )}
       {selectedEvent && (!teamList || teamList?.teams.length === 0) && (
         <div>
-          <Alert variant="warning">
+          <Alert variant="warning" className="gatool-awaiting-message">
             <div>
               <img src="loadingIcon.gif" alt="Loading data..." />
             </div>
@@ -581,7 +585,7 @@ function AnnouncePage({
         (!schedule || schedule?.length === 0) &&
         !adHocMode && (
           <div>
-            <Alert variant="warning">
+            <Alert variant="warning" className="gatool-awaiting-message">
               <div>
                 <img src="loadingIcon.gif" alt="Loading data..." />
               </div>
@@ -773,6 +777,7 @@ function AnnouncePage({
             <BottomButtons
               previousMatch={previousMatch}
               nextMatch={nextMatch}
+              currentMatch={currentMatch}
               matchDetails={matchDetails}
               playoffSchedule={playoffSchedule}
               eventHighScores={eventHighScores}

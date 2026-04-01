@@ -337,7 +337,7 @@ function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMat
 			"width": "100%"
 		}} {...swipeHandlers}>
 			{!matches && <div>
-				<Alert variant="warning" ><div><img src="loadingIcon.gif" alt="Loading data..." /></div><div>Waiting for Playoff Match Schedule</div></Alert>
+				<Alert variant="warning" className="gatool-awaiting-message"><div><img src="loadingIcon.gif" alt="Loading data..." /></div><div>Waiting for Playoff Match Schedule</div></Alert>
 			</div>}
 			{matches &&
 				<>

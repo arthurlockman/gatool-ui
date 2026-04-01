@@ -7,7 +7,11 @@ import { useEffect } from "react";
 import { originalAndSustaining, allianceSelectionBaseRounds } from "./Constants";
 import useWindowDimensions from "hooks/UseWindowDimensions";
 
-function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays, handleReset, teamFilter, setTeamFilter, ftcMode, remapNumberToString, useFourTeamAlliances, setResetAllianceSelection }) {
+const ALLIANCE_DECLINED_TITLE =
+    "Not eligible to be selected (previously declined an alliance offer).";
+const ALLIANCE_REMOVED_TITLE = "Removed from playoff participation.";
+
+function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays, handleReset, teamFilter, setTeamFilter, ftcMode, remapNumberToString, useFourTeamAlliances, setResetAllianceSelection, isResetModalOpen = false }) {
     const OriginalAndSustaining = _.cloneDeep(originalAndSustaining);
     const AllianceSelectionBaseRounds = _.cloneDeep(allianceSelectionBaseRounds);
 
@@ -87,8 +91,11 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
     } else { allianceDisplayOrder = [[1, 8], [2, 7], [3, 6], [4, 5]] }
 
     const resetFilter = () => {
-        // @ts-ignore
-        document.getElementById("filterControl").value = "";
+        const filterControl = document.getElementById("filterControl");
+        if (filterControl) {
+            // @ts-ignore
+            filterControl.value = "";
+        }
         setTeamFilter("")
     }
 
@@ -522,7 +529,17 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
     useHotkeys('d', () => document.getElementById("declineButton")?.click(), { scopes: 'allianceDecline' });
     useHotkeys('s', () => document.getElementById("skipButton")?.click(), { scopes: 'allianceSkip' });
     useHotkeys('meta+z, ctrl+z', () => document.getElementById("undoButton")?.click(), { scopes: 'undo' });
-    useHotkeys('esc', () => document.getElementById("resetFilter")?.click(), { scopes: 'allianceFilter' });
+    useHotkeys(
+        'esc',
+        () => {
+            // Let active modals own Escape.
+            if (!show && !isResetModalOpen) {
+                document.getElementById("resetFilter")?.click();
+            }
+        },
+        { scopes: 'allianceFilter' },
+        [show, isResetModalOpen]
+    );
     
     const currentRound = asArrays?.allianceSelectionOrder?.[asArrays.nextChoice]?.round || -1;
     
@@ -633,17 +650,17 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         return (
             <>
                 {(asArrays?.nextChoice < asArrays.allianceSelectionOrder?.length && !isUnavailableCaptain && !skipped && !removed) &&
-                    (String(team?.teamNumber).startsWith(teamFilter) || teamFilter === "") && <div key={"availableButton" + team?.teamNumber} className={declined ? "availableTeam allianceDecline" : skipped ? "availableTeam allianceTeam allianceSkip" : "availableTeam allianceTeam"} onClick={(e) => handleShow(team, declined ? "declined" : "show", e)}><b>{displayTeamNumber}</b></div>}
+                    (String(team?.teamNumber).startsWith(teamFilter) || teamFilter === "") && <div key={"availableButton" + team?.teamNumber} className={declined ? "availableTeam allianceDecline" : skipped ? "availableTeam allianceTeam allianceSkip" : "availableTeam allianceTeam"} title={declined ? ALLIANCE_DECLINED_TITLE : undefined} onClick={(e) => handleShow(team, declined ? "declined" : "show", e)}><b>{displayTeamNumber}</b></div>}
 
                 {(asArrays?.nextChoice >= asArrays.allianceSelectionOrder?.length || isUnavailableCaptain || skipped || removed) &&
-                    (String(team?.teamNumber).startsWith(teamFilter) || teamFilter === "") && <div key={"availableButtonDisabled" + team?.teamNumber} className={declined ? "availableTeam allianceDecline" : removed ? "availableTeam allianceTeam" : skipped ? "availableTeam allianceTeam allianceSkip" : "availableTeam allianceTeam"} style={removed ? { backgroundColor: "orange", color: "white" } : {}}><b>{displayTeamNumber}</b></div>}
+                    (String(team?.teamNumber).startsWith(teamFilter) || teamFilter === "") && <div key={"availableButtonDisabled" + team?.teamNumber} className={declined ? "availableTeam allianceDecline" : removed ? "availableTeam allianceTeam allianceRemovedTeam" : skipped ? "availableTeam allianceTeam allianceSkip" : "availableTeam allianceTeam"} title={removed ? ALLIANCE_REMOVED_TITLE : declined ? ALLIANCE_DECLINED_TITLE : undefined}><b>{displayTeamNumber}</b></div>}
             </>
         )
     }
     
     return (
         <>
-            <Container fluid>
+            <Container fluid className="gatool-alliance-selection">
                 {selectedEvent && rankings?.ranks?.length > 0 && teamList?.teams?.length > 0 && allianceCount && allianceCount?.count === -1 && <Alert style={{ fontSize: "24px" }}>Please set an alliance count on the Setup Screen.</Alert>}
                 {selectedEvent && rankings?.ranks?.length > 0 && teamList?.teams?.length > 0 && allianceCount && allianceCount?.count > 0 &&
                     <>
@@ -669,7 +686,13 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                     <Col xs={width < 600 ? 12 : inChamps ? 4 : 5}>
                                         <Container fluid className="allianceContainer">
                                             <Row>
-                                                <Col><strong>Teams for Alliance Selection</strong></Col>
+                                                <Col>
+                                                    <strong>Teams for Alliance Selection</strong>
+                                                    <div className="alliance-selection-legend text-muted">
+                                                        <span className="alliance-selection-legend-decline">Red</span> = not eligible to be selected ·{" "}
+                                                        <span className="alliance-selection-legend-removed">Orange</span> = removed from playoffs
+                                                    </div>
+                                                </Col>
                                             </Row>
                                             <Row key={"AvailableTeams"} >
                                                 {availColumns.map((column, index) => {
@@ -703,9 +726,9 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                         return (
                                                             <React.Fragment key={`backupTeam${team.teamNumber}`}>
                                                                 {(asArrays?.nextChoice < asArrays.allianceSelectionOrder?.length && !removed) &&
-                                                                <div className={declined ? "allianceDecline" : "allianceTeam"} onClick={(e) => handleShow(team, declined ? "declined" : "show", e)}><b>{displayTeamNumber}</b></div>}
+                                                                <div className={declined ? "allianceDecline allianceTeam" : "allianceTeam"} title={declined ? ALLIANCE_DECLINED_TITLE : undefined} onClick={(e) => handleShow(team, declined ? "declined" : "show", e)}><b>{displayTeamNumber}</b></div>}
                                                                 {(asArrays?.nextChoice >= asArrays.allianceSelectionOrder?.length || removed) &&
-                                                                    <div className={declined ? "allianceDecline" : "allianceTeam"} style={removed ? { backgroundColor: "orange", color: "white" } : {}}><b>{displayTeamNumber}</b></div>}
+                                                                    <div className={declined ? "allianceDecline allianceTeam" : removed ? "allianceTeam allianceRemovedTeam" : "allianceTeam"} title={removed ? ALLIANCE_REMOVED_TITLE : declined ? ALLIANCE_DECLINED_TITLE : undefined}><b>{displayTeamNumber}</b></div>}
                                                             </React.Fragment>
                                                         )
                                                     })}
@@ -728,7 +751,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                             return (
                                                                 <React.Fragment key={`skippedTeam${team.teamNumber}`}>
                                                                     {(asArrays?.nextChoice < asArrays.allianceSelectionOrder?.length) &&
-                                                                    <div className={declined ? "allianceDecline" : "allianceTeam allianceSkip allianceTeamChoice"} ><b>{displayTeamNumber}</b></div>}
+                                                                    <div className={declined ? "allianceDecline allianceTeam allianceSkip allianceTeamChoice" : "allianceTeam allianceSkip allianceTeamChoice"} title={declined ? ALLIANCE_DECLINED_TITLE : undefined}><b>{displayTeamNumber}</b></div>}
                                                                 </React.Fragment>
                                                             )
                                                         })}
@@ -784,6 +807,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                                                             <div><b>Captain</b></div>
                                                                                             <div key={`${allianceName}captainAvailable`}
                                                                                                 className={captain?.declined ? "captainDecline allianceTeamChoice" : captain?.skipped ? "allianceTeam allianceSkip allianceTeamChoice" : round1?.teamNumber ? "allianceTeam allianceTeamChosen" : "allianceTeam allianceTeamChoice"}
+                                                                                                title={captain?.declined ? ALLIANCE_DECLINED_TITLE : undefined}
                                                                                                 onClick={(e) => handleShow(captain, captain.mode, e)}>
                                                                                                 {captain?.teamNumber ? <b>{remapNumberToString ? remapNumberToString(captain?.teamNumber) : captain?.teamNumber}</b> : <div>TBD</div>}
                                                                                             </div>
@@ -796,7 +820,8 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                                                         <Col xs={12} className={"alliancedrop allianceCaptain"} >
                                                                                             <div><b>Captain</b></div>
                                                                                             <div key={`${allianceName}captainunavailable`}
-                                                                                                className={captain?.declined ? "captainDecline allianceTeamChoice" : captain?.skipped ? "allianceTeam allianceSkip allianceTeamChoice" : round1?.teamNumber ? "allianceTeam allianceTeamChosen" : "allianceTeam allianceTeamChoice"} >
+                                                                                                className={captain?.declined ? "captainDecline allianceTeamChoice" : captain?.skipped ? "allianceTeam allianceSkip allianceTeamChoice" : round1?.teamNumber ? "allianceTeam allianceTeamChosen" : "allianceTeam allianceTeamChoice"}
+                                                                                                title={captain?.declined ? ALLIANCE_DECLINED_TITLE : undefined}>
                                                                                                 {captain?.teamNumber ? <b>{remapNumberToString ? remapNumberToString(captain?.teamNumber) : captain?.teamNumber}</b> : <div>TBD</div>}
                                                                                             </div>
                                                                                         </Col>
@@ -806,7 +831,8 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                                                     <Col xs={inChamps && !ftcMode ? 4 : !inChamps && ftcMode ? 12 : 6} className={(asArrays.allianceSelectionOrder[asArrays?.nextChoice]?.number === allianceNumber) && (asArrays.allianceSelectionOrder[asArrays?.nextChoice]?.round === 1) ? "alliancedrop nextAllianceChoice" : "alliancedrop"}>
                                                                                         <div><b>1<sup>st</sup> pick</b></div>
                                                                                         <div key={`${allianceName}round1`}
-                                                                                            className={round1?.declined ? "allianceDecline allianceTeamChoice" : round1?.teamNumber ? "allianceTeam allianceTeamChosen" : "allianceTeam allianceTeamChoice"}>{round1?.teamNumber ? <b>{remapNumberToString ? remapNumberToString(round1?.teamNumber) : round1?.teamNumber}</b> : <b>TBD</b>}
+                                                                                            className={round1?.declined ? "allianceDecline allianceTeamChoice" : round1?.teamNumber ? "allianceTeam allianceTeamChosen" : "allianceTeam allianceTeamChoice"}
+                                                                                            title={round1?.declined ? ALLIANCE_DECLINED_TITLE : undefined}>{round1?.teamNumber ? <b>{remapNumberToString ? remapNumberToString(round1?.teamNumber) : round1?.teamNumber}</b> : <b>TBD</b>}
                                                                                         </div>
                                                                                     </Col>
 
@@ -814,7 +840,8 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                                                         <Col xs={inChamps && !ftcMode ? 4 : 6} className={(asArrays.allianceSelectionOrder[asArrays?.nextChoice]?.number === allianceNumber) && (asArrays.allianceSelectionOrder[asArrays?.nextChoice]?.round === 2) ? "alliancedrop nextAllianceChoice" : "alliancedrop"}>
                                                                                             <div><b>2<sup>nd</sup> pick</b></div>
                                                                                             <div key={`${allianceName}round2`}
-                                                                                                className={round2?.declined ? "allianceDecline allianceTeamChoice" : round2?.teamNumber ? "allianceTeam allianceTeamChosen" : "allianceTeam allianceTeamChoice"}>{round2?.teamNumber ? <b>{remapNumberToString ? remapNumberToString(round2?.teamNumber) : round2?.teamNumber}</b> : <b>TBD</b>}
+                                                                                                className={round2?.declined ? "allianceDecline allianceTeamChoice" : round2?.teamNumber ? "allianceTeam allianceTeamChosen" : "allianceTeam allianceTeamChoice"}
+                                                                                                title={round2?.declined ? ALLIANCE_DECLINED_TITLE : undefined}>{round2?.teamNumber ? <b>{remapNumberToString ? remapNumberToString(round2?.teamNumber) : round2?.teamNumber}</b> : <b>TBD</b>}
                                                                                             </div>
                                                                                         </Col>}
 
@@ -823,7 +850,8 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                                                         <Col xs={inChamps ? 4 : 6} className={(asArrays.allianceSelectionOrder[asArrays?.nextChoice]?.number === allianceNumber) && (asArrays.allianceSelectionOrder[asArrays?.nextChoice]?.round === 3) ? "alliancedrop nextAllianceChoice" : "alliancedrop"}>
                                                                                             <div><b>3<sup>rd</sup> pick</b></div>
                                                                                             <div key={`${allianceName}round3`}
-                                                                                                className={round3?.declined ? "allianceDecline allianceTeamChoice" : round3?.teamNumber ? "allianceTeam allianceTeamChosen" : "allianceTeam allianceTeamChoice"}>{round3?.teamNumber ? <b>{remapNumberToString ? remapNumberToString(round3?.teamNumber) : round3?.teamNumber}</b> : <b>TBD</b>}
+                                                                                                className={round3?.declined ? "allianceDecline allianceTeamChoice" : round3?.teamNumber ? "allianceTeam allianceTeamChosen" : "allianceTeam allianceTeamChoice"}
+                                                                                                title={round3?.declined ? ALLIANCE_DECLINED_TITLE : undefined}>{round3?.teamNumber ? <b>{remapNumberToString ? remapNumberToString(round3?.teamNumber) : round3?.teamNumber}</b> : <b>TBD</b>}
                                                                                             </div>
                                                                                         </Col>}
                                                                                 </Row>
@@ -857,9 +885,9 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                         return (
                                                             <React.Fragment key={`backupTeam${team.teamNumber}`}>
                                                                 {(asArrays?.nextChoice < asArrays.allianceSelectionOrder?.length && !removed) &&
-                                                                <div className={declined ? "allianceDecline" : "allianceTeam"} onClick={(e) => handleShow(team, declined ? "declined" : "show", e)}><b>{displayTeamNumber}</b></div>}
+                                                                <div className={declined ? "allianceDecline allianceTeam" : "allianceTeam"} title={declined ? ALLIANCE_DECLINED_TITLE : undefined} onClick={(e) => handleShow(team, declined ? "declined" : "show", e)}><b>{displayTeamNumber}</b></div>}
                                                                 {(asArrays?.nextChoice >= asArrays.allianceSelectionOrder?.length || removed) &&
-                                                                    <div className={declined ? "allianceDecline" : "allianceTeam"} style={removed ? { backgroundColor: "orange", color: "white" } : {}}><b>{displayTeamNumber}</b></div>}
+                                                                    <div className={declined ? "allianceDecline allianceTeam" : removed ? "allianceTeam allianceRemovedTeam" : "allianceTeam"} title={removed ? ALLIANCE_REMOVED_TITLE : declined ? ALLIANCE_DECLINED_TITLE : undefined}><b>{displayTeamNumber}</b></div>}
                                                             </React.Fragment>
                                                         )
                                                     })}
@@ -882,7 +910,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                             return (
                                                                 <React.Fragment key={`skippedTeam${team.teamNumber}`}>
                                                                     {(asArrays?.nextChoice < asArrays.allianceSelectionOrder?.length) &&
-                                                                    <div className={declined ? "allianceDecline" : "allianceTeam allianceSkip allianceTeamChoice"} ><b>{displayTeamNumber}</b></div>}
+                                                                    <div className={declined ? "allianceDecline allianceTeam allianceSkip allianceTeamChoice" : "allianceTeam allianceSkip allianceTeamChoice"} title={declined ? ALLIANCE_DECLINED_TITLE : undefined}><b>{displayTeamNumber}</b></div>}
                                                                 </React.Fragment>
                                                             )
                                                         })}

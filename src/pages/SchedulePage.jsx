@@ -949,7 +949,7 @@ function SchedulePage({
     <Container fluid>
       {!selectedEvent && (
         <div>
-          <Alert variant="warning">
+          <Alert variant="warning" className="gatool-awaiting-message">
             You need to select an event before you can see anything here.
           </Alert>
         </div>
@@ -960,7 +960,7 @@ function SchedulePage({
           qualSchedule?.schedule?.schedule?.length === 0) &&
         (!playoffSchedule || playoffSchedule?.schedule?.length === 0) && (
           <div>
-            <Alert variant="warning">
+            <Alert variant="warning" className="gatool-awaiting-message">
               {(!practiceSchedule ||
                 practiceSchedule?.schedule?.length === 0 ||
                 practiceSchedule?.schedule?.schedule?.length === 0) &&
@@ -1023,8 +1023,7 @@ function SchedulePage({
                             {!playoffOnly && (
                               <Col
                                 xs={5}
-                                className={"leftTable"}
-                                style={{ cursor: "pointer", color: "darkblue" }}
+                                className="leftTable gatool-tap-link"
                                 onClick={clickLoadPractice}
                               >
                                 <b>
@@ -1042,8 +1041,7 @@ function SchedulePage({
                             {playoffOnly && showPlayoffMessage && (
                               <Col
                                 xs={5}
-                                className={"leftTable"}
-                                style={{ cursor: "pointer", color: "darkblue" }}
+                                className="leftTable gatool-tap-link"
                                 onClick={clickLoadOfflinePlayoffs}
                               >
                                 <b>
@@ -1113,8 +1111,7 @@ function SchedulePage({
                         {!selectedEvent?.value?.code.includes("OFFLINE") && (
                           <Col
                             xs={6}
-                            className={"leftTable"}
-                            style={{ cursor: "pointer", color: "darkblue" }}
+                            className="leftTable gatool-tap-link"
                             onClick={clickLoadPractice}
                           >
                             <b>
@@ -1157,8 +1154,7 @@ function SchedulePage({
                         xs={
                           selectedEvent?.value?.code.includes("OFFLINE") ? 4 : 7
                         }
-                        className={"leftTable"}
-                        style={{ cursor: "pointer", color: "darkblue" }}
+                        className="leftTable gatool-tap-link"
                         onClick={clickRemovePractice}
                       >
                         {selectedEvent?.value?.code.includes("OFFLINE") && (
@@ -1217,8 +1213,7 @@ function SchedulePage({
                       </Col>
                       <Col
                         xs={3}
-                        className={"leftTable"}
-                        style={{ cursor: "pointer", color: "darkblue" }}
+                        className="leftTable gatool-tap-link"
                         onClick={clickRemovePractice}
                       >
                         {selectedEvent?.value?.code.includes("OFFLINE") && (
@@ -1248,8 +1243,7 @@ function SchedulePage({
                       {showPlayoffMessage && (
                         <Col
                           xs={3}
-                          className={"leftTable"}
-                          style={{ cursor: "pointer", color: "darkblue" }}
+                          className="leftTable gatool-tap-link"
                           onClick={clickLoadOfflinePlayoffs}
                         >
                           <b>
@@ -1264,8 +1258,7 @@ function SchedulePage({
                       {!showPlayoffMessage && (
                         <Col
                           xs={3}
-                          className={"leftTable"}
-                          style={{ color: "darkblue" }}
+                          className="leftTable gatool-tap-link-text"
                         >
                           <b>
                             Please set the Alliance Count before uploading a
@@ -1304,7 +1297,13 @@ function SchedulePage({
             offlinePlayoffSchedule)) && (
           <div>
             <h4>{eventLabel}</h4>
-            <Table responsive striped bordered size="sm">
+            <Table
+              responsive
+              striped
+              bordered
+              size="sm"
+              className="gatool-schedule-table"
+            >
               <thead className="thead-default">
                 <tr>
                   <th className="col2">
@@ -1891,7 +1890,13 @@ function SchedulePage({
           </Button>
         </Modal.Footer>
       </Modal>
-      <Modal fullscreen={true} show={showScores} onHide={handleCloseScores}>
+      <Modal
+        fullscreen={true}
+        show={showScores}
+        onHide={handleCloseScores}
+        keyboard
+        contentClassName="gatool-score-details-modal"
+      >
         <Modal.Header
           className={"promoteBackup"}
           closeVariant={"white"}
@@ -1904,6 +1909,7 @@ function SchedulePage({
         <Modal.Body>
           <Container fluid>
             <Table
+              className="gatool-score-details-table"
               style={{ margin: "0px auto", overflowY: "scroll" }}
               responsive
               striped
@@ -1927,27 +1933,27 @@ function SchedulePage({
                   <td>Winner:</td>
                   <td colSpan={2}>
                     {scoresMatch?.winner?.winner === "red" ? (
-                      <span style={{ color: "red" }}>
+                      <span className="gatool-score-winner-red">
                         <b>Red Alliance</b>
                       </span>
                     ) : scoresMatch?.winner?.winner === "blue" ? (
-                      <span style={{ color: "blue" }}>
+                      <span className="gatool-score-winner-blue">
                         <b>Blue Alliance</b>
                       </span>
                     ) : scoresMatch?.winner?.tieWinner === "red" ? (
-                      <span style={{ color: "red" }}>
+                      <span className="gatool-score-winner-red">
                         <b>{scoresMatch?.winner?.tieDetail}</b>
                       </span>
                     ) : scoresMatch?.winner?.tieWinner === "blue" ? (
-                      <span style={{ color: "blue" }}>
+                      <span className="gatool-score-winner-blue">
                         <b>{scoresMatch?.winner?.tieDetail}</b>
                       </span>
                     ) : scoresMatch?.winner?.tieWinner === "tie" ? (
-                      <span style={{ color: "green" }}>
+                      <span className="gatool-score-winner-tie">
                         <b>{scoresMatch?.winner?.tieDetail}</b>
                       </span>
                     ) : (
-                      <span style={{ color: "green" }}>
+                      <span className="gatool-score-winner-tie">
                         <b>TIE</b>
                       </span>
                     )}
@@ -2003,8 +2009,8 @@ function SchedulePage({
             </Table>
           </Container>
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseScores}>
+        <Modal.Footer className="gatool-score-details-footer">
+          <Button variant="primary" type="button" onClick={handleCloseScores}>
             Done
           </Button>
         </Modal.Footer>
