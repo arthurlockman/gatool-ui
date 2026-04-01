@@ -134,7 +134,7 @@ function CheatsheetPage({
       {!ftcMode && (
         <>
           <img
-            src="/cheatsheet/rebuilt-cheat-sheet-01102026.png"
+            src="/cheatsheet/rebuilt-cheat-sheet-04012026.png"
             width="100%"
             alt="Cheatsheet"
           ></img>
@@ -144,7 +144,7 @@ function CheatsheetPage({
               <span
                 className="gatool-tap-link"
                 onClick={() => {
-                  downloadPDF("/cheatsheet/rebuilt-cheat-sheet-01102026.pdf");
+                  downloadPDF("/cheatsheet/rebuilt-cheat-sheet-04012026.pdf");
                 }}
               >
                 Download the Cheat Sheet
