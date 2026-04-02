@@ -1292,7 +1292,7 @@ function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSor
                         {resetNotes && <li>Team Notes (both Announce Screen and Team Data Screen notes)</li>}
                     </ul>
                     <p>Other local updates {resetNotes ? "(team names, organization, etc.)" : "(team names, organization, notes, etc.)"} will be preserved.</p>
-                    <Form.Group style={{ backgroundColor: "#d4edda", padding: "10px", borderRadius: "4px" }}>
+                    <Form.Group className="gatool-reset-notes-option" style={{ padding: "10px", borderRadius: "4px" }}>
                         <Form.Check
                             type="checkbox"
                             id="resetNotes"

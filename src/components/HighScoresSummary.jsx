@@ -62,6 +62,7 @@ function HighScoresSummary({
       sections.push({
         label: "World",
         bg: "#f2dede",
+        tone: "world",
         penaltyFree,
         overall,
         allianceContribution,
@@ -90,6 +91,7 @@ function HighScoresSummary({
       sections.push({
         label: regionCode ? `Region ${regionCode}` : "Region",
         bg: "#fff5ce",
+        tone: "district",
         penaltyFree,
         overall,
         allianceContribution,
@@ -120,6 +122,7 @@ function HighScoresSummary({
       sections.push({
         label: leagueLabel,
         bg: "#eff9ee",
+        tone: "league",
         penaltyFree,
         overall,
         allianceContribution,
@@ -153,6 +156,7 @@ function HighScoresSummary({
       sections.push({
         label: districtLabel,
         bg: "#fff5ce",
+        tone: "district",
         penaltyFree,
         overall,
         allianceContribution,
@@ -196,19 +200,19 @@ function HighScoresSummary({
   const renderColumn = (sec) => (
     <Col key={sec.label} xs={12} md={colSize}>
       <div
-        className="border rounded p-2 h-100 gatool-highscores-summary-panel"
+        className={`border rounded p-2 h-100 gatool-highscores-summary-panel gatool-highscores-summary--${sec.tone}`}
         style={{ fontSize: "0.9rem", backgroundColor: sec.bg }}
       >
         <div className="fw-bold mb-2">{sec.label}</div>
-        <div style={scoreBlockStyle(sec, true)}>
+        <div className="gatool-highscores-summary-block" style={scoreBlockStyle(sec, true)}>
           <div className="text-muted small">No penalties to winner</div>
           {renderEntry(sec.penaltyFree)}
         </div>
-        <div style={scoreBlockStyle(sec, false)}>
+        <div className="gatool-highscores-summary-block" style={scoreBlockStyle(sec, false)}>
           <div className="text-muted small">Incl. penalties</div>
           {renderEntry(sec.overall)}
         </div>
-        <div style={scoreBlockStyle(sec, false)}>
+        <div className="gatool-highscores-summary-block" style={scoreBlockStyle(sec, false)}>
           <div className="text-muted small">Score minus penalties</div>
           {renderEntry(sec.allianceContribution)}
         </div>
@@ -219,11 +223,12 @@ function HighScoresSummary({
   // FRC Regionals (World only): show as three columns (No penalties to winner | Incl. penalties | Score minus penalties)
   if (isFRCRegionalOnly) {
     const sec = sections[0];
+    const toneClass = `gatool-highscores-summary--${sec.tone}`;
     return (
       <Row className="mb-2">
         <Col xs={12} md={4}>
           <div
-            className="border rounded p-2 h-100 gatool-highscores-summary-panel"
+            className={`border rounded p-2 h-100 gatool-highscores-summary-panel ${toneClass}`}
             style={{ fontSize: "0.9rem", backgroundColor: sec.bg }}
           >
             <div className="fw-bold mb-2">{sec.label} — No penalties to winner</div>
@@ -232,7 +237,7 @@ function HighScoresSummary({
         </Col>
         <Col xs={12} md={4}>
           <div
-            className="border rounded p-2 h-100 gatool-highscores-summary-panel"
+            className={`border rounded p-2 h-100 gatool-highscores-summary-panel ${toneClass}`}
             style={{ fontSize: "0.9rem", backgroundColor: sec.bg }}
           >
             <div className="fw-bold mb-2">{sec.label} — Incl. penalties</div>
@@ -241,7 +246,7 @@ function HighScoresSummary({
         </Col>
         <Col xs={12} md={4}>
           <div
-            className="border rounded p-2 h-100 gatool-highscores-summary-panel"
+            className={`border rounded p-2 h-100 gatool-highscores-summary-panel ${toneClass}`}
             style={{ fontSize: "0.9rem", backgroundColor: sec.bg }}
           >
             <div className="fw-bold mb-2">{sec.label} — Score minus penalties</div>

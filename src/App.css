@@ -163,14 +163,15 @@ td {
   align-items: center;
 }
 
+/* Same alliance fills as Announce (Announce.jsx announceBackground) */
 .redAlliancePlayByPlay {
   border: 1px solid #ccc;
   align-content: center;
   text-align: center;
-  background-color: red;
+  background-color: #f7b3b4;
   font-size: x-large;
   font-weight: bold;
-  color: white;
+  color: #1a1a1a;
   padding: 4px;
 }
 
@@ -178,10 +179,10 @@ td {
   border: 1px solid #ccc;
   align-content: center;
   text-align: center;
-  background-color: blue;
+  background-color: #98b4f4;
   font-size: x-large;
   font-weight: bold;
-  color: white;
+  color: #1a1a1a;
   padding: 4px;
 }
 
@@ -770,6 +771,13 @@ td {
   background-color: #d9edf7;
 }
 
+/* BottomButtons event high score: same event-blue as Stats (light theme) */
+:root:not([data-bs-theme="dark"]) .gatool-highscores-summary-panel.gatool-highscores-summary--event {
+  background-color: #d9edf7;
+  border-color: #9acfea;
+  color: #31708f;
+}
+
 .statsMatchHeader {
   font-weight: bold;
   font-size: 1.1em;
@@ -842,15 +850,21 @@ td {
   line-height: 1.35;
 }
 
+/* Match Setup “Tap to refresh Schedule” (btn-success / --bs-success) */
 [data-bs-theme="dark"] .teamTableHighlight {
-  background-color: rgb(167, 230, 178) !important;
-  color: #052e16 !important;
-  border-color: rgba(34, 197, 94, 0.55);
+  background-color: var(--bs-success) !important;
+  color: #fff !important;
+  border-color: #146c43 !important;
 }
 
 .teamTableButtonHighlight {
   background-color: rgb(48, 171, 0) !important;
   color: white !important;
+}
+
+[data-bs-theme="dark"] .teamTableButtonHighlight {
+  background-color: var(--bs-success) !important;
+  color: #fff !important;
 }
 
 .teamDataNumber {
@@ -869,14 +883,14 @@ td {
   background: #f2fff1;
 }
 
-/* Dark mode: single fill for every “local edit” control (inputs + Quill) */
+/* Dark mode: local-edit fields — same green family as btn-success (#198754), not lime mint */
 [data-bs-theme="dark"] {
-  --gatool-local-edit-surface: #d1fae5;
-  --gatool-local-edit-border: #10b981;
-  --gatool-local-edit-text: #0f172a;
+  --gatool-local-edit-surface: #1a3d2f;
+  --gatool-local-edit-border: #198754;
+  --gatool-local-edit-text: #f1faf4;
 }
 
-/* Light-background “local edit” fields: Bootstrap dark theme leaves light text → unreadable on #f2fff1 */
+/* Local edit fields: dark success-tinted surface + light text (Bootstrap default body text would fail) */
 [data-bs-theme="dark"] .form-control.formHighlight,
 [data-bs-theme="dark"] textarea.form-control.formHighlight {
   color: var(--gatool-local-edit-text) !important;
@@ -887,12 +901,12 @@ td {
 [data-bs-theme="dark"] .form-control.formHighlight:focus {
   color: var(--gatool-local-edit-text) !important;
   background-color: var(--gatool-local-edit-surface) !important;
-  border-color: #059669 !important;
-  box-shadow: 0 0 0 0.2rem rgba(16, 185, 129, 0.35);
+  border-color: #157347 !important;
+  box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.35);
 }
 
 [data-bs-theme="dark"] .form-control.formHighlight::placeholder {
-  color: #475569 !important;
+  color: rgba(241, 250, 244, 0.45) !important;
   opacity: 1;
 }
 
@@ -908,7 +922,7 @@ td {
 }
 
 [data-bs-theme="dark"] .quill.formHighlight .ql-editor.ql-blank::before {
-  color: #64748b !important;
+  color: rgba(241, 250, 244, 0.4) !important;
 }
 
 [data-bs-theme="dark"] .quill.formHighlight .ql-toolbar {
@@ -917,11 +931,11 @@ td {
 }
 
 [data-bs-theme="dark"] .quill.formHighlight .ql-toolbar .ql-stroke {
-  stroke: #334155 !important;
+  stroke: #cbd5e1 !important;
 }
 
 [data-bs-theme="dark"] .quill.formHighlight .ql-toolbar .ql-fill {
-  fill: #334155 !important;
+  fill: #cbd5e1 !important;
 }
 
 [data-bs-theme="dark"] .quill.formHighlight .ql-toolbar .ql-picker-label {
@@ -1778,37 +1792,157 @@ body {
   background-color: var(--bs-tertiary-bg) !important;
 }
 
-/* Stats high-score tables (pastel cells + Bootstrap table vars) */
-[data-bs-theme="dark"] .gatool-highScores-Table,
-[data-bs-theme="dark"] .gatool-highScores-Table td,
-[data-bs-theme="dark"] .gatool-highScores-Table th {
-  color: #1c1917 !important;
+/* Stats high-score tables: dark tinted cells + light text (overrides inline pastel backgrounds) */
+[data-bs-theme="dark"] .gatool-worldHighScores {
+  --gatool-stats-cell-tint: rgba(200, 85, 85, 0.42);
+  border-color: rgba(248, 113, 113, 0.55);
+  color: #fef2f2 !important;
+  background-color: var(--bs-body-bg);
 }
 
-[data-bs-theme="dark"] .gatool-worldHighScores {
-  color: #5c2a2a !important;
+[data-bs-theme="dark"] .gatool-worldHighScores td,
+[data-bs-theme="dark"] .gatool-worldHighScores th {
+  background: linear-gradient(
+      var(--gatool-stats-cell-tint),
+      var(--gatool-stats-cell-tint)
+    )
+    var(--bs-body-bg) !important;
+  color: #fef2f2 !important;
+  border-color: rgba(252, 165, 165, 0.2);
 }
 
 [data-bs-theme="dark"] .gatool-districtHighScores {
-  color: #5c4a00 !important;
+  --gatool-stats-cell-tint: rgba(217, 119, 6, 0.36);
+  border-color: rgba(251, 191, 36, 0.5);
+  color: #fffbeb !important;
+  background-color: var(--bs-body-bg);
+}
+
+[data-bs-theme="dark"] .gatool-districtHighScores td,
+[data-bs-theme="dark"] .gatool-districtHighScores th {
+  background: linear-gradient(
+      var(--gatool-stats-cell-tint),
+      var(--gatool-stats-cell-tint)
+    )
+    var(--bs-body-bg) !important;
+  color: #fffbeb !important;
+  border-color: rgba(253, 224, 71, 0.18);
 }
 
 [data-bs-theme="dark"] .gatool-eventHighScores {
-  color: #164e63 !important;
+  --gatool-stats-cell-tint: rgba(56, 146, 196, 0.4);
+  border-color: rgba(125, 211, 252, 0.45);
+  color: #f0f9ff !important;
+  background-color: var(--bs-body-bg);
 }
 
-/* High score summary strips on Announce / Play-by-Play */
-[data-bs-theme="dark"] .gatool-highscores-summary-panel {
-  color: #1c1917 !important;
+[data-bs-theme="dark"] .gatool-eventHighScores td,
+[data-bs-theme="dark"] .gatool-eventHighScores th {
+  background: linear-gradient(
+      var(--gatool-stats-cell-tint),
+      var(--gatool-stats-cell-tint)
+    )
+    var(--bs-body-bg) !important;
+  color: #f0f9ff !important;
+  border-color: rgba(186, 230, 253, 0.2);
 }
 
-[data-bs-theme="dark"] .gatool-highscores-summary-panel .text-muted {
-  color: #44403c !important;
+[data-bs-theme="dark"] .gatool-worldHighScores i,
+[data-bs-theme="dark"] .gatool-districtHighScores i,
+[data-bs-theme="dark"] .gatool-eventHighScores i {
+  color: rgba(255, 255, 255, 0.85) !important;
 }
 
-/* Teams table: locally edited cells (light green fill) */
-[data-bs-theme="dark"] .gatool-teamdata-local-edit {
-  color: #0f172a !important;
+/* High score summary panels (Announce / Play-by-Play): match Stats page table tints + light text */
+[data-bs-theme="dark"] .gatool-highscores-summary-panel.gatool-highscores-summary--world {
+  background: linear-gradient(
+      rgba(200, 85, 85, 0.42),
+      rgba(200, 85, 85, 0.42)
+    )
+    var(--bs-body-bg) !important;
+  color: #fef2f2 !important;
+  border-color: rgba(248, 113, 113, 0.55) !important;
+}
+
+[data-bs-theme="dark"] .gatool-highscores-summary-panel.gatool-highscores-summary--world .text-muted {
+  color: rgba(254, 242, 242, 0.75) !important;
+}
+
+[data-bs-theme="dark"] .gatool-highscores-summary-panel.gatool-highscores-summary--world .gatool-highscores-summary-block {
+  border-top-color: rgba(252, 165, 165, 0.35) !important;
+}
+
+[data-bs-theme="dark"] .gatool-highscores-summary-panel.gatool-highscores-summary--district {
+  background: linear-gradient(
+      rgba(217, 119, 6, 0.36),
+      rgba(217, 119, 6, 0.36)
+    )
+    var(--bs-body-bg) !important;
+  color: #fffbeb !important;
+  border-color: rgba(251, 191, 36, 0.5) !important;
+}
+
+[data-bs-theme="dark"] .gatool-highscores-summary-panel.gatool-highscores-summary--district .text-muted {
+  color: rgba(255, 251, 235, 0.72) !important;
+}
+
+[data-bs-theme="dark"] .gatool-highscores-summary-panel.gatool-highscores-summary--district .gatool-highscores-summary-block {
+  border-top-color: rgba(253, 224, 71, 0.28) !important;
+}
+
+/* FTC league column: light mint → dark success tint (distinct from region/district amber) */
+[data-bs-theme="dark"] .gatool-highscores-summary-panel.gatool-highscores-summary--league {
+  background: linear-gradient(
+      rgba(25, 135, 84, 0.38),
+      rgba(25, 135, 84, 0.38)
+    )
+    var(--bs-body-bg) !important;
+  color: #ecfdf5 !important;
+  border-color: rgba(52, 211, 153, 0.5) !important;
+}
+
+[data-bs-theme="dark"] .gatool-highscores-summary-panel.gatool-highscores-summary--league .text-muted {
+  color: rgba(236, 253, 245, 0.72) !important;
+}
+
+[data-bs-theme="dark"] .gatool-highscores-summary-panel.gatool-highscores-summary--league .gatool-highscores-summary-block {
+  border-top-color: rgba(52, 211, 153, 0.35) !important;
+}
+
+/* Event high score strip (BottomButtons): same blue family as Stats event table */
+[data-bs-theme="dark"] .gatool-highscores-summary-panel.gatool-highscores-summary--event {
+  background: linear-gradient(
+      rgba(56, 146, 196, 0.4),
+      rgba(56, 146, 196, 0.4)
+    )
+    var(--bs-body-bg) !important;
+  color: #f0f9ff !important;
+  border-color: rgba(125, 211, 252, 0.45) !important;
+}
+
+/* Teams table: override inline rgb(195,244,199) — same success green as refresh Schedule */
+[data-bs-theme="dark"] td.gatool-teamdata-local-edit,
+[data-bs-theme="dark"] .teamNotes.gatool-teamdata-local-edit {
+  background: linear-gradient(
+      rgba(25, 135, 84, 0.5),
+      rgba(25, 135, 84, 0.5)
+    )
+    var(--bs-body-bg) !important;
+  color: #f1faf4 !important;
+}
+
+/* Team page reset modal: was inline #d4edda */
+.gatool-reset-notes-option {
+  background-color: #d4edda;
+}
+
+[data-bs-theme="dark"] .gatool-reset-notes-option {
+  background: linear-gradient(
+      rgba(25, 135, 84, 0.4),
+      rgba(25, 135, 84, 0.4)
+    )
+    var(--bs-modal-bg, var(--bs-body-bg));
+  border: 1px solid #198754;
 }
 
 /* Awards grid */
@@ -1884,13 +2018,57 @@ body {
   color: #f8fafc;
 }
 
-/* Play-by-Play: score strip contrast */
-[data-bs-theme="dark"] .redAlliancePlayByPlay .playByPlayRobotName {
+/* Play-by-Play: same dark alliance tints + text as Announce */
+[data-bs-theme="dark"] td.redAlliancePlayByPlay {
+  background-color: rgba(95, 26, 32, 0.92) !important;
+  color: #f1f5f9 !important;
+  border-color: rgba(252, 165, 165, 0.35);
+}
+
+[data-bs-theme="dark"] td.blueAlliancePlayByPlay {
+  background-color: rgba(28, 52, 108, 0.92) !important;
+  color: #f1f5f9 !important;
+  border-color: rgba(147, 197, 253, 0.35);
+}
+
+[data-bs-theme="dark"] .redAlliancePlayByPlay .playByPlayRobotName,
+[data-bs-theme="dark"] .blueAlliancePlayByPlay .playByPlayRobotName {
   color: #fef08a !important;
 }
 
-[data-bs-theme="dark"] .redAlliancePlayByPlay .playByPlayAlliance {
+[data-bs-theme="dark"] .redAlliancePlayByPlay .playByPlayAlliance,
+[data-bs-theme="dark"] .blueAlliancePlayByPlay .playByPlayAlliance {
   color: #fde047 !important;
+}
+
+[data-bs-theme="dark"] .redAlliancePlayByPlay .playByPlayTeamName,
+[data-bs-theme="dark"] .blueAlliancePlayByPlay .playByPlayTeamName,
+[data-bs-theme="dark"] .redAlliancePlayByPlay .playByPlayOrganization,
+[data-bs-theme="dark"] .blueAlliancePlayByPlay .playByPlayOrganization,
+[data-bs-theme="dark"] .redAlliancePlayByPlay .playByPlayCity,
+[data-bs-theme="dark"] .blueAlliancePlayByPlay .playByPlayCity,
+[data-bs-theme="dark"] .redAlliancePlayByPlay .mottoes,
+[data-bs-theme="dark"] .blueAlliancePlayByPlay .mottoes,
+[data-bs-theme="dark"] .redAlliancePlayByPlay .playByPlayteamNumber,
+[data-bs-theme="dark"] .blueAlliancePlayByPlay .playByPlayteamNumber {
+  color: #f8fafc !important;
+}
+
+[data-bs-theme="dark"] .redAlliancePlayByPlay .champsQualified,
+[data-bs-theme="dark"] .blueAlliancePlayByPlay .champsQualified {
+  color: #fde047 !important;
+}
+
+[data-bs-theme="dark"] .redAlliancePlayByPlay .playByPlaysayNumber,
+[data-bs-theme="dark"] .blueAlliancePlayByPlay .playByPlaysayNumber,
+[data-bs-theme="dark"] .redAlliancePlayByPlay .playByPlayWinLossTie,
+[data-bs-theme="dark"] .blueAlliancePlayByPlay .playByPlayWinLossTie {
+  color: #e2e8f0 !important;
+}
+
+[data-bs-theme="dark"] .redAlliancePlayByPlay .tbd,
+[data-bs-theme="dark"] .blueAlliancePlayByPlay .tbd {
+  color: #cbd5e1 !important;
 }
 
 /* Emcee / PlayoffDetails: alliance colors on dark page bg (deeper / more saturated than red-400 / blue-400) */
