@@ -51,10 +51,12 @@ function BottomButtons({
                 </Col>}
 
                 {hasEventHighScore && <Col xs={matchDetails?.tournamentLevel.toLowerCase() !== "playoff" ? "8" : "3"} lg={matchDetails?.tournamentLevel.toLowerCase() !== "playoff" ? "6" : "2"}>
-                    <p><b>{highScoreMode ? 'Event' : matchDetails?.tournamentLevel.toLowerCase() === "playoff" ? 'Playoffs' : 'Quals'} High Score: {eventHighScore?.score}<br />
-                        in {eventHighScore?.matchName}<br />
-                        ({eventHighScore?.allianceMembers})</b>
-                    </p>
+                    <div className="border rounded p-2 h-100 gatool-highscores-summary-panel gatool-highscores-summary--event">
+                        <p className="mb-0"><b>{highScoreMode ? 'Event' : matchDetails?.tournamentLevel.toLowerCase() === "playoff" ? 'Playoffs' : 'Quals'} High Score: {eventHighScore?.score}<br />
+                            in {eventHighScore?.matchName}<br />
+                            ({eventHighScore?.allianceMembers})</b>
+                        </p>
+                    </div>
                 </Col>}
 
                 {matchDetails?.tournamentLevel.toLowerCase() !== "playoff" && !hasEventHighScore && (

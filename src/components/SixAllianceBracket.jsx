@@ -720,7 +720,7 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 	useHotkeys('left', () => previousMatch(), { scopes: 'matchNavigation' });
 
 	return (
-		<div {...swipeHandlers} style={{
+		<div className="gatool-playoff-bracket" {...swipeHandlers} style={{
 			"width": "100%"
 		}}>
 			{!matches && <div>

@@ -94,7 +94,7 @@ function TwoAllianceBracket({ nextMatch, previousMatch, getSchedule, useSwipe, u
 	const WHITE = "#FFFFFF";
 
 	return (
-		<div style={{
+		<div className="gatool-playoff-bracket" style={{
 			"width": "100%"
 		}} {...swipeHandlers}>
 			{/* <?xml version="1.0" encoding="utf-8"?> */}
