@@ -2071,6 +2071,92 @@ body {
   color: #cbd5e1 !important;
 }
 
+/* Playoff bracket SVGs (8 / 6 / 4 / 2 alliance): dark canvas, column rails, connector lines, labels */
+[data-bs-theme="dark"] .gatool-playoff-bracket svg g#background rect[fill="#FFFFFF"],
+[data-bs-theme="dark"] .gatool-playoff-bracket svg g#background rect[fill="#fff"] {
+  fill: #1a1b20 !important;
+}
+
+[data-bs-theme="dark"] .gatool-playoff-bracket svg g#background rect[fill="#DBDAD9"],
+[data-bs-theme="dark"] .gatool-playoff-bracket svg g#background rect[fill="#d9d8d7"] {
+  fill: #383b45 !important;
+}
+
+[data-bs-theme="dark"] .gatool-playoff-bracket svg g#background polyline[stroke="#000000"],
+[data-bs-theme="dark"] .gatool-playoff-bracket svg g#background polyline[stroke="#000"],
+[data-bs-theme="dark"] .gatool-playoff-bracket svg g#background line[stroke="#000000"],
+[data-bs-theme="dark"] .gatool-playoff-bracket svg g#background line[stroke="#000"] {
+  stroke: #94a3b8 !important;
+}
+
+[data-bs-theme="dark"] .gatool-playoff-bracket svg g#background line[stroke="#8E8E8E"],
+[data-bs-theme="dark"] .gatool-playoff-bracket svg g#background line[stroke="#8e8e8e"],
+[data-bs-theme="dark"] .gatool-playoff-bracket svg g#background line[stroke="#8c8c8c"] {
+  stroke: #64748b !important;
+}
+
+[data-bs-theme="dark"] .gatool-playoff-bracket svg g#background text,
+[data-bs-theme="dark"] .gatool-playoff-bracket svg g#background tspan {
+  fill: #e2e8f0 !important;
+}
+
+[data-bs-theme="dark"] .gatool-playoff-bracket svg path#finalsBackground {
+  fill: #3d404d !important;
+  stroke: #94a3b8 !important;
+}
+
+[data-bs-theme="dark"] .gatool-playoff-bracket svg g[id^="match"] > g > rect[fill="#000000"],
+[data-bs-theme="dark"] .gatool-playoff-bracket svg g#finalsContainer > rect[fill="#000000"] {
+  fill: #252932 !important;
+}
+
+/* Dark mode only: saturated bracket red/blue (light theme keeps SVG #FF0000 / #0000FF) */
+[data-bs-theme="dark"] .gatool-playoff-bracket svg polygon[fill="#FF0000"],
+[data-bs-theme="dark"] .gatool-playoff-bracket svg polygon[fill="#ff0000"] {
+  fill: #ef4444 !important;
+}
+
+[data-bs-theme="dark"] .gatool-playoff-bracket svg polygon[fill="#0000FF"],
+[data-bs-theme="dark"] .gatool-playoff-bracket svg polygon[fill="#0000ff"] {
+  fill: #3b82f6 !important;
+}
+
+[data-bs-theme="dark"] .gatool-playoff-bracket svg text[id^="finalsM"][id$="Scores"] tspan[fill="#0000FF"],
+[data-bs-theme="dark"] .gatool-playoff-bracket svg text[id^="finalsM"][id$="Scores"] tspan[fill="#0000ff"] {
+  fill: #3b82f6 !important;
+}
+
+[data-bs-theme="dark"] .gatool-playoff-bracket svg text[id^="finalsM"][id$="Scores"] tspan[fill="#FF0000"],
+[data-bs-theme="dark"] .gatool-playoff-bracket svg text[id^="finalsM"][id$="Scores"] tspan[fill="#ff0000"] {
+  fill: #ef4444 !important;
+}
+
+[data-bs-theme="dark"] .gatool-playoff-bracket svg text[id^="finalsM"][id$="Scores"] tspan[fill="#09BA48"],
+[data-bs-theme="dark"] .gatool-playoff-bracket svg text[id^="finalsM"][id$="Scores"] tspan[fill="#09ba48"] {
+  fill: #86efac !important;
+}
+
+[data-bs-theme="dark"] .gatool-playoff-bracket svg circle[id^="winnerMatch"][id$="Dot"][fill="#0000FF"],
+[data-bs-theme="dark"] .gatool-playoff-bracket svg circle[id^="winnerMatch"][id$="Dot"][fill="#0000ff"] {
+  fill: #2563eb !important;
+  stroke: #bfdbfe !important;
+  stroke-width: 2px !important;
+}
+
+[data-bs-theme="dark"] .gatool-playoff-bracket svg circle[id^="winnerMatch"][id$="Dot"][fill="#FF0000"],
+[data-bs-theme="dark"] .gatool-playoff-bracket svg circle[id^="winnerMatch"][id$="Dot"][fill="#ff0000"] {
+  fill: #dc2626 !important;
+  stroke: #fecaca !important;
+  stroke-width: 2px !important;
+}
+
+[data-bs-theme="dark"] .gatool-playoff-bracket svg circle[id^="winnerMatch"][id$="Dot"][fill="#09BA48"],
+[data-bs-theme="dark"] .gatool-playoff-bracket svg circle[id^="winnerMatch"][id$="Dot"][fill="#09ba48"] {
+  fill: #4ade80 !important;
+  stroke: #bbf7d0 !important;
+  stroke-width: 2px !important;
+}
+
 /* Emcee / PlayoffDetails: alliance colors on dark page bg (deeper / more saturated than red-400 / blue-400) */
 [data-bs-theme="dark"] .redAllianceTeam {
   color: #ef4444 !important;

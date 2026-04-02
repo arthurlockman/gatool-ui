@@ -660,7 +660,7 @@ function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previous
 
 
 	return (
-		<div style={{
+		<div className="gatool-playoff-bracket" style={{
 			"width": "100%"
 		}} {...swipeHandlers}>
 			{!matches && <div>

@@ -333,7 +333,7 @@ function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMat
 	const getFinalsMatchScoreForDisplay = (matchNumber, alliance) => matchScore(matchNumber, alliance);
 
 	return (
-		<div style={{
+		<div className="gatool-playoff-bracket" style={{
 			"width": "100%"
 		}} {...swipeHandlers}>
 			{!matches && <div>

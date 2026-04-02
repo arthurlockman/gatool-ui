@@ -738,7 +738,7 @@ function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMat
 	useHotkeys('left', () => previousMatch(), { scopes: 'matchNavigation' });
 
 	return (
-		<div {...swipeHandlers} style={{
+		<div className="gatool-playoff-bracket" {...swipeHandlers} style={{
 			"width": "100%"
 		}}>
 			{!matches && <div>
