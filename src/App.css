@@ -1956,8 +1956,9 @@ body {
   background-color: #4ade80 !important;
 }
 
-/* Announce: override inline pastel TDs — dark alliance tint + light text */
-[data-bs-theme="dark"] .gatool-announce.redAlliance td.col1,
+/* Announce: override inline pastel TDs — dark alliance tint + light text.
+   Rank column is also td.col1 but uses class "ranking" + inline rankHighlight(); exclude it so green/yellow/orange highlights are not overridden by !important. */
+[data-bs-theme="dark"] .gatool-announce.redAlliance td.col1:not(.ranking),
 [data-bs-theme="dark"] .gatool-announce.redAlliance td.col2,
 [data-bs-theme="dark"] .gatool-announce.redAlliance td.col7,
 [data-bs-theme="dark"] .gatool-announce.redAlliance td.announce-alliance-matchup-cell {
@@ -1965,12 +1966,23 @@ body {
   color: #f1f5f9 !important;
 }
 
-[data-bs-theme="dark"] .gatool-announce.blueAlliance td.col1,
+[data-bs-theme="dark"] .gatool-announce.blueAlliance td.col1:not(.ranking),
 [data-bs-theme="dark"] .gatool-announce.blueAlliance td.col2,
 [data-bs-theme="dark"] .gatool-announce.blueAlliance td.col7,
 [data-bs-theme="dark"] .gatool-announce.blueAlliance td.announce-alliance-matchup-cell {
   background-color: rgba(28, 52, 108, 0.92) !important;
   color: #f1f5f9 !important;
+}
+
+/* Plain rank cell (no rankHighlight): match alliance row; highlighted cells use .announce-rank-highlight + inline styles only */
+[data-bs-theme="dark"] .gatool-announce.redAlliance td.col1.ranking.announce-rank-plain {
+  background-color: rgba(95, 26, 32, 0.92) !important;
+  color: #f8fafc !important;
+}
+
+[data-bs-theme="dark"] .gatool-announce.blueAlliance td.col1.ranking.announce-rank-plain {
+  background-color: rgba(28, 52, 108, 0.92) !important;
+  color: #f8fafc !important;
 }
 
 /* Prior partnerships: base rule sets .announce-alliance-matchup-line { color: #222 }, which wins over inherited cell text */
@@ -2014,8 +2026,82 @@ body {
   color: #a7f3d0 !important;
 }
 
-[data-bs-theme="dark"] .gatool-announce .ranking {
-  color: #f8fafc;
+/*
+ * Play-by-Play (light mode): restore classic saturated red/blue fields + white text.
+ * Dark mode work had switched these to Announce pastels globally; that reads as “washed out” on a light UI.
+ */
+[data-bs-theme="light"] .playByPlayTable td.redAlliancePlayByPlay,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.redAlliancePlayByPlay {
+  background-color: #ff0000 !important;
+  color: #ffffff !important;
+  border-color: #ccc !important;
+}
+
+[data-bs-theme="light"] .playByPlayTable td.blueAlliancePlayByPlay,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.blueAlliancePlayByPlay {
+  background-color: #0000ff !important;
+  color: #ffffff !important;
+  border-color: #ccc !important;
+}
+
+[data-bs-theme="light"] .playByPlayTable td.redAlliancePlayByPlay .playByPlayTeamName,
+[data-bs-theme="light"] .playByPlayTable td.blueAlliancePlayByPlay .playByPlayTeamName,
+[data-bs-theme="light"] .playByPlayTable td.redAlliancePlayByPlay .playByPlayOrganization,
+[data-bs-theme="light"] .playByPlayTable td.blueAlliancePlayByPlay .playByPlayOrganization,
+[data-bs-theme="light"] .playByPlayTable td.redAlliancePlayByPlay .playByPlayCity,
+[data-bs-theme="light"] .playByPlayTable td.blueAlliancePlayByPlay .playByPlayCity,
+[data-bs-theme="light"] .playByPlayTable td.redAlliancePlayByPlay .mottoes,
+[data-bs-theme="light"] .playByPlayTable td.blueAlliancePlayByPlay .mottoes,
+[data-bs-theme="light"] .playByPlayTable td.redAlliancePlayByPlay .playByPlayteamNumber,
+[data-bs-theme="light"] .playByPlayTable td.blueAlliancePlayByPlay .playByPlayteamNumber,
+[data-bs-theme="light"] .playByPlayTable td.redAlliancePlayByPlay .playByPlaysayNumber,
+[data-bs-theme="light"] .playByPlayTable td.blueAlliancePlayByPlay .playByPlaysayNumber,
+[data-bs-theme="light"] .playByPlayTable td.redAlliancePlayByPlay .playByPlayWinLossTie,
+[data-bs-theme="light"] .playByPlayTable td.blueAlliancePlayByPlay .playByPlayWinLossTie,
+[data-bs-theme="light"] .playByPlayTable td.redAlliancePlayByPlay .champsQualified,
+[data-bs-theme="light"] .playByPlayTable td.blueAlliancePlayByPlay .champsQualified,
+[data-bs-theme="light"] .playByPlayTable td.redAlliancePlayByPlay .notes,
+[data-bs-theme="light"] .playByPlayTable td.blueAlliancePlayByPlay .notes,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.redAlliancePlayByPlay .playByPlayTeamName,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.blueAlliancePlayByPlay .playByPlayTeamName,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.redAlliancePlayByPlay .playByPlayOrganization,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.blueAlliancePlayByPlay .playByPlayOrganization,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.redAlliancePlayByPlay .playByPlayCity,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.blueAlliancePlayByPlay .playByPlayCity,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.redAlliancePlayByPlay .mottoes,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.blueAlliancePlayByPlay .mottoes,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.redAlliancePlayByPlay .playByPlayteamNumber,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.blueAlliancePlayByPlay .playByPlayteamNumber,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.redAlliancePlayByPlay .playByPlaysayNumber,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.blueAlliancePlayByPlay .playByPlaysayNumber,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.redAlliancePlayByPlay .playByPlayWinLossTie,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.blueAlliancePlayByPlay .playByPlayWinLossTie,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.redAlliancePlayByPlay .champsQualified,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.blueAlliancePlayByPlay .champsQualified,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.redAlliancePlayByPlay .notes,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.blueAlliancePlayByPlay .notes {
+  color: #ffffff !important;
+}
+
+[data-bs-theme="light"] .playByPlayTable td.redAlliancePlayByPlay .playByPlayRobotName,
+[data-bs-theme="light"] .playByPlayTable td.blueAlliancePlayByPlay .playByPlayRobotName,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.redAlliancePlayByPlay .playByPlayRobotName,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.blueAlliancePlayByPlay .playByPlayRobotName {
+  color: #f9fe00 !important;
+}
+
+[data-bs-theme="light"] .playByPlayTable td.redAlliancePlayByPlay .playByPlayAlliance,
+[data-bs-theme="light"] .playByPlayTable td.blueAlliancePlayByPlay .playByPlayAlliance,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.redAlliancePlayByPlay .playByPlayAlliance,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.blueAlliancePlayByPlay .playByPlayAlliance {
+  color: #f3f858 !important;
+}
+
+[data-bs-theme="light"] .playByPlayTable td.redAlliancePlayByPlay .tbd,
+[data-bs-theme="light"] .playByPlayTable td.blueAlliancePlayByPlay .tbd,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.redAlliancePlayByPlay .tbd,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.blueAlliancePlayByPlay .tbd {
+  color: #f1f5f9 !important;
 }
 
 /* Play-by-Play: same dark alliance tints + text as Announce */

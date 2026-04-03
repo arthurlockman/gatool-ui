@@ -175,9 +175,9 @@ function Announce({
                 </td>
             ) : (
                 <td
-                    className={"col1 ranking"}
+                    className={`col1 ranking ${team?.rankStyle?.backgroundColor === "" ? "announce-rank-plain" : "announce-rank-highlight"}`}
                     style={
-                        team?.rankStyle.backgroundColor === ""
+                        team?.rankStyle?.backgroundColor === ""
                             ? {
                                   backgroundColor:
                                       _.toLower(allianceColor) === "red"
