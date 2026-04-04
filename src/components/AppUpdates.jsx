@@ -1,5 +1,15 @@
 export const appUpdates = [
   {
+    date: "April 3, 2026",
+    message: (
+      <ul>
+        <li>ALL PROGRAMS:</li>
+        <ul>
+          <li>Dark Mode refinements</li>
+        </ul>
+      </ul>
+    ),
+  },{
     date: "April 1, 2026",
     message: (
       <ul>
