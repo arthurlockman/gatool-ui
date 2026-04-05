@@ -1682,6 +1682,10 @@ body {
   color: var(--bs-body-color);
 }
 
+[data-bs-theme="dark"] .appearanceSettings td {
+  color: var(--bs-body-color);
+}
+
 [data-bs-theme="dark"] .switchLabel,
 [data-bs-theme="dark"] .UISettings td,
 [data-bs-theme="dark"] .teamInfoSettings td,

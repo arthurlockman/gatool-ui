@@ -76,7 +76,7 @@ const ftcModeOptions = [
 
 
 
-function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, regionFilters, setRegionFilters, districts, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showNotesAnnounce, setShowNotesAnnounce, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, autoUpdate, setAutoUpdate, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, showQualsStatsQuals, setShowQualsStatsQuals, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee, showDistrictChampsStats, setShowDistrictChampsStats, showChampsStatsAtDistrictRegional, setShowChampsStatsAtDistrictRegional, monthsWarning, setMonthsWarning, user, isAuthenticated, adHocMode, setAdHocMode, supportedYears, FTCSupportedYears, reloadPage, autoHideSponsors, setAutoHideSponsors, setLoadingCommunityUpdates, hidePracticeSchedule, setHidePracticeSchedule, systemMessage, setTeamListLoading, getTeamList, getAlliances, setHaveChampsTeams, appUpdates, usePullDownToUpdate, setUsePullDownToUpdate, useSwipe, setUseSwipe, eventLabel, setEventLabel, showInspection, setShowInspection, showWorldAndStatsOnAnnouncePlayByPlay, setShowWorldAndStatsOnAnnouncePlayByPlay, showMinorAwards, setShowMinorAwards, highScoreMode, setHighScoreMode, systemBell, setSystemBell, eventBell, setEventBell, eventMessage, setEventMessage, putEventNotifications, useCheesyArena, setUseCheesyArena, useFourTeamAlliances, setUseFourTeamAlliances, ftcLeagues, ftcRegions, ftcMode, setFTCMode, ftcTypes, useFTCOffline, setUseFTCOffline, FTCServerURL, setFTCServerURL, FTCKey, requestFTCKey, checkFTCKey, FTCOfflineAvailable, getFTCOfflineStatus, getCheesyStatus, showBlueBanners, setShowBlueBanners, manualOfflineMode, setManualOfflineMode, useScrollMemory, setUseScrollMemory, syncEvent, setSyncEvent, screenMode, setScreenMode, screenModeSyncFrequency, setScreenModeSyncFrequency, backgroundDataRefresh, setBackgroundDataRefresh, backgroundDataRefreshFrequency, setBackgroundDataRefreshFrequency, darkMode, setDarkMode }) {
+function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, regionFilters, setRegionFilters, districts, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showNotesAnnounce, setShowNotesAnnounce, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, autoUpdate, setAutoUpdate, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, showQualsStatsQuals, setShowQualsStatsQuals, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee, showDistrictChampsStats, setShowDistrictChampsStats, showChampsStatsAtDistrictRegional, setShowChampsStatsAtDistrictRegional, monthsWarning, setMonthsWarning, user, isAuthenticated, adHocMode, setAdHocMode, supportedYears, FTCSupportedYears, reloadPage, autoHideSponsors, setAutoHideSponsors, setLoadingCommunityUpdates, hidePracticeSchedule, setHidePracticeSchedule, systemMessage, setTeamListLoading, getTeamList, getAlliances, setHaveChampsTeams, appUpdates, usePullDownToUpdate, setUsePullDownToUpdate, useSwipe, setUseSwipe, eventLabel, setEventLabel, showInspection, setShowInspection, showWorldAndStatsOnAnnouncePlayByPlay, setShowWorldAndStatsOnAnnouncePlayByPlay, showMinorAwards, setShowMinorAwards, highScoreMode, setHighScoreMode, systemBell, setSystemBell, eventBell, setEventBell, eventMessage, setEventMessage, putEventNotifications, useCheesyArena, setUseCheesyArena, useFourTeamAlliances, setUseFourTeamAlliances, ftcLeagues, ftcRegions, ftcMode, setFTCMode, ftcTypes, useFTCOffline, setUseFTCOffline, FTCServerURL, setFTCServerURL, FTCKey, requestFTCKey, checkFTCKey, FTCOfflineAvailable, getFTCOfflineStatus, getCheesyStatus, showBlueBanners, setShowBlueBanners, manualOfflineMode, setManualOfflineMode, useScrollMemory, setUseScrollMemory, syncEvent, setSyncEvent, screenMode, setScreenMode, screenModeSyncFrequency, setScreenModeSyncFrequency, backgroundDataRefresh, setBackgroundDataRefresh, backgroundDataRefreshFrequency, setBackgroundDataRefreshFrequency, darkMode, setDarkMode, useOsTheme, setUseOsTheme, appearanceDark }) {
     const isOnline = useOnlineStatus();
     const PWASupported = (isChrome && Number(browserVersion) >= 76) || (isSafari && Number(browserVersion) >= 15 && Number(fullBrowserVersion.split(".")[1]) >= 4);
 
@@ -328,10 +328,10 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                 if (data.eventMenuTint === "offseasonAzure") {
                                     return {
                                         ...styles,
-                                        backgroundColor: darkMode
+                                        backgroundColor: appearanceDark
                                             ? "rgba(37, 99, 235, 0.42)"
                                             : "rgba(191, 219, 254, 0.9)",
-                                        color: darkMode ? "#f1f5f9" : "#0c1929",
+                                        color: appearanceDark ? "#f1f5f9" : "#0c1929",
                                         padding: "2px 6px",
                                         borderRadius: "3px",
                                     };
@@ -339,10 +339,10 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                 if (data.eventMenuTint === "offseason") {
                                     return {
                                         ...styles,
-                                        backgroundColor: darkMode
+                                        backgroundColor: appearanceDark
                                             ? "rgba(161, 98, 7, 0.5)"
                                             : "rgba(254, 229, 165, 0.95)",
-                                        color: darkMode ? "#fffbeb" : "#3d2914",
+                                        color: appearanceDark ? "#fffbeb" : "#3d2914",
                                         padding: "2px 6px",
                                         borderRadius: "3px",
                                     };
@@ -445,7 +445,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                 <img
                                     style={{ width: "100%" }}
                                     src={
-                                        darkMode
+                                        appearanceDark
                                             ? "/images/first_age_frc_rebuilt_logo_vertical_rgb_fullcolorreverse.png"
                                             : "/images/first_age_frc_rebuilt_logo_vertical_rgb_fullcolor.gif"
                                     }
@@ -456,7 +456,7 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                 <img
                                     style={{ width: "100%" }}
                                     src={
-                                        darkMode
+                                        appearanceDark
                                             ? "/images/first_age_ftc_decode_logo_vertical_rgb_fullcolorreverse.png"
                                             : "/images/first_age_ftc_decode_logo_vertical_rgb_fullcolor.png"
                                     }
@@ -637,15 +637,6 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                     <td style={{ fontSize: "1.25em" }} colSpan={2}>{showUISettings ? <CaretUpFill /> : <CaretDownFill />} <b>{showUISettings ? "Hide" : "Show"} User Interface Settings</b></td>
                                 </tr>
                                 {showUISettings && <><tr className={"UISettings"}>
-                                    <td>
-                                        <Switch checked={darkMode === true} onChange={setDarkMode} />
-                                    </td>
-                                    <td>
-                                        <b>Dark mode</b><br />
-                                        <i>Uses a dark theme across the app (saved on this device; also syncs when Sync Event is enabled).</i>
-                                    </td>
-                                </tr>
-                                    <tr className={"UISettings"}>
                                     <td>
                                         <Switch checked={_.isNull(showInspection) || _.isUndefined(showInspection) ? false : showInspection} onChange={setShowInspection} />
                                     </td>
@@ -925,6 +916,24 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
                                         </td>
                                     </tr>
                                 </>}
+                                <tr className="appearanceSettings">
+                                    <td>
+                                        <Switch checked={useOsTheme === true} onChange={setUseOsTheme} />
+                                    </td>
+                                    <td>
+                                        <b>Use OS Dark/Light Theme</b><br />
+                                        <i>When enabled, the app follows your operating system appearance (light or dark). Your manual Dark mode choice below is saved for when this is off.</i>
+                                    </td>
+                                </tr>
+                                <tr className="appearanceSettings">
+                                    <td>
+                                        <Switch checked={darkMode === true} onChange={setDarkMode} disabled={useOsTheme} />
+                                    </td>
+                                    <td>
+                                        <b>Dark mode</b><br />
+                                        <i>Choose light or dark when “Use OS Dark/Light Theme” is off. Saved on this device; also syncs when Sync Event is enabled.</i>
+                                    </td>
+                                </tr>
                                 <tr>
                                     <td>
                                         <Switch checked={adHocMode === null ? false : adHocMode} onChange={setAdHocMode} />
