@@ -21,6 +21,7 @@ import {
   WifiOff,
 } from "react-bootstrap-icons";
 import { TabStates } from "../App";
+import HelpDocsView from "./HelpDocsView";
 import { useOnlineStatus } from "../contextProviders/OnlineContext";
 import { useEffect, useState } from "react";
 import moment from "moment";
@@ -406,13 +407,8 @@ function MainNavigation({
           <Modal.Title>Help</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <div style={{ height: "calc(100vh - 200px)" }}>
-            <iframe
-              width="100%"
-              height="100%"
-              src={`${process.env.PUBLIC_URL || ""}/help-docs.html`}
-              title="Help"
-            />
+          <div style={{ height: "calc(100vh - 200px)", minHeight: 320 }}>
+            {helpModalOpen ? <HelpDocsView embedded /> : null}
           </div>
         </Modal.Body>
         <Modal.Footer>

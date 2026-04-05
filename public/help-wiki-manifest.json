@@ -1,0 +1,84 @@
+{
+  "generatedAt": "2026-04-04T23:08:14.944Z",
+  "rawBaseUrl": "https://raw.githubusercontent.com/wiki/arthurlockman/gatool-ui",
+  "pages": [
+    {
+      "file": "Home.md",
+      "title": "Home",
+      "anchor": "home",
+      "wikiUrl": "https://github.com/arthurlockman/gatool-ui/wiki/Home"
+    },
+    {
+      "file": "Install-gatool-as-an-App-(Full-Screen).md",
+      "title": "Install gatool as an App (Full Screen)",
+      "anchor": "install-gatool-as-an-app-full-screen",
+      "wikiUrl": "https://github.com/arthurlockman/gatool-ui/wiki/Install-gatool-as-an-App-(Full-Screen)"
+    },
+    {
+      "file": "How-do-I-use-gatool?.md",
+      "title": "How do I use gatool?",
+      "anchor": "how-do-i-use-gatool",
+      "wikiUrl": "https://github.com/arthurlockman/gatool-ui/wiki/How-do-I-use-gatool?"
+    },
+    {
+      "file": "Setup.md",
+      "title": "Setup",
+      "anchor": "setup",
+      "wikiUrl": "https://github.com/arthurlockman/gatool-ui/wiki/Setup"
+    },
+    {
+      "file": "Match-Schedule.md",
+      "title": "Match Schedule",
+      "anchor": "match-schedule",
+      "wikiUrl": "https://github.com/arthurlockman/gatool-ui/wiki/Match-Schedule"
+    },
+    {
+      "file": "Team-Data.md",
+      "title": "Team Data",
+      "anchor": "team-data",
+      "wikiUrl": "https://github.com/arthurlockman/gatool-ui/wiki/Team-Data"
+    },
+    {
+      "file": "Announce.md",
+      "title": "Announce",
+      "anchor": "announce",
+      "wikiUrl": "https://github.com/arthurlockman/gatool-ui/wiki/Announce"
+    },
+    {
+      "file": "Play‐by‐play.md",
+      "title": "Play‐by‐play",
+      "anchor": "play-by-play",
+      "wikiUrl": "https://github.com/arthurlockman/gatool-ui/wiki/Play‐by‐play"
+    },
+    {
+      "file": "Alliance-Selection-and-Playoffs.md",
+      "title": "Alliance Selection and Playoffs",
+      "anchor": "alliance-selection-and-playoffs",
+      "wikiUrl": "https://github.com/arthurlockman/gatool-ui/wiki/Alliance-Selection-and-Playoffs"
+    },
+    {
+      "file": "Awards.md",
+      "title": "Awards",
+      "anchor": "awards",
+      "wikiUrl": "https://github.com/arthurlockman/gatool-ui/wiki/Awards"
+    },
+    {
+      "file": "Stats.md",
+      "title": "Stats",
+      "anchor": "stats",
+      "wikiUrl": "https://github.com/arthurlockman/gatool-ui/wiki/Stats"
+    },
+    {
+      "file": "Cheat-Sheet.md",
+      "title": "Cheat Sheet",
+      "anchor": "cheat-sheet",
+      "wikiUrl": "https://github.com/arthurlockman/gatool-ui/wiki/Cheat-Sheet"
+    },
+    {
+      "file": "Emcee-numbers.md",
+      "title": "Emcee numbers",
+      "anchor": "emcee-numbers",
+      "wikiUrl": "https://github.com/arthurlockman/gatool-ui/wiki/Emcee-numbers"
+    }
+  ]
+}
