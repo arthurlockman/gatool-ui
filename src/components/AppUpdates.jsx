@@ -1,5 +1,16 @@
 export const appUpdates = [
   {
+    date: "April 5, 2026",
+    message: (
+      <ul>
+        <li>ALL PROGRAMS:</li>
+        <ul>
+          <li>Help system now renders properly within the app.</li>
+          <li>The app now follows the system theme for dark mode. Users can still manually choose dark mode in the Settings page.</li>
+        </ul>
+      </ul>
+    ),
+  },{
     date: "April 3, 2026",
     message: (
       <ul>
