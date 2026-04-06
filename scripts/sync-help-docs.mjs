@@ -6,7 +6,10 @@ import { marked } from "marked";
 
 const repoRoot = process.cwd();
 const outputPath = join(repoRoot, "public", "help-docs.html");
+const manifestPath = join(repoRoot, "public", "help-wiki-manifest.json");
 const wikiRepo = "https://github.com/arthurlockman/gatool-ui.wiki.git";
+/** Public raw URLs for each wiki .md file (used when REACT_APP_HELP_LIVE_WIKI=true in the app). */
+const wikiRawBaseUrl = "https://raw.githubusercontent.com/wiki/arthurlockman/gatool-ui";
 
 function slugify(value) {
   return String(value || "")
@@ -138,6 +141,7 @@ function buildFromWiki() {
         const anchor = slugify(title);
         const html = marked.parse(raw);
         return {
+          file: filename,
           title,
           anchor,
           html,
@@ -152,9 +156,28 @@ function buildFromWiki() {
         return a.title.localeCompare(b.title);
       });
 
+    const manifest = {
+      generatedAt: new Date().toISOString(),
+      rawBaseUrl: wikiRawBaseUrl,
+      pages: pages.map((p) => ({
+        file: p.file,
+        title: p.title,
+        anchor: p.anchor,
+        wikiUrl: p.wikiUrl,
+      })),
+    };
+    writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
+
     const doc = renderDocument(pages);
     writeFileSync(outputPath, doc, "utf8");
+    const written = readFileSync(outputPath, "utf8");
+    if (!written.includes("<section") || !written.includes("gatool Help")) {
+      throw new Error("help-docs.html was written but does not look valid.");
+    }
     console.log(`Help docs synced from wiki (${pages.length} pages).`);
+    console.log(
+      "Ship this snapshot: git add public/help-docs.html public/help-wiki-manifest.json && git commit -m \"Update help from wiki\""
+    );
   } finally {
     rmSync(tempRoot, { recursive: true, force: true });
   }
@@ -165,7 +188,7 @@ function main() {
     buildFromWiki();
   } catch (error) {
     if (existsSync(outputPath)) {
-      console.warn("Wiki sync failed; using existing public/help-docs.html");
+      console.warn("Wiki sync failed; using existing public/help-docs.html (and help-wiki-manifest.json if present).");
       console.warn(error?.message || error);
       return;
     }

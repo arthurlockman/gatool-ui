@@ -1,10 +1,7 @@
+import HelpDocsView from "../components/HelpDocsView";
+
 function HelpPage() {
-    return (
-        <iframe style={{
-            bottom: 0,
-            width: "100%", height: "90vh"
-        }} src={`${process.env.PUBLIC_URL || ""}/help-docs.html`} title="Help" />
-    )
+    return <HelpDocsView embedded={false} />;
 }
 
 export default HelpPage;

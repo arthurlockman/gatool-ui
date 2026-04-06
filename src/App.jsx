@@ -426,6 +426,14 @@ function App() {
     "setting:darkMode",
     false
   );
+  const [useOsTheme, setUseOsTheme] = usePersistentState(
+    "setting:useOsTheme",
+    true
+  );
+  const [systemPrefersDark, setSystemPrefersDark] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  });
   const [eventNamesCY, setEventNamesCY] = usePersistentState(
     "cache:eventNamesCY",
     []
@@ -5008,6 +5016,7 @@ function App() {
       showWorldAndStatsOnAnnouncePlayByPlay: showWorldAndStatsOnAnnouncePlayByPlay,
       swapScreen: swapScreen,
       darkMode: darkMode,
+      useOsTheme: useOsTheme,
       autoAdvance: autoAdvance,
       highScoreMode: highScoreMode,
       autoUpdate: autoUpdate,
@@ -6296,11 +6305,24 @@ function App() {
   }, [autoUpdate, backgroundDataRefresh, backgroundDataRefreshFrequency, start, stop]);
 
   useEffect(() => {
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    const onChange = () => setSystemPrefersDark(mq.matches);
+    onChange();
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
+  const appearanceDark = useMemo(
+    () => (useOsTheme ? systemPrefersDark : !!darkMode),
+    [useOsTheme, systemPrefersDark, darkMode]
+  );
+
+  useEffect(() => {
     document.documentElement.setAttribute(
       "data-bs-theme",
-      darkMode ? "dark" : "light"
+      appearanceDark ? "dark" : "light"
     );
-  }, [darkMode]);
+  }, [appearanceDark]);
 
   // Track last event code we attempted to sync in Screen Mode
   // This prevents reloading the same event when React state hasn't updated yet
@@ -6458,6 +6480,9 @@ function App() {
         }
         if (userPrefs.darkMode !== undefined && userPrefs.darkMode !== darkMode) {
           setDarkMode(userPrefs.darkMode);
+        }
+        if (userPrefs.useOsTheme !== undefined && userPrefs.useOsTheme !== useOsTheme) {
+          setUseOsTheme(userPrefs.useOsTheme);
         }
         if (userPrefs.autoAdvance !== undefined && userPrefs.autoAdvance !== autoAdvance) {
           setAutoAdvance(userPrefs.autoAdvance);
@@ -6772,6 +6797,7 @@ function App() {
     showInspection,
     swapScreen,
     darkMode,
+    useOsTheme,
     autoAdvance,
     highScoreMode,
     autoUpdate,
@@ -6821,6 +6847,7 @@ function App() {
         showInspection,
         swapScreen,
         darkMode,
+        useOsTheme,
         autoAdvance,
         highScoreMode,
         autoUpdate,
@@ -6885,6 +6912,7 @@ function App() {
     showInspection,
     swapScreen,
     darkMode,
+    useOsTheme,
     autoAdvance,
     highScoreMode,
     autoUpdate,
@@ -7111,6 +7139,9 @@ function App() {
                     setManualOfflineMode={setManualOfflineMode}
                     darkMode={darkMode}
                     setDarkMode={setDarkMode}
+                    useOsTheme={useOsTheme}
+                    setUseOsTheme={setUseOsTheme}
+                    appearanceDark={appearanceDark}
                   />
                 }
               />
