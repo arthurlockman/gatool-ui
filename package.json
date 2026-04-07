@@ -1,0 +1,69 @@
+{
+  "name": "gatool-ui",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@auth0/auth0-react": "^1.12.1",
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@fortawesome/react-fontawesome": "^0.2.2",
+    "@testing-library/jest-dom": "^6.1.3",
+    "@testing-library/react": "^14.0.0",
+    "@testing-library/user-event": "^14.5.1",
+    "bootstrap": "^5.3.5",
+    "docxtemplater": "^3.61.1",
+    "file-saver": "^2.0.5",
+    "localforage": "^1.10.0",
+    "lodash": "^4.18.1",
+    "marked": "^17.0.5",
+    "moment": "^2.30.1",
+    "notistack": "^3.0.2",
+    "pizzip": "^3.1.8",
+    "react": "^18.2.0",
+    "react-bootstrap": "^2.10.0",
+    "react-bootstrap-icons": "^1.10.3",
+    "react-device-detect": "^2.2.3",
+    "react-dom": "^18.2.0",
+    "react-drag-drop-files": "^3.0.1",
+    "react-hotkeys-hook": "^5.0.1",
+    "react-interval-hook": "^1.1.5",
+    "react-loader-spinner": "^6.1.6",
+    "react-quill": "^2.0.0",
+    "react-quizlet-flashcard": "^3.0.0",
+    "react-range": "^1.10.0",
+    "react-router-dom": "^6.30.3",
+    "react-scripts": "^5.0.1",
+    "react-select": "^5.10.1",
+    "react-swipeable": "^7.0.2",
+    "react-switch": "^7.1.0",
+    "react-toastify": "^11.0.5",
+    "web-vitals": "^4.2.4",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.19.3/xlsx-0.19.3.tgz"
+  },
+  "scripts": {
+    "prestart": "node scripts/sync-help-docs.mjs",
+    "start": "react-scripts --openssl-legacy-provider start",
+    "sync-help-docs": "node scripts/sync-help-docs.mjs",
+    "build": "npm run sync-help-docs && export CI=true; react-scripts --openssl-legacy-provider build",
+    "test": "react-scripts --openssl-legacy-provider test",
+    "eject": "react-scripts --openssl-legacy-provider eject",
+    "build:ci": "npm run sync-help-docs && react-scripts build"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

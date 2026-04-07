@@ -1,0 +1,624 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="bracket" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1280 810">
+  <!-- Generator: Adobe Illustrator 29.7.1, SVG Export Plug-In . SVG Version: 2.1.1 Build 8)  -->
+  <g id="background">
+    <rect x="1" width="1279" height="810" fill="#fff"/>
+    <rect x="1091" y="89" width="75" height="684" fill="#dbdad9"/>
+    <rect x="862" y="89" width="75" height="684" fill="#dbdad9"/>
+    <rect x="677" y="89" width="75" height="684" fill="#dbdad9"/>
+    <rect x="109" y="89" width="75" height="684" fill="#dbdad9"/>
+    <rect x="302" y="89" width="75" height="684" fill="#dbdad9"/>
+    <rect x="490" y="89" width="75" height="684" fill="#dbdad9"/>
+    <polyline points="242 175.1 430.8 175.1 430.8 328.1 242.6 328.1" fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="2"/>
+    <polyline points="242.5 175.1 242.5 213.6 199.1 213.6" fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="2"/>
+    <polyline points="242.5 328.1 242.5 368.6 199.1 368.6" fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="2"/>
+    <polyline points="431 254 1006 254 1006 504.1 816.8 504.1 816.8 574.1 630 574.1" fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="2"/>
+    <polyline points="611.7 648 629.7 648 629.7 509 611.7 509" fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="2"/>
+    <line x1="1024" y1="421" x2="1006" y2="421" fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="2"/>
+    <line x1="70" y1="419" x2="971" y2="419" fill="none" stroke="#8e8e8e" stroke-miterlimit="10" stroke-width="2"/>
+    <g isolation="isolate">
+      <g isolation="isolate">
+        <text transform="translate(49.7 348.7) rotate(-90)" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="26" font-weight="700" isolation="isolate"><tspan x="0" y="0">UPPER BRACKET</tspan></text>
+      </g>
+    </g>
+    <g isolation="isolate">
+      <g isolation="isolate">
+        <text transform="translate(49.7 673.2) rotate(-90)" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="26" font-weight="700" isolation="isolate"><tspan x="0" y="0">LOWER BRACKET</tspan></text>
+      </g>
+    </g>
+    <g isolation="isolate">
+      <g isolation="isolate">
+        <text transform="translate(116.7 84.3)" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="16" font-weight="700" isolation="isolate"><tspan x="0" y="0">ROUND 1</tspan></text>
+      </g>
+    </g>
+    <g isolation="isolate">
+      <g isolation="isolate">
+        <text transform="translate(306.7 84.3)" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="16" font-weight="700" isolation="isolate"><tspan x="0" y="0">ROUND 2</tspan></text>
+      </g>
+    </g>
+    <g isolation="isolate">
+      <g isolation="isolate">
+        <text transform="translate(494.7 84.3)" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="16" font-weight="700" isolation="isolate"><tspan x="0" y="0">ROUND 3</tspan></text>
+      </g>
+    </g>
+    <g isolation="isolate">
+      <g isolation="isolate">
+        <text transform="translate(682.7 84.3)" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="16" font-weight="700" isolation="isolate"><tspan x="0" y="0">ROUND 4</tspan></text>
+      </g>
+    </g>
+    <g isolation="isolate">
+      <g isolation="isolate">
+        <text transform="translate(869.7 84.3)" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="16" font-weight="700" isolation="isolate"><tspan x="0" y="0">ROUND 5</tspan></text>
+      </g>
+    </g>
+    <g isolation="isolate">
+      <g isolation="isolate">
+        <text transform="translate(1106.1 84.3)" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="16" font-weight="700" isolation="isolate"><tspan x="0" y="0">FINALS</tspan></text>
+      </g>
+    </g>
+    <g id="playoffBracketTitle" isolation="isolate">
+      <g isolation="isolate">
+        <text transform="translate(278 47.7)" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="38" font-weight="700" isolation="isolate"><tspan x="0" y="0">PLAYOFF BRACKET {selectedEvent?.label}</tspan></text>
+      </g>
+    </g>
+  </g>
+  <g id="finals">
+    <path id="finalsBackground" d="M1254.5,511.6h-230.5c-5.5,0-10-4.5-10-10v-158.2c0-5.5,4.5-10,10-10h230.5c5.5,0,10,4.5,10,10v158.1c0,5.6-4.5,10.1-10,10.1h0Z" fill="#c1c1c1" stroke="#000" stroke-miterlimit="10" stroke-width="2"/>
+    <g id="finalsContainer">
+      <polygon points="1164.7 389.6 1048.4 389.6 1048.4 353.5 1164.7 353.5 1177.6 371.6 1164.7 389.6" fill="red"/>
+      <polygon points="1164.7 426 1048.4 426 1048.4 390 1164.7 390 1177.6 408 1164.7 426" fill="blue"/>
+      <line x1="1164.7" y1="389.7" x2="1026" y2="389.7" fill="none" stroke="#fff" stroke-miterlimit="10"/>
+      <rect x="1026" y="353.5" width="22.4" height="72.5"/>
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(1041.8 418.6) rotate(-90)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">BEST 2 of 3</tspan></text>
+        </g>
+      </g>
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(1067.2 368.2)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">Winner of M7</tspan></text>
+          </g>
+        </g>
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(1053.9 382.8)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">22222 22222 22222</tspan></text>
+          </g>
+        </g>
+      </g>
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(1067.2 404.6)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">Winner of M9</tspan></text>
+          </g>
+        </g>
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(1053.9 419.2)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">22222 22222 22222</tspan></text>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g id="trophy">
+      <rect x="1204.4" y="414.2" width="26.5" height="1.7" fill="#474e5d"/>
+      <rect x="1207.7" y="414.2" width="1.7" height="1.7" fill="#606776"/>
+      <rect x="1225.9" y="414.2" width="5" height="1.7" fill="#2e3544"/>
+      <rect x="1206" y="404.2" width="23.2" height="9.9" fill="#474e5d"/>
+      <rect x="1209.3" y="404.2" width="1.7" height="9.9" fill="#606776"/>
+      <rect x="1224.2" y="404.2" width="5" height="9.9" fill="#2e3544"/>
+      <path d="M1219.3,390.2c0,6.1,3.9,11.3,9.3,13.3l.6.8h-23.2l.6-.8c5.5-1.9,9.4-7.1,9.4-13.3h3.3,0Z" fill="#ffca10"/>
+      <path d="M1216.8,390.2h-.4c0,6.1-2.9,11.3-7,13.3l-.4.8h2.9l.3-.8c2.6-2,4.6-7.2,4.6-13.3Z" fill="#fee79b"/>
+      <path d="M1228.6,403.4c-5.4-1.9-9.3-7.1-9.3-13.3h-.8c0,6.1,1.9,11.3,4.7,13.3l.3.8h5.8l-.7-.8Z" fill="#ffa200"/>
+      <path d="M1194.4,366.1c0,11.9,10.4,21.5,23.2,21.5s23.2-9.6,23.2-21.5h-46.4,0ZM1217.6,385.2c-10.5,0-19.2-7.2-20.5-16.6h41.1c-1.4,9.4-10.1,16.6-20.6,16.6Z" fill="#ffca10"/>
+      <path d="M1232.5,362.8h-29.8c0,15.6,6.7,28.2,14.9,28.2s14.9-12.6,14.9-28.2Z" fill="#ffca10"/>
+      <path d="M1225.1,362.8c0,15.6-3.3,28.2-7.5,28.2,8.2,0,14.9-12.6,14.9-28.2h-7.4Z" fill="#ffa200"/>
+      <path d="M1208.6,362.8h-2.2c0,15.6,5,28.2,11.2,28.2-5,0-9-12.6-9-28.2Z" fill="#fee79b"/>
+    </g>
+    <circle id="winnerMatch3Dot" cx="1139.5" cy="451" r="8" fill="#09ba48"/>
+    <circle id="winnerMatch2Dot" cx="1110.2" cy="451" r="8" fill="blue"/>
+    <circle id="winnerMatch1Dot" cx="1081" cy="451" r="8" fill="red"/>
+    <g id="finalsM1Scores" isolation="isolate">
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(1069.6 477.6)" fill="red" font-family="MyriadPro-Semibold, &apos;Myriad Pro&apos;" font-size="14" font-weight="600" isolation="isolate"><tspan x="0" y="0">999</tspan></text>
+        </g>
+      </g>
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(1068.8 491.6)" fill="blue" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="14" font-weight="700" isolation="isolate"><tspan x="0" y="0">999</tspan></text>
+        </g>
+      </g>
+    </g>
+    <g id="finalsM2Scores" isolation="isolate">
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(1098.1 477.6)" fill="red" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="14" font-weight="700" isolation="isolate"><tspan x="0" y="0">999</tspan></text>
+        </g>
+      </g>
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(1098.9 491.6)" fill="blue" font-family="MyriadPro-Semibold, &apos;Myriad Pro&apos;" font-size="14" font-weight="600" isolation="isolate"><tspan x="0" y="0">999</tspan></text>
+        </g>
+      </g>
+    </g>
+    <g id="finalsM3Scores" isolation="isolate">
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(1128.1 477.6)" fill="red" font-family="MyriadPro-Semibold, &apos;Myriad Pro&apos;" font-size="14" font-weight="600" isolation="isolate"><tspan x="0" y="0">999</tspan></text>
+        </g>
+      </g>
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(1127.3 491.6)" fill="blue" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="14" font-weight="700" isolation="isolate"><tspan x="0" y="0">999</tspan></text>
+        </g>
+      </g>
+    </g>
+    <circle id="winnerMatch4Dot" cx="1168.7" cy="451" r="8" fill="#09ba48"/>
+    <g id="finalsM4Scores" isolation="isolate">
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(1157.3 477.6)" fill="red" font-family="MyriadPro-Semibold, &apos;Myriad Pro&apos;" font-size="14" font-weight="600" isolation="isolate"><tspan x="0" y="0">999</tspan></text>
+        </g>
+      </g>
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(1156.5 491.6)" fill="blue" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="14" font-weight="700" isolation="isolate"><tspan x="0" y="0">999</tspan></text>
+        </g>
+      </g>
+    </g>
+    <circle id="winnerMatch5Dot" cx="1197.9" cy="451" r="8" fill="#09ba48"/>
+    <g id="finalsM5Scores" isolation="isolate">
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(1186.7 477.6)" fill="red" font-family="MyriadPro-Semibold, &apos;Myriad Pro&apos;" font-size="14" font-weight="600" isolation="isolate"><tspan x="0" y="0">999</tspan></text>
+        </g>
+      </g>
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(1185.9 491.6)" fill="blue" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="14" font-weight="700" isolation="isolate"><tspan x="0" y="0">999</tspan></text>
+        </g>
+      </g>
+    </g>
+  </g>
+  <g id="match9">
+    <g>
+      <polygon points="984.7 504.6 848.4 504.6 848.4 468.5 984.7 468.5 997.6 486.6 984.7 504.6" fill="red"/>
+      <polygon points="984.7 541 848.4 541 848.4 505 984.7 505 997.6 523 984.7 541" fill="blue"/>
+      <line x1="984.7" y1="504.7" x2="826" y2="504.7" fill="none" stroke="#fff" stroke-miterlimit="10"/>
+      <rect x="826" y="468.5" width="22.4" height="72.5"/>
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(841.8 528.3) rotate(-90)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">MATCH 9</tspan></text>
+        </g>
+      </g>
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(872.2 483.2)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">Loser of M7</tspan></text>
+          </g>
+        </g>
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(854 497.8)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">22222 22222 22222</tspan></text>
+          </g>
+        </g>
+      </g>
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(867.2 519.6)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">Winner of M8</tspan></text>
+          </g>
+        </g>
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(853.9 534.2)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">22222 22222 22222</tspan></text>
+          </g>
+        </g>
+      </g>
+      <circle id="match9BlueDot" cx="993" cy="483" r="8" fill="#ffca10"/>
+      <circle id="match9BlueDot1" cx="993" cy="520" r="8" fill="#ffca10"/>
+      <g id="M9BlueScore" isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(959.4 525.6)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="15" font-weight="700" isolation="isolate"><tspan x="0" y="0">999</tspan></text>
+        </g>
+      </g>
+      <g id="M9RedScore" isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(959.4 489.6)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="15" font-weight="700" isolation="isolate"><tspan x="0" y="0">999</tspan></text>
+        </g>
+      </g>
+    </g>
+  </g>
+  <g id="match8">
+    <g>
+      <polygon points="802.7 574.6 666.4 574.6 666.4 538.5 802.7 538.5 815.6 556.6 802.7 574.6" fill="red"/>
+      <polygon points="802.7 611 666.4 611 666.4 575 802.7 575 815.6 593 802.7 611" fill="blue"/>
+      <line x1="802.7" y1="574.7" x2="644" y2="574.7" fill="none" stroke="#fff" stroke-miterlimit="10"/>
+      <rect x="644" y="538.5" width="22.4" height="72.5"/>
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(659.8 598.3) rotate(-90)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">MATCH 8</tspan></text>
+        </g>
+      </g>
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(687.2 553.2)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">Winner of M6</tspan></text>
+          </g>
+        </g>
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(671.9 567.8)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">22222 22222 22222</tspan></text>
+          </g>
+        </g>
+      </g>
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(688.6 589.6)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">Winner of M5</tspan></text>
+          </g>
+        </g>
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(671.9 604.2)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">22222 22222 22222</tspan></text>
+          </g>
+        </g>
+      </g>
+      <circle id="match8RedDot" cx="814" cy="556" r="8" fill="#ffca10"/>
+      <circle id="match8BlueDot" cx="814" cy="593" r="8" fill="#ffca10"/>
+      <g id="M8BlueScore" isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(779.4 595.6)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="15" font-weight="700" isolation="isolate"><tspan x="0" y="0">999</tspan></text>
+        </g>
+      </g>
+      <g id="M8RedScore" isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(779.4 559.6)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="15" font-weight="700" isolation="isolate"><tspan x="0" y="0">999</tspan></text>
+        </g>
+      </g>
+    </g>
+  </g>
+  <g id="match7">
+    <g>
+      <polygon points="802.7 254.6 666.4 254.6 666.4 218.5 802.7 218.5 815.6 236.6 802.7 254.6" fill="red"/>
+      <polygon points="802.7 291 666.4 291 666.4 255 802.7 255 815.6 273 802.7 291" fill="blue"/>
+      <line x1="802.7" y1="254.7" x2="644" y2="254.7" fill="none" stroke="#fff" stroke-miterlimit="10"/>
+      <rect x="644" y="218.5" width="22.4" height="72.5"/>
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(659.8 276.3) rotate(-90)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">MATCH 7</tspan></text>
+        </g>
+      </g>
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(695.4 233.2)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">Winner M3</tspan></text>
+          </g>
+        </g>
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(671.9 247.8)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">22222 22222 22222</tspan></text>
+          </g>
+        </g>
+      </g>
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(688.6 269.6)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">Winner of M4</tspan></text>
+          </g>
+        </g>
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(671.9 284.2)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">22222 22222 22222</tspan></text>
+          </g>
+        </g>
+      </g>
+      <circle id="match7RedDot" cx="814" cy="236" r="8" fill="#ffca10"/>
+      <circle id="match7BlueDot" cx="814" cy="273" r="8" fill="#ffca10"/>
+      <g id="M7BlueScore" isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(779.4 277.6)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="15" font-weight="700" isolation="isolate"><tspan x="0" y="0">999</tspan></text>
+        </g>
+      </g>
+      <g id="M7RedScore" isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(779.4 241.6)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="15" font-weight="700" isolation="isolate"><tspan x="0" y="0">999</tspan></text>
+        </g>
+      </g>
+    </g>
+  </g>
+  <g id="match6">
+    <g>
+      <polygon points="611.7 508.6 475.4 508.6 475.4 472.5 611.7 472.5 624.6 490.6 611.7 508.6" fill="red"/>
+      <polygon points="611.7 545 475.4 545 475.4 509 611.7 509 624.6 527 611.7 545" fill="blue"/>
+      <line x1="611.7" y1="508.7" x2="453" y2="508.7" fill="none" stroke="#fff" stroke-miterlimit="10"/>
+      <rect x="453" y="472.5" width="22.4" height="72.5"/>
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(468.8 532.3) rotate(-90)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">MATCH 6</tspan></text>
+        </g>
+      </g>
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(502.5 487.2)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">Loser of M4</tspan></text>
+          </g>
+        </g>
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(480.9 501.8)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">22222 22222 22222</tspan></text>
+          </g>
+        </g>
+      </g>
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(503.3 523.6)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">Loser of M1</tspan></text>
+          </g>
+        </g>
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(480.9 538.2)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">22222 22222 22222</tspan></text>
+          </g>
+        </g>
+      </g>
+      <circle id="match6RedDot" cx="623" cy="490" r="8" fill="#ffca10"/>
+      <circle id="match6lueDot" cx="623" cy="527" r="8" fill="#ffca10"/>
+      <g id="M6BlueScore" isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(587.4 532.6)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="15" font-weight="700" isolation="isolate"><tspan x="0" y="0">999</tspan></text>
+        </g>
+      </g>
+      <g id="M6RedScore" isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(587.4 496.6)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="15" font-weight="700" isolation="isolate"><tspan x="0" y="0">999</tspan></text>
+        </g>
+      </g>
+    </g>
+  </g>
+  <g id="match5">
+    <g>
+      <polygon points="611.7 647.6 475.4 647.6 475.4 611.5 611.7 611.5 624.6 629.6 611.7 647.6" fill="red"/>
+      <polygon points="611.7 684 475.4 684 475.4 648 611.7 648 624.6 666 611.7 684" fill="blue"/>
+      <line x1="611.7" y1="647.7" x2="453" y2="647.7" fill="none" stroke="#fff" stroke-miterlimit="10"/>
+      <rect x="453" y="611.5" width="22.4" height="72.5"/>
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(468.8 672) rotate(-90)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">MATCH 5</tspan></text>
+        </g>
+      </g>
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(502.5 626.2)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">Loser of M3</tspan></text>
+          </g>
+        </g>
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(480.9 640.8)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">22222 22222 22222</tspan></text>
+          </g>
+        </g>
+      </g>
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(497.6 662.6)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">Loserof M2</tspan></text>
+          </g>
+        </g>
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(480.9 677.2)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">22222 22222 22222</tspan></text>
+          </g>
+        </g>
+      </g>
+      <circle id="match5RedDot" cx="623" cy="629" r="8" fill="#ffca10"/>
+      <circle id="match5BlueDot" cx="623" cy="666" r="8" fill="#ffca10"/>
+      <g id="M5BlueScore" isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(587.4 669.6)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="15" font-weight="700" isolation="isolate"><tspan x="0" y="0">999</tspan></text>
+        </g>
+      </g>
+      <g id="M5RedScore" isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(587.4 633.6)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="15" font-weight="700" isolation="isolate"><tspan x="0" y="0">999</tspan></text>
+        </g>
+      </g>
+    </g>
+  </g>
+  <g id="match4">
+    <g>
+      <polygon points="412.7 328.6 276.4 328.6 276.4 292.5 412.7 292.5 425.6 310.6 412.7 328.6" fill="red"/>
+      <polygon points="412.7 365 276.4 365 276.4 329 412.7 329 425.6 347 412.7 365" fill="blue"/>
+      <line x1="412.7" y1="328.7" x2="254" y2="328.7" fill="none" stroke="#fff" stroke-miterlimit="10"/>
+      <rect x="254" y="292.5" width="22.4" height="72.5"/>
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(269.8 353) rotate(-90)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">MATCH 4</tspan></text>
+        </g>
+      </g>
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(310.5 307.2)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">Alliance 2</tspan></text>
+          </g>
+        </g>
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(281.9 321.8)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">22222 22222 22222</tspan></text>
+          </g>
+        </g>
+      </g>
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(298.6 343.6)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">Winner of M2</tspan></text>
+          </g>
+        </g>
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(281.9 358.2)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">22222 22222 22222</tspan></text>
+          </g>
+        </g>
+      </g>
+      <circle id="matchRedDot" cx="426" cy="309" r="8" fill="#ffca10"/>
+      <circle id="match8BlueDot1" cx="426" cy="346" r="8" fill="#ffca10"/>
+      <g id="M8BlueScore1" isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(390.4 352.6)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="15" font-weight="700" isolation="isolate"><tspan x="0" y="0">999</tspan></text>
+        </g>
+      </g>
+      <g id="M8RedScore1" isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(390.4 316.6)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="15" font-weight="700" isolation="isolate"><tspan x="0" y="0">999</tspan></text>
+        </g>
+      </g>
+    </g>
+  </g>
+  <g id="match3">
+    <g>
+      <polygon points="412.7 174.6 276.4 174.6 276.4 138.5 412.7 138.5 425.6 156.6 412.7 174.6" fill="red"/>
+      <polygon points="412.7 211 276.4 211 276.4 175 412.7 175 425.6 193 412.7 211" fill="blue"/>
+      <line x1="412.7" y1="174.7" x2="254" y2="174.7" fill="none" stroke="#fff" stroke-miterlimit="10"/>
+      <rect x="254" y="138.5" width="22.4" height="72.5"/>
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(269.8 199) rotate(-90)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">MATCH 3</tspan></text>
+        </g>
+      </g>
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(310.5 153.2)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">Alliance 1</tspan></text>
+          </g>
+        </g>
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(281.9 167.8)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">22222 22222 22222</tspan></text>
+          </g>
+        </g>
+      </g>
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(298.6 189.6)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">Winner of M1</tspan></text>
+          </g>
+        </g>
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(281.9 204.2)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">22222 22222 22222</tspan></text>
+          </g>
+        </g>
+      </g>
+      <circle id="match3RedDot" cx="426" cy="156" r="8" fill="#ffca10"/>
+      <circle id="match3BlueDot" cx="426" cy="193" r="8" fill="#ffca10"/>
+      <g id="M3BlueScore" isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(390.4 196.6)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="15" font-weight="700" isolation="isolate"><tspan x="0" y="0">999</tspan></text>
+        </g>
+      </g>
+      <g id="M3RedScore" isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(390.4 160.6)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="15" font-weight="700" isolation="isolate"><tspan x="0" y="0">999</tspan></text>
+        </g>
+      </g>
+    </g>
+  </g>
+  <g id="match2">
+    <g>
+      <polygon points="223.7 367.6 87.4 367.6 87.4 331.5 223.7 331.5 236.6 349.6 223.7 367.6" fill="red"/>
+      <polygon points="223.7 404 87.4 404 87.4 368 223.7 368 236.6 386 223.7 404" fill="blue"/>
+      <line x1="223.7" y1="367.7" x2="65" y2="367.7" fill="none" stroke="#fff" stroke-miterlimit="10"/>
+      <rect x="65" y="331.5" width="22.4" height="72.5"/>
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(80.8 392) rotate(-90)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">MATCH 2</tspan></text>
+        </g>
+      </g>
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(119.5 346.2)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">Alliance 3</tspan></text>
+          </g>
+        </g>
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(92.9 360.8)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">22222 22222 22222</tspan></text>
+          </g>
+        </g>
+      </g>
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(119.5 382.6)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">Alliance 6</tspan></text>
+          </g>
+        </g>
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(92.9 397.2)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">22222 22222 22222</tspan></text>
+          </g>
+        </g>
+      </g>
+      <circle id="match2RedDot" cx="237" cy="350" r="8" fill="#ffca10"/>
+      <circle id="match2BlueDot" cx="237" cy="387" r="8" fill="#ffca10"/>
+      <g id="M2BlueScore" isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(202.4 391.6)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="15" font-weight="700" isolation="isolate"><tspan x="0" y="0">999</tspan></text>
+        </g>
+      </g>
+      <g id="M2RedScore" isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(202.4 355.6)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="15" font-weight="700" isolation="isolate"><tspan x="0" y="0">999</tspan></text>
+        </g>
+      </g>
+    </g>
+  </g>
+  <g id="match1">
+    <g>
+      <polygon points="223.7 213.6 87.4 213.6 87.4 177.5 223.7 177.5 236.6 195.6 223.7 213.6" fill="red"/>
+      <polygon points="223.7 250 87.4 250 87.4 214 223.7 214 236.6 232 223.7 250" fill="blue"/>
+      <line x1="223.7" y1="213.7" x2="65" y2="213.7" fill="none" stroke="#fff" stroke-miterlimit="10"/>
+      <rect x="65" y="177.5" width="22.4" height="72.5"/>
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(80.8 238) rotate(-90)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">MATCH 1</tspan></text>
+        </g>
+      </g>
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(119.5 192.2)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">Alliance 4</tspan></text>
+          </g>
+        </g>
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(92.9 206.8)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">22222 22222 22222</tspan></text>
+          </g>
+        </g>
+      </g>
+      <g isolation="isolate">
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(119.5 228.6)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">Alliance 5</tspan></text>
+          </g>
+        </g>
+        <g isolation="isolate">
+          <g isolation="isolate">
+            <text transform="translate(92.9 243.2)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="12.1" font-weight="700" isolation="isolate"><tspan x="0" y="0">22222 22222 22222</tspan></text>
+          </g>
+        </g>
+      </g>
+      <circle id="match1RedDot" cx="237" cy="195" r="8" fill="#ffca10"/>
+      <circle id="match1BlueDot" cx="237" cy="232" r="8" fill="#ffca10"/>
+      <g id="M1BlueScore" isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(202.4 236.6)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="15" font-weight="700" isolation="isolate"><tspan x="0" y="0">999</tspan></text>
+        </g>
+      </g>
+      <g id="M1RedScore" isolation="isolate">
+        <g isolation="isolate">
+          <text transform="translate(202.4 200.6)" fill="#fff" font-family="MyriadPro-Bold, &apos;Myriad Pro&apos;" font-size="15" font-weight="700" isolation="isolate"><tspan x="0" y="0">999</tspan></text>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

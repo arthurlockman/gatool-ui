@@ -1,0 +1,805 @@
+import Announce from "../components/Announce";
+import { Alert, Container } from "react-bootstrap";
+import _ from "lodash";
+import { rankHighlight } from "../components/HelperFunctions";
+import BottomButtons from "../components/BottomButtons";
+import TopButtons from "../components/TopButtons";
+import { useHotkeys } from "react-hotkeys-hook";
+import { useSwipeable } from "react-swipeable";
+import moment from "moment";
+import { useEffect, useRef } from "react";
+import NotificationBanner from "components/NotificationBanner";
+import EventNotificationBanner from "components/EventNotificationBanner";
+import useScrollPosition from "../hooks/useScrollPosition";
+import { useScrollToTop } from "../contextProviders/ScrollContainerContext";
+import AnnounceAllianceMatchupSummary from "../components/AnnounceAllianceMatchupSummary";
+import {
+  getConnectionsEventKey,
+  allianceRosterToConnectionKey,
+} from "../utils/allianceConnectionsApi";
+import { getAllianceLookupEntry } from "../utils/allianceLookup";
+import { matchHasPostedResult } from "../utils/playoffReserveEdits";
+
+function AnnouncePage({
+  selectedEvent,
+  selectedYear,
+  worldStats,
+  ftcRegionHighScores,
+  ftcLeagueHighScores,
+  districts,
+  ftcLeagues,
+  teamList,
+  rankings,
+  communityUpdates,
+  currentMatch,
+  playoffSchedule,
+  qualSchedule,
+  allianceCount,
+  alliances,
+  setAlliances,
+  awardsMenu,
+  showNotesAnnounce,
+  showAwards,
+  showMinorAwards,
+  showSponsors,
+  showMottoes,
+  showChampsStats,
+  timeFormat,
+  eventHighScores,
+  backupTeam,
+  setBackupTeam,
+  upsertPlayoffReserveOverlay,
+  removePlayoffReserveOverlay,
+  playoffReserveEdits,
+  nextMatch,
+  previousMatch,
+  setMatchFromMenu,
+  practiceSchedule,
+  eventNamesCY,
+  districtRankings,
+  regionalEventDetail,
+  getRegionalEventDetail,
+  showDistrictChampsStats,
+  showChampsStatsAtDistrictRegional,
+  showBlueBanners,
+  adHocMatch,
+  setAdHocMatch,
+  adHocMode,
+  offlinePlayoffSchedule,
+  swapScreen,
+  autoHideSponsors,
+  hidePracticeSchedule,
+  teamReduction,
+  qualsLength,
+  playoffOnly,
+  getSchedule,
+  usePullDownToUpdate,
+  useSwipe,
+  eventLabel,
+  playoffCountOverride,
+  showInspection,
+  showWorldAndStatsOnAnnouncePlayByPlay,
+  highScoreMode,
+  eventMessage,
+  eventBell,
+  setEventBell,
+  ftcMode,
+  remapNumberToString,
+  remapStringToNumber,
+  useScrollMemory,
+  alliancePartnerConnectionsCache,
+}) {
+  // Remember scroll position for Announce page
+  useScrollPosition('announce', true, false, useScrollMemory);
+  const scrollToTop = useScrollToTop();
+
+  const isRegionalEvent = !ftcMode && !selectedEvent?.value?.districtCode;
+  const regionalDetailForSeason = regionalEventDetail?.season === selectedYear?.value ? regionalEventDetail : null;
+  useEffect(() => {
+    if (isRegionalEvent && selectedEvent?.value?.code && !selectedEvent?.value?.code.includes("OFFLINE") && !regionalDetailForSeason && getRegionalEventDetail) {
+      getRegionalEventDetail();
+    }
+  }, [isRegionalEvent, selectedEvent?.value?.code, regionalDetailForSeason, getRegionalEventDetail]);
+
+  // Reset scroll position when navigating to a different match
+  // Reset both Announce and Play By Play scroll positions when match changes
+  const previousMatchRef = useRef(currentMatch);
+  useEffect(() => {
+    if (previousMatchRef.current !== currentMatch && previousMatchRef.current !== undefined) {
+      scrollToTop();
+      // Clear saved scroll position for both Announce and Play By Play when match changes
+      sessionStorage.removeItem('scrollPosition_announce');
+      sessionStorage.removeItem('scrollPosition_playbyplay');
+    }
+    previousMatchRef.current = currentMatch;
+  }, [currentMatch, scrollToTop]);
+
+  const matchesToNotify = _.toInteger(
+    (teamList?.teams?.length - teamReduction) / 6
+  );
+  if (
+    qualSchedule?.schedule?.schedule?.length > 0 ||
+    qualSchedule?.schedule?.length > 0
+  ) {
+  }
+  const notification =
+    currentMatch >= qualsLength - matchesToNotify &&
+      currentMatch <= qualsLength &&
+      showInspection
+      ? {
+        expiry: moment().add(1, "hour"),
+        onTime: moment(),
+        message:
+          "Please remind teams to have their robots reinspected before Playoffs and to send their team rep(s) for Alliance Selection.",
+      }
+      : {};
+
+  function updateTeamDetails(station, matchDetails) {
+    var team = {};
+    var alliance = station.slice(0, station.length - 1);
+    var allianceNumber =
+      matchDetails?.teams[
+        _.findIndex(matchDetails?.teams, { station: `${alliance}1` })
+      ]?.alliance;
+
+
+    if (station.slice(-1) !== "4") {
+      team =
+        matchDetails?.teams[
+        _.findIndex(matchDetails?.teams, { station: station })
+        ];
+      // Reverse-map the team number to get the actual team number for lookups
+      const lookupTeamNumber = remapNumberToString(team?.teamNumber);
+
+
+      team = communityUpdates
+        ? _.merge(
+          team,
+          teamList?.teams[
+          _.findIndex(teamList?.teams, { teamNumber: team?.teamNumber })
+          ],
+          rankings?.ranks[
+          _.findIndex(rankings?.ranks, { teamNumber: lookupTeamNumber })
+          ],
+          communityUpdates[
+          _.findIndex(communityUpdates, { teamNumber: team?.teamNumber })
+          ]
+        )
+        : _.merge(
+          team,
+          teamList?.teams[
+          _.findIndex(teamList?.teams, { teamNumber: team?.teamNumber })
+          ],
+          rankings?.ranks[
+          _.findIndex(rankings?.ranks, { teamNumber: lookupTeamNumber })
+          ]
+        );
+
+      team.rankStyle = rankHighlight(team?.rank, allianceCount || { count: 8 });
+      const announceAllianceEntry = getAllianceLookupEntry(
+        alliances?.Lookup,
+        team?.teamNumber,
+        remapNumberToString
+      );
+      team.alliance = announceAllianceEntry?.alliance ?? null;
+      team.allianceRole = announceAllianceEntry?.role ?? null;
+
+      var teamDistrictRanks =
+        _.filter(districtRankings?.districtRanks, {
+          teamNumber: team?.teamNumber,
+        })[0] || null;
+      team.districtRanking = teamDistrictRanks?.rank;
+      team.qualifiedDistrictCmp = teamDistrictRanks?.qualifiedDistrictCmp;
+      team.qualifiedFirstCmp = teamDistrictRanks?.qualifiedFirstCmp;
+      // Regional event: set World Champs qualification from regional advancement (main teams Red1–Red3, Blue1–Blue3)
+      if (
+        !ftcMode &&
+        !selectedEvent?.value?.districtCode &&
+        selectedEvent?.value?.code &&
+        !selectedEvent?.value?.code.includes("OFFLINE") &&
+        regionalEventDetail?.teams?.length > 0 &&
+        (regionalEventDetail?.season == null || regionalEventDetail?.season === selectedYear?.value || String(regionalEventDetail?.season) === String(selectedYear?.value))
+      ) {
+        const lookupNumber = remapStringToNumber ? remapStringToNumber(team?.teamNumber) : team?.teamNumber;
+        const num = lookupNumber != null ? Number(lookupNumber) : NaN;
+        const regionalAdvancement = _.find(regionalEventDetail.teams, (t) =>
+          Number(t.teamNumber) === num || String(t.teamNumber) === String(lookupNumber)
+        );
+        if (regionalAdvancement) {
+          team.qualifiedFirstCmp = Boolean(regionalAdvancement.qualifiedFirstCmp);
+        }
+      }
+    }
+
+    if (station?.slice(-1) === "4") {
+
+      if (inPlayoffs || selectedEvent?.value?.champLevel === "CHAMPS") {
+        var playoffTeams = matchDetails?.teams.map((team) => {
+          // Reverse-map the team number to get the actual team number for lookups
+          const lookupTeamNumber = remapNumberToString(team?.teamNumber);
+          return { teamNumber: lookupTeamNumber, alliance: team?.alliance };
+        });
+        var allianceTeams = allianceNumber
+          ? _.filter(playoffTeams, { alliance: allianceNumber }).map((o) => {
+            return o.teamNumber;
+          })
+          : [];
+        // var allianceMembers = allianceNumber ? _.filter(alliances?.alliances, { "number": Number(allianceNumber.slice(-1)) })[0] : [];
+        var allianceMembers = allianceNumber
+          ? _.filter(alliances?.alliances, { name: allianceNumber })[0]
+          : [];
+        var allianceArray = [];
+        allianceArray.push(allianceMembers?.captain);
+        allianceArray.push(allianceMembers?.round1);
+        allianceArray.push(allianceMembers?.round2);
+        if (allianceMembers?.round3) {
+          allianceArray.push(allianceMembers?.round3);
+        }
+        if (allianceMembers?.backup) {
+          allianceArray.push(allianceMembers?.backup);
+        }
+
+        var remainingTeam = _.difference(allianceArray, allianceTeams);
+        if (remainingTeam.length > 0 && teamList?.teams?.length > 0) {
+          // Reverse-map the team number to get the actual team number for lookups
+          const lookupRemainingTeam = remainingTeam[0];
+
+          team = _.merge(
+            team,
+            teamList?.teams[
+            _.findIndex(teamList?.teams, { teamNumber: remapStringToNumber(lookupRemainingTeam) })
+            ],
+            rankings?.ranks?.length > 0
+              ? rankings?.ranks[
+              _.findIndex(rankings?.ranks, { teamNumber: lookupRemainingTeam })
+              ]
+              : null,
+            communityUpdates?.length > 0
+              ? communityUpdates[
+              _.findIndex(communityUpdates, {
+                teamNumber: remapStringToNumber(lookupRemainingTeam),
+              })
+              ]
+              : null
+          );
+
+          team.rankStyle = rankHighlight(
+            team?.rank,
+            allianceCount || { count: 8 }
+          );
+          const remEntry = getAllianceLookupEntry(
+            alliances?.Lookup,
+            lookupRemainingTeam,
+            remapNumberToString
+          );
+          team.alliance = remEntry?.alliance ?? null;
+          team.allianceRole = remEntry?.role ?? null;
+
+          if (selectedEvent?.value?.districtCode) {
+            teamDistrictRanks =
+              _.filter(districtRankings?.districtRanks, {
+                teamNumber: lookupRemainingTeam,
+              })[0] || null;
+            team.districtRanking = teamDistrictRanks?.rank;
+            team.qualifiedDistrictCmp = teamDistrictRanks?.qualifiedDistrictCmp;
+            team.qualifiedFirstCmp = teamDistrictRanks?.qualifiedFirstCmp;
+          } else if (
+            !ftcMode &&
+            selectedEvent?.value?.code &&
+            !selectedEvent?.value?.code.includes("OFFLINE") &&
+            regionalEventDetail?.teams?.length > 0 &&
+            (regionalEventDetail?.season == null || regionalEventDetail?.season === selectedYear?.value || String(regionalEventDetail?.season) === String(selectedYear?.value))
+          ) {
+            const lookupNumber = remapStringToNumber ? remapStringToNumber(lookupRemainingTeam) : lookupRemainingTeam;
+            const num = lookupNumber != null ? Number(lookupNumber) : NaN;
+            const regionalAdvancement = _.find(regionalEventDetail.teams, (t) =>
+              Number(t.teamNumber) === num || String(t.teamNumber) === String(lookupNumber)
+            );
+            if (regionalAdvancement) {
+              team.qualifiedFirstCmp = Boolean(regionalAdvancement.qualifiedFirstCmp);
+            }
+          }
+        }
+      }
+    }
+
+    return team;
+  }
+
+  var schedule = [];
+  if (
+    (practiceSchedule?.schedule?.schedule?.length > 0 ||
+      practiceSchedule?.schedule?.length > 0) &&
+    (qualSchedule?.schedule?.length === 0 ||
+      qualSchedule?.schedule?.schedule?.length === 0)
+  ) {
+    schedule =
+      practiceSchedule?.schedule?.schedule || practiceSchedule?.schedule;
+  }
+  if (
+    (practiceSchedule?.schedule?.schedule?.length > 0 ||
+      practiceSchedule?.schedule?.length > 0) &&
+    (qualSchedule?.schedule?.length > 0 ||
+      qualSchedule?.schedule?.schedule?.length > 0)
+  ) {
+    var firstMatch =
+      typeof qualSchedule.schedule?.schedule !== "undefined"
+        ? qualSchedule.schedule?.schedule[0]
+        : qualSchedule?.schedule[0];
+    if (
+      moment().isBefore(moment(firstMatch.startTime).subtract(20, "minutes")) &&
+      !hidePracticeSchedule
+    ) {
+      schedule =
+        practiceSchedule?.schedule?.schedule || practiceSchedule?.schedule;
+    }
+  }
+  if (offlinePlayoffSchedule?.schedule?.length > 0) {
+    schedule = _.concat(schedule, offlinePlayoffSchedule?.schedule);
+  }
+
+  // Handle nested structure (standard from API/uploads) or flat structure (legacy)
+  if (qualSchedule?.schedule?.schedule?.length > 0) {
+    schedule = _.concat(schedule, qualSchedule?.schedule?.schedule);
+  } else if (qualSchedule?.schedule?.length > 0) {
+    schedule = _.concat(schedule, qualSchedule?.schedule);
+  }
+
+  if (playoffSchedule?.schedule?.length > 0) {
+    schedule = _.concat(schedule, playoffSchedule?.schedule);
+  }
+
+  var matchDetails = !adHocMode
+    ? schedule[currentMatch - 1]
+    : adHocMatch
+      ? {
+        description: "Practice Match",
+        startTime: null,
+        matchNumber: 1,
+        field: "Primary",
+        tournamentLevel: "Practice",
+        teams: [
+          {
+            teamNumber: adHocMatch[0]?.teamNumber
+              ? adHocMatch[0]?.teamNumber
+              : null,
+            station: "Red1",
+            surrogate: false,
+            dq: false,
+          },
+          {
+            teamNumber: adHocMatch[1]?.teamNumber
+              ? adHocMatch[1]?.teamNumber
+              : null,
+            station: "Red2",
+            surrogate: false,
+            dq: false,
+          },
+          {
+            teamNumber: adHocMatch[2]?.teamNumber
+              ? adHocMatch[2]?.teamNumber
+              : null,
+            station: "Red3",
+            surrogate: false,
+            dq: false,
+          },
+          {
+            teamNumber: adHocMatch[3]?.teamNumber
+              ? adHocMatch[3]?.teamNumber
+              : null,
+            station: "Blue1",
+            surrogate: false,
+            dq: false,
+          },
+          {
+            teamNumber: adHocMatch[4]?.teamNumber
+              ? adHocMatch[4]?.teamNumber
+              : null,
+            station: "Blue2",
+            surrogate: false,
+            dq: false,
+          },
+          {
+            teamNumber: adHocMatch[5]?.teamNumber
+              ? adHocMatch[5]?.teamNumber
+              : null,
+            station: "Blue3",
+            surrogate: false,
+            dq: false,
+          },
+        ],
+        isReplay: false,
+        matchVideoLink: null,
+        scoreRedFinal: null,
+        scoreRedFoul: null,
+        scoreRedAuto: null,
+        scoreBlueFinal: null,
+        scoreBlueFoul: null,
+        scoreBlueAuto: null,
+        autoStartTime: null,
+        actualStartTime: null,
+        postResultTime: null,
+        winner: {
+          winner: null,
+          tieWinner: null,
+          level: null,
+        },
+      }
+      : null;
+
+  if (
+    practiceSchedule?.schedule.length > 0 &&
+    adHocMatch &&
+    (!qualSchedule || qualSchedule?.schedule.length === 0)
+  ) {
+    if (matchDetails && typeof matchDetails?.teams === "undefined") {
+      matchDetails.teams = adHocMatch;
+    }
+  }
+
+  var inPlayoffs = matchDetails?.tournamentLevel
+    ? matchDetails?.tournamentLevel.toLowerCase() === "playoff"
+      ? true
+      : false
+    : false;
+
+  const matchMenu = schedule.map((match, index) => {
+    var tag = `${match?.description} of ${qualSchedule?.schedule?.length}`;
+    if (
+      (match?.tournamentLevel &&
+        match?.tournamentLevel?.toLowerCase() === "playoff") ||
+      (match?.tournamentLevel &&
+        match?.tournamentLevel?.toLowerCase() === "practice")
+    ) {
+      tag = match?.description;
+    }
+    return {
+      value: index + 1,
+      label: tag,
+      matchCompleted: matchHasPostedResult(match),
+    };
+  });
+
+  var displayOrder = !ftcMode
+    ? ["Red1", "Red2", "Red3", "Red4", "Blue1", "Blue2", "Blue3", "Blue4"]
+    : ["Red1", "Red2", "Red3", "Blue1", "Blue2", "Blue3"];
+  var teamDetails = [];
+  if (teamList && matchDetails) {
+    //fill in the team details
+    displayOrder.forEach((station) => {
+      teamDetails[station] = updateTeamDetails(station, matchDetails);
+    });
+  }
+
+  const connectionsEventKey =
+    !ftcMode && inPlayoffs
+      ? getConnectionsEventKey(selectedEvent, selectedYear)
+      : null;
+
+  const playoffAllianceTeamNums = (prefix) => {
+    if (!matchDetails?.teams) return [];
+    const nums = [];
+    for (let i = 1; i <= 4; i++) {
+      const t = _.find(matchDetails.teams, { station: `${prefix}${i}` });
+      const raw = t?.teamNumber;
+      if (raw != null && Number(raw) > 0) {
+        const n = remapStringToNumber
+          ? Number(remapStringToNumber(raw))
+          : Number(raw);
+        if (!Number.isNaN(n)) nums.push(n);
+      }
+    }
+    return nums;
+  };
+  const onFieldRedKey = playoffAllianceTeamNums("Red")
+    .slice()
+    .sort((a, b) => a - b)
+    .join(",");
+  const onFieldBlueKey = playoffAllianceTeamNums("Blue")
+    .slice()
+    .sort((a, b) => a - b)
+    .join(",");
+
+  const firstRedWithTeamGlobal = ["Red1", "Red2", "Red3", "Red4"].find(
+    (s) => teamDetails[s]?.teamNumber > 0
+  );
+  const firstBlueWithTeamGlobal = ["Blue1", "Blue2", "Blue3", "Blue4"].find(
+    (s) => teamDetails[s]?.teamNumber > 0
+  );
+
+  const cacheEntryForSide = (firstStationWithTeam, onFieldKey) => {
+    const allianceName = firstStationWithTeam
+      ? teamDetails[firstStationWithTeam]?.alliance
+      : null;
+    const rosterAlliance = alliances?.alliances?.find(
+      (x) => x.name === allianceName
+    );
+    const rosterKey = rosterAlliance
+      ? allianceRosterToConnectionKey(rosterAlliance)
+      : null;
+    const keysToTry = [rosterKey, onFieldKey].filter(Boolean);
+    const cache = alliancePartnerConnectionsCache || {};
+    for (const k of keysToTry) {
+      if (cache[k] !== undefined) return cache[k];
+    }
+    if (keysToTry.length === 0) {
+      return { loading: false, data: null, error: null };
+    }
+    return { loading: true, data: null, error: null };
+  };
+
+  const redCache = cacheEntryForSide(firstRedWithTeamGlobal, onFieldRedKey);
+  const blueCache = cacheEntryForSide(firstBlueWithTeamGlobal, onFieldBlueKey);
+
+  const showPlayoffMatchupColumn = Boolean(connectionsEventKey);
+
+  if (
+    practiceSchedule?.schedule?.schedule?.length > 0 ||
+    practiceSchedule?.schedule?.length > 0
+  ) {
+    if (!adHocMatch) {
+      setAdHocMatch(matchDetails?.teams);
+    }
+  }
+
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: () => {
+      if (useSwipe) nextMatch();
+    },
+    onSwipedRight: () => {
+      if (useSwipe) previousMatch();
+    },
+    onSwipedDown: () => {
+      if (usePullDownToUpdate) {
+        if (useSwipe) getSchedule();
+      }
+    },
+    preventScrollOnSwipe: useSwipe,
+  });
+
+  useHotkeys("right", () => nextMatch(), { scopes: "matchNavigation" });
+  useHotkeys("left", () => previousMatch(), { scopes: "matchNavigation" });
+
+  return (
+    <Container fluid>
+      {!selectedEvent && (
+        <div>
+          <Alert variant="warning" className="gatool-awaiting-message">
+            You need to select an event before you can see anything here.
+          </Alert>
+        </div>
+      )}
+      {selectedEvent && (!teamList || teamList?.teams.length === 0) && (
+        <div>
+          <Alert variant="warning" className="gatool-awaiting-message">
+            <div>
+              <img src="loadingIcon.gif" alt="Loading data..." />
+            </div>
+            Awaiting team data for {eventLabel}
+          </Alert>
+        </div>
+      )}
+      {selectedEvent &&
+        teamList &&
+        (!schedule || schedule?.length === 0) &&
+        !adHocMode && (
+          <div>
+            <Alert variant="warning" className="gatool-awaiting-message">
+              <div>
+                <img src="loadingIcon.gif" alt="Loading data..." />
+              </div>
+              Awaiting schedule data for {eventLabel}
+            </Alert>
+          </div>
+        )}
+      {selectedEvent &&
+        teamList?.teams.length > 0 &&
+        (schedule?.length > 0 ||
+          practiceSchedule?.schedule.length > 0 ||
+          adHocMode) && (
+          <Container fluid {...swipeHandlers}>
+            <TopButtons
+              previousMatch={previousMatch}
+              nextMatch={nextMatch}
+              currentMatch={currentMatch}
+              matchMenu={matchMenu}
+              setMatchFromMenu={setMatchFromMenu}
+              selectedEvent={selectedEvent}
+              matchDetails={matchDetails}
+              timeFormat={timeFormat}
+              inPlayoffs={inPlayoffs}
+              alliances={alliances}
+              setAlliances={setAlliances}
+              rankings={rankings}
+              backupTeam={backupTeam}
+              setBackupTeam={setBackupTeam}
+              upsertPlayoffReserveOverlay={upsertPlayoffReserveOverlay}
+              removePlayoffReserveOverlay={removePlayoffReserveOverlay}
+              playoffReserveEdits={playoffReserveEdits}
+              teamList={teamList}
+              adHocMatch={adHocMatch}
+              setAdHocMatch={setAdHocMatch}
+              adHocMode={adHocMode}
+              swapScreen={swapScreen}
+              playoffOnly={playoffOnly}
+              eventLabel={eventLabel}
+              ftcMode={ftcMode}
+            />
+            <NotificationBanner notification={notification} />
+            <EventNotificationBanner
+              notifications={eventMessage}
+              eventBell={eventBell}
+              setEventBell={setEventBell}
+            />
+            {!matchDetails?.description.includes("Bye Match") && (
+              <table className={"table table-responsive"}>
+                <thead>
+                  <tr key={"header"}>
+                    <td>Team #</td>
+                    <td>Team Name</td>
+                    <td>Organization, Sponsors & Awards</td>
+                    <td>
+                      {showPlayoffMatchupColumn
+                        ? "Prior Partnerships"
+                        : "Rank"}
+                    </td>
+                  </tr>
+                </thead>
+                <tbody>
+                  {displayOrder.map((station, index) => {
+                    const redRowsWithTeam = ["Red1", "Red2", "Red3", "Red4"].filter(
+                      (s) => teamDetails[s]?.teamNumber > 0
+                    ).length;
+                    const blueRowsWithTeam = [
+                      "Blue1",
+                      "Blue2",
+                      "Blue3",
+                      "Blue4",
+                    ].filter((s) => teamDetails[s]?.teamNumber > 0).length;
+
+                    let column4 = undefined;
+                    if (
+                      showPlayoffMatchupColumn &&
+                      !_.isEmpty(teamDetails[station]) &&
+                      teamDetails[station].teamNumber > 0
+                    ) {
+                      if (
+                        station.startsWith("Red") &&
+                        firstRedWithTeamGlobal &&
+                        redRowsWithTeam > 0
+                      ) {
+                        if (station === firstRedWithTeamGlobal) {
+                          column4 = {
+                            type: "matchup",
+                            rowSpan: redRowsWithTeam,
+                            content: (
+                              <AnnounceAllianceMatchupSummary
+                                connections={redCache.data}
+                                loading={redCache.loading}
+                                error={redCache.error}
+                              />
+                            ),
+                          };
+                        } else {
+                          column4 = { type: "omit" };
+                        }
+                      } else if (
+                        station.startsWith("Blue") &&
+                        firstBlueWithTeamGlobal &&
+                        blueRowsWithTeam > 0
+                      ) {
+                        if (station === firstBlueWithTeamGlobal) {
+                          column4 = {
+                            type: "matchup",
+                            rowSpan: blueRowsWithTeam,
+                            content: (
+                              <AnnounceAllianceMatchupSummary
+                                connections={blueCache.data}
+                                loading={blueCache.loading}
+                                error={blueCache.error}
+                              />
+                            ),
+                          };
+                        } else {
+                          column4 = { type: "omit" };
+                        }
+                      }
+                    }
+
+                    if (
+                      !_.isEmpty(teamDetails[station]) &&
+                      !_.isUndefined(teamDetails[station].teamNumber) &&
+                      !_.isNull(teamDetails[station].teamNumber) &&
+                      teamDetails[station].teamNumber > 0
+                    ) {
+                      const announceRow = (
+                        <Announce
+                          station={station}
+                          team={teamDetails[station]}
+                          inPlayoffs={inPlayoffs}
+                          key={`${station}${index}`}
+                          awardsMenu={awardsMenu}
+                          selectedYear={selectedYear}
+                          selectedEvent={selectedEvent}
+                          showNotesAnnounce={showNotesAnnounce}
+                          autoHideSponsors={autoHideSponsors}
+                          showAwards={showAwards}
+                          showMinorAwards={showMinorAwards}
+                          showSponsors={showSponsors}
+                          showMottoes={showMottoes}
+                          showChampsStats={showChampsStats}
+                          showChampsStatsAtDistrictRegional={showChampsStatsAtDistrictRegional}
+                          showBlueBanners={showBlueBanners}
+                          eventNamesCY={eventNamesCY}
+                          showDistrictChampsStats={showDistrictChampsStats}
+                          playoffOnly={playoffOnly}
+                          ftcMode={ftcMode}
+                          remapNumberToString={remapNumberToString}
+                          column4={column4}
+                        />
+                      );
+                      return announceRow;
+                    } else {
+                      if (
+                        !ftcMode &&
+                        station.slice(-1) !== "4" &&
+                        ftcMode &&
+                        station.slice(-1) !== "3"
+                      ) {
+                        var allianceColor = _.toLower(station.slice(0, -1));
+                        const tbdRow = (
+                          <tr
+                            key={`${station}-tbd`}
+                            className={`gatool-announce ${allianceColor}Alliance`}
+                          >
+                            <td colSpan={4} className={"tbd"}>
+                              {adHocMode ? "No team selected" : "TBD"}
+                            </td>
+                          </tr>
+                        );
+                        return tbdRow;
+                      } else {
+                        return "";
+                      }
+                    }
+                  })}
+                </tbody>
+              </table>
+            )}
+            {matchDetails?.description?.includes("Bye Match") && (
+              <Alert>
+                <h1>
+                  <b>BYE MATCH</b>
+                </h1>
+              </Alert>
+            )}
+            <BottomButtons
+              previousMatch={previousMatch}
+              nextMatch={nextMatch}
+              currentMatch={currentMatch}
+              matchDetails={matchDetails}
+              playoffSchedule={playoffSchedule}
+              eventHighScores={eventHighScores}
+              alliances={alliances}
+              selectedEvent={selectedEvent}
+              adHocMode={adHocMode}
+              playoffCountOverride={playoffCountOverride}
+              showWorldAndStatsOnAnnouncePlayByPlay={showWorldAndStatsOnAnnouncePlayByPlay}
+              highScoreMode={highScoreMode}
+              ftcMode={ftcMode}
+              worldStats={worldStats}
+              ftcRegionHighScores={ftcRegionHighScores}
+              ftcLeagueHighScores={ftcLeagueHighScores}
+              selectedYear={selectedYear}
+              eventNamesCY={eventNamesCY}
+              districts={districts}
+              ftcLeagues={ftcLeagues}
+            />
+          </Container>
+        )}
+    </Container>
+  );
+}
+
+export default AnnouncePage;

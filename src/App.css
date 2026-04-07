@@ -1,0 +1,2418 @@
+/* Fixed layout: top and bottom bars always visible, middle section scrolls */
+#root {
+  height: 100%;
+  overflow: hidden;
+}
+
+.app-layout-fixed {
+  height: 100vh;
+  height: 100dvh;
+}
+
+/* Bottom bar is in the flex flow, not position fixed */
+.app-layout-bottom .navbar-fixed-bottom-custom,
+.app-layout-bottom .navbar {
+  position: static !important;
+  bottom: auto !important;
+}
+
+.App {
+  text-align: center;
+  font-size: 14px;
+  width: 100%;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+body {
+  font-family: ibm-plex-sans, Helvetica, Arial, "Lucida Grande", sans-serif;
+  line-height: normal;
+}
+
+th,
+td {
+  padding: 5px;
+}
+
+.red {
+  color: red;
+}
+
+.blue {
+  color: blue;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.centerTable {
+  vertical-align: middle;
+}
+
+.block {
+  display: block;
+}
+
+.rankPoints {
+  display: inline-block;
+  width: 1em;
+}
+
+.unearned {
+  color: #aaa;
+}
+
+.leftTable {
+  vertical-align: middle;
+  text-align: left;
+}
+
+.TBAButton {
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
+
+.setupPageMenus {
+  background-color: rgb(227, 247, 255);
+  padding: 10px;
+  border-color: blue;
+  border-style: solid;
+  margin-bottom: 5px;
+}
+
+.ftcSetupPageMenus {
+  background-color: rgb(255, 245, 227);
+  padding: 10px;
+  border-color: orange;
+  border-style: solid;
+  margin-bottom: 5px;
+}
+
+.setupPageFilters {
+  background-color: rgb(231, 255, 227);
+  padding: 10px;
+  border-color: rgb(107, 221, 0);
+  border-style: solid;
+  margin-bottom: 10px;
+}
+
+.switchLabel {
+  display: table-cell;
+  height: 25px;
+  vertical-align: middle;
+}
+
+.gatool-button {
+  font-size: 20px;
+  font-weight: bold;
+  padding: 5px;
+  margin: 0px;
+  vertical-align: middle;
+}
+
+.redAlliance {
+  border: 2px solid #ccc;
+  background-color: #f7b3b4;
+}
+
+.blueAlliance {
+  border: 2px solid #ccc;
+  background-color: #98b4f4;
+}
+
+.redAllianceTeam {
+  color: #ff0000;
+}
+
+.blueAllianceTeam {
+  color: #0000ff;
+}
+
+.tieAllianceTeam {
+  color: #09ba48;
+}
+
+.gatool-playbyplay {
+  border: 1px solid #ccc;
+  text-align: left;
+  align-items: center;
+}
+
+/* Same alliance fills as Announce (Announce.jsx announceBackground) */
+.redAlliancePlayByPlay {
+  border: 1px solid #ccc;
+  align-content: center;
+  text-align: center;
+  background-color: #f7b3b4;
+  font-size: x-large;
+  font-weight: bold;
+  color: #1a1a1a;
+  padding: 4px;
+}
+
+.blueAlliancePlayByPlay {
+  border: 1px solid #ccc;
+  align-content: center;
+  text-align: center;
+  background-color: #98b4f4;
+  font-size: x-large;
+  font-weight: bold;
+  color: #1a1a1a;
+  padding: 4px;
+}
+
+.playByPlayTable {
+  display: table;
+  width: 100%;
+}
+
+.playByPlayTableRow {
+  vertical-align: middle;
+  text-align: center;
+  display: table-cell;
+}
+
+.playByPlayTeamName {
+  font-size: 36px;
+  margin: 0px;
+  line-height: 1em;
+}
+
+.playByPlayTeamNameStats {
+  font-size: 24px;
+  margin: 0px;
+}
+
+.playByPlayWinLossTie {
+  font-size: large;
+  font-style: italic;
+  align-content: center;
+  text-align: center;
+}
+
+.playByPlayRobotName {
+  font-style: italic;
+  color: #f9fe00;
+  margin: 5px 0px 5px;
+  line-height: 100%;
+}
+
+.playByPlayteamNumber {
+  font-size: 40px;
+  margin: 0px;
+}
+
+.playByPlaysayNumber {
+  font-size: medium;
+  line-height: 110%;
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
+.playByPlayOrganization {
+  font-size: medium;
+  font-style: italic;
+  line-height: 100%;
+  margin: 0px;
+}
+
+.playByPlayCity {
+  font-size: medium;
+  line-height: 100%;
+  padding-top: 10px;
+  margin: 0px;
+}
+
+.playByPlayAlliance {
+  font-size: 20px;
+  line-height: 100%;
+  margin-top: 5px;
+  display: block;
+  color: #f3f858;
+}
+
+.playByPlayChampsAlliance {
+  margin: 0px;
+  line-height: 100%;
+}
+
+.blueAlliance {
+  border: 2px solid #ccc;
+  background-color: #98b4f4;
+}
+
+[data-bs-theme="light"] .teamInfoSettings,
+:root:not([data-bs-theme="dark"]) .teamInfoSettings {
+  background-color: #dce5fa;
+}
+
+[data-bs-theme="light"] .statsSettings,
+:root:not([data-bs-theme="dark"]) .statsSettings {
+  background-color: #faecdc;
+}
+
+[data-bs-theme="light"] .UISettings,
+:root:not([data-bs-theme="dark"]) .UISettings {
+  background-color: #f4dcfa;
+}
+
+.announceTeamNumber {
+  font-size: x-large;
+  color: black;
+}
+
+.announceAlliance {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.announceOrganization {
+  font-size: 20px;
+  font-weight: bold;
+  line-height: 100%;
+}
+
+.sponsors {
+  line-height: 1;
+  font-weight: 900;
+}
+
+.awards {
+  font-style: italic;
+  line-height: 1;
+}
+
+.awardHilight {
+  font-weight: bold;
+  color: green;
+}
+
+.gatool-announce {
+  border: 1px solid #ccc;
+  text-align: left;
+  align-items: center;
+  line-height: 110%;
+}
+
+.ranking {
+  align-content: center;
+  vertical-align: middle;
+  text-align: center;
+  font-size: xx-large;
+  color: black;
+  padding: 0;
+}
+
+/* Announce: prior playoff partnerships (replaces rank column, row-spanned) */
+.announce-alliance-matchup-cell {
+  vertical-align: middle;
+  text-align: left;
+  font-size: 1.05rem;
+  line-height: 1.35;
+  min-width: 22rem;
+  max-width: 30rem;
+  padding: 0.75rem 0.65rem !important;
+  border-left: 1px solid #ccc;
+}
+
+.announce-alliance-matchup-summary {
+  max-height: 70vh;
+  overflow-y: auto;
+  font-size: 1.05rem;
+}
+
+.announce-alliance-matchup-summary--status {
+  font-size: 1.05rem;
+  line-height: 1.4;
+}
+
+.announce-alliance-matchup-pair {
+  margin-top: 0.5rem;
+  font-size: 1.08rem;
+}
+
+.announce-alliance-matchup-pair:first-child {
+  margin-top: 0;
+}
+
+.announce-alliance-matchup-line {
+  padding-left: 0.4rem;
+  margin-top: 0.2rem;
+  font-size: 1.02rem;
+  line-height: 1.4;
+  color: #222;
+}
+
+.announce-alliance-matchup-line-result strong {
+  font-weight: 700;
+}
+
+/* Winning outcomes (see isPartnershipWinnerResult in component) */
+.announce-alliance-matchup-line--winner {
+  font-weight: 700;
+}
+
+.announce-alliance-matchup-line--winner .announce-alliance-matchup-line-main {
+  font-weight: 700;
+}
+
+.announce-alliance-matchup-line--winner .announce-alliance-matchup-line-result strong {
+  font-weight: 700;
+}
+
+.announce-alliance-matchup-line--finalist {
+  font-weight: 700;
+}
+
+.announce-alliance-matchup-line--finalist .announce-alliance-matchup-line-main,
+.announce-alliance-matchup-line--finalist .announce-alliance-matchup-line-result strong {
+  font-weight: 700;
+}
+
+/* Announce: Red vs Blue opponents row (between Red and Blue alliance rows) */
+.match-opponents-row {
+  background: #f5f5f5;
+}
+
+.match-opponents-row-spacer {
+  background: #f5f5f5;
+  border: none;
+  padding: 0.4rem 0.5rem !important;
+}
+
+/* "When these alliances met" block inside Red column 4 (combined cell) */
+.match-opponents-in-column {
+  margin-top: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #ccc;
+}
+
+.match-opponents-cell {
+  padding: 0.6rem 0.75rem !important;
+  border-left: 1px solid #ccc;
+  vertical-align: middle;
+  font-size: 1.02rem;
+}
+
+.match-opponents-summary-title {
+  margin-bottom: 0.35rem;
+  font-size: 1.05rem;
+}
+
+.match-opponents-summary-line {
+  padding-left: 0.4rem;
+  margin-top: 0.2rem;
+  line-height: 1.4;
+  color: #222;
+}
+
+.match-opponents-summary-line-result strong {
+  font-weight: 700;
+}
+
+.match-opponents-summary--status {
+  font-size: 1.02rem;
+}
+
+.rank1 {
+  text-align: center;
+  color: white;
+  background-color: orange;
+}
+
+.rank2 {
+  text-align: center;
+  color: white;
+  background-color: green;
+}
+
+.rank9 {
+  text-align: center;
+  color: black;
+  background-color: yellow;
+}
+
+.rank0 {
+  text-align: center;
+  color: black;
+}
+
+.teamName {
+  font-size: x-large;
+  color: black;
+  line-height: 100%;
+}
+
+.champs {
+  color: blue;
+}
+
+.HOFRed {
+  font-style: italic;
+  font-weight: bold;
+  color: blue;
+  line-height: 1;
+}
+
+.HOFBlue {
+  font-style: italic;
+  font-weight: bold;
+  color: red;
+  line-height: 1;
+}
+
+.HOF {
+  font-size: 120%;
+}
+
+.robotName {
+  font-style: italic;
+  font-weight: bold;
+  color: #ff4000;
+}
+
+.narrowFont {
+  font-family: ibm-plex-sans-condensed, Arial-Narrow, "Arial Narrow";
+  font-style: normal;
+}
+
+.staleTeam {
+  border-left: 5px solid red !important;
+  color: red !important;
+}
+
+.modal-footer {
+  justify-content: center;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes throb {
+  30% {
+    rotate:0deg;
+    scale: 1.5;
+  }
+  40% {
+    rotate: 30deg;
+  }
+  50% {
+    rotate: -30deg;
+  }
+  60% {
+    rotate: 30deg;
+  }
+  70% {
+    rotate: -30deg;
+  }
+  80% {
+    rotate: 30deg;
+  }
+  90% {
+    rotate: -30deg;
+    scale:1.5;
+  }
+  100% {
+    scale: 1;
+    rotate: 0deg
+  }
+}
+
+/* Column definitions for tables */
+.col1 {
+  width: 8.333%;
+}
+
+.col2 {
+  width: 16.667%;
+}
+
+.col4 {
+  width: 33.333%;
+}
+
+.col5 {
+  width: 41.667%;
+}
+
+.col6 {
+  width: 50%;
+}
+
+.col7 {
+  width: 58.333%;
+}
+
+.vertical-center {
+  min-height: 100%;
+  /* Fallback for browsers do NOT support vh unit */
+  min-height: 100vh;
+  /* These two lines are counted as one :-)       */
+
+  display: flex;
+  align-items: center;
+}
+
+.wltTable {
+  border-width: thin;
+  background-color: rgba(255, 255, 255, 0.2);
+  text-align: center;
+  align-content: center;
+  margin: auto;
+}
+
+.wltCol {
+  font-size: medium;
+  white-space: nowrap;
+}
+
+.scheduleTablered {
+  background-color: #ffd7d7 !important;
+}
+
+.scheduleTableblue {
+  background-color: #ceceff !important;
+}
+
+.scheduleTabletie {
+  background-color: #d3ffe3 !important;
+}
+
+/* Schedule table (dark mode): station team #s on striped rows + score/RP cells */
+[data-bs-theme="dark"] .gatool-schedule-table .scheduleTablered {
+  background-color: rgba(127, 29, 29, 0.5) !important;
+}
+
+[data-bs-theme="dark"] .gatool-schedule-table .scheduleTableblue {
+  background-color: rgba(30, 58, 138, 0.5) !important;
+}
+
+[data-bs-theme="dark"] .gatool-schedule-table .scheduleTabletie {
+  background-color: rgba(6, 95, 70, 0.45) !important;
+}
+
+[data-bs-theme="dark"] .gatool-schedule-table .coopertition {
+  background-color: rgba(113, 63, 18, 0.45) !important;
+}
+
+/* Team stations & unscored match rows: light red/blue on dark background */
+[data-bs-theme="dark"] .gatool-schedule-table tbody td:not([class*="scheduleTable"]) span.red {
+  color: #f87171 !important;
+}
+
+[data-bs-theme="dark"] .gatool-schedule-table tbody td:not([class*="scheduleTable"]) span.blue {
+  color: #60a5fa !important;
+}
+
+/* Posted scores / RP: light text on tinted cells */
+[data-bs-theme="dark"] .gatool-schedule-table tbody td[class*="scheduleTable"] span.red {
+  color: #fecaca !important;
+}
+
+[data-bs-theme="dark"] .gatool-schedule-table tbody td[class*="scheduleTable"] span.blue {
+  color: #bfdbfe !important;
+}
+
+[data-bs-theme="dark"] .gatool-schedule-table tbody td[class*="scheduleTable"] span.red.bold {
+  color: #ffffff !important;
+}
+
+[data-bs-theme="dark"] .gatool-schedule-table tbody td[class*="scheduleTable"] span.blue.bold {
+  color: #ffffff !important;
+}
+
+[data-bs-theme="dark"] .gatool-schedule-table tbody td[class*="scheduleTable"] .rankPoints.unearned {
+  color: #d1d5db !important;
+  opacity: 0.85;
+}
+
+/* Score details modal: close button visible & tappable (dark theme can zero out btn-close) */
+.gatool-score-details-modal .modal-header .btn-close {
+  opacity: 1 !important;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0.5rem;
+  margin: -0.25rem -0.25rem -0.25rem auto;
+  flex-shrink: 0;
+  background: transparent
+    url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/%3e%3c/svg%3e")
+    center / 1.1em auto no-repeat !important;
+  filter: none !important;
+}
+
+.gatool-score-details-footer {
+  justify-content: center;
+}
+
+/* Score details table: readable text on red/blue columns (not inherited light body text) */
+.gatool-score-details-table td.scheduleTablered,
+.gatool-score-details-table th.scheduleTablered,
+.gatool-score-details-table td.scheduleTableblue,
+.gatool-score-details-table th.scheduleTableblue {
+  color: #1e293b !important;
+}
+
+[data-bs-theme="dark"] .gatool-score-details-table td.scheduleTablered,
+[data-bs-theme="dark"] .gatool-score-details-table th.scheduleTablered,
+[data-bs-theme="dark"] .gatool-score-details-table .scheduleTablered {
+  background-color: rgba(127, 29, 29, 0.55) !important;
+  color: #fecaca !important;
+}
+
+[data-bs-theme="dark"] .gatool-score-details-table td.scheduleTableblue,
+[data-bs-theme="dark"] .gatool-score-details-table th.scheduleTableblue,
+[data-bs-theme="dark"] .gatool-score-details-table .scheduleTableblue {
+  background-color: rgba(30, 58, 138, 0.55) !important;
+  color: #bfdbfe !important;
+}
+
+/* Winner line in score header: avoid low-contrast named colors on grey */
+.gatool-score-winner-red {
+  color: #b91c1c;
+}
+
+.gatool-score-winner-blue {
+  color: #1d4ed8;
+}
+
+.gatool-score-winner-tie {
+  color: #047857;
+}
+
+[data-bs-theme="dark"] .gatool-score-winner-red {
+  color: #fca5a5;
+}
+
+[data-bs-theme="dark"] .gatool-score-winner-blue {
+  color: #93c5fd;
+}
+
+[data-bs-theme="dark"] .gatool-score-winner-tie {
+  color: #6ee7b7;
+}
+
+.buttonNoWrap {
+  white-space: nowrap;
+}
+
+.awardsButton {
+  padding: 5px;
+}
+
+.allianceAnnounceDialog {
+  font-size: 30px;
+  align-content: center;
+  text-align: center;
+}
+
+.gatool-HighScores {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.gatool-highScores-Table {
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+  padding: 0px;
+  margin: 0px;
+  border: 3px solid;
+  border-collapse: collapse;
+  margin-bottom: 10px;
+  height: 100%;
+}
+.gatool-worldHighScores {
+  border-color: #dca7a7;
+  color: #a94442;
+  background-color: #f2dede;
+}
+
+.gatool-districtHighScores {
+  border-color: #bc9b15;
+  color: #ad8b03;
+  background-color: #fff5ce;
+}
+
+.gatool-eventHighScores {
+  border-color: #9acfea;
+  color: #31708f;
+  background-color: #d9edf7;
+}
+
+/* BottomButtons event high score: same event-blue as Stats (light theme) */
+:root:not([data-bs-theme="dark"]) .gatool-highscores-summary-panel.gatool-highscores-summary--event {
+  background-color: #d9edf7;
+  border-color: #9acfea;
+  color: #31708f;
+}
+
+.statsMatchHeader {
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+.statsMatchName {
+  font-weight: bold;
+  font-style: italic;
+}
+
+.statsScore {
+  font-weight: bolder;
+  font-size: 1.2em;
+}
+
+/* Pastel alerts: light theme only so dark mode can use its own surfaces + text */
+[data-bs-theme="light"] .alert-warning,
+:root:not([data-bs-theme="dark"]) .alert-warning {
+  color: #8a6d3b;
+  background-color: #fcf8e3;
+  border-color: #faebcc;
+}
+
+[data-bs-theme="light"] .alert-danger,
+:root:not([data-bs-theme="dark"]) .alert-danger {
+  color: #a94442;
+  background-color: #f2dede;
+  border-color: #ebccd1;
+}
+
+[data-bs-theme="light"] .alert-success,
+:root:not([data-bs-theme="dark"]) .alert-success {
+  color: #3c763d;
+  background-color: #dff0d8;
+  border-color: #d6e9c6;
+}
+
+.alert-dismissible .btn-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  padding: .75rem 1rem;
+}
+
+
+.teamNumberButton {
+  background-color: #ccc;
+}
+
+.teamNumberButton:hover {
+  background-color: #aaa;
+  cursor: pointer;
+}
+
+.teamTable {
+  line-height: 1.3;
+}
+
+/* Legend + inline cue: always light green chip — force dark text so it stays readable in dark theme */
+.teamTableHighlight {
+  display: inline-block;
+  background-color: rgb(195, 244, 199) !important;
+  color: #14532d !important;
+  padding: 0.12em 0.45em;
+  border-radius: 4px;
+  border: 1px solid rgba(22, 101, 52, 0.45);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  line-height: 1.35;
+}
+
+/* Match Setup “Tap to refresh Schedule” (btn-success / --bs-success) */
+[data-bs-theme="dark"] .teamTableHighlight {
+  background-color: var(--bs-success) !important;
+  color: #fff !important;
+  border-color: #146c43 !important;
+}
+
+.teamTableButtonHighlight {
+  background-color: rgb(48, 171, 0) !important;
+  color: white !important;
+}
+
+[data-bs-theme="dark"] .teamTableButtonHighlight {
+  background-color: var(--bs-success) !important;
+  color: #fff !important;
+}
+
+.teamDataNumber {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.teamDataButtons {
+  margin-left: 5px;
+  font-size: 11px;
+}
+
+.formHighlight {
+  outline: green;
+  outline-style: solid;
+  background: #f2fff1;
+}
+
+/* Dark mode: local-edit fields — same green family as btn-success (#198754), not lime mint */
+[data-bs-theme="dark"] {
+  --gatool-local-edit-surface: #1a3d2f;
+  --gatool-local-edit-border: #198754;
+  --gatool-local-edit-text: #f1faf4;
+}
+
+/* Local edit fields: dark success-tinted surface + light text (Bootstrap default body text would fail) */
+[data-bs-theme="dark"] .form-control.formHighlight,
+[data-bs-theme="dark"] textarea.form-control.formHighlight {
+  color: var(--gatool-local-edit-text) !important;
+  background-color: var(--gatool-local-edit-surface) !important;
+  border-color: var(--gatool-local-edit-border) !important;
+}
+
+[data-bs-theme="dark"] .form-control.formHighlight:focus {
+  color: var(--gatool-local-edit-text) !important;
+  background-color: var(--gatool-local-edit-surface) !important;
+  border-color: #157347 !important;
+  box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.35);
+}
+
+[data-bs-theme="dark"] .form-control.formHighlight::placeholder {
+  color: rgba(241, 250, 244, 0.45) !important;
+  opacity: 1;
+}
+
+/* ReactQuill roots as div.quill.formHighlight — same surface as .form-control.formHighlight */
+[data-bs-theme="dark"] .quill.formHighlight .ql-container {
+  background-color: var(--gatool-local-edit-surface) !important;
+  border-color: var(--gatool-local-edit-border) !important;
+}
+
+[data-bs-theme="dark"] .quill.formHighlight .ql-editor {
+  color: var(--gatool-local-edit-text) !important;
+  background-color: var(--gatool-local-edit-surface) !important;
+}
+
+[data-bs-theme="dark"] .quill.formHighlight .ql-editor.ql-blank::before {
+  color: rgba(241, 250, 244, 0.4) !important;
+}
+
+[data-bs-theme="dark"] .quill.formHighlight .ql-toolbar {
+  background-color: var(--gatool-local-edit-surface) !important;
+  border-color: var(--gatool-local-edit-border) !important;
+}
+
+[data-bs-theme="dark"] .quill.formHighlight .ql-toolbar .ql-stroke {
+  stroke: #cbd5e1 !important;
+}
+
+[data-bs-theme="dark"] .quill.formHighlight .ql-toolbar .ql-fill {
+  fill: #cbd5e1 !important;
+}
+
+[data-bs-theme="dark"] .quill.formHighlight .ql-toolbar .ql-picker-label {
+  color: var(--gatool-local-edit-text) !important;
+}
+
+[data-bs-theme="dark"] .quill.formHighlight .ql-toolbar .ql-picker-options {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+/*
+ * Quill “snow” has no dark theme: toolbar is transparent, icons are #444, so on a dark modal body they vanish.
+ * When the editor is not “formHighlight”, give the toolbar an explicit light strip; editor matches body + readable placeholder.
+ */
+[data-bs-theme="dark"] .quill:not(.formHighlight) .ql-toolbar.ql-snow {
+  background-color: #e2e8f0 !important;
+  border-color: #64748b !important;
+}
+
+[data-bs-theme="dark"] .quill:not(.formHighlight) .ql-container.ql-snow {
+  background-color: var(--bs-body-bg) !important;
+  border-color: #64748b !important;
+}
+
+[data-bs-theme="dark"] .quill:not(.formHighlight) .ql-editor {
+  color: var(--bs-body-color) !important;
+  background-color: var(--bs-body-bg) !important;
+}
+
+[data-bs-theme="dark"] .quill:not(.formHighlight) .ql-editor.ql-blank::before {
+  color: #94a3b8 !important;
+}
+
+[data-bs-theme="dark"] .quill:not(.formHighlight) .ql-toolbar .ql-picker {
+  color: #334155 !important;
+}
+
+[data-bs-theme="dark"] .quill:not(.formHighlight) .ql-toolbar .ql-picker.ql-expanded .ql-picker-label {
+  color: #475569 !important;
+}
+
+[data-bs-theme="dark"] .quill:not(.formHighlight) .ql-toolbar .ql-picker.ql-expanded .ql-picker-label .ql-stroke {
+  stroke: #475569 !important;
+}
+
+[data-bs-theme="dark"] .quill:not(.formHighlight) .ql-toolbar .ql-picker.ql-expanded .ql-picker-label .ql-fill {
+  fill: #475569 !important;
+}
+
+[data-bs-theme="dark"] .quill:not(.formHighlight) .ql-tooltip {
+  background-color: #f8fafc !important;
+  color: #1e293b !important;
+  border-color: #94a3b8 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+[data-bs-theme="dark"] .quill:not(.formHighlight) .ql-tooltip a {
+  color: #0369a1 !important;
+}
+
+/*
+ * Fullscreen team editor: snow.css / browser defaults can leave a second Quill editor white.
+ * Tie non-highlight editors to the modal surface (higher specificity than generic .quill rules).
+ */
+[data-bs-theme="dark"] .gatool-team-edit-modal .quill:not(.formHighlight) .ql-container.ql-snow,
+[data-bs-theme="dark"] .gatool-team-edit-modal .quill:not(.formHighlight) .ql-snow .ql-editor {
+  background-color: var(--bs-modal-bg, var(--bs-body-bg)) !important;
+  color: var(--bs-body-color) !important;
+}
+
+/* Team edit modal: default inputs read clearly against dark body (not only Quill) */
+[data-bs-theme="dark"] .gatool-team-edit-modal .form-control:not(.formHighlight):not(:disabled) {
+  border-color: #64748b !important;
+}
+
+[data-bs-theme="dark"] .gatool-team-edit-modal .form-control:not(.formHighlight):not(:disabled)::placeholder {
+  color: #94a3b8 !important;
+  opacity: 1;
+}
+
+.formLabel {
+  margin-top: 20px;
+}
+
+.robotNameCheckbox {
+  margin-left: 10px !important;
+}
+
+.davidPrice {
+  font-size: 400px;
+  text-align: center;
+  font-family: "alternate-gothic-no-1-d", sans-serif;
+  line-height: 85%;
+  vertical-align: middle;
+}
+
+.davidPriceSmall {
+  font-size: 400px;
+  text-align: center;
+  font-family: "alternate-gothic-no-1-d", sans-serif;
+  line-height: 85%;
+  vertical-align: middle;
+}
+
+.davidPriceSmallLandscape {
+  font-size: 250px;
+  text-align: center;
+  font-family: "alternate-gothic-no-1-d", sans-serif;
+  line-height: 85%;
+  vertical-align: middle;
+}
+
+.davidPriceCaptain {
+  position: relative;
+  bottom: 10%;
+  text-shadow: 2px 2px 0 white, -2px -2px 0 white, 2px -2px 0 white, -2px 2px 0 white;
+}
+
+.davidPriceQuals {
+  font-size: 700px;
+  text-align: center;
+  font-family: "alternate-gothic-no-1-d", sans-serif;
+  line-height: 85%;
+  vertical-align: middle;
+}
+
+.davidPriceQualsSmall {
+  font-size: 600px;
+  text-align: center;
+  font-family: "alternate-gothic-no-1-d", sans-serif;
+  line-height: 85%;
+  vertical-align: middle;
+}
+
+.davidPriceWarning {
+  background-color: #fcf8e3;
+  border-color: #faebcc;
+}
+
+.davidPriceSuccess {
+  background-color: #dff0d8;
+  border-color: #d6e9c6;
+}
+
+.davidPriceDetail {
+  font-size: 80px;
+  text-align: center;
+  font-family: "alternate-gothic-no-1-d", sans-serif;
+  line-height: 90%;
+}
+
+.davidPriceDetailSmall {
+  font-size: 70px;
+  text-align: center;
+  font-family: "alternate-gothic-no-1-d", sans-serif;
+  line-height: 90%;
+}
+
+.davidPriceDetailSmallLandscape {
+  font-size: 60px;
+  text-align: center;
+  font-family: "alternate-gothic-no-1-d", sans-serif;
+  line-height: 90%;
+}
+
+.playoffDetails {
+  font-size: x-large;
+  font-weight: 900;
+}
+
+.RedReplace {
+  margin: 5px;
+  color: white;
+  background-color: red;
+  font-weight: bolder;
+}
+
+.BlueReplace {
+  margin: 5px;
+  color: white;
+  background-color: blue;
+  font-weight: bolder;
+}
+
+.promoteBackup {
+  border-radius: 5px;
+  font-size: 16px;
+  font-stretch: condensed;
+  font-weight: bold;
+  padding: 5px;
+  margin: 0px;
+  background-color: darkorchid;
+  color: white;
+  vertical-align: middle;
+  align-content: center;
+}
+
+.promoteBackup:hover {
+  background-color: rgb(81, 25, 133);
+}
+
+.backupDialog {
+  font-size: 30px;
+  align-content: center;
+  text-align: center;
+}
+
+.alliance-backup-modal-dialog {
+  max-width: min(960px, 96vw);
+}
+
+.alliance-backup-modal-body.backupDialog {
+  font-size: 22px;
+}
+
+.alliance-backup-modal-columns {
+  text-align: center;
+}
+
+.alliance-backup-modal-team-btn {
+  box-sizing: border-box;
+  padding: 12px 10px;
+  min-height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.alliance-backup-modal-reserve-btn {
+  font-size: clamp(0.95rem, 2.8vw, 1.35rem);
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: normal;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+/* On-field teams in reserve modal: same look as before but not clickable */
+.alliance-backup-modal-field-display {
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Add / Remove alliance actions: match RedReplace / BlueReplace tiles (not Bootstrap primary/danger) */
+button.alliance-backup-modal-alliance-action-btn {
+  cursor: pointer;
+  border: none;
+}
+
+button.alliance-backup-modal-alliance-action-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.navBarText {
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.hiddenInput {
+  width: 0px;
+  height: 0px;
+  overflow: hidden;
+}
+
+.topBorderLine {
+  border-top: 2px darkblue solid;
+}
+
+[data-bs-theme="dark"] .topBorderLine {
+  border-top-color: #38bdf8;
+  border-top-width: 2px;
+}
+
+.tbd {
+  text-align: center;
+  font-weight: bold;
+  font-size: x-large;
+}
+
+.notes {
+  font-size: small;
+}
+
+.champsQualified {
+  font-size: medium;
+  font-weight: bolder;
+  color: yellow;
+}
+
+.champsQualifiedAnnounce {
+  font-weight: bolder;
+  color: rgba(22, 87, 2, 0.93);
+}
+
+.teamTableHeader {
+  white-space: nowrap;
+}
+
+.flashCards {
+  display: flex;
+  align-content: center;
+  flex-flow: column;
+  align-items: center;
+}
+
+/* react-quizlet-flashcard: prev/next use transparent buttons + #1c1b1e SVG fill (invisible on dark bg) */
+.flashCards .FlashcardArrayWrapper__controls {
+  gap: 1.5rem;
+  min-height: 3.5rem;
+  margin-top: 0.5rem;
+}
+
+.flashCards .FlashcardArrayWrapper__controls button {
+  min-width: 3.25rem;
+  min-height: 3.25rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: 0.65rem;
+  background-color: var(--bs-tertiary-bg);
+  border: 1px solid var(--bs-border-color);
+  color: var(--bs-emphasis-color);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.flashCards .FlashcardArrayWrapper__controls button:hover {
+  background-color: var(--bs-secondary-bg);
+  border-color: var(--bs-primary);
+  color: var(--bs-primary);
+}
+
+.flashCards .FlashcardArrayWrapper__controls button:focus-visible {
+  outline: 2px solid var(--bs-primary);
+  outline-offset: 2px;
+}
+
+.flashCards .FlashcardArrayWrapper__controls button svg {
+  width: 2rem !important;
+  height: 2rem !important;
+}
+
+.flashCards .FlashcardArrayWrapper__controls button svg path {
+  fill: currentColor !important;
+}
+
+.flashCards .FlashcardArrayWrapper__controls--count {
+  font-size: 1.05rem !important;
+  font-weight: 600;
+  color: var(--bs-emphasis-color);
+  min-width: 3.5ch;
+  text-align: center;
+}
+
+[data-bs-theme="dark"] .flashCards .FlashcardArrayWrapper__controls button {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+.teamNotes p {
+  margin: 0px;
+  line-height: 1em;
+}
+
+.teamNotes h1 {
+  font-size: large;
+  font-weight: bold;
+}
+
+.teamNotes h2 {
+  font-size: larger;
+  font-weight: bold;
+}
+
+.quill {
+  border-radius: 6px;
+}
+
+.ql-container {
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+.ql-toolbar {
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+}
+
+.ql-editor {
+  font-size: 1rem;
+}
+
+.ql-size-large {
+  font-size: larger;
+}
+
+.ql-size-huge {
+  font-size: x-large;
+}
+
+.ql-size-small {
+  font-size: x-small;
+}
+
+.FlashcardArrayWrapper {
+  width: 100% !important;
+}
+
+.hideLandscape {
+  display: block;
+}
+.showLandscape {
+  display: none;
+}
+
+.foulButtons {
+  font-size: 14px;
+  border : 2px solid #ccc;
+}
+
+.coopertition {
+  background-color: rgb(243, 235, 154) !important;
+}
+
+@media only screen and (max-width: 820px) and (orientation: portrait) {
+  /* For Portrait iPad: */
+  .wltCol {
+    font-size: small;
+  }
+  .redAlliancePlayByPlay {
+    font-size: large;
+  }
+  .blueAlliancePlayByPlay {
+    font-size: large;
+  }
+  .playByPlayTeamName {
+    font-size: 30px;
+  }
+  .playByPlayTeamNameStats {
+    font-size: 18px;
+  }
+  .playByPlayWinLossTie {
+    font-size: medium;
+  }
+  .playByPlayteamNumber {
+    font-size: 30px;
+  }
+  .playByPlaysayNumber {
+    font-size: medium;
+  }
+  .playByPlayOrganization {
+    font-size: small;
+  }
+  .playByPlayCity {
+    font-size: small;
+  }
+  .playByPlayAlliance {
+    font-size: 16px;
+  }
+  .foulButtons {
+    font-size: 12px;
+  }
+}
+
+@media only screen and (max-width: 768px) and (orientation: portrait) {
+  /* For Portrait iPad mini: */
+  .wltCol {
+    font-size: x-small;
+  }
+  .redAlliancePlayByPlay {
+    font-size: medium;
+  }
+  .blueAlliancePlayByPlay {
+    font-size: medium;
+  }
+  .playByPlayTeamName {
+    font-size: 24px;
+  }
+  .playByPlayTeamNameStats {
+    font-size: 14px;
+  }
+  .playByPlayWinLossTie {
+    font-size: small;
+  }
+  .playByPlayteamNumber {
+    font-size: 24px;
+  }
+  .playByPlaysayNumber {
+    font-size: small;
+  }
+  .playByPlayOrganization {
+    font-size: small;
+  }
+  .playByPlayCity {
+    font-size: small;
+  }
+  .playByPlayAlliance {
+    font-size: 14px;
+  }
+  .foulButtons {
+    font-size: 12px;
+  }
+}
+
+@media screen and (max-width: 1194px) and (orientation: landscape) {
+  .wltCol {
+    font-size: small;
+  }
+  .playByPlayWinLossTie {
+    font-size: small;
+  }
+  .playByPlayRobotName {
+    font-size: medium;
+  }
+  .playByPlayTeamName {
+    font-size: 28px;
+  }
+  .hideLandscape {
+    display: none;
+  }
+  .showLandscape {
+    display: block;
+  }
+  .foulButtons {
+    font-size: 12px;
+  }
+}
+
+/* Ensure footer stays fixed to viewport, especially on mobile devices during orientation changes */
+/* Bootstrap 5 uses 'fixed-bottom' class when fixed="bottom" prop is used */
+.navbar.fixed-bottom,
+.navbar-fixed-bottom-custom {
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  z-index: 1030 !important;
+  /* Ensure it's positioned relative to viewport, not any parent container */
+  -webkit-transform: translateZ(0) !important;
+  transform: translateZ(0) !important;
+  /* Prevent any margin/padding from affecting positioning */
+  margin: 0 !important;
+}
+
+/* Ensure html and body don't interfere with fixed positioning; only main content area scrolls */
+html {
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  height: 100%;
+}
+
+body {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  /* Prevent body from creating a new containing block */
+  -webkit-transform: none;
+  transform: none;
+}
+
+/* On mobile devices, ensure the footer recalculates position on orientation change */
+/* Use viewport units to ensure it stays relative to the viewport, not a parent container */
+@media screen and (max-width: 1024px) {
+  .navbar.fixed-bottom,
+  .navbar-fixed-bottom-custom {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100vw !important;
+    /* Force hardware acceleration and ensure viewport positioning */
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+  
+  /* Prevent any parent containers from creating containing blocks */
+  #root,
+  .App {
+    -webkit-transform: none !important;
+    transform: none !important;
+    -webkit-perspective: none !important;
+    perspective: none !important;
+  }
+}
+
+/* Handle orientation changes specifically - force recalculation */
+@media screen and (orientation: portrait) {
+  .navbar.fixed-bottom,
+  .navbar-fixed-bottom-custom {
+    position: fixed !important;
+    bottom: 0 !important;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media screen and (orientation: landscape) {
+  .navbar.fixed-bottom,
+  .navbar-fixed-bottom-custom {
+    position: fixed !important;
+    bottom: 0 !important;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Bootstrap 5.3 color mode (data-bs-theme set from Settings → Dark mode) */
+[data-bs-theme="dark"] .app-layout-main {
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
+}
+
+[data-bs-theme="dark"] .Toastify__toast {
+  background: var(--bs-tertiary-bg);
+  color: var(--bs-body-color);
+}
+
+[data-bs-theme="dark"] .Toastify__toast-body {
+  color: var(--bs-body-color);
+}
+
+[data-bs-theme="dark"] .Toastify__close-button {
+  color: var(--bs-body-color);
+  opacity: 0.8;
+}
+
+/* --- Dark mode: legibility (contrast on custom panels, nav, selects, tables) --- */
+
+/* "Awaiting …" / loading callouts (className gatool-awaiting-message on Alert) */
+[data-bs-theme="dark"] .alert-warning.gatool-awaiting-message {
+  color: #fefce8 !important;
+}
+
+[data-bs-theme="dark"] .alert-danger.gatool-awaiting-message {
+  color: #fecaca !important;
+}
+
+/* Inline “Awaiting …” (not inside Alert), e.g. announce/play-by-play footer */
+[data-bs-theme="dark"] .gatool-awaiting-inline {
+  color: #f1f5f9 !important;
+}
+
+/* Replaces inline color:darkblue for tappable hints — readable on dark panels */
+.gatool-tap-link {
+  cursor: pointer;
+  color: #0c2461;
+}
+
+[data-bs-theme="dark"] .gatool-tap-link {
+  color: #7dd3fc !important;
+}
+
+[data-bs-theme="dark"] .gatool-tap-link:hover {
+  color: #bae6fd !important;
+}
+
+.gatool-tap-link-text {
+  color: #0c2461;
+}
+
+[data-bs-theme="dark"] .gatool-tap-link-text {
+  color: #e0f2fe !important;
+}
+
+[data-bs-theme="dark"] a:not(.nav-link):not(.btn):not(.page-link) {
+  color: #7dd3fc;
+}
+
+[data-bs-theme="dark"] a:not(.nav-link):not(.btn):not(.page-link):hover {
+  color: #bae6fd;
+}
+
+[data-bs-theme="dark"] .navbar.bg-light {
+  background-color: var(--bs-dark) !important;
+  color: var(--bs-body-color);
+}
+
+/* Inactive tabs: light label/icon on dark bar or tinted chip */
+[data-bs-theme="dark"] .gatool-main-nav .nav-link:not(.active):not([aria-current="page"]),
+[data-bs-theme="dark"] .gatool-main-nav .nav-link:not(.active):not([aria-current="page"]) .navBarText {
+  color: #f1f5f9 !important;
+}
+
+[data-bs-theme="dark"] .gatool-main-nav .nav-link:not(.active):not([aria-current="page"]) svg:not(.gatool-nav-system-bell) {
+  color: #f1f5f9 !important;
+}
+
+/* Active tab: keep dark text on bright green / gray / orange / red chips */
+[data-bs-theme="dark"] .gatool-main-nav .nav-link.active,
+[data-bs-theme="dark"] .gatool-main-nav .nav-link[aria-current="page"],
+[data-bs-theme="dark"] .gatool-main-nav .nav-link.active .navBarText,
+[data-bs-theme="dark"] .gatool-main-nav .nav-link[aria-current="page"] .navBarText {
+  color: #0f172a !important;
+}
+
+[data-bs-theme="dark"] .gatool-main-nav .nav-link.active svg:not(.gatool-nav-system-bell),
+[data-bs-theme="dark"] .gatool-main-nav .nav-link[aria-current="page"] svg:not(.gatool-nav-system-bell) {
+  color: #0f172a !important;
+}
+
+[data-bs-theme="dark"] .app-footer-link {
+  color: #93c5fd;
+}
+
+[data-bs-theme="dark"] .app-footer-link:hover {
+  color: #bfdbfe;
+}
+
+/* Setup / filters: pastel boxes → dark surfaces + light text */
+[data-bs-theme="dark"] .setupPageMenus,
+[data-bs-theme="dark"] .ftcSetupPageMenus,
+[data-bs-theme="dark"] .setupPageFilters {
+  background-color: var(--bs-secondary-bg);
+  border-color: var(--bs-border-color);
+  color: var(--bs-body-color);
+}
+
+/* Setup: three tinted bands (same families as light #dce5fa / #faecdc / #f4dcfa).
+   Gradient + secondary-bg approximates color-mix without compat issues on older browsers. */
+[data-bs-theme="dark"] .teamInfoSettings {
+  background: linear-gradient(
+      rgba(110, 168, 254, 0.22),
+      rgba(110, 168, 254, 0.22)
+    )
+    var(--bs-secondary-bg);
+  color: var(--bs-body-color);
+}
+
+[data-bs-theme="dark"] .statsSettings {
+  background: linear-gradient(
+      rgba(240, 168, 104, 0.2),
+      rgba(240, 168, 104, 0.2)
+    )
+    var(--bs-secondary-bg);
+  color: var(--bs-body-color);
+}
+
+[data-bs-theme="dark"] .UISettings {
+  background: linear-gradient(
+      rgba(199, 143, 255, 0.2),
+      rgba(199, 143, 255, 0.2)
+    )
+    var(--bs-secondary-bg);
+  color: var(--bs-body-color);
+}
+
+[data-bs-theme="dark"] .appearanceSettings td {
+  color: var(--bs-body-color);
+}
+
+[data-bs-theme="dark"] .switchLabel,
+[data-bs-theme="dark"] .UISettings td,
+[data-bs-theme="dark"] .teamInfoSettings td,
+[data-bs-theme="dark"] .statsSettings td {
+  color: var(--bs-body-color);
+}
+
+/* react-select (classNamePrefix gatool-rs) */
+[data-bs-theme="dark"] .gatool-rs__control {
+  background-color: var(--bs-secondary-bg) !important;
+  border-color: var(--bs-border-color) !important;
+}
+
+[data-bs-theme="dark"] .gatool-rs__single-value,
+[data-bs-theme="dark"] .gatool-rs__input-container,
+[data-bs-theme="dark"] .gatool-rs__multi-value__label {
+  color: var(--bs-body-color) !important;
+}
+
+[data-bs-theme="dark"] .gatool-rs__placeholder {
+  color: var(--bs-secondary-color) !important;
+}
+
+[data-bs-theme="dark"] .gatool-rs__menu {
+  background-color: var(--bs-body-bg) !important;
+  border: 1px solid var(--bs-border-color) !important;
+}
+
+/* Default menu rows (event list tints use classes below) */
+[data-bs-theme="dark"]
+  .gatool-rs__option:not(.gatool-event-option-offseason-azure):not(.gatool-event-option-offseason):not(.gatool-match-completed-option) {
+  background-color: var(--bs-body-bg) !important;
+  color: var(--bs-body-color) !important;
+}
+
+[data-bs-theme="dark"]
+  .gatool-rs__option--is-focused:not(.gatool-event-option-offseason-azure):not(.gatool-event-option-offseason):not(
+    .gatool-match-completed-option
+  ):not(.gatool-rs__option--is-selected) {
+  background-color: var(--bs-secondary-bg) !important;
+}
+
+/* Announce / Play-by-Play match menu: posted matches (see matchHasPostedResult + TopButtons classNames) */
+.gatool-rs__option.gatool-match-completed-option {
+  background-color: #bbf7d0 !important;
+  color: #14532d !important;
+}
+
+.gatool-rs__option.gatool-match-completed-option.gatool-rs__option--is-focused:not(.gatool-rs__option--is-selected),
+.gatool-rs__option.gatool-match-completed-option.gatool-rs__option--is-selected {
+  background-color: #86efac !important;
+  color: #052e16 !important;
+}
+
+[data-bs-theme="dark"] .gatool-rs__option.gatool-match-completed-option {
+  background-color: #166534 !important;
+  color: #ecfdf5 !important;
+}
+
+[data-bs-theme="dark"] .gatool-rs__option.gatool-match-completed-option.gatool-rs__option--is-focused:not(.gatool-rs__option--is-selected),
+[data-bs-theme="dark"] .gatool-rs__option.gatool-match-completed-option.gatool-rs__option--is-selected {
+  background-color: #15803d !important;
+  color: #f0fdf4 !important;
+}
+
+/* Setup event list: offseason row backgrounds (menu) */
+.gatool-rs__option.gatool-event-option-offseason-azure:not(.gatool-rs__option--is-selected) {
+  background-color: rgba(191, 219, 254, 0.92) !important;
+  color: #0c1929 !important;
+}
+
+.gatool-rs__option.gatool-event-option-offseason:not(.gatool-rs__option--is-selected) {
+  background-color: rgba(254, 229, 165, 0.95) !important;
+  color: #3d2914 !important;
+}
+
+[data-bs-theme="dark"] .gatool-rs__option.gatool-event-option-offseason-azure:not(.gatool-rs__option--is-selected) {
+  background-color: rgba(37, 99, 235, 0.42) !important;
+  color: #eff6ff !important;
+}
+
+[data-bs-theme="dark"] .gatool-rs__option.gatool-event-option-offseason:not(.gatool-rs__option--is-selected) {
+  background-color: rgba(161, 98, 7, 0.5) !important;
+  color: #fffbeb !important;
+}
+
+.gatool-rs__option--is-focused.gatool-event-option-offseason-azure:not(.gatool-rs__option--is-selected) {
+  background-color: rgba(147, 197, 253, 0.98) !important;
+  color: #0c1929 !important;
+}
+
+[data-bs-theme="dark"] .gatool-rs__option--is-focused.gatool-event-option-offseason-azure:not(.gatool-rs__option--is-selected) {
+  background-color: rgba(59, 130, 246, 0.58) !important;
+  color: #ffffff !important;
+}
+
+.gatool-rs__option--is-focused.gatool-event-option-offseason:not(.gatool-rs__option--is-selected) {
+  background-color: rgba(253, 224, 138, 0.98) !important;
+  color: #422006 !important;
+}
+
+[data-bs-theme="dark"] .gatool-rs__option--is-focused.gatool-event-option-offseason:not(.gatool-rs__option--is-selected) {
+  background-color: rgba(202, 138, 4, 0.58) !important;
+  color: #fffbeb !important;
+}
+
+[data-bs-theme="dark"] .gatool-rs__multi-value {
+  background-color: var(--bs-tertiary-bg) !important;
+}
+
+/* Stats high-score tables: dark tinted cells + light text (overrides inline pastel backgrounds) */
+[data-bs-theme="dark"] .gatool-worldHighScores {
+  --gatool-stats-cell-tint: rgba(200, 85, 85, 0.42);
+  border-color: rgba(248, 113, 113, 0.55);
+  color: #fef2f2 !important;
+  background-color: var(--bs-body-bg);
+}
+
+[data-bs-theme="dark"] .gatool-worldHighScores td,
+[data-bs-theme="dark"] .gatool-worldHighScores th {
+  background: linear-gradient(
+      var(--gatool-stats-cell-tint),
+      var(--gatool-stats-cell-tint)
+    )
+    var(--bs-body-bg) !important;
+  color: #fef2f2 !important;
+  border-color: rgba(252, 165, 165, 0.2);
+}
+
+[data-bs-theme="dark"] .gatool-districtHighScores {
+  --gatool-stats-cell-tint: rgba(217, 119, 6, 0.36);
+  border-color: rgba(251, 191, 36, 0.5);
+  color: #fffbeb !important;
+  background-color: var(--bs-body-bg);
+}
+
+[data-bs-theme="dark"] .gatool-districtHighScores td,
+[data-bs-theme="dark"] .gatool-districtHighScores th {
+  background: linear-gradient(
+      var(--gatool-stats-cell-tint),
+      var(--gatool-stats-cell-tint)
+    )
+    var(--bs-body-bg) !important;
+  color: #fffbeb !important;
+  border-color: rgba(253, 224, 71, 0.18);
+}
+
+[data-bs-theme="dark"] .gatool-eventHighScores {
+  --gatool-stats-cell-tint: rgba(56, 146, 196, 0.4);
+  border-color: rgba(125, 211, 252, 0.45);
+  color: #f0f9ff !important;
+  background-color: var(--bs-body-bg);
+}
+
+[data-bs-theme="dark"] .gatool-eventHighScores td,
+[data-bs-theme="dark"] .gatool-eventHighScores th {
+  background: linear-gradient(
+      var(--gatool-stats-cell-tint),
+      var(--gatool-stats-cell-tint)
+    )
+    var(--bs-body-bg) !important;
+  color: #f0f9ff !important;
+  border-color: rgba(186, 230, 253, 0.2);
+}
+
+[data-bs-theme="dark"] .gatool-worldHighScores i,
+[data-bs-theme="dark"] .gatool-districtHighScores i,
+[data-bs-theme="dark"] .gatool-eventHighScores i {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* High score summary panels (Announce / Play-by-Play): match Stats page table tints + light text */
+[data-bs-theme="dark"] .gatool-highscores-summary-panel.gatool-highscores-summary--world {
+  background: linear-gradient(
+      rgba(200, 85, 85, 0.42),
+      rgba(200, 85, 85, 0.42)
+    )
+    var(--bs-body-bg) !important;
+  color: #fef2f2 !important;
+  border-color: rgba(248, 113, 113, 0.55) !important;
+}
+
+[data-bs-theme="dark"] .gatool-highscores-summary-panel.gatool-highscores-summary--world .text-muted {
+  color: rgba(254, 242, 242, 0.75) !important;
+}
+
+[data-bs-theme="dark"] .gatool-highscores-summary-panel.gatool-highscores-summary--world .gatool-highscores-summary-block {
+  border-top-color: rgba(252, 165, 165, 0.35) !important;
+}
+
+[data-bs-theme="dark"] .gatool-highscores-summary-panel.gatool-highscores-summary--district {
+  background: linear-gradient(
+      rgba(217, 119, 6, 0.36),
+      rgba(217, 119, 6, 0.36)
+    )
+    var(--bs-body-bg) !important;
+  color: #fffbeb !important;
+  border-color: rgba(251, 191, 36, 0.5) !important;
+}
+
+[data-bs-theme="dark"] .gatool-highscores-summary-panel.gatool-highscores-summary--district .text-muted {
+  color: rgba(255, 251, 235, 0.72) !important;
+}
+
+[data-bs-theme="dark"] .gatool-highscores-summary-panel.gatool-highscores-summary--district .gatool-highscores-summary-block {
+  border-top-color: rgba(253, 224, 71, 0.28) !important;
+}
+
+/* FTC league column: light mint → dark success tint (distinct from region/district amber) */
+[data-bs-theme="dark"] .gatool-highscores-summary-panel.gatool-highscores-summary--league {
+  background: linear-gradient(
+      rgba(25, 135, 84, 0.38),
+      rgba(25, 135, 84, 0.38)
+    )
+    var(--bs-body-bg) !important;
+  color: #ecfdf5 !important;
+  border-color: rgba(52, 211, 153, 0.5) !important;
+}
+
+[data-bs-theme="dark"] .gatool-highscores-summary-panel.gatool-highscores-summary--league .text-muted {
+  color: rgba(236, 253, 245, 0.72) !important;
+}
+
+[data-bs-theme="dark"] .gatool-highscores-summary-panel.gatool-highscores-summary--league .gatool-highscores-summary-block {
+  border-top-color: rgba(52, 211, 153, 0.35) !important;
+}
+
+/* Event high score strip (BottomButtons): same blue family as Stats event table */
+[data-bs-theme="dark"] .gatool-highscores-summary-panel.gatool-highscores-summary--event {
+  background: linear-gradient(
+      rgba(56, 146, 196, 0.4),
+      rgba(56, 146, 196, 0.4)
+    )
+    var(--bs-body-bg) !important;
+  color: #f0f9ff !important;
+  border-color: rgba(125, 211, 252, 0.45) !important;
+}
+
+/* Teams table: override inline rgb(195,244,199) — same success green as refresh Schedule */
+[data-bs-theme="dark"] td.gatool-teamdata-local-edit,
+[data-bs-theme="dark"] .teamNotes.gatool-teamdata-local-edit {
+  background: linear-gradient(
+      rgba(25, 135, 84, 0.5),
+      rgba(25, 135, 84, 0.5)
+    )
+    var(--bs-body-bg) !important;
+  color: #f1faf4 !important;
+}
+
+/* Team page reset modal: was inline #d4edda */
+.gatool-reset-notes-option {
+  background-color: #d4edda;
+}
+
+[data-bs-theme="dark"] .gatool-reset-notes-option {
+  background: linear-gradient(
+      rgba(25, 135, 84, 0.4),
+      rgba(25, 135, 84, 0.4)
+    )
+    var(--bs-modal-bg, var(--bs-body-bg));
+  border: 1px solid #198754;
+}
+
+/* Awards grid */
+[data-bs-theme="dark"] .awardsButton .btn-outline-success {
+  color: #86efac !important;
+  border-color: #4ade80 !important;
+}
+
+[data-bs-theme="dark"] .awardsButton .btn-outline-success:hover {
+  color: #052e16 !important;
+  background-color: #4ade80 !important;
+}
+
+/* Announce: override inline pastel TDs — dark alliance tint + light text.
+   Rank column is also td.col1 but uses class "ranking" + inline rankHighlight(); exclude it so green/yellow/orange highlights are not overridden by !important. */
+[data-bs-theme="dark"] .gatool-announce.redAlliance td.col1:not(.ranking),
+[data-bs-theme="dark"] .gatool-announce.redAlliance td.col2,
+[data-bs-theme="dark"] .gatool-announce.redAlliance td.col7,
+[data-bs-theme="dark"] .gatool-announce.redAlliance td.announce-alliance-matchup-cell {
+  background-color: rgba(95, 26, 32, 0.92) !important;
+  color: #f1f5f9 !important;
+}
+
+[data-bs-theme="dark"] .gatool-announce.blueAlliance td.col1:not(.ranking),
+[data-bs-theme="dark"] .gatool-announce.blueAlliance td.col2,
+[data-bs-theme="dark"] .gatool-announce.blueAlliance td.col7,
+[data-bs-theme="dark"] .gatool-announce.blueAlliance td.announce-alliance-matchup-cell {
+  background-color: rgba(28, 52, 108, 0.92) !important;
+  color: #f1f5f9 !important;
+}
+
+/* Plain rank cell (no rankHighlight): match alliance row; highlighted cells use .announce-rank-highlight + inline styles only */
+[data-bs-theme="dark"] .gatool-announce.redAlliance td.col1.ranking.announce-rank-plain {
+  background-color: rgba(95, 26, 32, 0.92) !important;
+  color: #f8fafc !important;
+}
+
+[data-bs-theme="dark"] .gatool-announce.blueAlliance td.col1.ranking.announce-rank-plain {
+  background-color: rgba(28, 52, 108, 0.92) !important;
+  color: #f8fafc !important;
+}
+
+/* Prior partnerships: base rule sets .announce-alliance-matchup-line { color: #222 }, which wins over inherited cell text */
+[data-bs-theme="dark"] .gatool-announce .announce-alliance-matchup-line {
+  color: #e2e8f0 !important;
+}
+
+[data-bs-theme="dark"] .gatool-announce .announce-alliance-matchup-summary--status .text-muted {
+  color: #cbd5e1 !important;
+  opacity: 1;
+}
+
+[data-bs-theme="dark"] .gatool-announce .announceTeamNumber,
+[data-bs-theme="dark"] .gatool-announce .teamName {
+  color: #f8fafc !important;
+}
+
+[data-bs-theme="dark"] .gatool-announce .champs {
+  color: #93c5fd !important;
+}
+
+[data-bs-theme="dark"] .gatool-announce .HOFRed {
+  color: #93c5fd !important;
+}
+
+[data-bs-theme="dark"] .gatool-announce .HOFBlue {
+  color: #fca5a5 !important;
+}
+
+/* Robot name: was #fdba74 (orange-300) — bump saturation so it doesn’t read “muddy” on tinted rows */
+[data-bs-theme="dark"] .gatool-announce .robotName {
+  color: #fb923c !important;
+}
+
+/* Award wins: was #6ee7b7 — less pastel, still bold/large; revert if contrast feels low on blue rows */
+[data-bs-theme="dark"] .gatool-announce .awardHilight {
+  color: #34d399 !important;
+}
+
+[data-bs-theme="dark"] .gatool-announce .champsQualifiedAnnounce {
+  color: #a7f3d0 !important;
+}
+
+/*
+ * Play-by-Play (light mode): restore classic saturated red/blue fields + white text.
+ * Dark mode work had switched these to Announce pastels globally; that reads as “washed out” on a light UI.
+ */
+[data-bs-theme="light"] .playByPlayTable td.redAlliancePlayByPlay,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.redAlliancePlayByPlay {
+  background-color: #ff0000 !important;
+  color: #ffffff !important;
+  border-color: #ccc !important;
+}
+
+[data-bs-theme="light"] .playByPlayTable td.blueAlliancePlayByPlay,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.blueAlliancePlayByPlay {
+  background-color: #0000ff !important;
+  color: #ffffff !important;
+  border-color: #ccc !important;
+}
+
+[data-bs-theme="light"] .playByPlayTable td.redAlliancePlayByPlay .playByPlayTeamName,
+[data-bs-theme="light"] .playByPlayTable td.blueAlliancePlayByPlay .playByPlayTeamName,
+[data-bs-theme="light"] .playByPlayTable td.redAlliancePlayByPlay .playByPlayOrganization,
+[data-bs-theme="light"] .playByPlayTable td.blueAlliancePlayByPlay .playByPlayOrganization,
+[data-bs-theme="light"] .playByPlayTable td.redAlliancePlayByPlay .playByPlayCity,
+[data-bs-theme="light"] .playByPlayTable td.blueAlliancePlayByPlay .playByPlayCity,
+[data-bs-theme="light"] .playByPlayTable td.redAlliancePlayByPlay .mottoes,
+[data-bs-theme="light"] .playByPlayTable td.blueAlliancePlayByPlay .mottoes,
+[data-bs-theme="light"] .playByPlayTable td.redAlliancePlayByPlay .playByPlayteamNumber,
+[data-bs-theme="light"] .playByPlayTable td.blueAlliancePlayByPlay .playByPlayteamNumber,
+[data-bs-theme="light"] .playByPlayTable td.redAlliancePlayByPlay .playByPlaysayNumber,
+[data-bs-theme="light"] .playByPlayTable td.blueAlliancePlayByPlay .playByPlaysayNumber,
+[data-bs-theme="light"] .playByPlayTable td.redAlliancePlayByPlay .playByPlayWinLossTie,
+[data-bs-theme="light"] .playByPlayTable td.blueAlliancePlayByPlay .playByPlayWinLossTie,
+[data-bs-theme="light"] .playByPlayTable td.redAlliancePlayByPlay .champsQualified,
+[data-bs-theme="light"] .playByPlayTable td.blueAlliancePlayByPlay .champsQualified,
+[data-bs-theme="light"] .playByPlayTable td.redAlliancePlayByPlay .notes,
+[data-bs-theme="light"] .playByPlayTable td.blueAlliancePlayByPlay .notes,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.redAlliancePlayByPlay .playByPlayTeamName,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.blueAlliancePlayByPlay .playByPlayTeamName,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.redAlliancePlayByPlay .playByPlayOrganization,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.blueAlliancePlayByPlay .playByPlayOrganization,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.redAlliancePlayByPlay .playByPlayCity,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.blueAlliancePlayByPlay .playByPlayCity,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.redAlliancePlayByPlay .mottoes,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.blueAlliancePlayByPlay .mottoes,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.redAlliancePlayByPlay .playByPlayteamNumber,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.blueAlliancePlayByPlay .playByPlayteamNumber,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.redAlliancePlayByPlay .playByPlaysayNumber,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.blueAlliancePlayByPlay .playByPlaysayNumber,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.redAlliancePlayByPlay .playByPlayWinLossTie,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.blueAlliancePlayByPlay .playByPlayWinLossTie,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.redAlliancePlayByPlay .champsQualified,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.blueAlliancePlayByPlay .champsQualified,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.redAlliancePlayByPlay .notes,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.blueAlliancePlayByPlay .notes {
+  color: #ffffff !important;
+}
+
+[data-bs-theme="light"] .playByPlayTable td.redAlliancePlayByPlay .playByPlayRobotName,
+[data-bs-theme="light"] .playByPlayTable td.blueAlliancePlayByPlay .playByPlayRobotName,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.redAlliancePlayByPlay .playByPlayRobotName,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.blueAlliancePlayByPlay .playByPlayRobotName {
+  color: #f9fe00 !important;
+}
+
+[data-bs-theme="light"] .playByPlayTable td.redAlliancePlayByPlay .playByPlayAlliance,
+[data-bs-theme="light"] .playByPlayTable td.blueAlliancePlayByPlay .playByPlayAlliance,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.redAlliancePlayByPlay .playByPlayAlliance,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.blueAlliancePlayByPlay .playByPlayAlliance {
+  color: #f3f858 !important;
+}
+
+[data-bs-theme="light"] .playByPlayTable td.redAlliancePlayByPlay .tbd,
+[data-bs-theme="light"] .playByPlayTable td.blueAlliancePlayByPlay .tbd,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.redAlliancePlayByPlay .tbd,
+:root:not([data-bs-theme="dark"]) .playByPlayTable td.blueAlliancePlayByPlay .tbd {
+  color: #f1f5f9 !important;
+}
+
+/* Play-by-Play: same dark alliance tints + text as Announce */
+[data-bs-theme="dark"] td.redAlliancePlayByPlay {
+  background-color: rgba(95, 26, 32, 0.92) !important;
+  color: #f1f5f9 !important;
+  border-color: rgba(252, 165, 165, 0.35);
+}
+
+[data-bs-theme="dark"] td.blueAlliancePlayByPlay {
+  background-color: rgba(28, 52, 108, 0.92) !important;
+  color: #f1f5f9 !important;
+  border-color: rgba(147, 197, 253, 0.35);
+}
+
+[data-bs-theme="dark"] .redAlliancePlayByPlay .playByPlayRobotName,
+[data-bs-theme="dark"] .blueAlliancePlayByPlay .playByPlayRobotName {
+  color: #fef08a !important;
+}
+
+[data-bs-theme="dark"] .redAlliancePlayByPlay .playByPlayAlliance,
+[data-bs-theme="dark"] .blueAlliancePlayByPlay .playByPlayAlliance {
+  color: #fde047 !important;
+}
+
+[data-bs-theme="dark"] .redAlliancePlayByPlay .playByPlayTeamName,
+[data-bs-theme="dark"] .blueAlliancePlayByPlay .playByPlayTeamName,
+[data-bs-theme="dark"] .redAlliancePlayByPlay .playByPlayOrganization,
+[data-bs-theme="dark"] .blueAlliancePlayByPlay .playByPlayOrganization,
+[data-bs-theme="dark"] .redAlliancePlayByPlay .playByPlayCity,
+[data-bs-theme="dark"] .blueAlliancePlayByPlay .playByPlayCity,
+[data-bs-theme="dark"] .redAlliancePlayByPlay .mottoes,
+[data-bs-theme="dark"] .blueAlliancePlayByPlay .mottoes,
+[data-bs-theme="dark"] .redAlliancePlayByPlay .playByPlayteamNumber,
+[data-bs-theme="dark"] .blueAlliancePlayByPlay .playByPlayteamNumber {
+  color: #f8fafc !important;
+}
+
+[data-bs-theme="dark"] .redAlliancePlayByPlay .champsQualified,
+[data-bs-theme="dark"] .blueAlliancePlayByPlay .champsQualified {
+  color: #fde047 !important;
+}
+
+[data-bs-theme="dark"] .redAlliancePlayByPlay .playByPlaysayNumber,
+[data-bs-theme="dark"] .blueAlliancePlayByPlay .playByPlaysayNumber,
+[data-bs-theme="dark"] .redAlliancePlayByPlay .playByPlayWinLossTie,
+[data-bs-theme="dark"] .blueAlliancePlayByPlay .playByPlayWinLossTie {
+  color: #e2e8f0 !important;
+}
+
+[data-bs-theme="dark"] .redAlliancePlayByPlay .tbd,
+[data-bs-theme="dark"] .blueAlliancePlayByPlay .tbd {
+  color: #cbd5e1 !important;
+}
+
+/* Playoff bracket SVGs (8 / 6 / 4 / 2 alliance): dark canvas, column rails, connector lines, labels */
+[data-bs-theme="dark"] .gatool-playoff-bracket svg g#background rect[fill="#FFFFFF"],
+[data-bs-theme="dark"] .gatool-playoff-bracket svg g#background rect[fill="#fff"] {
+  fill: #1a1b20 !important;
+}
+
+[data-bs-theme="dark"] .gatool-playoff-bracket svg g#background rect[fill="#DBDAD9"],
+[data-bs-theme="dark"] .gatool-playoff-bracket svg g#background rect[fill="#d9d8d7"] {
+  fill: #383b45 !important;
+}
+
+[data-bs-theme="dark"] .gatool-playoff-bracket svg g#background polyline[stroke="#000000"],
+[data-bs-theme="dark"] .gatool-playoff-bracket svg g#background polyline[stroke="#000"],
+[data-bs-theme="dark"] .gatool-playoff-bracket svg g#background line[stroke="#000000"],
+[data-bs-theme="dark"] .gatool-playoff-bracket svg g#background line[stroke="#000"] {
+  stroke: #94a3b8 !important;
+}
+
+[data-bs-theme="dark"] .gatool-playoff-bracket svg g#background line[stroke="#8E8E8E"],
+[data-bs-theme="dark"] .gatool-playoff-bracket svg g#background line[stroke="#8e8e8e"],
+[data-bs-theme="dark"] .gatool-playoff-bracket svg g#background line[stroke="#8c8c8c"] {
+  stroke: #64748b !important;
+}
+
+[data-bs-theme="dark"] .gatool-playoff-bracket svg g#background text,
+[data-bs-theme="dark"] .gatool-playoff-bracket svg g#background tspan {
+  fill: #e2e8f0 !important;
+}
+
+[data-bs-theme="dark"] .gatool-playoff-bracket svg path#finalsBackground {
+  fill: #3d404d !important;
+  stroke: #94a3b8 !important;
+}
+
+[data-bs-theme="dark"] .gatool-playoff-bracket svg g[id^="match"] > g > rect[fill="#000000"],
+[data-bs-theme="dark"] .gatool-playoff-bracket svg g#finalsContainer > rect[fill="#000000"] {
+  fill: #252932 !important;
+}
+
+/* Dark mode only: saturated bracket red/blue (light theme keeps SVG #FF0000 / #0000FF) */
+[data-bs-theme="dark"] .gatool-playoff-bracket svg polygon[fill="#FF0000"],
+[data-bs-theme="dark"] .gatool-playoff-bracket svg polygon[fill="#ff0000"] {
+  fill: #ef4444 !important;
+}
+
+[data-bs-theme="dark"] .gatool-playoff-bracket svg polygon[fill="#0000FF"],
+[data-bs-theme="dark"] .gatool-playoff-bracket svg polygon[fill="#0000ff"] {
+  fill: #3b82f6 !important;
+}
+
+[data-bs-theme="dark"] .gatool-playoff-bracket svg text[id^="finalsM"][id$="Scores"] tspan[fill="#0000FF"],
+[data-bs-theme="dark"] .gatool-playoff-bracket svg text[id^="finalsM"][id$="Scores"] tspan[fill="#0000ff"] {
+  fill: #3b82f6 !important;
+}
+
+[data-bs-theme="dark"] .gatool-playoff-bracket svg text[id^="finalsM"][id$="Scores"] tspan[fill="#FF0000"],
+[data-bs-theme="dark"] .gatool-playoff-bracket svg text[id^="finalsM"][id$="Scores"] tspan[fill="#ff0000"] {
+  fill: #ef4444 !important;
+}
+
+[data-bs-theme="dark"] .gatool-playoff-bracket svg text[id^="finalsM"][id$="Scores"] tspan[fill="#09BA48"],
+[data-bs-theme="dark"] .gatool-playoff-bracket svg text[id^="finalsM"][id$="Scores"] tspan[fill="#09ba48"] {
+  fill: #86efac !important;
+}
+
+[data-bs-theme="dark"] .gatool-playoff-bracket svg circle[id^="winnerMatch"][id$="Dot"][fill="#0000FF"],
+[data-bs-theme="dark"] .gatool-playoff-bracket svg circle[id^="winnerMatch"][id$="Dot"][fill="#0000ff"] {
+  fill: #2563eb !important;
+  stroke: #bfdbfe !important;
+  stroke-width: 2px !important;
+}
+
+[data-bs-theme="dark"] .gatool-playoff-bracket svg circle[id^="winnerMatch"][id$="Dot"][fill="#FF0000"],
+[data-bs-theme="dark"] .gatool-playoff-bracket svg circle[id^="winnerMatch"][id$="Dot"][fill="#ff0000"] {
+  fill: #dc2626 !important;
+  stroke: #fecaca !important;
+  stroke-width: 2px !important;
+}
+
+[data-bs-theme="dark"] .gatool-playoff-bracket svg circle[id^="winnerMatch"][id$="Dot"][fill="#09BA48"],
+[data-bs-theme="dark"] .gatool-playoff-bracket svg circle[id^="winnerMatch"][id$="Dot"][fill="#09ba48"] {
+  fill: #4ade80 !important;
+  stroke: #bbf7d0 !important;
+  stroke-width: 2px !important;
+}
+
+/* Emcee / PlayoffDetails: alliance colors on dark page bg (deeper / more saturated than red-400 / blue-400) */
+[data-bs-theme="dark"] .redAllianceTeam {
+  color: #ef4444 !important;
+}
+
+[data-bs-theme="dark"] .blueAllianceTeam {
+  color: #3b82f6 !important;
+}
+
+[data-bs-theme="dark"] .davidPriceCaptain {
+  /* Emcee captain line: drop harsh white stroke; subtle dark halo keeps red/blue readable */
+  text-shadow:
+    0 0 4px rgba(0, 0, 0, 0.65),
+    0 1px 3px rgba(0, 0, 0, 0.45);
+}
+
+/* Dark mode: alerts must set BOTH surface and text (pastels are light-theme-only above) */
+[data-bs-theme="dark"] .alert-success {
+  background-color: rgba(20, 60, 40, 0.55) !important;
+  border-color: rgba(52, 211, 153, 0.45) !important;
+  color: #d1fae5 !important;
+}
+
+[data-bs-theme="dark"] .alert-warning {
+  background-color: rgba(55, 48, 20, 0.75) !important;
+  border-color: rgba(250, 204, 21, 0.45) !important;
+  color: #fef9c3 !important;
+}
+
+[data-bs-theme="dark"] .alert-danger {
+  background-color: rgba(60, 24, 28, 0.75) !important;
+  border-color: rgba(248, 113, 113, 0.5) !important;
+  color: #fecaca !important;
+}
+
+[data-bs-theme="dark"] .alert-info {
+  background-color: rgba(20, 45, 65, 0.75) !important;
+  border-color: rgba(56, 189, 248, 0.45) !important;
+  color: #e0f2fe !important;
+}
+
+[data-bs-theme="dark"] .alert-primary {
+  background-color: rgba(30, 40, 70, 0.75) !important;
+  border-color: rgba(129, 140, 248, 0.45) !important;
+  color: #e0e7ff !important;
+}
+
+[data-bs-theme="dark"] .alert-secondary {
+  background-color: var(--bs-secondary-bg) !important;
+  border-color: var(--bs-border-color) !important;
+  color: var(--bs-body-color) !important;
+}
+
+/* Setup: settings table rows + nested labels (Team Info / UI / Stats) */
+[data-bs-theme="dark"] .UISettings label,
+[data-bs-theme="dark"] .teamInfoSettings label,
+[data-bs-theme="dark"] .statsSettings label {
+  color: var(--bs-body-color);
+}
+
+[data-bs-theme="dark"] .UISettings .form-check-label,
+[data-bs-theme="dark"] .teamInfoSettings .form-check-label,
+[data-bs-theme="dark"] .statsSettings .form-check-label {
+  color: var(--bs-body-color);
+}
+
+/* Bottom bar: plain copyright text (links use .app-footer-link) */
+[data-bs-theme="dark"] .app-footer-copy {
+  color: #cbd5e1;
+}
+
+/*
+ * Alliance Selection: pastel columns (AllianceSelectionPage.css) inherit light body text in dark theme.
+ * Force dark text on light panels; keep white-on-red/green chosen states.
+ */
+[data-bs-theme="dark"] .gatool-alliance-selection .allianceContainer,
+[data-bs-theme="dark"] .gatool-alliance-selection .backupAlliancesTable,
+[data-bs-theme="dark"] .gatool-alliance-selection .skippedAlliancesTable {
+  color: #0f172a !important;
+}
+
+[data-bs-theme="dark"] .gatool-alliance-selection .alliancesTeamsTable,
+[data-bs-theme="dark"] .gatool-alliance-selection .alliancesTeamsTableHeader {
+  color: #0f172a !important;
+}
+
+[data-bs-theme="dark"] .gatool-alliance-selection .fullAlliance {
+  color: #14532d !important;
+}
+
+[data-bs-theme="dark"] .gatool-alliance-selection .allianceTeam:not(.allianceDecline):not(.captainDecline):not(.allianceTeamChosen):not(
+    .allianceRemovedTeam
+  ),
+[data-bs-theme="dark"] .gatool-alliance-selection .availableTeam:not(.allianceDecline):not(.allianceRemovedTeam) {
+  color: #0f172a !important;
+  background-color: #ffffff !important;
+}
+
+[data-bs-theme="dark"]
+  .gatool-alliance-selection
+  .allianceTeam:not(.allianceDecline):not(.captainDecline):not(.allianceTeamChosen):not(.allianceRemovedTeam):hover,
+[data-bs-theme="dark"]
+  .gatool-alliance-selection
+  .availableTeam:not(.allianceDecline):not(.allianceRemovedTeam):hover {
+  background-color: #ccfbf1 !important;
+  color: #0f172a !important;
+}
+
+[data-bs-theme="dark"] .gatool-alliance-selection .allianceRemovedTeam {
+  background-color: #ff7700 !important;
+  color: #ffffff !important;
+  border: 1px solid #ffb347 !important;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
+}
+
+[data-bs-theme="dark"] .gatool-alliance-selection .allianceRemovedTeam:hover {
+  background-color: #ff9933 !important;
+  color: #1c1917 !important;
+}
+
+[data-bs-theme="dark"] .gatool-alliance-selection .alliance.dropzone {
+  background-color: rgba(248, 113, 113, 0.12) !important;
+  box-shadow: inset 0 0 0 1px rgba(248, 113, 113, 0.35);
+}
+
+[data-bs-theme="dark"] .gatool-alliance-selection .alliance-selection-legend {
+  color: #334155 !important;
+}
+
+[data-bs-theme="dark"] .gatool-alliance-selection .alliance-selection-legend-decline {
+  color: #991b1b;
+  font-weight: 700;
+}
+
+[data-bs-theme="dark"] .gatool-alliance-selection .alliance-selection-legend-removed {
+  color: #ff7700;
+  font-weight: 700;
+}
+
+[data-bs-theme="dark"] .gatool-alliance-selection .alliancedrop {
+  color: #0f172a !important;
+  background-color: #e2e8f0 !important;
+  border-color: #64748b !important;
+}
+
+[data-bs-theme="dark"] .gatool-alliance-selection .allianceCaptain {
+  color: #422006 !important;
+  background: rgba(253, 224, 71, 0.95) !important;
+}
+
+[data-bs-theme="dark"] .gatool-alliance-selection .nextAllianceChoice {
+  background-color: rgba(254, 243, 199, 0.98) !important;
+  color: #422006 !important;
+  border-color: #dc2626 !important;
+}
+
+[data-bs-theme="dark"] .gatool-alliance-selection .allianceSkip {
+  color: #422006 !important;
+}
+
+[data-bs-theme="dark"] .gatool-alliance-selection .allianceDecline,
+[data-bs-theme="dark"] .gatool-alliance-selection .captainDecline {
+  color: #ffffff !important;
+}
+
+[data-bs-theme="dark"] .gatool-alliance-selection .allianceTeamChosen,
+[data-bs-theme="dark"] .gatool-alliance-selection .allianceTeamChosen b {
+  color: #ffffff !important;
+}

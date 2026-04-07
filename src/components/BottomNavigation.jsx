@@ -1,0 +1,173 @@
+import Navbar from "react-bootstrap/Navbar";
+import {
+  Button,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+} from "react-bootstrap";
+import { useState } from "react";
+
+function BottomNavigation({ ftcMode }) {
+  const [url, setURL] = useState({ title: null, url: null });
+  const handleClose = () => {
+    setURL({ title: null, url: null });
+  };
+
+  return (
+    <>
+      <Navbar
+        bg="light"
+        className="navbar-fixed-bottom-custom app-layout-bottom-bar"
+        style={{
+          width: "100%",
+          margin: 0,
+          flexShrink: 0,
+        }}
+      >
+        <span className="app-footer-copy" style={{ width: "100%", fontSize: "11px" }}>
+          © 2017-{new Date().getFullYear()} Arthur Rosa &amp; James Lockman,{" "}
+          <span
+            className="app-footer-link"
+            style={{ cursor: "pointer" }}
+            onClick={() => {
+              setURL({
+                title: "Northern Force",
+                url: "http://www.northernforce.org/",
+              });
+            }}
+          >
+            FIRST Robotics Team 172 Northern Force
+          </span>{" "}
+          and the{" "}
+          <span
+            className="app-footer-link"
+            style={{ cursor: "pointer" }}
+            onClick={() => {
+              setURL({ title: "GoFAR", url: "http://gofarmaine.org" });
+            }}
+          >
+            Gorham-Falmouth Alliance for Robotics.<br/>
+          </span>{" Event Data provided by "}
+          {!ftcMode && (
+            <>
+              <span
+                className="app-footer-link"
+            style={{ cursor: "pointer" }}
+                onClick={() => {
+                  setURL({
+                    title: "FIRST API",
+                    url: "https://frc-events.firstinspires.org/services/API",
+                  });
+                }}
+              >
+                
+                <i>
+                  <b>FIRST</b>
+                </i>
+                .
+              </span>{" "}
+              Additional Data provided by{" "}
+              <span
+                className="app-footer-link"
+            style={{ cursor: "pointer" }}
+                onClick={() => {
+                  setURL({
+                    title: "TBA API",
+                    url: "https://www.thebluealliance.com/apidocs/v3",
+                  });
+                }}
+              >
+                <i>
+                  <b>TBA</b>
+                </i>
+              </span>{", by "}
+              <span
+                className="app-footer-link"
+            style={{ cursor: "pointer" }}
+                onClick={() => {
+                  setURL({
+                    title: "Caster's Tool",
+                    url: "https://casterstool.com",
+                  });
+                }}
+              >
+                <i>
+                  <b>Caster's Tool</b>
+                </i>
+              </span>{", and by "}
+              <span
+                className="app-footer-link"
+            style={{ cursor: "pointer" }}
+                onClick={() => {
+                  setURL({
+                    title: "Statbotics API",
+                    url: "https://www.statbotics.io",
+                  });
+                }}
+              >
+                <i>
+                  <b>Statbotics.io</b>
+                </i>
+                .
+              </span>
+            </>
+          )}
+          {ftcMode && (
+            <>
+              <span
+                className="app-footer-link"
+            style={{ cursor: "pointer" }}
+                onClick={() => {
+                  setURL({
+                    title: "FIRST API",
+                    url: "https://ftc-events.firstinspires.org/services/API",
+                  });
+                }}
+              >
+                <i>
+                  <b>FIRST</b>
+                </i>
+                .
+              </span>{" Additional Data provided by "}
+              <span
+                className="app-footer-link"
+            style={{ cursor: "pointer" }}
+                onClick={() => {
+                  setURL({
+                    title: "FTC Scout API",
+                    url: "https://ftcscout.org/api",
+                  });
+                }}
+              >
+                {" "}
+                <b>
+                  FTC<i>Scout</i>
+                </b>
+                APIs
+              </span>
+            </>
+          )}
+        </span>
+      </Navbar>
+      <Modal centered={true} show={url?.title} onHide={handleClose} fullscreen>
+        <ModalHeader>{url?.title}</ModalHeader>
+        <ModalBody>
+          <div style={{ height: "calc(100vh - 200px)" }}>
+            <iframe
+              width="100%"
+              height="100%"
+              src={url?.url}
+              title={url?.title}
+            />
+          </div>
+        </ModalBody>
+        <ModalFooter>
+          <Button onClick={handleClose}>Close {url?.title}</Button>
+        </ModalFooter>
+      </Modal>
+    </>
+  );
+}
+
+export default BottomNavigation;
