@@ -541,8 +541,6 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         [show, isResetModalOpen]
     );
     
-    const currentRound = asArrays?.allianceSelectionOrder?.[asArrays.nextChoice]?.round || -1;
-    
     // Early return if not initialized yet - wait for useEffect to complete
     if (!allianceSelectionArrays || _.isEmpty(allianceSelectionArrays)) {
         return null;
@@ -622,6 +620,8 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         //set up the Alliances
         alliances = asArrays.alliances;
     }
+
+    const currentRound = asArrays?.allianceSelectionOrder?.[asArrays.nextChoice]?.round || -1;
 
     const availCell = (team) => {
         const currentRound = asArrays?.allianceSelectionOrder?.[asArrays.nextChoice]?.round || -1;
