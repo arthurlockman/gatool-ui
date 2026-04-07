@@ -5,7 +5,7 @@ export const appUpdates = [
       <ul>
         <li>ALL PROGRAMS:</li>
         <ul>
-          <li>Some patches</li>
+          <li>Alliance Selection screen now displays the correct title over the list of Alliances (Round 1 of 1, Round 1 of 2, etc. <i>Thank you Austin Jenchi for the fix!</i></li>
         </ul>
         <li>FTC:</li>
         <ul>
