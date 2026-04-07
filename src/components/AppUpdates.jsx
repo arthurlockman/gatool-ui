@@ -1,5 +1,19 @@
 export const appUpdates = [
   {
+    date: "April 7, 2026",
+    message: (
+      <ul>
+        <li>ALL PROGRAMS:</li>
+        <ul>
+          <li>Some patches</li>
+        </ul>
+        <li>FTC:</li>
+        <ul>
+          <li>We no longer display KICKOFF events in the event list.</li>
+        </ul>
+      </ul>
+    ),
+  },{
     date: "April 5, 2026",
     message: (
       <ul>
