@@ -97,20 +97,29 @@ function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedY
 
     const ftcFiltersMenu = _.orderBy(ftcLeagues, "label", "asc")
 
-    const regionFiltersMenu = [...ftcTypes.map((/** @type {{ type: string; description: string; }} */ type) => {
+    const regionFiltersMenu = [..._.filter(ftcTypes, (/** @type {{ type: string }} */ type) => String(type?.type ?? "").trim().toUpperCase() !== "KICKOFF").map((/** @type {{ type: string; description: string; }} */ type) => {
         return { value: type.type, label: type.description }
     }), ..._.orderBy(ftcRegions.map((/** @type {{ regionCode: string; description: string; }} */ region) => {
         return { value: region.regionCode, label: region.description }
     }), "label", "asc")];
 
     function filterEvents(events) {
+        // FTC: hide kickoffs in the picker (covers persisted cache and any API shape quirks)
+        var working = ftcMode
+            ? _.filter(events, (o) => {
+                const t = String(_.get(o, "value.type") ?? "").trim().toUpperCase();
+                const tn = String(_.get(o, "value.typeName") ?? "").trim().toUpperCase();
+                return t !== "KICKOFF" && tn !== "KICKOFF";
+            })
+            : events;
+
         //filter the array
         var filters = [...eventFilters?.map((e) => { return e?.value }), ...regionFilters?.map((e) => { return e?.value })];
 
-        var filteredEvents = events;
+        var filteredEvents = working;
         //reduce the list by time, then additively include other filters
         if (timeFilter && (timeFilter?.value !== "all")) {
-            filteredEvents = _.filter(events, function (o) { return (_.indexOf(o?.filters, timeFilter.value) >= 0) });
+            filteredEvents = _.filter(filteredEvents, function (o) { return (_.indexOf(o?.filters, timeFilter.value) >= 0) });
         }
         var filterTemp = [];
         if (filters.length > 0) {

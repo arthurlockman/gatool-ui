@@ -5605,6 +5605,23 @@ function App() {
           }
         }
 
+        // FTC: kickoff events are not competition events; omit from picker and type filters
+        if (ftcMode) {
+          result.events = _.filter(result?.events, (e) => {
+            const type = String(
+              _.get(e, "type") ?? _.get(e, "Type") ?? ""
+            )
+              .trim()
+              .toUpperCase();
+            const typeName = String(
+              _.get(e, "typeName") ?? _.get(e, "TypeName") ?? ""
+            )
+              .trim()
+              .toUpperCase();
+            return type !== "12" && typeName !== "KICKOFF";
+          });
+        }
+
         var regionCodes = [];
         var types = [];
         const events = result?.events.map((e) => {
