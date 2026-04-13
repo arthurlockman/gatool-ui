@@ -14,6 +14,8 @@ import { useScrollToTop } from "../contextProviders/ScrollContainerContext";
 import { useEffect, useRef } from "react";
 import { getAllianceLookupEntry } from "../utils/allianceLookup";
 import { matchHasPostedResult } from "../utils/playoffReserveEdits";
+import { applyPlayoffStationOrderToMatch } from "../utils/playoffStationOrderEdits";
+import { getPlayByPlayDisplayOrder } from "../utils/playByPlayDisplayOrder";
 
 function PlayByPlayPage({
   selectedEvent,
@@ -46,6 +48,9 @@ function PlayByPlayPage({
   upsertPlayoffReserveOverlay,
   removePlayoffReserveOverlay,
   playoffReserveEdits,
+  playoffStationOrderEdits,
+  upsertPlayoffStationOrderOverlay,
+  removePlayoffStationOrderOverlay,
   nextMatch,
   previousMatch,
   setMatchFromMenu,
@@ -118,14 +123,7 @@ function PlayByPlayPage({
       }
       : {};
 
-  var displayOrder = ftcMode
-    ? ["Blue1", "Red2", "Blue2", "Red1", "Blue3", "Red3"]
-    : ["Blue1", "Red3", "Blue2", "Red2", "Blue3", "Red1", "Blue4", "Red4"];
-  if (swapScreen === true) {
-    displayOrder = ftcMode
-      ? ["Red2", "Blue1", "Red1", "Blue2", "Red3", "Blue3"]
-      : ["Red3", "Blue1", "Red2", "Blue2", "Red1", "Blue3", "Red4", "Blue4"];
-  }
+  var displayOrder = getPlayByPlayDisplayOrder(ftcMode, swapScreen);
 
 
 
@@ -226,7 +224,7 @@ function PlayByPlayPage({
           allianceArray.push(allianceMembers?.backup);
         }
 
-        var remainingTeam = _.difference(allianceArray, allianceTeams);
+        var remainingTeam = _.difference(allianceArray.filter(Boolean), allianceTeams);
         if (remainingTeam.length > 0) {
           // Reverse-map the team number to get the actual team number for lookups
           const lookupRemainingTeam = remainingTeam[0];
@@ -450,6 +448,17 @@ function PlayByPlayPage({
       ? true
       : false
     : false;
+
+  matchDetails = applyPlayoffStationOrderToMatch(
+    matchDetails,
+    selectedEvent?.value?.code,
+    playoffStationOrderEdits,
+    ftcMode
+  );
+  /** Raw match (before station-order overlay) — used by TopButtons reserve dialog so it
+   *  works from schedule station assignments, not visual reorder. */
+  const rawMatchDetailsForReserve = schedule[currentMatch - 1] ?? null;
+
   const matchMenu = schedule.map((match, index) => {
     var tag = `${match?.description} of ${qualSchedule?.schedule?.length}`;
     if (
@@ -544,6 +553,7 @@ function PlayByPlayPage({
               setMatchFromMenu={setMatchFromMenu}
               selectedEvent={selectedEvent}
               matchDetails={matchDetails}
+              rawMatchDetailsForReserve={rawMatchDetailsForReserve}
               timeFormat={timeFormat}
               inPlayoffs={inPlayoffs}
               alliances={alliances}
@@ -554,6 +564,9 @@ function PlayByPlayPage({
               upsertPlayoffReserveOverlay={upsertPlayoffReserveOverlay}
               removePlayoffReserveOverlay={removePlayoffReserveOverlay}
               playoffReserveEdits={playoffReserveEdits}
+              playoffStationOrderEdits={playoffStationOrderEdits}
+              upsertPlayoffStationOrderOverlay={upsertPlayoffStationOrderOverlay}
+              removePlayoffStationOrderOverlay={removePlayoffStationOrderOverlay}
               teamList={teamList}
               adHocMatch={adHocMatch}
               setAdHocMatch={setAdHocMatch}
@@ -562,6 +575,8 @@ function PlayByPlayPage({
               playoffOnly={playoffOnly}
               eventLabel={eventLabel}
               ftcMode={ftcMode}
+              remapNumberToString={remapNumberToString}
+              remapStringToNumber={remapStringToNumber}
             />
             <NotificationBanner
               notification={notification}
@@ -679,7 +694,7 @@ function PlayByPlayPage({
                       <tr className={"gatool-playbyplay"}>
                         <PlayByPlay
                           station={displayOrder[6]}
-                          team={teamDetails[displayOrder[6]]}
+                          team={_.isEmpty(teamDetails[displayOrder[6]]) ? null : teamDetails[displayOrder[6]]}
                           inPlayoffs={inPlayoffs}
                           key={displayOrder[6]}
                           selectedEvent={selectedEvent}
@@ -694,7 +709,7 @@ function PlayByPlayPage({
                         />
                         <PlayByPlay
                           station={displayOrder[7]}
-                          team={teamDetails[displayOrder[7]]}
+                          team={_.isEmpty(teamDetails[displayOrder[7]]) ? null : teamDetails[displayOrder[7]]}
                           inPlayoffs={inPlayoffs}
                           key={displayOrder[7]}
                           selectedEvent={selectedEvent}

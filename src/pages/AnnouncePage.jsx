@@ -19,6 +19,7 @@ import {
 } from "../utils/allianceConnectionsApi";
 import { getAllianceLookupEntry } from "../utils/allianceLookup";
 import { matchHasPostedResult } from "../utils/playoffReserveEdits";
+import { applyPlayoffStationOrderToMatch } from "../utils/playoffStationOrderEdits";
 
 function AnnouncePage({
   selectedEvent,
@@ -52,6 +53,9 @@ function AnnouncePage({
   upsertPlayoffReserveOverlay,
   removePlayoffReserveOverlay,
   playoffReserveEdits,
+  playoffStationOrderEdits,
+  upsertPlayoffStationOrderOverlay,
+  removePlayoffStationOrderOverlay,
   nextMatch,
   previousMatch,
   setMatchFromMenu,
@@ -444,6 +448,13 @@ function AnnouncePage({
       : false
     : false;
 
+  matchDetails = applyPlayoffStationOrderToMatch(
+    matchDetails,
+    selectedEvent?.value?.code,
+    playoffStationOrderEdits,
+    ftcMode
+  );
+
   const matchMenu = schedule.map((match, index) => {
     var tag = `${match?.description} of ${qualSchedule?.schedule?.length}`;
     if (
@@ -618,6 +629,9 @@ function AnnouncePage({
               upsertPlayoffReserveOverlay={upsertPlayoffReserveOverlay}
               removePlayoffReserveOverlay={removePlayoffReserveOverlay}
               playoffReserveEdits={playoffReserveEdits}
+              playoffStationOrderEdits={playoffStationOrderEdits}
+              upsertPlayoffStationOrderOverlay={upsertPlayoffStationOrderOverlay}
+              removePlayoffStationOrderOverlay={removePlayoffStationOrderOverlay}
               teamList={teamList}
               adHocMatch={adHocMatch}
               setAdHocMatch={setAdHocMatch}
@@ -626,6 +640,8 @@ function AnnouncePage({
               playoffOnly={playoffOnly}
               eventLabel={eventLabel}
               ftcMode={ftcMode}
+              remapNumberToString={remapNumberToString}
+              remapStringToNumber={remapStringToNumber}
             />
             <NotificationBanner notification={notification} />
             <EventNotificationBanner

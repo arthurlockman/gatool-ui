@@ -22,6 +22,10 @@ import { playoffOverrideMenu } from "components/Constants";
 import { CheckCircleFill, XCircleFill } from "react-bootstrap-icons";
 import Handshake from "components/Handshake";
 import useScrollPosition from "../hooks/useScrollPosition";
+import {
+  getPlayoffScheduleRowStyles,
+  playoffMatchHasDisplayableResult,
+} from "../utils/frcPlayoffSchedule";
 
 function SchedulePage({
   selectedEvent,
@@ -1632,21 +1636,12 @@ function SchedulePage({
                 {playoffSchedule &&
                   playoffSchedule?.schedule?.length > 0 &&
                   playoffSchedule.schedule.map((match, index) => {
-                    let redStyle = "red";
-                    let blueStyle = "blue";
-                    let winnerStyle = "tie";
                     let qualMatchCount = qualSchedule?.schedule?.length;
-                    if (
-                      Number(match.scoreRedFinal) > Number(match.scoreBlueFinal)
-                    ) {
-                      redStyle += " bold";
-                      winnerStyle = "red";
-                    } else if (
-                      Number(match.scoreBlueFinal) > Number(match.scoreRedFinal)
-                    ) {
-                      blueStyle += " bold";
-                      winnerStyle = "blue";
-                    }
+                    const { redStyle, blueStyle, winnerStyle } =
+                      getPlayoffScheduleRowStyles(match, ftcMode);
+                    const showPlayoffResultHighlight =
+                      Boolean(match?.actualStartTime) ||
+                      playoffMatchHasDisplayableResult(match);
 
                     return (
                       <tr
@@ -1666,7 +1661,7 @@ function SchedulePage({
                         <td>{index + 1 + (qualMatchCount || 0)}</td>
                         <td
                           className={
-                            match?.actualStartTime
+                            showPlayoffResultHighlight
                               ? `centerTable scheduleTable${winnerStyle}`
                               : "centerTable"
                           }

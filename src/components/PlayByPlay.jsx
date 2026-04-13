@@ -10,7 +10,18 @@ function PlayByPlay({ station, team, inPlayoffs, selectedEvent, showNotes, showM
     }
     
     var allianceColor = station.slice(0, -1);
-    
+    const isReserveStation = station.slice(-1) === "4";
+
+    // Reserve station with no team: render alliance-colored filler cells to maintain table structure
+    if (isReserveStation && !team?.teamNumber) {
+        return (
+            <>
+                <td className={`col2 ${allianceColor.toLowerCase()}AlliancePlayByPlay align-middle`} />
+                <td className={`col4 ${allianceColor.toLowerCase()}AlliancePlayByPlay`} />
+            </>
+        );
+    }
+
     // Display remapped team number if available
     const displayTeamNumber = remapNumberToString ? remapNumberToString(team?.teamNumber) : team?.teamNumber;
 
@@ -62,7 +73,13 @@ function PlayByPlay({ station, team, inPlayoffs, selectedEvent, showNotes, showM
                     </>
                 }
                 {!team?.teamNumber && <>
-                    <div className={"tbd"}>{adHocMode ? "No team selected" : ftcMode ? "No third Alliance member" : "No fourth Alliance member"}</div>
+                    <div className={"tbd"}>
+                        {adHocMode
+                            ? "No team selected"
+                            : inPlayoffs
+                                ? "TBD"
+                                : (ftcMode ? "No third Alliance member" : "No fourth Alliance member")}
+                    </div>
                 </>}
             </td>
         </>

@@ -698,6 +698,151 @@ td {
   color: #bfdbfe !important;
 }
 
+/* Playoff “Reorder field stations”: station-tinted sort rows + readable dark theme */
+.playoff-station-order-modal__content .modal-body {
+  background-color: var(--bs-modal-bg, var(--bs-body-bg));
+  color: var(--bs-body-color);
+}
+
+.playoff-station-sort-row {
+  border-width: 1px;
+}
+
+.playoff-station-sort-row--red {
+  background-color: red;
+  border-color: rgba(220, 53, 69, 0.6) !important;
+  color: white;
+}
+
+.playoff-station-sort-row--red .playoff-station-sort-meta {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.playoff-station-sort-row--red .playoff-station-sort-team {
+  color: white;
+  font-weight: 700;
+}
+
+.playoff-station-sort-row--blue {
+  background-color: blue;
+  border-color: rgba(13, 110, 253, 0.6) !important;
+  color: white;
+}
+
+.playoff-station-sort-row--blue .playoff-station-sort-meta {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.playoff-station-sort-row--blue .playoff-station-sort-team {
+  color: white;
+  font-weight: 700;
+}
+
+.playoff-station-sort-row--bench {
+  background-color: #f1f3f5;
+  border-color: rgba(73, 80, 87, 0.35) !important;
+}
+
+.playoff-station-sort-row--bench .playoff-station-sort-meta {
+  color: #495057;
+}
+
+.playoff-station-sort-row--bench .playoff-station-sort-team {
+  color: #212529;
+  font-weight: 700;
+}
+
+.playoff-station-sort-handle {
+  cursor: grab;
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
+.playoff-station-sort-row:active .playoff-station-sort-handle {
+  cursor: grabbing;
+}
+
+.playoff-station-sort-row--red .playoff-station-sort-handle {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.playoff-station-sort-row--blue .playoff-station-sort-handle {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.playoff-station-sort-row--bench .playoff-station-sort-handle {
+  color: #6c757d;
+}
+
+[data-bs-theme="dark"] .playoff-station-order-modal__content {
+  background-color: var(--bs-modal-bg, var(--bs-body-bg));
+  color: var(--bs-body-color);
+  border-color: var(--bs-border-color-translucent);
+}
+
+[data-bs-theme="dark"] .playoff-station-order-modal__content .modal-footer {
+  background-color: var(--bs-modal-bg, var(--bs-body-bg));
+  border-top-color: var(--bs-border-color-translucent);
+}
+
+[data-bs-theme="dark"] .playoff-station-sort-row--red {
+  background-color: rgba(127, 29, 29, 0.52);
+  border-color: rgba(248, 113, 113, 0.45) !important;
+  color: #fecaca;
+}
+
+[data-bs-theme="dark"] .playoff-station-sort-row--red .playoff-station-sort-meta {
+  color: #fca5a5;
+}
+
+[data-bs-theme="dark"] .playoff-station-sort-row--red .playoff-station-sort-team {
+  color: #fff7f7;
+  font-weight: 700;
+}
+
+[data-bs-theme="dark"] .playoff-station-sort-row--red .playoff-station-sort-handle {
+  color: #f87171;
+  opacity: 0.95;
+}
+
+[data-bs-theme="dark"] .playoff-station-sort-row--blue {
+  background-color: rgba(30, 58, 138, 0.52);
+  border-color: rgba(96, 165, 250, 0.45) !important;
+  color: #bfdbfe;
+}
+
+[data-bs-theme="dark"] .playoff-station-sort-row--blue .playoff-station-sort-meta {
+  color: #93c5fd;
+}
+
+[data-bs-theme="dark"] .playoff-station-sort-row--blue .playoff-station-sort-team {
+  color: #f0f7ff;
+  font-weight: 700;
+}
+
+[data-bs-theme="dark"] .playoff-station-sort-row--blue .playoff-station-sort-handle {
+  color: #60a5fa;
+}
+
+[data-bs-theme="dark"] .playoff-station-sort-row--bench {
+  background-color: rgba(51, 65, 85, 0.55);
+  border-color: rgba(148, 163, 184, 0.4) !important;
+  color: #e2e8f0;
+}
+
+[data-bs-theme="dark"] .playoff-station-sort-row--bench .playoff-station-sort-meta {
+  color: #cbd5e1;
+}
+
+[data-bs-theme="dark"] .playoff-station-sort-row--bench .playoff-station-sort-team {
+  color: #f8fafc;
+  font-weight: 700;
+}
+
+[data-bs-theme="dark"] .playoff-station-sort-row--bench .playoff-station-sort-handle {
+  color: #94a3b8;
+}
+
 /* Winner line in score header: avoid low-contrast named colors on grey */
 .gatool-score-winner-red {
   color: #b91c1c;
@@ -1114,11 +1259,33 @@ td {
   font-weight: bolder;
 }
 
+[data-bs-theme="dark"] .RedReplace {
+  background-color: rgba(127, 29, 29, 0.65) !important;
+  color: #fecaca !important;
+  border-color: rgba(248, 113, 113, 0.5) !important;
+}
+
+[data-bs-theme="dark"] .RedReplace:hover:not(:disabled) {
+  background-color: rgba(153, 27, 27, 0.8) !important;
+  color: #fff7f7 !important;
+}
+
 .BlueReplace {
   margin: 5px;
   color: white;
   background-color: blue;
   font-weight: bolder;
+}
+
+[data-bs-theme="dark"] .BlueReplace {
+  background-color: rgba(30, 58, 138, 0.65) !important;
+  color: #bfdbfe !important;
+  border-color: rgba(96, 165, 250, 0.5) !important;
+}
+
+[data-bs-theme="dark"] .BlueReplace:hover:not(:disabled) {
+  background-color: rgba(30, 64, 175, 0.8) !important;
+  color: #f0f7ff !important;
 }
 
 .promoteBackup {
@@ -1138,6 +1305,16 @@ td {
   background-color: rgb(81, 25, 133);
 }
 
+.playoff-station-sort-handle {
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.playoff-station-sort-handle:active {
+  cursor: grabbing;
+}
+
 .backupDialog {
   font-size: 30px;
   align-content: center;
@@ -1146,6 +1323,17 @@ td {
 
 .alliance-backup-modal-dialog {
   max-width: min(960px, 96vw);
+}
+
+[data-bs-theme="dark"] .alliance-backup-modal__content {
+  background-color: var(--bs-modal-bg, var(--bs-body-bg));
+  color: var(--bs-body-color);
+  border-color: var(--bs-border-color-translucent);
+}
+
+[data-bs-theme="dark"] .alliance-backup-modal__content .modal-body {
+  background-color: var(--bs-modal-bg, var(--bs-body-bg));
+  color: var(--bs-body-color);
 }
 
 .alliance-backup-modal-body.backupDialog {
