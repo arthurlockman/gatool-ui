@@ -21,6 +21,7 @@ function PlayByPlayPage({
   worldStats,
   ftcRegionHighScores,
   ftcLeagueHighScores,
+  frcDistrictHighScores,
   districts,
   ftcLeagues,
   eventNamesCY,
@@ -735,6 +736,7 @@ function PlayByPlayPage({
               worldStats={worldStats}
               ftcRegionHighScores={ftcRegionHighScores}
               ftcLeagueHighScores={ftcLeagueHighScores}
+              frcDistrictHighScores={frcDistrictHighScores}
               selectedYear={selectedYear}
               eventNamesCY={eventNamesCY}
               districts={districts}

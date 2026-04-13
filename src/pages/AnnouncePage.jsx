@@ -26,6 +26,7 @@ function AnnouncePage({
   worldStats,
   ftcRegionHighScores,
   ftcLeagueHighScores,
+  frcDistrictHighScores,
   districts,
   ftcLeagues,
   teamList,
@@ -791,6 +792,7 @@ function AnnouncePage({
               worldStats={worldStats}
               ftcRegionHighScores={ftcRegionHighScores}
               ftcLeagueHighScores={ftcLeagueHighScores}
+              frcDistrictHighScores={frcDistrictHighScores}
               selectedYear={selectedYear}
               eventNamesCY={eventNamesCY}
               districts={districts}

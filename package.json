@@ -42,6 +42,7 @@
   "scripts": {
     "prestart": "node scripts/sync-help-docs.mjs",
     "start": "react-scripts --openssl-legacy-provider start",
+    "start:local": "REACT_APP_API_BASE=http://localhost:3001/v3/ react-scripts --openssl-legacy-provider start",
     "sync-help-docs": "node scripts/sync-help-docs.mjs",
     "build": "npm run sync-help-docs && export CI=true; react-scripts --openssl-legacy-provider build",
     "test": "react-scripts --openssl-legacy-provider test",

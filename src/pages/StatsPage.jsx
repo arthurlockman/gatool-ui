@@ -15,6 +15,7 @@ function StatsPage({
   ftcRegionHighScores,
   ftcLeagueHighScores,
   ftcLeagues,
+  frcDistrictHighScores,
 }) {
   const eventDistrict = _.filter(districts, {
     value: selectedEvent?.value?.districtCode,
@@ -23,7 +24,8 @@ function StatsPage({
     worldStats ||
     eventHighScores ||
     ftcRegionHighScores ||
-    ftcLeagueHighScores;
+    ftcLeagueHighScores ||
+    frcDistrictHighScores;
   const isFTC = !!ftcMode;
   const hasLeague = !!(isFTC && selectedEvent?.value?.leagueCode);
   const [useLeagueHighScores, setUseLeagueHighScores] = useState(false);
@@ -163,7 +165,7 @@ function StatsPage({
                   <thead>
                     <tr>
                       <td className={"statsMatchHeader"} colSpan={2} style={{ backgroundColor: "#fff5ce" }}>
-                        {eventDistrict?.label} High Scores {worldStats?.year}
+                        {eventDistrict?.label} High Scores {frcDistrictHighScores?.year || selectedYear?.value}
                       </td>
                     </tr>
                   </thead>
@@ -174,15 +176,15 @@ function StatsPage({
                   </tr>
                     <tr>
                       <StatsMatch
-                        highScores={worldStats?.highscores}
-                        matchType={`${selectedYear.value}District${selectedEvent?.value?.districtCode}penaltyFreequal`}
+                        highScores={frcDistrictHighScores?.highscores}
+                        matchType={"penaltyFreequal"}
                         matchName={"No penalties in match"}
                         eventNamesCY={eventNamesCY}
                         tableType={"district"}
                       />
                       <StatsMatch
-                        highScores={worldStats?.highscores}
-                        matchType={`${selectedYear.value}District${selectedEvent?.value?.districtCode}penaltyFreeplayoff`}
+                        highScores={frcDistrictHighScores?.highscores}
+                        matchType={"penaltyFreeplayoff"}
                         matchName={"No penalties in match"}
                         eventNamesCY={eventNamesCY}
                         tableType={"district"}
@@ -190,15 +192,15 @@ function StatsPage({
                     </tr>
                     <tr>
                       <StatsMatch
-                        highScores={worldStats?.highscores}
-                        matchType={`${selectedYear.value}District${selectedEvent?.value?.districtCode}TBAPenaltyFreequal`}
+                        highScores={frcDistrictHighScores?.highscores}
+                        matchType={"TBAPenaltyFreequal"}
                         matchName={"No penalties to winner"}
                         eventNamesCY={eventNamesCY}
                         tableType={"district"}
                       />
                       <StatsMatch
-                        highScores={worldStats?.highscores}
-                        matchType={`${selectedYear.value}District${selectedEvent?.value?.districtCode}TBAPenaltyFreeplayoff`}
+                        highScores={frcDistrictHighScores?.highscores}
+                        matchType={"TBAPenaltyFreeplayoff"}
                         matchName={"No penalties to winner"}
                         eventNamesCY={eventNamesCY}
                         tableType={"district"}
@@ -206,15 +208,15 @@ function StatsPage({
                     </tr>
                     <tr>
                       <StatsMatch
-                        highScores={worldStats?.highscores}
-                        matchType={`${selectedYear.value}District${selectedEvent?.value?.districtCode}offsettingqual`}
+                        highScores={frcDistrictHighScores?.highscores}
+                        matchType={"offsettingqual"}
                         matchName={"Offsetting penalties"}
                         eventNamesCY={eventNamesCY}
                         tableType={"district"}
                       />
                       <StatsMatch
-                        highScores={worldStats?.highscores}
-                        matchType={`${selectedYear.value}District${selectedEvent?.value?.districtCode}offsettingplayoff`}
+                        highScores={frcDistrictHighScores?.highscores}
+                        matchType={"offsettingplayoff"}
                         matchName={"Offsetting penalties"}
                         eventNamesCY={eventNamesCY}
                         tableType={"district"}
@@ -222,15 +224,15 @@ function StatsPage({
                     </tr>
                     <tr>
                       <StatsMatch
-                        highScores={worldStats?.highscores}
-                        matchType={`${selectedYear.value}District${selectedEvent?.value?.districtCode}overallqual`}
+                        highScores={frcDistrictHighScores?.highscores}
+                        matchType={"overallqual"}
                         matchName={"Incl. penalties"}
                         eventNamesCY={eventNamesCY}
                         tableType={"district"}
                       />
                       <StatsMatch
-                        highScores={worldStats?.highscores}
-                        matchType={`${selectedYear.value}District${selectedEvent?.value?.districtCode}overallplayoff`}
+                        highScores={frcDistrictHighScores?.highscores}
+                        matchType={"overallplayoff"}
                         matchName={"Incl. penalties"}
                         eventNamesCY={eventNamesCY}
                         tableType={"district"}
@@ -238,15 +240,15 @@ function StatsPage({
                     </tr>
                     <tr>
                       <StatsMatch
-                        highScores={worldStats?.highscores}
-                        matchType={`${selectedYear.value}District${selectedEvent?.value?.districtCode}allianceContributionqual`}
+                        highScores={frcDistrictHighScores?.highscores}
+                        matchType={"allianceContributionqual"}
                         matchName={"Score minus penalties"}
                         eventNamesCY={eventNamesCY}
                         tableType={"district"}
                       />
                       <StatsMatch
-                        highScores={worldStats?.highscores}
-                        matchType={`${selectedYear.value}District${selectedEvent?.value?.districtCode}allianceContributionplayoff`}
+                        highScores={frcDistrictHighScores?.highscores}
+                        matchType={"allianceContributionplayoff"}
                         matchName={"Score minus penalties"}
                         eventNamesCY={eventNamesCY}
                         tableType={"district"}
