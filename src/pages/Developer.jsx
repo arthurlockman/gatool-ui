@@ -19,7 +19,6 @@ import NotificationBanner from "components/NotificationBanner";
 function Developer({
   putNotifications,
   getNotifications,
-  forceUserSync,
   getSyncStatus,
   systemBell,
   setSystemBell,
@@ -50,12 +49,7 @@ function Developer({
     link: "",
   });
 
-  const [lastSyncData, setLastSyncData] = useState({
-    timestamp: null,
-    fullUsers: null,
-    readOnlyUsers: null,
-    deletedUsers: null,
-  });
+  const [lastSyncData, setLastSyncData] = useState(null);
 
   const [userPrefsResult, setUserPrefsResult] = useState(null);
   const [userPrefsLoading, setUserPrefsLoading] = useState(false);
@@ -365,25 +359,44 @@ function Developer({
           </Tab>
           <Tab eventKey="users" title="User Management">
             <Container>
-              <Button onClick={forceUserSync} type="button" variant="primary">
-                Sync users with Mailchimp
-              </Button>
-              <div>
-                <h3>
-                  Last Sync time:{" "}
-                  {lastSyncData &&
-                    moment(lastSyncData.timestamp).format(
+              {lastSyncData && (
+                <div>
+                  <h3>
+                    Last Sync:{" "}
+                    {moment(lastSyncData.lastUpdated).format(
                       "ddd, MMM Do YYYY, h:mm:ss a"
                     )}
-                </h3>
-                <p>Full users: {lastSyncData && lastSyncData.fullUsers}</p>
-                <p>
-                  Read only users: {lastSyncData && lastSyncData.readOnlyUsers}
-                </p>
-                <p>
-                  Deleted users: {lastSyncData && lastSyncData.deletedUsers}
-                </p>
-              </div>
+                  </h3>
+                  <p>Total events: {lastSyncData.totalEvents}</p>
+                  <p>Subscribes: {lastSyncData.subscribes}</p>
+                  <p>Unsubscribes: {lastSyncData.unsubscribes}</p>
+                  <p>Profile updates: {lastSyncData.profileUpdates}</p>
+                  <p>Cleaned: {lastSyncData.cleaned}</p>
+                  {lastSyncData.recentEvents?.length > 0 && (
+                    <>
+                      <h4>Recent Events</h4>
+                      <table className="table table-sm table-striped">
+                        <thead>
+                          <tr>
+                            <th>Time</th>
+                            <th>Type</th>
+                            <th>Email</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {lastSyncData.recentEvents.map((evt, i) => (
+                            <tr key={i}>
+                              <td>{moment(evt.timestamp).format("MMM D, h:mm a")}</td>
+                              <td>{evt.type}</td>
+                              <td>{evt.email}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </>
+                  )}
+                </div>
+              )}
               <br />
               <div>
                 <input

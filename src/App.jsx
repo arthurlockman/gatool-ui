@@ -395,6 +395,7 @@ function App() {
   );
   const [ftcRegionHighScores, setFtcRegionHighScores] = useState(null);
   const [ftcLeagueHighScores, setFtcLeagueHighScores] = useState(null);
+  const [frcDistrictHighScores, setFrcDistrictHighScores] = useState(null);
   const [teamReduction, setTeamReduction] = usePersistentState(
     "setting:teamReduction",
     0
@@ -3173,8 +3174,24 @@ function App() {
       );
 
       if (shouldFetchChampsData) {
-        champsTeams = teams.teams.map(async (team) => {
-          // Initialize blueBanners outside the try-catch so it's always available
+        // Batch-fetch history for all teams in one request
+        const teamNumbers = teams.teams.map((t) => t?.teamNumber);
+        let historyMap = {};
+        try {
+          const baseURL = ftcMode ? ftcBaseURL : undefined;
+          const historyResult = await httpClient.postNoAuth(
+            `${selectedYear?.value}/queryHistory`,
+            { teams: teamNumbers },
+            baseURL
+          );
+          if (historyResult.status === 200) {
+            historyMap = await historyResult.json();
+          }
+        } catch (e) {
+          console.error("Error fetching batch history:", e);
+        }
+
+        champsTeams = teams.teams.map((team) => {
           var blueBanners = {
             teamNumber: team?.teamNumber,
             blueBanners: 0,
@@ -3196,13 +3213,8 @@ function App() {
           };
 
           try {
-            var champsRequest = await httpClient.getNoAuth(
-              `${selectedYear?.value}/team/${team?.teamNumber}/history/`,
-              ftcMode ? ftcBaseURL : undefined
-            );
-            if (champsRequest.status === 200) {
-              // @ts-ignore
-              var history = await champsRequest.json();
+            var history = historyMap[String(team?.teamNumber)];
+            if (history) {
               var appearances = history?.events;
               var awards = history?.awards;
               var result = {
@@ -3222,20 +3234,6 @@ function App() {
 
               if (appearances && Array.isArray(appearances)) {
                 appearances.forEach((appearance) => {
-                  //check for district code
-                  //DISTRICT_CMP = 2
-                  //DISTRICT_CMP_DIVISION = 5
-                  // Ontario (>=2019), Michigan (>=2017), Texas (>=2022), New England (>=2022),
-                  // Indiana (>=2022) check for Einstein appearances
-                  // appearances.district.abbreviation = "ont"
-                  // appearances.district.abbreviation = "fim"
-                  // appearances.district.abbreviation = "ne"
-                  // appearances.district.abbreviation = "tx" || "fit"
-                  // >=2017 check for Division appearance then Champs appearances
-                  //test for champs prior to 2001
-
-                  //Use timeDifference to filter out teams from the current year's Einstein appearances
-                  // for World and District Champs events.
                   var timeDifference = moment(appearance?.end_date).diff(
                     moment(),
                     "minutes"
@@ -3271,16 +3269,10 @@ function App() {
                     }
                   }
 
-                  //check for champs Division code
-                  //CMP_DIVISION = 3
-                  //CMP_FINALS = 4
-                  //FOC = 6
-                  // >=2001 check for Division appearance then Champs appearances
                   if (appearance.event_type === 6) {
                     result.FOCAppearances += 1;
                     result.FOCAppearancesYears.push(appearance.year);
                   }
-                  //test for champs prior to 2001
                   if (appearance.year < 2001) {
                     if (appearance.event_type === 4) {
                       result.champsAppearances += 1;
@@ -3292,7 +3284,6 @@ function App() {
                       result.champsAppearancesYears.push(appearance.year);
                     }
 
-                    // FIXED: mapping out current year's Einstein appearances.
                     if (appearance.event_type === 4 && timeDifference < 0) {
                       result.einsteinAppearances += 1;
                       result.einsteinAppearancesYears.push(appearance.year);
@@ -3301,36 +3292,28 @@ function App() {
                 });
               }
 
-              // Calculate comprehensive Blue Banner tracking
               if (appearances && awards) {
                 const blueBannerData = calculateBlueBanners({ events: appearances }, awards);
                 Object.assign(blueBanners, blueBannerData);
               }
 
               team.champsAppearances = result;
-              team.blueBanners = blueBanners;
-              return team;
             }
-            // Still set blueBanners even if request failed, so UI doesn't break
             team.blueBanners = blueBanners;
             return team;
           } catch (error) {
-            console.error(`Error fetching history for team ${team?.teamNumber}:`, error);
-            // Set blueBanners even on error to prevent UI issues
+            console.error(`Error processing history for team ${team?.teamNumber}:`, error);
             team.blueBanners = blueBanners;
             return team;
           }
         });
 
-        await Promise.all(champsTeams).then(function (values) {
-          teams.lastUpdate = moment().format();
-
-          teams.teams = _.filter(values, (value) => {
-            return value ? true : false;
-          });
-          teams.teams = _.sortBy(teams.teams, ["teamNumber"]);
-          setTeamList(teams);
+        teams.lastUpdate = moment().format();
+        teams.teams = _.filter(champsTeams, (value) => {
+          return value ? true : false;
         });
+        teams.teams = _.sortBy(teams.teams, ["teamNumber"]);
+        setTeamList(teams);
       } else {
         // Initialize empty blueBanners for all teams when not fetching champs data
         teams.teams = teams.teams.map((team) => {
@@ -3901,7 +3884,7 @@ function App() {
     setDistrictRankings(districtranks);
   }
 
-  /** Fetches regional championship advancement per team (teamdetail/teamNumber); backend is paged so we fetch each event team individually.
+  /** Fetches regional championship advancement for all event teams in a single batch request.
    * @param ranksOverride - optional array of rank rows (e.g. from getRanks) to use for team list; each must have teamNumber.
    */
   async function getRegionalEventDetail(ranksOverride) {
@@ -3912,32 +3895,27 @@ function App() {
       return;
     }
     try {
-      const responses = await Promise.allSettled(
-        teamNumbers.map((teamNumber) =>
-          httpClient.getNoAuth(`${selectedYear?.value}/regional/teamdetail/${teamNumber}`)
-        )
+      const result = await httpClient.postNoAuth(
+        `${selectedYear.value}/queryRegionalTeamDetail`,
+        { teams: teamNumbers }
       );
-      const teams = [];
-      for (let i = 0; i < responses.length; i++) {
-        const r = responses[i];
-        if (r.status === "fulfilled" && r.value && r.value.status === 200) {
-          try {
-            // @ts-ignore
-            const data = await r.value.json();
-            // Per-team endpoint returns { season, teams: [ singleTeam ], ... }
-            if (data.teams && Array.isArray(data.teams)) {
-              teams.push(...data.teams);
-            }
-          } catch (_) {
-            // skip failed parse
+      if (result.status === 200) {
+        const data = await result.json();
+        const teams = [];
+        for (const teamNumber of teamNumbers) {
+          const detail = data[String(teamNumber)];
+          if (detail && detail.teams && Array.isArray(detail.teams)) {
+            teams.push(...detail.teams);
           }
         }
+        setRegionalEventDetail({
+          season: selectedYear?.value,
+          lastUpdate: moment().format(),
+          teams,
+        });
+      } else {
+        setRegionalEventDetail(null);
       }
-      setRegionalEventDetail({
-        season: selectedYear?.value,
-        lastUpdate: moment().format(),
-        teams,
-      });
     } catch (e) {
       setRegionalEventDetail(null);
     }
@@ -3950,55 +3928,51 @@ function App() {
    * @param teams The event's team list
    * @return sets the array of URLs
    */
-  function getRobotImages() {
-    var robotImageList = teamList?.teams.map(async (team) => {
-      var media = await httpClient.getNoAuth(
-        `${selectedYear?.value}/team/${team?.teamNumber}/media`
+  async function getRobotImages() {
+    const teams = teamList?.teams;
+    if (!teams?.length || !selectedYear?.value) return;
+    try {
+      const teamNumbers = teams.map((t) => t?.teamNumber);
+      const result = await httpClient.postNoAuth(
+        `${selectedYear.value}/queryMedia`,
+        { teams: teamNumbers }
       );
-      var mediaArray = [];
-      if (media?.status !== 204) {
-        // @ts-ignore
-        mediaArray = await media.json();
+      if (result.status === 200) {
+        const data = await result.json();
+        const robotImageList = teams.map((team) => {
+          const mediaArray = data[String(team?.teamNumber)] || [];
+          const image = _.filter(mediaArray, { type: "imgur" })[0];
+          return {
+            teamNumber: team?.teamNumber,
+            imageUrl: image?.direct_url || null,
+          };
+        });
+        setRobotImages(robotImageList);
       }
-      var image = _.filter(mediaArray, { type: "imgur" })[0];
-      return {
-        teamNumber: team?.teamNumber,
-        imageUrl: image?.direct_url || null,
-      };
-    });
-    Promise.all(robotImageList).then((values) => {
-      setRobotImages(values);
-    });
+    } catch (e) {
+      console.error("Error fetching robot images batch:", e);
+    }
   }
 
   async function getEPA() {
-    var epa = teamList?.teams.map(async (team) => {
-      var epaData = await httpClient.getNoAuth(
-        `${selectedYear?.value}/statbotics/${team?.teamNumber}/`
+    const teams = teamList?.teams;
+    if (!teams?.length || !selectedYear?.value) return;
+    try {
+      const teamNumbers = teams.map((t) => t?.teamNumber);
+      const result = await httpClient.postNoAuth(
+        `${selectedYear.value}/queryStatbotics`,
+        { teams: teamNumbers }
       );
-      // var epaData = await httpClient.getNoAuth(
-      //   `team_year/${team?.teamNumber}/${selectedYear?.value}`,
-      //   "https://api.statbotics.io/v3/",
-      //   20000
-      // );
-      if (epaData.status === 200) {
-        // @ts-ignore
-        var epaArray = await epaData.json();
-        return {
+      if (result.status === 200) {
+        const data = await result.json();
+        const epaList = teams.map((team) => ({
           teamNumber: team?.teamNumber,
-          epa: epaArray,
-        };
-      } else {
-        return {
-          teamNumber: team?.teamNumber,
-          epa: {},
-        };
+          epa: data[String(team?.teamNumber)] || {},
+        }));
+        setEPA(epaList);
       }
-    });
-    if (Array.isArray(epa) && epa.length > 0) {
-      Promise.all(epa).then((values) => {
-        setEPA(values);
-      });
+    } catch (e) {
+      console.error("Error fetching EPA batch:", e);
     }
   }
 
@@ -4186,8 +4160,75 @@ function App() {
     }
   }
 
-  /** Known FTC score type suffixes used by StatsPage Region table matchTypes */
-  const FTC_SCORE_TYPE_SUFFIXES = /(penaltyFreequal|penaltyFreeplayoff|TBAPenaltyFreequal|TBAPenaltyFreeplayoff|offsettingqual|offsettingplayoff|overallqual|overallplayoff|allianceContributionqual|allianceContributionplayoff)$/;
+  /** Known score type suffixes used by StatsPage matchType lookups (shared by FTC region/league and FRC district normalization) */
+  const SCORE_TYPE_SUFFIXES = /(penaltyFreequal|penaltyFreeplayoff|TBAPenaltyFreequal|TBAPenaltyFreeplayoff|offsettingqual|offsettingplayoff|overallqual|overallplayoff|allianceContributionqual|allianceContributionplayoff)$/;
+
+  /**
+   * Fetches FRC district high scores from the dedicated district endpoint.
+   * @async
+   * @function getFrcDistrictHighScores
+   */
+  async function getFrcDistrictHighScores() {
+    const districtCode = selectedEvent?.value?.districtCode;
+    if (ftcMode || !selectedYear?.value || !districtCode) {
+      setFrcDistrictHighScores(null);
+      return;
+    }
+    try {
+      const result = await httpClient.getNoAuth(
+        `${selectedYear.value}/highscores/district/${encodeURIComponent(districtCode)}`
+      );
+      if (result.status === 200) {
+        const data = await result.json();
+        const list = Array.isArray(data) ? data : [];
+        var scores = { year: selectedYear.value, lastUpdate: moment().format(), highscores: {} };
+        var reducedScores = {};
+        list.forEach((score) => {
+          if (score?.matchData?.match) {
+            var details = {};
+            if (!_.isEmpty(eventnames[selectedYear?.value])) {
+              details.eventName =
+                eventnames[selectedYear?.value][score?.matchData?.event?.eventCode] ||
+                score?.matchData?.event?.eventCode;
+            } else {
+              details.eventName = score?.matchData?.event?.eventCode;
+            }
+            details.alliance = _.upperFirst(score?.matchData?.highScoreAlliance);
+            // Strip year and district prefix to get bare score type suffix (e.g. "TBAPenaltyFreeplayoff")
+            let scoreType = score?.yearType;
+            if (scoreType && typeof scoreType === "string") {
+              scoreType = scoreType.replace("FRC:district:", "District");
+              const match = scoreType.match(SCORE_TYPE_SUFFIXES);
+              if (match) scoreType = match[1];
+            }
+            details.scoreType = scoreType;
+            details.matchName = score?.matchData?.match?.description;
+            details.allianceMembers = _.filter(
+              score?.matchData?.match?.teams,
+              (o) => _.startsWith(o.station, details.alliance)
+            )
+              .map((team) => team.teamNumber)
+              .join(" ");
+            details.score = score.matchData.match[`score${details.alliance}Final`];
+            if (details.scoreType && details.scoreType.includes("allianceContribution")) {
+              const m = score.matchData.match;
+              const redF = m.scoreRedFinal ?? 0, blueF = m.scoreBlueFinal ?? 0, redFoul = m.scoreRedFoul ?? 0, blueFoul = m.scoreBlueFoul ?? 0;
+              details.score = details.alliance === "Red"
+                ? redF - redFoul
+                : blueF - blueFoul;
+            }
+            if (details.scoreType) reducedScores[details.scoreType] = details;
+          }
+        });
+        scores.highscores = reducedScores;
+        setFrcDistrictHighScores(scores);
+      } else {
+        setFrcDistrictHighScores(null);
+      }
+    } catch (e) {
+      setFrcDistrictHighScores(null);
+    }
+  }
 
   /**
    * Normalizes FTC high scores API response (array) to the same shape as worldStats.highscores.
@@ -4210,7 +4251,7 @@ function App() {
         let scoreType = score?.yearType || score?.scoreType;
         // Region API returns e.g. "2025FTCRegionUSTXpenaltyFreequal" or "2025FTCRegionUSTXHOoffsettingqual" - extract suffix to match StatsPage matchTypes
         if (regionCode && scoreType && typeof scoreType === "string") {
-          const match = scoreType.match(FTC_SCORE_TYPE_SUFFIXES);
+          const match = scoreType.match(SCORE_TYPE_SUFFIXES);
           if (match) scoreType = match[1];
         } else if (scoreType && year && String(scoreType).indexOf(year) === 0) {
           // World: strip leading year prefix (and "FTC" if present, handled in getWorldStats)
@@ -4916,11 +4957,6 @@ function App() {
    * This function forces a user sync with mailchimp. This will take a long time.
    * @returns {Promise<{ok}|void|undefined>}
    */
-  async function forceUserSync() {
-    // @ts-ignore
-    return await httpClient.post(`system/syncUsers`);
-  }
-
   /**
    * This function fetches systemwide notifications from gatool Cloud.
    * @async
@@ -5250,6 +5286,7 @@ function App() {
       getSystemMessages();
       getEventMessages();
       getWorldStats();
+      if (!ftcMode && selectedEvent?.value?.districtCode) getFrcDistrictHighScores();
     }
   };
 
@@ -5274,6 +5311,7 @@ function App() {
         getSystemMessages();
         getEventMessages();
         getWorldStats();
+        if (!ftcMode && selectedEvent?.value?.districtCode) getFrcDistrictHighScores();
       }
     }
   };
@@ -5298,6 +5336,7 @@ function App() {
       getEventMessages();
       getSchedule();
       getWorldStats();
+      if (!ftcMode && selectedEvent?.value?.districtCode) getFrcDistrictHighScores();
     }
   };
 
@@ -5400,6 +5439,10 @@ function App() {
         } else {
           setFtcLeagueHighScores(null);
         }
+      } else if (selectedEvent?.value?.districtCode) {
+        getFrcDistrictHighScores();
+      } else {
+        setFrcDistrictHighScores(null);
       }
     }
   };
@@ -6241,6 +6284,7 @@ function App() {
     setEventHighScores(null);
     setFtcRegionHighScores(null);
     setFtcLeagueHighScores(null);
+    setFrcDistrictHighScores(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ftcMode]);
 
@@ -6299,6 +6343,8 @@ function App() {
         } else {
           setFtcLeagueHighScores(null);
         }
+      } else if (selectedEvent?.value?.districtCode) {
+        getFrcDistrictHighScores();
       }
     },
     intervalDelayMs,
@@ -7277,6 +7323,7 @@ function App() {
                     worldStats={worldStats}
                     ftcRegionHighScores={ftcRegionHighScores}
                     ftcLeagueHighScores={ftcLeagueHighScores}
+                    frcDistrictHighScores={frcDistrictHighScores}
                     districts={districts}
                     ftcLeagues={ftcLeagues}
                     teamList={teamList}
@@ -7354,6 +7401,7 @@ function App() {
                     worldStats={worldStats}
                     ftcRegionHighScores={ftcRegionHighScores}
                     ftcLeagueHighScores={ftcLeagueHighScores}
+                    frcDistrictHighScores={frcDistrictHighScores}
                     districts={districts}
                     ftcLeagues={ftcLeagues}
                     eventNamesCY={eventNamesCY}
@@ -7483,6 +7531,7 @@ function App() {
                     ftcRegionHighScores={ftcRegionHighScores}
                     ftcLeagueHighScores={ftcLeagueHighScores}
                     ftcLeagues={ftcLeagues}
+                    frcDistrictHighScores={frcDistrictHighScores}
                   />
                 }
               />
@@ -7534,7 +7583,6 @@ function App() {
                   <Developer
                     putNotifications={putNotifications}
                     getNotifications={getNotifications}
-                    forceUserSync={forceUserSync}
                     getSyncStatus={getSyncStatus}
                     systemBell={systemBell}
                     setSystemBell={setSystemBell}

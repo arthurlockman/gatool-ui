@@ -22,6 +22,7 @@ function BottomButtons({
   worldStats,
   ftcRegionHighScores,
   ftcLeagueHighScores,
+  frcDistrictHighScores,
   selectedYear,
   eventNamesCY,
   districts,
@@ -76,6 +77,7 @@ function BottomButtons({
                 worldStats={worldStats}
                 ftcRegionHighScores={ftcRegionHighScores}
                 ftcLeagueHighScores={ftcLeagueHighScores}
+                frcDistrictHighScores={frcDistrictHighScores}
                 selectedEvent={selectedEvent}
                 selectedYear={selectedYear}
                 eventNamesCY={eventNamesCY}

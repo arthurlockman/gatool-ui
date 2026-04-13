@@ -24,6 +24,7 @@ function HighScoresSummary({
   worldStats,
   ftcRegionHighScores,
   ftcLeagueHighScores,
+  frcDistrictHighScores,
   selectedEvent,
   selectedYear,
   eventNamesCY,
@@ -131,22 +132,21 @@ function HighScoresSummary({
   }
 
   // FRC District
-  if (!isFTC && districtCode && worldStats?.highscores && year) {
-    const prefix = `${year}District${districtCode}`;
+  if (!isFTC && districtCode && frcDistrictHighScores?.highscores) {
     const penaltyFree = bestOfQualPlayoff(
-      worldStats.highscores,
-      `${prefix}TBAPenaltyFreequal`,
-      `${prefix}TBAPenaltyFreeplayoff`
+      frcDistrictHighScores.highscores,
+      "TBAPenaltyFreequal",
+      "TBAPenaltyFreeplayoff"
     );
     const overall = bestOfQualPlayoff(
-      worldStats.highscores,
-      `${prefix}overallqual`,
-      `${prefix}overallplayoff`
+      frcDistrictHighScores.highscores,
+      "overallqual",
+      "overallplayoff"
     );
     const allianceContribution = bestOfQualPlayoff(
-      worldStats.highscores,
-      `${prefix}allianceContributionqual`,
-      `${prefix}allianceContributionplayoff`
+      frcDistrictHighScores.highscores,
+      "allianceContributionqual",
+      "allianceContributionplayoff"
     );
     if (penaltyFree || overall || allianceContribution) {
       const districtOption = _.filter(districts || [], {
