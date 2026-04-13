@@ -1356,6 +1356,7 @@ function App() {
    */
   // @ts-ignore
   async function getSchedule(loadingEvent, options = {}) {
+    if (!selectedYear?.value || !selectedEvent?.value?.code) return;
     console.log(`Fetching schedule for ${selectedEvent?.value?.name}...`);
 
     /**
