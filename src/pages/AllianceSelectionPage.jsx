@@ -11,6 +11,7 @@ import Switch from "react-switch";
 import { useHotkeysContext, useHotkeys } from "react-hotkeys-hook";
 import _ from "lodash";
 import useScrollPosition from "../hooks/useScrollPosition";
+import { playoffMatchHasDisplayableResult } from "../utils/frcPlayoffSchedule";
 
 import './AllianceSelectionPage.css';
 
@@ -125,11 +126,12 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
     // return the score of the match, by matchNumber
     function matchScore(matchNumber, alliance) {
         var score = null;
-        if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.actualStartTime) {
+        const m = matches[_.findIndex(matches, { "matchNumber": matchNumber })];
+        if (m?.actualStartTime || playoffMatchHasDisplayableResult(m)) {
             if (alliance === "red") {
-                score = matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.scoreRedFinal;
+                score = m?.scoreRedFinal;
             } else if (alliance === "blue") {
-                score = matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.scoreBlueFinal;
+                score = m?.scoreBlueFinal;
             }
 
         }
@@ -139,8 +141,9 @@ function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, play
     // return the winner of the match, by matchNumber
     function matchWinner(matchNumber) {
         var winner = null;
-        if (matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.actualStartTime) {
-            winner = matches[_.findIndex(matches, { "matchNumber": matchNumber })]?.winner
+        const m = matches[_.findIndex(matches, { "matchNumber": matchNumber })];
+        if (m?.actualStartTime || playoffMatchHasDisplayableResult(m)) {
+            winner = m?.winner
         }
         return winner;
     }

@@ -46,6 +46,7 @@ import { toast } from "react-toastify";
 import { trainingData } from "components/TrainingMatches";
 import { timeZones } from "components/TimeZones";
 import { extendFTCPlayoffScheduleWithPartialMatches } from "./utils/ftcPlayoffSchedule";
+import { extendFRCPlayoffScheduleWithPartialMatches } from "./utils/frcPlayoffSchedule";
 import {
   normalizeFtcHybridMatch,
   hydrateFtcPlayoffTeamsFromResults,
@@ -525,6 +526,57 @@ function App() {
     const next = { ...prev, [code]: forEv };
     playoffReserveEditsRef.current = next;
     setPlayoffReserveEdits(next);
+  }
+
+  /** Per-event, per-playoff-match station order (Red1… / Blue1…) for Announce / Play-by-Play. */
+  const [playoffStationOrderEdits, setPlayoffStationOrderEdits] =
+    usePersistentState("cache:playoffStationOrderEditsByMatch", {});
+  const playoffStationOrderEditsRef = useRef({});
+  useEffect(() => {
+    playoffStationOrderEditsRef.current =
+      playoffStationOrderEdits && typeof playoffStationOrderEdits === "object"
+        ? playoffStationOrderEdits
+        : {};
+  }, [playoffStationOrderEdits]);
+
+  function upsertPlayoffStationOrderOverlay({ eventCode, matchKey, teams }) {
+    if (!eventCode || !matchKey || !teams?.length) return;
+    const prev = _.cloneDeep(
+      playoffStationOrderEditsRef.current &&
+        typeof playoffStationOrderEditsRef.current === "object"
+        ? playoffStationOrderEditsRef.current
+        : {}
+    );
+    const next = {
+      ...prev,
+      [eventCode]: {
+        ...(prev[eventCode] || {}),
+        [matchKey]: { teams: _.cloneDeep(teams) },
+      },
+    };
+    playoffStationOrderEditsRef.current = next;
+    setPlayoffStationOrderEdits(next);
+  }
+
+  function removePlayoffStationOrderOverlay({ eventCode, matchKey }) {
+    if (!eventCode || !matchKey) return;
+    const prev = _.cloneDeep(
+      playoffStationOrderEditsRef.current &&
+        typeof playoffStationOrderEditsRef.current === "object"
+        ? playoffStationOrderEditsRef.current
+        : {}
+    );
+    if (!prev[eventCode]) return;
+    const ev = { ...prev[eventCode] };
+    delete ev[matchKey];
+    const next = { ...prev };
+    if (Object.keys(ev).length === 0) {
+      delete next[eventCode];
+    } else {
+      next[eventCode] = ev;
+    }
+    playoffStationOrderEditsRef.current = next;
+    setPlayoffStationOrderEdits(next);
   }
 
   const [showReloaded, setShowReloaded] = usePersistentState(
@@ -1381,6 +1433,40 @@ function App() {
         } else winner.winner = "TBD";
         return winner;
       }
+      if (match?.redWins === true) {
+        winner.winner = "red";
+        return winner;
+      }
+      if (match?.blueWins === true) {
+        winner.winner = "blue";
+        return winner;
+      }
+      if (match?.redWins === false && match?.blueWins === false) {
+        winner.winner = "tie";
+        return winner;
+      }
+      if (!ftcMode) {
+        const wa =
+          match?.scores?.winningAlliance ??
+          match?.winningAlliance ??
+          match?.WinningAlliance;
+        const r = match?.scoreRedFinal;
+        const b = match?.scoreBlueFinal;
+        const hasScores = r != null && b != null;
+        const tieOnPoints = hasScores && Number(r) === Number(b);
+        const committed =
+          (match?.actualStartTime != null && match?.actualStartTime !== "") ||
+          (match?.postResultTime != null && match?.postResultTime !== "");
+        if (wa === 1 || wa === 2) {
+          if (
+            tieOnPoints ||
+            (!hasScores && (committed || match?.scores))
+          ) {
+            winner.winner = wa === 1 ? "red" : "blue";
+            return winner;
+          }
+        }
+      }
       if (match?.scoreRedFinal != null || match?.scoreBlueFinal != null) {
         if (match?.scoreRedFinal < match?.scoreBlueFinal) {
           winner.winner = "blue";
@@ -1705,6 +1791,21 @@ function App() {
       }
     }
 
+    if (
+      !ftcMode &&
+      selectedEvent?.value?.code?.includes("PRACTICE") &&
+      training?.scores?.qual
+    ) {
+      if (
+        selectedEvent?.value?.code === "PRACTICE1" &&
+        training.scores.qual.partial?.MatchScores?.length
+      ) {
+        qualScores = _.cloneDeep(training.scores.qual.partial);
+      } else if (training.scores.qual.final?.MatchScores?.length) {
+        qualScores = _.cloneDeep(training.scores.qual.final);
+      }
+    }
+
     const qualMatches = qualschedule?.schedule?.schedule.map((match) => {
       if (ftcMode) {
         match = normalizeFtcHybridMatch(match);
@@ -1723,11 +1824,21 @@ function App() {
           match.scoreBlueFinal = matchResults.alliances?.[0]?.totalPoints;
           // @ts-ignore - FRC may use "BonusAchieved" or "Achieved" in key names for ranking points
           match.redRP = _.pickBy(matchResults.alliances[1], (value, key) => {
-            return key.endsWith("BonusAchieved") || key.endsWith("Achieved") || key.endsWith("RP");
+            return (
+              key === "rp" ||
+              key.endsWith("BonusAchieved") ||
+              key.endsWith("Achieved") ||
+              key.endsWith("RP")
+            );
           });
           // @ts-ignore
           match.blueRP = _.pickBy(matchResults.alliances[0], (value, key) => {
-            return key.endsWith("BonusAchieved") || key.endsWith("Achieved") || key.endsWith("RP");
+            return (
+              key === "rp" ||
+              key.endsWith("BonusAchieved") ||
+              key.endsWith("Achieved") ||
+              key.endsWith("RP")
+            );
           });
         }
       } else if (selectedEvent?.value?.type === "OffSeason") {
@@ -1737,13 +1848,23 @@ function App() {
         }
         if (match.scores?.alliances?.[1]) {
           match.redRP = _.pickBy(match.scores.alliances[1], (value, key) => {
-            return key.endsWith("BonusAchieved") || key.endsWith("Achieved") || key.endsWith("RP");
+            return (
+              key === "rp" ||
+              key.endsWith("BonusAchieved") ||
+              key.endsWith("Achieved") ||
+              key.endsWith("RP")
+            );
           });
         }
         // @ts-ignore
         if (match.scores?.alliances?.[0]) {
           match.blueRP = _.pickBy(match.scores.alliances[0], (value, key) => {
-            return key.endsWith("BonusAchieved") || key.endsWith("Achieved") || key.endsWith("RP");
+            return (
+              key === "rp" ||
+              key.endsWith("BonusAchieved") ||
+              key.endsWith("Achieved") ||
+              key.endsWith("RP")
+            );
           });
         }
       }
@@ -2081,7 +2202,6 @@ function App() {
       // adds the winner to the schedule.
       playoffschedule.schedule = playoffschedule.schedule.map(
         (match, index) => {
-          match.winner = winner(match);
           //fix the match number fro FTC matches
           if (ftcMode) {
             // Preserve original matchNumber before overwriting (needed for tiebreaker detection)
@@ -2118,6 +2238,7 @@ function App() {
               delete match.matchScores;
             }
           }
+          match.winner = winner(match);
           return match;
         }
       );
@@ -2147,6 +2268,26 @@ function App() {
             }
           }
         });
+      }
+
+      if (
+        !ftcMode &&
+        playoffschedule?.schedule?.length > 0 &&
+        Array.isArray(playoffschedule.schedule)
+      ) {
+        let allianceCountForPlayoff = 6;
+        if (playoffCountOverride?.value != null) {
+          allianceCountForPlayoff = parseInt(playoffCountOverride.value, 10);
+        } else if (teamList?.teamCountTotal != null) {
+          if (teamList.teamCountTotal <= 10) allianceCountForPlayoff = 2;
+          else if (teamList.teamCountTotal <= 20) allianceCountForPlayoff = 4;
+          else if (teamList.teamCountTotal <= 40) allianceCountForPlayoff = 6;
+          else allianceCountForPlayoff = 8;
+        }
+        playoffschedule.schedule = extendFRCPlayoffScheduleWithPartialMatches(
+          playoffschedule.schedule,
+          allianceCountForPlayoff
+        );
       }
     }
 
@@ -3185,7 +3326,7 @@ function App() {
             { teams: teamNumbers },
             baseURL
           );
-          if (historyResult.status === 200) {
+          if (historyResult.status === 200 && historyResult instanceof Response) {
             historyMap = await historyResult.json();
           }
         } catch (e) {
@@ -3900,7 +4041,7 @@ function App() {
         `${selectedYear.value}/queryRegionalTeamDetail`,
         { teams: teamNumbers }
       );
-      if (result.status === 200) {
+      if (result.status === 200 && result instanceof Response) {
         const data = await result.json();
         const teams = [];
         for (const teamNumber of teamNumbers) {
@@ -3938,7 +4079,7 @@ function App() {
         `${selectedYear.value}/queryMedia`,
         { teams: teamNumbers }
       );
-      if (result.status === 200) {
+      if (result.status === 200 && result instanceof Response) {
         const data = await result.json();
         const robotImageList = teams.map((team) => {
           const mediaArray = data[String(team?.teamNumber)] || [];
@@ -3964,7 +4105,7 @@ function App() {
         `${selectedYear.value}/queryStatbotics`,
         { teams: teamNumbers }
       );
-      if (result.status === 200) {
+      if (result.status === 200 && result instanceof Response) {
         const data = await result.json();
         const epaList = teams.map((team) => ({
           teamNumber: team?.teamNumber,
@@ -4179,7 +4320,7 @@ function App() {
       const result = await httpClient.getNoAuth(
         `${selectedYear.value}/highscores/district/${encodeURIComponent(districtCode)}`
       );
-      if (result.status === 200) {
+      if (result.status === 200 && result instanceof Response) {
         const data = await result.json();
         const list = Array.isArray(data) ? data : [];
         var scores = { year: selectedYear.value, lastUpdate: moment().format(), highscores: {} };
@@ -5398,6 +5539,27 @@ function App() {
       setCurrentMatch(1);
       await setDistrictRankings(null);
       setRegionalEventDetail(null);
+
+      // Clear reserve overlays and station-order overrides for the event being loaded
+      // so stale local edits from a previous session don't carry over.
+      const eventCodeToLoad = selectedEvent?.value?.code;
+      if (eventCodeToLoad) {
+        const codeKey = String(eventCodeToLoad);
+        if (playoffReserveEditsRef.current?.[codeKey]) {
+          const nextReserve = Object.fromEntries(
+            Object.entries(playoffReserveEditsRef.current).filter(([k]) => k !== codeKey)
+          );
+          playoffReserveEditsRef.current = nextReserve;
+          setPlayoffReserveEdits(nextReserve);
+        }
+        if (playoffStationOrderEditsRef.current?.[codeKey]) {
+          const nextStation = Object.fromEntries(
+            Object.entries(playoffStationOrderEditsRef.current).filter(([k]) => k !== codeKey)
+          );
+          playoffStationOrderEditsRef.current = nextStation;
+          setPlayoffStationOrderEdits(nextStation);
+        }
+      }
       setAdHocMatch([
         { teamNumber: null, station: "Red1", surrogate: false, dq: false },
         { teamNumber: null, station: "Red2", surrogate: false, dq: false },
@@ -6168,7 +6330,13 @@ function App() {
 
       // For FTC: Check if all teams that actually competed have completed their matches
       // For FRC: Use the traditional team list count minus reductions
-      const expectedTeamCount = ftcMode ? actualCompetingTeamsCount : (teamList?.teamCountTotal - teamReduction);
+      // Practice events ship a large training team list but rankings only include teams on the synthetic schedule
+      const isPracticeEvent = selectedEvent?.value?.code?.includes("PRACTICE");
+      const expectedTeamCount = ftcMode
+        ? actualCompetingTeamsCount
+        : isPracticeEvent
+          ? actualCompetingTeamsCount
+          : teamList?.teamCountTotal - teamReduction;
       const teamsWithExpectedMatches = _.filter(rankings?.ranks, { matchesPlayed: matchesPerTeam }).length;
 
       // Additional check: all competing teams have at least the expected matches
@@ -6194,6 +6362,7 @@ function App() {
     playoffSchedule,
     setAllianceSelection,
     ftcMode,
+    selectedEvent,
   ]);
 
   // check to see if Alliance Selection is ready when in Offline and we have uploaded Ranks
@@ -7389,6 +7558,9 @@ function App() {
                     upsertPlayoffReserveOverlay={upsertPlayoffReserveOverlay}
                     removePlayoffReserveOverlay={removePlayoffReserveOverlay}
                     playoffReserveEdits={playoffReserveEdits}
+                    playoffStationOrderEdits={playoffStationOrderEdits}
+                    upsertPlayoffStationOrderOverlay={upsertPlayoffStationOrderOverlay}
+                    removePlayoffStationOrderOverlay={removePlayoffStationOrderOverlay}
                   />
                 }
               />
@@ -7458,6 +7630,9 @@ function App() {
                     upsertPlayoffReserveOverlay={upsertPlayoffReserveOverlay}
                     removePlayoffReserveOverlay={removePlayoffReserveOverlay}
                     playoffReserveEdits={playoffReserveEdits}
+                    playoffStationOrderEdits={playoffStationOrderEdits}
+                    upsertPlayoffStationOrderOverlay={upsertPlayoffStationOrderOverlay}
+                    removePlayoffStationOrderOverlay={removePlayoffStationOrderOverlay}
                   />
                 }
               />

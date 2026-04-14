@@ -1,5 +1,22 @@
 export const appUpdates = [
   {
+    date: "April 13, 2026",
+    message: (
+      <ul>
+        <li>ALL PROGRAMS:</li>
+        <ul>
+          <li>Updated winning Alliance detection logic to allow earleir propagation of Alliances during playoffs</li>
+          <li>Users can now sort teams in Playoffs</li>
+          <li>Performance improvements when loading event data</li>
+          <li>Other UI tweaks and improvements</li>
+        </ul>
+        <li>FRC:</li>
+        <ul>
+          <li>Updated Practice Events to match current playoff model</li>
+        </ul>
+      </ul>
+    ),
+  },{
     date: "April 7, 2026",
     message: (
       <ul>
