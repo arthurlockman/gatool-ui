@@ -1,48 +1,23 @@
 import _ from "lodash";
-import { Alert, Button, Col, Container, Modal, Row } from "react-bootstrap";
-import { useState } from "react";
+import { Alert } from "react-bootstrap";
 import moment from "moment";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useSwipeable } from "react-swipeable";
-import { matchClassesBase } from "./Constants";
+import { matchClassesBase } from "../data/matchClasses";
 import Match from "./Match";
 import PlayoffMatch from "./PlayoffMatch";
 import FinalsMatchIndicator from "./FinalsMatchIndicator";
+import { GOLD, RED, BLUE, GREEN, BLACK, WHITE, black, bold, semibold } from "./bracketConstants";
+import { getTeamByStation } from "../utils/bracketHelpers";
+import { useBracketState } from "../hooks/useBracketState";
+import WinnerSelectionModal from "./WinnerSelectionModal";
 
 function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMatch, getSchedule, useSwipe, usePullDownToUpdate, offlinePlayoffSchedule, setOfflinePlayoffSchedule, eventLabel, ftcMode, matches, allianceNumbers, allianceName, matchScore, matchWinner }) {
-	const [showSelectWinner, setShowSelectWinner] = useState(false);
-	const [showConfirmWinner, setShowConfirmWinner] = useState(false);
-	const [winningAlliance, setWinningAlliance] = useState(null);
-	const [winnerMatch, setWinnerMatch] = useState(-1);
-
-	//Ball colors
-	const GOLD = "#FFCA10";
-	const RED = "#FF0000";
-	const BLUE = "#0000FF";
-	const GREEN = "#09BA48";
-	const BLACK = "#000000";
-	const WHITE = "#FFFFFF";
-	//font weights
-	const black = "900";
-	const bold = "700";
-	const semibold = "600";
-	//const normal = "400";
+	const { showSelectWinner, setShowSelectWinner, showConfirmWinner, winningAlliance, winnerMatch, setWinnerMatch, handleChooseWinner, handleClose, resetWinnerState } = useBracketState();
 
 	const currentPlayoffMatch = currentMatch - qualsLength;
 	const finalsStartMatch = 6; // First finals match for 4-alliance bracket
 
-	/**
-	 * This function finds a team by their station assignment
-	 * @param teams the array of team objects
-	 * @param station the station to find (e.g., "Red1", "Red2", "Red3", "Blue1", "Blue2", "Blue3")
-	 * @returns the team number or null if not found
-	 */
-	const getTeamByStation = (teams, station) => {
-		if (!teams || !Array.isArray(teams)) return null;
-		const team = teams.find((t) => t?.station?.toLowerCase() === station?.toLowerCase());
-		return team?.teamNumber || null;
-	};
-	
 	// Check if we're viewing any finals match (for gold background on "FINALS"/"BEST 2 of 3")
 	// In FTC mode, use series number comparison to handle tiebreakers correctly
 	let isInFinalsView = false;
@@ -116,11 +91,6 @@ function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMat
 		}
 	}
 
-	const handleChooseWinner = (winner) => {
-		setWinningAlliance(winner);
-		setShowSelectWinner(false);
-		setShowConfirmWinner(true);
-	}
 	const handleConfirmWinner = async () => {
 		console.log(winningAlliance);
 		const losingAlliance = winningAlliance === "red" ? "blue" : "red";
@@ -269,17 +239,8 @@ function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMat
 		}
 
 		await setOfflinePlayoffSchedule(tempMatches);
-		setWinnerMatch(-1)
-		setShowSelectWinner(false);
-		setShowConfirmWinner(false);
+		resetWinnerState();
 
-	}
-
-	// manages closing the modal
-	const handleClose = () => {
-		setWinnerMatch(-1);
-		setShowSelectWinner(false);
-		setShowConfirmWinner(false);
 	}
 
 	// eslint-disable-next-line react-hooks/rules-of-hooks
@@ -517,48 +478,19 @@ function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMat
 							fontWeights={{ bold }}
 						/>
 					</svg>
-					<Modal centered={true} show={showSelectWinner} size="lg" onHide={handleClose}>
-						<Modal.Header className={"allianceAccept"} closeVariant={"white"} closeButton>
-							<Modal.Title ><b>Select a winner for {matches[winnerMatch - 1]?.description}</b></Modal.Title>
-						</Modal.Header>
-						<Modal.Body>
-							<Container fluid>
-								<Row>
-									<Col style={{ backgroundColor: "red", color: "white", fontWeight: "bold", fontSize: "40px", textAlign: "center", padding: "50px 0" }} xs={(winnerMatch < 14) ? 5 : 4} onClick={() => { handleChooseWinner("red") }} variant="danger">{allianceName(winnerMatch, "red")}</Col>
-									{(winnerMatch < 14) &&
-										<Col xs={2}></Col>}
-									{((offlinePlayoffSchedule?.schedule?.length > 14) && (winnerMatch >= 14)) &&
-										<>
-											<Col xs={1}></Col>
-											<Col style={{ backgroundColor: "green", color: "white", fontWeight: "bold", fontSize: "40px", textAlign: "center", padding: "50px 0" }} xs={2} onClick={() => { handleChooseWinner("tie") }}>It's a Tie!</Col>
-											<Col xs={1}></Col>
-										</>
-									}
-									<Col style={{ backgroundColor: "blue", color: "white", fontWeight: "bold", fontSize: "40px", textAlign: "center", padding: "50px 0" }} xs={(winnerMatch < 14) ? 5 : 4} onClick={() => { handleChooseWinner("blue") }}>{allianceName(winnerMatch, "blue")}</Col>
-								</Row>
-							</Container>
-						</Modal.Body>
-						<Modal.Footer>
-							<Button variant="secondary" onClick={handleClose}>Close without selecting a winner</Button>
-						</Modal.Footer>
-					</Modal>
-					<Modal centered={true} show={showConfirmWinner} size="lg" onHide={handleClose}>
-						<Modal.Header className={"allianceAccept"} closeVariant={"white"} closeButton>
-							<Modal.Title ><b>Confirm winner for {matches[winnerMatch - 1]?.description}</b></Modal.Title>
-						</Modal.Header>
-						<Modal.Body>
-							<Container fluid>
-								<Row>
-									<Col xs={4}></Col>
-									<Col style={{ backgroundColor: winningAlliance === "blue" ? "blue" : winningAlliance === "red" ? "red" : "green", color: "white", fontWeight: "bold", fontSize: "40px", textAlign: "center", padding: "50px 0" }} xs={4} onClick={handleConfirmWinner}>{winningAlliance === "tie" ? "It's a tie!" : allianceName(winnerMatch, winningAlliance)}</Col>
-									<Col xs={4}></Col>
-								</Row>
-							</Container>
-						</Modal.Body>
-						<Modal.Footer>
-							<Button variant="secondary" onClick={handleClose}>Close without selecting a winner</Button>
-						</Modal.Footer>
-					</Modal>
+					<WinnerSelectionModal
+						showSelectWinner={showSelectWinner}
+						showConfirmWinner={showConfirmWinner}
+						winnerMatch={winnerMatch}
+						winningAlliance={winningAlliance}
+						matches={matches}
+						finalsStartMatch={14}
+						offlinePlayoffSchedule={offlinePlayoffSchedule}
+						getAllianceNameForDisplay={getAllianceNameForDisplay}
+						handleChooseWinner={handleChooseWinner}
+						handleConfirmWinner={handleConfirmWinner}
+						handleClose={handleClose}
+					/>
 				</>
 			}
 		</div>
