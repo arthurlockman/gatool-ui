@@ -4,7 +4,7 @@ import _ from "lodash";
 import { HandThumbsDownFill, HandThumbsUpFill, TrophyFill, XSquare } from "react-bootstrap-icons";
 import { useHotkeysContext, useHotkeys } from "react-hotkeys-hook";
 import { useEffect } from "react";
-import { originalAndSustaining, allianceSelectionBaseRounds } from "./Constants";
+import { originalAndSustaining, allianceSelectionBaseRounds } from "../data/appConfig";
 import useWindowDimensions from "hooks/UseWindowDimensions";
 
 const ALLIANCE_DECLINED_TITLE =

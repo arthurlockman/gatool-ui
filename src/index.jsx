@@ -11,6 +11,7 @@ import { Auth0Provider } from "@auth0/auth0-react";
 import { AuthClientContextProvider } from './contextProviders/AuthClientContext';
 import { ToastContainer } from 'react-toastify';
 import { OnlineStatusProvider } from './contextProviders/OnlineContext';
+import { SettingsProvider } from './contexts/SettingsContext';
 import { HotkeysProvider } from 'react-hotkeys-hook'
 import { SnackbarProvider } from 'notistack';
 
@@ -49,7 +50,9 @@ root.render(
         >
           <AuthClientContextProvider>
             <SnackbarProvider>
-              <App />
+              <SettingsProvider>
+                <App />
+              </SettingsProvider>
             </SnackbarProvider>
           </AuthClientContextProvider>
         </Auth0Provider>

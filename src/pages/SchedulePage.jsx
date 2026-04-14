@@ -18,7 +18,7 @@ import { toast } from "react-toastify";
 import _ from "lodash";
 import Switch from "react-switch";
 import { useState } from "react";
-import { playoffOverrideMenu } from "components/Constants";
+import { playoffOverrideMenu } from "data/appConfig";
 import { CheckCircleFill, XCircleFill } from "react-bootstrap-icons";
 import Handshake from "components/Handshake";
 import useScrollPosition from "../hooks/useScrollPosition";

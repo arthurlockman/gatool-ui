@@ -1,6 +1,6 @@
 import { ArrowRight } from "react-bootstrap-icons";
 import _ from "lodash";
-import { matchClassesBase } from "./Constants";
+import { matchClassesBase } from "../data/matchClasses";
 
 function PlayoffDetails({
   matchDetails,

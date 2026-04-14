@@ -27,6 +27,7 @@ import { Blocks } from "react-loader-spinner";
 import { Button, Container } from "react-bootstrap";
 import { usePersistentState } from "./hooks/UsePersistentState";
 import { useDarkMode } from "./hooks/useDarkMode";
+import { useSettings } from "./contexts/SettingsContext";
 import _ from "lodash";
 import moment from "moment";
 import Developer from "./pages/Developer";
@@ -293,96 +294,38 @@ function App() {
     "setting:timeFilter",
     null
   );
-  const [timeFormat, setTimeFormat] = usePersistentState("setting:timeFormat", {
-    label: "12hr",
-    value: "h:mm:ss a",
-  });
-  const [showSponsors, setShowSponsors] = usePersistentState(
-    "setting:showSponsors",
-    null
-  );
-  const [autoHideSponsors, setAutoHideSponsors] = usePersistentState(
-    "setting:autoHideSponsors",
-    null
-  );
-  const [showAwards, setShowAwards] = usePersistentState(
-    "setting:showAwards",
-    null
-  );
-  const [showMinorAwards, setShowMinorAwards] = usePersistentState(
-    "setting:showMinorAwards",
-    null
-  );
-  const [showNotes, setShowNotes] = usePersistentState(
-    "setting:showNotes",
-    null
-  );
-  const [showNotesAnnounce, setShowNotesAnnounce] = usePersistentState(
-    "setting:showNotesAnnounce",
-    null
-  );
-  const [showMottoes, setShowMottoes] = usePersistentState(
-    "setting:showMottoes",
-    null
-  );
-  const [showChampsStats, setShowChampsStats] = usePersistentState(
-    "setting:showChampsStats",
-    null
-  );
-  const [showDistrictChampsStats, setShowDistrictChampsStats] =
-    usePersistentState("setting:showDistrictChampsStats", null);
-  const [showChampsStatsAtDistrictRegional, setShowChampsStatsAtDistrictRegional] =
-    usePersistentState("setting:showChampsStatsAtDistrictRegional", null);
-  const [showBlueBanners, setShowBlueBanners] = usePersistentState(
-    "setting:showBlueBanners",
-    null
-  );
-  const [hidePracticeSchedule, setHidePracticeSchedule] = usePersistentState(
-    "setting:hidePracticeSchedule"
-  );
-  const [monthsWarning, setMonthsWarning] = usePersistentState(
-    "setting:monthsWarning",
-    { label: "6 months", value: "6" }
-  );
-  const [showInspection, setShowInspection] = usePersistentState(
-    "setting:showInspection",
-    false
-  );
 
-  const [showWorldAndStatsOnAnnouncePlayByPlay, setShowWorldAndStatsOnAnnouncePlayByPlay] = usePersistentState(
-    "setting:showWorldAndStatsOnAnnouncePlayByPlay",
-    true
-  );
-
-  const [swapScreen, setSwapScreen] = usePersistentState(
-    "setting:swapScreen",
-    null
-  );
-  const [autoAdvance, setAutoAdvance] = usePersistentState(
-    "setting:autoAdvance",
-    null
-  );
-  const [highScoreMode, setHighScoreMode] = usePersistentState(
-    "setting:highScoreMode",
-    null
-  );
-
-  const [autoUpdate, setAutoUpdate] = usePersistentState(
-    "setting:autoUpdate",
-    null
-  );
-  const [awardsMenu, setAwardsMenu] = usePersistentState(
-    "setting:awardsMenu",
-    null
-  );
-  const [showQualsStats, setShowQualsStats] = usePersistentState(
-    "setting:showQualsStats",
-    null
-  );
-  const [showQualsStatsQuals, setShowQualsStatsQuals] = usePersistentState(
-    "setting:showQualsStatsQuals",
-    null
-  );
+  // Display & UX preferences from SettingsContext
+  const {
+    timeFormat, setTimeFormat,
+    showSponsors, setShowSponsors,
+    autoHideSponsors, setAutoHideSponsors,
+    showAwards, setShowAwards,
+    showMinorAwards, setShowMinorAwards,
+    showNotes, setShowNotes,
+    showNotesAnnounce, setShowNotesAnnounce,
+    showMottoes, setShowMottoes,
+    showChampsStats, setShowChampsStats,
+    showDistrictChampsStats, setShowDistrictChampsStats,
+    showChampsStatsAtDistrictRegional, setShowChampsStatsAtDistrictRegional,
+    showBlueBanners, setShowBlueBanners,
+    hidePracticeSchedule, setHidePracticeSchedule,
+    monthsWarning, setMonthsWarning,
+    showInspection, setShowInspection,
+    showWorldAndStatsOnAnnouncePlayByPlay, setShowWorldAndStatsOnAnnouncePlayByPlay,
+    swapScreen, setSwapScreen,
+    autoAdvance, setAutoAdvance,
+    highScoreMode, setHighScoreMode,
+    autoUpdate, setAutoUpdate,
+    awardsMenu, setAwardsMenu,
+    showQualsStats, setShowQualsStats,
+    showQualsStatsQuals, setShowQualsStatsQuals,
+    teamReduction, setTeamReduction,
+    reverseEmcee, setReverseEmcee,
+    useSwipe,
+    usePullDownToUpdate, setUsePullDownToUpdate,
+    useScrollMemory, setUseScrollMemory,
+  } = useSettings();
   const [worldStats, setWorldStats] = usePersistentState("cache:stats", null);
   const [eventHighScores, setEventHighScores] = usePersistentState(
     "cache:eventHighScores",
@@ -391,10 +334,6 @@ function App() {
   const [ftcRegionHighScores, setFtcRegionHighScores] = useState(null);
   const [ftcLeagueHighScores, setFtcLeagueHighScores] = useState(null);
   const [frcDistrictHighScores, setFrcDistrictHighScores] = useState(null);
-  const [teamReduction, setTeamReduction] = usePersistentState(
-    "setting:teamReduction",
-    0
-  );
   const [allianceSelection, setAllianceSelection] = useState(null);
   /** Preloaded prior-partnership data per alliance roster (key = sorted team ids). */
   const [alliancePartnerConnectionsCache, setAlliancePartnerConnectionsCache] =
@@ -414,11 +353,7 @@ function App() {
     []
   );
   const [allianceSelectionArrays, setAllianceSelectionArrays] = useState({});
-  const [reverseEmcee, setReverseEmcee] = usePersistentState(
-    "setting:reverseEmcee",
-    null
-  );
-  const { darkMode, setDarkMode, useOsTheme, setUseOsTheme, systemPrefersDark, appearanceDark } = useDarkMode();
+  const { darkMode, setDarkMode, useOsTheme, setUseOsTheme, appearanceDark } = useDarkMode();
   const [eventNamesCY, setEventNamesCY] = usePersistentState(
     "cache:eventNamesCY",
     []
@@ -568,15 +503,6 @@ function App() {
   );
   const [qualsLength, setQualsLength] = useState(-1);
   const [currentMatch, setCurrentMatch] = useState(null);
-  const [useSwipe, setUseSwipe] = usePersistentState("cache:useSwipe", false);
-  const [usePullDownToUpdate, setUsePullDownToUpdate] = usePersistentState(
-    "setting:usePullDownToUpdate",
-    false
-  );
-  const [useScrollMemory, setUseScrollMemory] = usePersistentState(
-    "setting:useScrollMemory",
-    true
-  );
   const [syncEvent, setSyncEvent] = usePersistentState(
     "setting:syncEvent",
     false
@@ -7215,35 +7141,7 @@ function App() {
                     qualSchedule={qualSchedule}
                     playoffSchedule={playoffSchedule}
                     rankings={rankings}
-                    timeFormat={timeFormat}
-                    setTimeFormat={setTimeFormat}
-                    showSponsors={showSponsors}
-                    setShowSponsors={setShowSponsors}
-                    showAwards={showAwards}
-                    setShowAwards={setShowAwards}
-                    showNotes={showNotes}
-                    setShowNotes={setShowNotes}
-                    showNotesAnnounce={showNotesAnnounce}
-                    setShowNotesAnnounce={setShowNotesAnnounce}
-                    showMottoes={showMottoes}
-                    setShowMottoes={setShowMottoes}
-                    showChampsStats={showChampsStats}
-                    setShowChampsStats={setShowChampsStats}
-                    swapScreen={swapScreen}
-                    setSwapScreen={setSwapScreen}
-                    autoAdvance={autoAdvance}
-                    setAutoAdvance={setAutoAdvance}
-                    autoUpdate={autoUpdate}
-                    setAutoUpdate={setAutoUpdate}
                     getSchedule={getSchedule}
-                    awardsMenu={awardsMenu}
-                    setAwardsMenu={setAwardsMenu}
-                    showQualsStats={showQualsStats}
-                    setShowQualsStats={setShowQualsStats}
-                    showQualsStatsQuals={showQualsStatsQuals}
-                    setShowQualsStatsQuals={setShowQualsStatsQuals}
-                    teamReduction={teamReduction}
-                    setTeamReduction={setTeamReduction}
                     playoffCountOverride={playoffCountOverride}
                     setPlayoffCountOverride={setPlayoffCountOverride}
                     allianceCount={allianceCount}
@@ -7251,16 +7149,6 @@ function App() {
                     setLocalUpdates={setLocalUpdates}
                     putTeamData={putTeamData}
                     getCommunityUpdates={getCommunityUpdates}
-                    reverseEmcee={reverseEmcee}
-                    setReverseEmcee={setReverseEmcee}
-                    showDistrictChampsStats={showDistrictChampsStats}
-                    setShowDistrictChampsStats={setShowDistrictChampsStats}
-                    showChampsStatsAtDistrictRegional={showChampsStatsAtDistrictRegional}
-                    setShowChampsStatsAtDistrictRegional={setShowChampsStatsAtDistrictRegional}
-                    showBlueBanners={showBlueBanners}
-                    setShowBlueBanners={setShowBlueBanners}
-                    monthsWarning={monthsWarning}
-                    setMonthsWarning={setMonthsWarning}
                     user={user}
                     isAuthenticated={isAuthenticated}
                     adHocMode={adHocMode}
@@ -7268,43 +7156,15 @@ function App() {
                     supportedYears={supportedYears}
                     FTCSupportedYears={FTCSupportedYears}
                     reloadPage={reloadPage}
-                    autoHideSponsors={autoHideSponsors}
-                    setAutoHideSponsors={setAutoHideSponsors}
                     setLoadingCommunityUpdates={setLoadingCommunityUpdates}
-                    hidePracticeSchedule={hidePracticeSchedule}
-                    setHidePracticeSchedule={setHidePracticeSchedule}
                     systemMessage={systemMessage}
                     setTeamListLoading={setTeamListLoading}
                     getTeamList={getTeamList}
                     getAlliances={getAlliances}
                     setHaveChampsTeams={setHaveChampsTeams}
                     appUpdates={appUpdates}
-                    usePullDownToUpdate={usePullDownToUpdate}
-                    setUsePullDownToUpdate={setUsePullDownToUpdate}
-                    useSwipe={useSwipe}
-                    setUseSwipe={setUseSwipe}
-                    useScrollMemory={useScrollMemory}
-                    setUseScrollMemory={setUseScrollMemory}
-                    syncEvent={syncEvent}
-                    setSyncEvent={setSyncEvent}
-                    screenMode={screenMode}
-                    setScreenMode={setScreenMode}
-                    screenModeSyncFrequency={screenModeSyncFrequency}
-                    setScreenModeSyncFrequency={setScreenModeSyncFrequency}
-                    backgroundDataRefresh={backgroundDataRefresh}
-                    setBackgroundDataRefresh={setBackgroundDataRefresh}
-                    backgroundDataRefreshFrequency={backgroundDataRefreshFrequency}
-                    setBackgroundDataRefreshFrequency={setBackgroundDataRefreshFrequency}
                     eventLabel={eventLabel}
                     setEventLabel={setEventLabel}
-                    showInspection={showInspection}
-                    setShowInspection={setShowInspection}
-                    showWorldAndStatsOnAnnouncePlayByPlay={showWorldAndStatsOnAnnouncePlayByPlay}
-                    setShowWorldAndStatsOnAnnouncePlayByPlay={setShowWorldAndStatsOnAnnouncePlayByPlay}
-                    showMinorAwards={showMinorAwards}
-                    setShowMinorAwards={setShowMinorAwards}
-                    highScoreMode={highScoreMode}
-                    setHighScoreMode={setHighScoreMode}
                     systemBell={systemBell}
                     setSystemBell={setSystemBell}
                     eventBell={eventBell}
@@ -7333,6 +7193,16 @@ function App() {
                     getCheesyStatus={getCheesyStatus}
                     manualOfflineMode={manualOfflineMode}
                     setManualOfflineMode={setManualOfflineMode}
+                    syncEvent={syncEvent}
+                    setSyncEvent={setSyncEvent}
+                    screenMode={screenMode}
+                    setScreenMode={setScreenMode}
+                    screenModeSyncFrequency={screenModeSyncFrequency}
+                    setScreenModeSyncFrequency={setScreenModeSyncFrequency}
+                    backgroundDataRefresh={backgroundDataRefresh}
+                    setBackgroundDataRefresh={setBackgroundDataRefresh}
+                    backgroundDataRefreshFrequency={backgroundDataRefreshFrequency}
+                    setBackgroundDataRefreshFrequency={setBackgroundDataRefreshFrequency}
                     darkMode={darkMode}
                     setDarkMode={setDarkMode}
                     useOsTheme={useOsTheme}

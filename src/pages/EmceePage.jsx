@@ -6,7 +6,7 @@ import { useSwipeable } from "react-swipeable";
 import useWindowDimensions from "hooks/UseWindowDimensions";
 import EmceeClock from "components/EmceeClock";
 import moment from "moment";
-import { matchClassesBase } from "components/Constants";
+import { matchClassesBase } from "data/matchClasses";
 
 function EmceePage({
   selectedEvent,

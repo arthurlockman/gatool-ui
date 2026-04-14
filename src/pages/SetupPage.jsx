@@ -9,7 +9,8 @@ import { useOnlineStatus } from "../contextProviders/OnlineContext";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { isSafari, isChrome, fullBrowserVersion, browserVersion, isIOS, browserName, isDesktop, isTablet, isMobile } from "react-device-detect";
-import { playoffOverrideMenu } from "components/Constants";
+import { playoffOverrideMenu } from "data/appConfig";
+import { useSettings } from "contexts/SettingsContext";
 import Contenteditable from "components/ContentEditable";
 import { ArrowClockwise, Trash, Copy, Plus, BellFill, CaretUpFill, CaretDownFill } from 'react-bootstrap-icons';
 import NotificationBanner from "components/NotificationBanner";
@@ -76,7 +77,23 @@ const ftcModeOptions = [
 
 
 
-function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, regionFilters, setRegionFilters, districts, timeFilter, setTimeFilter, timeFormat, setTimeFormat, showSponsors, setShowSponsors, showAwards, setShowAwards, showNotes, setShowNotes, showNotesAnnounce, setShowNotesAnnounce, showMottoes, setShowMottoes, showChampsStats, setShowChampsStats, swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, autoUpdate, setAutoUpdate, getSchedule, awardsMenu, setAwardsMenu, showQualsStats, setShowQualsStats, showQualsStatsQuals, setShowQualsStatsQuals, teamReduction, setTeamReduction, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, reverseEmcee, setReverseEmcee, showDistrictChampsStats, setShowDistrictChampsStats, showChampsStatsAtDistrictRegional, setShowChampsStatsAtDistrictRegional, monthsWarning, setMonthsWarning, user, isAuthenticated, adHocMode, setAdHocMode, supportedYears, FTCSupportedYears, reloadPage, autoHideSponsors, setAutoHideSponsors, setLoadingCommunityUpdates, hidePracticeSchedule, setHidePracticeSchedule, systemMessage, setTeamListLoading, getTeamList, getAlliances, setHaveChampsTeams, appUpdates, usePullDownToUpdate, setUsePullDownToUpdate, useSwipe, setUseSwipe, eventLabel, setEventLabel, showInspection, setShowInspection, showWorldAndStatsOnAnnouncePlayByPlay, setShowWorldAndStatsOnAnnouncePlayByPlay, showMinorAwards, setShowMinorAwards, highScoreMode, setHighScoreMode, systemBell, setSystemBell, eventBell, setEventBell, eventMessage, setEventMessage, putEventNotifications, useCheesyArena, setUseCheesyArena, useFourTeamAlliances, setUseFourTeamAlliances, ftcLeagues, ftcRegions, ftcMode, setFTCMode, ftcTypes, useFTCOffline, setUseFTCOffline, FTCServerURL, setFTCServerURL, FTCKey, requestFTCKey, checkFTCKey, FTCOfflineAvailable, getFTCOfflineStatus, getCheesyStatus, showBlueBanners, setShowBlueBanners, manualOfflineMode, setManualOfflineMode, useScrollMemory, setUseScrollMemory, syncEvent, setSyncEvent, screenMode, setScreenMode, screenModeSyncFrequency, setScreenModeSyncFrequency, backgroundDataRefresh, setBackgroundDataRefresh, backgroundDataRefreshFrequency, setBackgroundDataRefreshFrequency, darkMode, setDarkMode, useOsTheme, setUseOsTheme, appearanceDark }) {
+function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, regionFilters, setRegionFilters, districts, timeFilter, setTimeFilter, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, user, isAuthenticated, adHocMode, setAdHocMode, supportedYears, FTCSupportedYears, reloadPage, setLoadingCommunityUpdates, systemMessage, setTeamListLoading, getTeamList, getAlliances, setHaveChampsTeams, appUpdates, eventLabel, setEventLabel, getSchedule, systemBell, setSystemBell, eventBell, setEventBell, eventMessage, setEventMessage, putEventNotifications, useCheesyArena, setUseCheesyArena, useFourTeamAlliances, setUseFourTeamAlliances, ftcLeagues, ftcRegions, ftcMode, setFTCMode, ftcTypes, useFTCOffline, setUseFTCOffline, FTCServerURL, setFTCServerURL, FTCKey, requestFTCKey, checkFTCKey, FTCOfflineAvailable, getFTCOfflineStatus, getCheesyStatus, manualOfflineMode, setManualOfflineMode, syncEvent, setSyncEvent, screenMode, setScreenMode, screenModeSyncFrequency, setScreenModeSyncFrequency, backgroundDataRefresh, setBackgroundDataRefresh, backgroundDataRefreshFrequency, setBackgroundDataRefreshFrequency, darkMode, setDarkMode, useOsTheme, setUseOsTheme, appearanceDark }) {
+    const {
+        timeFormat, setTimeFormat, showSponsors, setShowSponsors, autoHideSponsors, setAutoHideSponsors,
+        showAwards, setShowAwards, showMinorAwards, setShowMinorAwards, showNotes, setShowNotes,
+        showNotesAnnounce, setShowNotesAnnounce, showMottoes, setShowMottoes,
+        showChampsStats, setShowChampsStats, showDistrictChampsStats, setShowDistrictChampsStats,
+        showChampsStatsAtDistrictRegional, setShowChampsStatsAtDistrictRegional,
+        showBlueBanners, setShowBlueBanners, hidePracticeSchedule, setHidePracticeSchedule,
+        monthsWarning, setMonthsWarning, showInspection, setShowInspection,
+        showWorldAndStatsOnAnnouncePlayByPlay, setShowWorldAndStatsOnAnnouncePlayByPlay,
+        swapScreen, setSwapScreen, autoAdvance, setAutoAdvance, highScoreMode, setHighScoreMode,
+        autoUpdate, setAutoUpdate, awardsMenu, setAwardsMenu,
+        showQualsStats, setShowQualsStats, showQualsStatsQuals, setShowQualsStatsQuals,
+        teamReduction, setTeamReduction, reverseEmcee, setReverseEmcee,
+        useSwipe, setUseSwipe, usePullDownToUpdate, setUsePullDownToUpdate,
+        useScrollMemory, setUseScrollMemory,
+    } = useSettings();
     const isOnline = useOnlineStatus();
     const PWASupported = (isChrome && Number(browserVersion) >= 76) || (isSafari && Number(browserVersion) >= 15 && Number(fullBrowserVersion.split(".")[1]) >= 4);
 

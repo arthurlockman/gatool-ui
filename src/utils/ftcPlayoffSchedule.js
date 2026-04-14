@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { matchClassesBase } from "../components/Constants";
+import { matchClassesBase } from "../data/matchClasses";
 
 /**
  * Returns whether a playoff match has a known result (completed).
