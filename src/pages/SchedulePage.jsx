@@ -7,10 +7,6 @@ import {
   Container,
   Row,
   Table,
-  Modal,
-  Form,
-  Tooltip,
-  OverlayTrigger,
 } from "react-bootstrap";
 import moment from "moment";
 import { utils, read } from "xlsx";
@@ -19,8 +15,14 @@ import _ from "lodash";
 import Switch from "react-switch";
 import { useState } from "react";
 import { playoffOverrideMenu } from "data/appConfig";
-import { CheckCircleFill, XCircleFill } from "react-bootstrap-icons";
-import Handshake from "components/Handshake";
+import ScoresDetailsModal, { rankPointDisplay } from "components/ScoresDetailsModal";
+import AdjustAlliancesModal from "components/AdjustAlliancesModal";
+import {
+  removeSurrogate,
+  createByeMatch,
+  parseCSVToSchedule,
+  normalizeAndValidateSchedule,
+} from "utils/scheduleParsingHelpers";
 import useScrollPosition from "../hooks/useScrollPosition";
 import {
   getPlayoffScheduleRowStyles,
@@ -61,8 +63,6 @@ function SchedulePage({
   const [showAdjustAlliances, setShowAdjustAlliances] = useState(false);
   const [showScores, setShowScores] = useState(false);
   const [scoresMatch, setScoresMatch] = useState(null);
-
-  const [formData, setFormData] = useState(null);
 
   // Remember scroll position for Schedule page
   useScrollPosition('schedule', true, false, useScrollMemory);
@@ -178,61 +178,7 @@ function SchedulePage({
     },
   ];
 
-  const byeMatch = (bye, matchTime, description) => {
-    return {
-      description: description,
-      tournamentLevel: "Playoff",
-      matchNumber: bye,
-      startTime: matchTime,
-      actualStartTime: null,
-      postResultTime: null,
-      scoreRedFinal: null,
-      scoreRedFoul: null,
-      scoreRedAuto: null,
-      scoreBlueFinal: null,
-      scoreBlueFoul: null,
-      scoreBlueAuto: null,
-      teams: [
-        {
-          teamNumber: null,
-          station: "Red1",
-          surrogate: !1,
-          dq: !1,
-        },
-        {
-          teamNumber: null,
-          station: "Red2",
-          surrogate: !1,
-          dq: !1,
-        },
-        {
-          teamNumber: null,
-          station: "Red3",
-          surrogate: !1,
-          dq: !1,
-        },
-        {
-          teamNumber: null,
-          station: "Blue1",
-          surrogate: !1,
-          dq: !1,
-        },
-        {
-          teamNumber: null,
-          station: "Blue2",
-          surrogate: !1,
-          dq: !1,
-        },
-        {
-          teamNumber: null,
-          station: "Blue3",
-          surrogate: !1,
-          dq: !1,
-        },
-      ],
-      winner: { winner: "", tieWinner: "", level: 0 },
-    };
-  };
+  const byeMatch = createByeMatch;
 
   // This function clicks the hidden file upload button
   function clickLoadPractice() {
@@ -325,59 +271,10 @@ function SchedulePage({
       if (isCSV) {
         // Parse CSV file
         const csvText = new TextDecoder().decode(data);
-        const lines = csvText.split('\n');
-        
-        // Parse header to understand column structure
-        const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
-        
-        // Find event name (usually in second row, first column)
-        if (lines[1]) {
-          const secondRow = lines[1].split(',').map(c => c.replace(/"/g, '').trim());
-          if (secondRow[0]) {
-            eventnameTemp = secondRow[0];
-          }
-        }
-        
-        // Find column indices (CSV format from FIRST)
-        const timeCol = headers.findIndex(h => h.toLowerCase().includes('starttime') || h.toLowerCase().includes('time'));
-        const descCol = headers.findIndex(h => h.toLowerCase().includes('textbox17') || h.toLowerCase().includes('description'));
-        const blue1Col = headers.findIndex(h => h.toLowerCase().includes('bluestation1') || h === 'textbox15');
-        const blue2Col = headers.findIndex(h => h.toLowerCase().includes('bluestation2'));
-        const blue3Col = headers.findIndex(h => h.toLowerCase().includes('bluestation3'));
-        const red1Col = headers.findIndex(h => h.toLowerCase().includes('redstation1'));
-        const red2Col = headers.findIndex(h => h.toLowerCase().includes('redstation2'));
-        const red3Col = headers.findIndex(h => h.toLowerCase().includes('redstation3'));
-        
-        // Parse data rows (skip header and first 3 rows)
-        schedule = [];
-        for (let i = 3; i < lines.length; i++) {
-          if (!lines[i].trim()) continue;
-          
-          const cols = lines[i].split(',').map(c => c.replace(/"/g, '').trim());
-          
-          // Skip rows without match data
-          if (!cols[descCol] || (!cols[descCol].toLowerCase().includes('qualification') && !cols[descCol].toLowerCase().includes('practice'))) {
-            continue;
-          }
-          
-          // Check if at least one team number exists to avoid blank matches
-          const hasTeamData = cols[blue1Col] || cols[blue2Col] || cols[blue3Col] || 
-                             cols[red1Col] || cols[red2Col] || cols[red3Col];
-          
-          if (!hasTeamData) {
-            continue;
-          }
-          
-          schedule.push({
-            Time: cols[timeCol] || "",
-            Description: cols[descCol] || "",
-            "Blue 1": cols[blue1Col] || "",
-            "Blue 2": cols[blue2Col] || "",
-            "Blue 3": cols[blue3Col] || "",
-            "Red 1": cols[red1Col] || "",
-            "Red 2": cols[red2Col] || "",
-            "Red 3": cols[red3Col] || "",
-          });
+        const parsed = parseCSVToSchedule(csvText);
+        schedule = parsed.schedule;
+        if (parsed.eventName) {
+          eventnameTemp = parsed.eventName;
         }
       } else {
         // Parse Excel file (existing logic)
@@ -389,51 +286,10 @@ function SchedulePage({
       
       var formattedSchedule = {};
       var matchNumber = 0;
-      var errorMatches = [];
       var errorMessage = "";
       var innerSchedule = [];
-      const basicMatch = {
-        Time: "",
-        Description: "",
-        "Blue 1": "",
-        "Blue 2": "",
-        "Blue 3": "",
-        "Red 1": "",
-        "Red 2": "",
-        "Red 3": "",
-      };
-      const matchKeys = [
-        "Red 1",
-        "Red 2",
-        "Red 3",
-        "Blue 1",
-        "Blue 2",
-        "Blue 3",
-      ];
-      schedule = schedule.map((match) => {
-        match = _.merge(_.cloneDeep(basicMatch), match);
-        var scheduleKeys = Object.keys(match);
-        scheduleKeys.forEach((key) => {
-          match[key] = match[key].toString();
-        });
-        // detect matches with missing teams
-        if (match["Description"]?.includes("Practice") || match["Description"]?.includes("Qualification")) {
-          for (var i = 0; i < matchKeys?.length; i++) {
-            if (match[matchKeys[i]] === "") {
-              errorMatches.push(match);
-              break;
-            }
-          }
-        }
-        return match;
-      });
-
-      // Filter out blank rows (rows without any team data)
-      schedule = schedule.filter((match) => {
-        const hasTeamData = match["Blue 1"] || match["Blue 2"] || match["Blue 3"] || 
-                           match["Red 1"] || match["Red 2"] || match["Red 3"];
-        return hasTeamData;
-      });
+      const { normalized, errorMatches } = normalizeAndValidateSchedule(schedule);
+      schedule = normalized;
 
       if (errorMatches?.length > 0) {
         errorMessage =
@@ -617,11 +473,6 @@ function SchedulePage({
     reader.readAsArrayBuffer(f);
   }
 
-  function removeSurrogate(teamNumber) {
-    teamNumber = teamNumber.replace("*", "");
-    return teamNumber;
-  }
-
   /**
    * This function finds a team by their station assignment
    * @param teams the array of team objects
@@ -637,12 +488,17 @@ function SchedulePage({
   }
 
   const handleOpen = () => {
-    setFormData(_.cloneDeep(alliances));
     setShowAdjustAlliances(true);
   };
 
   const handleClose = () => {
     setShowAdjustAlliances(false);
+  };
+
+  const handleAdjustAlliancesSave = (alliancesTemp, teamNumbers) => {
+    getAlliances(alliancesTemp);
+    getTeamList(teamNumbers);
+    handleClose();
   };
 
   const handleOpenScores = (match) => {
@@ -654,53 +510,12 @@ function SchedulePage({
     setShowScores(false);
   };
 
-  const handleFormValue = (allianceNumber, property, value) => {
-    var formDataTemp = _.cloneDeep(formData);
-    formDataTemp.alliances[allianceNumber - 1][property] = value;
-    setFormData(formDataTemp);
-  };
-
   const handleChampsStyle = (e) => {
     var eventTemp = _.cloneDeep(selectedEvent);
     eventTemp.value.type = "Championship";
     eventTemp.value.champLevel = "CHAMPS";
     setSelectedEvent(eventTemp);
     setChampsStyle(e);
-  };
-
-  const handleAdjustAlliances = () => {
-    console.log("Adjusting Alliances");
-    var alliancesTemp = {};
-    var teamNumbers = [];
-    alliancesTemp.Alliances = formData.alliances.map((alliance) => {
-      // Add the Alliance members to the team list
-      var keys = Object.keys(alliance);
-      keys.forEach((key) => {
-        if (key.includes("captain") || key.includes("round")) {
-          if (alliance[key]) {
-            teamNumbers.push(Number(alliance[key]));
-          }
-        }
-      });
-
-      return {
-        number: Number(alliance.number),
-        captain: Number(alliance.captain),
-        round1: Number(alliance.round1),
-        round2: Number(alliance.round2),
-        round3: Number(alliance.round3),
-        backup: null,
-        backupReplaced: null,
-        name: alliance.name,
-      };
-    });
-
-    getAlliances(alliancesTemp);
-
-    // Reset the team list based on changes to the Alliances
-    getTeamList(teamNumbers);
-
-    handleClose();
   };
 
   const showPlayoffMessage =
@@ -717,237 +532,6 @@ function SchedulePage({
     moment().isBefore(moment(firstMatch?.startTime).subtract(20, "minutes"))
   ) {
   }
-  const rankPointDisplay = (rankPoints) => {
-    var pointsDisplay = [];
-    _.forEach(rankPoints, (value, key) => {
-      // FRC uses "BonusAchieved" or "Achieved" in key names; prefer stripping BonusAchieved first, then Achieved
-      const name = key.endsWith("BonusAchieved")
-        ? key.slice(0, -"BonusAchieved".length)
-        : key.endsWith("Achieved")
-          ? key.slice(0, -"Achieved".length)
-          : key;
-      pointsDisplay.push({
-        bonus: _.startCase(name),
-        earned: value,
-      });
-    });
-    return pointsDisplay.map((point, index) => {
-      return (
-        <React.Fragment key={`rp-${point.bonus}-${index}`}>
-          <OverlayTrigger
-            delay={500}
-            overlay={
-              <Tooltip id={`tooltip-${point.bonus}`}>
-                {point.bonus} {point.earned ? " Achieved" : " Not Achieved"}
-              </Tooltip>
-            }
-          >
-            <span className={`rankPoints${point.earned ? "" : " unearned"}`}>
-              {point.bonus.slice(0, 1)}
-            </span>
-          </OverlayTrigger>
-        </React.Fragment>
-      );
-    });
-  };
-
-  const scoreAchieved = (result) => {
-    return result ? (
-      <CheckCircleFill style={{ color: "green" }} />
-    ) : (
-      <XCircleFill style={{ color: "red" }} />
-    );
-  };
-
-  const addScoreType = (scores) => {
-    if (scores == null || typeof scores !== "object" || Array.isArray(scores)) {
-      return [];
-    }
-    return Object.keys(scores).map((key) => {
-      if (key.toLowerCase().includes("alliance")) return { type: 1, key: key };
-      else if (
-        key.toLowerCase().includes("bonus") ||
-        key.toLowerCase() === "rp"
-      )
-        return { type: 2, key: key };
-      else if (key.toLowerCase().includes("auto")) return { type: 3, key: key };
-      else if (key.toLowerCase().includes("teleop"))
-        return { type: 4, key: key };
-      else if (key.toLowerCase().includes("endgame"))
-        return { type: 5, key: key };
-      else if (key.toLowerCase().includes("algae"))
-        return { type: 6, key: key };
-      else if (key.toLowerCase().includes("foul")) return { type: 7, key: key };
-      else if (key.toLowerCase().includes("total"))
-        return { type: 9, key: key };
-      else return { type: 10, key: key };
-    });
-  };
-
-  const scoresRow = (key, rowKey) => {
-    const redAlliance = scoresMatch?.scores?.alliances?.[1];
-    const blueAlliance = scoresMatch?.scores?.alliances?.[0];
-    const redVal = redAlliance?.[key.key];
-    const blueVal = blueAlliance?.[key.key];
-    return (
-      <tr key={rowKey}>
-        <td>
-          <b>{key.key}</b>
-        </td>
-        <td className="scheduleTablered">
-          {typeof redVal === "boolean"
-            ? scoreAchieved(redVal)
-            : redVal}
-        </td>
-        <td className="scheduleTableblue">
-          {typeof blueVal === "boolean"
-            ? scoreAchieved(blueVal)
-            : blueVal}
-        </td>
-      </tr>
-    );
-  };
-
-  const expandScoresRow = (key) => {
-    const redAlliance = scoresMatch?.scores?.alliances?.[1];
-    const blueAlliance = scoresMatch?.scores?.alliances?.[0];
-    const redRow = redAlliance?.[key.key];
-    const blueRow = blueAlliance?.[key.key];
-    const safeRedRow = redRow != null && typeof redRow === "object" && !Array.isArray(redRow) ? redRow : {};
-    const safeBlueRow = blueRow != null && typeof blueRow === "object" && !Array.isArray(blueRow) ? blueRow : {};
-    return (
-      <>
-        <tr>
-          <td>
-            <b>{key.key}</b>
-          </td>
-          <td className="scheduleTablered"></td>
-          <td className="scheduleTableblue"></td>
-        </tr>
-
-        {Object.keys(safeRedRow).map((itemKey, itemIndex) => {
-          const redItem = safeRedRow[itemKey];
-          const blueItem = safeBlueRow[itemKey];
-          if (redItem != null && typeof redItem === "object" && !Array.isArray(redItem)) {
-            const redRowKeys = Object.keys(redItem);
-            return (
-              <React.Fragment key={`redrow-${itemKey}-${itemIndex}`}>
-                <tr>
-                  <td>
-                    <b>     {itemKey}</b>
-                  </td>
-                  <td className="scheduleTablered">
-                    <tr>
-                      <td>
-                        <tr>
-                          {redRowKeys.map((score, scoreIndex) => {
-                            return (
-                              <td
-                                key={`red-header-${score}-${scoreIndex}`}
-                                style={{
-                                  writingMode: "vertical-rl",
-                                  padding: "5px 0px 0px 5px",
-                                }}
-                              >
-                                <b>{score}</b>
-                              </td>
-                            );
-                          })}
-                        </tr>
-                        <tr>
-                          {redRowKeys.map((score, scoreIndex) => {
-                            const redVal = redItem[score];
-                            const writingMode =
-                              typeof redVal === "string"
-                                ? "vertical-rl"
-                                : Array.isArray(redVal)
-                                ? "vertical-rl"
-                                : "horizontal-tb";
-                            return (
-                              <td
-                                key={`red-value-${score}-${scoreIndex}`}
-                                style={{
-                                  writingMode: writingMode,
-                                  padding: "5px 0px 0px 5px",
-                                }}
-                              >
-                                {typeof redVal === "string"
-                                  ? redVal
-                                  : Array.isArray(redVal)
-                                  ? redVal.join(",")
-                                  : scoreAchieved(redVal)}
-                              </td>
-                            );
-                          })}
-                        </tr>
-                      </td>
-                    </tr>
-                  </td>
-                  <td className="scheduleTableblue">
-                    <tr>
-                      <td>
-                        <tr>
-                          {redRowKeys.map((score, scoreIndex) => {
-                            return (
-                              <td
-                                key={`blue-header-${score}-${scoreIndex}`}
-                                style={{
-                                  writingMode: "vertical-rl",
-                                  padding: "5px 0px 0px 5px",
-                                }}
-                              >
-                                <b>{score}</b>
-                              </td>
-                            );
-                          })}
-                        </tr>
-                        <tr>
-                          {redRowKeys.map((score, scoreIndex) => {
-                            const blueVal = (blueItem != null && typeof blueItem === "object") ? blueItem[score] : undefined;
-                            const writingMode =
-                              typeof blueVal === "string"
-                                ? "vertical-rl"
-                                : Array.isArray(blueVal)
-                                ? "vertical-rl"
-                                : "horizontal-tb";
-                            return (
-                              <td
-                                key={`blue-value-${score}-${scoreIndex}`}
-                                style={{
-                                  writingMode: writingMode,
-                                  padding: "5px 0px 0px 5px",
-                                }}
-                              >
-                                {typeof blueVal === "string"
-                                  ? blueVal
-                                  : Array.isArray(blueVal)
-                                  ? blueVal.join(",")
-                                  : scoreAchieved(blueVal)}
-                              </td>
-                            );
-                          })}
-                        </tr>
-                      </td>
-                    </tr>
-                  </td>
-                </tr>
-              </React.Fragment>
-            );
-          } else {
-            return (
-              <tr key={`redrow-simple-${itemKey}-${itemIndex}`}>
-                <td>
-                  <b>     {itemKey}</b>
-                </td>
-                <td className="scheduleTablered">{redItem}</td>
-                <td className="scheduleTableblue">{safeBlueRow[itemKey]}</td>
-              </tr>
-            );
-          }
-        })}
-      </>
-    );
-  };
 
   return (
     <Container fluid>
@@ -1768,248 +1352,17 @@ function SchedulePage({
             </Table>
           </div>
         )}
-      <Modal
-        centered={true}
+      <AdjustAlliancesModal
         show={showAdjustAlliances}
-        size="lg"
         onHide={handleClose}
-      >
-        <Modal.Header
-          className={"promoteBackup"}
-          closeVariant={"white"}
-          closeButton
-        >
-          <Modal.Title>Adjust Alliances</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Container>
-            <Row>
-              Use this form to adjust the Alliance members. If you add Alliance
-              members, gatool will add the teams to the Team List. This is
-              especially useful when planning 4-team Alliance events.
-            </Row>
-            <Form>
-              <Table>
-                <Row>
-                  <Col>Number</Col>
-                  <Col>Name</Col>
-                  <Col>Captain</Col>
-                  <Col>Round 1</Col>
-                  <Col>Round 2</Col>
-                  <Col>Round 3</Col>
-                </Row>
-                {(Array.isArray(formData?.alliances) ? formData.alliances : []).map((alliance, allianceIndex) => {
-                  return (
-                    <Row key={`alliance-${alliance.number}-${allianceIndex}`}>
-                      <Col>{alliance.number}</Col>
-                      <Col>
-                        <Form.Control
-                          type="text"
-                          value={alliance.name}
-                          placeholder="Name"
-                          onChange={(e) =>
-                            handleFormValue(
-                              alliance.number,
-                              "name",
-                              e.target.value
-                            )
-                          }
-                        />
-                      </Col>
-                      <Col>
-                        <Form.Control
-                          type="text"
-                          value={alliance.captain}
-                          placeholder="Captain"
-                          onChange={(e) =>
-                            handleFormValue(
-                              alliance.number,
-                              "captain",
-                              e.target.value
-                            )
-                          }
-                        />
-                      </Col>
-                      <Col>
-                        <Form.Control
-                          type="text"
-                          value={alliance.round1}
-                          placeholder="Round 1"
-                          onChange={(e) =>
-                            handleFormValue(
-                              alliance.number,
-                              "round1",
-                              e.target.value
-                            )
-                          }
-                        />
-                      </Col>
-                      <Col>
-                        <Form.Control
-                          type="text"
-                          value={alliance.round2}
-                          placeholder="Round 2"
-                          onChange={(e) =>
-                            handleFormValue(
-                              alliance.number,
-                              "round2",
-                              e.target.value
-                            )
-                          }
-                        />
-                      </Col>
-                      <Col>
-                        <Form.Control
-                          type="text"
-                          value={alliance.round3}
-                          placeholder="Round 3"
-                          onChange={(e) =>
-                            handleFormValue(
-                              alliance.number,
-                              "round3",
-                              e.target.value
-                            )
-                          }
-                        />
-                      </Col>
-                    </Row>
-                  );
-                })}
-              </Table>
-            </Form>
-          </Container>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleAdjustAlliances}>
-            Save Alliances
-          </Button>
-        </Modal.Footer>
-      </Modal>
-      <Modal
-        fullscreen={true}
+        alliances={alliances}
+        onSave={handleAdjustAlliancesSave}
+      />
+      <ScoresDetailsModal
         show={showScores}
         onHide={handleCloseScores}
-        keyboard
-        contentClassName="gatool-score-details-modal"
-      >
-        <Modal.Header
-          className={"promoteBackup"}
-          closeVariant={"white"}
-          closeButton
-        >
-          <Modal.Title>
-            Score Details for {scoresMatch?.description}
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Container fluid>
-            <Table
-              className="gatool-score-details-table"
-              style={{ margin: "0px auto", overflowY: "scroll" }}
-              responsive
-              striped
-              bordered
-              size="sm"
-            >
-              <tbody>
-                <tr>
-                  <td>Start Time:</td>
-                  <td colSpan={2}>
-                    {moment(scoresMatch?.actualStartTime).format("dd hh:mm A")}
-                  </td>
-                </tr>
-                <tr>
-                  <td>Post Time:</td>
-                  <td colSpan={2}>
-                    {moment(scoresMatch?.postResultTime).format("dd hh:mm A")}
-                  </td>
-                </tr>
-                <tr>
-                  <td>Winner:</td>
-                  <td colSpan={2}>
-                    {scoresMatch?.winner?.winner === "red" ? (
-                      <span className="gatool-score-winner-red">
-                        <b>Red Alliance</b>
-                      </span>
-                    ) : scoresMatch?.winner?.winner === "blue" ? (
-                      <span className="gatool-score-winner-blue">
-                        <b>Blue Alliance</b>
-                      </span>
-                    ) : scoresMatch?.winner?.tieWinner === "red" ? (
-                      <span className="gatool-score-winner-red">
-                        <b>{scoresMatch?.winner?.tieDetail}</b>
-                      </span>
-                    ) : scoresMatch?.winner?.tieWinner === "blue" ? (
-                      <span className="gatool-score-winner-blue">
-                        <b>{scoresMatch?.winner?.tieDetail}</b>
-                      </span>
-                    ) : scoresMatch?.winner?.tieWinner === "tie" ? (
-                      <span className="gatool-score-winner-tie">
-                        <b>{scoresMatch?.winner?.tieDetail}</b>
-                      </span>
-                    ) : (
-                      <span className="gatool-score-winner-tie">
-                        <b>TIE</b>
-                      </span>
-                    )}
-                  </td>
-                </tr>
-                <tr>
-                  <td>Coopertition:</td>
-                  <td colSpan={2}>
-                    <Handshake
-                      result={
-                        scoresMatch?.scores?.coopertitionBonusAchieved ||
-                        scoresMatch?.scores?.alliances?.[0]
-                          ?.coopertitionCriteriaMet
-                      }
-                    />
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <b>Criterion</b>
-                  </td>
-                  <td className="scheduleTablered">
-                    <b>Red Alliance Results</b>
-                  </td>
-                  <td className="scheduleTableblue">
-                    <b>Blue Alliance Results</b>
-                  </td>
-                </tr>
-                {(scoresMatch?.scores?.alliances?.[0] != null && typeof scoresMatch.scores.alliances[0] === "object") ? (
-                  _.orderBy(
-                    addScoreType(scoresMatch.scores.alliances[0]),
-                    ["type", "key"],
-                    ["asc", "asc"]
-                  ).map((key, keyIndex) => {
-                    const rowKey = `score-row-${key?.type ?? ""}-${key?.key ?? ""}-${keyIndex}`;
-                    if (
-                      typeof scoresMatch?.scores?.alliances?.[0]?.[key.key] ===
-                      "object"
-                    ) {
-                      return (
-                        <React.Fragment key={rowKey}>
-                          {expandScoresRow(key)}
-                        </React.Fragment>
-                      );
-                    } else {
-                      return scoresRow(key, rowKey);
-                    }
-                  })
-                ) : (
-                  <></>
-                )}
-              </tbody>
-            </Table>
-          </Container>
-        </Modal.Body>
-        <Modal.Footer className="gatool-score-details-footer">
-          <Button variant="primary" type="button" onClick={handleCloseScores}>
-            Done
-          </Button>
-        </Modal.Footer>
-      </Modal>
+        scoresMatch={scoresMatch}
+      />
     </Container>
   );
 }

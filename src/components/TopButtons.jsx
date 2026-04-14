@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useMemo, useCallback } from "react";
-import { Row, Col, Button, Modal, Container, Table, Nav } from "react-bootstrap";
+import { Row, Col, Button, Modal, Container, Nav } from "react-bootstrap";
 import { ArrowUpSquareFill, CaretLeftFill, CaretRightFill, GripVertical } from "react-bootstrap-icons";
 import Select from "react-select";
 import MatchClock from "../components/MatchClock";
@@ -7,10 +7,17 @@ import _ from "lodash";
 import { useHotkeysContext } from "react-hotkeys-hook";
 import { roundThreeOrReserveRoleLabel } from "../utils/allianceRoleLabels";
 import {
-    compactReserveEditsForEvent,
     matchHasPostedResult,
 } from "../utils/playoffReserveEdits";
 import { useSettings } from "../contexts/SettingsContext";
+import AdHocMatchModal from "../components/AdHocMatchModal";
+import {
+    hasLocalPlayoffReserveSetOverride,
+    syncAllianceLookupRound3Entry,
+    clearAllianceLookupRound3,
+    getAllianceIndexForMatchSide,
+    getPlayoffReserveForSide,
+} from "../components/allianceHelpers";
 import {
     DndContext,
     closestCenter,
@@ -33,198 +40,6 @@ import {
 } from "../utils/playoffStationOrderEdits";
 import { getFieldStationsInPlayByPlayVisualOrder } from "../utils/playByPlayDisplayOrder";
 import { getAllianceLookupEntry } from "../utils/allianceLookup";
-
-// ─── Reserve helpers ──────────────────────────────────────────────────────────
-
-/**
- * True when this alliance has a persisted `op: 'set'` overlay (user-added reserve / round3 in gatool).
- * Merged `alliances` alone mixes API + overlay; comparing to overrides on each render decides if Remove is allowed.
- */
-function hasLocalPlayoffReserveSetOverride(playoffReserveEdits, eventCode, allianceNumber) {
-    if (
-        !eventCode ||
-        allianceNumber === undefined ||
-        allianceNumber === null ||
-        allianceNumber === ""
-    ) {
-        return false;
-    }
-    const raw = playoffReserveEdits?.[eventCode];
-    if (!raw || typeof raw !== "object") {
-        return false;
-    }
-    const e = compactReserveEditsForEvent(raw)[String(allianceNumber)];
-    if (!e || e.op !== "set") {
-        return false;
-    }
-    const hasRound3 =
-        e.round3 !== undefined && e.round3 !== null && e.round3 !== "";
-    const hasBackup =
-        e.backup !== undefined && e.backup !== null && e.backup !== "";
-    return hasRound3 || hasBackup;
-}
-
-function sameAllianceRow(entry, allianceRow) {
-    if (!entry || !allianceRow) return false;
-    const num = allianceRow.number;
-    const name = allianceRow.name;
-    return (
-        (num !== undefined &&
-            num !== null &&
-            entry.number !== undefined &&
-            entry.number !== null &&
-            Number(entry.number) === Number(num)) ||
-        (name && entry.alliance === name)
-    );
-}
-
-function lookupTeamStillOnAllianceRoster(allianceRow, teamNum) {
-    if (teamNum == null || teamNum === "") return false;
-    const s = String(teamNum);
-    return (
-        String(allianceRow.captain) === s ||
-        String(allianceRow.round1) === s ||
-        String(allianceRow.round2) === s
-    );
-}
-
-function syncAllianceLookupRound3Entry(
-    alliancesTemp,
-    allianceRow,
-    prevRound3TeamNumber,
-    roundThreeRoleLabel
-) {
-    const lu = alliancesTemp?.Lookup;
-    if (!lu || !allianceRow) return;
-    const newR3 = allianceRow.round3;
-    if (
-        prevRound3TeamNumber != null &&
-        prevRound3TeamNumber !== "" &&
-        String(prevRound3TeamNumber) !== String(newR3 ?? "")
-    ) {
-        if (!lookupTeamStillOnAllianceRoster(allianceRow, prevRound3TeamNumber)) {
-            delete lu[String(prevRound3TeamNumber)];
-        }
-    }
-    for (const entry of Object.values(lu)) {
-        if (sameAllianceRow(entry, allianceRow)) {
-            entry.round3 = allianceRow.round3 ?? null;
-            entry.backup = null;
-            entry.backupReplaced = null;
-        }
-    }
-    const r3 = allianceRow.round3;
-    if (r3 != null && r3 !== "") {
-        lu[String(r3)] = {
-            role: roundThreeRoleLabel,
-            alliance: allianceRow.name,
-            number: allianceRow.number,
-            captain: allianceRow.captain,
-            round1: allianceRow.round1,
-            round2: allianceRow.round2,
-            round3: allianceRow.round3,
-            backup: null,
-            backupReplaced: null,
-        };
-    }
-}
-
-function clearAllianceLookupRound3(alliancesTemp, allianceRow, removedRound3) {
-    const lu = alliancesTemp?.Lookup;
-    if (!lu || !allianceRow) return;
-    if (removedRound3 != null && removedRound3 !== "") {
-        if (!lookupTeamStillOnAllianceRoster(allianceRow, removedRound3)) {
-            delete lu[String(removedRound3)];
-        }
-    }
-    for (const entry of Object.values(lu)) {
-        if (sameAllianceRow(entry, allianceRow)) {
-            entry.round3 = null;
-            entry.backup = null;
-            entry.backupReplaced = null;
-        }
-    }
-}
-
-function getAllianceIndexForMatchSide(side, matchDetails, alliancesTemp) {
-    const field = matchDetails?.teams?.find(
-        (t) =>
-            String(t.station || "").startsWith(side) &&
-            t.teamNumber != null &&
-            Number(t.teamNumber) > 0
-    );
-    if (!field) return null;
-    const lu = alliancesTemp?.Lookup?.[String(field.teamNumber)];
-    if (!lu?.alliance) return null;
-    const idx = _.findIndex(alliancesTemp?.alliances, { name: lu.alliance });
-    if (idx < 0) return null;
-    return { idx, allianceName: lu.alliance };
-}
-
-/**
- * @param {'Red'|'Blue'} side
- * @returns {null | { teamNumber: number|string, allianceName: string, allianceNumber: number|string, side: string, isPlayoffReserve: boolean }}
- */
-function getPlayoffReserveForSide(side, matchDetails, alliances, inPlayoffs) {
-    if (!inPlayoffs || !matchDetails?.teams?.length || !alliances?.alliances?.length) {
-        return null;
-    }
-
-    const allianceNumbersOnSide = new Set();
-    if (alliances?.Lookup) {
-        matchDetails.teams.forEach((t) => {
-            const stationSide = String(t.station || "").startsWith("Blue") ? "Blue" : "Red";
-            if (stationSide !== side) return;
-            const lu = alliances.Lookup[String(t.teamNumber)];
-            if (lu?.number !== undefined && lu?.number !== null && lu?.number !== "") {
-                const n = Number(lu.number);
-                if (Number.isFinite(n)) allianceNumbersOnSide.add(n);
-            }
-        });
-    }
-    if (allianceNumbersOnSide.size === 0) {
-        const sideTeamNums = new Set(
-            matchDetails.teams
-                .filter((t) => String(t.station || "").startsWith(side))
-                .map((t) => String(t.teamNumber))
-        );
-        for (const al of alliances.alliances) {
-            const rosterNums = [al.captain, al.round1, al.round2, al.round3, al.backup]
-                .filter((n) => n != null && n !== "")
-                .map(String);
-            if (rosterNums.some((n) => sideTeamNums.has(n))) {
-                const alNum = Number(al.number);
-                if (Number.isFinite(alNum)) allianceNumbersOnSide.add(alNum);
-            }
-        }
-    }
-
-    for (const al of alliances.alliances) {
-        const reserveNum =
-            al.round3 !== undefined && al.round3 !== null && al.round3 !== ""
-                ? al.round3
-                : al.backup !== undefined && al.backup !== null && al.backup !== ""
-                  ? al.backup
-                  : null;
-        const alNum = Number(al.number);
-        if (!Number.isFinite(alNum) || !allianceNumbersOnSide.has(alNum)) continue;
-        if (reserveNum == null) continue;
-        const isMainFieldTeam = matchDetails.teams.some(
-            (t) =>
-                String(t.teamNumber) === String(reserveNum) &&
-                /^(Red|Blue)[123]$/.test(String(t.station || ""))
-        );
-        if (isMainFieldTeam) continue;
-        return {
-            teamNumber: reserveNum,
-            allianceName: al.name,
-            allianceNumber: al.number,
-            side,
-            isPlayoffReserve: true,
-        };
-    }
-    return null;
-}
 
 // ─── Reorder (drag-and-drop) helpers ─────────────────────────────────────────
 
@@ -724,23 +539,6 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
     };
 
     // ── derived data ─────────────────────────────────────────────────────────
-    const adHocStation = (value) => {
-        var station = value[0];
-        var teamNumber = value[1].value;
-        var adHocMatchNew = _.cloneDeep(adHocMatch);
-        if (_.isNull(adHocMatchNew)) {
-            adHocMatchNew = [
-                { teamNumber: null, station: "Red1", surrogate: false, dq: false },
-                { teamNumber: null, station: "Red2", surrogate: false, dq: false },
-                { teamNumber: null, station: "Red3", surrogate: false, dq: false },
-                { teamNumber: null, station: "Blue1", surrogate: false, dq: false },
-                { teamNumber: null, station: "Blue2", surrogate: false, dq: false },
-                { teamNumber: null, station: "Blue3", surrogate: false, dq: false },
-            ];
-        }
-        adHocMatchNew[_.findIndex(adHocMatchNew, { station: station })].teamNumber = teamNumber;
-        setAdHocMatch(adHocMatchNew);
-    };
 
     var allianceMembers = alliances?.Lookup ? Object.keys(alliances?.Lookup) : null;
     var availableTeams = [];
@@ -1224,232 +1022,14 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
                     )}
                 </Modal>
 
-                {/* ── Ad-hoc (Change Teams) modal — unchanged ── */}
-                <Modal centered={true} show={showAdHoc} onHide={handleCloseAdHoc}>
-                    <Modal.Header className={"promoteBackup"} closeButton closeVariant="white">
-                        <Modal.Title>Configure Teams for Match</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <Container>
-                            {adHocMatch && <div>Select teams for each station below.</div>}
-                            {!adHocMatch && (
-                                <div className="gatool-awaiting-inline">Awaiting match data...</div>
-                            )}
-                            {!swapScreen && adHocMatch && (
-                                <Table>
-                                    <Row>
-                                        <Col className="blueAlliance">
-                                            <div style={{ backgroundColor: "#98B4F4" }}>
-                                                <b>Blue 1</b>{" "}
-                                                <Select
-                                                    classNamePrefix="gatool-rs"
-                                                    options={eventTeams}
-                                                    tabIndex={4}
-                                                    value={
-                                                        adHocMatch[3]?.teamNumber
-                                                            ? { value: adHocMatch[3]?.teamNumber, label: adHocMatch[3]?.teamNumber }
-                                                            : ""
-                                                    }
-                                                    onChange={(e) => { adHocStation(["Blue1", e]); }}
-                                                />
-                                            </div>
-                                        </Col>
-                                        <Col className="redAlliance">
-                                            <div style={{ backgroundColor: "#F7B3B4" }}>
-                                                <b>Red 3</b>{" "}
-                                                <Select
-                                                    classNamePrefix="gatool-rs"
-                                                    options={eventTeams}
-                                                    tabIndex={3}
-                                                    value={
-                                                        adHocMatch[2]?.teamNumber
-                                                            ? { value: adHocMatch[2]?.teamNumber, label: adHocMatch[2]?.teamNumber }
-                                                            : ""
-                                                    }
-                                                    onChange={(e) => { adHocStation(["Red3", e]); }}
-                                                />
-                                            </div>
-                                        </Col>
-                                    </Row>
-                                    <Row>
-                                        <Col className="blueAlliance">
-                                            <div style={{ backgroundColor: "#98B4F4" }}>
-                                                <b>Blue 2</b>{" "}
-                                                <Select
-                                                    classNamePrefix="gatool-rs"
-                                                    options={eventTeams}
-                                                    tabIndex={5}
-                                                    value={
-                                                        adHocMatch[4]?.teamNumber
-                                                            ? { value: adHocMatch[4]?.teamNumber, label: adHocMatch[4]?.teamNumber }
-                                                            : ""
-                                                    }
-                                                    onChange={(e) => { adHocStation(["Blue2", e]); }}
-                                                />
-                                            </div>
-                                        </Col>
-                                        <Col className="redAlliance">
-                                            <div style={{ backgroundColor: "#F7B3B4" }}>
-                                                <b>Red 2</b>{" "}
-                                                <Select
-                                                    classNamePrefix="gatool-rs"
-                                                    options={eventTeams}
-                                                    tabIndex={2}
-                                                    value={
-                                                        adHocMatch[1]?.teamNumber
-                                                            ? { value: adHocMatch[1]?.teamNumber, label: adHocMatch[1]?.teamNumber }
-                                                            : ""
-                                                    }
-                                                    onChange={(e) => { adHocStation(["Red2", e]); }}
-                                                />
-                                            </div>
-                                        </Col>
-                                    </Row>
-                                    <Row>
-                                        <Col className="blueAlliance">
-                                            <div style={{ backgroundColor: "#98B4F4" }}>
-                                                <b>Blue 3</b>{" "}
-                                                <Select
-                                                    classNamePrefix="gatool-rs"
-                                                    options={eventTeams}
-                                                    tabIndex={6}
-                                                    value={
-                                                        adHocMatch[5]?.teamNumber
-                                                            ? { value: adHocMatch[5]?.teamNumber, label: adHocMatch[5]?.teamNumber }
-                                                            : ""
-                                                    }
-                                                    onChange={(e) => { adHocStation(["Blue3", e]); }}
-                                                />
-                                            </div>
-                                        </Col>
-                                        <Col className="redAlliance">
-                                            <div style={{ backgroundColor: "#F7B3B4" }}>
-                                                <b>Red 1</b>
-                                                <Select
-                                                    classNamePrefix="gatool-rs"
-                                                    options={eventTeams}
-                                                    tabIndex={1}
-                                                    value={
-                                                        adHocMatch[0]?.teamNumber
-                                                            ? { value: adHocMatch[0]?.teamNumber, label: adHocMatch[0]?.teamNumber }
-                                                            : ""
-                                                    }
-                                                    onChange={(e) => { adHocStation(["Red1", e]); }}
-                                                />
-                                            </div>
-                                        </Col>
-                                    </Row>
-                                </Table>
-                            )}
-                            {swapScreen && adHocMatch && (
-                                <Table>
-                                    <Row>
-                                        <Col className="redAlliance">
-                                            <div style={{ backgroundColor: "#F7B3B4" }}>
-                                                <b>Red 3</b>{" "}
-                                                <Select
-                                                    classNamePrefix="gatool-rs"
-                                                    options={eventTeams}
-                                                    tabIndex={4}
-                                                    value={
-                                                        adHocMatch[2]?.teamNumber
-                                                            ? { value: adHocMatch[2]?.teamNumber, label: adHocMatch[2]?.teamNumber }
-                                                            : ""
-                                                    }
-                                                    onChange={(e) => { adHocStation(["Red3", e]); }}
-                                                />
-                                            </div>
-                                        </Col>
-                                        <Col className="blueAlliance">
-                                            <div style={{ backgroundColor: "#98B4F4" }}>
-                                                <b>Blue 1</b>{" "}
-                                                <Select
-                                                    classNamePrefix="gatool-rs"
-                                                    options={eventTeams}
-                                                    tabIndex={3}
-                                                    value={
-                                                        adHocMatch[3]?.teamNumber
-                                                            ? { value: adHocMatch[3]?.teamNumber, label: adHocMatch[3]?.teamNumber }
-                                                            : ""
-                                                    }
-                                                    onChange={(e) => { adHocStation(["Blue1", e]); }}
-                                                />
-                                            </div>
-                                        </Col>
-                                    </Row>
-                                    <Row>
-                                        <Col className="redAlliance">
-                                            <div style={{ backgroundColor: "#F7B3B4" }}>
-                                                <b>Red 2</b>{" "}
-                                                <Select
-                                                    classNamePrefix="gatool-rs"
-                                                    options={eventTeams}
-                                                    tabIndex={5}
-                                                    value={
-                                                        adHocMatch[1]?.teamNumber
-                                                            ? { value: adHocMatch[1]?.teamNumber, label: adHocMatch[1]?.teamNumber }
-                                                            : ""
-                                                    }
-                                                    onChange={(e) => { adHocStation(["Red2", e]); }}
-                                                />
-                                            </div>
-                                        </Col>
-                                        <Col className="blueAlliance">
-                                            <div style={{ backgroundColor: "#98B4F4" }}>
-                                                <b>Blue 2</b>{" "}
-                                                <Select
-                                                    classNamePrefix="gatool-rs"
-                                                    options={eventTeams}
-                                                    tabIndex={2}
-                                                    value={
-                                                        adHocMatch[4]?.teamNumber
-                                                            ? { value: adHocMatch[4]?.teamNumber, label: adHocMatch[4]?.teamNumber }
-                                                            : ""
-                                                    }
-                                                    onChange={(e) => { adHocStation(["Blue2", e]); }}
-                                                />
-                                            </div>
-                                        </Col>
-                                    </Row>
-                                    <Row>
-                                        <Col className="redAlliance">
-                                            <div style={{ backgroundColor: "#F7B3B4" }}>
-                                                <b>Red 1</b>
-                                                <Select
-                                                    classNamePrefix="gatool-rs"
-                                                    options={eventTeams}
-                                                    tabIndex={6}
-                                                    value={
-                                                        adHocMatch[0]?.teamNumber
-                                                            ? { value: adHocMatch[0]?.teamNumber, label: adHocMatch[0]?.teamNumber }
-                                                            : ""
-                                                    }
-                                                    onChange={(e) => { adHocStation(["Red1", e]); }}
-                                                />
-                                            </div>
-                                        </Col>
-                                        <Col className="blueAlliance">
-                                            <div style={{ backgroundColor: "#98B4F4" }}>
-                                                <b>Blue 3</b>{" "}
-                                                <Select
-                                                    classNamePrefix="gatool-rs"
-                                                    options={eventTeams}
-                                                    tabIndex={1}
-                                                    value={
-                                                        adHocMatch[5]?.teamNumber
-                                                            ? { value: adHocMatch[5]?.teamNumber, label: adHocMatch[5]?.teamNumber }
-                                                            : ""
-                                                    }
-                                                    onChange={(e) => { adHocStation(["Blue3", e]); }}
-                                                />
-                                            </div>
-                                        </Col>
-                                    </Row>
-                                </Table>
-                            )}
-                        </Container>
-                    </Modal.Body>
-                </Modal>
+                {/* ── Ad-hoc (Change Teams) modal ── */}
+                <AdHocMatchModal
+                    show={showAdHoc}
+                    onHide={handleCloseAdHoc}
+                    adHocMatch={adHocMatch}
+                    onStationChange={setAdHocMatch}
+                    eventTeams={eventTeams}
+                />
             </Row>
         </>
     );
