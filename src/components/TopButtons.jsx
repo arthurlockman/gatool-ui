@@ -538,37 +538,55 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
 
     const blueColumnFirst = !swapScreen;
 
-    const reorderRedColumn = (
-        <Col md={6} key="col-red">
-            <SortableContext items={redIds} strategy={verticalListSortingStrategy}>
-                {redItems.map((t) => (
-                    <SortableTeamRow
-                        key={t._sortKey}
-                        id={t._sortKey}
-                        station={t?.station}
-                        teamNumber={t?.teamNumber}
-                        orderHint={t.station ? `${t.station}` : "Bench / not on field"}
-                    />
-                ))}
-            </SortableContext>
-        </Col>
-    );
+    const reorderRedColumn = (() => {
+        let fieldIdx = 0;
+        return (
+            <Col md={6} key="col-red">
+                <SortableContext items={redIds} strategy={verticalListSortingStrategy}>
+                    {redItems.map((t) => {
+                        const isField = isRedFieldStation(t.station);
+                        const fi = isField ? fieldIdx++ : -1;
+                        const finalStation = isField ? (visualRedOrderRef.current[fi] ?? t.station) : t.station;
+                        const label = isField ? finalStation : "Bench / not on field";
+                        return (
+                            <SortableTeamRow
+                                key={t._sortKey}
+                                id={t._sortKey}
+                                station={finalStation}
+                                teamNumber={t?.teamNumber}
+                                orderHint={label}
+                            />
+                        );
+                    })}
+                </SortableContext>
+            </Col>
+        );
+    })();
 
-    const reorderBlueColumn = (
-        <Col md={6} key="col-blue"> 
-            <SortableContext items={blueIds} strategy={verticalListSortingStrategy}>
-                {blueItems.map((t) => (
-                    <SortableTeamRow
-                        key={t._sortKey}
-                        id={t._sortKey}
-                        station={t?.station}
-                        teamNumber={t?.teamNumber}
-                        orderHint={t.station ? `${t.station}` : "Bench / not on field"}
-                    />
-                ))}
-            </SortableContext>
-        </Col>
-    );
+    const reorderBlueColumn = (() => {
+        let fieldIdx = 0;
+        return (
+            <Col md={6} key="col-blue">
+                <SortableContext items={blueIds} strategy={verticalListSortingStrategy}>
+                    {blueItems.map((t) => {
+                        const isField = isBlueFieldStation(t.station);
+                        const fi = isField ? fieldIdx++ : -1;
+                        const finalStation = isField ? (visualBlueOrderRef.current[fi] ?? t.station) : t.station;
+                        const label = isField ? finalStation : "Bench / not on field";
+                        return (
+                            <SortableTeamRow
+                                key={t._sortKey}
+                                id={t._sortKey}
+                                station={finalStation}
+                                teamNumber={t?.teamNumber}
+                                orderHint={label}
+                            />
+                        );
+                    })}
+                </SortableContext>
+            </Col>
+        );
+    })();
 
     // ── open / close handlers ────────────────────────────────────────────────
     const handleShow = () => {
