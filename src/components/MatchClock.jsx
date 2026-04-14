@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import moment from 'moment/moment';
 import { Col } from 'react-bootstrap';
 import { useInterval } from 'react-interval-hook';
+import { useSettings } from "../contexts/SettingsContext";
 
-const MatchClock = ({ matchDetails, timeFormat }) => {
+const MatchClock = ({ matchDetails }) => {
+    const { timeFormat } = useSettings();
     const [currentTime, setCurrentTime] = useState(moment());
 
     const { start, stop } = useInterval(

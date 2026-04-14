@@ -26,6 +26,7 @@ import {
   getPlayoffScheduleRowStyles,
   playoffMatchHasDisplayableResult,
 } from "../utils/frcPlayoffSchedule";
+import { useSettings } from "../contexts/SettingsContext";
 
 function SchedulePage({
   selectedEvent,
@@ -53,11 +54,10 @@ function SchedulePage({
   eventLabel,
   setEventLabel,
   allianceCount,
-  hidePracticeSchedule,
   ftcMode,
   remapNumberToString,
-  useScrollMemory,
 }) {
+  const { hidePracticeSchedule, useScrollMemory } = useSettings();
   const [showAdjustAlliances, setShowAdjustAlliances] = useState(false);
   const [showScores, setShowScores] = useState(false);
   const [scoresMatch, setScoresMatch] = useState(null);

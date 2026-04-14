@@ -1,5 +1,6 @@
 
 import _ from "lodash";
+import { useSettings } from "../contexts/SettingsContext";
 
 const announceBackground = { "red": "#F7B3B4", "blue": "#98B4F4" }
 
@@ -7,26 +8,16 @@ function Announce({
   station,
   team,
   inPlayoffs,
-  awardsMenu,
   selectedYear,
   selectedEvent,
-  showNotesAnnounce,
-  showAwards,
-  showMinorAwards,
-  showSponsors,
-  autoHideSponsors,
-  showMottoes,
-  showChampsStats,
   eventNamesCY,
-  showDistrictChampsStats,
-  showChampsStatsAtDistrictRegional,
   playoffOnly,
   ftcMode,
-  showBlueBanners,
   remapNumberToString,
   /** Fourth column: rank (quals) | matchup summary with rowspan (playoffs) | omit when rowspan continues */
   column4,
 }) {
+    const { awardsMenu, showNotesAnnounce, showAwards, showMinorAwards, showSponsors, autoHideSponsors, showMottoes, showChampsStats, showDistrictChampsStats, showChampsStatsAtDistrictRegional, showBlueBanners } = useSettings();
     const originalAndSustaining = ["20", "45", "126", "148", "151", "157", "190", "191", "250"];
     var allianceColor = station.slice(0, -1);
     var awardsYears = team?.awards ? Object.keys(team.awards) : []

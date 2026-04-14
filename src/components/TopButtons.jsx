@@ -10,6 +10,7 @@ import {
     compactReserveEditsForEvent,
     matchHasPostedResult,
 } from "../utils/playoffReserveEdits";
+import { useSettings } from "../contexts/SettingsContext";
 import {
     DndContext,
     closestCenter,
@@ -371,7 +372,8 @@ function SortableTeamRow({ id, teamNumber, orderHint, station }) {
 
 // ─── TopButtons ───────────────────────────────────────────────────────────────
 
-function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatchFromMenu, selectedEvent, matchDetails, rawMatchDetailsForReserve, timeFormat, alliances, setAlliances, rankings, inPlayoffs, backupTeam, setBackupTeam, upsertPlayoffReserveOverlay, removePlayoffReserveOverlay, playoffReserveEdits, playoffStationOrderEdits, upsertPlayoffStationOrderOverlay, removePlayoffStationOrderOverlay, teamList, adHocMatch, setAdHocMatch, adHocMode, swapScreen, playoffOnly, eventLabel, ftcMode, remapNumberToString, remapStringToNumber }) {
+function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatchFromMenu, selectedEvent, matchDetails, rawMatchDetailsForReserve, alliances, setAlliances, rankings, inPlayoffs, backupTeam, setBackupTeam, upsertPlayoffReserveOverlay, removePlayoffReserveOverlay, playoffReserveEdits, playoffStationOrderEdits, upsertPlayoffStationOrderOverlay, removePlayoffStationOrderOverlay, teamList, adHocMatch, setAdHocMatch, adHocMode, playoffOnly, eventLabel, ftcMode, remapNumberToString, remapStringToNumber }) {
+    const { swapScreen } = useSettings();
 
     // ── shared modal state ────────────────────────────────────────────────────
     const [showTeamOpsModal, setShowTeamOpsModal] = useState(false);
@@ -982,7 +984,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
                         </Button>
                     )}
                 </Col>
-                {!adHocMode && <MatchClock matchDetails={matchDetails} timeFormat={timeFormat} />}
+                {!adHocMode && <MatchClock matchDetails={matchDetails} />}
                 <Col
                     xs={topBarCenterColXs}
                     lg={!ftcMode && (inPlayoffs || inPractice) ? (showTopBarTeamOpsCol ? "3" : "4") : "4"}

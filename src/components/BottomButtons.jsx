@@ -3,6 +3,7 @@ import FoulButtons from "./FoulButtons";
 import HighScoresSummary from "./HighScoresSummary";
 import { CaretLeftFill, CaretRightFill } from "react-bootstrap-icons";
 import PlayoffDetails from "../components/PlayoffDetails";
+import { useSettings } from "../contexts/SettingsContext";
 
 
 function BottomButtons({
@@ -16,9 +17,7 @@ function BottomButtons({
   selectedEvent,
   adHocMode,
   playoffCountOverride,
-  highScoreMode,
   ftcMode,
-  showWorldAndStatsOnAnnouncePlayByPlay,
   worldStats,
   ftcRegionHighScores,
   ftcLeagueHighScores,
@@ -28,6 +27,7 @@ function BottomButtons({
   districts,
   ftcLeagues,
 }) {
+  const { showWorldAndStatsOnAnnouncePlayByPlay, highScoreMode } = useSettings();
     var matches = playoffSchedule?.schedule;
     var eventHighScore = eventHighScores?.highscores?.overallqual;
     if (!highScoreMode) {

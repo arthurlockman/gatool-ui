@@ -22,6 +22,7 @@ import moment from "moment";
 import { useState, useEffect, useRef } from "react";
 import { rankHighlight } from "../components/HelperFunctions";
 import useScrollPosition from "../hooks/useScrollPosition";
+import { useSettings } from "../contexts/SettingsContext";
 
 function RanksPage({
   selectedEvent,
@@ -47,8 +48,8 @@ function RanksPage({
   ftcMode,
   remapNumberToString,
   remapStringToNumber,
-  useScrollMemory,
 }) {
+  const { useScrollMemory } = useSettings();
   // Remember scroll position for Ranks page
   useScrollPosition('ranks', true, false, useScrollMemory);
 

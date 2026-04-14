@@ -20,6 +20,7 @@ import {
 import { getAllianceLookupEntry } from "../utils/allianceLookup";
 import { matchHasPostedResult } from "../utils/playoffReserveEdits";
 import { applyPlayoffStationOrderToMatch } from "../utils/playoffStationOrderEdits";
+import { useSettings } from "../contexts/SettingsContext";
 
 function AnnouncePage({
   selectedEvent,
@@ -39,14 +40,6 @@ function AnnouncePage({
   allianceCount,
   alliances,
   setAlliances,
-  awardsMenu,
-  showNotesAnnounce,
-  showAwards,
-  showMinorAwards,
-  showSponsors,
-  showMottoes,
-  showChampsStats,
-  timeFormat,
   eventHighScores,
   backupTeam,
   setBackupTeam,
@@ -64,36 +57,24 @@ function AnnouncePage({
   districtRankings,
   regionalEventDetail,
   getRegionalEventDetail,
-  showDistrictChampsStats,
-  showChampsStatsAtDistrictRegional,
-  showBlueBanners,
   adHocMatch,
   setAdHocMatch,
   adHocMode,
   offlinePlayoffSchedule,
-  swapScreen,
-  autoHideSponsors,
-  hidePracticeSchedule,
-  teamReduction,
   qualsLength,
   playoffOnly,
   getSchedule,
-  usePullDownToUpdate,
-  useSwipe,
   eventLabel,
   playoffCountOverride,
-  showInspection,
-  showWorldAndStatsOnAnnouncePlayByPlay,
-  highScoreMode,
   eventMessage,
   eventBell,
   setEventBell,
   ftcMode,
   remapNumberToString,
   remapStringToNumber,
-  useScrollMemory,
   alliancePartnerConnectionsCache,
 }) {
+  const { hidePracticeSchedule, teamReduction, showInspection, usePullDownToUpdate, useSwipe, useScrollMemory } = useSettings();
   // Remember scroll position for Announce page
   useScrollPosition('announce', true, false, useScrollMemory);
   const scrollToTop = useScrollToTop();
@@ -619,7 +600,6 @@ function AnnouncePage({
               setMatchFromMenu={setMatchFromMenu}
               selectedEvent={selectedEvent}
               matchDetails={matchDetails}
-              timeFormat={timeFormat}
               inPlayoffs={inPlayoffs}
               alliances={alliances}
               setAlliances={setAlliances}
@@ -636,7 +616,6 @@ function AnnouncePage({
               adHocMatch={adHocMatch}
               setAdHocMatch={setAdHocMatch}
               adHocMode={adHocMode}
-              swapScreen={swapScreen}
               playoffOnly={playoffOnly}
               eventLabel={eventLabel}
               ftcMode={ftcMode}
@@ -736,20 +715,9 @@ function AnnouncePage({
                           team={teamDetails[station]}
                           inPlayoffs={inPlayoffs}
                           key={`${station}${index}`}
-                          awardsMenu={awardsMenu}
                           selectedYear={selectedYear}
                           selectedEvent={selectedEvent}
-                          showNotesAnnounce={showNotesAnnounce}
-                          autoHideSponsors={autoHideSponsors}
-                          showAwards={showAwards}
-                          showMinorAwards={showMinorAwards}
-                          showSponsors={showSponsors}
-                          showMottoes={showMottoes}
-                          showChampsStats={showChampsStats}
-                          showChampsStatsAtDistrictRegional={showChampsStatsAtDistrictRegional}
-                          showBlueBanners={showBlueBanners}
                           eventNamesCY={eventNamesCY}
-                          showDistrictChampsStats={showDistrictChampsStats}
                           playoffOnly={playoffOnly}
                           ftcMode={ftcMode}
                           remapNumberToString={remapNumberToString}
@@ -802,8 +770,6 @@ function AnnouncePage({
               selectedEvent={selectedEvent}
               adHocMode={adHocMode}
               playoffCountOverride={playoffCountOverride}
-              showWorldAndStatsOnAnnouncePlayByPlay={showWorldAndStatsOnAnnouncePlayByPlay}
-              highScoreMode={highScoreMode}
               ftcMode={ftcMode}
               worldStats={worldStats}
               ftcRegionHighScores={ftcRegionHighScores}

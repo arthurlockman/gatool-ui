@@ -111,6 +111,10 @@ export function SettingsProvider({ children }) {
     "setting:useScrollMemory",
     true
   );
+  const [useFourTeamAlliances, setUseFourTeamAlliances] = usePersistentState(
+    "setting:useFourTeamAlliances",
+    null
+  );
 
   const value = useMemo(() => ({
     timeFormat, setTimeFormat,
@@ -141,6 +145,7 @@ export function SettingsProvider({ children }) {
     useSwipe, setUseSwipe,
     usePullDownToUpdate, setUsePullDownToUpdate,
     useScrollMemory, setUseScrollMemory,
+    useFourTeamAlliances, setUseFourTeamAlliances,
   }), [
     timeFormat, showSponsors, autoHideSponsors, showAwards, showMinorAwards,
     showNotes, showNotesAnnounce, showMottoes, showChampsStats,
@@ -149,6 +154,7 @@ export function SettingsProvider({ children }) {
     showWorldAndStatsOnAnnouncePlayByPlay, swapScreen, autoAdvance,
     highScoreMode, autoUpdate, awardsMenu, showQualsStats, showQualsStatsQuals,
     teamReduction, reverseEmcee, useSwipe, usePullDownToUpdate, useScrollMemory,
+    useFourTeamAlliances,
     // Setters are stable (from useState) — no need to include them, but including for safety
     setTimeFormat, setShowSponsors, setAutoHideSponsors, setShowAwards, setShowMinorAwards,
     setShowNotes, setShowNotesAnnounce, setShowMottoes, setShowChampsStats,
@@ -157,6 +163,7 @@ export function SettingsProvider({ children }) {
     setShowWorldAndStatsOnAnnouncePlayByPlay, setSwapScreen, setAutoAdvance,
     setHighScoreMode, setAutoUpdate, setAwardsMenu, setShowQualsStats, setShowQualsStatsQuals,
     setTeamReduction, setReverseEmcee, setUseSwipe, setUsePullDownToUpdate, setUseScrollMemory,
+    setUseFourTeamAlliances,
   ]);
 
   return (

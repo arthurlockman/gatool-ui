@@ -7,6 +7,7 @@ import useWindowDimensions from "hooks/UseWindowDimensions";
 import EmceeClock from "components/EmceeClock";
 import moment from "moment";
 import { matchClassesBase } from "data/matchClasses";
+import { useSettings } from "../contexts/SettingsContext";
 
 function EmceePage({
   selectedEvent,
@@ -18,17 +19,13 @@ function EmceePage({
   currentMatch,
   nextMatch,
   previousMatch,
-  reverseEmcee,
-  timeFormat,
-  hidePracticeSchedule,
   getSchedule,
-  usePullDownToUpdate,
-  useSwipe,
   eventLabel,
   playoffCountOverride,
   ftcMode,
   remapNumberToString,
 }) {
+  const { reverseEmcee, hidePracticeSchedule, usePullDownToUpdate, useSwipe } = useSettings();
   const { height, width } = useWindowDimensions();
 
   const lookupAllianceEntryWithData = (teamNumber, alliancesData) => {
@@ -776,7 +773,7 @@ function EmceePage({
           {...swipeHandlers}
           style={{ textAlign: "center", padding: "7px" }}
         >
-          <EmceeClock matchDetails={matchDetails} timeFormat={timeFormat} />
+          <EmceeClock matchDetails={matchDetails} />
           <div className={`davidPriceQuals`}>
             {schedule[currentMatch - 1]?.matchNumber}
           </div>
@@ -785,7 +782,7 @@ function EmceePage({
       {selectedEvent && schedule?.length > 0 && inPlayoffs && (
         <>
           <Container fluid {...swipeHandlers}>
-            <EmceeClock matchDetails={matchDetails} timeFormat={timeFormat} />
+            <EmceeClock matchDetails={matchDetails} />
             <Row>
               <Col
                 className={`davidPriceDetail${smallScreen}${portrait}`}

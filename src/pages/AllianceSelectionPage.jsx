@@ -12,11 +12,13 @@ import { useHotkeysContext, useHotkeys } from "react-hotkeys-hook";
 import _ from "lodash";
 import useScrollPosition from "../hooks/useScrollPosition";
 import { playoffMatchHasDisplayableResult } from "../utils/frcPlayoffSchedule";
+import { useSettings } from "../contexts/SettingsContext";
 
 import './AllianceSelectionPage.css';
 
 
-function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, playoffSchedule, offlinePlayoffSchedule, alliances, rankings, timeFormat, getRanks, allianceSelection, playoffs, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays, rankingsOverride, loadEvent, practiceSchedule, setOfflinePlayoffSchedule, currentMatch, qualsLength, nextMatch, previousMatch, getSchedule, useSwipe, usePullDownToUpdate, eventLabel, playoffCountOverride, ftcMode, remapNumberToString, useFourTeamAlliances, useScrollMemory }) {
+function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, playoffSchedule, offlinePlayoffSchedule, alliances, rankings, getRanks, allianceSelection, playoffs, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays, rankingsOverride, loadEvent, practiceSchedule, setOfflinePlayoffSchedule, currentMatch, qualsLength, nextMatch, previousMatch, getSchedule, eventLabel, playoffCountOverride, ftcMode, remapNumberToString }) {
+    const { timeFormat, useSwipe, usePullDownToUpdate, useFourTeamAlliances, useScrollMemory } = useSettings();
     /**
      * This function finds a team by their station assignment
      * @param teams the array of team objects

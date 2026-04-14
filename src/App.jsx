@@ -24,7 +24,7 @@ import { roundThreeOrReserveRoleLabel } from "./utils/allianceRoleLabels";
 import { UseAuthClient } from "./contextProviders/AuthClientContext";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Blocks } from "react-loader-spinner";
-import { Button, Container } from "react-bootstrap";
+import { Container } from "react-bootstrap";
 import { usePersistentState } from "./hooks/UsePersistentState";
 import { useDarkMode } from "./hooks/useDarkMode";
 import { useSettings } from "./contexts/SettingsContext";
@@ -58,8 +58,7 @@ import { useInterval } from "react-interval-hook";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useHotkeys } from "react-hotkeys-hook";
-import { useServiceWorker } from "contextProviders/ServiceWorkerContext";
-import { useSnackbar } from "notistack";
+import { useNotifications } from "hooks/useNotifications";
 
 export const TabStates = {
   NotReady: "notready",
@@ -322,9 +321,9 @@ function App() {
     showQualsStatsQuals, setShowQualsStatsQuals,
     teamReduction, setTeamReduction,
     reverseEmcee, setReverseEmcee,
-    useSwipe,
     usePullDownToUpdate, setUsePullDownToUpdate,
     useScrollMemory, setUseScrollMemory,
+    useFourTeamAlliances, setUseFourTeamAlliances,
   } = useSettings();
   const [worldStats, setWorldStats] = usePersistentState("cache:stats", null);
   const [eventHighScores, setEventHighScores] = usePersistentState(
@@ -497,10 +496,6 @@ function App() {
     setPlayoffStationOrderEdits(next);
   }
 
-  const [showReloaded, setShowReloaded] = usePersistentState(
-    "cache:showReloaded",
-    false
-  );
   const [qualsLength, setQualsLength] = useState(-1);
   const [currentMatch, setCurrentMatch] = useState(null);
   const [syncEvent, setSyncEvent] = usePersistentState(
@@ -565,23 +560,6 @@ function App() {
   const [loadingCommunityUpdates, setLoadingCommunityUpdates] = useState(false);
   const [haveChampsTeams, setHaveChampsTeams] = useState(false);
   const [EITeams, setEITeams] = useState([]);
-  const [systemMessage, setSystemMessage] = usePersistentState(
-    "setting:systemMessage",
-    null
-  );
-  const [systemBell, setSystemBell] = usePersistentState(
-    "setting:systemBell",
-    ""
-  );
-  const [eventMessage, setEventMessage] = usePersistentState(
-    "setting:eventMessage",
-    []
-  );
-  const [eventBell, setEventBell] = usePersistentState("setting:eventBell", []);
-
-  // Handle update notifications from the service worker
-  const { waitingWorker, showReload, reloadPage } = useServiceWorker();
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
   // event name lookups
   const eventnames = ftcMode
@@ -598,10 +576,6 @@ function App() {
     null
   );
   const [cheesyTeamList, setCheesyTeamList] = useState([]);
-  const [useFourTeamAlliances, setUseFourTeamAlliances] = usePersistentState(
-    "setting:useFourTeamAlliances",
-    null
-  );
 
   // FTC Offline status
   const [FTCOfflineAvailable, setFTCOfflineAvailable] = useState(false);
@@ -618,6 +592,29 @@ function App() {
     "setting:manualOfflineMode",
     false
   );
+
+  // Notification system (state, API, service worker effects)
+  const {
+    systemMessage,
+    setSystemMessage,
+    systemBell,
+    setSystemBell,
+    eventMessage,
+    setEventMessage,
+    eventBell,
+    setEventBell,
+    putNotifications,
+    putEventNotifications,
+    getNotifications,
+    getSystemMessages,
+    getEventMessages,
+    reloadPage,
+  } = useNotifications({
+    httpClient,
+    selectedEvent,
+    useFTCOffline,
+    manualOfflineMode,
+  });
 
   /**
    * Function to get the Cheesy Arena status by connecting to the Cheesy Arena API
@@ -754,66 +751,6 @@ function App() {
     return () => ac.abort();
     // allianceConnectionsPrefetchSignature encodes alliances.alliances rosters
   }, [allianceConnectionsPrefetchSignature, ftcMode]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Display an alert when there are updates to the app. This allows the user to update the cached code.
-  useEffect(() => {
-    const reload = () => {
-      setShowReloaded(true);
-      reloadPage();
-    };
-
-    if (showReload && waitingWorker) {
-      enqueueSnackbar("A new version was released.", {
-        persist: true,
-        variant: "success",
-        action: (
-          <>
-            <Button
-              className="snackbar-button"
-              color="primary"
-              onClick={reload}
-            >
-              Reload and Update
-            </Button>
-          </>
-        ),
-      });
-    }
-  }, [waitingWorker, showReload, setShowReloaded, reloadPage, enqueueSnackbar]);
-
-  // Display an alert when updates have been made to the app. The user can clear the message.
-  useEffect(() => {
-    const closeSnackBar = () => {
-      setShowReloaded(false);
-      closeSnackbar();
-    };
-
-    if (showReloaded) {
-      enqueueSnackbar(
-        <div>
-          A new version was released. Here's what changed on{" "}
-          {appUpdates[0].date}:<br />
-          {appUpdates[0].message}
-        </div>,
-        {
-          persist: false,
-          autoHideDuration: 7500,
-          variant: "success",
-          action: (
-            <>
-              <Button
-                className="snackbar-button"
-                color="primary"
-                onClick={closeSnackBar}
-              >
-                Return to Announcing
-              </Button>
-            </>
-          ),
-        }
-      );
-    }
-  }, [showReloaded, setShowReloaded, enqueueSnackbar, closeSnackbar]);
 
   /**
    * Trim all values in an array
@@ -4978,68 +4915,6 @@ function App() {
   }
 
   /**
-   * This function writes updated system alerts data back to gatool Cloud.
-   * @async
-   * @function putNotifications
-   * @param {object} data the data to be put to gatool Cloud
-   * @returns {Promise<object>} result
-   */
-  async function putNotifications(data) {
-    var result = await httpClient.put(`system/announcements`, data);
-    return result;
-  }
-
-  /**
-   * This function writes updated event alerts data back to gatool Cloud.
-   * @async
-   * @function putEventNotifications
-   * @param {object} data the data to be put to gatool Cloud
-   * @returns {Promise<object>} result
-   */
-  async function putEventNotifications(data) {
-    var result = await httpClient.put(
-      `system/announcements/${selectedEvent?.value?.code}`,
-      data
-    );
-    return result;
-  }
-
-  /**
-   * This function forces a user sync with mailchimp. This will take a long time.
-   * @returns {Promise<{ok}|void|undefined>}
-   */
-  /**
-   * This function fetches systemwide notifications from gatool Cloud.
-   * @async
-   * @function getNotifications
-   * @returns {Promise<object>} system notifications posted by system admins
-   */
-  async function getNotifications() {
-    var result = await httpClient.getNoAuth(`announcements`);
-    // @ts-ignore
-    if (result.status === 200) {
-      try {
-        // @ts-ignore
-        var notifications = await result.json();
-        return notifications != null ? notifications : { message: "", onTime: "", offTime: "", onDate: "", offDate: "", variant: "", link: "" };
-      } catch (e) {
-        return { message: "", onTime: "", offTime: "", onDate: "", offDate: "", variant: "", link: "" };
-      }
-    } else if (result.status === 204) {
-      return { message: "", onTime: "", offTime: "", onDate: "", offDate: "", variant: "", link: "" };
-    } else {
-      return {
-        message: `**Error** ${result?.statusText || "unknown"}`,
-        onTime: null,
-        offTime: null,
-        onDate: null,
-        offDate: null,
-        variant: "danger",
-      };
-    }
-  }
-
-  /**
    * This function fetches the logged-in user's preferences from gatool Cloud.
    * @async
    * @function getUserPrefs
@@ -5139,138 +5014,12 @@ function App() {
     }
   }
 
-  /**
-   * This function fetches event specific notifications from gatool Cloud.
-   * @async
-   * @function getEventNotifications
-   * @returns {Promise<object>} The team's update history array
-   */
-  async function getEventNotifications() {
-    if (!selectedEvent?.value?.code) {
-      return [];
-    }
-    var result = await httpClient.getNoAuth(
-      `announcements/${selectedEvent?.value?.code}`
-    );
-
-    if (result.status === 200) {
-      try {
-        // @ts-ignore
-        var notifications = await result.json();
-        // API may return array or wrapped object (e.g. { announcements: [...] })
-        if (Array.isArray(notifications)) {
-          return notifications;
-        }
-        if (notifications && Array.isArray(notifications.announcements)) {
-          return notifications.announcements;
-        }
-        if (notifications && typeof notifications === 'object') {
-          return [notifications];
-        }
-        return [];
-      } catch (e) {
-        // If JSON parsing fails (e.g., empty body), return empty array
-        return [];
-      }
-    } else if (result.status === 204) {
-      // No Content status, return empty array
-      return [];
-    } else if (result.status === 404) {
-      return [
-        {
-          message: `**Error** ${result?.statusText || "not found"}`,
-          onTime: null,
-          offTime: null,
-          onDate: null,
-          offDate: null,
-          variant: "danger",
-          user: null,
-        },
-      ];
-    } else if (result.status === 408) {
-      // Request timeout - return empty so we don't show an error banner; leave event list unchanged
-      return [];
-    } else {
-      return [
-        {
-          message: `**Error** ${result?.statusText || "unknown"}`,
-          onTime: null,
-          offTime: null,
-          onDate: null,
-          offDate: null,
-          variant: "danger",
-          user: null,
-        },
-      ];
-    }
-  }
-
   const getSyncStatus = async () => {
     const result = await httpClient.get(`system/syncusers`);
     if (result.status === 200) {
       const syncResult = await result.json();
       return syncResult;
     }
-  };
-
-  const getSystemMessages = async () => {
-    // Skip external API calls when in FTC offline mode without internet
-    if (useFTCOffline && (!isOnline || manualOfflineMode)) {
-      console.log("FTC Offline mode: Skipping System Messages API call while offline" + (manualOfflineMode ? " (manual override)" : ""));
-      return;
-    }
-
-    var message = await getNotifications();
-    if (message?.message.includes("**Error**")) {
-      console.log(message?.message);
-    } else {
-      var formattedMessage = {
-        message: message?.message,
-        expiry: moment(`${message?.offDate} ${message?.offTime}`),
-        onTime: moment(`${message?.onDate} ${message?.onTime}`),
-        variant: message?.variant || "",
-        link: message?.link || "",
-      };
-      if (JSON.stringify(formattedMessage) !== JSON.stringify(systemMessage)) {
-        setSystemBell("");
-        setSystemMessage(formattedMessage);
-      }
-    }
-  };
-
-  const getEventMessages = async () => {
-    // Skip external API calls when in FTC offline mode without internet
-    if (useFTCOffline && (!isOnline || manualOfflineMode)) {
-      console.log("FTC Offline mode: Skipping Event Messages API call while offline" + (manualOfflineMode ? " (manual override)" : ""));
-      return;
-    }
-
-    var message = await getEventNotifications();
-    const list = Array.isArray(message) ? message : [];
-    const isErrorResponse = list.length > 0 && list[0]?.message?.includes?.("**Error**");
-    if (isErrorResponse) {
-      console.log(`No Event Messages found for ${selectedEvent?.label}`);
-      setEventMessage([]);
-      return;
-    }
-
-    var formattedMessage = list.map((item) => {
-      const onM = item?.onDate != null && item?.onTime != null
-        ? moment(`${item.onDate} ${item.onTime}`)
-        : moment();
-      const offM = item?.offDate != null && item?.offTime != null
-        ? moment(`${item.offDate} ${item.offTime}`)
-        : moment().add(1, "days");
-      return {
-        message: item?.message ?? "",
-        expiry: offM,
-        onTime: onM,
-        variant: item?.variant || "primary",
-        user: item?.user ?? null,
-        link: item?.link ?? "",
-      };
-    });
-    setEventMessage(formattedMessage);
   };
 
   /**
@@ -7241,10 +6990,8 @@ function App() {
                     setEventLabel={setEventLabel}
                     allianceCount={allianceCount}
                     setPlayoffCountOverride={setPlayoffCountOverride}
-                    hidePracticeSchedule={hidePracticeSchedule}
                     ftcMode={ftcMode}
                     remapNumberToString={remapNumberToString}
-                    useScrollMemory={useScrollMemory}
                   />
                 }
               />
@@ -7270,17 +7017,14 @@ function App() {
                     qualSchedule={qualSchedule}
                     playoffSchedule={playoffSchedule}
                     originalAndSustaining={originalAndSustaining}
-                    monthsWarning={monthsWarning}
                     user={user}
                     isAuthenticated={isAuthenticated}
                     getTeamHistory={getTeamHistory}
-                    timeFormat={timeFormat}
                     getCommunityUpdates={getCommunityUpdates}
                     getTeamList={getTeamList}
                     eventLabel={eventLabel}
                     ftcMode={ftcMode}
                     remapNumberToString={remapNumberToString}
-                    useScrollMemory={useScrollMemory}
                   />
                 }
               />
@@ -7312,7 +7056,6 @@ function App() {
                     ftcMode={ftcMode}
                     remapNumberToString={remapNumberToString}
                     remapStringToNumber={remapStringToNumber}
-                    useScrollMemory={useScrollMemory}
                   />
                 }
               />
@@ -7320,7 +7063,7 @@ function App() {
               <Route
                 path="/announce"
                 element={
-                  <AnnouncePage
+                    <AnnouncePage
                     selectedEvent={selectedEvent}
                     selectedYear={selectedYear}
                     worldStats={worldStats}
@@ -7337,14 +7080,6 @@ function App() {
                     playoffSchedule={playoffSchedule}
                     alliances={alliances}
                     setAlliances={setAlliances}
-                    awardsMenu={awardsMenu}
-                    showNotesAnnounce={showNotesAnnounce}
-                    showAwards={showAwards}
-                    showMinorAwards={showMinorAwards}
-                    showSponsors={showSponsors}
-                    showMottoes={showMottoes}
-                    showChampsStats={showChampsStats}
-                    timeFormat={timeFormat}
                     eventHighScores={eventHighScores}
                     backupTeam={backupTeam}
                     setBackupTeam={setBackupTeam}
@@ -7357,34 +7092,21 @@ function App() {
                     districtRankings={districtRankings}
                     regionalEventDetail={regionalEventDetail}
                     getRegionalEventDetail={getRegionalEventDetail}
-                    showDistrictChampsStats={showDistrictChampsStats}
-                    showChampsStatsAtDistrictRegional={showChampsStatsAtDistrictRegional}
-                    showBlueBanners={showBlueBanners}
                     adHocMatch={adHocMatch}
                     setAdHocMatch={setAdHocMatch}
                     adHocMode={adHocMode}
                     offlinePlayoffSchedule={offlinePlayoffSchedule}
-                    swapScreen={swapScreen}
-                    autoHideSponsors={autoHideSponsors}
-                    hidePracticeSchedule={hidePracticeSchedule}
-                    teamReduction={teamReduction}
                     qualsLength={qualsLength}
                     playoffOnly={playoffOnly}
                     getSchedule={getSchedule}
-                    usePullDownToUpdate={usePullDownToUpdate}
-                    useSwipe={useSwipe}
                     eventLabel={eventLabel}
                     playoffCountOverride={playoffCountOverride}
-                    showInspection={showInspection}
-                    showWorldAndStatsOnAnnouncePlayByPlay={showWorldAndStatsOnAnnouncePlayByPlay}
-                    highScoreMode={highScoreMode}
                     eventMessage={eventMessage}
                     eventBell={eventBell}
                     setEventBell={setEventBell}
                     ftcMode={ftcMode}
                     remapNumberToString={remapNumberToString}
                     remapStringToNumber={remapStringToNumber}
-                    useScrollMemory={useScrollMemory}
                     alliancePartnerConnectionsCache={
                       alliancePartnerConnectionsCache
                     }
@@ -7419,12 +7141,6 @@ function App() {
                     playoffSchedule={playoffSchedule}
                     alliances={alliances}
                     setAlliances={setAlliances}
-                    showMottoes={showMottoes}
-                    showNotes={showNotes}
-                    showQualsStats={showQualsStats}
-                    showQualsStatsQuals={showQualsStatsQuals}
-                    swapScreen={swapScreen}
-                    timeFormat={timeFormat}
                     eventHighScores={eventHighScores}
                     backupTeam={backupTeam}
                     setBackupTeam={setBackupTeam}
@@ -7440,18 +7156,11 @@ function App() {
                     setAdHocMatch={setAdHocMatch}
                     adHocMode={adHocMode}
                     offlinePlayoffSchedule={offlinePlayoffSchedule}
-                    hidePracticeSchedule={hidePracticeSchedule}
-                    teamReduction={teamReduction}
                     qualsLength={qualsLength}
                     playoffOnly={playoffOnly}
                     getSchedule={getSchedule}
-                    usePullDownToUpdate={usePullDownToUpdate}
-                    useSwipe={useSwipe}
                     eventLabel={eventLabel}
                     playoffCountOverride={playoffCountOverride}
-                    showInspection={showInspection}
-                    showWorldAndStatsOnAnnouncePlayByPlay={showWorldAndStatsOnAnnouncePlayByPlay}
-                    highScoreMode={highScoreMode}
                     EPA={EPA}
                     eventMessage={eventMessage}
                     eventBell={eventBell}
@@ -7459,7 +7168,6 @@ function App() {
                     ftcMode={ftcMode}
                     remapNumberToString={remapNumberToString}
                     remapStringToNumber={remapStringToNumber}
-                    useScrollMemory={useScrollMemory}
                     upsertPlayoffReserveOverlay={upsertPlayoffReserveOverlay}
                     removePlayoffReserveOverlay={removePlayoffReserveOverlay}
                     playoffReserveEdits={playoffReserveEdits}
@@ -7481,7 +7189,6 @@ function App() {
                     offlinePlayoffSchedule={offlinePlayoffSchedule}
                     alliances={alliances}
                     rankings={rankings}
-                    timeFormat={timeFormat}
                     getRanks={getRanks}
                     allianceSelection={allianceSelection}
                     playoffs={playoffs}
@@ -7499,14 +7206,10 @@ function App() {
                     nextMatch={nextMatch}
                     previousMatch={previousMatch}
                     getSchedule={getSchedule}
-                    useSwipe={useSwipe}
-                    usePullDownToUpdate={usePullDownToUpdate}
                     eventLabel={eventLabel}
                     playoffCountOverride={playoffCountOverride}
                     ftcMode={ftcMode}
                     remapNumberToString={remapNumberToString}
-                    useFourTeamAlliances={useFourTeamAlliances}
-                    useScrollMemory={useScrollMemory}
                   />
                 }
               />
@@ -7571,14 +7274,9 @@ function App() {
                     currentMatch={currentMatch}
                     nextMatch={nextMatch}
                     previousMatch={previousMatch}
-                    reverseEmcee={reverseEmcee}
-                    timeFormat={timeFormat}
                     practiceSchedule={practiceSchedule}
                     offlinePlayoffSchedule={offlinePlayoffSchedule}
-                    hidePracticeSchedule={hidePracticeSchedule}
                     getSchedule={getSchedule}
-                    usePullDownToUpdate={usePullDownToUpdate}
-                    useSwipe={useSwipe}
                     eventLabel={eventLabel}
                     playoffCountOverride={playoffCountOverride}
                     ftcMode={ftcMode}
