@@ -706,6 +706,11 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
             clearAllianceLookupRound3(alliancesTemp, alliancesTemp.alliances[idx], removedRound3);
         }
         removePlayoffReserveOverlay?.({ allianceNumber });
+        // Also clear any station-order reordering for this match — the reorder
+        // may have placed the reserve team into a field station, which is now invalid.
+        if (eventCode && matchKey) {
+            removePlayoffStationOrderOverlay?.({ eventCode, matchKey });
+        }
         setAlliances(alliancesTemp);
         setShowTeamOpsModal(false);
         setBackupTeam(null);
