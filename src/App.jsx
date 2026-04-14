@@ -26,25 +26,19 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { Blocks } from "react-loader-spinner";
 import { Button, Container } from "react-bootstrap";
 import { usePersistentState } from "./hooks/UsePersistentState";
+import { useDarkMode } from "./hooks/useDarkMode";
 import _ from "lodash";
 import moment from "moment";
 import Developer from "./pages/Developer";
-import {
-  eventNames,
-  FTCEventNames,
-  specialAwards,
-  hallOfFame,
-  FTCHallOfFame,
-  originalAndSustaining,
-  refreshRate,
-  communityUpdateTemplate,
-  ftcRegions,
-} from "./components/Constants";
-import { appUpdates } from "./components/AppUpdates";
+import { eventNames, FTCEventNames } from "./data/eventNames";
+import { specialAwards, hallOfFame, FTCHallOfFame } from "./data/hallOfFame";
+import { originalAndSustaining, refreshRate, communityUpdateTemplate } from "./data/appConfig";
+import { ftcRegions } from "./data/ftcRegions";
+import { appUpdates } from "./data/appUpdates";
 import { useOnlineStatus } from "./contextProviders/OnlineContext";
 import { toast } from "react-toastify";
 import { trainingData } from "components/TrainingMatches";
-import { timeZones } from "components/TimeZones";
+import { timeZones } from "data/timeZones";
 import { extendFTCPlayoffScheduleWithPartialMatches } from "./utils/ftcPlayoffSchedule";
 import { extendFRCPlayoffScheduleWithPartialMatches } from "./utils/frcPlayoffSchedule";
 import {
@@ -424,18 +418,7 @@ function App() {
     "setting:reverseEmcee",
     null
   );
-  const [darkMode, setDarkMode] = usePersistentState(
-    "setting:darkMode",
-    false
-  );
-  const [useOsTheme, setUseOsTheme] = usePersistentState(
-    "setting:useOsTheme",
-    true
-  );
-  const [systemPrefersDark, setSystemPrefersDark] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return window.matchMedia("(prefers-color-scheme: dark)").matches;
-  });
+  const { darkMode, setDarkMode, useOsTheme, setUseOsTheme, systemPrefersDark, appearanceDark } = useDarkMode();
   const [eventNamesCY, setEventNamesCY] = usePersistentState(
     "cache:eventNamesCY",
     []
@@ -6536,26 +6519,6 @@ function App() {
       stop();
     }
   }, [autoUpdate, backgroundDataRefresh, backgroundDataRefreshFrequency, start, stop]);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    const onChange = () => setSystemPrefersDark(mq.matches);
-    onChange();
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, []);
-
-  const appearanceDark = useMemo(
-    () => (useOsTheme ? systemPrefersDark : !!darkMode),
-    [useOsTheme, systemPrefersDark, darkMode]
-  );
-
-  useEffect(() => {
-    document.documentElement.setAttribute(
-      "data-bs-theme",
-      appearanceDark ? "dark" : "light"
-    );
-  }, [appearanceDark]);
 
   // Track last event code we attempted to sync in Screen Mode
   // This prevents reloading the same event when React state hasn't updated yet
