@@ -6,7 +6,9 @@ export const appUpdates = [
         <li>ALL PROGRAMS:</li>
         <ul>
           <li>Updated winning Alliance detection logic to allow earleir propagation of Alliances during playoffs</li>
+          <li>Users can now sort teams in Playoffs</li>
           <li>Performance improvements when loading event data</li>
+          <li>Other UI tweaks and improvements</li>
         </ul>
         <li>FRC:</li>
         <ul>
