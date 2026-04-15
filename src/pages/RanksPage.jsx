@@ -33,13 +33,9 @@ function RanksPage({
   setRankings,
   allianceSelection,
   setAllianceSelectionArrays,
-  playoffs,
-  regionalEventDetail,
-  getRegionalEventDetail,
-  EPA,
 }) {
-  const { selectedEvent, teamList, rankings, allianceCount, districtRankings, selectedYear, eventLabel, communityUpdates, ftcMode, remapNumberToString, remapStringToNumber } = useEventData();
-  const { getRanks } = useEventActions();
+  const { selectedEvent, teamList, rankings, allianceCount, districtRankings, selectedYear, eventLabel, communityUpdates, ftcMode, remapNumberToString, remapStringToNumber, EPA, regionalEventDetail, playoffs } = useEventData();
+  const { getRanks, getRegionalEventDetail } = useEventActions();
   const { useScrollMemory } = useSettings();
   // Remember scroll position for Ranks page
   useScrollPosition('ranks', true, false, useScrollMemory);

@@ -699,7 +699,7 @@ function App() {
         console.log("Cheesy Arena is available.");
         setCheesyArenaAvailable(true);
         if (loadSchedule) {
-          getTeamList();
+          eventStoreRef.current.getTeamList();
           getSchedule();
         }
         return true;
@@ -816,36 +816,7 @@ function App() {
     // allianceConnectionsPrefetchSignature encodes alliances.alliances rosters
   }, [allianceConnectionsPrefetchSignature, ftcMode]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  /**
-   * Trim all values in an array
-   * @function trimArray
-   * @param arr the array to trim
-   * @return {array} the trimmed array
-   */
-  function trimArray(arr) {
-    if (arr) {
-      for (var i = 0; i <= arr.length - 1; i++) {
-        arr[i] = arr[i].trim();
-      }
-      return arr;
-    }
-    return null;
-  }
-
   //functions to retrieve API data
-
-  /**
-   * Returns whether the event is Champs
-   * @constant inWorldChamps
-   * @return {boolean}
-   * */
-  const inWorldChamps = () => {
-    if (selectedEvent?.value?.champLevel === "CHAMPS") {
-      return true;
-    } else {
-      return false;
-    }
-  };
 
   /**
    * @constant conformCheesyArenaMatch
@@ -1045,31 +1016,6 @@ function App() {
   };
 
   /**
-   * @constant conformFTCOfflineTeam
-   * @param {*} teamDetails team details from FTC Offline server
-   * @returns reformatted team details from FTC Offline server
-   */
-  const conformFTCOfflineTeam = (teamDetails) => {
-    return {
-      teamNumber: teamDetails?.number,
-      displayTeamNumber: `${teamDetails?.number}`,
-      nameFull: teamDetails?.school,
-      nameShort: teamDetails?.name,
-      schoolName: null,
-      city: teamDetails?.city,
-      stateProv: teamDetails?.state,
-      country: teamDetails?.country,
-      website: null,
-      rookieYear: teamDetails?.rookie,
-      robotName: null,
-      districtCode: null,
-      homeCMP: null,
-      homeRegion: null,
-      displayLocation: `${teamDetails?.city}, ${teamDetails?.state}, ${teamDetails?.country}`,
-    };
-  };
-
-  /**
    * Helper function to fetch all TBA offseason events
    * @param {string} year Year
    * @returns Array of TBA events
@@ -1086,30 +1032,6 @@ function App() {
       return [];
     } catch (error) {
       console.error("Error fetching TBA events:", error);
-      return [];
-    }
-  };
-
-  /**
-   * Helper function to fetch TBA teams for an event
-   * @param {string} tbaEventKey TBA event key
-   * @param {string} year Year
-   * @returns Array of TBA teams
-   */
-  const fetchTBATeams = async (tbaEventKey, year) => {
-    try {
-      console.log(`Fetching TBA teams for event: ${tbaEventKey}`);
-      const result = await httpClient.getNoAuth(
-        `${year}/offseason/teams/${tbaEventKey}`
-      );
-      if (result.status === 200) {
-        // @ts-ignore
-        const teams = await result.json();
-        return teams;
-      }
-      return [];
-    } catch (error) {
-      console.error("Error fetching TBA teams:", error);
       return [];
     }
   };
@@ -1135,39 +1057,6 @@ function App() {
     } catch (error) {
       console.error("Error fetching TBA matches:", error);
       return [];
-    }
-  };
-
-  /**
-   * Helper function to fetch team remappings for a TBA event
-   * @param {string} tbaEventKey TBA event key
-   * @param {string} year Year
-   * @returns Object with team remapping data
-   */
-  const fetchTeamRemappings = async (tbaEventKey, year) => {
-    try {
-      const result = await httpClient.getNoAuth(
-        `${year}/offseason/event/${tbaEventKey}`
-      );
-      if (result.status === 200) {
-        // @ts-ignore
-        const eventData = await result.json();
-        const remappedTeams = eventData?.remapTeams ?? null;
-        if (remappedTeams == null || typeof remappedTeams !== "object") {
-          return null;
-        }
-        const keys = Object.keys(remappedTeams);
-        const remappedTeamsObject = { numbers: {}, strings: {} };
-        keys.forEach((key, index) => {
-          remappedTeamsObject.numbers[key.replace("frc", "")] = remappedTeams[key].replace("frc", "");
-          remappedTeamsObject.strings[remappedTeams[key].replace("frc", "")] = key.replace("frc", "");
-        });
-        return remappedTeamsObject;
-      }
-      return null;
-    } catch (error) {
-      console.error("Error fetching team remappings:", error);
-      return null;
     }
   };
 
@@ -1336,7 +1225,7 @@ function App() {
           if (cheesyTeamList.length === 0) {
             const reducedTeamList = _.uniq(teams);
             setCheesyTeamList(reducedTeamList);
-            getTeamList(reducedTeamList);
+            eventStoreRef.current.getTeamList(reducedTeamList);
           }
         }
       } else if (!useFTCOffline) {
@@ -2159,1337 +2048,6 @@ function App() {
     getEventStats(selectedYear?.value, selectedEvent?.value?.code);
   }
 
-  /**
-   * Calculates Blue Banner counts categorized by event level and type
-   * Blue Banners are awarded for:
-   * - Event Winners (award_type === 1)
-   * - Chairman's Award (award_type === 0, name includes "Chairman")
-   * - Impact Award (award_type === 0, name includes "Impact")
-   * 
-   * @param {Object} champsAppearances - Team's championship appearances with events
-   * @param {Array} awards - Team's awards history
-   * @returns {Object} Blue Banner counts by category
-   */
-  function calculateBlueBanners(champsAppearances, awards) {
-    const banners = {
-      blueBanners: 0,
-      blueBannersYears: [],
-
-      // Regional Level
-      regionalWins: 0,
-      regionalWinsYears: [],
-      regionalChairmans: 0,
-      regionalChairmansYears: [],
-      regionalImpact: 0,
-      regionalImpactYears: [],
-      regionalWoodieFlowers: 0,
-      regionalWoodieFlowersYears: [],
-
-      // District Level
-      districtWins: 0,
-      districtWinsYears: [],
-      districtChairmans: 0,
-      districtChairmansYears: [],
-      districtImpact: 0,
-      districtImpactYears: [],
-      districtWoodieFlowers: 0,
-      districtWoodieFlowersYears: [],
-
-      // District Championship Division Level
-      districtDivisionWins: 0,
-      districtDivisionWinsYears: [],
-      districtDivisionChairmans: 0,
-      districtDivisionChairmansYears: [],
-      districtDivisionImpact: 0,
-      districtDivisionImpactYears: [],
-
-      // District Championship Level
-      districtChampionshipWins: 0,
-      districtChampionshipWinsYears: [],
-      districtChampionshipChairmans: 0,
-      districtChampionshipChairmansYears: [],
-      districtChampionshipImpact: 0,
-      districtChampionshipImpactYears: [],
-      districtChampionshipWoodieFlowers: 0,
-      districtChampionshipWoodieFlowersYears: [],
-
-      // World Championship Division Level
-      championshipDivisionWins: 0,
-      championshipDivisionWinsYears: [],
-      championshipDivisionChairmans: 0,
-      championshipDivisionChairmansYears: [],
-      championshipDivisionImpact: 0,
-      championshipDivisionImpactYears: [],
-
-      // World Championship (Einstein) Level
-      einsteinWins: 0,
-      einsteinWinsYears: [],
-      einsteinChairmans: 0,
-      einsteinChairmansYears: [],
-      einsteinImpact: 0,
-      einsteinImpactYears: [],
-      einsteinChairmansFinalist: 0,
-      einsteinChairmansFinalistYears: [],
-      einsteinImpactFinalist: 0,
-      einsteinImpactFinalistYears: [],
-      championshipWoodieFlowers: 0,
-      championshipWoodieFlowersYears: [],
-
-      // Festival of Champions
-      festivalWins: 0,
-      festivalWinsYears: [],
-    };
-
-    // Create a map of event keys to event objects for quick lookup
-    const eventMap = {};
-    if (champsAppearances?.events) {
-      champsAppearances.events.forEach((event) => {
-        eventMap[event.key] = event;
-      });
-    }
-
-    // Process each award
-    if (!awards || !Array.isArray(awards)) {
-      return banners;
-    }
-
-    awards.forEach((award) => {
-      const event = eventMap[award.event_key];
-      if (!event) return;
-
-      const isWin = award.award_type === 1;
-      const isChairmans = award.award_type === 0 && (
-        award.name.includes("Chairman") ||
-        award.name.toLowerCase().includes("chairman")
-      );
-      const isImpact = award.award_type === 0 && award.name.includes("Impact");
-      const isChairmansImpactFinalist = award.award_type === 69 && (
-        award.name.includes("Chairman") ||
-        award.name.toLowerCase().includes("chairman") ||
-        award.name.includes("Impact")
-      );
-      const isWoodieFlowers = award.award_type === 3 && (
-        award.name.includes("Woodie Flowers") ||
-        award.name.toLowerCase().includes("woodie flowers")
-      );
-
-      // Only count Blue Banner awards
-      if (!isWin && !isChairmans && !isImpact && !isChairmansImpactFinalist && !isWoodieFlowers) return;
-
-      // Determine event level and category
-      const eventType = event.event_type;
-      const eventTypeString = event.event_type_string;
-      const eventName = event.name || "";
-      const eventKey = event.key || "";
-
-      // Check for Festival of Champions
-      const isFestival = eventName.toLowerCase().includes("festival of champions") ||
-        eventKey.toLowerCase().includes("festival");
-
-      // Event type codes:
-      // 0 = Regional
-      // 1 = District
-      // 2 = District Championship
-      // 3 = Championship Division
-      // 4 = Championship Finals (Einstein)
-      // 5 = District Championship Division
-      // 99 = Offseason
-
-      if (isFestival && isWin) {
-        banners.festivalWins += 1;
-        banners.festivalWinsYears.push(award.year);
-        banners.blueBanners += 1;
-        banners.blueBannersYears.push(award.year);
-      } else if (eventType === 0) {
-        // Regional
-        if (isWin) {
-          banners.regionalWins += 1;
-          banners.regionalWinsYears.push(award.year);
-          banners.blueBanners += 1;
-          banners.blueBannersYears.push(award.year);
-        } else if (isChairmans) {
-          banners.regionalChairmans += 1;
-          banners.regionalChairmansYears.push(award.year);
-          banners.blueBanners += 1;
-          banners.blueBannersYears.push(award.year);
-        } else if (isImpact) {
-          banners.regionalImpact += 1;
-          banners.regionalImpactYears.push(award.year);
-          banners.blueBanners += 1;
-          banners.blueBannersYears.push(award.year);
-        } else if (isWoodieFlowers) {
-          banners.regionalWoodieFlowers += 1;
-          banners.regionalWoodieFlowersYears.push(award.year);
-          banners.blueBanners += 1;
-          banners.blueBannersYears.push(award.year);
-        }
-      } else if (eventType === 1) {
-        // District
-        if (isWin) {
-          banners.districtWins += 1;
-          banners.districtWinsYears.push(award.year);
-          banners.blueBanners += 1;
-          banners.blueBannersYears.push(award.year);
-        } else if (isChairmans) {
-          banners.districtChairmans += 1;
-          banners.districtChairmansYears.push(award.year);
-          banners.blueBanners += 1;
-          banners.blueBannersYears.push(award.year);
-        } else if (isImpact) {
-          banners.districtImpact += 1;
-          banners.districtImpactYears.push(award.year);
-          banners.blueBanners += 1;
-          banners.blueBannersYears.push(award.year);
-        } else if (isWoodieFlowers) {
-          banners.districtWoodieFlowers += 1;
-          banners.districtWoodieFlowersYears.push(award.year);
-          banners.blueBanners += 1;
-          banners.blueBannersYears.push(award.year);
-        }
-      } else if (eventType === 2) {
-        // District Championship or District Championship with Divisions
-        // Check if it's a division within a district championship
-        const isDivision = event.parent_event_key !== null ||
-          eventTypeString === "District Championship Division" ||
-          eventName.toLowerCase().includes("division");
-
-        if (isDivision) {
-          // District Championship Division
-          if (isWin) {
-            banners.districtDivisionWins += 1;
-            banners.districtDivisionWinsYears.push(award.year);
-            banners.blueBanners += 1;
-            banners.blueBannersYears.push(award.year);
-          } else if (isChairmans) {
-            banners.districtDivisionChairmans += 1;
-            banners.districtDivisionChairmansYears.push(award.year);
-            banners.blueBanners += 1;
-            banners.blueBannersYears.push(award.year);
-          } else if (isImpact) {
-            banners.districtDivisionImpact += 1;
-            banners.districtDivisionImpactYears.push(award.year);
-            banners.blueBanners += 1;
-            banners.blueBannersYears.push(award.year);
-          }
-        } else {
-          // District Championship (Einstein-equivalent)
-          if (isWin) {
-            banners.districtChampionshipWins += 1;
-            banners.districtChampionshipWinsYears.push(award.year);
-            banners.blueBanners += 1;
-            banners.blueBannersYears.push(award.year);
-          } else if (isChairmans) {
-            // District Championship Chairman's awards are counted as Regional awards
-            banners.regionalChairmans += 1;
-            banners.regionalChairmansYears.push(award.year);
-            banners.blueBanners += 1;
-            banners.blueBannersYears.push(award.year);
-          } else if (isImpact) {
-            // District Championship Impact awards are counted as Regional awards
-            banners.regionalImpact += 1;
-            banners.regionalImpactYears.push(award.year);
-            banners.blueBanners += 1;
-            banners.blueBannersYears.push(award.year);
-          } else if (isWoodieFlowers) {
-            banners.districtChampionshipWoodieFlowers += 1;
-            banners.districtChampionshipWoodieFlowersYears.push(award.year);
-            banners.blueBanners += 1;
-            banners.blueBannersYears.push(award.year);
-          }
-        }
-      } else if (eventType === 3 || eventType === 5) {
-        // Championship Division (at World Championships)
-        if (isWin) {
-          banners.championshipDivisionWins += 1;
-          banners.championshipDivisionWinsYears.push(award.year);
-          banners.blueBanners += 1;
-          banners.blueBannersYears.push(award.year);
-        } else if (isChairmans) {
-          banners.championshipDivisionChairmans += 1;
-          banners.championshipDivisionChairmansYears.push(award.year);
-          banners.blueBanners += 1;
-          banners.blueBannersYears.push(award.year);
-        } else if (isImpact) {
-          banners.championshipDivisionImpact += 1;
-          banners.championshipDivisionImpactYears.push(award.year);
-          banners.blueBanners += 1;
-          banners.blueBannersYears.push(award.year);
-        }
-      } else if (eventType === 4) {
-        // Championship Finals (Einstein)
-        if (isWin) {
-          banners.einsteinWins += 1;
-          banners.einsteinWinsYears.push(award.year);
-          banners.blueBanners += 1;
-          banners.blueBannersYears.push(award.year);
-        } else if (isChairmans) {
-          banners.einsteinChairmans += 1;
-          banners.einsteinChairmansYears.push(award.year);
-          banners.blueBanners += 1;
-          banners.blueBannersYears.push(award.year);
-        } else if (isImpact) {
-          banners.einsteinImpact += 1;
-          banners.einsteinImpactYears.push(award.year);
-          banners.blueBanners += 1;
-          banners.blueBannersYears.push(award.year);
-        } else if (isChairmansImpactFinalist) {
-          // Chairman's/Impact Finalist - determine which type based on award name
-          if (award.name.includes("Chairman") || award.name.toLowerCase().includes("chairman")) {
-            banners.einsteinChairmansFinalist += 1;
-            banners.einsteinChairmansFinalistYears.push(award.year);
-          } else {
-            banners.einsteinImpactFinalist += 1;
-            banners.einsteinImpactFinalistYears.push(award.year);
-          }
-          banners.blueBanners += 1;
-          banners.blueBannersYears.push(award.year);
-        } else if (isWoodieFlowers) {
-          banners.championshipWoodieFlowers += 1;
-          banners.championshipWoodieFlowersYears.push(award.year);
-          banners.blueBanners += 1;
-          banners.blueBannersYears.push(award.year);
-        }
-      }
-    });
-
-    return banners;
-  }
-
-  /**
-   *  This function retrieves a a list of teams for a specific event from FIRST. It parses the list and modifies some of the data to produce more readable content.
-   * @async
-   * @function getTeamList
-   * @param adHocTeamList When loading a team list from a spreadsheet, this is the array of teams in the event
-   * @return sets the teamList
-   */
-  async function getTeamList(adHocTeamList) {
-    if (
-      (teamListLoading === "" ||
-        teamListLoading !== selectedEvent?.value?.name) &&
-      (selectedEvent?.value?.code !== "OFFLINE" || adHocTeamList)
-    ) {
-      console.log(`Fetching team list for ${selectedEvent?.value?.name}...`);
-      setTeamListLoading(selectedEvent?.value?.name);
-      /**
-       * Determines whether an award, by name, deserves special highlighting in the Announce Screen
-       * @function awardsHilight
-       * @param awardName The name of the award to highlight
-       * @return true if "special" award; false if not
-       */
-      function awardsHilight(awardName) {
-        if (
-          awardName === "District Chairman's Award" ||
-          awardName === "District Event Winner" ||
-          awardName === "District Event Finalist" ||
-          awardName === "Regional Engineering Inspiration Award" ||
-          awardName === "District Engineering Inspiration Award" ||
-          awardName === "Engineering Inspiration Award" ||
-          awardName === "District Championship Finalist" ||
-          awardName === "District Championship Winner" ||
-          awardName === "Regional Winners" ||
-          awardName === "Regional Finalists" ||
-          awardName === "Regional Chairman's Award" ||
-          awardName === "FIRST Dean's List Finalist Award" ||
-          awardName === "District Championship Dean's List Semi-Finalist" ||
-          awardName === "Championship Subdivision Winner" ||
-          awardName === "Championship Subdivision Finalist" ||
-          awardName === "Championship Division Winner" ||
-          awardName === "Championship Division Finalist" ||
-          awardName === "Championship Winner" ||
-          awardName === "Championship Finalist" ||
-          awardName === "Chairman's Award" ||
-          awardName === "Chairman's Award Finalist" ||
-          awardName === "FIRST Dean's List Award" ||
-          awardName === "Woodie Flowers Award" ||
-          awardName === "Woodie Flowers Finalist Award" ||
-          awardName === "Innovation Challenge Winner" ||
-          awardName === "Innovation Challenge Finalist" ||
-          awardName === "FIRST Impact Award" ||
-          awardName === "FIRST Impact Award Finalist" ||
-          awardName === "District FIRST Impact Award" ||
-          awardName === "Regional FIRST Impact Award" ||
-          awardName === "Inspire Award" ||
-          awardName.includes("Winning Alliance") ||
-          awardName === "Think Award" ||
-          awardName === "Dean's List Winner" ||
-          awardName === "Compass Award" ||
-          awardName === "Volunteer Award"
-        ) {
-          return true;
-        } else {
-          return false;
-        }
-      }
-
-      var result = null;
-      var teams = {
-        teamCountTotal: adHocTeamList?.length || 0,
-        teamCountPage: 1,
-        pageCurrent: 1,
-        pageTotal: 1,
-        teams: [],
-      };
-
-      if (
-        selectedEvent?.value?.code.includes("OFFLINE") ||
-        (inWorldChamps() && !ftcMode) ||
-        (cheesyArenaAvailable && useCheesyArena)
-      ) {
-        if (adHocTeamList) {
-          //https://api.gatool.org/v3/2023/teams?teamNumber=172
-
-          var adHocTeams = adHocTeamList.map(async (team) => {
-            var request = await httpClient.getNoAuth(
-              `${selectedYear?.value}/teams?teamNumber=${team}`,
-              ftcMode ? ftcBaseURL : undefined
-            );
-
-            if (request.status === 200) {
-              // @ts-ignorevar
-              const teamDetails = await request.json();
-              return teamDetails.teams[0];
-            } else if (request.status === 400) {
-              // team not found. Return a stub team
-              return {
-                teamNumber: team,
-                displayTeamNumber: `${team}`,
-                nameFull: `Team ${team}`,
-                nameShort: `Team ${team}`,
-                schoolName: null,
-                city: "Unknown",
-                stateProv: "Unknown",
-                country: "Unknown",
-                website: null,
-                rookieYear: null,
-                robotName: null,
-                districtCode: null,
-                homeCMP: null,
-                homeRegion: null,
-                displayLocation: "Unknown",
-              };
-            } else {
-              return undefined;
-            }
-          });
-
-          await Promise.all(adHocTeams).then(function (values) {
-            // set the team list from the team list.
-            console.log(
-              `Fetching community updates for ${selectedEvent?.value?.name} from getTeamList`
-            );
-            teams.lastUpdate = moment().format();
-            teams.teams = _.filter(values, (n) => {
-              return n ? true : false;
-            });
-            getCommunityUpdates(false, teams.teams);
-          });
-        }
-      } else if (
-        !selectedEvent?.value?.code.includes("PRACTICE") &&
-        !useFTCOffline &&
-        selectedEvent?.value?.type !== "OffSeason"
-      ) {
-        // get the team list from FIRST API
-        result = await httpClient.getNoAuth(
-          `${selectedYear?.value}/teams?eventCode=${selectedEvent?.value?.code}`,
-          ftcMode ? ftcBaseURL : undefined
-        );
-        if (result.status === 200) {
-          // @ts-ignore
-          teams = await result.json();
-        }
-      } else if (
-        !selectedEvent?.value?.code.includes("PRACTICE") &&
-        selectedEvent?.value?.type === "OffSeason" &&
-        !useFTCOffline &&
-        !ftcMode
-      ) {
-        // get the team list from TBA via gatool Offseason API
-        console.log("Using TBA for Offseason Event Team List");
-        // Use event's tbaEventKey directly
-        const eventKey = selectedEvent?.value?.tbaEventKey;
-
-        if (!eventKey) {
-          console.log("No TBA event key available for this offseason event");
-        }
-
-        if (eventKey) {
-          const tbaTeams = await fetchTBATeams(
-            eventKey,
-            selectedYear?.value
-          );
-
-          if (tbaTeams && tbaTeams?.teams?.length > 0) {
-            teams = {
-              ...tbaTeams,
-              lastUpdate: moment().format(),
-            };
-          }
-        }
-      } else if (useFTCOffline) {
-        // get the team list from the FTC Offline API
-        const val = await httpClient.getNoAuth(
-          `/api/v1/events/${selectedEvent?.value?.code}/teams/`,
-          FTCServerURL,
-          undefined,
-          { Authorization: FTCKey?.key || "" }
-        );
-        if (val.status === 200) {
-          // @ts-ignore
-          result = await val.json();
-          if (result?.teamNumbers.length > 0) {
-            let ftcTeams = result.teamNumbers.map(async (team) => {
-              const val = await httpClient.getNoAuth(
-                `/api/v1/events/${selectedEvent?.value?.code}/teams/${team}/`,
-                FTCServerURL,
-                undefined,
-                { Authorization: FTCKey?.key || "" }
-              );
-              if (val.status === 200) {
-                // @ts-ignore
-                const teamDetails = await val.json();
-                return conformFTCOfflineTeam(teamDetails);
-              }
-            });
-            await Promise.all(ftcTeams).then((values) => {
-              teams.lastUpdate = moment().format();
-              teams.teams = values;
-              teams.teamCountTotal = values.length;
-            });
-          }
-        }
-      } else {
-        teams = training.teams.teams;
-      }
-
-      if (typeof teams.Teams !== "undefined") {
-        teams.teams = teams.Teams;
-        delete teams.Teams;
-      }
-
-      // handle District EI and RAS teams
-      // if District Champs, filter list of events by district code
-      var districtEvents = null;
-      if (
-        events &&
-        (selectedEvent?.value?.type === "DistrictChampionship" ||
-          selectedEvent?.value?.type === "DistrictChampionshipWithLevels")
-      ) {
-        districtEvents = _.filter(events, {
-          value: { districtCode: selectedEvent?.value?.districtCode },
-        });
-        // get awards for those filtered events
-        var districtEITeams = districtEvents.map(async (event) => {
-          try {
-            var request = await httpClient.getNoAuth(
-              `${selectedYear?.value}/awards/event/${event?.value?.code}`,
-              ftcMode ? ftcBaseURL : undefined
-            );
-            if (request.status === 200) {
-              // @ts-ignore
-              var eventDetails = await request.json();
-              // filter that list by EI {awardId: "633"} {name: "District Engineering Inspiration Award"} and {awardID: "417"} {name:"Rookie All Star Award"}
-              return _.filter(eventDetails?.awards, (award) => {
-                return award.awardId === 633 || award.awardId === 417;
-              });
-            }
-            // Return empty array if request failed
-            return [];
-          } catch (error) {
-            // Return empty array on error to prevent undefined values
-            console.error(`Error fetching awards for event ${event?.value?.code}:`, error);
-            return [];
-          }
-        });
-
-        await Promise.all(districtEITeams).then(async function (values) {
-          var tempTeams = [];
-          values.forEach((value) => {
-            // @ts-ignore
-            // Check if value exists and is an array before accessing [0]
-            if (value && Array.isArray(value) && value[0]?.teamNumber) {
-              if (
-                _.findIndex(teams.teams, { teamNumber: value[0]?.teamNumber }) <
-                0
-              ) {
-                // @ts-ignore
-                tempTeams.push(value[0]?.teamNumber);
-              }
-            }
-          });
-          // get team details for those teams not in this event
-          if (tempTeams.length > 0) {
-            var EITeamData = tempTeams.map(async (teamNumber) => {
-              var request = await httpClient.getNoAuth(
-                `${selectedYear?.value}/teams?teamNumber=${teamNumber}`,
-                ftcMode ? ftcBaseURL : undefined
-              );
-              if (request.status === 200) {
-                // @ts-ignore
-                var teamDetails = await request.json();
-                return teamDetails.teams[0];
-              }
-              if (request.status === 400) {
-                // team not found. Return a stub team
-                return {
-                  teamNumber: teamNumber,
-                  displayTeamNumber: `${teamNumber}`,
-                  nameFull: `Team ${teamNumber}`,
-                  nameShort: `Team ${teamNumber}`,
-                  schoolName: null,
-                  city: "Unknown",
-                  stateProv: "Unknown",
-                  country: "Unknown",
-                  website: null,
-                  rookieYear: null,
-                  robotName: null,
-                  districtCode: null,
-                  homeCMP: null,
-                  homeRegion: null,
-                  displayLocation: "Unknown",
-                };
-              } else {
-                return undefined;
-              }
-            });
-
-            await Promise.all(EITeamData).then((values) => {
-              // merge with teams.teams
-              if (values.length > 0) {
-                //prepare to get community updates for these teams
-                setEITeams(
-                  _.filter(values, (value) => {
-                    return value ? true : false;
-                  })
-                );
-                values.forEach((value) => {
-                  teams.teams.push(value);
-                });
-                teams.teams = _.sortBy(teams.teams, ["teamNumber"]);
-              }
-            });
-          }
-        });
-      }
-
-      // Fix the sponsors now that teams are loaded
-
-      // prepare to separate and combine sponsors and organization name
-      var teamListSponsorsFixed = teams?.teams?.map((teamRow) => {
-        var sponsors = {
-          organization: "",
-          sponsors: "",
-          topSponsors: "",
-          topSponsor: "",
-          sponsorsRaw: teamRow.nameFull,
-          sponsorArray: [],
-          topSponsorsArray: [],
-          organizationArray: [],
-          lastSponsor: "",
-        };
-
-        if (teamRow.schoolName) {
-          sponsors.organization = teamRow.schoolName;
-          if (sponsors.organization === sponsors.sponsorsRaw) {
-            sponsors.sponsorArray[0] = sponsors.sponsorsRaw;
-          } else {
-            sponsors.sponsorArray = trimArray(sponsors.sponsorsRaw.split("/"));
-            sponsors.sponsorArray.push(
-              sponsors.sponsorArray.pop().split("&")[0]
-            );
-          }
-        } else {
-          sponsors.sponsorArray = trimArray(teamRow?.nameFull?.split("/"));
-        }
-
-        sponsors.organizationArray = trimArray(
-          teamRow?.nameFull?.split("/").pop().split("&")
-        );
-
-        if (
-          !sponsors.sponsorArray &&
-          !sponsors?.organizationArray &&
-          !sponsors?.organization
-        ) {
-          sponsors.organization = "No organization in TIMS";
-          sponsors.sponsors = "No sponsors in TIMS";
-          sponsors.topSponsorsArray[0] = sponsors.sponsors;
-        }
-
-        if (sponsors?.sponsorArray?.length === 1) {
-          sponsors.sponsors = sponsors.sponsorArray[0];
-          sponsors.topSponsors = sponsors.sponsors;
-          sponsors.topSponsor = sponsors.sponsors;
-        } else {
-          if (
-            sponsors?.organizationArray?.length > 1 &&
-            !sponsors?.organization
-          ) {
-            sponsors.sponsorArray.pop();
-            sponsors.sponsorArray.push(
-              sponsors.organizationArray.slice(0).shift()
-            );
-          }
-          if (sponsors?.sponsorArray) {
-            sponsors.topSponsorsArray = sponsors.sponsorArray.slice(0, 5);
-          }
-          sponsors.topSponsorsArrayUnchanged = sponsors.topSponsorsArray;
-          if (sponsors.sponsorArray) {
-            sponsors.lastSponsor = sponsors.sponsorArray.pop();
-            sponsors.sponsors = sponsors.sponsorArray.join(", ");
-            if (sponsors.lastSponso) {
-              sponsors.sponsors += " & " + sponsors.lastSponsor;
-            }
-            sponsors.lastSponsor = sponsors.topSponsorsArray.pop();
-            sponsors.topSponsors = sponsors.topSponsorsArray.join(", ");
-            sponsors.topSponsors += " & " + sponsors.lastSponsor;
-            sponsors.topSponsor = sponsors.topSponsorsArrayUnchanged[0];
-          }
-        }
-
-        if (
-          sponsors?.organizationArray?.length === 1 &&
-          !sponsors?.organization
-        ) {
-          sponsors.organization = sponsors.organizationArray[0];
-        } else {
-          if (!sponsors?.organization) {
-            sponsors.organizationArray.shift();
-            sponsors.organization = sponsors.organizationArray.join(" & ");
-          }
-        }
-
-        teamRow.sponsors = sponsors?.sponsors;
-        teamRow.topSponsors = sponsors?.topSponsors;
-        teamRow.topSponsorsArray = sponsors?.topSponsorsArrayUnchanged;
-        teamRow.topSponsor = sponsors.topSponsor;
-        teamRow.organization = sponsors?.organization;
-        return teamRow;
-      });
-
-      teams.teams = teamListSponsorsFixed;
-
-      //fetch awards for the current teams
-      // Initialize newTeams with current teams as fallback to ensure we always have teams data
-      // Create new team objects to avoid mutating originals
-      var newTeams = teams.teams.map((team) => {
-        // Preserve existing awards if they exist, otherwise initialize empty object
-        const awards = (team.awards && typeof team.awards === 'object') ? team.awards : {};
-        return {
-          ...team,
-          awards: awards
-        };
-      });
-
-      // Skip external API calls when in FTC offline mode without internet
-      if (useFTCOffline && (!isOnline || manualOfflineMode)) {
-        console.log("FTC Offline mode: Skipping queryAwards API call while offline" + (manualOfflineMode ? " (manual override)" : "") + " - using cached awards");
-        // Awards already initialized above, just use cached data
-      } else if (teams?.teams.length > 0) {
-        try {
-          const teamNumbers = teams.teams.map((t) => t?.teamNumber);
-          const baseURL = ftcMode ? ftcBaseURL : undefined;
-
-          var req = await httpClient.postNoAuth(
-            `${selectedYear?.value}/queryAwards`,
-            {
-              teams: teamNumbers,
-            },
-            baseURL
-          );
-
-          if (req.status === 200) {
-            // @ts-ignore
-            var awards = await req.json();
-
-            // Merge awards into teams - ensure all teams get awards data
-            // Try both string and number keys since API might return different formats
-            // Create new team objects to avoid mutating originals
-            newTeams = teams.teams.map((team) => {
-              const teamNum = team?.teamNumber;
-              // Try multiple key formats to handle different API response structures
-              const teamAwards = awards[`${teamNum}`] || awards[teamNum] || awards[String(teamNum)] || {};
-
-              // Create a new team object with awards merged in
-              return {
-                ...team,
-                awards: teamAwards
-              };
-            });
-
-            const teamsWithAwards = newTeams.filter(t => t.awards && Object.keys(t.awards).length > 0).length;
-            if (teamsWithAwards > 0) {
-              console.log(`Awards loaded: ${teamsWithAwards} of ${newTeams.length} teams have awards data`);
-            }
-          } else {
-            console.warn(`Awards API returned status ${req.status} for event ${selectedEvent?.value?.code}, using teams without awards update`);
-          }
-        } catch (error) {
-          console.error(`Error fetching awards for event ${selectedEvent?.value?.code}:`, error);
-          // newTeams already initialized with teams above, so we'll use those
-        }
-      }
-
-      // Parse awards to ensure we highlight them properly and remove extraneous text i.e. FIRST CHampionship from name
-      // newTeams is guaranteed to have data at this point (initialized above)
-      var formattedAwards = newTeams.map((team) => {
-        try {
-          // Add in special awards not reported by FIRST APIs (from 2021 season)
-          for (var index = 0; index < 3; index++) {
-            const targetYear = parseInt(selectedYear?.value) - index;
-            let items = specialAwards.filter(
-              (item) => item.Year === targetYear
-            );
-            if (items.length > 0) {
-              let teamAwards = items[0].awards.filter(
-                (item) => item.teamNumber === team.teamNumber
-              );
-              if (teamAwards.length > 0) {
-                const yearKey = `${selectedYear?.value - index}`;
-                // Ensure the year key exists in awards before accessing it
-                if (!team.awards[yearKey]) {
-                  team.awards[yearKey] = { awards: [] };
-                }
-                // Ensure awards array exists
-                if (!team.awards[yearKey].awards) {
-                  team.awards[yearKey].awards = [];
-                }
-                team.awards[yearKey].awards = _.concat(
-                  team.awards[yearKey].awards,
-                  teamAwards
-                );
-              }
-            }
-          }
-          var awardYears = Object.keys(team?.awards || {});
-
-          awardYears?.forEach((year) => {
-            const yearKey = `${year}`;
-            const yearAwards = team?.awards[yearKey];
-
-            if (yearAwards !== null && yearAwards !== undefined) {
-              // Normalize the structure - ensure it has an awards array
-              if (!yearAwards.awards || !Array.isArray(yearAwards.awards)) {
-                // If awards property doesn't exist or isn't an array, initialize it
-                team.awards[yearKey] = {
-                  awards: Array.isArray(yearAwards) ? yearAwards : []
-                };
-              } else {
-                // Ensure structure is correct
-                team.awards[yearKey] = {
-                  awards: yearAwards.awards
-                };
-              }
-
-              // Map over awards to add highlight, eventName, and year properties
-              if (team.awards[yearKey].awards && Array.isArray(team.awards[yearKey].awards)) {
-                team.awards[yearKey].awards = team.awards[yearKey].awards.map((award) => {
-                  award.highlight = awardsHilight(award.name);
-                  award.eventName = eventnames[`${year}`]
-                    ? eventnames[`${year}`][award.eventCode]
-                    : award.eventCode;
-                  award.year = year;
-                  return award;
-                });
-              }
-            } else {
-              // Initialize empty awards array for this year
-              team.awards[yearKey] = { awards: [] };
-            }
-          });
-          team.hallOfFame = [];
-          _.filter(halloffame, { Chairmans: team.teamNumber }).forEach(
-            (award) => {
-              team.hallOfFame.push({
-                // @ts-ignore
-                year: award?.Year,
-                // @ts-ignore
-                challenge: award?.Challenge,
-                type: "chairmans",
-              });
-            }
-          );
-          _.filter(halloffame, { Impact: team.teamNumber }).forEach(
-            (award) => {
-              team.hallOfFame.push({
-                // @ts-ignore
-                year: award?.Year,
-                // @ts-ignore
-                challenge: award?.Challenge,
-                type: "impact",
-              });
-            }
-          );
-          _.filter(halloffame, { Inspire: team.teamNumber }).forEach(
-            (award) => {
-              team.hallOfFame.push({
-                // @ts-ignore
-                year: award?.Year,
-                // @ts-ignore
-                challenge: award?.Challenge,
-                type: "inspire",
-              });
-            }
-          );
-          _.filter(halloffame, { Winner1: team.teamNumber }).forEach(
-            (award) => {
-              team.hallOfFame.push({
-                // @ts-ignore
-                year: award.Year,
-                // @ts-ignore
-                challenge: award.Challenge,
-                type: "winner",
-              });
-            }
-          );
-          _.filter(halloffame, { Winner2: team.teamNumber }).forEach(
-            (award) => {
-              team.hallOfFame.push({
-                // @ts-ignore
-                year: award.Year,
-                // @ts-ignore
-                challenge: award.Challenge,
-                type: "winner",
-              });
-            }
-          );
-          _.filter(halloffame, { Winner3: team.teamNumber }).forEach(
-            (award) => {
-              team.hallOfFame.push({
-                // @ts-ignore
-                year: award?.Year,
-                // @ts-ignore
-                challenge: award?.Challenge,
-                type: "winner",
-              });
-            }
-          );
-          _.filter(halloffame, { Winner4: team.teamNumber }).forEach(
-            (award) => {
-              team.hallOfFame.push({
-                // @ts-ignore
-                year: award.Year,
-                // @ts-ignore
-                challenge: award.Challenge,
-                type: "winner",
-              });
-            }
-          );
-          _.filter(halloffame, { Winner5: team.teamNumber }).forEach(
-            (award) => {
-              team.hallOfFame.push({
-                // @ts-ignore
-                year: award.Year,
-                // @ts-ignore
-                challenge: award.Challenge,
-                type: "winner",
-              });
-            }
-          );
-
-          team.hallOfFame = _.orderBy(
-            team.hallOfFame,
-            ["type", "year"],
-            ["asc", "asc"]
-          );
-
-          return team;
-        } catch (error) {
-          console.error(`Error processing awards for team ${team?.teamNumber}:`, error);
-          // Return team with existing awards data even if processing failed
-          return team;
-        }
-      });
-
-      // Update teams.teams with formatted awards before proceeding to champs data
-      // This ensures awards are always merged before state is updated
-      teams.teams = formattedAwards;
-
-      var champsTeams = [];
-      // When online and in FRC mode, always check for blue banners if showBlueBanners is enabled
-      const shouldFetchChampsData = !ftcMode && (
-        selectedEvent?.value?.champLevel !== "" ||
-        showDistrictChampsStats === true ||
-        showChampsStatsAtDistrictRegional === true ||
-        (isOnline && showBlueBanners === true) ||
-        (selectedEvent?.value?.code.includes("OFFLINE") &&
-          playoffOnly &&
-          champsStyle)
-      );
-
-      if (shouldFetchChampsData) {
-        // Batch-fetch history for all teams in one request
-        const teamNumbers = teams.teams.map((t) => t?.teamNumber);
-        let historyMap = {};
-        try {
-          const baseURL = ftcMode ? ftcBaseURL : undefined;
-          const historyResult = await httpClient.postNoAuth(
-            `${selectedYear?.value}/queryHistory`,
-            { teams: teamNumbers },
-            baseURL
-          );
-          if (historyResult.status === 200 && historyResult instanceof Response) {
-            historyMap = await historyResult.json();
-          }
-        } catch (e) {
-          console.error("Error fetching batch history:", e);
-        }
-
-        champsTeams = teams.teams.map((team) => {
-          var blueBanners = {
-            teamNumber: team?.teamNumber,
-            blueBanners: 0,
-            blueBannersYears: [],
-            regionalBanners: 0,
-            regionalBannersYears: [],
-            districtBanners: 0,
-            districtBannersYears: [],
-            FOCBanners: 0,
-            FOCBannersYears: [],
-            einsteinBanners: 0,
-            einsteinBannersYears: [],
-            divisionBanners: 0,
-            divisionBannersYears: [],
-            districtDivisionBanners: 0,
-            districtDivisionBannersYears: [],
-            districtEinsteinBanners: 0,
-            districtEinsteinBannersYears: [],
-          };
-
-          try {
-            var history = historyMap[String(team?.teamNumber)];
-            if (history) {
-              var appearances = history?.events;
-              var awards = history?.awards;
-              var result = {
-                teamNumber: team?.teamNumber,
-                champsAppearances: 0,
-                champsAppearancesYears: [],
-                einsteinAppearances: 0,
-                einsteinAppearancesYears: [],
-
-                districtChampsAppearances: 0,
-                districtChampsAppearancesYears: [],
-                districtEinsteinAppearances: 0,
-                districtEinsteinAppearancesYears: [],
-                FOCAppearances: 0,
-                FOCAppearancesYears: [],
-              };
-
-              if (appearances && Array.isArray(appearances)) {
-                appearances.forEach((appearance) => {
-                  var timeDifference = moment(appearance?.end_date).diff(
-                    moment(),
-                    "minutes"
-                  );
-
-                  if (appearance.district !== null) {
-                    if (
-                      (appearance.year >= 2019 &&
-                        appearance.district.abbreviation === "ont") ||
-                      (appearance.year >= 2017 &&
-                        appearance.district.abbreviation === "fim") ||
-                      (appearance.year >= 2022 &&
-                        appearance.district.abbreviation === "ne") ||
-                      (appearance.year >= 2022 &&
-                        (appearance.district.abbreviation === "tx" ||
-                          appearance.district.abbreviation === "fit"))
-                    ) {
-                      if (appearance.event_type === 5) {
-                        result.districtChampsAppearances += 1;
-                        result.districtChampsAppearancesYears.push(appearance.year);
-                      }
-                      if (appearance.event_type === 2 && timeDifference < 0) {
-                        result.districtEinsteinAppearances += 1;
-                        result.districtEinsteinAppearancesYears.push(
-                          appearance.year
-                        );
-                      }
-                    } else {
-                      if (appearance.event_type === 2) {
-                        result.districtChampsAppearances += 1;
-                        result.districtChampsAppearancesYears.push(appearance.year);
-                      }
-                    }
-                  }
-
-                  if (appearance.event_type === 6) {
-                    result.FOCAppearances += 1;
-                    result.FOCAppearancesYears.push(appearance.year);
-                  }
-                  if (appearance.year < 2001) {
-                    if (appearance.event_type === 4) {
-                      result.champsAppearances += 1;
-                      result.champsAppearancesYears.push(appearance.year);
-                    }
-                  } else {
-                    if (appearance.event_type === 3) {
-                      result.champsAppearances += 1;
-                      result.champsAppearancesYears.push(appearance.year);
-                    }
-
-                    if (appearance.event_type === 4 && timeDifference < 0) {
-                      result.einsteinAppearances += 1;
-                      result.einsteinAppearancesYears.push(appearance.year);
-                    }
-                  }
-                });
-              }
-
-              if (appearances && awards) {
-                const blueBannerData = calculateBlueBanners({ events: appearances }, awards);
-                Object.assign(blueBanners, blueBannerData);
-              }
-
-              team.champsAppearances = result;
-            }
-            team.blueBanners = blueBanners;
-            return team;
-          } catch (error) {
-            console.error(`Error processing history for team ${team?.teamNumber}:`, error);
-            team.blueBanners = blueBanners;
-            return team;
-          }
-        });
-
-        teams.lastUpdate = moment().format();
-        teams.teams = _.filter(champsTeams, (value) => {
-          return value ? true : false;
-        });
-        teams.teams = _.sortBy(teams.teams, ["teamNumber"]);
-        setTeamList(teams);
-      } else {
-        // Initialize empty blueBanners for all teams when not fetching champs data
-        teams.teams = teams.teams.map((team) => {
-          if (!team.blueBanners) {
-            team.blueBanners = {
-              teamNumber: team?.teamNumber,
-              blueBanners: 0,
-              blueBannersYears: [],
-            };
-          }
-          return team;
-        });
-        teams.lastUpdate = moment().format();
-        setTeamList(teams);
-      }
-      // });
-      // determine the number of Alliances in the playoffs for FTC events
-      if (ftcMode && !selectedEvent.value.allianceCount) {
-        var allianceCount = "EightAlliance";
-        if (teams.teams.length <= 10) {
-          allianceCount = "TwoAlliance";
-        } else if (teams.teams.length <= 20) {
-          allianceCount = "FourAlliance";
-        } else if (teams.teams.length <= 40) {
-          allianceCount = "SixAlliance";
-        }
-        const selectedEventTemp = _.cloneDeep(selectedEvent);
-        selectedEventTemp.value.allianceCount = allianceCount;
-        setSelectedEvent(selectedEventTemp);
-      }
-
-      setTeamListLoading("");
-    } else {
-      console.log(
-        `Team List for ${selectedEvent?.value?.name} is loading. Skipping...`
-      );
-    }
-  }
-
-
-  /** Fetches regional championship advancement for all event teams in a single batch request.
-   * @param ranksOverride - optional array of rank rows (e.g. from getRanks) to use for team list; each must have teamNumber.
-   */
-  async function getRegionalEventDetail(ranksOverride) {
-    if (!selectedYear?.value) return;
-    const teamNumbers = (ranksOverride?.map((r) => r.teamNumber)) ?? teamList?.teams?.map((t) => t.teamNumber) ?? [];
-    if (teamNumbers.length === 0) {
-      setRegionalEventDetail(null);
-      return;
-    }
-    try {
-      const result = await httpClient.postNoAuth(
-        `${selectedYear.value}/queryRegionalTeamDetail`,
-        { teams: teamNumbers }
-      );
-      if (result.status === 200 && result instanceof Response) {
-        const data = await result.json();
-        const teams = [];
-        for (const teamNumber of teamNumbers) {
-          const detail = data[String(teamNumber)];
-          if (detail && detail.teams && Array.isArray(detail.teams)) {
-            teams.push(...detail.teams);
-          }
-        }
-        setRegionalEventDetail({
-          season: selectedYear?.value,
-          lastUpdate: moment().format(),
-          teams,
-        });
-      } else {
-        setRegionalEventDetail(null);
-      }
-    } catch (e) {
-      setRegionalEventDetail(null);
-    }
-  }
-
-  /** This function retrieves URLs for robot images from The Blue Alliance
-   * @async
-   * @function getRobotImages
-   * @param selectedYear The currently selected year, which is a persistent state variable
-   * @param teams The event's team list
-   * @return sets the array of URLs
-   */
-  async function getRobotImages() {
-    const teams = teamList?.teams;
-    if (!teams?.length || !selectedYear?.value) return;
-    try {
-      const teamNumbers = teams.map((t) => t?.teamNumber);
-      const result = await httpClient.postNoAuth(
-        `${selectedYear.value}/queryMedia`,
-        { teams: teamNumbers }
-      );
-      if (result.status === 200 && result instanceof Response) {
-        const data = await result.json();
-        const robotImageList = teams.map((team) => {
-          const mediaArray = data[String(team?.teamNumber)] || [];
-          const image = _.filter(mediaArray, { type: "imgur" })[0];
-          return {
-            teamNumber: team?.teamNumber,
-            imageUrl: image?.direct_url || null,
-          };
-        });
-        setRobotImages(robotImageList);
-      }
-    } catch (e) {
-      console.error("Error fetching robot images batch:", e);
-    }
-  }
-
-  async function getEPA() {
-    const teams = teamList?.teams;
-    if (!teams?.length || !selectedYear?.value) return;
-    try {
-      const teamNumbers = teams.map((t) => t?.teamNumber);
-      const result = await httpClient.postNoAuth(
-        `${selectedYear.value}/queryStatbotics`,
-        { teams: teamNumbers }
-      );
-      if (result.status === 200 && result instanceof Response) {
-        const data = await result.json();
-        const epaList = teams.map((team) => ({
-          teamNumber: team?.teamNumber,
-          epa: data[String(team?.teamNumber)] || {},
-        }));
-        setEPA(epaList);
-      }
-    } catch (e) {
-      console.error("Error fetching EPA batch:", e);
-    }
-  }
-
-  async function getEPAFTC() {
-    // Skip external API calls when in FTC offline mode without internet
-    if (useFTCOffline && (!isOnline || manualOfflineMode)) {
-      console.log("FTC Offline mode: Skipping FTCScout API calls while offline" + (manualOfflineMode ? " (manual override)" : ""));
-      setEPA([]);
-      return;
-    }
-
-    var epa = teamList?.teams.map(async (team) => {
-      var epaArray = {
-        teamNumber: team?.teamNumber,
-        epa: {},
-        record: {
-          wins: 0,
-          losses: 0,
-          ties: 0,
-          qualMatchesPlayed: 0,
-          dq: 0,
-          eventCount: 0,
-        },
-      };
-      var seasonStats = {
-        wins: 0,
-        losses: 0,
-        ties: 0,
-        qualMatchesPlayed: 0,
-        dq: 0,
-        eventCount: 0,
-      };
-      // first let's get the EPA for the team
-
-      var epaData = await httpClient.getNoAuth(
-        `${selectedYear?.value}/ftcscout/quick-stats/${team?.teamNumber}`,
-        ftcMode ? ftcBaseURL : undefined
-      );
-      // var epaData = await httpClient.getNoAuth(
-      //   `teams/${team?.teamNumber}/quick-stats?season=${selectedYear?.value}`,
-      //   "https://api.ftcscout.org/rest/v1/",
-      //   20000
-      // );
-      if (epaData.status === 200) {
-        // @ts-ignore
-        epaArray = await epaData.json();
-        // now let's get the season stats for the same team.
-        // https://api.ftcscout.org/rest/v1/teams/172/events/2023
-        // to get wins, losses, ties, played, dq
-        var seasonResult = await httpClient.getNoAuth(
-          `${selectedYear?.value}/ftcscout/events/${team?.teamNumber}`,
-          ftcMode ? ftcBaseURL : undefined
-        );
-        // var seasonResult = await httpClient.getNoAuth(
-        //   `teams/${team?.teamNumber}/events/${selectedYear?.value}`,
-        //   "https://api.ftcscout.org/rest/v1/",
-        //   20000
-        // );
-        if (seasonResult.status === 200) {
-          // @ts-ignore
-          var events = await seasonResult.json();
-          events.forEach((event) => {
-            if (event?.stats) {
-              seasonStats.wins += event.stats.wins || 0;
-              seasonStats.losses += event.stats.losses || 0;
-              seasonStats.ties += event.stats.ties || 0;
-              seasonStats.qualMatchesPlayed +=
-                event.stats.qualMatchesPlayed || 0;
-              seasonStats.dq += event.stats.dq || 0;
-              seasonStats.eventCount +=
-                event.stats.qualMatchesPlayed > 0 ? 1 : 0;
-            }
-          });
-        }
-      } else if (
-        epaData.status === 500 ||
-        epaData.status === 408 ||
-        epaData.status === 404 ||
-        epaData.status === 400
-      ) {
-        // do nothing
-        // console.log("No EPA data for team " + team?.teamNumber);
-      }
-      return {
-        teamNumber: team?.teamNumber,
-        epa: {
-          epa: {
-            total_points: {
-              mean: Math.round(100 * epaArray?.tot?.value) / 100 || 0,
-              sd: 0,
-            },
-          },
-          record: seasonStats,
-        },
-      };
-    });
-    if (Array.isArray(epa) && epa.length > 0) {
-      Promise.all(epa).then((values) => {
-        setEPA(values);
-      });
-    }
-  }
-
 
   /**
    * This function writes updated team data back to gatool Cloud.
@@ -3837,7 +2395,7 @@ function App() {
 
       // Fetch team remappings for TBA offseason events
       if (selectedEvent?.value?.type === "OffSeason" && selectedEvent?.value?.tbaEventKey && !ftcMode) {
-        const remappings = await fetchTeamRemappings(
+        const remappings = await eventStoreRef.current.fetchTeamRemappings(
           selectedEvent.value.tbaEventKey,
           selectedYear.value
         );
@@ -3847,7 +2405,7 @@ function App() {
         await setTeamRemappings(null);
       }
 
-      getTeamList();
+      eventStoreRef.current.getTeamList();
       await getSchedule(true);
       getSystemMessages();
       await getEventMessages();
@@ -4475,7 +3033,7 @@ function App() {
   useEffect(() => {
     if (showBlueBanners === true && !ftcMode && selectedEvent && teamList?.teams?.length > 0 && isOnline) {
       console.log("Show Blue Banners enabled, refreshing team list to fetch blue banner data");
-      getTeamList();
+      eventStoreRef.current.getTeamList();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showBlueBanners]);
@@ -4483,7 +3041,7 @@ function App() {
   // Refresh team list when local-event Champs stats are enabled so appearance data is loaded
   useEffect(() => {
     if (showChampsStatsAtDistrictRegional === true && !ftcMode && selectedEvent && teamList?.teams?.length > 0 && isOnline) {
-      getTeamList();
+      eventStoreRef.current.getTeamList();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showChampsStatsAtDistrictRegional]);
@@ -4491,7 +3049,7 @@ function App() {
   // Refresh when District Champs playoff stats are enabled (otherwise list was built without history)
   useEffect(() => {
     if (showDistrictChampsStats === true && !ftcMode && selectedEvent && teamList?.teams?.length > 0 && isOnline) {
-      getTeamList();
+      eventStoreRef.current.getTeamList();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showDistrictChampsStats]);
@@ -4692,7 +3250,7 @@ function App() {
       !ftcMode
     ) {
       console.log(`Fetching robot images for ${selectedEvent?.value?.name}...`);
-      getRobotImages();
+      eventStoreRef.current.getRobotImages();
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -5394,8 +3952,75 @@ function App() {
   useHotkeys("j", () => tabNavLeft(), { scopes: "tabNavigation" });
   useHotkeys("s,F5", () => getSchedule(), { scopes: "tabNavigation" });
 
+  // --- Team Data slice dependencies ---
+  // Passed to EventStoreProvider → useTeamData hook
+
+  // Narrow callback: when getTeamList finishes in the adHoc branch, request community updates
+  const requestCommunityUpdatesForTeams = useCallback(
+    (teams) => {
+      getCommunityUpdates(false, teams.teams);
+    },
+    [getCommunityUpdates]
+  );
+
+  // Narrow callback: getTeamList patches selectedEvent for FTC alliance count
+  const patchSelectedEvent = useCallback(
+    (mutator) => {
+      setSelectedEvent((prev) => {
+        if (!prev) return prev;
+        const patched = JSON.parse(JSON.stringify(prev));
+        mutator(patched);
+        // No-op guard: skip update if value didn't change
+        if (JSON.stringify(patched) === JSON.stringify(prev)) return prev;
+        return patched;
+      });
+    },
+    [setSelectedEvent]
+  );
+
+  const teamDeps = {
+    // State + setters
+    teamList,
+    setTeamList,
+    teamListLoading,
+    setTeamListLoading,
+    setTeamRemappings,
+    setRobotImages,
+    setEPA,
+    setHaveChampsTeams,
+    setEITeams,
+    setRegionalEventDetail,
+    // Read-only environment
+    httpClient,
+    selectedEvent,
+    selectedYear,
+    ftcMode,
+    isOnline,
+    manualOfflineMode,
+    useFTCOffline,
+    FTCServerURL,
+    FTCKey,
+    cheesyArenaAvailable,
+    useCheesyArena,
+    events,
+    showBlueBanners,
+    showDistrictChampsStats,
+    showChampsStatsAtDistrictRegional,
+    playoffOnly,
+    champsStyle,
+    eventnames,
+    halloffame,
+    specialAwards,
+    training,
+    // Narrow callbacks
+    requestCommunityUpdatesForTeams,
+    patchSelectedEvent,
+  };
+
   // --- Rankings/Alliances slice dependencies ---
   // Passed to EventStoreProvider → useRankingsAlliances hook
+  // NOTE: getEPA, getEPAFTC, getTeamList, getRegionalEventDetail are now provided
+  // by the team slice via slice composition inside EventStoreProvider.
   const rankingsDeps = {
     httpClient,
     selectedEvent,
@@ -5413,10 +4038,6 @@ function App() {
     playoffReserveEditsRef,
     setPlayoffReserveEdits,
     training,
-    getEPA,
-    getEPAFTC,
-    getRegionalEventDetail,
-    getTeamList,
     setHaveChampsTeams,
     haveChampsTeams,
     // State + setters (owned by App.jsx, used by the hook)
@@ -5456,6 +4077,9 @@ function App() {
       currentMatch,
       remapNumberToString,
       remapStringToNumber,
+      EPA,
+      robotImages,
+      regionalEventDetail,
     }),
     [
       selectedEvent,
@@ -5477,6 +4101,9 @@ function App() {
       currentMatch,
       remapNumberToString,
       remapStringToNumber,
+      EPA,
+      robotImages,
+      regionalEventDetail,
     ]
   );
 
@@ -5487,7 +4114,6 @@ function App() {
     setFTCMode,
     loadEvent,
     getSchedule,
-    getTeamList,
     getCommunityUpdates,
     nextMatch,
     previousMatch,
@@ -5503,7 +4129,7 @@ function App() {
           </Container>
         </div>
       ) : (
-        <EventStoreProvider data={eventDataValue} actions={eventActions} rankingsDeps={rankingsDeps} storeRef={eventStoreRef}>
+        <EventStoreProvider data={eventDataValue} actions={eventActions} teamDeps={teamDeps} rankingsDeps={rankingsDeps} storeRef={eventStoreRef}>
             <BrowserRouter>
           <Routes>
             <Route
@@ -5648,10 +4274,6 @@ function App() {
                     allianceSelection={allianceSelection}
                     setRankings={setRankings}
                     setAllianceSelectionArrays={setAllianceSelectionArrays}
-                    playoffs={playoffs}
-                    regionalEventDetail={regionalEventDetail}
-                    getRegionalEventDetail={getRegionalEventDetail}
-                    EPA={EPA}
                   />
                 }
               />
@@ -5671,8 +4293,6 @@ function App() {
                     backupTeam={backupTeam}
                     setBackupTeam={setBackupTeam}
                     eventNamesCY={eventNamesCY}
-                    regionalEventDetail={regionalEventDetail}
-                    getRegionalEventDetail={getRegionalEventDetail}
                     adHocMatch={adHocMatch}
                     setAdHocMatch={setAdHocMatch}
                     adHocMode={adHocMode}
@@ -5710,15 +4330,12 @@ function App() {
                     eventHighScores={eventHighScores}
                     backupTeam={backupTeam}
                     setBackupTeam={setBackupTeam}
-                    regionalEventDetail={regionalEventDetail}
-                    getRegionalEventDetail={getRegionalEventDetail}
                     adHocMatch={adHocMatch}
                     setAdHocMatch={setAdHocMatch}
                     adHocMode={adHocMode}
                     qualsLength={qualsLength}
                     playoffOnly={playoffOnly}
                     playoffCountOverride={playoffCountOverride}
-                    EPA={EPA}
                     eventMessage={eventMessage}
                     eventBell={eventBell}
                     setEventBell={setEventBell}
@@ -5775,9 +4392,7 @@ function App() {
               <Route
                 path="/cheatsheet"
                 element={
-                  <CheatsheetPage
-                    robotImages={robotImages}
-                  />
+                  <CheatsheetPage />
                 }
               />
 

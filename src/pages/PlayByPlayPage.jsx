@@ -38,21 +38,18 @@ function PlayByPlayPage({
   playoffStationOrderEdits,
   upsertPlayoffStationOrderOverlay,
   removePlayoffStationOrderOverlay,
-  regionalEventDetail,
-  getRegionalEventDetail,
   adHocMatch,
   setAdHocMatch,
   adHocMode,
   qualsLength,
   playoffOnly,
   playoffCountOverride,
-  EPA,
   eventMessage,
   eventBell,
   setEventBell,
 }) {
-  const { selectedEvent, selectedYear, eventLabel, ftcMode, teamList, qualSchedule, playoffSchedule, practiceSchedule, offlinePlayoffSchedule, rankings, districtRankings, alliances, allianceCount, communityUpdates, currentMatch, remapNumberToString, remapStringToNumber } = useEventData();
-  const { nextMatch, previousMatch, setMatchFromMenu, getSchedule } = useEventActions();
+  const { selectedEvent, selectedYear, eventLabel, ftcMode, teamList, qualSchedule, playoffSchedule, practiceSchedule, offlinePlayoffSchedule, rankings, districtRankings, alliances, allianceCount, communityUpdates, currentMatch, remapNumberToString, remapStringToNumber, EPA, regionalEventDetail } = useEventData();
+  const { nextMatch, previousMatch, setMatchFromMenu, getSchedule, getRegionalEventDetail } = useEventActions();
   const { swapScreen, hidePracticeSchedule, teamReduction, showInspection, usePullDownToUpdate, useSwipe, useScrollMemory } = useSettings();
   // Remember scroll position for Play by play page
   useScrollPosition('playbyplay', true, false, useScrollMemory);

@@ -5,10 +5,8 @@ import _ from "lodash";
 import { apiBaseUrl } from "../contextProviders/AuthClientContext";
 import { useEventData } from "contexts/EventDataContext";
 
-function CheatsheetPage({
-  robotImages,
-}) {
-  const { teamList, communityUpdates, selectedEvent, selectedYear, eventLabel, ftcMode } = useEventData();
+function CheatsheetPage() {
+  const { teamList, communityUpdates, selectedEvent, selectedYear, eventLabel, ftcMode, robotImages } = useEventData();
   const sortedTeams = _.orderBy(teamList?.teams, "teamNumber", "asc");
   const cardStyle = {
     display: "flex",

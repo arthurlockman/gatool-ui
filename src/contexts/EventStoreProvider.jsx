@@ -2,6 +2,7 @@ import { useRef, useMemo } from "react";
 import { EventDataProvider } from "./EventDataContext";
 import { EventActionsProvider } from "./EventActionsContext";
 import { useRankingsAlliances } from "../hooks/useRankingsAlliances";
+import { useTeamData } from "../hooks/useTeamData";
 
 /**
  * Request deduplication: prevents multiple in-flight fetches to the same logical endpoint.
@@ -59,16 +60,18 @@ function createEpochGuard() {
  * fetch functions. The provider merges all slices into the shared contexts.
  *
  * Current slices:
+ * - useTeamData: team list, EPA, robot images, regional event detail, remappings
  * - useRankingsAlliances: rankings, alliances, districtRankings, playoffs
  *
  * @param {object} props.data - Read-mostly event data from App.jsx (will shrink over time)
  * @param {object} props.actions - Action functions from App.jsx (will shrink over time)
+ * @param {object} props.teamDeps - Dependencies for the team data slice
  * @param {object} props.rankingsDeps - Dependencies for the rankings/alliances slice
  * @param {React.MutableRefObject} props.storeRef - Ref that the provider populates with
  *   store-owned functions so App.jsx callers (getSchedule, loadEvent) can invoke them
  *   without being inside the provider tree.
  */
-export function EventStoreProvider({ data, actions, rankingsDeps, storeRef, children }) {
+export function EventStoreProvider({ data, actions, teamDeps, rankingsDeps, storeRef, children }) {
   // --- Request deduplication (available to future slices) ---
   // eslint-disable-next-line no-unused-vars
   const inflightRef = useRef(createInflightTracker());
@@ -80,21 +83,41 @@ export function EventStoreProvider({ data, actions, rankingsDeps, storeRef, chil
     rankings: createEpochGuard(),
   });
 
+  // --- Team Data slice ---
+  // The hook receives state + setters from App.jsx (via teamDeps) and returns
+  // fetch functions. State ownership stays in App.jsx.
+  const teamSlice = useTeamData(teamDeps, {
+    epochGuard: epochGuards.current.teamList,
+  });
+
   // --- Rankings & Alliances slice ---
-  // The hook receives state + setters from App.jsx (via rankingsDeps) and returns
-  // fetch functions + semantic actions. State ownership stays in App.jsx.
-  const rankingsSlice = useRankingsAlliances(rankingsDeps);
+  // Compose: team functions feed directly into rankings (no App.jsx roundtrip).
+  const composedRankingsDeps = {
+    ...rankingsDeps,
+    getEPA: teamSlice.getEPA,
+    getEPAFTC: teamSlice.getEPAFTC,
+    getTeamList: teamSlice.getTeamList,
+    getRegionalEventDetail: teamSlice.getRegionalEventDetail,
+  };
+  const rankingsSlice = useRankingsAlliances(composedRankingsDeps);
 
   // --- Expose store-owned functions to App.jsx via ref ---
   // This allows App.jsx functions (getSchedule, loadEvent) that live above the
   // provider tree to call store-owned functions without being context consumers.
   if (storeRef) {
     storeRef.current = {
-      // Fetch actions
+      // Team data slice
+      getTeamList: teamSlice.getTeamList,
+      getEPA: teamSlice.getEPA,
+      getEPAFTC: teamSlice.getEPAFTC,
+      getRobotImages: teamSlice.getRobotImages,
+      getRegionalEventDetail: teamSlice.getRegionalEventDetail,
+      fetchTeamRemappings: teamSlice.fetchTeamRemappings,
+      resetTeamDataState: teamSlice.resetTeamDataState,
+      // Rankings & alliances slice
       getRanks: rankingsSlice.getRanks,
       getAlliances: rankingsSlice.getAlliances,
       getDistrictRanks: rankingsSlice.getDistrictRanks,
-      // Semantic mutations
       resetRankingsAlliancesState: rankingsSlice.resetRankingsAlliancesState,
       applyUserPrefs: rankingsSlice.applyUserPrefs,
     };
@@ -109,11 +132,15 @@ export function EventStoreProvider({ data, actions, rankingsDeps, storeRef, chil
     setFTCMode: actions.setFTCMode,
     loadEvent: actions.loadEvent,
     getSchedule: actions.getSchedule,
-    getTeamList: actions.getTeamList,
     getCommunityUpdates: actions.getCommunityUpdates,
     nextMatch: actions.nextMatch,
     previousMatch: actions.previousMatch,
     setMatchFromMenu: actions.setMatchFromMenu,
+    // Store-owned: team data slice
+    getTeamList: teamSlice.getTeamList,
+    getEPA: teamSlice.getEPA,
+    getRobotImages: teamSlice.getRobotImages,
+    fetchTeamRemappings: teamSlice.fetchTeamRemappings,
     // Store-owned: rankings & alliances slice
     getRanks: rankingsSlice.getRanks,
     getAlliances: rankingsSlice.getAlliances,

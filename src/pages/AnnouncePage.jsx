@@ -42,8 +42,6 @@ function AnnouncePage({
   upsertPlayoffStationOrderOverlay,
   removePlayoffStationOrderOverlay,
   eventNamesCY,
-  regionalEventDetail,
-  getRegionalEventDetail,
   adHocMatch,
   setAdHocMatch,
   adHocMode,
@@ -55,8 +53,8 @@ function AnnouncePage({
   setEventBell,
   alliancePartnerConnectionsCache,
 }) {
-  const { selectedEvent, selectedYear, eventLabel, ftcMode, teamList, qualSchedule, playoffSchedule, practiceSchedule, offlinePlayoffSchedule, rankings, districtRankings, alliances, allianceCount, communityUpdates, currentMatch, remapNumberToString, remapStringToNumber } = useEventData();
-  const { nextMatch, previousMatch, setMatchFromMenu, getSchedule } = useEventActions();
+  const { selectedEvent, selectedYear, eventLabel, ftcMode, teamList, qualSchedule, playoffSchedule, practiceSchedule, offlinePlayoffSchedule, rankings, districtRankings, alliances, allianceCount, communityUpdates, currentMatch, remapNumberToString, remapStringToNumber, regionalEventDetail } = useEventData();
+  const { nextMatch, previousMatch, setMatchFromMenu, getSchedule, getRegionalEventDetail } = useEventActions();
   const { hidePracticeSchedule, teamReduction, showInspection, usePullDownToUpdate, useSwipe, useScrollMemory } = useSettings();
   // Remember scroll position for Announce page
   useScrollPosition('announce', true, false, useScrollMemory);

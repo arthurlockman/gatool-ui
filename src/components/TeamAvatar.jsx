@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 
 /**
- * Module-level cache: teamKey -> blob URL (or empty string for failures).
- * Survives component unmounts so avatars are never re-fetched within a session.
+ * Module-level cache: cacheKey -> Promise<string> | string.
+ * Values are either a pending Promise (fetch in-flight), a blob URL string
+ * (success), or "" (permanent failure). Using Promises lets remounted
+ * components subscribe to an in-flight fetch instead of treating it as failed.
  */
 const avatarCache = new Map();
 
@@ -14,35 +16,58 @@ const avatarCache = new Map();
  */
 export default function TeamAvatar({ src, teamNumber }) {
   const cacheKey = `${teamNumber}@${src}`;
-  const cached = avatarCache.get(cacheKey);
 
-  const [blobUrl, setBlobUrl] = useState(cached && cached !== "" ? cached : null);
-  const [failed, setFailed] = useState(cached === "");
+  // Serve immediately from cache on mount (first render only)
+  const cached = avatarCache.get(cacheKey);
+  const resolvedUrl = typeof cached === "string" && cached !== "" ? cached : null;
+
+  const [blobUrl, setBlobUrl] = useState(resolvedUrl);
+  const [failed, setFailed] = useState(typeof cached === "string" && cached === "");
 
   useEffect(() => {
-    if (avatarCache.has(cacheKey)) return;
+    // Read cache inside the effect so changes don't cause re-runs
+    const entry = avatarCache.get(cacheKey);
+
+    // Already have a resolved result
+    if (typeof entry === "string") {
+      if (entry !== "") setBlobUrl(entry);
+      else setFailed(true);
+      return;
+    }
 
     let cancelled = false;
-    avatarCache.set(cacheKey, ""); // mark in-flight to prevent duplicate fetches
 
-    fetch(src)
-      .then((r) => {
-        if (!r.ok) throw new Error("avatar not found");
-        return r.blob();
-      })
-      .then((blob) => {
-        const url = URL.createObjectURL(blob);
-        avatarCache.set(cacheKey, url);
-        if (!cancelled) setBlobUrl(url);
-      })
-      .catch(() => {
-        avatarCache.set(cacheKey, "");
-        if (!cancelled) setFailed(true);
-      });
+    // Reuse an in-flight promise or start a new fetch
+    const promise =
+      entry ||
+      fetch(src)
+        .then((r) => {
+          if (!r.ok) throw new Error("avatar not found");
+          return r.blob();
+        })
+        .then((blob) => {
+          const url = URL.createObjectURL(blob);
+          avatarCache.set(cacheKey, url);
+          return url;
+        })
+        .catch(() => {
+          avatarCache.set(cacheKey, "");
+          return "";
+        });
+
+    // Store the promise so concurrent/future mounts share one fetch
+    if (!entry) avatarCache.set(cacheKey, promise);
+
+    promise.then((result) => {
+      if (cancelled) return;
+      if (result && result !== "") setBlobUrl(result);
+      else setFailed(true);
+    });
 
     return () => {
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cacheKey, src]);
 
   if (failed || !blobUrl) return null;
@@ -51,8 +76,8 @@ export default function TeamAvatar({ src, teamNumber }) {
 
 /** Clear the avatar cache (call when switching events). */
 export function clearAvatarCache() {
-  for (const url of avatarCache.values()) {
-    if (url) URL.revokeObjectURL(url);
+  for (const val of avatarCache.values()) {
+    if (typeof val === "string" && val) URL.revokeObjectURL(val);
   }
   avatarCache.clear();
 }
