@@ -22,32 +22,24 @@ import { useState, useEffect, useRef } from "react";
 import { rankHighlight } from "../components/HelperFunctions";
 import useScrollPosition from "../hooks/useScrollPosition";
 import { useSettings } from "../contexts/SettingsContext";
+import { useEventData } from "contexts/EventDataContext";
+import { useEventActions } from "contexts/EventActionsContext";
 
 function RanksPage({
-  selectedEvent,
-  teamList,
-  rankings,
   rankSort,
   setRankSort,
-  allianceCount,
   rankingsOverride,
   setRankingsOverride,
   setRankings,
   allianceSelection,
-  getRanks,
   setAllianceSelectionArrays,
   playoffs,
-  districtRankings,
   regionalEventDetail,
   getRegionalEventDetail,
-  selectedYear,
-  eventLabel,
-  communityUpdates,
   EPA,
-  ftcMode,
-  remapNumberToString,
-  remapStringToNumber,
 }) {
+  const { selectedEvent, teamList, rankings, allianceCount, districtRankings, selectedYear, eventLabel, communityUpdates, ftcMode, remapNumberToString, remapStringToNumber } = useEventData();
+  const { getRanks } = useEventActions();
   const { useScrollMemory } = useSettings();
   // Remember scroll position for Ranks page
   useScrollPosition('ranks', true, false, useScrollMemory);

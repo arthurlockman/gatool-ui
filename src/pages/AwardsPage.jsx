@@ -4,10 +4,12 @@ import { Trophy } from "react-bootstrap-icons";
 import _ from "lodash";
 import { useHotkeysContext, useHotkeys } from "react-hotkeys-hook";
 import useWindowDimensions from "hooks/UseWindowDimensions";
+import { useEventData } from "contexts/EventDataContext";
 
 
 
-function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates, eventLabel, remapNumberToString }) {
+function AwardsPage() {
+  const { selectedEvent, selectedYear, teamList, communityUpdates, eventLabel, remapNumberToString } = useEventData();
     const originalAndSustaining = ["20", "45", "126", "148", "151", "157", "190", "191", "250"];
     const { disableScope, enableScope } = useHotkeysContext();
 

@@ -14,7 +14,7 @@ import AwardsPage from "./pages/AwardsPage";
 import StatsPage from "./pages/StatsPage";
 import CheatsheetPage from "./pages/CheatsheetPage";
 import EmceePage from "./pages/EmceePage";
-import { useEffect, useState, useRef, useMemo } from "react";
+import { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import {
   applyPlayoffReserveEdits,
   compactReserveEditsForEvent,
@@ -28,6 +28,8 @@ import { Container } from "react-bootstrap";
 import { usePersistentState } from "./hooks/UsePersistentState";
 import { useDarkMode } from "./hooks/useDarkMode";
 import { useSettings } from "./contexts/SettingsContext";
+import { EventDataProvider, useEventData } from "./contexts/EventDataContext";
+import { EventActionsProvider } from "./contexts/EventActionsContext";
 import _ from "lodash";
 import moment from "moment";
 import Developer from "./pages/Developer";
@@ -102,23 +104,17 @@ const ftcBaseURL = "https://api.gatool.org/ftc/v2/";
 const pagesWithScrollMemory = ['schedule', 'teamdata', 'ranks', 'announce', 'playbyplay', 'allianceselection'];
 
 function LayoutsWithNavbar({
-  selectedEvent,
-  practiceSchedule,
-  qualSchedule,
   playoffs,
-  teamList,
-  communityUpdates,
-  rankings,
   eventHighScores,
   worldHighScores,
   allianceSelection,
   systemBell,
   systemMessage,
-  ftcMode,
   screenMode,
   screenModeStatus,
   syncEvent,
 }) {
+  const { selectedEvent, qualSchedule, teamList, communityUpdates, rankings, practiceSchedule, ftcMode } = useEventData();
   const location = useLocation();
   const scrollContainerRef = useRef(null);
 
@@ -1218,20 +1214,20 @@ function App() {
    * @param {string} teamString The string team identifier
    * @returns {number} The numeric team number, or null if not found
    */
-  const remapStringToNumber = (teamString) => {
+  const remapStringToNumber = useCallback((teamString) => {
     if (!teamRemappings) return Number(teamString);
     return Number(teamRemappings.strings[teamString]) || Number(teamString) || null;
-  };
+  }, [teamRemappings]);
 
   /**
    * Remaps a numeric team number to its string identifier (e.g., 9990 -> "TeamA")
    * @param {number} teamNumber The numeric team number
    * @returns {string|number} The string team identifier, or the original number if not found
    */
-  const remapNumberToString = (teamNumber) => {
+  const remapNumberToString = useCallback((teamNumber) => {
     if (!teamRemappings) return teamNumber;
     return teamRemappings.numbers[teamNumber] || teamNumber || "";
-  };
+  }, [teamRemappings]);
 
   /**
    * This function retrieves a schedule from FIRST. It attempts to get both the Qual and Playoff Schedule and sets the global variables
@@ -6836,6 +6832,88 @@ function App() {
   useHotkeys("j", () => tabNavLeft(), { scopes: "tabNavigation" });
   useHotkeys("s,F5", () => getSchedule(), { scopes: "tabNavigation" });
 
+  // --- Event Data Context (read-mostly state) ---
+  const eventDataValue = useMemo(
+    () => ({
+      selectedEvent,
+      selectedYear,
+      eventLabel,
+      ftcMode,
+      teamList,
+      qualSchedule,
+      playoffSchedule,
+      practiceSchedule,
+      offlinePlayoffSchedule,
+      rankings,
+      districtRankings,
+      alliances,
+      allianceCount,
+      communityUpdates,
+      currentMatch,
+      remapNumberToString,
+      remapStringToNumber,
+    }),
+    [
+      selectedEvent,
+      selectedYear,
+      eventLabel,
+      ftcMode,
+      teamList,
+      qualSchedule,
+      playoffSchedule,
+      practiceSchedule,
+      offlinePlayoffSchedule,
+      rankings,
+      districtRankings,
+      alliances,
+      allianceCount,
+      communityUpdates,
+      currentMatch,
+      remapNumberToString,
+      remapStringToNumber,
+    ]
+  );
+
+  // --- Event Actions Context (ref-stabilized functions) ---
+  const eventActionsRef = useRef({});
+  eventActionsRef.current = {
+    setSelectedEvent,
+    setSelectedYear,
+    setFTCMode,
+    loadEvent,
+    getSchedule,
+    getTeamList,
+    getRanks,
+    getAlliances,
+    getCommunityUpdates,
+    nextMatch,
+    previousMatch,
+    setMatchFromMenu,
+  };
+
+  const eventActionsValue = useMemo(
+    () => ({
+      setSelectedEvent: (...args) =>
+        eventActionsRef.current.setSelectedEvent(...args),
+      setSelectedYear: (...args) =>
+        eventActionsRef.current.setSelectedYear(...args),
+      setFTCMode: (...args) => eventActionsRef.current.setFTCMode(...args),
+      loadEvent: (...args) => eventActionsRef.current.loadEvent(...args),
+      getSchedule: (...args) => eventActionsRef.current.getSchedule(...args),
+      getTeamList: (...args) => eventActionsRef.current.getTeamList(...args),
+      getRanks: (...args) => eventActionsRef.current.getRanks(...args),
+      getAlliances: (...args) => eventActionsRef.current.getAlliances(...args),
+      getCommunityUpdates: (...args) =>
+        eventActionsRef.current.getCommunityUpdates(...args),
+      nextMatch: (...args) => eventActionsRef.current.nextMatch(...args),
+      previousMatch: (...args) =>
+        eventActionsRef.current.previousMatch(...args),
+      setMatchFromMenu: (...args) =>
+        eventActionsRef.current.setMatchFromMenu(...args),
+    }),
+    []
+  );
+
   return (
     <div className="App">
       {isLoading ? (
@@ -6845,25 +6923,20 @@ function App() {
           </Container>
         </div>
       ) : (
-        <BrowserRouter>
+        <EventActionsProvider value={eventActionsValue}>
+          <EventDataProvider value={eventDataValue}>
+            <BrowserRouter>
           <Routes>
             <Route
               path="/"
               element={
                 <LayoutsWithNavbar
-                  selectedEvent={selectedEvent}
-                  qualSchedule={qualSchedule}
                   playoffs={playoffs}
-                  teamList={teamList}
-                  communityUpdates={communityUpdates}
-                  rankings={rankings}
                   eventHighScores={eventHighScores}
                   worldHighScores={worldStats}
                   allianceSelection={allianceSelection}
-                  practiceSchedule={practiceSchedule}
                   systemBell={systemBell}
                   systemMessage={systemMessage}
-                  ftcMode={ftcMode}
                   screenMode={screenMode}
                   screenModeStatus={screenModeStatus}
                   syncEvent={syncEvent}
@@ -6874,12 +6947,7 @@ function App() {
                 path="/"
                 element={
                   <SetupPage
-                    selectedEvent={selectedEvent}
-                    setSelectedEvent={setSelectedEvent}
-                    setSelectedYear={setSelectedYear}
-                    selectedYear={selectedYear}
                     eventList={events}
-                    teamList={teamList}
                     eventFilters={eventFilters}
                     setEventFilters={setEventFilters}
                     regionFilters={regionFilters}
@@ -6887,17 +6955,11 @@ function App() {
                     districts={districts}
                     timeFilter={timeFilter}
                     setTimeFilter={setTimeFilter}
-                    qualSchedule={qualSchedule}
-                    playoffSchedule={playoffSchedule}
-                    rankings={rankings}
-                    getSchedule={getSchedule}
                     playoffCountOverride={playoffCountOverride}
                     setPlayoffCountOverride={setPlayoffCountOverride}
-                    allianceCount={allianceCount}
                     localUpdates={localUpdates}
                     setLocalUpdates={setLocalUpdates}
                     putTeamData={putTeamData}
-                    getCommunityUpdates={getCommunityUpdates}
                     user={user}
                     isAuthenticated={isAuthenticated}
                     adHocMode={adHocMode}
@@ -6908,12 +6970,8 @@ function App() {
                     setLoadingCommunityUpdates={setLoadingCommunityUpdates}
                     systemMessage={systemMessage}
                     setTeamListLoading={setTeamListLoading}
-                    getTeamList={getTeamList}
-                    getAlliances={getAlliances}
                     setHaveChampsTeams={setHaveChampsTeams}
                     appUpdates={appUpdates}
-                    eventLabel={eventLabel}
-                    setEventLabel={setEventLabel}
                     systemBell={systemBell}
                     setSystemBell={setSystemBell}
                     eventBell={eventBell}
@@ -6926,8 +6984,6 @@ function App() {
                     useFourTeamAlliances={useFourTeamAlliances}
                     setUseFourTeamAlliances={setUseFourTeamAlliances}
                     ftcLeagues={ftcLeagues}
-                    ftcMode={ftcMode}
-                    setFTCMode={setFTCMode}
                     ftcRegions={ftcregions}
                     ftcTypes={ftcTypes}
                     useFTCOffline={useFTCOffline}
@@ -6965,33 +7021,19 @@ function App() {
                 path="/schedule"
                 element={
                   <SchedulePage
-                    selectedEvent={selectedEvent}
-                    setSelectedEvent={setSelectedEvent}
-                    playoffSchedule={playoffSchedule}
-                    qualSchedule={qualSchedule}
-                    practiceSchedule={practiceSchedule}
                     setPracticeSchedule={setPracticeSchedule}
-                    getTeamList={getTeamList}
                     setOfflinePlayoffSchedule={setOfflinePlayoffSchedule}
-                    offlinePlayoffSchedule={offlinePlayoffSchedule}
-                    loadEvent={loadEvent}
                     practiceFileUploaded={practiceFileUploaded}
                     setPracticeFileUploaded={setPracticeFileUploaded}
                     setTeamListLoading={setTeamListLoading}
-                    getAlliances={getAlliances}
                     playoffOnly={playoffOnly}
                     setPlayoffOnly={setPlayoffOnly}
-                    alliances={alliances}
                     champsStyle={champsStyle}
                     setChampsStyle={setChampsStyle}
                     setQualsLength={setQualsLength}
                     playoffCountOverride={playoffCountOverride}
-                    eventLabel={eventLabel}
                     setEventLabel={setEventLabel}
-                    allianceCount={allianceCount}
                     setPlayoffCountOverride={setPlayoffCountOverride}
-                    ftcMode={ftcMode}
-                    remapNumberToString={remapNumberToString}
                   />
                 }
               />
@@ -7000,31 +7042,18 @@ function App() {
                 path="/teamdata"
                 element={
                   <TeamDataPage
-                    selectedEvent={selectedEvent}
-                    selectedYear={selectedYear}
-                    teamList={teamList}
-                    rankings={rankings}
                     teamSort={teamSort}
                     setTeamSort={setTeamSort}
-                    communityUpdates={communityUpdates}
                     setCommunityUpdates={setCommunityUpdates}
-                    allianceCount={allianceCount}
                     lastVisit={lastVisit}
                     setLastVisit={setLastVisit}
                     putTeamData={putTeamData}
                     localUpdates={localUpdates}
                     setLocalUpdates={setLocalUpdates}
-                    qualSchedule={qualSchedule}
-                    playoffSchedule={playoffSchedule}
                     originalAndSustaining={originalAndSustaining}
                     user={user}
                     isAuthenticated={isAuthenticated}
                     getTeamHistory={getTeamHistory}
-                    getCommunityUpdates={getCommunityUpdates}
-                    getTeamList={getTeamList}
-                    eventLabel={eventLabel}
-                    ftcMode={ftcMode}
-                    remapNumberToString={remapNumberToString}
                   />
                 }
               />
@@ -7033,29 +7062,17 @@ function App() {
                 path="/ranks"
                 element={
                   <RanksPage
-                    selectedEvent={selectedEvent}
-                    teamList={teamList}
-                    rankings={rankings}
                     rankSort={rankSort}
                     setRankSort={setRankSort}
-                    allianceCount={allianceCount}
                     rankingsOverride={rankingsOverride}
                     setRankingsOverride={setRankingsOverride}
                     allianceSelection={allianceSelection}
-                    getRanks={getRanks}
                     setRankings={setRankings}
                     setAllianceSelectionArrays={setAllianceSelectionArrays}
                     playoffs={playoffs}
-                    districtRankings={districtRankings}
                     regionalEventDetail={regionalEventDetail}
                     getRegionalEventDetail={getRegionalEventDetail}
-                    selectedYear={selectedYear}
-                    eventLabel={eventLabel}
-                    communityUpdates={communityUpdates}
                     EPA={EPA}
-                    ftcMode={ftcMode}
-                    remapNumberToString={remapNumberToString}
-                    remapStringToNumber={remapStringToNumber}
                   />
                 }
               />
@@ -7064,49 +7081,28 @@ function App() {
                 path="/announce"
                 element={
                     <AnnouncePage
-                    selectedEvent={selectedEvent}
-                    selectedYear={selectedYear}
                     worldStats={worldStats}
                     ftcRegionHighScores={ftcRegionHighScores}
                     ftcLeagueHighScores={ftcLeagueHighScores}
                     frcDistrictHighScores={frcDistrictHighScores}
                     districts={districts}
                     ftcLeagues={ftcLeagues}
-                    teamList={teamList}
-                    rankings={rankings}
-                    communityUpdates={communityUpdates}
-                    currentMatch={currentMatch}
-                    qualSchedule={qualSchedule}
-                    playoffSchedule={playoffSchedule}
-                    alliances={alliances}
                     setAlliances={setAlliances}
                     eventHighScores={eventHighScores}
                     backupTeam={backupTeam}
                     setBackupTeam={setBackupTeam}
-                    allianceCount={allianceCount}
-                    nextMatch={nextMatch}
-                    previousMatch={previousMatch}
-                    setMatchFromMenu={setMatchFromMenu}
-                    practiceSchedule={practiceSchedule}
                     eventNamesCY={eventNamesCY}
-                    districtRankings={districtRankings}
                     regionalEventDetail={regionalEventDetail}
                     getRegionalEventDetail={getRegionalEventDetail}
                     adHocMatch={adHocMatch}
                     setAdHocMatch={setAdHocMatch}
                     adHocMode={adHocMode}
-                    offlinePlayoffSchedule={offlinePlayoffSchedule}
                     qualsLength={qualsLength}
                     playoffOnly={playoffOnly}
-                    getSchedule={getSchedule}
-                    eventLabel={eventLabel}
                     playoffCountOverride={playoffCountOverride}
                     eventMessage={eventMessage}
                     eventBell={eventBell}
                     setEventBell={setEventBell}
-                    ftcMode={ftcMode}
-                    remapNumberToString={remapNumberToString}
-                    remapStringToNumber={remapStringToNumber}
                     alliancePartnerConnectionsCache={
                       alliancePartnerConnectionsCache
                     }
@@ -7124,8 +7120,6 @@ function App() {
                 path="/playbyplay"
                 element={
                   <PlayByPlayPage
-                    selectedEvent={selectedEvent}
-                    selectedYear={selectedYear}
                     worldStats={worldStats}
                     ftcRegionHighScores={ftcRegionHighScores}
                     ftcLeagueHighScores={ftcLeagueHighScores}
@@ -7133,41 +7127,22 @@ function App() {
                     districts={districts}
                     ftcLeagues={ftcLeagues}
                     eventNamesCY={eventNamesCY}
-                    teamList={teamList}
-                    rankings={rankings}
-                    communityUpdates={communityUpdates}
-                    currentMatch={currentMatch}
-                    qualSchedule={qualSchedule}
-                    playoffSchedule={playoffSchedule}
-                    alliances={alliances}
                     setAlliances={setAlliances}
                     eventHighScores={eventHighScores}
                     backupTeam={backupTeam}
                     setBackupTeam={setBackupTeam}
-                    allianceCount={allianceCount}
-                    nextMatch={nextMatch}
-                    previousMatch={previousMatch}
-                    setMatchFromMenu={setMatchFromMenu}
-                    practiceSchedule={practiceSchedule}
-                    districtRankings={districtRankings}
                     regionalEventDetail={regionalEventDetail}
                     getRegionalEventDetail={getRegionalEventDetail}
                     adHocMatch={adHocMatch}
                     setAdHocMatch={setAdHocMatch}
                     adHocMode={adHocMode}
-                    offlinePlayoffSchedule={offlinePlayoffSchedule}
                     qualsLength={qualsLength}
                     playoffOnly={playoffOnly}
-                    getSchedule={getSchedule}
-                    eventLabel={eventLabel}
                     playoffCountOverride={playoffCountOverride}
                     EPA={EPA}
                     eventMessage={eventMessage}
                     eventBell={eventBell}
                     setEventBell={setEventBell}
-                    ftcMode={ftcMode}
-                    remapNumberToString={remapNumberToString}
-                    remapStringToNumber={remapStringToNumber}
                     upsertPlayoffReserveOverlay={upsertPlayoffReserveOverlay}
                     removePlayoffReserveOverlay={removePlayoffReserveOverlay}
                     playoffReserveEdits={playoffReserveEdits}
@@ -7182,34 +7157,15 @@ function App() {
                 path="/allianceselection"
                 element={
                   <AllianceSelectionPage
-                    selectedYear={selectedYear}
-                    selectedEvent={selectedEvent}
-                    qualSchedule={qualSchedule}
-                    playoffSchedule={playoffSchedule}
-                    offlinePlayoffSchedule={offlinePlayoffSchedule}
-                    alliances={alliances}
-                    rankings={rankings}
-                    getRanks={getRanks}
                     allianceSelection={allianceSelection}
                     playoffs={playoffs}
-                    teamList={teamList}
-                    allianceCount={allianceCount}
-                    communityUpdates={communityUpdates}
                     allianceSelectionArrays={allianceSelectionArrays}
                     setAllianceSelectionArrays={setAllianceSelectionArrays}
                     rankingsOverride={rankingsOverride}
-                    loadEvent={loadEvent}
-                    practiceSchedule={practiceSchedule}
                     setOfflinePlayoffSchedule={setOfflinePlayoffSchedule}
-                    currentMatch={currentMatch}
                     qualsLength={qualsLength}
-                    nextMatch={nextMatch}
-                    previousMatch={previousMatch}
-                    getSchedule={getSchedule}
-                    eventLabel={eventLabel}
+                    playoffOnly={playoffOnly}
                     playoffCountOverride={playoffCountOverride}
-                    ftcMode={ftcMode}
-                    remapNumberToString={remapNumberToString}
                   />
                 }
               />
@@ -7217,14 +7173,7 @@ function App() {
               <Route
                 path="/awards"
                 element={
-                  <AwardsPage
-                    selectedEvent={selectedEvent}
-                    selectedYear={selectedYear}
-                    teamList={teamList}
-                    communityUpdates={communityUpdates}
-                    eventLabel={eventLabel}
-                    remapNumberToString={remapNumberToString}
-                  />
+                  <AwardsPage />
                 }
               />
 
@@ -7233,13 +7182,9 @@ function App() {
                 element={
                   <StatsPage
                     worldStats={worldStats}
-                    selectedEvent={selectedEvent}
                     eventHighScores={eventHighScores}
                     eventNamesCY={eventNamesCY}
-                    eventLabel={eventLabel}
                     districts={districts}
-                    selectedYear={selectedYear}
-                    ftcMode={ftcMode}
                     ftcRegionHighScores={ftcRegionHighScores}
                     ftcLeagueHighScores={ftcLeagueHighScores}
                     ftcLeagues={ftcLeagues}
@@ -7252,13 +7197,7 @@ function App() {
                 path="/cheatsheet"
                 element={
                   <CheatsheetPage
-                    teamList={teamList}
-                    communityUpdates={communityUpdates}
-                    selectedEvent={selectedEvent}
-                    selectedYear={selectedYear}
                     robotImages={robotImages}
-                    eventLabel={eventLabel}
-                    ftcMode={ftcMode}
                   />
                 }
               />
@@ -7267,20 +7206,7 @@ function App() {
                 path="/emcee"
                 element={
                   <EmceePage
-                    selectedEvent={selectedEvent}
-                    playoffSchedule={playoffSchedule}
-                    qualSchedule={qualSchedule}
-                    alliances={alliances}
-                    currentMatch={currentMatch}
-                    nextMatch={nextMatch}
-                    previousMatch={previousMatch}
-                    practiceSchedule={practiceSchedule}
-                    offlinePlayoffSchedule={offlinePlayoffSchedule}
-                    getSchedule={getSchedule}
-                    eventLabel={eventLabel}
                     playoffCountOverride={playoffCountOverride}
-                    ftcMode={ftcMode}
-                    remapNumberToString={remapNumberToString}
                   />
                 }
               />
@@ -7302,6 +7228,8 @@ function App() {
             </Route>
           </Routes>
         </BrowserRouter>
+          </EventDataProvider>
+        </EventActionsProvider>
       )}
     </div>
   );

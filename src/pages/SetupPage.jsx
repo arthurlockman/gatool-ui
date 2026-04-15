@@ -11,6 +11,8 @@ import { toast } from "react-toastify";
 import { isSafari, isChrome, fullBrowserVersion, browserVersion, isIOS, browserName, isDesktop, isTablet, isMobile } from "react-device-detect";
 import { playoffOverrideMenu } from "data/appConfig";
 import { useSettings } from "contexts/SettingsContext";
+import { useEventData } from "contexts/EventDataContext";
+import { useEventActions } from "contexts/EventActionsContext";
 import Contenteditable from "components/ContentEditable";
 import { ArrowClockwise, Trash, Copy, Plus, BellFill, CaretUpFill, CaretDownFill } from 'react-bootstrap-icons';
 import NotificationBanner from "components/NotificationBanner";
@@ -77,7 +79,77 @@ const ftcModeOptions = [
 
 
 
-function SetupPage({ selectedEvent, setSelectedEvent, selectedYear, setSelectedYear, eventList, teamList, qualSchedule, playoffSchedule, rankings, eventFilters, setEventFilters, regionFilters, setRegionFilters, districts, timeFilter, setTimeFilter, playoffCountOverride, setPlayoffCountOverride, allianceCount, localUpdates, setLocalUpdates, putTeamData, getCommunityUpdates, user, isAuthenticated, adHocMode, setAdHocMode, supportedYears, FTCSupportedYears, reloadPage, setLoadingCommunityUpdates, systemMessage, setTeamListLoading, getTeamList, getAlliances, setHaveChampsTeams, appUpdates, eventLabel, setEventLabel, getSchedule, systemBell, setSystemBell, eventBell, setEventBell, eventMessage, setEventMessage, putEventNotifications, useCheesyArena, setUseCheesyArena, useFourTeamAlliances, setUseFourTeamAlliances, ftcLeagues, ftcRegions, ftcMode, setFTCMode, ftcTypes, useFTCOffline, setUseFTCOffline, FTCServerURL, setFTCServerURL, FTCKey, requestFTCKey, checkFTCKey, FTCOfflineAvailable, getFTCOfflineStatus, getCheesyStatus, manualOfflineMode, setManualOfflineMode, syncEvent, setSyncEvent, screenMode, setScreenMode, screenModeSyncFrequency, setScreenModeSyncFrequency, backgroundDataRefresh, setBackgroundDataRefresh, backgroundDataRefreshFrequency, setBackgroundDataRefreshFrequency, darkMode, setDarkMode, useOsTheme, setUseOsTheme, appearanceDark }) {
+function SetupPage({
+  eventList,
+  eventFilters,
+  setEventFilters,
+  regionFilters,
+  setRegionFilters,
+  districts,
+  timeFilter,
+  setTimeFilter,
+  playoffCountOverride,
+  setPlayoffCountOverride,
+  localUpdates,
+  setLocalUpdates,
+  putTeamData,
+  user,
+  isAuthenticated,
+  adHocMode,
+  setAdHocMode,
+  supportedYears,
+  FTCSupportedYears,
+  reloadPage,
+  setLoadingCommunityUpdates,
+  systemMessage,
+  setTeamListLoading,
+  setHaveChampsTeams,
+  appUpdates,
+  setEventLabel,
+  systemBell,
+  setSystemBell,
+  eventBell,
+  setEventBell,
+  eventMessage,
+  setEventMessage,
+  putEventNotifications,
+  useCheesyArena,
+  setUseCheesyArena,
+  useFourTeamAlliances,
+  setUseFourTeamAlliances,
+  ftcLeagues,
+  ftcRegions,
+  ftcTypes,
+  useFTCOffline,
+  setUseFTCOffline,
+  FTCServerURL,
+  setFTCServerURL,
+  FTCKey,
+  requestFTCKey,
+  checkFTCKey,
+  FTCOfflineAvailable,
+  getFTCOfflineStatus,
+  getCheesyStatus,
+  manualOfflineMode,
+  setManualOfflineMode,
+  syncEvent,
+  setSyncEvent,
+  screenMode,
+  setScreenMode,
+  screenModeSyncFrequency,
+  setScreenModeSyncFrequency,
+  backgroundDataRefresh,
+  setBackgroundDataRefresh,
+  backgroundDataRefreshFrequency,
+  setBackgroundDataRefreshFrequency,
+  darkMode,
+  setDarkMode,
+  useOsTheme,
+  setUseOsTheme,
+  appearanceDark,
+}) {
+  const { selectedEvent, selectedYear, eventLabel, ftcMode, teamList, qualSchedule, playoffSchedule, rankings, allianceCount } = useEventData();
+  const { setSelectedEvent, setSelectedYear, setFTCMode, getSchedule, getCommunityUpdates, getTeamList, getAlliances } = useEventActions();
     const {
         timeFormat, setTimeFormat, showSponsors, setShowSponsors, autoHideSponsors, setAutoHideSponsors,
         showAwards, setShowAwards, showMinorAwards, setShowMinorAwards, showNotes, setShowNotes,

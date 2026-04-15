@@ -13,11 +13,24 @@ import _ from "lodash";
 import useScrollPosition from "../hooks/useScrollPosition";
 import { playoffMatchHasDisplayableResult } from "../utils/frcPlayoffSchedule";
 import { useSettings } from "../contexts/SettingsContext";
+import { useEventData } from "contexts/EventDataContext";
+import { useEventActions } from "contexts/EventActionsContext";
 
 import './AllianceSelectionPage.css';
 
 
-function AllianceSelectionPage({ selectedYear, selectedEvent, qualSchedule, playoffSchedule, offlinePlayoffSchedule, alliances, rankings, getRanks, allianceSelection, playoffs, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays, rankingsOverride, loadEvent, practiceSchedule, setOfflinePlayoffSchedule, currentMatch, qualsLength, nextMatch, previousMatch, getSchedule, eventLabel, playoffCountOverride, ftcMode, remapNumberToString }) {
+function AllianceSelectionPage({
+  allianceSelection,
+  playoffs,
+  allianceSelectionArrays,
+  setAllianceSelectionArrays,
+  rankingsOverride,
+  setOfflinePlayoffSchedule,
+  qualsLength,
+  playoffCountOverride,
+}) {
+  const { selectedEvent, selectedYear, qualSchedule, playoffSchedule, offlinePlayoffSchedule, alliances, rankings, teamList, allianceCount, communityUpdates, practiceSchedule, currentMatch, eventLabel, ftcMode, remapNumberToString } = useEventData();
+  const { getRanks, loadEvent, nextMatch, previousMatch, getSchedule } = useEventActions();
     const { timeFormat, useSwipe, usePullDownToUpdate, useFourTeamAlliances, useScrollMemory } = useSettings();
     /**
      * This function finds a team by their station assignment

@@ -3,16 +3,12 @@ import { Container, Row } from "react-bootstrap";
 import { FlashcardArray } from "react-quizlet-flashcard";
 import _ from "lodash";
 import { apiBaseUrl } from "../contextProviders/AuthClientContext";
+import { useEventData } from "contexts/EventDataContext";
 
 function CheatsheetPage({
-  teamList,
-  communityUpdates,
-  selectedEvent,
-  selectedYear,
   robotImages,
-  eventLabel,
-  ftcMode,
 }) {
+  const { teamList, communityUpdates, selectedEvent, selectedYear, eventLabel, ftcMode } = useEventData();
   const sortedTeams = _.orderBy(teamList?.teams, "teamNumber", "asc");
   const cardStyle = {
     display: "flex",

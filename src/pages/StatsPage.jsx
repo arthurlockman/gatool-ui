@@ -2,21 +2,19 @@ import { Alert, Container, Row, Col } from "react-bootstrap";
 import StatsMatch from "../components/StatsMatch";
 import _ from "lodash";
 import { useState } from "react";
+import { useEventData } from "contexts/EventDataContext";
 
 function StatsPage({
   worldStats,
-  selectedEvent,
   eventHighScores,
   eventNamesCY,
-  eventLabel,
   districts,
-  selectedYear,
-  ftcMode,
   ftcRegionHighScores,
   ftcLeagueHighScores,
   ftcLeagues,
   frcDistrictHighScores,
 }) {
+  const { selectedEvent, eventLabel, selectedYear, ftcMode } = useEventData();
   const eventDistrict = _.filter(districts, {
     value: selectedEvent?.value?.districtCode,
   })[0];

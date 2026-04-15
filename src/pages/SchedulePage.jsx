@@ -29,36 +29,26 @@ import {
   playoffMatchHasDisplayableResult,
 } from "../utils/frcPlayoffSchedule";
 import { useSettings } from "../contexts/SettingsContext";
+import { useEventData } from "contexts/EventDataContext";
+import { useEventActions } from "contexts/EventActionsContext";
 
 function SchedulePage({
-  selectedEvent,
-  setSelectedEvent,
-  playoffSchedule,
-  qualSchedule,
-  practiceSchedule,
   setPracticeSchedule,
-  offlinePlayoffSchedule,
   setOfflinePlayoffSchedule,
-  getTeamList,
-  loadEvent,
   practiceFileUploaded,
   setPracticeFileUploaded,
   setTeamListLoading,
-  getAlliances,
   playoffOnly,
   setPlayoffOnly,
-  alliances,
   champsStyle,
   setChampsStyle,
   setQualsLength,
   playoffCountOverride,
   setPlayoffCountOverride,
-  eventLabel,
   setEventLabel,
-  allianceCount,
-  ftcMode,
-  remapNumberToString,
 }) {
+  const { selectedEvent, playoffSchedule, qualSchedule, practiceSchedule, offlinePlayoffSchedule, alliances, eventLabel, allianceCount, ftcMode, remapNumberToString } = useEventData();
+  const { setSelectedEvent, getTeamList, loadEvent, getAlliances } = useEventActions();
   const { hidePracticeSchedule, useScrollMemory } = useSettings();
   const [showAdjustAlliances, setShowAdjustAlliances] = useState(false);
   const [showScores, setShowScores] = useState(false);

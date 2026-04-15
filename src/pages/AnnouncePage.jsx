@@ -21,24 +21,16 @@ import { getAllianceLookupEntry } from "../utils/allianceLookup";
 import { matchHasPostedResult } from "../utils/playoffReserveEdits";
 import { applyPlayoffStationOrderToMatch } from "../utils/playoffStationOrderEdits";
 import { useSettings } from "../contexts/SettingsContext";
+import { useEventData } from "contexts/EventDataContext";
+import { useEventActions } from "contexts/EventActionsContext";
 
 function AnnouncePage({
-  selectedEvent,
-  selectedYear,
   worldStats,
   ftcRegionHighScores,
   ftcLeagueHighScores,
   frcDistrictHighScores,
   districts,
   ftcLeagues,
-  teamList,
-  rankings,
-  communityUpdates,
-  currentMatch,
-  playoffSchedule,
-  qualSchedule,
-  allianceCount,
-  alliances,
   setAlliances,
   eventHighScores,
   backupTeam,
@@ -49,31 +41,22 @@ function AnnouncePage({
   playoffStationOrderEdits,
   upsertPlayoffStationOrderOverlay,
   removePlayoffStationOrderOverlay,
-  nextMatch,
-  previousMatch,
-  setMatchFromMenu,
-  practiceSchedule,
   eventNamesCY,
-  districtRankings,
   regionalEventDetail,
   getRegionalEventDetail,
   adHocMatch,
   setAdHocMatch,
   adHocMode,
-  offlinePlayoffSchedule,
   qualsLength,
   playoffOnly,
-  getSchedule,
-  eventLabel,
   playoffCountOverride,
   eventMessage,
   eventBell,
   setEventBell,
-  ftcMode,
-  remapNumberToString,
-  remapStringToNumber,
   alliancePartnerConnectionsCache,
 }) {
+  const { selectedEvent, selectedYear, eventLabel, ftcMode, teamList, qualSchedule, playoffSchedule, practiceSchedule, offlinePlayoffSchedule, rankings, districtRankings, alliances, allianceCount, communityUpdates, currentMatch, remapNumberToString, remapStringToNumber } = useEventData();
+  const { nextMatch, previousMatch, setMatchFromMenu, getSchedule } = useEventActions();
   const { hidePracticeSchedule, teamReduction, showInspection, usePullDownToUpdate, useSwipe, useScrollMemory } = useSettings();
   // Remember scroll position for Announce page
   useScrollPosition('announce', true, false, useScrollMemory);

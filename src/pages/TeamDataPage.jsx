@@ -20,6 +20,8 @@ import TeamHistoryModal from "components/TeamHistoryModal";
 import { useInterval } from "react-interval-hook";
 import useScrollPosition from "../hooks/useScrollPosition";
 import { useSettings } from "../contexts/SettingsContext";
+import { useEventData } from "contexts/EventDataContext";
+import { useEventActions } from "contexts/EventActionsContext";
 
 /** Blue banner stats are a nested object; SheetJS leaves those cells blank unless stringified. */
 const BLUE_BANNER_EXPORT_ROWS = [
@@ -67,7 +69,22 @@ function formatBlueBannersForExport(bb) {
     return parts.join("; ");
 }
 
-function TeamDataPage({ selectedEvent, selectedYear, teamList, rankings, teamSort, setTeamSort, communityUpdates, setCommunityUpdates, allianceCount, lastVisit, setLastVisit, putTeamData, localUpdates, setLocalUpdates, qualSchedule, playoffSchedule, originalAndSustaining, user, isAuthenticated, getTeamHistory, getCommunityUpdates, getTeamList, eventLabel, ftcMode, remapNumberToString }) {
+function TeamDataPage({
+  teamSort,
+  setTeamSort,
+  setCommunityUpdates,
+  lastVisit,
+  setLastVisit,
+  putTeamData,
+  localUpdates,
+  setLocalUpdates,
+  originalAndSustaining,
+  user,
+  isAuthenticated,
+  getTeamHistory,
+}) {
+  const { selectedEvent, selectedYear, teamList, rankings, communityUpdates, allianceCount, qualSchedule, playoffSchedule, eventLabel, ftcMode, remapNumberToString } = useEventData();
+  const { getCommunityUpdates, getTeamList } = useEventActions();
     const { monthsWarning, timeFormat, useScrollMemory } = useSettings();
     const [currentTime, setCurrentTime] = useState(moment());
     const [clockRunning, setClockRunning] = useState(true);

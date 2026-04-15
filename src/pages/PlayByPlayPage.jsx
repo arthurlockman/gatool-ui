@@ -17,10 +17,10 @@ import { matchHasPostedResult } from "../utils/playoffReserveEdits";
 import { applyPlayoffStationOrderToMatch } from "../utils/playoffStationOrderEdits";
 import { getPlayByPlayDisplayOrder } from "../utils/playByPlayDisplayOrder";
 import { useSettings } from "../contexts/SettingsContext";
+import { useEventData } from "contexts/EventDataContext";
+import { useEventActions } from "contexts/EventActionsContext";
 
 function PlayByPlayPage({
-  selectedEvent,
-  selectedYear,
   worldStats,
   ftcRegionHighScores,
   ftcLeagueHighScores,
@@ -28,14 +28,6 @@ function PlayByPlayPage({
   districts,
   ftcLeagues,
   eventNamesCY,
-  teamList,
-  rankings,
-  communityUpdates,
-  currentMatch,
-  playoffSchedule,
-  qualSchedule,
-  allianceCount,
-  alliances,
   setAlliances,
   eventHighScores,
   backupTeam,
@@ -46,12 +38,6 @@ function PlayByPlayPage({
   playoffStationOrderEdits,
   upsertPlayoffStationOrderOverlay,
   removePlayoffStationOrderOverlay,
-  nextMatch,
-  previousMatch,
-  setMatchFromMenu,
-  practiceSchedule,
-  offlinePlayoffSchedule,
-  districtRankings,
   regionalEventDetail,
   getRegionalEventDetail,
   adHocMatch,
@@ -59,17 +45,14 @@ function PlayByPlayPage({
   adHocMode,
   qualsLength,
   playoffOnly,
-  getSchedule,
-  eventLabel,
   playoffCountOverride,
   EPA,
   eventMessage,
   eventBell,
   setEventBell,
-  ftcMode,
-  remapNumberToString,
-  remapStringToNumber,
 }) {
+  const { selectedEvent, selectedYear, eventLabel, ftcMode, teamList, qualSchedule, playoffSchedule, practiceSchedule, offlinePlayoffSchedule, rankings, districtRankings, alliances, allianceCount, communityUpdates, currentMatch, remapNumberToString, remapStringToNumber } = useEventData();
+  const { nextMatch, previousMatch, setMatchFromMenu, getSchedule } = useEventActions();
   const { swapScreen, hidePracticeSchedule, teamReduction, showInspection, usePullDownToUpdate, useSwipe, useScrollMemory } = useSettings();
   // Remember scroll position for Play by play page
   useScrollPosition('playbyplay', true, false, useScrollMemory);

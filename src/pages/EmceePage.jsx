@@ -8,23 +8,14 @@ import EmceeClock from "components/EmceeClock";
 import moment from "moment";
 import { matchClassesBase } from "data/matchClasses";
 import { useSettings } from "../contexts/SettingsContext";
+import { useEventData } from "contexts/EventDataContext";
+import { useEventActions } from "contexts/EventActionsContext";
 
 function EmceePage({
-  selectedEvent,
-  playoffSchedule,
-  qualSchedule,
-  practiceSchedule,
-  offlinePlayoffSchedule,
-  alliances,
-  currentMatch,
-  nextMatch,
-  previousMatch,
-  getSchedule,
-  eventLabel,
   playoffCountOverride,
-  ftcMode,
-  remapNumberToString,
 }) {
+  const { selectedEvent, playoffSchedule, qualSchedule, practiceSchedule, offlinePlayoffSchedule, alliances, currentMatch, eventLabel, ftcMode, remapNumberToString } = useEventData();
+  const { nextMatch, previousMatch, getSchedule } = useEventActions();
   const { reverseEmcee, hidePracticeSchedule, usePullDownToUpdate, useSwipe } = useSettings();
   const { height, width } = useWindowDimensions();
 
