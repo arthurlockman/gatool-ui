@@ -3,6 +3,7 @@ import { EventDataProvider } from "./EventDataContext";
 import { EventActionsProvider } from "./EventActionsContext";
 import { useRankingsAlliances } from "../hooks/useRankingsAlliances";
 import { useTeamData } from "../hooks/useTeamData";
+import { useMatchNavigation } from "../hooks/useMatchNavigation";
 
 /**
  * Request deduplication: prevents multiple in-flight fetches to the same logical endpoint.
@@ -62,6 +63,7 @@ function createEpochGuard() {
  * Current slices:
  * - useTeamData: team list, EPA, robot images, regional event detail, remappings
  * - useRankingsAlliances: rankings, alliances, districtRankings, playoffs
+ * - useMatchNavigation: nextMatch, previousMatch, setMatchFromMenu
  *
  * @param {object} props.data - Read-mostly event data from App.jsx (will shrink over time)
  * @param {object} props.actions - Action functions from App.jsx (will shrink over time)
@@ -71,7 +73,7 @@ function createEpochGuard() {
  *   store-owned functions so App.jsx callers (getSchedule, loadEvent) can invoke them
  *   without being inside the provider tree.
  */
-export function EventStoreProvider({ data, actions, teamDeps, rankingsDeps, storeRef, children }) {
+export function EventStoreProvider({ data, actions, teamDeps, rankingsDeps, matchNavDeps, storeRef, children }) {
   // --- Request deduplication (available to future slices) ---
   // eslint-disable-next-line no-unused-vars
   const inflightRef = useRef(createInflightTracker());
@@ -101,6 +103,9 @@ export function EventStoreProvider({ data, actions, teamDeps, rankingsDeps, stor
   };
   const rankingsSlice = useRankingsAlliances(composedRankingsDeps);
 
+  // --- Match Navigation slice ---
+  const matchNavSlice = useMatchNavigation(matchNavDeps);
+
   // --- Expose store-owned functions to App.jsx via ref ---
   // This allows App.jsx functions (getSchedule, loadEvent) that live above the
   // provider tree to call store-owned functions without being context consumers.
@@ -120,6 +125,10 @@ export function EventStoreProvider({ data, actions, teamDeps, rankingsDeps, stor
       getDistrictRanks: rankingsSlice.getDistrictRanks,
       resetRankingsAlliancesState: rankingsSlice.resetRankingsAlliancesState,
       applyUserPrefs: rankingsSlice.applyUserPrefs,
+      // Match navigation slice
+      nextMatch: matchNavSlice.nextMatch,
+      previousMatch: matchNavSlice.previousMatch,
+      setMatchFromMenu: matchNavSlice.setMatchFromMenu,
     };
   }
 
@@ -133,9 +142,10 @@ export function EventStoreProvider({ data, actions, teamDeps, rankingsDeps, stor
     loadEvent: actions.loadEvent,
     getSchedule: actions.getSchedule,
     getCommunityUpdates: actions.getCommunityUpdates,
-    nextMatch: actions.nextMatch,
-    previousMatch: actions.previousMatch,
-    setMatchFromMenu: actions.setMatchFromMenu,
+    // Store-owned: match navigation slice
+    nextMatch: matchNavSlice.nextMatch,
+    previousMatch: matchNavSlice.previousMatch,
+    setMatchFromMenu: matchNavSlice.setMatchFromMenu,
     // Store-owned: team data slice
     getTeamList: teamSlice.getTeamList,
     getEPA: teamSlice.getEPA,
