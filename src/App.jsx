@@ -16,11 +16,9 @@ import CheatsheetPage from "./pages/CheatsheetPage";
 import EmceePage from "./pages/EmceePage";
 import { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import {
-  applyPlayoffReserveEdits,
   compactReserveEditsForEvent,
   prunePlayoffReserveSetsAfterPostedMatches,
 } from "./utils/playoffReserveEdits";
-import { roundThreeOrReserveRoleLabel } from "./utils/allianceRoleLabels";
 import { UseAuthClient } from "./contextProviders/AuthClientContext";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Blocks } from "react-loader-spinner";
@@ -28,8 +26,8 @@ import { Container } from "react-bootstrap";
 import { usePersistentState } from "./hooks/UsePersistentState";
 import { useDarkMode } from "./hooks/useDarkMode";
 import { useSettings } from "./contexts/SettingsContext";
-import { EventDataProvider, useEventData } from "./contexts/EventDataContext";
-import { EventActionsProvider } from "./contexts/EventActionsContext";
+import { useEventData } from "./contexts/EventDataContext";
+import { EventStoreProvider } from "./contexts/EventStoreProvider";
 import _ from "lodash";
 import moment from "moment";
 import Developer from "./pages/Developer";
@@ -48,7 +46,6 @@ import {
   normalizeFtcHybridMatch,
   hydrateFtcPlayoffTeamsFromResults,
   normalizePlayoffScheduleApiResponse,
-  normalizeFtcGatoolAllianceRow,
 } from "./utils/ftcHybridMatchTeams";
 import {
   getConnectionsEventKey,
@@ -106,7 +103,6 @@ const ftcBaseURL = "https://api.gatool.org/ftc/v2/";
 const pagesWithScrollMemory = ['schedule', 'teamdata', 'ranks', 'announce', 'playbyplay', 'allianceselection'];
 
 function LayoutsWithNavbar({
-  playoffs,
   eventHighScores,
   worldHighScores,
   allianceSelection,
@@ -116,7 +112,7 @@ function LayoutsWithNavbar({
   screenModeStatus,
   syncEvent,
 }) {
-  const { selectedEvent, qualSchedule, teamList, communityUpdates, rankings, practiceSchedule, ftcMode } = useEventData();
+  const { selectedEvent, qualSchedule, teamList, communityUpdates, rankings, practiceSchedule, ftcMode, playoffs } = useEventData();
   const location = useLocation();
   const scrollContainerRef = useRef(null);
 
@@ -211,6 +207,10 @@ function App() {
   }, [getAccessTokenSilently, isAuthenticated, loginWithRedirect]);
 
   const [httpClient, operationsInProgress] = UseAuthClient();
+  /** Ref populated by EventStoreProvider with store-owned functions.
+   *  Allows App.jsx orchestrators (getSchedule, loadEvent) to call
+   *  store functions even though they live above the provider tree. */
+  const eventStoreRef = useRef({});
   const [selectedEvent, setSelectedEvent] = usePersistentState(
     "setting:selectedEvent",
     null
@@ -251,13 +251,22 @@ function App() {
     "cache:robotImages",
     null
   );
-  const [rankings, setRankings] = usePersistentState("cache:rankings", null);
   const [EPA, setEPA] = usePersistentState("cache:EPA", null);
+  const [rankings, setRankings] = usePersistentState("cache:rankings", null);
   const [rankingsOverride, setRankingsOverride] = usePersistentState(
     "setting:rankingsOverride",
     null
   );
   const [alliances, setAlliances] = usePersistentState("cache:alliances", null);
+  const [allianceCount, setAllianceCount] = usePersistentState(
+    "setting:allianceCount",
+    null
+  );
+  const [districtRankings, setDistrictRankings] = usePersistentState(
+    "cache:districtRankings",
+    null
+  );
+  const [playoffs, setPlayoffs] = usePersistentState("cache:playoffs", null);
   /**
    * Playoff reserve edits keyed only by event code then alliance **number** (string):
    * { op: 'set', round3 } | legacy { op: 'set', backup, backupReplaced } | { op: 'clear' }.
@@ -272,8 +281,6 @@ function App() {
   } else {
     playoffReserveEditsRef.current = {};
   }
-  /** Drop stale getAlliances responses so an older fetch cannot overwrite newer alliance + overlay edits. */
-  const getAlliancesEpochRef = useRef(0);
   const [teamRemappings, setTeamRemappings] = usePersistentState("cache:teamRemappings", null);
   const [eventFilters, setEventFilters] = usePersistentState(
     "setting:eventFilters",
@@ -323,13 +330,8 @@ function App() {
   /** Preloaded prior-partnership data per alliance roster (key = sorted team ids). */
   const [alliancePartnerConnectionsCache, setAlliancePartnerConnectionsCache] =
     useState({});
-  const [playoffs, setPlayoffs] = usePersistentState("cache:playoffs", null);
   const [playoffCountOverride, setPlayoffCountOverride] = usePersistentState(
     "setting:playoffCountOverride",
-    null
-  );
-  const [allianceCount, setAllianceCount] = usePersistentState(
-    "setting:allianceCount",
     null
   );
   const [lastVisit, setLastVisit] = usePersistentState("cache:lastVisit", {});
@@ -342,10 +344,6 @@ function App() {
   const [eventNamesCY, setEventNamesCY] = usePersistentState(
     "cache:eventNamesCY",
     []
-  );
-  const [districtRankings, setDistrictRankings] = usePersistentState(
-    "cache:districtRankings",
-    null
   );
   // Live data: changes after every match; do not persist
   const [regionalEventDetail, setRegionalEventDetail] = useState(null);
@@ -941,28 +939,6 @@ function App() {
   };
 
   /**
-   * @constant conformCheesyArenaRankings
-   * @param match Match details from TBA
-   * @param level Tournament Level
-   */
-  const conformCheesyArenaRankings = (team) => {
-    return {
-      ...team,
-      rank: team?.Rank,
-      teamNumber: team?.TeamId,
-      wins: team?.Wins,
-      losses: team?.Losses,
-      ties: team?.Ties,
-      qualAverage:
-        team?.MatchPoints && team?.Played
-          ? team?.MatchPoints / team?.Played
-          : 0,
-      dq: team?.Disqualifications,
-      matchesPlayed: team?.Played,
-    };
-  };
-
-  /**
    * Should be merged with /events/{{eventName}}/matches/{{matchNumber}} for full schedule.
    * @constant conformFTCOfflineScheduleMatch
    * @param match Match details from FTC Server
@@ -1070,24 +1046,6 @@ function App() {
   };
 
   /**
-   * @constant conformFTCOfflineRankings
-   * @param match Match details from FTC Server
-   * @param level Tournament Level
-   */
-  // eslint-disable-next-line
-  // @ts-ignore
-  const conformFTCOfflineRankings = (team) => {
-    return {
-      ...team,
-      rank: team?.ranking,
-      teamNumber: team?.team,
-      qualAverage: Math.round(100 * team?.tbp1) / 100,
-      dq: team?.dq || 0,
-      sortOrder1: Number(team?.rankingPoints) || 0,
-    };
-  };
-
-  /**
    * @constant conformFTCOfflineTeam
    * @param {*} teamDetails team details from FTC Offline server
    * @returns reformatted team details from FTC Offline server
@@ -1109,24 +1067,6 @@ function App() {
       homeCMP: null,
       homeRegion: null,
       displayLocation: `${teamDetails?.city}, ${teamDetails?.state}, ${teamDetails?.country}`,
-    };
-  };
-
-  /**
-   * @constant conformFTCOfflineAlliance
-   * @param {*} alliance team details from FTC Offline server
-   * @returns reformatted team details from FTC Offline server
-   */
-  const conformFTCOfflineAlliance = (alliance) => {
-    return {
-      number: alliance?.seed,
-      captain: alliance?.captain || null,
-      round1: alliance?.pick1 || null,
-      round2: alliance?.pick2 || null,
-      round3: alliance?.pick3 || null,
-      backup: null,
-      backupReplaced: null,
-      name: `Alliance ${alliance?.seed}`,
     };
   };
 
@@ -1195,54 +1135,6 @@ function App() {
       return [];
     } catch (error) {
       console.error("Error fetching TBA matches:", error);
-      return [];
-    }
-  };
-
-  /**
-   * Helper function to fetch TBA rankings for an event
-   * @param {string} tbaEventKey TBA event key
-   * @param {string} year Year
-   * @returns TBA rankings
-   */
-  const fetchTBARankings = async (tbaEventKey, year) => {
-    try {
-      console.log(`Fetching TBA rankings for event: ${tbaEventKey}`);
-      const result = await httpClient.getNoAuth(
-        `${year}/offseason/rankings/${tbaEventKey}/`
-      );
-      if (result.status === 200) {
-        // @ts-ignore
-        const rankings = await result.json();
-        return rankings;
-      }
-      return null;
-    } catch (error) {
-      console.error("Error fetching TBA rankings:", error);
-      return null;
-    }
-  };
-
-  /**
-   * Helper function to fetch TBA alliances for an event
-   * @param {string} tbaEventKey TBA event key
-   * @param {string} year Year
-   * @returns Array of TBA alliances
-   */
-  const fetchTBAAlliances = async (tbaEventKey, year) => {
-    try {
-      console.log(`Fetching TBA alliances for event: ${tbaEventKey}`);
-      const result = await httpClient.getNoAuth(
-        `${year}/offseason/alliances/${tbaEventKey}/`
-      );
-      if (result.status === 200) {
-        // @ts-ignore
-        const alliances = await result.json();
-        return alliances;
-      }
-      return [];
-    } catch (error) {
-      console.error("Error fetching TBA alliances:", error);
       return [];
     }
   };
@@ -2259,9 +2151,9 @@ function App() {
     }
 
     if (playoffschedule?.schedule?.length > 0 || (isOfflineEvent && playoffSchedule?.schedule?.length > 0)) {
-      getAlliances();
+      eventStoreRef.current.getAlliances();
     }
-    getRanks();
+    eventStoreRef.current.getRanks();
     // System messages are fetched by callers (loadEvent, useInterval, nextMatch, etc.) to avoid double-fetch
 
     // Calculate event high scores after schedule is loaded
@@ -3406,252 +3298,13 @@ function App() {
     }
   }
 
-  /**
-   * This function retrieves the ranking data for a specified event from FIRST.
-   * @async
-   * @function getRanks
-   * @param selectedYear The currently selected year, which is a persistent state variable
-   * @param selectedEvent The currently selected event, which is a persistent state variable
-   * @return sets rankings
-   */
-  async function getRanks() {
-    console.log(`Fetching Ranks for ${selectedEvent?.value?.name}...`);
-    var result = null;
-    var ranks = null;
-    if (selectedEvent?.value?.code.includes("OFFLINE")) {
-      ranks = { rankings: { Rankings: [] } };
-    } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
-      ranks = { rankings: { Rankings: [] } };
-      if (useCheesyArena && cheesyArenaAvailable) {
-        // get rankings from Cheesy Arena
-        result = await fetch("http://10.0.100.5:8080/api/rankings");
-        if (result.status === 200) {
-          var data = await result.json();
-          if (data?.Rankings.length > 0) {
-            // reformat data to FIRST API Rankings format
-            ranks = {
-              rankings: {
-                rankings: data?.Rankings.map((team) => {
-                  return conformCheesyArenaRankings(team);
-                }),
-              },
-            };
-          }
-        }
-      } else if (
-        useFTCOffline &&
-        FTCOfflineAvailable &&
-        ftcMode?.value === "FTCLocal"
-      ) {
-        // get the ranks from the FTC Local Server
-        console.log("Using FTC Local Server for ranks");
-        const rankingsResult = await httpClient.getNoAuth(
-          `/api/v1/events/${selectedEvent?.value.code}/rankings/`,
-          FTCServerURL,
-          undefined,
-          { Authorization: FTCKey?.key || "" }
-        );
-        if (rankingsResult.status === 200) {
-          // @ts-ignore
-          const rankingsData = await rankingsResult.json();
-          if (rankingsData?.rankingList?.length > 0) {
-            // reformat data to FIRST API Rankings format
-            ranks = {
-              rankings: {
-                rankings: rankingsData?.rankingList.map((team) => {
-                  return conformFTCOfflineRankings(team);
-                }),
-              },
-            };
-          }
-        } else if (rankingsResult.status === 204) {
-          ranks = { rankings: { Rankings: [] } };
-        }
-      } else if (
-        !useFTCOffline &&
-        selectedEvent?.value?.type === "OffSeason" &&
-        !ftcMode
-      ) {
-        // get the ranks from TBA via gatool Offseason API
-        console.log("Using TBA for Offseason Event Rankings");
-        // Use event's tbaEventKey directly
-        const eventKey = selectedEvent?.value?.tbaEventKey;
-
-        if (!eventKey) {
-          console.log("No TBA event key available for this offseason event");
-        }
-
-        if (eventKey) {
-          const tbaRankings = await fetchTBARankings(
-            eventKey,
-            selectedYear?.value
-          );
-
-          if (
-            tbaRankings &&
-            tbaRankings.rankings &&
-            tbaRankings.rankings.rankings.length > 0
-          ) {
-            ranks = {
-              rankings: {
-                rankings: tbaRankings.rankings.rankings,
-              },
-            };
-          } else {
-            ranks = { rankings: { Rankings: [] } };
-          }
-        }
-      } else if (!useFTCOffline) {
-        //do not use Cheesy Arena and use FIRST API
-        result = await httpClient.getNoAuth(
-          `${selectedYear?.value}/rankings/${selectedEvent?.value.code}`,
-          ftcMode ? ftcBaseURL : undefined
-        );
-        if (result.status === 200) {
-          // @ts-ignore
-          ranks = await result.json();
-        }
-      }
-    } else if (selectedEvent?.value?.code === "PRACTICE1") {
-      ranks = { rankings: _.cloneDeep(training.ranks.partial) };
-    } else {
-      ranks = { rankings: _.cloneDeep(training.ranks.final) };
-    }
-
-    if (typeof ranks.Rankings === "undefined") {
-      ranks.ranks = ranks.rankings;
-      delete ranks.rankings;
-    } else {
-      ranks.ranks = ranks.Rankings;
-      delete ranks.Rankings;
-    }
-
-    if (typeof ranks.ranks.Rankings !== "undefined") {
-      ranks.ranks = ranks.ranks.Rankings;
-      delete ranks.ranks.Rankings;
-    } else {
-      ranks.ranks = ranks.ranks.rankings;
-      delete ranks.ranks.rankings;
-    }
-
-    // Filter out FTC rankings entries that haven't played any matches yet
-    // In FTC, rankings are published before matches start (ordered by team number)
-    // We only want to show teams that have actually played matches
-    if (ftcMode && ranks?.ranks && Array.isArray(ranks.ranks)) {
-      const originalCount = ranks.ranks.length;
-      ranks.ranks = ranks.ranks.filter((rank) => {
-        // Keep entries that have matchesCounted defined and greater than 0
-        return rank.matchesCounted !== undefined && rank.matchesCounted !== null && rank.matchesCounted > 0;
-      });
-      const filteredCount = ranks.ranks.length;
-      if (originalCount !== filteredCount) {
-        console.log(`Filtered FTC rankings: ${originalCount} -> ${filteredCount} (removed ${originalCount - filteredCount} teams with no matches played)`);
-      }
-    }
-
-    // fix FTC online rankings
-    const teamResults = teamList?.teams.map((team) => {
-      return {
-        teamNumber: team?.teamNumber,
-        qualTotal: 0,
-        dqTotal: 0,
-        matchesPlayed: 0,
-      };
-    });
-    if (ftcMode && ranks?.ranks?.length > 0) {
-      if (qualSchedule?.schedule?.length > 0) {
-        qualSchedule.schedule.forEach((match) => {
-          const matchReference = _.cloneDeep(match);
-          match.teams.forEach((matchTeam) => {
-            const teamIndex = _.findIndex(teamResults, {
-              teamNumber: matchTeam.teamNumber,
-            });
-            if (teamIndex >= 0 && !matchTeam.surrogate) {
-              const teamScore = matchTeam.station.toLowerCase().includes("red")
-                ? matchReference.scoreRedFinal
-                : matchReference.scoreBlueFinal;
-              teamResults[teamIndex].qualTotal += teamScore;
-              if (matchTeam.dq) {
-                teamResults[teamIndex].dqTotal += 1;
-              }
-              teamResults[teamIndex].matchesPlayed += 1;
-            }
-          });
-        });
-      }
-      // merge the teamResults into the ranks
-      ranks.ranks = ranks.ranks.map((rank) => {
-        const teamIndex = _.findIndex(teamResults, {
-          teamNumber: rank.teamNumber,
-        });
-        if (teamIndex >= 0) {
-          rank.qualAverage = teamResults[teamIndex].matchesPlayed
-            ? Math.round(
-              (teamResults[teamIndex].qualTotal * 100) /
-              teamResults[teamIndex].matchesPlayed
-            ) / 100
-            : 0;
-          rank.dq = teamResults[teamIndex].dqTotal;
-        }
-        return rank;
-      });
-    }
-
-    ranks.lastModified = ranks.headers
-      ? moment(ranks?.headers["last-modified"]).format()
-      : moment().format();
-    ranks.lastUpdate = moment().format();
-
-    // For OFFLINE events, only update rankings if there's no uploaded rankings already
-    const isOfflineEvent = selectedEvent?.value?.code === "OFFLINE";
-    if (!isOfflineEvent || !rankings || rankings?.ranks?.length === 0) {
-      setRankings(ranks);
-    } else {
-      console.log("OFFLINE event - preserving uploaded rankings");
-    }
-
-    if (ranks?.ranks?.length > 0 || (isOfflineEvent && rankings?.ranks?.length > 0)) {
-      if (!ftcMode) {
-        getEPA();
-      } else if (ftcMode) {
-        getEPAFTC();
-      }
-      if (selectedEvent?.value.districtCode) {
-        getDistrictRanks();
-      }
-    }
-      // FRC Regional event: fetch championship advancement per team (live data — changes after every match)
-    if (!ftcMode && !selectedEvent?.value?.districtCode && selectedEvent?.value?.code && !selectedEvent?.value?.code.includes("OFFLINE")) {
-      getRegionalEventDetail(ranks?.ranks);
-    }
-  }
-
-  /** This function retrieves the ranking data for a specific District from FIRST
-   * @async
-   * @function getDistrictRanks
-   * @param selectedYear The currently selected year, which is a persistent state variable
-   * @param selectedEvent The currently selected event, which is a persistent state variable
-   * @return sets districtRankings
-   */
-  async function getDistrictRanks() {
-    var result = null;
-    var districtranks = null;
-    result = await httpClient.getNoAuth(
-      `${selectedYear?.value}/district/rankings/${selectedEvent?.value.districtCode}`,
-      ftcMode ? ftcBaseURL : undefined
-    );
-    // @ts-ignore
-    districtranks = await result.json();
-    districtranks.lastUpdate = moment().format();
-    setDistrictRankings(districtranks);
-  }
 
   /** Fetches regional championship advancement for all event teams in a single batch request.
    * @param ranksOverride - optional array of rank rows (e.g. from getRanks) to use for team list; each must have teamNumber.
    */
   async function getRegionalEventDetail(ranksOverride) {
     if (!selectedYear?.value) return;
-    const teamNumbers = (ranksOverride?.map((r) => r.teamNumber)) ?? teamList?.teams?.map((t) => t.teamNumber) ?? rankings?.ranks?.map((r) => r.teamNumber) ?? [];
+    const teamNumbers = (ranksOverride?.map((r) => r.teamNumber)) ?? teamList?.teams?.map((t) => t.teamNumber) ?? [];
     if (teamNumbers.length === 0) {
       setRegionalEventDetail(null);
       return;
@@ -3838,323 +3491,6 @@ function App() {
     }
   }
 
-  /**
-   * This function retrieves the Playoff Alliance data for a specified event from FIRST. It also formats the Alliance data to better support lookups in the playoff Bracket and on Announce and Play By Play.
-   * @async
-   * @function getAlliances
-   * @param selectedYear The currently selected year, which is a persistent state variable
-   * @param selectedEvent The currently selected event, which is a persistent state variable
-   * @returns sets alliances
-   */
-  async function getAlliances(allianceTemp) {
-    console.log("Getting Alliances");
-    getAlliancesEpochRef.current += 1;
-    const getAlliancesEpoch = getAlliancesEpochRef.current;
-    var result = null;
-    var alliances = allianceTemp || { Alliances: [] };
-    if (
-      !selectedEvent?.value?.code.includes("PRACTICE") &&
-      !selectedEvent?.value?.code.includes("OFFLINE")
-    ) {
-      if (useCheesyArena && cheesyArenaAvailable) {
-        // get rankings from Cheesy Arena
-        result = await fetch("http://10.0.100.5:8080/api/alliances");
-        var data = await result.json();
-        if (data.length > 0) {
-          // reformat data to FIRST API Rankings format
-          alliances = {
-            Alliances: data.map((Alliance) => {
-              return {
-                number: Alliance?.Id,
-                captain: Alliance?.TeamIds[0] || null,
-                round1: Alliance?.TeamIds[1] || null,
-                round2: Alliance?.TeamIds[2] || null,
-                round3: Alliance?.TeamIds[3] || null,
-                backup: Alliance?.TeamIds[4] || null,
-                backupReplaced: null,
-                name: `Alliance ${Alliance?.Id}`,
-              };
-            }),
-          };
-        }
-      } else if (
-        useFTCOffline &&
-        FTCOfflineAvailable &&
-        ftcMode?.value === "FTCLocal"
-      ) {
-        // get the alliances from the FTC Local Server
-        console.log("Using FTC Local Server for Alliances");
-        const allianceResult = await httpClient.getNoAuth(
-          `/api/v1/events/${selectedEvent?.value.code}/elim/alliances/`,
-          FTCServerURL,
-          undefined,
-          { Authorization: FTCKey?.key || "" }
-        );
-        if (allianceResult.status === 200) {
-          // @ts-ignore
-          const allianceData = await allianceResult.json();
-          if (allianceData?.alliances?.length > 0) {
-            // reformat data to FIRST API Rankings format
-            alliances = {
-              Alliances: allianceData?.alliances.map((alliance) => {
-                return conformFTCOfflineAlliance(alliance);
-              }),
-            };
-          }
-        } else if (allianceResult.status === 204) {
-          alliances = { Alliances: [] };
-        }
-      } else if (
-        !useFTCOffline &&
-        selectedEvent?.value?.type === "OffSeason" &&
-        !ftcMode
-      ) {
-        // get the alliances from TBA via gatool Offseason API
-        console.log("Using TBA for Offseason Event Alliances");
-        // Use event's tbaEventKey directly
-        const eventKey = selectedEvent?.value?.tbaEventKey;
-
-        if (!eventKey) {
-          console.log("No TBA event key available for this offseason event");
-        }
-
-        if (eventKey) {
-          const tbaAlliances = await fetchTBAAlliances(
-            eventKey,
-            selectedYear?.value
-          );
-
-          if (tbaAlliances && tbaAlliances?.alliances?.length > 0) {
-            alliances = {
-              Alliances: tbaAlliances?.alliances,
-              count: tbaAlliances?.count,
-            };
-          } else {
-            alliances = { Alliances: [] };
-            console.log(
-              `No Alliances found for ${selectedEvent?.value?.name} on TBA. Skipping...`
-            );
-          }
-        }
-      } else if (!useFTCOffline) {
-        result = await httpClient.getNoAuth(
-          `${selectedYear?.value}/alliances/${selectedEvent?.value.code}`,
-          ftcMode ? ftcBaseURL : undefined
-        );
-        if (result.status !== 200) {
-          alliances = { Alliances: [] };
-          console.log(
-            `No Alliances found for ${selectedEvent?.value?.name}. Skipping...`
-          );
-        } else {
-          // @ts-ignore
-          alliances = await result.json();
-          if (typeof alliances.Alliances !== "undefined") {
-            alliances.alliances = alliances.Alliances;
-            delete alliances.Alliances;
-          }
-          // remove "Seed" from FTC alliance names
-          if (ftcMode && Array.isArray(alliances.alliances)) {
-            alliances.alliances = alliances.alliances.map((alliance) => {
-              if (alliance?.name && typeof alliance.name === "string") {
-                alliance.name = alliance.name.replace("Seed ", "");
-              }
-              return alliance;
-            });
-          }
-        }
-      }
-    } else if (
-      selectedEvent?.value?.code === "PRACTICE1" ||
-      selectedEvent?.value?.code === "PRACTICE2"
-    ) {
-      alliances = training.alliances.initial;
-    } else if (selectedEvent?.value?.code === "PRACTICE3") {
-      alliances = training.alliances.partial;
-    } else if (selectedEvent?.value?.code === "PRACTICE4") {
-      alliances = training.alliances.final;
-    }
-
-    if (typeof alliances.Alliances !== "undefined") {
-      alliances.alliances = alliances.Alliances;
-      delete alliances.Alliances;
-    }
-    // FTC gatool (and some payloads) nest captain/round picks as { teamNumber, displayTeamNumber, teamName }
-    if (Array.isArray(alliances?.alliances)) {
-      alliances.alliances = alliances.alliances.map((a) =>
-        normalizeFtcGatoolAllianceRow(a)
-      );
-    }
-    /** Reserve merge + prune must commit with setAlliances (same epoch) so stale fetches do not mutate edits without updating alliances. */
-    /** @type {{ code: string; pruneKeys: string[] } | null} */
-    let reserveEditsPruneForCommit = null;
-    if (!allianceTemp && selectedEvent?.value?.code) {
-      const code = selectedEvent.value.code;
-      const pruneKeys = applyPlayoffReserveEdits(
-        alliances,
-        code,
-        playoffReserveEditsRef.current
-      );
-      if (pruneKeys.length > 0) {
-        reserveEditsPruneForCommit = { code, pruneKeys };
-      }
-    }
-    var allianceLookup = {};
-    if (alliances?.alliances) {
-      const setAllianceLookupEntry = (teamNumber, payload) => {
-        if (_.isNull(teamNumber) || _.isUndefined(teamNumber) || teamNumber === "") {
-          return;
-        }
-        const rawKey = `${teamNumber}`;
-        allianceLookup[rawKey] = payload;
-        const remappedKey = `${remapNumberToString(teamNumber)}`;
-        if (remappedKey && remappedKey !== rawKey) {
-          allianceLookup[remappedKey] = payload;
-        }
-      };
-
-      alliances?.alliances.forEach((rawAlliance) => {
-        const alliance = ftcMode
-          ? {
-              ...rawAlliance,
-              captain:
-                rawAlliance.captain ??
-                rawAlliance.captainTeam ??
-                rawAlliance.captainTeamNumber ??
-                null,
-              round1:
-                rawAlliance.round1 ??
-                rawAlliance.pick1 ??
-                null,
-              round2:
-                rawAlliance.round2 ??
-                rawAlliance.pick2 ??
-                null,
-              round3:
-                rawAlliance.round3 ??
-                rawAlliance.pick3 ??
-                null,
-              backup:
-                rawAlliance.backup ??
-                rawAlliance.backupTeam ??
-                null,
-            }
-          : rawAlliance;
-
-        setAllianceLookupEntry(alliance.captain, {
-          role: `Captain`,
-          alliance: alliance.name,
-          number: alliance.number,
-          captain: alliance.captain,
-          round1: alliance.round1,
-          round2: alliance.round2,
-          round3: alliance.round3,
-          backup: alliance.backup,
-          backupReplaced: alliance.backupReplaced,
-        });
-        setAllianceLookupEntry(alliance.round1, {
-          role: `Round 1 Selection`,
-          alliance: alliance.name,
-          number: alliance.number,
-          captain: alliance.captain,
-          round1: alliance.round1,
-          round2: alliance.round2,
-          round3: alliance.round3,
-          backup: alliance.backup,
-          backupReplaced: alliance.backupReplaced,
-        });
-        if (alliance.round2) {
-          setAllianceLookupEntry(alliance.round2, {
-            role: `Round 2 Selection`,
-            alliance: alliance.name,
-            number: alliance.number,
-            captain: alliance.captain,
-            round1: alliance.round1,
-            round2: alliance.round2,
-            round3: alliance.round3,
-            backup: alliance.backup,
-            backupReplaced: alliance.backupReplaced,
-          });
-        }
-        if (alliance.round3) {
-          setAllianceLookupEntry(alliance.round3, {
-            role: roundThreeOrReserveRoleLabel(selectedEvent?.value),
-            alliance: alliance.name,
-            number: alliance.number,
-            captain: alliance.captain,
-            round1: alliance.round1,
-            round2: alliance.round2,
-            round3: alliance.round3,
-            backup: alliance.backup,
-            backupReplaced: alliance.backupReplaced,
-          });
-        }
-        if (alliance.backup) {
-          setAllianceLookupEntry(alliance.backup, {
-            role: `Reserve team`,
-            alliance: alliance.name,
-            number: alliance.number,
-            captain: alliance.captain,
-            round1: alliance.round1,
-            round2: alliance.round2,
-            round3: alliance.round3,
-            backup: alliance.backup,
-            backupReplaced: alliance.backupReplaced,
-          });
-        }
-      });
-      alliances.Lookup = allianceLookup;
-    }
-
-    alliances.lastUpdate = moment().format();
-    console.log(`${alliances?.alliances?.length} Alliances loaded.`);
-    if (getAlliancesEpoch !== getAlliancesEpochRef.current) {
-      return;
-    }
-    if (reserveEditsPruneForCommit) {
-      const { code, pruneKeys } = reserveEditsPruneForCommit;
-      setPlayoffReserveEdits((prev) => {
-        const forEv = compactReserveEditsForEvent({ ...(prev[code] || {}) });
-        for (const k of pruneKeys) {
-          delete forEv[k];
-        }
-        let next;
-        if (Object.keys(forEv).length === 0) {
-          const { [code]: _removed, ...rest } = prev;
-          next = rest;
-        } else {
-          next = { ...prev, [code]: forEv };
-        }
-        playoffReserveEditsRef.current = next;
-        return next;
-      });
-    }
-    setAlliances(alliances);
-    if (alliances?.alliances?.length > 0) {
-      setPlayoffs(true);
-
-      // If we are in World Champs, we need to determine the team list from the Alliances
-      if (selectedEvent?.value?.type === "Championship" && alliances) {
-        var tempChampsTeamList = [];
-        if (!haveChampsTeams) {
-          alliances?.alliances.forEach((alliance) => {
-            tempChampsTeamList.push(alliance?.captain);
-            tempChampsTeamList.push(alliance?.round1);
-            tempChampsTeamList.push(alliance?.round2);
-            tempChampsTeamList.push(alliance?.round3);
-          });
-
-          // We have bypassed getting the team list and details in the normal loading cycle,
-          // so we need to get the details now from this array of competing teams
-          setHaveChampsTeams(true);
-          await getTeamList(_.uniq(tempChampsTeamList));
-          if (getAlliancesEpoch !== getAlliancesEpochRef.current) {
-            return;
-          }
-        }
-      }
-    }
-  }
 
   /**
    * This function writes updated team data back to gatool Cloud.
@@ -4429,7 +3765,6 @@ function App() {
         await setPlayoffSchedule(null);
         await setOfflinePlayoffSchedule(null);
         await setTeamList(null);
-        await setRankings(null);
         if (isOfflineEvent && !isSameEvent) {
           console.log("Switching to OFFLINE event - clearing previous event data");
         }
@@ -4445,22 +3780,21 @@ function App() {
       setEITeams([]);
       await setRobotImages(null);
       await setEventHighScores(null);
-      await setPlayoffs(false);
+
+      // Reset rankings/alliances state (store-owned)
+      await eventStoreRef.current.resetRankingsAlliancesState(shouldPreserveOfflineData);
 
       // For OFFLINE events, preserve alliance-related settings only if reloading same event
       if (!shouldPreserveOfflineData) {
-        await setAllianceCount(null);
         await setTeamReduction(null);
         await setPlayoffCountOverride(null);
         setAllianceSelectionArrays({});
         setAllianceSelection(false);
-        await setRankingsOverride(null);
       } else {
         console.log("Reloading same OFFLINE event - preserving alliance count and settings");
       }
 
       setCurrentMatch(1);
-      await setDistrictRankings(null);
       setRegionalEventDetail(null);
 
       // Clear reserve overlays and station-order overrides for the event being loaded
@@ -5055,10 +4389,10 @@ function App() {
   }, [
     playoffCountOverride,
     teamList,
-    setAllianceCount,
     selectedEvent,
     ftcMode,
     useFourTeamAlliances,
+    setAllianceCount,
   ]);
 
   // Ensure FRC mode is set when OFFLINE or training events are loaded from localStorage
@@ -6060,6 +5394,46 @@ function App() {
   useHotkeys("j", () => tabNavLeft(), { scopes: "tabNavigation" });
   useHotkeys("s,F5", () => getSchedule(), { scopes: "tabNavigation" });
 
+  // --- Rankings/Alliances slice dependencies ---
+  // Passed to EventStoreProvider → useRankingsAlliances hook
+  const rankingsDeps = {
+    httpClient,
+    selectedEvent,
+    selectedYear,
+    ftcMode,
+    teamList,
+    qualSchedule,
+    useCheesyArena,
+    cheesyArenaAvailable,
+    useFTCOffline,
+    FTCOfflineAvailable,
+    FTCServerURL,
+    FTCKey,
+    remapNumberToString,
+    playoffReserveEditsRef,
+    setPlayoffReserveEdits,
+    training,
+    getEPA,
+    getEPAFTC,
+    getRegionalEventDetail,
+    getTeamList,
+    setHaveChampsTeams,
+    haveChampsTeams,
+    // State + setters (owned by App.jsx, used by the hook)
+    rankings,
+    setRankings,
+    rankingsOverride,
+    setRankingsOverride,
+    alliances,
+    setAlliances,
+    allianceCount,
+    setAllianceCount,
+    districtRankings,
+    setDistrictRankings,
+    playoffs,
+    setPlayoffs,
+  };
+
   // --- Event Data Context (read-mostly state) ---
   const eventDataValue = useMemo(
     () => ({
@@ -6073,9 +5447,11 @@ function App() {
       practiceSchedule,
       offlinePlayoffSchedule,
       rankings,
+      rankingsOverride,
       districtRankings,
       alliances,
       allianceCount,
+      playoffs,
       communityUpdates,
       currentMatch,
       remapNumberToString,
@@ -6092,9 +5468,11 @@ function App() {
       practiceSchedule,
       offlinePlayoffSchedule,
       rankings,
+      rankingsOverride,
       districtRankings,
       alliances,
       allianceCount,
+      playoffs,
       communityUpdates,
       currentMatch,
       remapNumberToString,
@@ -6102,45 +5480,19 @@ function App() {
     ]
   );
 
-  // --- Event Actions Context (ref-stabilized functions) ---
-  const eventActionsRef = useRef({});
-  eventActionsRef.current = {
+  // --- Event Actions (passed to EventStoreProvider for ref-stabilization) ---
+  const eventActions = {
     setSelectedEvent,
     setSelectedYear,
     setFTCMode,
     loadEvent,
     getSchedule,
     getTeamList,
-    getRanks,
-    getAlliances,
     getCommunityUpdates,
     nextMatch,
     previousMatch,
     setMatchFromMenu,
   };
-
-  const eventActionsValue = useMemo(
-    () => ({
-      setSelectedEvent: (...args) =>
-        eventActionsRef.current.setSelectedEvent(...args),
-      setSelectedYear: (...args) =>
-        eventActionsRef.current.setSelectedYear(...args),
-      setFTCMode: (...args) => eventActionsRef.current.setFTCMode(...args),
-      loadEvent: (...args) => eventActionsRef.current.loadEvent(...args),
-      getSchedule: (...args) => eventActionsRef.current.getSchedule(...args),
-      getTeamList: (...args) => eventActionsRef.current.getTeamList(...args),
-      getRanks: (...args) => eventActionsRef.current.getRanks(...args),
-      getAlliances: (...args) => eventActionsRef.current.getAlliances(...args),
-      getCommunityUpdates: (...args) =>
-        eventActionsRef.current.getCommunityUpdates(...args),
-      nextMatch: (...args) => eventActionsRef.current.nextMatch(...args),
-      previousMatch: (...args) =>
-        eventActionsRef.current.previousMatch(...args),
-      setMatchFromMenu: (...args) =>
-        eventActionsRef.current.setMatchFromMenu(...args),
-    }),
-    []
-  );
 
   return (
     <div className="App">
@@ -6151,15 +5503,13 @@ function App() {
           </Container>
         </div>
       ) : (
-        <EventActionsProvider value={eventActionsValue}>
-          <EventDataProvider value={eventDataValue}>
+        <EventStoreProvider data={eventDataValue} actions={eventActions} rankingsDeps={rankingsDeps} storeRef={eventStoreRef}>
             <BrowserRouter>
           <Routes>
             <Route
               path="/"
               element={
                 <LayoutsWithNavbar
-                  playoffs={playoffs}
                   eventHighScores={eventHighScores}
                   worldHighScores={worldStats}
                   allianceSelection={allianceSelection}
@@ -6457,8 +5807,7 @@ function App() {
             </Route>
           </Routes>
         </BrowserRouter>
-          </EventDataProvider>
-        </EventActionsProvider>
+        </EventStoreProvider>
       )}
     </div>
   );

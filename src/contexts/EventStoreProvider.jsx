@@ -1,0 +1,146 @@
+import { useRef, useMemo } from "react";
+import { EventDataProvider } from "./EventDataContext";
+import { EventActionsProvider } from "./EventActionsContext";
+import { useRankingsAlliances } from "../hooks/useRankingsAlliances";
+
+/**
+ * Request deduplication: prevents multiple in-flight fetches to the same logical endpoint.
+ * Key should encode function name + all params that affect the result.
+ * The Map is cleared on event change via clearInflight().
+ */
+function createInflightTracker() {
+  const map = new Map();
+  return {
+    /**
+     * If a fetch for `key` is already in-flight, return its promise.
+     * Otherwise, run `fetchFn`, store its promise, and auto-clean on settle.
+     */
+    dedupe(key, fetchFn) {
+      if (map.has(key)) return map.get(key);
+      const promise = fetchFn().finally(() => map.delete(key));
+      map.set(key, promise);
+      return promise;
+    },
+    clear() {
+      map.clear();
+    },
+    has(key) {
+      return map.has(key);
+    },
+  };
+}
+
+/**
+ * Creates an epoch-based stale-response guard.
+ * Increment the epoch before starting a fetch; compare after the fetch resolves.
+ * If epochs don't match, a newer fetch superseded this one — discard the result.
+ */
+function createEpochGuard() {
+  let epoch = 0;
+  return {
+    next() {
+      epoch += 1;
+      return epoch;
+    },
+    isCurrent(token) {
+      return token === epoch;
+    },
+    current() {
+      return epoch;
+    },
+  };
+}
+
+/**
+ * EventStoreProvider — wraps EventActionsProvider + EventDataProvider.
+ *
+ * Progressively absorbs state + fetch logic from App.jsx into domain-specific
+ * hooks. Each hook is a "store slice" that owns its state, mutations, and
+ * fetch functions. The provider merges all slices into the shared contexts.
+ *
+ * Current slices:
+ * - useRankingsAlliances: rankings, alliances, districtRankings, playoffs
+ *
+ * @param {object} props.data - Read-mostly event data from App.jsx (will shrink over time)
+ * @param {object} props.actions - Action functions from App.jsx (will shrink over time)
+ * @param {object} props.rankingsDeps - Dependencies for the rankings/alliances slice
+ * @param {React.MutableRefObject} props.storeRef - Ref that the provider populates with
+ *   store-owned functions so App.jsx callers (getSchedule, loadEvent) can invoke them
+ *   without being inside the provider tree.
+ */
+export function EventStoreProvider({ data, actions, rankingsDeps, storeRef, children }) {
+  // --- Request deduplication (available to future slices) ---
+  // eslint-disable-next-line no-unused-vars
+  const inflightRef = useRef(createInflightTracker());
+  // eslint-disable-next-line no-unused-vars
+  const epochGuards = useRef({
+    alliances: createEpochGuard(),
+    teamList: createEpochGuard(),
+    schedule: createEpochGuard(),
+    rankings: createEpochGuard(),
+  });
+
+  // --- Rankings & Alliances slice ---
+  // The hook receives state + setters from App.jsx (via rankingsDeps) and returns
+  // fetch functions + semantic actions. State ownership stays in App.jsx.
+  const rankingsSlice = useRankingsAlliances(rankingsDeps);
+
+  // --- Expose store-owned functions to App.jsx via ref ---
+  // This allows App.jsx functions (getSchedule, loadEvent) that live above the
+  // provider tree to call store-owned functions without being context consumers.
+  if (storeRef) {
+    storeRef.current = {
+      // Fetch actions
+      getRanks: rankingsSlice.getRanks,
+      getAlliances: rankingsSlice.getAlliances,
+      getDistrictRanks: rankingsSlice.getDistrictRanks,
+      // Semantic mutations
+      resetRankingsAlliancesState: rankingsSlice.resetRankingsAlliancesState,
+      applyUserPrefs: rankingsSlice.applyUserPrefs,
+    };
+  }
+
+  // --- Merge store-owned actions into the actions context value ---
+  // Explicit surface: store actions extend App.jsx actions
+  const allActions = {
+    // App.jsx actions (will shrink as more slices are extracted)
+    setSelectedEvent: actions.setSelectedEvent,
+    setSelectedYear: actions.setSelectedYear,
+    setFTCMode: actions.setFTCMode,
+    loadEvent: actions.loadEvent,
+    getSchedule: actions.getSchedule,
+    getTeamList: actions.getTeamList,
+    getCommunityUpdates: actions.getCommunityUpdates,
+    nextMatch: actions.nextMatch,
+    previousMatch: actions.previousMatch,
+    setMatchFromMenu: actions.setMatchFromMenu,
+    // Store-owned: rankings & alliances slice
+    getRanks: rankingsSlice.getRanks,
+    getAlliances: rankingsSlice.getAlliances,
+    getDistrictRanks: rankingsSlice.getDistrictRanks,
+  };
+
+  // --- Actions: ref-stabilized so the context value never changes ---
+  const actionsRef = useRef({});
+  actionsRef.current = allActions;
+
+  const stableActions = useMemo(
+    () =>
+      Object.fromEntries(
+        Object.keys(allActions).map((key) => [
+          key,
+          (...args) => actionsRef.current[key](...args),
+        ])
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [] // Empty deps: stable wrappers never change
+  );
+
+  return (
+    <EventActionsProvider value={stableActions}>
+      <EventDataProvider value={data}>{children}</EventDataProvider>
+    </EventActionsProvider>
+  );
+}
+
+export { createInflightTracker, createEpochGuard };
