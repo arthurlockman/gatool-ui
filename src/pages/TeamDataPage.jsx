@@ -959,15 +959,20 @@ function TeamDataPage({
                     <tbody>
                         {teamList && teamList?.teams && teamListExtended.map((team) => {
                             var cityState = `${team?.city}, ${team?.stateProv}${(team?.country !== "USA") ? ", " + team?.country : ""}`;
-                            var avatar = ftcMode ? `<span class="team-avatar team-${team?.teamNumber}"></span>` : `<img src='${apiBaseUrl}${selectedYear.value}/avatars/team/${team?.teamNumber}/avatar.png' onerror="this.style.display='none'">&nbsp`;
-                            var teamNameWithAvatar = team?.updates?.nameShortLocal ? team?.updates?.nameShortLocal : team?.nameShort;
-                            teamNameWithAvatar = avatar + "<br />" + teamNameWithAvatar;
+                            var teamName = team?.updates?.nameShortLocal ? team?.updates?.nameShortLocal : team?.nameShort;
 
                             return <tr key={`teamDataRow${team?.teamNumber}`}>
                                 <TeamTimer team={team} lastVisit={lastVisit} monthsWarning={monthsWarning} handleShow={handleShow} currentTime={currentTime} />
                                 <td style={rankHighlight(team?.rank ? team?.rank : 100, allianceCount || { "count": 8 })}>{team?.rank}</td>
                                 
-                                <td className={updateHighlightClass(team?.updates?.nameShortLocal)} dangerouslySetInnerHTML={{ __html: teamNameWithAvatar }} style={updateHighlight(team?.updates?.nameShortLocal)}></td>
+                                <td className={updateHighlightClass(team?.updates?.nameShortLocal)} style={updateHighlight(team?.updates?.nameShortLocal)}>
+                                    {ftcMode
+                                        ? <span className={`team-avatar team-${team?.teamNumber}`}></span>
+                                        : <img src={`${apiBaseUrl}${selectedYear.value}/avatars/team/${team?.teamNumber}/avatar.png`} onError={(e) => { e.target.style.display = 'none'; }} alt="" />
+                                    }
+                                    <br />
+                                    {teamName}
+                                </td>
                                 <td className={updateHighlightClass(team?.updates?.cityStateLocal)} style={updateHighlight(team?.updates?.cityStateLocal)}>{team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : cityState} </td>
                                 {(selectedEvent?.value?.type === "Championship" || selectedEvent?.value?.type === "ChampionshipDivision") ?
                                     <td className={updateHighlightClass(team?.updates?.topSponsorLocal)} style={updateHighlight(team?.updates?.topSponsorLocal)}>{team?.updates?.topSponsorLocal ? team?.updates?.topSponsorLocal : team?.topSponsor}</td> :
