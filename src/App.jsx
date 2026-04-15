@@ -33,7 +33,7 @@ import moment from "moment";
 import Developer from "./pages/Developer";
 import { eventNames, FTCEventNames } from "./data/eventNames";
 import { specialAwards, hallOfFame, FTCHallOfFame } from "./data/hallOfFame";
-import { originalAndSustaining, refreshRate, communityUpdateTemplate } from "./data/appConfig";
+import { originalAndSustaining, refreshRate } from "./data/appConfig";
 import { ftcRegions } from "./data/ftcRegions";
 import { appUpdates } from "./data/appUpdates";
 import { useOnlineStatus } from "./contextProviders/OnlineContext";
@@ -584,7 +584,6 @@ function App() {
     ftcLeagueHighScores,
     frcDistrictHighScores,
     setEventHighScores,
-    setFtcRegionHighScores,
     setFtcLeagueHighScores,
     setFrcDistrictHighScores,
     getWorldStats,
@@ -661,7 +660,6 @@ function App() {
     communityUpdates,
     setCommunityUpdates,
     getCommunityUpdates,
-    loadingCommunityUpdates,
     setLoadingCommunityUpdates,
   } = useCommunityUpdates({
     httpClient,
