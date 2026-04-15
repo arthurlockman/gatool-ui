@@ -7,6 +7,7 @@ import moment from "moment";
 import _ from "lodash";
 import { toast } from "react-toastify";
 import { apiBaseUrl } from "../contextProviders/AuthClientContext";
+import TeamAvatar from "../components/TeamAvatar";
 import { useOnlineStatus } from "../contextProviders/OnlineContext";
 import { utils, read, write, writeFile } from "xlsx";
 import Docxtemplater from "docxtemplater";
@@ -968,7 +969,7 @@ function TeamDataPage({
                                 <td className={updateHighlightClass(team?.updates?.nameShortLocal)} style={updateHighlight(team?.updates?.nameShortLocal)}>
                                     {ftcMode
                                         ? <span className={`team-avatar team-${team?.teamNumber}`}></span>
-                                        : <img src={`${apiBaseUrl}${selectedYear.value}/avatars/team/${team?.teamNumber}/avatar.png`} onError={(e) => { e.target.style.display = 'none'; }} alt="" />
+                                        : <TeamAvatar src={`${apiBaseUrl}${selectedYear.value}/avatars/team/${team?.teamNumber}/avatar.png`} teamNumber={team?.teamNumber} />
                                     }
                                     <br />
                                     {teamName}

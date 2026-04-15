@@ -53,6 +53,7 @@ import {
   allianceRosterToConnectionKey,
 } from "./utils/allianceConnectionsApi";
 import { useInterval } from "react-interval-hook";
+import { clearAvatarCache } from "./components/TeamAvatar";
 
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -3778,6 +3779,7 @@ function App() {
       setEITeams([]);
       await setRobotImages(null);
       await setEventHighScores(null);
+      clearAvatarCache();
 
       // Reset rankings/alliances state (store-owned)
       await eventStoreRef.current.resetRankingsAlliancesState(shouldPreserveOfflineData);
