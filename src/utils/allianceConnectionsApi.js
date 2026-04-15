@@ -91,6 +91,8 @@ export class ConnectionsApiError extends Error {
 /** Retries after first failure (4 attempts total). */
 const MATCHUPS_NETWORK_RETRIES = 3;
 const MATCHUPS_RETRY_DELAYS_MS = [400, 800, 1600];
+/** Per-attempt timeout so a hung server doesn't block the UI forever. */
+const MATCHUPS_TIMEOUT_MS = 10_000;
 
 function sleep(ms, signal) {
   return new Promise((resolve, reject) => {
@@ -122,14 +124,26 @@ function isFetchNetworkFailure(e) {
 async function fetchMatchupsWithRetries(url, signal) {
   let res;
   for (let attempt = 0; attempt <= MATCHUPS_NETWORK_RETRIES; attempt++) {
+    // Combine caller abort signal with a per-attempt timeout
+    const timeoutController = new AbortController();
+    const timeoutId = setTimeout(() => timeoutController.abort(), MATCHUPS_TIMEOUT_MS);
+    const onCallerAbort = () => timeoutController.abort();
+    signal?.addEventListener("abort", onCallerAbort, { once: true });
+
     try {
-      res = await fetch(url, { signal });
+      res = await fetch(url, { signal: timeoutController.signal });
     } catch (e) {
-      if (e?.name === "AbortError") throw e;
-      if (!isFetchNetworkFailure(e) || attempt === MATCHUPS_NETWORK_RETRIES) {
-        if (isFetchNetworkFailure(e)) {
+      // Re-throw if the CALLER aborted (not our timeout)
+      if (signal?.aborted) throw new DOMException("Aborted", "AbortError");
+      // Treat our timeout as a network failure (retryable)
+      const isTimeout = e?.name === "AbortError" && !signal?.aborted;
+      const isNetworkFail = isFetchNetworkFailure(e) || isTimeout;
+      if (!isNetworkFail || attempt === MATCHUPS_NETWORK_RETRIES) {
+        if (isNetworkFail) {
           throw new ConnectionsApiError(
-            "Network error — request could not reach the server. If the API works when you open it in the browser, CORS may be blocking requests from this app.",
+            isTimeout
+              ? "Request timed out — the server took too long to respond."
+              : "Network error — request could not reach the server. If the API works when you open it in the browser, CORS may be blocking requests from this app.",
             null,
             null
           );
@@ -142,6 +156,9 @@ async function fetchMatchupsWithRetries(url, signal) {
         signal
       );
       continue;
+    } finally {
+      clearTimeout(timeoutId);
+      signal?.removeEventListener("abort", onCallerAbort);
     }
 
     if (res.ok) return res;

@@ -27,20 +27,27 @@ class AuthClient {
     this.tokenGetter = tokenGetter;
   }
 
-  async get(path) {
+  async get(path, timeOut = 30000) {
     if (!this.online) {
       throw new Error("You are offline.");
     }
 
     this.operationStart();
-    var token = await this.getToken();
-    var response = await fetch(`${apiBaseUrl}${path}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }).finally(() => {
+    try {
+      var token = await this.getToken();
+      var response = await fetch(`${apiBaseUrl}${path}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        signal: AbortSignal.timeout(timeOut),
+      }).finally(() => {
+        this.operationDone();
+      });
+    } catch (e) {
       this.operationDone();
-    });
+      console.log("Fetch timeout exceeded");
+      return { status: 408, statusText: "Request Timeout" };
+    }
     if (response.ok) return response;
     var errorText = `Received a ${response.status} error from backend: "${response.statusText}"`;
     if (response.status === 400) {
@@ -138,7 +145,7 @@ class AuthClient {
     throw new Error(errorText);
   }
 
-  async put(path, body, customAPIBaseUrl) {
+  async put(path, body, customAPIBaseUrl, timeOut = 30000) {
     if (!this.online) {
       throw new Error("You are offline.");
     }
@@ -153,6 +160,7 @@ class AuthClient {
         },
         method: "PUT",
         body: JSON.stringify(body),
+        signal: AbortSignal.timeout(timeOut),
       }).finally(() => {
         this.operationDone();
       });
@@ -191,7 +199,7 @@ class AuthClient {
     throw new Error(errorText);
   }
 
-  async post(path, body) {
+  async post(path, body, timeOut = 30000) {
     if (!this.online) {
       throw new Error("You are offline.");
     }
@@ -206,6 +214,7 @@ class AuthClient {
         },
         method: "POST",
         body: body == null ? null : JSON.stringify(body),
+        signal: AbortSignal.timeout(timeOut),
       }).finally(() => {
         this.operationDone();
       });
@@ -239,7 +248,7 @@ class AuthClient {
     throw new Error(errorText);
   }
 
-  async postNoAuth(path, body, customAPIBaseUrl, headers) {
+  async postNoAuth(path, body, customAPIBaseUrl, headers, timeOut = 30000) {
     if (!this.online) {
       throw new Error("You are offline.");
     }
@@ -250,6 +259,7 @@ class AuthClient {
         headers: { ...headers, "Content-Type": "application/json" },
         method: "POST",
         body: body == null ? null : JSON.stringify(body),
+        signal: AbortSignal.timeout(timeOut),
       }).finally(() => {
         this.operationDone();
       });
@@ -283,7 +293,7 @@ class AuthClient {
     throw new Error(errorText);
   }
 
-  async delete(path) {
+  async delete(path, timeOut = 30000) {
     if (!this.online) {
       throw new Error("You are offline.");
     }
@@ -296,6 +306,7 @@ class AuthClient {
           Authorization: `Bearer ${token}`,
         },
         method: "DELETE",
+        signal: AbortSignal.timeout(timeOut),
       }).finally(() => {
         this.operationDone();
       });
