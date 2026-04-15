@@ -4,6 +4,7 @@ import { EventActionsProvider } from "./EventActionsContext";
 import { useRankingsAlliances } from "../hooks/useRankingsAlliances";
 import { useTeamData } from "../hooks/useTeamData";
 import { useMatchNavigation } from "../hooks/useMatchNavigation";
+import { useScheduleLoader } from "../hooks/useScheduleLoader";
 
 /**
  * Request deduplication: prevents multiple in-flight fetches to the same logical endpoint.
@@ -63,17 +64,19 @@ function createEpochGuard() {
  * Current slices:
  * - useTeamData: team list, EPA, robot images, regional event detail, remappings
  * - useRankingsAlliances: rankings, alliances, districtRankings, playoffs
+ * - useScheduleLoader: getSchedule (schedule fetching orchestrator)
  * - useMatchNavigation: nextMatch, previousMatch, setMatchFromMenu
  *
  * @param {object} props.data - Read-mostly event data from App.jsx (will shrink over time)
  * @param {object} props.actions - Action functions from App.jsx (will shrink over time)
  * @param {object} props.teamDeps - Dependencies for the team data slice
  * @param {object} props.rankingsDeps - Dependencies for the rankings/alliances slice
+ * @param {object} props.scheduleDeps - Dependencies for the schedule loader slice
  * @param {React.MutableRefObject} props.storeRef - Ref that the provider populates with
  *   store-owned functions so App.jsx callers (getSchedule, loadEvent) can invoke them
  *   without being inside the provider tree.
  */
-export function EventStoreProvider({ data, actions, teamDeps, rankingsDeps, matchNavDeps, storeRef, children }) {
+export function EventStoreProvider({ data, actions, teamDeps, rankingsDeps, scheduleDeps, matchNavDeps, storeRef, children }) {
   // --- Request deduplication (available to future slices) ---
   // eslint-disable-next-line no-unused-vars
   const inflightRef = useRef(createInflightTracker());
@@ -103,8 +106,25 @@ export function EventStoreProvider({ data, actions, teamDeps, rankingsDeps, matc
   };
   const rankingsSlice = useRankingsAlliances(composedRankingsDeps);
 
+  // --- Schedule Loader slice ---
+  // Compose: pass concrete store functions (getTeamList, getAlliances, getRanks)
+  // so the hook doesn't need eventStoreRef.
+  const composedScheduleDeps = {
+    ...scheduleDeps,
+    getTeamList: teamSlice.getTeamList,
+    getAlliances: rankingsSlice.getAlliances,
+    getRanks: rankingsSlice.getRanks,
+  };
+  const scheduleSlice = useScheduleLoader(composedScheduleDeps);
+
   // --- Match Navigation slice ---
-  const matchNavSlice = useMatchNavigation(matchNavDeps);
+  // Compose: override getSchedule with the store-owned version from scheduleSlice,
+  // so matchNav calls the hook's getSchedule (not the now-deleted App.jsx one).
+  const composedMatchNavDeps = {
+    ...matchNavDeps,
+    getSchedule: scheduleSlice.getSchedule,
+  };
+  const matchNavSlice = useMatchNavigation(composedMatchNavDeps);
 
   // --- Expose store-owned functions to App.jsx via ref ---
   // This allows App.jsx functions (getSchedule, loadEvent) that live above the
@@ -129,6 +149,8 @@ export function EventStoreProvider({ data, actions, teamDeps, rankingsDeps, matc
       nextMatch: matchNavSlice.nextMatch,
       previousMatch: matchNavSlice.previousMatch,
       setMatchFromMenu: matchNavSlice.setMatchFromMenu,
+      // Schedule loader slice
+      getSchedule: scheduleSlice.getSchedule,
     };
   }
 
@@ -140,8 +162,9 @@ export function EventStoreProvider({ data, actions, teamDeps, rankingsDeps, matc
     setSelectedYear: actions.setSelectedYear,
     setFTCMode: actions.setFTCMode,
     loadEvent: actions.loadEvent,
-    getSchedule: actions.getSchedule,
     getCommunityUpdates: actions.getCommunityUpdates,
+    // Store-owned: schedule loader slice
+    getSchedule: scheduleSlice.getSchedule,
     // Store-owned: match navigation slice
     nextMatch: matchNavSlice.nextMatch,
     previousMatch: matchNavSlice.previousMatch,
