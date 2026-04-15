@@ -2662,7 +2662,6 @@ function App() {
               ...tbaTeams,
               lastUpdate: moment().format(),
             };
-            getCommunityUpdates(false, teams.teams);
           }
         }
       } else if (useFTCOffline) {
@@ -2694,7 +2693,6 @@ function App() {
               teams.lastUpdate = moment().format();
               teams.teams = values;
               teams.teamCountTotal = values.length;
-              getCommunityUpdates(false, teams.teams);
             });
           }
         }
