@@ -5,6 +5,7 @@ import {
 } from "../utils/playoffReserveEdits";
 import { roundThreeOrReserveRoleLabel } from "../utils/allianceRoleLabels";
 import { normalizeFtcGatoolAllianceRow } from "../utils/ftcHybridMatchTeams";
+import { fetchLocal } from "../utils/fetchLocal";
 import _ from "lodash";
 import moment from "moment";
 
@@ -189,7 +190,7 @@ export function useRankingsAlliances(deps) {
     } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
       ranks = { rankings: { Rankings: [] } };
       if (useCheesyArena && cheesyArenaAvailable) {
-        result = await fetch("http://10.0.100.5:8080/api/rankings");
+        result = await fetchLocal("http://10.0.100.5:8080/api/rankings");
         if (result.status === 200) {
           var data = await result.json();
           if (data?.Rankings.length > 0) {
@@ -397,7 +398,7 @@ export function useRankingsAlliances(deps) {
       !selectedEvent?.value?.code.includes("OFFLINE")
     ) {
       if (useCheesyArena && cheesyArenaAvailable) {
-        result = await fetch("http://10.0.100.5:8080/api/alliances");
+        result = await fetchLocal("http://10.0.100.5:8080/api/alliances");
         var data = await result.json();
         if (data.length > 0) {
           alliancesData = {

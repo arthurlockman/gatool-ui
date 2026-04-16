@@ -206,6 +206,7 @@ function App() {
     null
   );
   const previousEventRef = useRef(null);
+  const loadEventAbortRef = useRef(null);
   const [selectedYear, setSelectedYear] = usePersistentState(
     "setting:selectedYear",
     null
@@ -968,6 +969,15 @@ function App() {
   const loadEvent = async () => {
     console.log("starting to load event");
     if (httpClient && selectedEvent?.value?.name && selectedYear?.value) {
+      // Abort any in-flight requests from the previous loadEvent call
+      if (loadEventAbortRef.current) {
+        loadEventAbortRef.current.abort();
+      }
+      loadEventAbortRef.current = new AbortController();
+
+      // Clear dedup cache so stale promises don't block fresh fetches
+      eventStoreRef.current?.resetInflight?.();
+
       console.log(`Conditions match to load ${selectedEvent?.value?.name}...`);
       const isOfflineEvent = selectedEvent?.value?.code === "OFFLINE";
       const previousWasOffline = previousEventRef.current?.code === "OFFLINE";

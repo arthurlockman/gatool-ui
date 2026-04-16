@@ -1,5 +1,6 @@
 import _ from "lodash";
 import moment from "moment";
+import { useRef } from "react";
 import { timeZones } from "../data/timeZones";
 
 const paleYellow = "#fdfaed";
@@ -42,6 +43,9 @@ export function useEventListLoader(deps) {
     // Callback for module-level ftcregions mutation (pre-existing pattern)
     updateFtcRegions,
   } = deps;
+
+  /** Stale-response guard — prevents slow year-A responses from overwriting year-B state */
+  const getEventsEpochRef = useRef(0);
 
   /**
    * Fetch all TBA offseason events for a given year
@@ -165,6 +169,10 @@ export function useEventListLoader(deps) {
         `Loading ${ftcMode ? ftcMode.label : "FRC"} events list for for ${selectedYear?.value
         }...`
       );
+
+      // Epoch guard: capture token so we can discard stale year-switch responses
+      const epoch = ++getEventsEpochRef.current;
+
       setEventsLoading(
         `${ftcMode ? ftcMode.label : "FRC"}-${selectedYear?.value}`
       );
@@ -409,6 +417,13 @@ export function useEventListLoader(deps) {
         );
 
         types = _.orderBy(_.uniqBy(types, "type"), "description", "asc");
+
+        // Epoch guard: discard if user switched year/mode while we were fetching
+        if (epoch !== getEventsEpochRef.current) {
+          console.log("getEvents: stale response discarded (year/mode switched)");
+          return;
+        }
+
         setFTCTypes(types);
 
         //Ensure that current year event names change when Division or sponsor names change

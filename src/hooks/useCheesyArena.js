@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { usePersistentState } from "./UsePersistentState";
+import { fetchLocal } from "../utils/fetchLocal";
 
 export function useCheesyArenaStatus() {
   const [cheesyArenaAvailable, setCheesyArenaAvailable] = useState(false);
@@ -12,11 +13,9 @@ export function useCheesyArenaStatus() {
   const getCheesyStatus = async () => {
     console.log("Checking Cheesy Arena status...");
     try {
-      var result = await fetch(
+      var result = await fetchLocal(
         "http://10.0.100.5:8080/api/matches/qualification",
-        {
-          signal: AbortSignal.timeout(5000),
-        }
+        { timeout: 5000 }
       );
       var data = result.status === 200;
       if (data) {

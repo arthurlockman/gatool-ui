@@ -27,7 +27,7 @@ class AuthClient {
     this.tokenGetter = tokenGetter;
   }
 
-  async get(path, timeOut = 30000) {
+  async get(path, timeOut = 30000, signal) {
     if (!this.online) {
       throw new Error("You are offline.");
     }
@@ -35,16 +35,21 @@ class AuthClient {
     this.operationStart();
     try {
       var token = await this.getToken();
+      const timeoutSignal = AbortSignal.timeout(timeOut);
       var response = await fetch(`${apiBaseUrl}${path}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-        signal: AbortSignal.timeout(timeOut),
+        signal: signal ? AbortSignal.any([timeoutSignal, signal]) : timeoutSignal,
       }).finally(() => {
         this.operationDone();
       });
     } catch (e) {
       this.operationDone();
+      if (e?.name === "AbortError" && signal?.aborted) {
+        // Caller-initiated cancellation — silently swallow
+        return { status: 0, statusText: "Aborted", ok: false, _aborted: true };
+      }
       console.log("Fetch timeout exceeded");
       return { status: 408, statusText: "Request Timeout" };
     }
@@ -77,15 +82,16 @@ class AuthClient {
     throw new Error(errorText);
   }
 
-  async getNoAuth(path, customAPIBaseUrl, timeOut = 300000, headers) {
+  async getNoAuth(path, customAPIBaseUrl, timeOut = 300000, headers, signal) {
     if (!this.online) {
       throw new Error("You are offline.");
     }
 
     this.operationStart();
     try {
+      const timeoutSignal = AbortSignal.timeout(timeOut);
       var options = {
-        signal: AbortSignal.timeout(timeOut),
+        signal: signal ? AbortSignal.any([timeoutSignal, signal]) : timeoutSignal,
       };
       if (headers) options.headers = headers;
       var response = await fetch(
@@ -97,6 +103,9 @@ class AuthClient {
       if (response.ok) return response;
     } catch (e) {
       this.operationDone();
+      if (e?.name === "AbortError" && signal?.aborted) {
+        return { status: 0, statusText: "Aborted", ok: false, _aborted: true };
+      }
       console.log("Fetch timeout exceeded");
       return { status: 408, statusText: "Request Timeout" };
     }

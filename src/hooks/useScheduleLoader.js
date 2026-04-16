@@ -1,5 +1,6 @@
 import _ from "lodash";
 import moment from "moment";
+import { fetchLocal } from "../utils/fetchLocal";
 import {
   conformCheesyArenaMatch,
   conformCheesyArenaScores,
@@ -31,7 +32,13 @@ const ftcBaseURL = "https://api.gatool.org/ftc/v2/";
  * @param {object} deps - Dependencies from App.jsx
  * @returns {{ getSchedule: function }}
  */
-export function useScheduleLoader(deps) {
+/**
+ * @param {object} deps — state + setters + read-only env values from App.jsx
+ * @param {object} [opts] — optional epoch guard from provider
+ * @param {object} [opts.epochGuard] — stale-response guard for getSchedule
+ */
+export function useScheduleLoader(deps, opts = {}) {
+  const { epochGuard } = opts;
   const {
     // State reads
     selectedEvent,
@@ -131,6 +138,10 @@ export function useScheduleLoader(deps) {
     if (!selectedYear?.value || !selectedEvent?.value?.code) return;
     console.log(`Fetching schedule for ${selectedEvent?.value?.name}...`);
 
+    // Epoch guard: capture a token so we can detect if a newer fetch superseded us
+    const epoch = epochGuard?.next();
+    const isStale = () => epochGuard && !epochGuard.isCurrent(epoch);
+
     var practiceschedule = null;
     var qualschedule = null;
     var qualScores = null;
@@ -158,7 +169,7 @@ export function useScheduleLoader(deps) {
     } else if (!selectedEvent?.value?.code.includes("PRACTICE") && !ftcMode) {
       if (useCheesyArena && cheesyArenaAvailable) {
         // get schedule from Cheesy Arena
-        var result = await fetch("http://10.0.100.5:8080/api/matches/practice");
+        var result = await fetchLocal("http://10.0.100.5:8080/api/matches/practice");
         var data = await result.json();
         if (data.length > 0) {
           // reformat data to match FIRST API format
@@ -213,6 +224,10 @@ export function useScheduleLoader(deps) {
         practiceSchedule.schedule = practiceSchedule?.schedule?.schedule;
       }
 
+      if (isStale()) {
+        console.log("getSchedule: stale response discarded (practice)");
+        return;
+      }
       if (practiceFileUploaded) {
         setPracticeFileUploaded(false);
       }
@@ -229,7 +244,7 @@ export function useScheduleLoader(deps) {
       if (useCheesyArena && cheesyArenaAvailable) {
         // get schedule from Cheesy Arena
         console.log("Using Cheesy Arena for Qual Schedule");
-        result = await fetch(
+        result = await fetchLocal(
           "http://10.0.100.5:8080/api/matches/qualification"
         );
         data = await result.json();
@@ -546,6 +561,12 @@ export function useScheduleLoader(deps) {
 
     qualschedule.lastUpdate = moment().format();
 
+    // Epoch guard: discard if a newer fetch has started
+    if (isStale()) {
+      console.log("getSchedule: stale response discarded (quals)");
+      return;
+    }
+
     // For OFFLINE events, only update qualSchedule if there's no uploaded schedule already
     const isOfflineEvent = selectedEvent?.value?.code === "OFFLINE";
     if (!isOfflineEvent || !qualSchedule || qualSchedule?.schedule?.length === 0) {
@@ -583,7 +604,7 @@ export function useScheduleLoader(deps) {
       if (useCheesyArena && cheesyArenaAvailable) {
         // get scores and schedule from Cheesy Arena
         console.log("Using Cheesy Arena for Playoff Schedule");
-        result = await fetch("http://10.0.100.5:8080/api/matches/playoff");
+        result = await fetchLocal("http://10.0.100.5:8080/api/matches/playoff");
         if (result.status === 200) {
           data = await result.json();
           if (data.length > 0) {
@@ -949,6 +970,14 @@ export function useScheduleLoader(deps) {
     if (playoffschedule?.completedMatchCount > 0) {
       lastMatchPlayed += playoffschedule?.completedMatchCount;
     }
+
+    // Epoch guard: discard if a newer fetch has started before committing
+    // playoffs, currentMatch, reserve edits, and downstream fan-out
+    if (isStale()) {
+      console.log("getSchedule: stale response discarded (playoffs)");
+      return;
+    }
+
     if (options.updateCurrentMatch !== false && ((loadingEvent && autoAdvance) || autoUpdate)) {
       if (
         lastMatchPlayed === qualschedule?.schedule.length + 1 ||

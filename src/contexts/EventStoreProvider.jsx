@@ -78,9 +78,7 @@ function createEpochGuard() {
  */
 export function EventStoreProvider({ data, actions, teamDeps, rankingsDeps, scheduleDeps, matchNavDeps, storeRef, children }) {
   // --- Request deduplication (available to future slices) ---
-  // eslint-disable-next-line no-unused-vars
   const inflightRef = useRef(createInflightTracker());
-  // eslint-disable-next-line no-unused-vars
   const epochGuards = useRef({
     alliances: createEpochGuard(),
     teamList: createEpochGuard(),
@@ -115,7 +113,9 @@ export function EventStoreProvider({ data, actions, teamDeps, rankingsDeps, sche
     getAlliances: rankingsSlice.getAlliances,
     getRanks: rankingsSlice.getRanks,
   };
-  const scheduleSlice = useScheduleLoader(composedScheduleDeps);
+  const scheduleSlice = useScheduleLoader(composedScheduleDeps, {
+    epochGuard: epochGuards.current.schedule,
+  });
 
   // --- Match Navigation slice ---
   // Compose: override getSchedule with the store-owned version from scheduleSlice,
@@ -151,6 +151,10 @@ export function EventStoreProvider({ data, actions, teamDeps, rankingsDeps, sche
       setMatchFromMenu: matchNavSlice.setMatchFromMenu,
       // Schedule loader slice
       getSchedule: scheduleSlice.getSchedule,
+      // Infrastructure: reset dedup + epoch guards on event change
+      resetInflight() {
+        inflightRef.current.clear();
+      },
     };
   }
 
