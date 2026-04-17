@@ -1,14 +1,15 @@
 import { ArrowRight } from "react-bootstrap-icons";
 import _ from "lodash";
 import { matchClassesBase } from "../data/matchClasses";
+import { useSettings } from "../contexts/SettingsContext";
 
 function PlayoffDetails({
   matchDetails,
   alliances,
   matches,
-  playoffCountOverride,
   ftcMode
 }) {
+  const { playoffCountOverride } = useSettings();
   const formatMatchClasses = (baseClasses) => {
     const newClasses = baseClasses.map((match) => {
       return {

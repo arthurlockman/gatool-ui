@@ -28,15 +28,13 @@ import { useEventActions } from "contexts/EventActionsContext";
 function RanksPage({
   rankSort,
   setRankSort,
-  rankingsOverride,
-  setRankingsOverride,
   setRankings,
   allianceSelection,
   setAllianceSelectionArrays,
 }) {
   const { selectedEvent, teamList, rankings, allianceCount, districtRankings, selectedYear, eventLabel, communityUpdates, ftcMode, remapNumberToString, remapStringToNumber, EPA, regionalEventDetail, playoffs } = useEventData();
   const { getRanks, getRegionalEventDetail } = useEventActions();
-  const { useScrollMemory } = useSettings();
+  const { useScrollMemory, rankingsOverride, setRankingsOverride } = useSettings();
   // Remember scroll position for Ranks page
   useScrollPosition('ranks', true, false, useScrollMemory);
 

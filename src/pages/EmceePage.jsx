@@ -11,9 +11,7 @@ import { useSettings } from "../contexts/SettingsContext";
 import { useEventData } from "contexts/EventDataContext";
 import { useEventActions } from "contexts/EventActionsContext";
 
-function EmceePage({
-  playoffCountOverride,
-}) {
+function EmceePage() {
   const { selectedEvent, playoffSchedule, qualSchedule, practiceSchedule, offlinePlayoffSchedule, alliances, currentMatch, eventLabel, ftcMode, remapNumberToString } = useEventData();
   const { nextMatch, previousMatch, getSchedule } = useEventActions();
   const { reverseEmcee, hidePracticeSchedule, usePullDownToUpdate, useSwipe } = useSettings();
@@ -925,7 +923,6 @@ function EmceePage({
                   matchDetails={matchDetails}
                   alliances={alliances}
                   matches={matches}
-                  playoffCountOverride={playoffCountOverride}
                   ftcMode={ftcMode}
                 />
               </Col>

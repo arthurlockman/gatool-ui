@@ -11,8 +11,10 @@ import { GOLD, RED, BLUE, GREEN, BLACK, WHITE, black, bold, semibold } from "./b
 import { getTeamByStation, getMatchLabel as getMatchLabelHelper, isCurrentMatchHelper, computeIsInFinalsView, getAllianceNumbersForDisplay as getAllianceNumbersForDisplayHelper, getAllianceNameForDisplay as getAllianceNameForDisplayHelper, getMatchScoreForDisplay as getMatchScoreForDisplayHelper, getMatchWinnerForDisplay as getMatchWinnerForDisplayHelper } from "../utils/bracketHelpers";
 import { useBracketState } from "../hooks/useBracketState";
 import WinnerSelectionModal from "./WinnerSelectionModal";
+import { useSettings } from "../contexts/SettingsContext";
 
-function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMatch, qualsLength, nextMatch, previousMatch, getSchedule, usePullDownToUpdate, useSwipe, eventLabel, playoffCountOverride, ftcMode, matches, allianceNumbers, allianceName, matchScore, matchWinner, alliances, remapNumberToString }) {
+function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMatch, qualsLength, nextMatch, previousMatch, getSchedule, usePullDownToUpdate, useSwipe, eventLabel, ftcMode, matches, allianceNumbers, allianceName, matchScore, matchWinner, alliances, remapNumberToString }) {
+	const { playoffCountOverride } = useSettings();
 	const { showSelectWinner, setShowSelectWinner, showConfirmWinner, winningAlliance, winnerMatch, setWinnerMatch, handleChooseWinner, handleClose, resetWinnerState } = useBracketState();
 
 

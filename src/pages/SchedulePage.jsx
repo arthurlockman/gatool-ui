@@ -43,13 +43,11 @@ function SchedulePage({
   champsStyle,
   setChampsStyle,
   setQualsLength,
-  playoffCountOverride,
-  setPlayoffCountOverride,
   setEventLabel,
 }) {
   const { selectedEvent, playoffSchedule, qualSchedule, practiceSchedule, offlinePlayoffSchedule, alliances, eventLabel, allianceCount, ftcMode, remapNumberToString } = useEventData();
   const { setSelectedEvent, getTeamList, loadEvent, getAlliances } = useEventActions();
-  const { hidePracticeSchedule, useScrollMemory } = useSettings();
+  const { hidePracticeSchedule, useScrollMemory, playoffCountOverride, setPlayoffCountOverride } = useSettings();
   const [showAdjustAlliances, setShowAdjustAlliances] = useState(false);
   const [showScores, setShowScores] = useState(false);
   const [scoresMatch, setScoresMatch] = useState(null);

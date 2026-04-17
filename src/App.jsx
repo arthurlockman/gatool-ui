@@ -2397,9 +2397,7 @@ function App() {
                     champsStyle={champsStyle}
                     setChampsStyle={setChampsStyle}
                     setQualsLength={setQualsLength}
-                    playoffCountOverride={playoffCountOverride}
                     setEventLabel={setEventLabel}
-                    setPlayoffCountOverride={setPlayoffCountOverride}
                   />
                 }
               />
@@ -2430,8 +2428,6 @@ function App() {
                   <RanksPage
                     rankSort={rankSort}
                     setRankSort={setRankSort}
-                    rankingsOverride={rankingsOverride}
-                    setRankingsOverride={setRankingsOverride}
                     allianceSelection={allianceSelection}
                     setRankings={setRankings}
                     setAllianceSelectionArrays={setAllianceSelectionArrays}
@@ -2459,7 +2455,6 @@ function App() {
                     adHocMode={adHocMode}
                     qualsLength={qualsLength}
                     playoffOnly={playoffOnly}
-                    playoffCountOverride={playoffCountOverride}
                     eventMessage={eventMessage}
                     eventBell={eventBell}
                     setEventBell={setEventBell}
@@ -2496,7 +2491,6 @@ function App() {
                     adHocMode={adHocMode}
                     qualsLength={qualsLength}
                     playoffOnly={playoffOnly}
-                    playoffCountOverride={playoffCountOverride}
                     eventMessage={eventMessage}
                     eventBell={eventBell}
                     setEventBell={setEventBell}
@@ -2518,11 +2512,9 @@ function App() {
                     playoffs={playoffs}
                     allianceSelectionArrays={allianceSelectionArrays}
                     setAllianceSelectionArrays={setAllianceSelectionArrays}
-                    rankingsOverride={rankingsOverride}
                     setOfflinePlayoffSchedule={setOfflinePlayoffSchedule}
                     qualsLength={qualsLength}
                     playoffOnly={playoffOnly}
-                    playoffCountOverride={playoffCountOverride}
                   />
                 }
               />
@@ -2560,9 +2552,7 @@ function App() {
               <Route
                 path="/emcee"
                 element={
-                  <EmceePage
-                    playoffCountOverride={playoffCountOverride}
-                  />
+                  <EmceePage />
                 }
               />
               <Route

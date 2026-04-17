@@ -43,7 +43,6 @@ function PlayByPlayPage({
   adHocMode,
   qualsLength,
   playoffOnly,
-  playoffCountOverride,
   eventMessage,
   eventBell,
   setEventBell,
@@ -678,7 +677,6 @@ function PlayByPlayPage({
               alliances={alliances}
               selectedEvent={selectedEvent}
               adHocMode={adHocMode}
-              playoffCountOverride={playoffCountOverride}
               ftcMode={ftcMode}
               worldStats={worldStats}
               ftcRegionHighScores={ftcRegionHighScores}
