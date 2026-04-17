@@ -21,13 +21,47 @@ class AuthClient {
   setOperationsInProgress = null;
   operationsInProgress = 0;
   online = true;
+  _inflight = new Map();
 
   constructor(tokenGetter, setOperationsInProgress) {
     this.setOperationsInProgress = setOperationsInProgress;
     this.tokenGetter = tokenGetter;
   }
 
+  // Clone a resolved GET result so each deduped caller gets an independent body.
+  // Non-Response results (e.g. timeout/abort shapes) are returned as-is.
+  _cloneGetResult(result) {
+    if (result && typeof result.clone === "function") return result.clone();
+    return result;
+  }
+
+  // Share a single in-flight GET promise across simultaneous callers for the
+  // same URL. Skipped entirely when the caller supplies an AbortSignal, since
+  // sharing a promise across differing lifecycles would let one caller's abort
+  // cancel another caller's request.
+  _dedupeGet(key, signal, runner) {
+    if (signal) return runner();
+    const existing = this._inflight.get(key);
+    if (existing) return existing.then((r) => this._cloneGetResult(r));
+    const p = runner();
+    this._inflight.set(key, p);
+    p.finally(() => {
+      if (this._inflight.get(key) === p) this._inflight.delete(key);
+    });
+    return p.then((r) => this._cloneGetResult(r));
+  }
+
+  clearInflight() {
+    this._inflight.clear();
+  }
+
   async get(path, timeOut = 30000, signal) {
+    return this._dedupeGet(`GET:${apiBaseUrl}${path}`, signal, () =>
+      this._doGet(path, timeOut, signal)
+    );
+  }
+
+  async _doGet(path, timeOut, signal) {
     if (!this.online) {
       throw new Error("You are offline.");
     }
@@ -83,6 +117,13 @@ class AuthClient {
   }
 
   async getNoAuth(path, customAPIBaseUrl, timeOut = 300000, headers, signal) {
+    const base = customAPIBaseUrl || apiBaseUrl;
+    return this._dedupeGet(`GETNA:${base}${path}`, signal, () =>
+      this._doGetNoAuth(path, customAPIBaseUrl, timeOut, headers, signal)
+    );
+  }
+
+  async _doGetNoAuth(path, customAPIBaseUrl, timeOut, headers, signal) {
     if (!this.online) {
       throw new Error("You are offline.");
     }

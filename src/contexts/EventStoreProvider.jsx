@@ -7,33 +7,6 @@ import { useMatchNavigation } from "../hooks/useMatchNavigation";
 import { useScheduleLoader } from "../hooks/useScheduleLoader";
 
 /**
- * Request deduplication: prevents multiple in-flight fetches to the same logical endpoint.
- * Key should encode function name + all params that affect the result.
- * The Map is cleared on event change via clearInflight().
- */
-function createInflightTracker() {
-  const map = new Map();
-  return {
-    /**
-     * If a fetch for `key` is already in-flight, return its promise.
-     * Otherwise, run `fetchFn`, store its promise, and auto-clean on settle.
-     */
-    dedupe(key, fetchFn) {
-      if (map.has(key)) return map.get(key);
-      const promise = fetchFn().finally(() => map.delete(key));
-      map.set(key, promise);
-      return promise;
-    },
-    clear() {
-      map.clear();
-    },
-    has(key) {
-      return map.has(key);
-    },
-  };
-}
-
-/**
  * Creates an epoch-based stale-response guard.
  * Increment the epoch before starting a fetch; compare after the fetch resolves.
  * If epochs don't match, a newer fetch superseded this one — discard the result.
@@ -77,8 +50,9 @@ function createEpochGuard() {
  *   without being inside the provider tree.
  */
 export function EventStoreProvider({ data, actions, teamDeps, rankingsDeps, scheduleDeps, matchNavDeps, storeRef, children }) {
-  // --- Request deduplication (available to future slices) ---
-  const inflightRef = useRef(createInflightTracker());
+  // Epoch guards per slice — used to discard stale responses when a newer fetch
+  // for the same slice supersedes an in-flight one. Request-level deduplication
+  // lives in AuthClient (httpClient.clearInflight() on event change).
   const epochGuards = useRef({
     alliances: createEpochGuard(),
     teamList: createEpochGuard(),
@@ -151,10 +125,6 @@ export function EventStoreProvider({ data, actions, teamDeps, rankingsDeps, sche
       setMatchFromMenu: matchNavSlice.setMatchFromMenu,
       // Schedule loader slice
       getSchedule: scheduleSlice.getSchedule,
-      // Infrastructure: reset dedup + epoch guards on event change
-      resetInflight() {
-        inflightRef.current.clear();
-      },
     };
   }
 
@@ -207,4 +177,4 @@ export function EventStoreProvider({ data, actions, teamDeps, rankingsDeps, sche
   );
 }
 
-export { createInflightTracker, createEpochGuard };
+export { createEpochGuard };

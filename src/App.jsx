@@ -976,7 +976,7 @@ function App() {
       loadEventAbortRef.current = new AbortController();
 
       // Clear dedup cache so stale promises don't block fresh fetches
-      eventStoreRef.current?.resetInflight?.();
+      httpClient.clearInflight?.();
 
       console.log(`Conditions match to load ${selectedEvent?.value?.name}...`);
       const isOfflineEvent = selectedEvent?.value?.code === "OFFLINE";
