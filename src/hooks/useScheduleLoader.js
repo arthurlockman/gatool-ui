@@ -80,7 +80,14 @@ export function useScheduleLoader(deps, opts = {}) {
     getTeamList,
     getAlliances,
     getRanks,
+    // Event-scoped abort signal
+    getEventSignal,
   } = deps;
+
+  // Reads the CURRENT event abort signal at call time. Using a getter avoids
+  // capturing a stale signal in closures — the ref is rotated on each event
+  // switch in App.jsx, so we must re-read it for every fetch.
+  const signal = () => getEventSignal?.();
 
   /**
    * Remaps a string team identifier to its numeric team number (e.g., "TeamA" -> 9990)
@@ -100,7 +107,11 @@ export function useScheduleLoader(deps, opts = {}) {
     try {
       console.log(`Fetching TBA matches for event: ${tbaEventKey}`);
       const result = await httpClient.getNoAuth(
-        `${year}/offseason/schedule/hybrid/${tbaEventKey}/`
+        `${year}/offseason/schedule/hybrid/${tbaEventKey}/`,
+        undefined,
+        undefined,
+        undefined,
+        signal()
       );
       if (result.status === 200) {
         // @ts-ignore
@@ -199,7 +210,10 @@ export function useScheduleLoader(deps, opts = {}) {
         // get the practice schedule from FIRST API
         const practiceResult = await httpClient.getNoAuth(
           `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/practice`,
-          ftcMode ? ftcBaseURL : undefined
+          ftcMode ? ftcBaseURL : undefined,
+          undefined,
+          undefined,
+          signal()
         );
         if (practiceResult.status === 200) {
           // @ts-ignore
@@ -280,7 +294,8 @@ export function useScheduleLoader(deps, opts = {}) {
           `/api/v1/events/${selectedEvent?.value.code}/matches/`,
           FTCServerURL,
           undefined,
-          { Authorization: FTCKey?.key || "" }
+          { Authorization: FTCKey?.key || "" },
+          signal()
         );
         if (qualsResult.status === 200) {
           // @ts-ignore
@@ -302,7 +317,8 @@ export function useScheduleLoader(deps, opts = {}) {
             `/api/${offlineYear}/v1/events/${selectedEvent?.value.code}/matches/${match.matchNumber}/`,
             FTCServerURL,
             undefined,
-            { Authorization: FTCKey?.key || "" }
+            { Authorization: FTCKey?.key || "" },
+            signal()
           );
           if (qualScoresResult.status === 200) {
             // @ts-ignore
@@ -404,7 +420,10 @@ export function useScheduleLoader(deps, opts = {}) {
       } else if (!useFTCOffline) {
         const qualsResult = await httpClient.getNoAuth(
           `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/qual`,
-          ftcMode ? ftcBaseURL : undefined
+          ftcMode ? ftcBaseURL : undefined,
+          undefined,
+          undefined,
+          signal()
         );
         if (qualsResult.status === 200) {
           // @ts-ignore
@@ -442,7 +461,10 @@ export function useScheduleLoader(deps, opts = {}) {
     ) {
       const qualsScoresResult = await httpClient.getNoAuth(
         `${selectedYear?.value}/scores/${selectedEvent?.value.code}/qual`,
-        ftcMode ? ftcBaseURL : undefined
+        ftcMode ? ftcBaseURL : undefined,
+        undefined,
+        undefined,
+        signal()
       );
       if (qualsScoresResult.status === 200) {
         // @ts-ignore
@@ -636,7 +658,8 @@ export function useScheduleLoader(deps, opts = {}) {
           `/api/v2/events/${selectedEvent?.value.code}/elims/`,
           FTCServerURL,
           undefined,
-          { Authorization: FTCKey?.key || "" }
+          { Authorization: FTCKey?.key || "" },
+          signal()
         );
         if (playoffResult.status === 200) {
           // @ts-ignore
@@ -663,7 +686,8 @@ export function useScheduleLoader(deps, opts = {}) {
                 `/api/${offlineYear}/v1/events/${selectedEvent?.value.code}/matches/${match?.matchName}/`,
                 FTCServerURL,
                 undefined,
-                { Authorization: FTCKey?.key || "" }
+                { Authorization: FTCKey?.key || "" },
+                signal()
               );
               if (playoffsScoresResult.status === 200) {
                 // @ts-ignore
@@ -758,7 +782,10 @@ export function useScheduleLoader(deps, opts = {}) {
       } else if (!useFTCOffline) {
         const playoffResult = await httpClient.getNoAuth(
           `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/playoff`,
-          ftcMode ? ftcBaseURL : undefined
+          ftcMode ? ftcBaseURL : undefined,
+          undefined,
+          undefined,
+          signal()
         );
         if (playoffResult.status === 200) {
           // @ts-ignore
@@ -846,7 +873,10 @@ export function useScheduleLoader(deps, opts = {}) {
     ) {
       const playoffScoresResult = await httpClient.getNoAuth(
         `${selectedYear?.value}/scores/${selectedEvent?.value.code}/playoff`,
-        ftcMode ? ftcBaseURL : undefined
+        ftcMode ? ftcBaseURL : undefined,
+        undefined,
+        undefined,
+        signal()
       );
       if (playoffScoresResult.status === 200) {
         // @ts-ignore

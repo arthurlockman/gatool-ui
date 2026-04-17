@@ -2187,6 +2187,8 @@ function App() {
     // Narrow callbacks
     requestCommunityUpdatesForTeams,
     patchSelectedEvent,
+    // Event-scoped abort signal (for cancelling on event switch)
+    getEventSignal: () => loadEventAbortRef.current?.signal,
   };
 
   // --- Rankings/Alliances slice dependencies ---
@@ -2225,6 +2227,8 @@ function App() {
     setDistrictRankings,
     playoffs,
     setPlayoffs,
+    // Event-scoped abort signal (for cancelling on event switch)
+    getEventSignal: () => loadEventAbortRef.current?.signal,
   };
 
   // --- Match Navigation deps (passed to EventStoreProvider → useMatchNavigation) ---
@@ -2287,6 +2291,8 @@ function App() {
     // External functions
     httpClient,
     getEventStats,
+    // Event-scoped abort signal (for cancelling on event switch)
+    getEventSignal: () => loadEventAbortRef.current?.signal,
   };
 
   // --- Event Data Context (read-mostly state) ---

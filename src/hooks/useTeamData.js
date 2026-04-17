@@ -145,7 +145,14 @@ export function useTeamData(deps, opts = {}) {
     // Narrow callbacks (avoid passing raw setters for cross-concerns)
     requestCommunityUpdatesForTeams,
     patchSelectedEvent,
+    // Event-scoped abort signal
+    getEventSignal,
   } = deps;
+
+  // Reads the CURRENT event abort signal at call time. Using a getter avoids
+  // capturing a stale signal in closures — the ref is rotated on each event
+  // switch in App.jsx, so we must re-read it for every fetch.
+  const signal = () => getEventSignal?.();
 
   /**
    * Fetches TBA teams for an offseason event.
@@ -154,7 +161,11 @@ export function useTeamData(deps, opts = {}) {
     try {
       console.log(`Fetching TBA teams for event: ${tbaEventKey}`);
       const result = await httpClient.getNoAuth(
-        `${year}/offseason/teams/${tbaEventKey}`
+        `${year}/offseason/teams/${tbaEventKey}`,
+        undefined,
+        undefined,
+        undefined,
+        signal()
       );
       if (result.status === 200) {
         // @ts-ignore
@@ -174,7 +185,11 @@ export function useTeamData(deps, opts = {}) {
   async function fetchTeamRemappings(tbaEventKey, year) {
     try {
       const result = await httpClient.getNoAuth(
-        `${year}/offseason/event/${tbaEventKey}`
+        `${year}/offseason/event/${tbaEventKey}`,
+        undefined,
+        undefined,
+        undefined,
+        signal()
       );
       if (result.status === 200) {
         // @ts-ignore
@@ -241,7 +256,10 @@ export function useTeamData(deps, opts = {}) {
           var adHocTeams = adHocTeamList.map(async (team) => {
             var request = await httpClient.getNoAuth(
               `${selectedYear?.value}/teams?teamNumber=${team}`,
-              ftcMode ? ftcBaseURL : undefined
+              ftcMode ? ftcBaseURL : undefined,
+              undefined,
+              undefined,
+              signal()
             );
 
             if (request.status === 200) {
@@ -290,7 +308,10 @@ export function useTeamData(deps, opts = {}) {
         // get the team list from FIRST API
         result = await httpClient.getNoAuth(
           `${selectedYear?.value}/teams?eventCode=${selectedEvent?.value?.code}`,
-          ftcMode ? ftcBaseURL : undefined
+          ftcMode ? ftcBaseURL : undefined,
+          undefined,
+          undefined,
+          signal()
         );
         if (result.status === 200) {
           // @ts-ignore
@@ -329,7 +350,8 @@ export function useTeamData(deps, opts = {}) {
           `/api/v1/events/${selectedEvent?.value?.code}/teams/`,
           FTCServerURL,
           undefined,
-          { Authorization: FTCKey?.key || "" }
+          { Authorization: FTCKey?.key || "" },
+          signal()
         );
         if (val.status === 200) {
           // @ts-ignore
@@ -340,7 +362,8 @@ export function useTeamData(deps, opts = {}) {
                 `/api/v1/events/${selectedEvent?.value?.code}/teams/${team}/`,
                 FTCServerURL,
                 undefined,
-                { Authorization: FTCKey?.key || "" }
+                { Authorization: FTCKey?.key || "" },
+                signal()
               );
               if (val.status === 200) {
                 // @ts-ignore
@@ -379,7 +402,10 @@ export function useTeamData(deps, opts = {}) {
           try {
             var request = await httpClient.getNoAuth(
               `${selectedYear?.value}/awards/event/${event?.value?.code}`,
-              ftcMode ? ftcBaseURL : undefined
+              ftcMode ? ftcBaseURL : undefined,
+              undefined,
+              undefined,
+              signal()
             );
             if (request.status === 200) {
               // @ts-ignore
@@ -417,7 +443,10 @@ export function useTeamData(deps, opts = {}) {
             var EITeamData = tempTeams.map(async (teamNumber) => {
               var request = await httpClient.getNoAuth(
                 `${selectedYear?.value}/teams?teamNumber=${teamNumber}`,
-                ftcMode ? ftcBaseURL : undefined
+                ftcMode ? ftcBaseURL : undefined,
+                undefined,
+                undefined,
+                signal()
               );
               if (request.status === 200) {
                 // @ts-ignore
@@ -1156,14 +1185,20 @@ export function useTeamData(deps, opts = {}) {
 
       var epaData = await httpClient.getNoAuth(
         `${selectedYear?.value}/ftcscout/quick-stats/${team?.teamNumber}`,
-        ftcMode ? ftcBaseURL : undefined
+        ftcMode ? ftcBaseURL : undefined,
+        undefined,
+        undefined,
+        signal()
       );
       if (epaData.status === 200) {
         // @ts-ignore
         epaArray = await epaData.json();
         var seasonResult = await httpClient.getNoAuth(
           `${selectedYear?.value}/ftcscout/events/${team?.teamNumber}`,
-          ftcMode ? ftcBaseURL : undefined
+          ftcMode ? ftcBaseURL : undefined,
+          undefined,
+          undefined,
+          signal()
         );
         if (seasonResult.status === 200) {
           // @ts-ignore

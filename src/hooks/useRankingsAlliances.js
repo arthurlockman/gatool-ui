@@ -121,7 +121,14 @@ export function useRankingsAlliances(deps) {
     setDistrictRankings,
     playoffs,
     setPlayoffs,
+    // Event-scoped abort signal
+    getEventSignal,
   } = deps;
+
+  // Reads the CURRENT event abort signal at call time. Using a getter avoids
+  // capturing a stale signal in closures — the ref is rotated on each event
+  // switch in App.jsx, so we must re-read it for every fetch.
+  const signal = () => getEventSignal?.();
 
   /** Stale-response guards — prevent slow responses from event A overwriting event B state */
   const getAlliancesEpochRef = useRef(0);
@@ -133,7 +140,11 @@ export function useRankingsAlliances(deps) {
     try {
       console.log(`Fetching TBA rankings for event: ${tbaEventKey}`);
       const result = await httpClient.getNoAuth(
-        `${year}/offseason/rankings/${tbaEventKey}/`
+        `${year}/offseason/rankings/${tbaEventKey}/`,
+        undefined,
+        undefined,
+        undefined,
+        signal()
       );
       if (result.status === 200) {
         const rankingsData = await result.json();
@@ -144,13 +155,18 @@ export function useRankingsAlliances(deps) {
       console.error("Error fetching TBA rankings:", error);
       return null;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [httpClient]);
 
   const fetchTBAAlliances = useCallback(async (tbaEventKey, year) => {
     try {
       console.log(`Fetching TBA alliances for event: ${tbaEventKey}`);
       const result = await httpClient.getNoAuth(
-        `${year}/offseason/alliances/${tbaEventKey}/`
+        `${year}/offseason/alliances/${tbaEventKey}/`,
+        undefined,
+        undefined,
+        undefined,
+        signal()
       );
       if (result.status === 200) {
         const alliancesData = await result.json();
@@ -161,6 +177,7 @@ export function useRankingsAlliances(deps) {
       console.error("Error fetching TBA alliances:", error);
       return [];
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [httpClient]);
 
   // --- getDistrictRanks ---
@@ -170,7 +187,10 @@ export function useRankingsAlliances(deps) {
     var districtranks = null;
     result = await httpClient.getNoAuth(
       `${selectedYear?.value}/district/rankings/${selectedEvent?.value.districtCode}`,
-      ftcMode ? ftcBaseURL : undefined
+      ftcMode ? ftcBaseURL : undefined,
+      undefined,
+      undefined,
+      signal()
     );
     districtranks = await result.json();
     districtranks.lastUpdate = moment().format();
@@ -213,7 +233,8 @@ export function useRankingsAlliances(deps) {
           `/api/v1/events/${selectedEvent?.value.code}/rankings/`,
           FTCServerURL,
           undefined,
-          { Authorization: FTCKey?.key || "" }
+          { Authorization: FTCKey?.key || "" },
+          signal()
         );
         if (rankingsResult.status === 200) {
           const rankingsData = await rankingsResult.json();
@@ -264,7 +285,10 @@ export function useRankingsAlliances(deps) {
       } else if (!useFTCOffline) {
         result = await httpClient.getNoAuth(
           `${selectedYear?.value}/rankings/${selectedEvent?.value.code}`,
-          ftcMode ? ftcBaseURL : undefined
+          ftcMode ? ftcBaseURL : undefined,
+          undefined,
+          undefined,
+          signal()
         );
         if (result.status === 200) {
           ranks = await result.json();
@@ -426,7 +450,8 @@ export function useRankingsAlliances(deps) {
           `/api/v1/events/${selectedEvent?.value.code}/elim/alliances/`,
           FTCServerURL,
           undefined,
-          { Authorization: FTCKey?.key || "" }
+          { Authorization: FTCKey?.key || "" },
+          signal()
         );
         if (allianceResult.status === 200) {
           const allianceData = await allianceResult.json();
@@ -473,7 +498,10 @@ export function useRankingsAlliances(deps) {
       } else if (!useFTCOffline) {
         result = await httpClient.getNoAuth(
           `${selectedYear?.value}/alliances/${selectedEvent?.value.code}`,
-          ftcMode ? ftcBaseURL : undefined
+          ftcMode ? ftcBaseURL : undefined,
+          undefined,
+          undefined,
+          signal()
         );
         if (result.status !== 200) {
           alliancesData = { Alliances: [] };
