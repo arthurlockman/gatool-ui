@@ -12,6 +12,7 @@ import { AuthClientContextProvider } from './contextProviders/AuthClientContext'
 import { ToastContainer } from 'react-toastify';
 import { OnlineStatusProvider } from './contextProviders/OnlineContext';
 import { SettingsProvider } from './contexts/SettingsContext';
+import { EventSelectionProvider } from './contexts/EventSelectionContext';
 import { HotkeysProvider } from 'react-hotkeys-hook'
 import { SnackbarProvider } from 'notistack';
 
@@ -51,7 +52,9 @@ root.render(
           <AuthClientContextProvider>
             <SnackbarProvider>
               <SettingsProvider>
-                <App />
+                <EventSelectionProvider>
+                  <App />
+                </EventSelectionProvider>
               </SettingsProvider>
             </SnackbarProvider>
           </AuthClientContextProvider>

@@ -1,6 +1,7 @@
 import _ from "lodash";
 import moment from "moment";
 import calculateBlueBanners from "../utils/calculateBlueBanners";
+import { useEventSelection } from "../contexts/EventSelectionContext";
 
 const ftcBaseURL = "https://api.gatool.org/ftc/v2/";
 
@@ -122,9 +123,6 @@ export function useTeamData(deps, opts = {}) {
     setRegionalEventDetail,
     // Read-only environment
     httpClient,
-    selectedEvent,
-    selectedYear,
-    ftcMode,
     isOnline,
     manualOfflineMode,
     useFTCOffline,
@@ -148,6 +146,9 @@ export function useTeamData(deps, opts = {}) {
     // Event-scoped abort signal
     getEventSignal,
   } = deps;
+
+  // Event selection comes from context now (moved out of dep bundles in Phase 8).
+  const { selectedEvent, selectedYear, ftcMode } = useEventSelection();
 
   // Reads the CURRENT event abort signal at call time. Using a getter avoids
   // capturing a stale signal in closures — the ref is rotated on each event

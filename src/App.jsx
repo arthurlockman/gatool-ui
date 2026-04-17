@@ -25,6 +25,7 @@ import { Container } from "react-bootstrap";
 import { usePersistentState } from "./hooks/UsePersistentState";
 import { useDarkMode } from "./hooks/useDarkMode";
 import { useSettings } from "./contexts/SettingsContext";
+import { useEventSelection } from "./contexts/EventSelectionContext";
 import { useEventData } from "./contexts/EventDataContext";
 import { EventStoreProvider } from "./contexts/EventStoreProvider";
 import _ from "lodash";
@@ -201,16 +202,16 @@ function App() {
    *  Allows App.jsx orchestrators (getSchedule, loadEvent) to call
    *  store functions even though they live above the provider tree. */
   const eventStoreRef = useRef({});
-  const [selectedEvent, setSelectedEvent] = usePersistentState(
-    "setting:selectedEvent",
-    null
-  );
+  const {
+    selectedEvent,
+    setSelectedEvent,
+    selectedYear,
+    setSelectedYear,
+    ftcMode,
+    setFTCMode,
+  } = useEventSelection();
   const previousEventRef = useRef(null);
   const loadEventAbortRef = useRef(null);
-  const [selectedYear, setSelectedYear] = usePersistentState(
-    "setting:selectedYear",
-    null
-  );
   const [events, setEvents] = usePersistentState("cache:events", []);
   const [districts, setDistricts] = usePersistentState("cache:districts", []);
   const [eventLabel, setEventLabel] = usePersistentState(
@@ -244,15 +245,7 @@ function App() {
   );
   const [EPA, setEPA] = usePersistentState("cache:EPA", null);
   const [rankings, setRankings] = usePersistentState("cache:rankings", null);
-  const [rankingsOverride, setRankingsOverride] = usePersistentState(
-    "setting:rankingsOverride",
-    null
-  );
   const [alliances, setAlliances] = usePersistentState("cache:alliances", null);
-  const [allianceCount, setAllianceCount] = usePersistentState(
-    "setting:allianceCount",
-    null
-  );
   const [districtRankings, setDistrictRankings] = usePersistentState(
     "cache:districtRankings",
     null
@@ -273,18 +266,6 @@ function App() {
     playoffReserveEditsRef.current = {};
   }
   const [teamRemappings, setTeamRemappings] = usePersistentState("cache:teamRemappings", null);
-  const [eventFilters, setEventFilters] = usePersistentState(
-    "setting:eventFilters",
-    []
-  );
-  const [regionFilters, setRegionFilters] = usePersistentState(
-    "setting:regionFilters",
-    []
-  );
-  const [timeFilter, setTimeFilter] = usePersistentState(
-    "setting:timeFilter",
-    null
-  );
 
   // Display & UX preferences from SettingsContext
   const {
@@ -316,15 +297,26 @@ function App() {
     usePullDownToUpdate, setUsePullDownToUpdate,
     useScrollMemory, setUseScrollMemory,
     useFourTeamAlliances, setUseFourTeamAlliances,
+    // Event list filters
+    eventFilters, setEventFilters,
+    regionFilters, setRegionFilters,
+    timeFilter, setTimeFilter,
+    // Event-data overrides
+    rankingsOverride, setRankingsOverride,
+    allianceCount, setAllianceCount,
+    playoffCountOverride, setPlayoffCountOverride,
+    // Multi-screen sync
+    syncEvent, setSyncEvent,
+    screenMode, setScreenMode,
+    screenModeSyncFrequency, setScreenModeSyncFrequency,
+    // Background refresh
+    backgroundDataRefresh, setBackgroundDataRefresh,
+    backgroundDataRefreshFrequency, setBackgroundDataRefreshFrequency,
   } = useSettings();
   const [allianceSelection, setAllianceSelection] = useState(null);
   /** Preloaded prior-partnership data per alliance roster (key = sorted team ids). */
   const [alliancePartnerConnectionsCache, setAlliancePartnerConnectionsCache] =
     useState({});
-  const [playoffCountOverride, setPlayoffCountOverride] = usePersistentState(
-    "setting:playoffCountOverride",
-    null
-  );
   const [lastVisit, setLastVisit] = usePersistentState("cache:lastVisit", {});
   const [localUpdates, setLocalUpdates] = usePersistentState(
     "cache:localUpdates",
@@ -473,26 +465,6 @@ function App() {
 
   const [qualsLength, setQualsLength] = useState(-1);
   const [currentMatch, setCurrentMatch] = useState(null);
-  const [syncEvent, setSyncEvent] = usePersistentState(
-    "setting:syncEvent",
-    false
-  );
-  const [screenMode, setScreenMode] = usePersistentState(
-    "setting:screenMode",
-    false
-  );
-  const [screenModeSyncFrequency, setScreenModeSyncFrequency] = usePersistentState(
-    "setting:screenModeSyncFrequency",
-    10
-  ); // Frequency in seconds (5-10)
-  const [backgroundDataRefresh, setBackgroundDataRefresh] = usePersistentState(
-    "setting:backgroundDataRefresh",
-    true
-  );
-  const [backgroundDataRefreshFrequency, setBackgroundDataRefreshFrequency] = usePersistentState(
-    "setting:backgroundDataRefreshFrequency",
-    15
-  ); // Frequency in seconds (5-60)
   const [screenModeStatus, setScreenModeStatus] = useState(null); // null = unknown, true = valid data, false = invalid/malformed
 
   // Enforce mutual exclusivity between syncEvent and screenMode
@@ -515,8 +487,6 @@ function App() {
       }, 100);
     }
   }, [screenMode, syncEvent, setSyncEvent]);
-
-  const [ftcMode, setFTCMode] = usePersistentState("setting:ftcMode", null);
 
   // Controllers for table sort order at render time
   const [teamSort, setTeamSort] = useState("");
@@ -557,7 +527,7 @@ function App() {
     getFTCLeagues,
     requestFTCKey,
     checkFTCKey,
-  } = useFTCOfflineMode({ httpClient, ftcMode, selectedYear, isOnline });
+  } = useFTCOfflineMode({ httpClient, isOnline });
 
   // High scores state and functions
   const {
@@ -576,9 +546,6 @@ function App() {
     getFrcDistrictHighScores,
   } = useHighScores({
     httpClient,
-    selectedEvent,
-    selectedYear,
-    ftcMode,
     qualSchedule,
     playoffSchedule,
     useFTCOffline,
@@ -646,9 +613,6 @@ function App() {
     setLoadingCommunityUpdates,
   } = useCommunityUpdates({
     httpClient,
-    selectedEvent,
-    selectedYear,
-    ftcMode,
     teamList,
     isOnline,
     useFTCOffline,
@@ -666,15 +630,12 @@ function App() {
   const updateFtcRegions = (newRegions) => { ftcregions = newRegions; };
   const { getEvents, getDistricts } = useEventListLoader({
     httpClient,
-    selectedYear,
-    ftcMode,
     useFTCOffline,
     FTCServerURL,
     FTCKey,
     isOnline,
     training,
     supportedYears,
-    selectedEvent,
     eventsLoading,
     eventnames,
     regionLookup,
@@ -683,7 +644,6 @@ function App() {
     setFTCTypes,
     setEventNamesCY,
     setDistricts,
-    setSelectedEvent,
     updateFtcRegions,
   });
 
@@ -2164,9 +2124,6 @@ function App() {
     setRegionalEventDetail,
     // Read-only environment
     httpClient,
-    selectedEvent,
-    selectedYear,
-    ftcMode,
     isOnline,
     manualOfflineMode,
     useFTCOffline,
@@ -2195,11 +2152,9 @@ function App() {
   // Passed to EventStoreProvider → useRankingsAlliances hook
   // NOTE: getEPA, getEPAFTC, getTeamList, getRegionalEventDetail are now provided
   // by the team slice via slice composition inside EventStoreProvider.
+  // Event selection + rankings/alliance overrides are read from context by the hook.
   const rankingsDeps = {
     httpClient,
-    selectedEvent,
-    selectedYear,
-    ftcMode,
     teamList,
     qualSchedule,
     useCheesyArena,
@@ -2217,12 +2172,8 @@ function App() {
     // State + setters (owned by App.jsx, used by the hook)
     rankings,
     setRankings,
-    rankingsOverride,
-    setRankingsOverride,
     alliances,
     setAlliances,
-    allianceCount,
-    setAllianceCount,
     districtRankings,
     setDistrictRankings,
     playoffs,
@@ -2234,6 +2185,7 @@ function App() {
   // --- Match Navigation deps (passed to EventStoreProvider → useMatchNavigation) ---
   // NOTE: getSchedule is NOT included here — EventStoreProvider composes it from
   // the schedule slice into matchNavDeps automatically.
+  // Event selection is read from context by the hook.
   const matchNavDeps = {
     currentMatch,
     adHocMode,
@@ -2241,8 +2193,6 @@ function App() {
     playoffSchedule,
     practiceSchedule,
     offlinePlayoffSchedule,
-    selectedEvent,
-    ftcMode,
     setCurrentMatch,
     setAdHocMatch,
     getSystemMessages,
@@ -2254,17 +2204,15 @@ function App() {
   // --- Schedule Loader deps (passed to EventStoreProvider → useScheduleLoader) ---
   // NOTE: getTeamList, getAlliances, getRanks are NOT included here — EventStoreProvider
   // composes them from earlier slices automatically.
+  // Event selection + playoffCountOverride/autoAdvance/autoUpdate are read from
+  // context by the hook.
   const scheduleDeps = {
     // State reads
-    selectedEvent,
-    selectedYear,
-    ftcMode,
     currentMatch,
     qualSchedule,
     playoffSchedule,
     practiceSchedule,
     practiceFileUploaded,
-    playoffCountOverride,
     teamList,
     cheesyTeamList,
     cheesyArenaAvailable,
@@ -2273,8 +2221,6 @@ function App() {
     FTCKey,
     useCheesyArena,
     useFTCOffline,
-    autoAdvance,
-    autoUpdate,
     teamRemappings,
     training,
     // State setters

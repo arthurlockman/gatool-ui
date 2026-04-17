@@ -6,6 +6,8 @@ import {
 import { roundThreeOrReserveRoleLabel } from "../utils/allianceRoleLabels";
 import { normalizeFtcGatoolAllianceRow } from "../utils/ftcHybridMatchTeams";
 import { fetchLocal } from "../utils/fetchLocal";
+import { useEventSelection } from "../contexts/EventSelectionContext";
+import { useSettings } from "../contexts/SettingsContext";
 import _ from "lodash";
 import moment from "moment";
 
@@ -87,9 +89,6 @@ function conformFTCOfflineAlliance(alliance) {
 export function useRankingsAlliances(deps) {
   const {
     httpClient,
-    selectedEvent,
-    selectedYear,
-    ftcMode,
     teamList,
     qualSchedule,
     useCheesyArena,
@@ -111,12 +110,8 @@ export function useRankingsAlliances(deps) {
     // State + setters (owned by App.jsx, passed in)
     rankings,
     setRankings,
-    rankingsOverride,
-    setRankingsOverride,
     alliances,
     setAlliances,
-    allianceCount,
-    setAllianceCount,
     districtRankings,
     setDistrictRankings,
     playoffs,
@@ -124,6 +119,15 @@ export function useRankingsAlliances(deps) {
     // Event-scoped abort signal
     getEventSignal,
   } = deps;
+
+  // Event selection + overrides come from context now (moved out of dep bundles in Phase 8).
+  const { selectedEvent, selectedYear, ftcMode } = useEventSelection();
+  const {
+    rankingsOverride,
+    setRankingsOverride,
+    allianceCount,
+    setAllianceCount,
+  } = useSettings();
 
   // Reads the CURRENT event abort signal at call time. Using a getter avoids
   // capturing a stale signal in closures — the ref is rotated on each event

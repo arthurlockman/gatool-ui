@@ -3,20 +3,19 @@ import { usePersistentState } from "./UsePersistentState";
 import { eventNames, FTCEventNames } from "../data/eventNames";
 import _ from "lodash";
 import moment from "moment";
+import { useEventSelection } from "../contexts/EventSelectionContext";
 
 const ftcBaseURL = "https://api.gatool.org/ftc/v2/";
 
 export function useHighScores({
   httpClient,
-  selectedEvent,
-  selectedYear,
-  ftcMode,
   qualSchedule,
   playoffSchedule,
   useFTCOffline,
   isOnline,
   manualOfflineMode,
 }) {
+  const { selectedEvent, selectedYear, ftcMode } = useEventSelection();
   const eventnames = ftcMode
     ? _.cloneDeep(FTCEventNames)
     : _.cloneDeep(eventNames);

@@ -16,6 +16,8 @@ import {
 import { extendFTCPlayoffScheduleWithPartialMatches } from "../utils/ftcPlayoffSchedule";
 import { extendFRCPlayoffScheduleWithPartialMatches } from "../utils/frcPlayoffSchedule";
 import { prunePlayoffReserveSetsAfterPostedMatches } from "../utils/playoffReserveEdits";
+import { useEventSelection } from "../contexts/EventSelectionContext";
+import { useSettings } from "../contexts/SettingsContext";
 
 const ftcBaseURL = "https://api.gatool.org/ftc/v2/";
 
@@ -41,15 +43,11 @@ export function useScheduleLoader(deps, opts = {}) {
   const { epochGuard } = opts;
   const {
     // State reads
-    selectedEvent,
-    selectedYear,
-    ftcMode,
     currentMatch,
     qualSchedule,
     playoffSchedule,
     practiceSchedule,
     practiceFileUploaded,
-    playoffCountOverride,
     teamList,
     cheesyTeamList,
     cheesyArenaAvailable,
@@ -58,8 +56,6 @@ export function useScheduleLoader(deps, opts = {}) {
     FTCKey,
     useCheesyArena,
     useFTCOffline,
-    autoAdvance,
-    autoUpdate,
     teamRemappings,
     training,
     // State setters
@@ -83,6 +79,10 @@ export function useScheduleLoader(deps, opts = {}) {
     // Event-scoped abort signal
     getEventSignal,
   } = deps;
+
+  // Event selection + overrides + refresh prefs come from context now (Phase 8).
+  const { selectedEvent, selectedYear, ftcMode } = useEventSelection();
+  const { playoffCountOverride, autoAdvance, autoUpdate } = useSettings();
 
   // Reads the CURRENT event abort signal at call time. Using a getter avoids
   // capturing a stale signal in closures — the ref is rotated on each event

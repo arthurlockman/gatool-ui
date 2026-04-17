@@ -5,15 +5,13 @@ import { trainingData } from "components/TrainingMatches";
 import { toast } from "react-toastify";
 import _ from "lodash";
 import moment from "moment";
+import { useEventSelection } from "../contexts/EventSelectionContext";
 
 const ftcBaseURL = "https://api.gatool.org/ftc/v2/";
 const training = _.cloneDeep(trainingData);
 
 export function useCommunityUpdates({
   httpClient,
-  selectedEvent,
-  selectedYear,
-  ftcMode,
   teamList,
   isOnline,
   useFTCOffline,
@@ -26,6 +24,7 @@ export function useCommunityUpdates({
   cheesyArenaAvailable,
   useCheesyArena,
 }) {
+  const { selectedEvent, selectedYear, ftcMode } = useEventSelection();
   const [communityUpdates, setCommunityUpdates] = usePersistentState(
     "cache:communityUpdates",
     null

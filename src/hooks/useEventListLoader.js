@@ -2,6 +2,7 @@ import _ from "lodash";
 import moment from "moment";
 import { useRef } from "react";
 import { timeZones } from "../data/timeZones";
+import { useEventSelection } from "../contexts/EventSelectionContext";
 
 const paleYellow = "#fdfaed";
 const paleBlue = "#effdff";
@@ -21,15 +22,12 @@ const timezones = _.cloneDeep(timeZones);
 export function useEventListLoader(deps) {
   const {
     httpClient,
-    selectedYear,
-    ftcMode,
     useFTCOffline,
     FTCServerURL,
     FTCKey,
     isOnline,
     training,
     supportedYears,
-    selectedEvent,
     eventsLoading,
     eventnames,
     regionLookup,
@@ -39,10 +37,19 @@ export function useEventListLoader(deps) {
     setFTCTypes,
     setEventNamesCY,
     setDistricts,
-    setSelectedEvent,
     // Callback for module-level ftcregions mutation (pre-existing pattern)
     updateFtcRegions,
   } = deps;
+
+  // Event selection comes from context now (Phase 8).
+  // Note: setSelectedEvent is used by getEvents to refresh the persisted
+  // selectedEvent with enriched API data.
+  const {
+    selectedEvent,
+    setSelectedEvent,
+    selectedYear,
+    ftcMode,
+  } = useEventSelection();
 
   /** Stale-response guard — prevents slow year-A responses from overwriting year-B state */
   const getEventsEpochRef = useRef(0);

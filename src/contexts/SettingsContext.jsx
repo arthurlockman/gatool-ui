@@ -116,6 +116,54 @@ export function SettingsProvider({ children }) {
     null
   );
 
+  // Event list filters
+  const [eventFilters, setEventFilters] = usePersistentState(
+    "setting:eventFilters",
+    []
+  );
+  const [regionFilters, setRegionFilters] = usePersistentState(
+    "setting:regionFilters",
+    []
+  );
+  const [timeFilter, setTimeFilter] = usePersistentState(
+    "setting:timeFilter",
+    null
+  );
+
+  // Event-data overrides (manual overrides for rankings/alliance counts)
+  const [rankingsOverride, setRankingsOverride] = usePersistentState(
+    "setting:rankingsOverride",
+    null
+  );
+  const [allianceCount, setAllianceCount] = usePersistentState(
+    "setting:allianceCount",
+    null
+  );
+  const [playoffCountOverride, setPlayoffCountOverride] = usePersistentState(
+    "setting:playoffCountOverride",
+    null
+  );
+
+  // Multi-screen sync
+  const [syncEvent, setSyncEvent] = usePersistentState(
+    "setting:syncEvent",
+    false
+  );
+  const [screenMode, setScreenMode] = usePersistentState(
+    "setting:screenMode",
+    false
+  );
+  const [screenModeSyncFrequency, setScreenModeSyncFrequency] =
+    usePersistentState("setting:screenModeSyncFrequency", 10);
+
+  // Background refresh
+  const [backgroundDataRefresh, setBackgroundDataRefresh] = usePersistentState(
+    "setting:backgroundDataRefresh",
+    true
+  );
+  const [backgroundDataRefreshFrequency, setBackgroundDataRefreshFrequency] =
+    usePersistentState("setting:backgroundDataRefreshFrequency", 15);
+
   const value = useMemo(() => ({
     timeFormat, setTimeFormat,
     showSponsors, setShowSponsors,
@@ -146,6 +194,21 @@ export function SettingsProvider({ children }) {
     usePullDownToUpdate, setUsePullDownToUpdate,
     useScrollMemory, setUseScrollMemory,
     useFourTeamAlliances, setUseFourTeamAlliances,
+    // Event list filters
+    eventFilters, setEventFilters,
+    regionFilters, setRegionFilters,
+    timeFilter, setTimeFilter,
+    // Event-data overrides
+    rankingsOverride, setRankingsOverride,
+    allianceCount, setAllianceCount,
+    playoffCountOverride, setPlayoffCountOverride,
+    // Multi-screen sync
+    syncEvent, setSyncEvent,
+    screenMode, setScreenMode,
+    screenModeSyncFrequency, setScreenModeSyncFrequency,
+    // Background refresh
+    backgroundDataRefresh, setBackgroundDataRefresh,
+    backgroundDataRefreshFrequency, setBackgroundDataRefreshFrequency,
   }), [
     timeFormat, showSponsors, autoHideSponsors, showAwards, showMinorAwards,
     showNotes, showNotesAnnounce, showMottoes, showChampsStats,
@@ -155,6 +218,10 @@ export function SettingsProvider({ children }) {
     highScoreMode, autoUpdate, awardsMenu, showQualsStats, showQualsStatsQuals,
     teamReduction, reverseEmcee, useSwipe, usePullDownToUpdate, useScrollMemory,
     useFourTeamAlliances,
+    eventFilters, regionFilters, timeFilter,
+    rankingsOverride, allianceCount, playoffCountOverride,
+    syncEvent, screenMode, screenModeSyncFrequency,
+    backgroundDataRefresh, backgroundDataRefreshFrequency,
     // Setters are stable (from useState) — no need to include them, but including for safety
     setTimeFormat, setShowSponsors, setAutoHideSponsors, setShowAwards, setShowMinorAwards,
     setShowNotes, setShowNotesAnnounce, setShowMottoes, setShowChampsStats,
@@ -164,6 +231,10 @@ export function SettingsProvider({ children }) {
     setHighScoreMode, setAutoUpdate, setAwardsMenu, setShowQualsStats, setShowQualsStatsQuals,
     setTeamReduction, setReverseEmcee, setUseSwipe, setUsePullDownToUpdate, setUseScrollMemory,
     setUseFourTeamAlliances,
+    setEventFilters, setRegionFilters, setTimeFilter,
+    setRankingsOverride, setAllianceCount, setPlayoffCountOverride,
+    setSyncEvent, setScreenMode, setScreenModeSyncFrequency,
+    setBackgroundDataRefresh, setBackgroundDataRefreshFrequency,
   ]);
 
   return (

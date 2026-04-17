@@ -1,14 +1,11 @@
 import { useState, useEffect } from "react";
 import { usePersistentState } from "./UsePersistentState";
+import { useEventSelection } from "../contexts/EventSelectionContext";
 
 const ftcBaseURL = "https://api.gatool.org/ftc/v2/";
 
-export function useFTCOfflineMode({
-  httpClient,
-  ftcMode,
-  selectedYear,
-  isOnline,
-}) {
+export function useFTCOfflineMode({ httpClient, isOnline }) {
+  const { ftcMode, selectedYear } = useEventSelection();
   const [FTCOfflineAvailable, setFTCOfflineAvailable] = useState(false);
   const [useFTCOffline, setUseFTCOffline] = usePersistentState(
     "setting:useFTCOffline",

@@ -1,3 +1,5 @@
+import { useEventSelection } from "../contexts/EventSelectionContext";
+
 /**
  * useMatchNavigation — match navigation logic extracted from App.jsx.
  *
@@ -11,8 +13,6 @@
  * @param {object} deps.playoffSchedule - Playoff match schedule
  * @param {object} deps.practiceSchedule - Practice match schedule
  * @param {object} deps.offlinePlayoffSchedule - Offline-generated playoff schedule
- * @param {object} deps.selectedEvent - Currently loaded event
- * @param {*} deps.ftcMode - FRC/FTC mode indicator
  * @param {Function} deps.setCurrentMatch - Setter for currentMatch
  * @param {Function} deps.setAdHocMatch - Setter for adHocMatch teams
  * @param {Function} deps.getSchedule - Schedule refresh (stays in App.jsx)
@@ -29,8 +29,6 @@ export function useMatchNavigation(deps) {
     playoffSchedule,
     practiceSchedule,
     offlinePlayoffSchedule,
-    selectedEvent,
-    ftcMode,
     setCurrentMatch,
     setAdHocMatch,
     getSchedule,
@@ -39,6 +37,9 @@ export function useMatchNavigation(deps) {
     getWorldStats,
     getFrcDistrictHighScores,
   } = deps;
+
+  // Event selection comes from context now (Phase 8).
+  const { selectedEvent, ftcMode } = useEventSelection();
 
   /**
    * Advances to the next match. Refreshes scores, ranks and world stats when appropriate.
