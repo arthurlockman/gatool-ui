@@ -81,15 +81,7 @@ const ftcModeOptions = [
 
 function SetupPage({
   eventList,
-  eventFilters,
-  setEventFilters,
-  regionFilters,
-  setRegionFilters,
   districts,
-  timeFilter,
-  setTimeFilter,
-  playoffCountOverride,
-  setPlayoffCountOverride,
   localUpdates,
   setLocalUpdates,
   putTeamData,
@@ -132,16 +124,6 @@ function SetupPage({
   getCheesyStatus,
   manualOfflineMode,
   setManualOfflineMode,
-  syncEvent,
-  setSyncEvent,
-  screenMode,
-  setScreenMode,
-  screenModeSyncFrequency,
-  setScreenModeSyncFrequency,
-  backgroundDataRefresh,
-  setBackgroundDataRefresh,
-  backgroundDataRefreshFrequency,
-  setBackgroundDataRefreshFrequency,
   darkMode,
   setDarkMode,
   useOsTheme,
@@ -165,6 +147,13 @@ function SetupPage({
         teamReduction, setTeamReduction, reverseEmcee, setReverseEmcee,
         useSwipe, setUseSwipe, usePullDownToUpdate, setUsePullDownToUpdate,
         useScrollMemory, setUseScrollMemory,
+        // Phase 8: previously prop-drilled from App.jsx, now read from SettingsContext
+        eventFilters, setEventFilters, regionFilters, setRegionFilters,
+        timeFilter, setTimeFilter, playoffCountOverride, setPlayoffCountOverride,
+        syncEvent, setSyncEvent, screenMode, setScreenMode,
+        screenModeSyncFrequency, setScreenModeSyncFrequency,
+        backgroundDataRefresh, setBackgroundDataRefresh,
+        backgroundDataRefreshFrequency, setBackgroundDataRefreshFrequency,
     } = useSettings();
     const isOnline = useOnlineStatus();
     const PWASupported = (isChrome && Number(browserVersion) >= 76) || (isSafari && Number(browserVersion) >= 15 && Number(fullBrowserVersion.split(".")[1]) >= 4);

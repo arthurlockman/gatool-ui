@@ -101,11 +101,10 @@ function LayoutsWithNavbar({
   allianceSelection,
   systemBell,
   systemMessage,
-  screenMode,
   screenModeStatus,
-  syncEvent,
 }) {
   const { selectedEvent, qualSchedule, teamList, communityUpdates, rankings, practiceSchedule, ftcMode, playoffs } = useEventData();
+  const { screenMode, syncEvent } = useSettings();
   const location = useLocation();
   const scrollContainerRef = useRef(null);
 
@@ -310,8 +309,8 @@ function App() {
     screenMode, setScreenMode,
     screenModeSyncFrequency, setScreenModeSyncFrequency,
     // Background refresh
-    backgroundDataRefresh, setBackgroundDataRefresh,
-    backgroundDataRefreshFrequency, setBackgroundDataRefreshFrequency,
+    backgroundDataRefresh,
+    backgroundDataRefreshFrequency,
   } = useSettings();
   const [allianceSelection, setAllianceSelection] = useState(null);
   /** Preloaded prior-partnership data per alliance roster (key = sorted team ids). */
@@ -2323,9 +2322,7 @@ function App() {
                   allianceSelection={allianceSelection}
                   systemBell={systemBell}
                   systemMessage={systemMessage}
-                  screenMode={screenMode}
                   screenModeStatus={screenModeStatus}
-                  syncEvent={syncEvent}
                 />
               }
             >
@@ -2334,15 +2331,7 @@ function App() {
                 element={
                   <SetupPage
                     eventList={events}
-                    eventFilters={eventFilters}
-                    setEventFilters={setEventFilters}
-                    regionFilters={regionFilters}
-                    setRegionFilters={setRegionFilters}
                     districts={districts}
-                    timeFilter={timeFilter}
-                    setTimeFilter={setTimeFilter}
-                    playoffCountOverride={playoffCountOverride}
-                    setPlayoffCountOverride={setPlayoffCountOverride}
                     localUpdates={localUpdates}
                     setLocalUpdates={setLocalUpdates}
                     putTeamData={putTeamData}
@@ -2385,16 +2374,6 @@ function App() {
                     getCheesyStatus={getCheesyStatus}
                     manualOfflineMode={manualOfflineMode}
                     setManualOfflineMode={setManualOfflineMode}
-                    syncEvent={syncEvent}
-                    setSyncEvent={setSyncEvent}
-                    screenMode={screenMode}
-                    setScreenMode={setScreenMode}
-                    screenModeSyncFrequency={screenModeSyncFrequency}
-                    setScreenModeSyncFrequency={setScreenModeSyncFrequency}
-                    backgroundDataRefresh={backgroundDataRefresh}
-                    setBackgroundDataRefresh={setBackgroundDataRefresh}
-                    backgroundDataRefreshFrequency={backgroundDataRefreshFrequency}
-                    setBackgroundDataRefreshFrequency={setBackgroundDataRefreshFrequency}
                     darkMode={darkMode}
                     setDarkMode={setDarkMode}
                     useOsTheme={useOsTheme}
