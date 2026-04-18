@@ -531,14 +531,7 @@ export const commonFouls = [
     rp: null,
     text: (
       <>
-        <p>A ROBOT may not damage FIELD elements.</p>
-      </>
-    ),
-    violation: (
-      <>
-        <p>
-        A ROBOT with BUMPERS completely outside of their ALLIANCE ZONE may not damage or functionally impair an opponent ROBOT by initiating contact, either directly or transitively via a SCORING ELEMENT CONTROLLED by the ROBOT:
-        </p>
+        <p>A ROBOT with BUMPERS completely outside of their ALLIANCE ZONE may not damage or functionally impair an opponent ROBOT by initiating contact, either directly or transitively via a SCORING ELEMENT CONTROLLED by the ROBOT:</p>
         <ol type="A">
           <li>inside the vertical projection of an opponent’s ROBOT PERIMETER, or</li>
           <li>with the opponent’s BUMPER backing or mounting.</li>
@@ -552,6 +545,11 @@ export const commonFouls = [
           <li>A ROBOT that is not in violation of G403 making contact with an opponent ROBOT during AUTO</li>
           <li>Damage that appears to the REFEREE as cosmetic only</li>
         </ol>
+      </>
+    ),
+    violation: (
+      <>
+        MAJOR FOUL and YELLOW CARD, or if opponent ROBOT is unable to drive, then MAJOR FOUL and RED CARD.
       </>
     ),
   },{
