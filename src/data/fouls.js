@@ -524,6 +524,36 @@ export const commonFouls = [
   },
   {
     year: 2026,
+    code: "G415",
+    name: "Stay out of other ROBOTS.",
+    level: "major",
+    card: "yellow",
+    rp: null,
+    text: (
+      <>
+        <p>A ROBOT with BUMPERS completely outside of their ALLIANCE ZONE may not damage or functionally impair an opponent ROBOT by initiating contact, either directly or transitively via a SCORING ELEMENT CONTROLLED by the ROBOT:</p>
+        <ol type="A">
+          <li>inside the vertical projection of an opponent’s ROBOT PERIMETER, or</li>
+          <li>with the opponent’s BUMPER backing or mounting.</li>
+          </ol>
+          <p>Exceptions to this rule:</p>
+          <ol type="A" start={3}>
+          <li>
+          Contact between the ROBOT’S BUMPERS or COMPONENTS inside the ROBOT PERIMETER and COMPONENTS inside an opening of an opponent’s BUMPERS or in the space above the BUMPER opening
+          </li>
+          <li>Damage or functional impairment because of contact with a tipped-over opponent ROBOT</li>
+          <li>A ROBOT that is not in violation of G403 making contact with an opponent ROBOT during AUTO</li>
+          <li>Damage that appears to the REFEREE as cosmetic only</li>
+        </ol>
+      </>
+    ),
+    violation: (
+      <>
+        MAJOR FOUL and YELLOW CARD, or if opponent ROBOT is unable to drive, then MAJOR FOUL and RED CARD.
+      </>
+    ),
+  },{
+    year: 2026,
     code: "G416",
     name: (
       <i>

@@ -1,5 +1,15 @@
 export const appUpdates = [
   {
+    date: "April 16, 2026",
+    message: (
+      <ul>
+        <li>FRC:</li>
+        <ul>
+          <li>Adding G415</li>
+        </ul>
+      </ul>
+    ),
+  },{
     date: "April 13, 2026",
     message: (
       <ul>

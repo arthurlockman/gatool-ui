@@ -14,7 +14,6 @@ import {
   normalizePlayoffScheduleApiResponse,
 } from "../utils/ftcHybridMatchTeams";
 import { extendFTCPlayoffScheduleWithPartialMatches } from "../utils/ftcPlayoffSchedule";
-import { extendFRCPlayoffScheduleWithPartialMatches } from "../utils/frcPlayoffSchedule";
 import { prunePlayoffReserveSetsAfterPostedMatches } from "../utils/playoffReserveEdits";
 import { useEventSelection } from "../contexts/EventSelectionContext";
 import { useSettings } from "../contexts/SettingsContext";
@@ -970,25 +969,6 @@ export function useScheduleLoader(deps, opts = {}) {
         });
       }
 
-      if (
-        !ftcMode &&
-        playoffschedule?.schedule?.length > 0 &&
-        Array.isArray(playoffschedule.schedule)
-      ) {
-        let allianceCountForPlayoff = 6;
-        if (playoffCountOverride?.value != null) {
-          allianceCountForPlayoff = parseInt(playoffCountOverride.value, 10);
-        } else if (teamList?.teamCountTotal != null) {
-          if (teamList.teamCountTotal <= 10) allianceCountForPlayoff = 2;
-          else if (teamList.teamCountTotal <= 20) allianceCountForPlayoff = 4;
-          else if (teamList.teamCountTotal <= 40) allianceCountForPlayoff = 6;
-          else allianceCountForPlayoff = 8;
-        }
-        playoffschedule.schedule = extendFRCPlayoffScheduleWithPartialMatches(
-          playoffschedule.schedule,
-          allianceCountForPlayoff
-        );
-      }
     }
 
     var lastMatchPlayed = 0;
