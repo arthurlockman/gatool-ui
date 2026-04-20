@@ -2851,7 +2851,8 @@ function App() {
       if (
         events &&
         (selectedEvent?.value?.type === "DistrictChampionship" ||
-          selectedEvent?.value?.type === "DistrictChampionshipWithLevels")
+          selectedEvent?.value?.type === "DistrictChampionshipWithLevels" ||
+          selectedEvent?.value?.type === "DistrictChampionshipDivision")
       ) {
         districtEvents = _.filter(events, {
           value: { districtCode: selectedEvent?.value?.districtCode },
@@ -2868,7 +2869,7 @@ function App() {
               var eventDetails = await request.json();
               // filter that list by EI {awardId: "633"} {name: "District Engineering Inspiration Award"} and {awardID: "417"} {name:"Rookie All Star Award"}
               return _.filter(eventDetails?.awards, (award) => {
-                return award.awardId === 633 || award.awardId === 417;
+                return award.awardId === 633 || award.awardId === 417 || award.awardId === 740;
               });
             }
             // Return empty array if request failed
@@ -2883,16 +2884,20 @@ function App() {
         await Promise.all(districtEITeams).then(async function (values) {
           var tempTeams = [];
           values.forEach((value) => {
-            // @ts-ignore
-            // Check if value exists and is an array before accessing [0]
-            if (value && Array.isArray(value) && value[0]?.teamNumber) {
-              if (
-                _.findIndex(teams.teams, { teamNumber: value[0]?.teamNumber }) <
-                0
-              ) {
+            // value is an array of EI/RAS awards from one event — iterate all, not just [0]
+            if (value && Array.isArray(value)) {
+              value.forEach((award) => {
                 // @ts-ignore
-                tempTeams.push(value[0]?.teamNumber);
-              }
+                if (award?.teamNumber) {
+                  if (
+                    _.findIndex(teams.teams, { teamNumber: award.teamNumber }) < 0 &&
+                    !tempTeams.includes(award.teamNumber)
+                  ) {
+                    // @ts-ignore
+                    tempTeams.push(award.teamNumber);
+                  }
+                }
+              });
             }
           });
           // get team details for those teams not in this event
@@ -5463,6 +5468,29 @@ function App() {
   };
 
   /**
+   * Wrapper for setSelectedEvent that immediately clears stale schedule and team list data
+   * so the UI never shows a previous event's data while the new event is loading.
+   * Skips clearing when the event code hasn't changed (e.g., same-event reloads).
+   */
+  const changeSelectedEvent = (newEvent) => {
+    const newCode = newEvent?.value?.code;
+    const currentCode = selectedEvent?.value?.code;
+    if (newCode && newCode !== currentCode) {
+      setTeamList(null);
+      setQualSchedule(null);
+      setPlayoffSchedule(null);
+      setOfflinePlayoffSchedule(null);
+      setRankings(null);
+      setCommunityUpdates([]);
+      setEITeams([]);
+      setRobotImages(null);
+      setEventHighScores(null);
+      setDistrictRankings(null);
+    }
+    setSelectedEvent(newEvent);
+  };
+
+  /**
    * This function loads an event when a user selects an event from the menu. It will reset all event data, load the event details, team lists, team updates, refresh scores, ranks and world stats when appropriate.
    * @async
    * @function loadEvent
@@ -7217,7 +7245,7 @@ function App() {
                 element={
                   <SetupPage
                     selectedEvent={selectedEvent}
-                    setSelectedEvent={setSelectedEvent}
+                    setSelectedEvent={changeSelectedEvent}
                     setSelectedYear={setSelectedYear}
                     selectedYear={selectedYear}
                     eventList={events}
@@ -7364,7 +7392,7 @@ function App() {
                 element={
                   <SchedulePage
                     selectedEvent={selectedEvent}
-                    setSelectedEvent={setSelectedEvent}
+                    setSelectedEvent={changeSelectedEvent}
                     playoffSchedule={playoffSchedule}
                     qualSchedule={qualSchedule}
                     practiceSchedule={practiceSchedule}
