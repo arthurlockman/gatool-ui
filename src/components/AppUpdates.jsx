@@ -1,5 +1,16 @@
 export const appUpdates = [
   {
+    date: "April 20, 2026",
+    message: (
+      <ul>
+        <li>FRC:</li>
+        <ul>
+          <li>Fixing issues related to playoff schedule corruption</li>
+          <li>Restoring Engineering Inspiration and Rookie All-Star non-competing teams to the team list for District Champs events</li>
+        </ul>
+      </ul>
+    ),
+  },{
     date: "April 16, 2026",
     message: (
       <ul>
