@@ -108,7 +108,7 @@ function CheatsheetPage({
       {ftcMode && (
         <>
           <img
-            src="/cheatsheet/decode_cheat_sheet_11282025.png"
+            src="/cheatsheet/decode_cheat_sheet_04222026.png"
             width="100%"
             alt="Cheatsheet"
           ></img>
@@ -118,7 +118,7 @@ function CheatsheetPage({
               <span
                 className="gatool-tap-link"
                 onClick={() => {
-                  downloadPDF("/cheatsheet/decode_cheat_sheet_11282025.pdf");
+                  downloadPDF("/cheatsheet/decode_cheat_sheet_04222026.pdf");
                 }}
               >
                 Download the Cheat Sheet
@@ -134,7 +134,7 @@ function CheatsheetPage({
       {!ftcMode && (
         <>
           <img
-            src="/cheatsheet/rebuilt-cheat-sheet-04012026.png"
+            src="/cheatsheet/rebuilt-cheat-sheet-04222026.png"
             width="100%"
             alt="Cheatsheet"
           ></img>
@@ -144,7 +144,7 @@ function CheatsheetPage({
               <span
                 className="gatool-tap-link"
                 onClick={() => {
-                  downloadPDF("/cheatsheet/rebuilt-cheat-sheet-04012026.pdf");
+                  downloadPDF("/cheatsheet/rebuilt-cheat-sheet-04222026.pdf");
                 }}
               >
                 Download the Cheat Sheet
