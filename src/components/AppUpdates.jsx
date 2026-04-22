@@ -1,5 +1,20 @@
 export const appUpdates = [
   {
+    date: "April 22, 2026",
+    message: (
+      <ul>
+        <li>FRC:</li>
+        <ul>
+          <li>Updated Cheat Sheet to include World Champs Ranking Point thresholds</li>
+          <li>Updated text for G211</li>
+        </ul>
+        <li>FTC:</li>
+        <ul>
+          <li>Updated Cheat Sheet to include World Champs Ranking Point thresholds</li>
+        </ul>
+      </ul>
+    ),
+  },{
     date: "April 20, 2026",
     message: (
       <ul>

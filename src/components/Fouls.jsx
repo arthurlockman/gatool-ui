@@ -303,6 +303,7 @@ export const commonFouls = [
           CARD for egregious ROBOT actions or team member behavior at any time
           during the event.
         </p>
+        <p>Intentionally violating a rule that only results in a YELLOW CARD in an ALLIANCE’S potential last match (such as a team’s last qualification MATCH, a lower bracket MATCH, or Finals 2 or 3) will be under increased scrutiny and will likely result in a RED CARD.</p>
       </>
     ),
     violation: <>YELLOW or RED CARD.</>,
