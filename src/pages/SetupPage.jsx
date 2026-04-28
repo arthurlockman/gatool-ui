@@ -32,6 +32,7 @@ const filterTime = [
     { value: "week6", label: "Week 6" },
     { value: "week7", label: "Week 7" },
     { value: "week8", label: "Week 8" },
+    { value: "week9", label: "First Championships" },
 ]
 
 const filterTimeFTC = [
