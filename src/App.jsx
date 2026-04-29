@@ -30,8 +30,6 @@ import _ from "lodash";
 import moment from "moment";
 import Developer from "./pages/Developer";
 import {
-  eventNames,
-  FTCEventNames,
   specialAwards,
   hallOfFame,
   FTCHallOfFame,
@@ -439,6 +437,14 @@ function App() {
     "cache:eventNamesCY",
     []
   );
+  const [priorYearEventNamesFRC, setPriorYearEventNamesFRC] = usePersistentState(
+    "cache:priorYearEventNamesFRC",
+    {}
+  );
+  const [priorYearEventNamesFTC, setPriorYearEventNamesFTC] = usePersistentState(
+    "cache:priorYearEventNamesFTC",
+    {}
+  );
   const [districtRankings, setDistrictRankings] = usePersistentState(
     "cache:districtRankings",
     null
@@ -673,10 +679,12 @@ function App() {
   const { waitingWorker, showReload, reloadPage } = useServiceWorker();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
-  // event name lookups
-  const eventnames = ftcMode
-    ? _.cloneDeep(FTCEventNames)
-    : _.cloneDeep(eventNames);
+  // event name lookups — prior years fetched dynamically, current year from eventNamesCY
+  const priorYearEventNames = ftcMode ? priorYearEventNamesFTC : priorYearEventNamesFRC;
+  const eventnames = {
+    ..._.cloneDeep(priorYearEventNames),
+    ...(selectedYear && eventNamesCY ? { [selectedYear.value]: eventNamesCY } : {}),
+  };
   const halloffame = ftcMode
     ? _.cloneDeep(FTCHallOfFame)
     : _.cloneDeep(hallOfFame);
@@ -775,6 +783,40 @@ function App() {
       getFTCOfflineStatus();
     }
   }, [FTCServerURL, ftcMode?.value]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Fetch event name lookups for the two prior years so award event names resolve
+  // without relying on static constants.
+  useEffect(() => {
+    if (!selectedYear || !isOnline) return;
+    const isFTC = !!ftcMode;
+    const cache = isFTC ? priorYearEventNamesFTC : priorYearEventNamesFRC;
+    const setter = isFTC ? setPriorYearEventNamesFTC : setPriorYearEventNamesFRC;
+    const currentYearNum = parseInt(selectedYear.value, 10);
+    const priorYears = [currentYearNum - 1, currentYearNum - 2].map(String);
+
+    priorYears.forEach(async (year) => {
+      if (cache[year]) return; // already cached
+      try {
+        const val = await httpClient.getNoAuth(
+          `${year}/events`,
+          isFTC ? ftcBaseURL : null
+        );
+        if (val.status === 200) {
+          const result = await val.json();
+          const events = result.Events || result.events || [];
+          const yearMap = {};
+          events.forEach((e) => {
+            const code = e.code || e.Code;
+            const name = e.name || e.Name;
+            if (code && name) yearMap[code] = name;
+          });
+          setter((prev) => ({ ...prev, [year]: yearMap }));
+        }
+      } catch (err) {
+        console.error(`Failed to fetch event names for ${year}:`, err);
+      }
+    });
+  }, [selectedYear?.value, ftcMode, isOnline]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const allianceConnectionsPrefetchSignature = useMemo(() => {
     if (!alliances?.alliances?.length) return "";
