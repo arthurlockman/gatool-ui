@@ -371,7 +371,7 @@ function SortableTeamRow({ id, teamNumber, orderHint, station }) {
 
 // ─── TopButtons ───────────────────────────────────────────────────────────────
 
-function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatchFromMenu, selectedEvent, matchDetails, rawMatchDetailsForReserve, timeFormat, alliances, setAlliances, rankings, inPlayoffs, backupTeam, setBackupTeam, upsertPlayoffReserveOverlay, removePlayoffReserveOverlay, playoffReserveEdits, playoffStationOrderEdits, upsertPlayoffStationOrderOverlay, removePlayoffStationOrderOverlay, teamList, adHocMatch, setAdHocMatch, adHocMode, swapScreen, playoffOnly, eventLabel, ftcMode, remapNumberToString, remapStringToNumber }) {
+function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatchFromMenu, selectedEvent, matchDetails, rawMatchDetailsForReserve = null, timeFormat, alliances, setAlliances, rankings, inPlayoffs, backupTeam, setBackupTeam, upsertPlayoffReserveOverlay, removePlayoffReserveOverlay, playoffReserveEdits, playoffStationOrderEdits, upsertPlayoffStationOrderOverlay, removePlayoffStationOrderOverlay, teamList, adHocMatch, setAdHocMatch, adHocMode, swapScreen, playoffOnly, eventLabel, ftcMode, remapNumberToString, remapStringToNumber }) {
 
     // ── shared modal state ────────────────────────────────────────────────────
     const [showTeamOpsModal, setShowTeamOpsModal] = useState(false);
