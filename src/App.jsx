@@ -5982,6 +5982,10 @@ function App() {
             e.champLevel = "CHAMPS";
           }
 
+          if (e.champLevel === "CHAMPS" || e.champLevel === "CMPDIV" || e.champLevel === "CMPSUB") {
+            filters.push("firstchamps");
+          }
+
           return {
             value: e,
             label: `${optionPrefix}${e.name}${optionPostfix}`,

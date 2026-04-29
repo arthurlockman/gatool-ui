@@ -32,7 +32,7 @@ const filterTime = [
     { value: "week6", label: "Week 6" },
     { value: "week7", label: "Week 7" },
     { value: "week8", label: "Week 8" },
-    { value: "week9", label: "First Championships" },
+    { value: "firstchamps", label: "FIRST Championship" },
 ]
 
 const filterTimeFTC = [
@@ -41,6 +41,7 @@ const filterTimeFTC = [
     { value: "future", label: "Future Events" },
     { value: "thisWeek", label: "This Week" },
     { value: "thisMonth", label: "This Month" },
+    { value: "firstchamps", label: "FIRST Championship" },
 ]
 
 const teamReducer = [
