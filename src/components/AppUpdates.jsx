@@ -1,5 +1,19 @@
 export const appUpdates = [
   {
+    date: "April 29, 2026",
+    message: (
+      <ul>
+        <li>FRC:</li>
+        <ul>
+          <li>Added FIRST Championships to the Timeframe selector on Setup Page</li>
+        </ul>
+        <li>ALL PROGRAMS:</li>
+        <ul>
+          <li>On Awards, internatinal teams' countries repeated when users entered updated city/state details. This no longer happens.</li>
+        </ul>
+      </ul>
+    ),
+  },{
     date: "April 22, 2026",
     message: (
       <ul>
