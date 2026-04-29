@@ -10,6 +10,7 @@ export const appUpdates = [
         <li>ALL PROGRAMS:</li>
         <ul>
           <li>On Awards, internatinal teams' countries repeated when users entered updated city/state details. This no longer happens.</li>
+          <li>Performance improvements when rendering some screens</li>
         </ul>
       </ul>
     ),
