@@ -1,5 +1,5 @@
 import { Alert, Container, Button, Row, Col, Modal, Form, InputGroup } from "react-bootstrap";
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Trophy } from "react-bootstrap-icons";
 import _ from "lodash";
 import { useHotkeysContext, useHotkeys } from "react-hotkeys-hook";
@@ -17,6 +17,11 @@ function AwardsPage() {
     const [awardTeam, setAwardTeam] = useState(null);
     const [teamFilter, setTeamFilter] = useState("");
 
+    const communityUpdatesLookup = useMemo(() => {
+        if (!communityUpdates) return {};
+        return Object.fromEntries(communityUpdates.map(u => [u.teamNumber, u]));
+    }, [communityUpdates]);
+
     const { width } = useWindowDimensions();
 
     const colCount = width > 1040 ? 6 :
@@ -24,43 +29,48 @@ function AwardsPage() {
             width > 640 ? 4 :
                 width > 480 ? 3 : 2;
 
-    var columns = [[], [], [], [], [], []];
-    var sortedTeams = _.orderBy(teamList?.teams, "teamNumber", "asc");
-    if (communityUpdates) (
-        sortedTeams = sortedTeams.map((team) => {
-            team.updates = team?.updates ? _.merge(team.updates, communityUpdates[_.findIndex(communityUpdates, { "teamNumber": team?.teamNumber })]?.updates) : communityUpdates[_.findIndex(communityUpdates, { "teamNumber": team?.teamNumber })]?.updates;
-            var years = 1 + Number(selectedYear?.value) - Number(team?.rookieYear);
-            if (typeof team?.updates?.teamYearsNoCompeteLocal !== "undefined") { years -= team?.updates?.teamYearsNoCompeteLocal };
-            var yearsDisplay = "th";
-            if (years.toString().endsWith("1")) { yearsDisplay = "st" };
-            if (years.toString().endsWith("2")) { yearsDisplay = "nd" };
-            if (years.toString().endsWith("3")) { yearsDisplay = "rd" };
-            if (years.toString() === "11" || years.toString() === "12" || years.toString() === "13") { yearsDisplay = "th" };
-            if (years.toString() === "1") { yearsDisplay = "Rookie" };
-            if (years === 1) { team.yearsDisplay = yearsDisplay } else { team.yearsDisplay = `${years}${yearsDisplay}`; }
-            return team;
-        })
-    )
-    var rows = sortedTeams?.length;
-    if (sortedTeams?.length > 0) {
-        sortedTeams?.forEach((team, index) => {
-            if (index <= 1 * rows / colCount - 1) {
-                columns[0].push(team);
-            } else if (index <= 2 * rows / colCount - 1) {
-                columns[1].push(team);
-            } else if (index <= 3 * rows / colCount - 1) {
-                columns[2].push(team);
-            } else if (index <= 4 * rows / colCount - 1) {
-                columns[3].push(team);
-            } else if (index <= 5 * rows / colCount - 1) {
-                columns[4].push(team);
-            } else {
-                columns[5].push(team);
-            }
-        })
-    }
+    const { sortedTeams, columns } = useMemo(() => {
+        const sorted = _.orderBy(teamList?.teams, "teamNumber", "asc");
+        const enriched = communityUpdates
+            ? sorted.map((team) => {
+                team.updates = team?.updates ? _.merge(team.updates, communityUpdatesLookup[team?.teamNumber]?.updates) : communityUpdatesLookup[team?.teamNumber]?.updates;
+                var years = 1 + Number(selectedYear?.value) - Number(team?.rookieYear);
+                if (typeof team?.updates?.teamYearsNoCompeteLocal !== "undefined") { years -= team?.updates?.teamYearsNoCompeteLocal };
+                var yearsDisplay = "th";
+                if (years.toString().endsWith("1")) { yearsDisplay = "st" };
+                if (years.toString().endsWith("2")) { yearsDisplay = "nd" };
+                if (years.toString().endsWith("3")) { yearsDisplay = "rd" };
+                if (years.toString() === "11" || years.toString() === "12" || years.toString() === "13") { yearsDisplay = "th" };
+                if (years.toString() === "1") { yearsDisplay = "Rookie" };
+                if (years === 1) { team.yearsDisplay = yearsDisplay } else { team.yearsDisplay = `${years}${yearsDisplay}`; }
+                return team;
+            })
+            : sorted;
+        const cols = [[], [], [], [], [], []];
+        const rows = enriched?.length;
+        if (rows > 0) {
+            enriched.forEach((team, index) => {
+                if (index <= 1 * rows / colCount - 1) {
+                    cols[0].push(team);
+                } else if (index <= 2 * rows / colCount - 1) {
+                    cols[1].push(team);
+                } else if (index <= 3 * rows / colCount - 1) {
+                    cols[2].push(team);
+                } else if (index <= 4 * rows / colCount - 1) {
+                    cols[3].push(team);
+                } else if (index <= 5 * rows / colCount - 1) {
+                    cols[4].push(team);
+                } else {
+                    cols[5].push(team);
+                }
+            });
+        }
+        return { sortedTeams: enriched, columns: cols };
+    }, [teamList?.teams, communityUpdates, communityUpdatesLookup, selectedYear?.value, colCount]);
 
-
+    const filteredByExact = teamFilter ? sortedTeams.filter(t => t.teamNumber === Number(teamFilter)) : [];
+    const filteredByPrefix = teamFilter ? sortedTeams.filter(t => String(t.teamNumber).startsWith(teamFilter)) : [];
+    const singleFilterMatch = filteredByExact.length === 1 || filteredByPrefix.length === 1;
 
     const handleClose = () => {
         setAwardTeam(null);
@@ -131,7 +141,7 @@ function AwardsPage() {
                             <InputGroup className="mb-3" >
                                 <InputGroup.Text>Filter the teams</InputGroup.Text>
                                 <Form.Control id={"filterControl"} type="number" placeholder="Enter a number" aria-label="Team Number" onChange={filterTeams} />
-                                {(_.filter(sortedTeams, { 'teamNumber': Number(teamFilter) }).length === 1 || (_.filter(sortedTeams, (team) => { return String(team?.teamNumber).startsWith(teamFilter) }).length === 1)) && <Button variant="primary" type="submit">Select this team</Button>}
+                                {singleFilterMatch && <Button variant="primary" type="submit">Select this team</Button>}
                             </InputGroup>
                         </Form>
                     </div>
@@ -139,7 +149,7 @@ function AwardsPage() {
                         return (index<colCount? <Col  key={index}>
                             {column.map((team) => {
                                 const displayTeamNumber = remapNumberToString ? remapNumberToString(team?.teamNumber) : team?.teamNumber;
-                                return ((String(team?.teamNumber).startsWith(teamFilter) || teamFilter === "") && <Row className={"awardsButton"} key={team.teamNumber} ><Button value={JSON.stringify(team)} onClick={handleShow} size="sm" variant={(team?.teamNumber === Number(teamFilter) || (_.filter(sortedTeams, (team) => { return String(team?.teamNumber).startsWith(teamFilter) }).length === 1)) ? "success" : "outline-success"}>{displayTeamNumber}</Button></Row>)
+                                return ((String(team?.teamNumber).startsWith(teamFilter) || teamFilter === "") && <Row className={"awardsButton"} key={team.teamNumber} ><Button value={JSON.stringify(team)} onClick={handleShow} size="sm" variant={(team?.teamNumber === Number(teamFilter) || singleFilterMatch) ? "success" : "outline-success"}>{displayTeamNumber}</Button></Row>)
                             })}
                         </Col> : null)
                     })}
@@ -152,7 +162,7 @@ function AwardsPage() {
                             <span className={"allianceAnnounceDialog"}>Team {remapNumberToString ? remapNumberToString(awardTeam?.teamNumber) : awardTeam?.teamNumber} {awardTeam?.updates?.nameShortLocal ? awardTeam.updates.nameShortLocal : awardTeam?.nameShort}<br />
                                 is {awardTeam?.updates?.awardsTextLocal ? awardTeam?.updates?.awardsTextLocal : <>{originalAndSustaining.includes(String(awardTeam?.teamNumber)) ? "an Original and Sustaining Team " : ""}from<br />
                                     {awardTeam?.updates?.organizationLocal ? awardTeam?.updates?.organizationLocal : awardTeam?.organization}<br />
-                                    in</>} {awardTeam?.updates?.cityStateLocal ? awardTeam?.updates?.cityStateLocal : `${awardTeam?.city}, ${awardTeam?.stateProv}`}{awardTeam?.country !== "USA" ? `, ${awardTeam?.country}` : ""}<br />
+                                    in</>} {awardTeam?.updates?.cityStateLocal ? awardTeam?.updates?.cityStateLocal : `${awardTeam?.city}, ${awardTeam?.stateProv}`}{awardTeam?.country !== "USA" && !awardTeam?.updates?.cityStateLocal ? `, ${awardTeam?.country}` : ""}<br />
                                 <br />
                                 Founded in {awardTeam?.rookieYear}, this is their {awardTeam?.yearsDisplay} season competing with <i><b>FIRST</b></i>. </span>
                         </Modal.Body>

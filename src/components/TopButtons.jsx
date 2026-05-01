@@ -187,7 +187,7 @@ function SortableTeamRow({ id, teamNumber, orderHint, station }) {
 
 // ─── TopButtons ───────────────────────────────────────────────────────────────
 
-function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatchFromMenu, selectedEvent, matchDetails, rawMatchDetailsForReserve, alliances, setAlliances, rankings, inPlayoffs, backupTeam, setBackupTeam, upsertPlayoffReserveOverlay, removePlayoffReserveOverlay, playoffReserveEdits, playoffStationOrderEdits, upsertPlayoffStationOrderOverlay, removePlayoffStationOrderOverlay, teamList, adHocMatch, setAdHocMatch, adHocMode, playoffOnly, eventLabel, ftcMode, remapNumberToString, remapStringToNumber }) {
+function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatchFromMenu, selectedEvent, matchDetails, rawMatchDetailsForReserve = null, alliances, setAlliances, rankings, inPlayoffs, backupTeam, setBackupTeam, upsertPlayoffReserveOverlay, removePlayoffReserveOverlay, playoffReserveEdits, playoffStationOrderEdits, upsertPlayoffStationOrderOverlay, removePlayoffStationOrderOverlay, teamList, adHocMatch, setAdHocMatch, adHocMode, playoffOnly, eventLabel, ftcMode, remapNumberToString, remapStringToNumber }) {
     const { swapScreen } = useSettings();
 
     // ── shared modal state ────────────────────────────────────────────────────

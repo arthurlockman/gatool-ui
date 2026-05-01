@@ -11,7 +11,7 @@ import EventNotificationBanner from "components/EventNotificationBanner";
 import moment from "moment";
 import useScrollPosition from "../hooks/useScrollPosition";
 import { useScrollToTop } from "../contextProviders/ScrollContainerContext";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { getAllianceLookupEntry } from "../utils/allianceLookup";
 import { matchHasPostedResult } from "../utils/playoffReserveEdits";
 import { applyPlayoffStationOrderToMatch } from "../utils/playoffStationOrderEdits";
@@ -92,7 +92,29 @@ function PlayByPlayPage({
 
   var displayOrder = getPlayByPlayDisplayOrder(ftcMode, swapScreen);
 
+  const teamListLookup = useMemo(() => {
+    const map = {};
+    teamList?.teams?.forEach(t => { map[t.teamNumber] = t; });
+    return map;
+  }, [teamList?.teams]);
 
+  const rankingsLookup = useMemo(() => {
+    const map = {};
+    rankings?.ranks?.forEach(r => { map[r.teamNumber] = r; });
+    return map;
+  }, [rankings?.ranks]);
+
+  const epaLookup = useMemo(() => {
+    const map = {};
+    EPA?.forEach(e => { map[e.teamNumber] = e; });
+    return map;
+  }, [EPA]);
+
+  const communityUpdatesLookup = useMemo(() => {
+    const map = {};
+    communityUpdates?.forEach(u => { map[u.teamNumber] = u; });
+    return map;
+  }, [communityUpdates]);
 
   function updateTeamDetails(station, matchDetails) {
     var team = {};
@@ -112,22 +134,10 @@ function PlayByPlayPage({
 
       team = _.merge(
         team,
-        teamList?.teams[
-        _.findIndex(teamList?.teams, { teamNumber: team?.teamNumber })
-        ],
-        rankings?.ranks?.length > 0
-          ? rankings?.ranks[
-          _.findIndex(rankings?.ranks, { teamNumber: lookupTeamNumber })
-          ]
-          : null,
-        EPA?.length > 0
-          ? EPA[_.findIndex(EPA, { teamNumber: team?.teamNumber })]
-          : null,
-        communityUpdates?.length > 0
-          ? communityUpdates[
-          _.findIndex(communityUpdates, { teamNumber: team?.teamNumber })
-          ]
-          : null
+        teamListLookup[team?.teamNumber],
+        rankings?.ranks?.length > 0 ? rankingsLookup[lookupTeamNumber] : null,
+        EPA?.length > 0 ? epaLookup[team?.teamNumber] : null,
+        communityUpdates?.length > 0 ? communityUpdatesLookup[team?.teamNumber] : null
       );
 
       team.rankStyle = rankHighlight(team?.rank, allianceCount || { count: 8 });
@@ -198,15 +208,9 @@ function PlayByPlayPage({
 
           team = _.merge(
             team,
-            teamList?.teams[
-            _.findIndex(teamList?.teams, { teamNumber: remapStringToNumber(lookupRemainingTeam) })
-            ],
-            rankings?.ranks[
-            _.findIndex(rankings?.ranks, { teamNumber: lookupRemainingTeam })
-            ],
-            communityUpdates[
-            _.findIndex(communityUpdates, { teamNumber: remapStringToNumber(lookupRemainingTeam) })
-            ]
+            teamListLookup[remapStringToNumber(lookupRemainingTeam)],
+            rankingsLookup[lookupRemainingTeam],
+            communityUpdatesLookup[remapStringToNumber(lookupRemainingTeam)]
           );
 
           team.rankStyle = rankHighlight(

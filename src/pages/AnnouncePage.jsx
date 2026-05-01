@@ -7,7 +7,7 @@ import TopButtons from "../components/TopButtons";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useSwipeable } from "react-swipeable";
 import moment from "moment";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import NotificationBanner from "components/NotificationBanner";
 import EventNotificationBanner from "components/EventNotificationBanner";
 import useScrollPosition from "../hooks/useScrollPosition";
@@ -100,6 +100,24 @@ function AnnouncePage({
       }
       : {};
 
+  const teamListLookup = useMemo(() => {
+    const map = {};
+    teamList?.teams?.forEach(t => { map[t.teamNumber] = t; });
+    return map;
+  }, [teamList?.teams]);
+
+  const rankingsLookup = useMemo(() => {
+    const map = {};
+    rankings?.ranks?.forEach(r => { map[r.teamNumber] = r; });
+    return map;
+  }, [rankings?.ranks]);
+
+  const communityUpdatesLookup = useMemo(() => {
+    const map = {};
+    communityUpdates?.forEach(u => { map[u.teamNumber] = u; });
+    return map;
+  }, [communityUpdates]);
+
   function updateTeamDetails(station, matchDetails) {
     var team = {};
     var alliance = station.slice(0, station.length - 1);
@@ -118,28 +136,12 @@ function AnnouncePage({
       const lookupTeamNumber = remapNumberToString(team?.teamNumber);
 
 
-      team = communityUpdates
-        ? _.merge(
-          team,
-          teamList?.teams[
-          _.findIndex(teamList?.teams, { teamNumber: team?.teamNumber })
-          ],
-          rankings?.ranks[
-          _.findIndex(rankings?.ranks, { teamNumber: lookupTeamNumber })
-          ],
-          communityUpdates[
-          _.findIndex(communityUpdates, { teamNumber: team?.teamNumber })
-          ]
-        )
-        : _.merge(
-          team,
-          teamList?.teams[
-          _.findIndex(teamList?.teams, { teamNumber: team?.teamNumber })
-          ],
-          rankings?.ranks[
-          _.findIndex(rankings?.ranks, { teamNumber: lookupTeamNumber })
-          ]
-        );
+      team = _.merge(
+        team,
+        teamListLookup[team?.teamNumber],
+        rankingsLookup[lookupTeamNumber],
+        communityUpdates ? communityUpdatesLookup[team?.teamNumber] : undefined
+      );
 
       team.rankStyle = rankHighlight(team?.rank, allianceCount || { count: 8 });
       const announceAllianceEntry = getAllianceLookupEntry(
@@ -212,21 +214,9 @@ function AnnouncePage({
 
           team = _.merge(
             team,
-            teamList?.teams[
-            _.findIndex(teamList?.teams, { teamNumber: remapStringToNumber(lookupRemainingTeam) })
-            ],
-            rankings?.ranks?.length > 0
-              ? rankings?.ranks[
-              _.findIndex(rankings?.ranks, { teamNumber: lookupRemainingTeam })
-              ]
-              : null,
-            communityUpdates?.length > 0
-              ? communityUpdates[
-              _.findIndex(communityUpdates, {
-                teamNumber: remapStringToNumber(lookupRemainingTeam),
-              })
-              ]
-              : null
+            teamListLookup[remapStringToNumber(lookupRemainingTeam)],
+            rankings?.ranks?.length > 0 ? rankingsLookup[lookupRemainingTeam] : null,
+            communityUpdates?.length > 0 ? communityUpdatesLookup[remapStringToNumber(lookupRemainingTeam)] : null
           );
 
           team.rankStyle = rankHighlight(
@@ -436,13 +426,20 @@ function AnnouncePage({
   var displayOrder = !ftcMode
     ? ["Red1", "Red2", "Red3", "Red4", "Blue1", "Blue2", "Blue3", "Blue4"]
     : ["Red1", "Red2", "Red3", "Blue1", "Blue2", "Blue3"];
-  var teamDetails = [];
-  if (teamList && matchDetails) {
-    //fill in the team details
-    displayOrder.forEach((station) => {
-      teamDetails[station] = updateTeamDetails(station, matchDetails);
-    });
-  }
+  const teamDetails = useMemo(() => {
+    const details = [];
+    if (teamList && matchDetails) {
+      displayOrder.forEach((station) => {
+        details[station] = updateTeamDetails(station, matchDetails);
+      });
+    }
+    return details;
+  // updateTeamDetails is an inline function; list its actual closure deps instead
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [matchDetails, teamListLookup, rankingsLookup, communityUpdatesLookup, communityUpdates,
+      alliances, allianceCount, districtRankings, displayOrder, inPlayoffs,
+      selectedEvent, selectedYear, regionalEventDetail, ftcMode,
+      remapNumberToString, remapStringToNumber, teamList]);
 
   const connectionsEventKey =
     !ftcMode && inPlayoffs

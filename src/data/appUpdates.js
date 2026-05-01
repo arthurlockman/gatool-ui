@@ -1,5 +1,44 @@
 export const appUpdates = [
   {
+    date: "April 29, 2026",
+    message: (
+      <ul>
+        <li>ALL PROGRAMS:</li>
+        <ul>
+        <li>Added FIRST Championship to the Timeframe selector on Setup Page</li>
+        <li>On Awards, internatinal teams' countries repeated when users entered updated city/state details. This no longer happens.</li>
+          <li>Performance improvements when rendering some screens</li>
+          <li>Made prior years' awards' event names dynamic to reduce maintenance</li>
+        </ul>
+      </ul>
+    ),
+  },{
+    date: "April 22, 2026",
+    message: (
+      <ul>
+        <li>FRC:</li>
+        <ul>
+          <li>Updated Cheat Sheet to include World Champs Ranking Point thresholds</li>
+          <li>Updated text for G211</li>
+        </ul>
+        <li>FTC:</li>
+        <ul>
+          <li>Updated Cheat Sheet to include World Champs Ranking Point thresholds</li>
+        </ul>
+      </ul>
+    ),
+  },{
+    date: "April 20, 2026",
+    message: (
+      <ul>
+        <li>FRC:</li>
+        <ul>
+          <li>Fixing issues related to playoff schedule corruption</li>
+          <li>Restoring Engineering Inspiration and Rookie All-Star non-competing teams to the team list for District Champs events</li>
+        </ul>
+      </ul>
+    ),
+  },{
     date: "April 16, 2026",
     message: (
       <ul>

@@ -30,7 +30,6 @@ import { useEventData } from "./contexts/EventDataContext";
 import { EventStoreProvider } from "./contexts/EventStoreProvider";
 import _ from "lodash";
 import Developer from "./pages/Developer";
-import { eventNames, FTCEventNames } from "./data/eventNames";
 import { specialAwards, hallOfFame, FTCHallOfFame } from "./data/hallOfFame";
 import { originalAndSustaining, refreshRate } from "./data/appConfig";
 import { ftcRegions } from "./data/ftcRegions";
@@ -327,6 +326,14 @@ function App() {
     "cache:eventNamesCY",
     []
   );
+  const [priorYearEventNamesFRC, setPriorYearEventNamesFRC] = usePersistentState(
+    "cache:priorYearEventNamesFRC",
+    {}
+  );
+  const [priorYearEventNamesFTC, setPriorYearEventNamesFTC] = usePersistentState(
+    "cache:priorYearEventNamesFTC",
+    {}
+  );
   // Live data: changes after every match; do not persist
   const [regionalEventDetail, setRegionalEventDetail] = useState(null);
   const [adHocMatch, setAdHocMatch] = useState([
@@ -497,10 +504,12 @@ function App() {
   const [haveChampsTeams, setHaveChampsTeams] = useState(false);
   const [EITeams, setEITeams] = useState([]);
 
-  // event name lookups
-  const eventnames = ftcMode
-    ? _.cloneDeep(FTCEventNames)
-    : _.cloneDeep(eventNames);
+  // event name lookups — prior years fetched dynamically, current year from eventNamesCY
+  const priorYearEventNames = ftcMode ? priorYearEventNamesFTC : priorYearEventNamesFRC;
+  const eventnames = {
+    ..._.cloneDeep(priorYearEventNames),
+    ...(selectedYear && eventNamesCY ? { [selectedYear.value]: eventNamesCY } : {}),
+  };
   const halloffame = ftcMode
     ? _.cloneDeep(FTCHallOfFame)
     : _.cloneDeep(hallOfFame);
@@ -645,6 +654,40 @@ function App() {
     setDistricts,
     updateFtcRegions,
   });
+
+  // Fetch event name lookups for the two prior years so award event names resolve
+  // without relying on static constants.
+  useEffect(() => {
+    if (!selectedYear || !isOnline) return;
+    const isFTC = !!ftcMode;
+    const cache = isFTC ? priorYearEventNamesFTC : priorYearEventNamesFRC;
+    const setter = isFTC ? setPriorYearEventNamesFTC : setPriorYearEventNamesFRC;
+    const currentYearNum = parseInt(selectedYear.value, 10);
+    const priorYears = [currentYearNum - 1, currentYearNum - 2].map(String);
+
+    priorYears.forEach(async (year) => {
+      if (cache[year]) return; // already cached
+      try {
+        const val = await httpClient.getNoAuth(
+          `${year}/events`,
+          isFTC ? ftcBaseURL : null
+        );
+        if (val.status === 200) {
+          const result = await val.json();
+          const events = result.Events || result.events || [];
+          const yearMap = {};
+          events.forEach((e) => {
+            const code = e.code || e.Code;
+            const name = e.name || e.Name;
+            if (code && name) yearMap[code] = name;
+          });
+          setter((prev) => ({ ...prev, [year]: yearMap }));
+        }
+      } catch (err) {
+        console.error(`Failed to fetch event names for ${year}:`, err);
+      }
+    });
+  }, [selectedYear?.value, ftcMode, isOnline]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /**
    * Wrapper around the hook's getCheesyStatus probe — adds loadSchedule orchestration
@@ -918,6 +961,29 @@ function App() {
     } else {
       setFrcDistrictHighScores(null);
     }
+  };
+
+  /**
+   * Wrapper for setSelectedEvent that immediately clears stale schedule and team list data
+   * so the UI never shows a previous event's data while the new event is loading.
+   * Skips clearing when the event code hasn't changed (e.g., same-event reloads).
+   */
+  const changeSelectedEvent = (newEvent) => {
+    const newCode = newEvent?.value?.code;
+    const currentCode = selectedEvent?.value?.code;
+    if (newCode && newCode !== currentCode) {
+      setTeamList(null);
+      setQualSchedule(null);
+      setPlayoffSchedule(null);
+      setOfflinePlayoffSchedule(null);
+      setRankings(null);
+      setCommunityUpdates([]);
+      setEITeams([]);
+      setRobotImages(null);
+      setEventHighScores(null);
+      setDistrictRankings(null);
+    }
+    setSelectedEvent(newEvent);
   };
 
   /**
@@ -2294,7 +2360,7 @@ function App() {
 
   // --- Event Actions (passed to EventStoreProvider for ref-stabilization) ---
   const eventActions = {
-    setSelectedEvent,
+    setSelectedEvent: changeSelectedEvent,
     setSelectedYear,
     setFTCMode,
     loadEvent,
