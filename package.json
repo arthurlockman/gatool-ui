@@ -51,7 +51,7 @@
     "lint": "eslint src --ext .js,.jsx --max-warnings=0",
     "lint:strict-changed": "node scripts/lint-changed.mjs",
     "test": "react-scripts --openssl-legacy-provider test",
-    "test:ci": "react-scripts --openssl-legacy-provider test --watchAll=false --passWithNoTests",
+    "test:ci": "react-scripts --openssl-legacy-provider test --watchAll=false --coverage --coverageReporters=text --coverageReporters=text-summary --coverageReporters=json-summary --coverageReporters=lcov",
     "eject": "react-scripts --openssl-legacy-provider eject",
     "build:ci": "npm run sync-help-docs && react-scripts build"
   },
