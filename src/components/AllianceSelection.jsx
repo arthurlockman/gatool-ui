@@ -109,7 +109,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         enableScope('tabNavigation');
     }
 
-    const handleShow = (team, mode, e) => {
+    const handleShow = (team, mode) => {
         setAllianceTeam(team);
         setAllianceMode(mode || "show");
         setShow(true);
@@ -119,7 +119,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         disableScope('tabNavigation');
     }
 
-    const handleAccept = (team, mode, e) => {
+    const handleAccept = (team, mode) => {
         if (mode === "accept") {
             setAllianceTeam(team);
             setAllianceMode("accept");
@@ -186,7 +186,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
 
     }
 
-    const handleDecline = (team, mode, e) => {
+    const handleDecline = (team, mode) => {
         if (mode === "decline") {
             setAllianceTeam(team);
             setAllianceMode("decline");
@@ -205,7 +205,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
 
     }
 
-    const handleSkip = (team, mode, e) => {
+    const handleSkip = (team, mode) => {
         if (mode === "skip") {
             setAllianceTeam(team);
             setAllianceMode("skip");
@@ -271,7 +271,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
 
     }
 
-    const handleRemoveFromPlayoffs = (team, mode, e) => {
+    const handleRemoveFromPlayoffs = (team, mode) => {
         if (mode === "remove") {
             setAllianceTeam(team);
             setAllianceMode("remove");

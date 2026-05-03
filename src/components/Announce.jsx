@@ -12,7 +12,6 @@ function Announce({
   selectedEvent,
   eventNamesCY,
   playoffOnly,
-  ftcMode,
   remapNumberToString,
   /** Fourth column: rank (quals) | matchup summary with rowspan (playoffs) | omit when rowspan continues */
   column4,

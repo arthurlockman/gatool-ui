@@ -129,13 +129,14 @@ class AuthClient {
     }
 
     this.operationStart();
+    let response;
     try {
       const timeoutSignal = AbortSignal.timeout(timeOut);
-      var options = {
+      const options = {
         signal: signal ? AbortSignal.any([timeoutSignal, signal]) : timeoutSignal,
       };
       if (headers) options.headers = headers;
-      var response = await fetch(
+      response = await fetch(
         `${customAPIBaseUrl || apiBaseUrl}${path}`,
         options
       ).finally(() => {
@@ -150,33 +151,13 @@ class AuthClient {
       console.log("Fetch timeout exceeded");
       return { status: 408, statusText: "Request Timeout" };
     }
-    var errorText = `Received a ${response.status} error from backend: "${response.statusText}"`;
-    if (response.status === 400) {
-      if (path.includes("statbotics") || path.includes("ftcscout")) {
-        return response;
-      } else if (path.includes("/teams?teamNumber=")) {
-        return response;
-      } else {
-        errorText +=
-          " This is an error with the FIRST APIs, not one caused by gatool. These usually clear in a few minutes, so please try again soon.";
-      }
-    }
-    if (response.status === 401) {
-      errorText +=
-        " Your session may have expired. Please log out and log in again.";
-    }
-    if (response.status === 404) {
-      errorText += " We couldn't find " + path;
-      return response;
-    }
-    if (response.status === 500) {
-      if (path.includes("statbotics") || path.includes("ftcscout")) {
-        return response;
-      } else {
-        errorText +=
-          " Something happened in the backend that we don't understand. We have logged the request and will investigate soon.";
-      }
-    }
+    return this._handleNoAuthErrorResponse(response, path, customAPIBaseUrl);
+  }
+
+  _handleNoAuthErrorResponse(response, path, customAPIBaseUrl) {
+    const isExternalUpstream = path.includes("statbotics") || path.includes("ftcscout");
+    let errorText = `Received a ${response.status} error from backend: "${response.statusText}"`;
+
     if (response.status === 503) {
       if (path.includes("/elim/alliances")) {
         return { status: 204, statusText: "No Alliances loaded" };
@@ -191,6 +172,28 @@ class AuthClient {
       show503ToastIfNotThrottled(errorText);
       throw new Error(errorText);
     }
+
+    if (response.status === 400) {
+      if (isExternalUpstream || path.includes("/teams?teamNumber=")) {
+        return response;
+      }
+      errorText +=
+        " This is an error with the FIRST APIs, not one caused by gatool. These usually clear in a few minutes, so please try again soon.";
+    }
+    if (response.status === 401) {
+      errorText +=
+        " Your session may have expired. Please log out and log in again.";
+    }
+    if (response.status === 404) {
+      errorText += " We couldn't find " + path;
+      return response;
+    }
+    if (response.status === 500) {
+      if (isExternalUpstream) return response;
+      errorText +=
+        " Something happened in the backend that we don't understand. We have logged the request and will investigate soon.";
+    }
+
     toast.error(errorText);
     throw new Error(errorText);
   }

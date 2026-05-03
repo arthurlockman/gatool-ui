@@ -61,8 +61,6 @@ function TeamEditModal({
     updateTeam,
     localUpdates,
     isOnline,
-    isAuthenticated,
-    user,
     selectedEvent,
     selectedYear,
     originalAndSustaining,
@@ -72,7 +70,6 @@ function TeamEditModal({
     onTrack,
     onClearVisits,
     onHistory,
-    timeFormat,
 }) {
     const [nameShortLocal, setNameShortLocal] = useState("");
     const [organizationLocal, setOrganizationLocal] = useState("");

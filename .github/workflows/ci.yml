@@ -17,6 +17,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
@@ -26,6 +28,18 @@ jobs:
 
     - name: Install dependencies
       run: npm ci
+
+    - name: Lint
+      run: npm run lint
+
+    - name: Lint changed files (strict)
+      if: github.event_name == 'pull_request'
+      run: npm run lint:strict-changed
+
+    - name: Test
+      run: npm run test:ci
+      env:
+        CI: true
 
     - name: Run build
       run: npm run build

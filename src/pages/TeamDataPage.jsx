@@ -175,7 +175,7 @@ function TeamDataPage({
      * @param {string} mode - determines whether to send the update to gatool Cloud. "update" = send to cloud
      * @param {*} e - the inbound event from clicking the button.
      */
-    const handleSubmit = async (mode, formValue, e) => {
+    const handleSubmit = async (mode, formValue) => {
         var visits = _.cloneDeep(lastVisit);
         visits[`${updateTeam.teamNumber}`] = moment().format();
         var communityUpdatesTemp = _.cloneDeep(communityUpdates);
@@ -275,7 +275,7 @@ function TeamDataPage({
      * @param {object} team - The team to display
      * @param {*} e  - the inbound event from clicking the button.
      */
-    const handleShow = (team, e) => {
+    const handleShow = (team) => {
         if (isAuthenticated && user["https://gatool.org/roles"] && user["https://gatool.org/roles"].indexOf("user") >= 0) {
             setUpdateTeam(team);
             setShow(true);
@@ -284,7 +284,7 @@ function TeamDataPage({
         }
     }
 
-    const handleHistory = async (team, e) => {
+    const handleHistory = async (team) => {
         if (isAuthenticated && user["https://gatool.org/roles"] && user["https://gatool.org/roles"].indexOf("user") >= 0) {
             var history = await getTeamHistory(team.teamNumber);
             setShowHistory(true);
@@ -299,7 +299,7 @@ function TeamDataPage({
         enableScope('tabNavigation');
     }
 
-    const clearVisits = (single, e) => {
+    const clearVisits = (single) => {
         if (single) {
             var visits = _.cloneDeep(lastVisit);
             delete visits[`${updateTeam.teamNumber}`];
@@ -436,7 +436,7 @@ function TeamDataPage({
         disableScope('tabNavigation');
     }
 
-    function handleSubmitDownload(e) {
+    function handleSubmitDownload() {
         //toDo make this work.
         setShowDownload(false);
         generateDocx(gaName);
@@ -899,7 +899,7 @@ function TeamDataPage({
                 <Alert variant="warning" className="gatool-awaiting-message">You need to select an event before you can see anything here.</Alert>
             </div>}
             {selectedEvent && (!teamList || teamList?.teams.length === 0) && <div>
-                <Alert variant="warning" className="gatool-awaiting-message" onClick={(e) => { handleGetTeamList() }}><div><img src="loadingIcon.gif" alt="Loading data..." /></div>
+                <Alert variant="warning" className="gatool-awaiting-message" onClick={() => { handleGetTeamList() }}><div><img src="loadingIcon.gif" alt="Loading data..." /></div>
                     <div>Awaiting team data for {eventLabel || selectedEvent?.label}</div>
                     {selectedEvent?.value?.code === "OFFLINE" && <div>Your OFFLINE Event team list is determined by the schedule. Upload a schedule on the Schedule tab to load teams.</div>}
                     {selectedEvent?.value?.code !== "OFFLINE" && <div>If your event has finished loading and you don't see a Team List, tap here to try loading your teams again.</div>}
