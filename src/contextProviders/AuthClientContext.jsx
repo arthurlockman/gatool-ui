@@ -1,10 +1,10 @@
-import { useAuth0 } from "@auth0/auth0-react";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import { useOnlineStatus } from "./OnlineContext";
+import { useAuth } from "./AuthProvider";
+import { apiBaseUrl } from "./apiBase";
 
-export const apiBaseUrl =
-  process.env.REACT_APP_API_BASE || "https://api.gatool.org/v3/";
+export { apiBaseUrl };
 
 const FIVE_O_THREE_TOAST_THROTTLE_MS = 10000; // Only show one 503 toast per 10s when many requests fail
 let last503ToastAt = 0;
@@ -410,14 +410,8 @@ class AuthClient {
   }
 
   async getToken() {
-    var tokenResponse = await this.tokenGetter({
-      audience: `https://${
-        process.env.REACT_APP_AUTH0_DOMAIN || "gatool.auth0.com"
-      }/userinfo`,
-      scope: "openid email profile offline_access",
-      detailedResponse: true,
-    });
-    return tokenResponse.id_token;
+    if (!this.tokenGetter) return null;
+    return await this.tokenGetter();
   }
 }
 
@@ -428,11 +422,11 @@ function UseAuthClient() {
 }
 
 function AuthClientContextProvider({ children }) {
-  const { getAccessTokenSilently } = useAuth0();
+  const { getAccessToken } = useAuth();
   const [operationsInProgress, setOperationsInProgress] = useState(0);
   const client = useMemo(() => {
-    return new AuthClient(getAccessTokenSilently, setOperationsInProgress);
-  }, [getAccessTokenSilently, setOperationsInProgress]);
+    return new AuthClient(getAccessToken, setOperationsInProgress);
+  }, [getAccessToken, setOperationsInProgress]);
 
   const isOnline = useOnlineStatus();
   useEffect(() => {

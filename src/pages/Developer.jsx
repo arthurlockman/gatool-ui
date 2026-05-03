@@ -1,4 +1,4 @@
-import { useAuth0 } from "@auth0/auth0-react";
+import { useAuth } from "../contextProviders/AuthProvider";
 import { useEffect, useState } from "react";
 import { read, utils } from "xlsx";
 import {
@@ -26,7 +26,7 @@ function Developer({
   putUserPrefs,
   getUserPrefs,
 }) {
-  const { user, getAccessTokenSilently } = useAuth0();
+  const { user, getAccessToken } = useAuth();
 
   const [token, setToken] = useState(null);
   const [formattedUsers, setFormattedUsers] = useState(null);
@@ -55,19 +55,16 @@ function Developer({
   const [userPrefsLoading, setUserPrefsLoading] = useState(false);
 
   useEffect(() => {
-    async function getToken() {
-      const tokenResponse = await getAccessTokenSilently({
-        audience: `https://${
-          process.env.REACT_APP_AUTH0_DOMAIN || "gatool.auth0.com"
-        }/userinfo`,
-        scope: "openid email profile",
-        detailedResponse: true,
-      });
-      setToken(tokenResponse.id_token);
+    async function fetchToken() {
+      try {
+        const t = await getAccessToken();
+        setToken(t);
+      } catch (e) {
+        setToken(null);
+      }
     }
-
-    getToken();
-  }, [getAccessTokenSilently, user]);
+    fetchToken();
+  }, [getAccessToken, user]);
 
   useEffect(() => {
     setFormattedMessage({

@@ -19,7 +19,7 @@ import {
   compactReserveEditsForEvent,
 } from "./utils/playoffReserveEdits";
 import { UseAuthClient } from "./contextProviders/AuthClientContext";
-import { useAuth0 } from "@auth0/auth0-react";
+import { useAuth } from "./contextProviders/AuthProvider";
 import { Blocks } from "react-loader-spinner";
 import { Container } from "react-bootstrap";
 import { usePersistentState } from "./hooks/UsePersistentState";
@@ -180,20 +180,20 @@ function App() {
     isAuthenticated,
     isLoading,
     user,
-    getAccessTokenSilently,
-    loginWithRedirect,
-  } = useAuth0();
+    getAccessToken,
+    openLoginModal,
+  } = useAuth();
 
   useEffect(() => {
     const checkLogin = async () => {
       try {
-        await getAccessTokenSilently();
+        await getAccessToken();
       } catch (error) {
         console.log("Error refreshing access token:", error);
       }
     };
     checkLogin();
-  }, [getAccessTokenSilently, isAuthenticated, loginWithRedirect]);
+  }, [getAccessToken, isAuthenticated, openLoginModal]);
 
   const [httpClient, operationsInProgress] = UseAuthClient();
   /** Ref populated by EventStoreProvider with store-owned functions.
@@ -2369,15 +2369,15 @@ function App() {
 
   return (
     <div className="App">
-      {isLoading ? (
-        <div className="vertical-center">
-          <Container>
-            <Blocks visible height="200" width="" ariaLabel="blocks-loading" />
-          </Container>
-        </div>
-      ) : (
-        <EventStoreProvider data={eventDataValue} actions={eventActions} teamDeps={teamDeps} rankingsDeps={rankingsDeps} scheduleDeps={scheduleDeps} matchNavDeps={matchNavDeps} storeRef={eventStoreRef}>
-            <BrowserRouter>
+      <EventStoreProvider data={eventDataValue} actions={eventActions} teamDeps={teamDeps} rankingsDeps={rankingsDeps} scheduleDeps={scheduleDeps} matchNavDeps={matchNavDeps} storeRef={eventStoreRef}>
+        {isLoading ? (
+          <div className="vertical-center">
+            <Container>
+              <Blocks visible height="200" width="" ariaLabel="blocks-loading" />
+            </Container>
+          </div>
+        ) : (
+          <BrowserRouter>
           <Routes>
             <Route
               path="/"
@@ -2639,8 +2639,8 @@ function App() {
             </Route>
           </Routes>
         </BrowserRouter>
-        </EventStoreProvider>
-      )}
+        )}
+      </EventStoreProvider>
     </div>
   );
 }
