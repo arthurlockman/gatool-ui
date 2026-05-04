@@ -1,4 +1,3 @@
-import React from "react";
 import { Container, Row } from "react-bootstrap";
 import { FlashcardArray } from "react-quizlet-flashcard";
 import _ from "lodash";

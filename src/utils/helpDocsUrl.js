@@ -3,7 +3,9 @@
  */
 export function getPublicUrl(path) {
   const normalized = path.startsWith("/") ? path : `/${path}`;
-  const base = (process.env.PUBLIC_URL || "").replace(/\/$/, "");
+  // Vite serves under BASE_URL (default "/"). Strip the trailing slash to
+  // produce e.g. "" + "/foo" = "/foo" without a double slash.
+  const base = (import.meta.env.BASE_URL || "/").replace(/\/$/, "");
   return `${base}${normalized}`;
 }
 
@@ -23,5 +25,5 @@ export function getHelpWikiManifestUrl() {
 
 /** When true, Help loads markdown from GitHub raw wiki URLs using the manifest (needs network). */
 export function useHelpLiveWiki() {
-  return process.env.REACT_APP_HELP_LIVE_WIKI === "true";
+  return import.meta.env.VITE_HELP_LIVE_WIKI === "true";
 }

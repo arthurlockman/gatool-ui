@@ -584,15 +584,15 @@ function TeamDataPage({
                         if (!_.isUndefined(team["showRobotName"])) {
                             update.updates["showRobotName"] = team["showRobotName"];
                             update.updates.lastUpdate = moment().format();
-                        };
+                        }
                         if (!_.isUndefined(team["teamNotes"])) {
                             update.updates["teamNotes"] = team["teamNotes"];
                             update.updates.lastUpdate = moment().format();
-                        };
+                        }
                         if (!_.isUndefined(team["sayNumber"])) {
                             update.updates["sayNumber"] = team["sayNumber"];
                             update.updates.lastUpdate = moment().format();
-                        };
+                        }
                         newUpdate = _.cloneDeep(update);
                         currentUpdate = _.cloneDeep(communityUpdates[_.findIndex(communityUpdatesTemp, { "teamNumber": team.teamNumber })]);
                         if (newUpdate?.updates) {

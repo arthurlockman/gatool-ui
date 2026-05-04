@@ -64,7 +64,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         } else {
             allianceSelectionOrderRounds.round2 = [];
         }
-    };
+    }
 
     allianceSelectionRounds.forEach((round, index) => {
         AllianceSelectionBaseRounds[round].forEach((alliance) => {
@@ -552,13 +552,13 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
             team = _.merge(team, teamList?.teams[_.findIndex(teamList?.teams, { "teamNumber": team?.teamNumber })]);
             team.updates = communityUpdates[_.findIndex(communityUpdates, { "teamNumber": team?.teamNumber })]?.updates || team?.updates || {}
             var years = 1 + Number(selectedYear?.value) - Number(team?.rookieYear);
-            if (typeof team?.updates?.teamYearsNoCompeteLocal !== "undefined") { years -= team?.updates?.teamYearsNoCompeteLocal };
+            if (typeof team?.updates?.teamYearsNoCompeteLocal !== "undefined") { years -= team?.updates?.teamYearsNoCompeteLocal }
             var yearsDisplay = "th";
-            if (years.toString().endsWith("1")) { yearsDisplay = "st" };
-            if (years.toString().endsWith("2")) { yearsDisplay = "nd" };
-            if (years.toString().endsWith("3")) { yearsDisplay = "rd" };
-            if (years.toString() === "11" || years.toString() === "12" || years.toString() === "13") { yearsDisplay = "th" };
-            if (years.toString() === "1") { yearsDisplay = "Rookie" };
+            if (years.toString().endsWith("1")) { yearsDisplay = "st" }
+            if (years.toString().endsWith("2")) { yearsDisplay = "nd" }
+            if (years.toString().endsWith("3")) { yearsDisplay = "rd" }
+            if (years.toString() === "11" || years.toString() === "12" || years.toString() === "13") { yearsDisplay = "th" }
+            if (years.toString() === "1") { yearsDisplay = "Rookie" }
             if (years === 1) { team.yearsDisplay = yearsDisplay } else { team.yearsDisplay = `${years}${yearsDisplay}`; }
             return team;
         })

@@ -83,11 +83,6 @@ function AnnouncePage({
   const matchesToNotify = _.toInteger(
     (teamList?.teams?.length - teamReduction) / 6
   );
-  if (
-    qualSchedule?.schedule?.schedule?.length > 0 ||
-    qualSchedule?.schedule?.length > 0
-  ) {
-  }
   const notification =
     currentMatch >= qualsLength - matchesToNotify &&
       currentMatch <= qualsLength &&

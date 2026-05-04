@@ -2373,7 +2373,7 @@ function App() {
         {isLoading ? (
           <div className="vertical-center">
             <Container>
-              <Blocks visible height="200" width="" ariaLabel="blocks-loading" />
+              <Blocks visible height="200" width="200" ariaLabel="blocks-loading" />
             </Container>
           </div>
         ) : (

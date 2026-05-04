@@ -1,4 +1,3 @@
-import React from "react";
 import Select from "react-select";
 import {
   Alert,
@@ -511,14 +510,6 @@ function SchedulePage({
     !_.isNull(playoffCountOverride);
   if (typeof practiceSchedule?.schedule?.schedule !== "undefined") {
     practiceSchedule.schedule = practiceSchedule?.schedule?.schedule;
-  }
-  var firstMatch =
-    typeof qualSchedule?.schedule?.schedule !== "undefined"
-      ? qualSchedule?.schedule?.schedule[0]
-      : qualSchedule?.schedule[0];
-  if (
-    moment().isBefore(moment(firstMatch?.startTime).subtract(20, "minutes"))
-  ) {
   }
 
   return (

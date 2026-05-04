@@ -1,5 +1,5 @@
 const MATCHUPS_API_BASE =
-  process.env.REACT_APP_API_BASE || "https://api.gatool.org/v3/";
+  import.meta.env.VITE_API_BASE || "https://api.gatool.org/v3/";
 
 /**
  * Prior alliance partner history from gatool matchups API.

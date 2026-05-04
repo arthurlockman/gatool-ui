@@ -35,13 +35,13 @@ function AwardsPage() {
             ? sorted.map((team) => {
                 team.updates = team?.updates ? _.merge(team.updates, communityUpdatesLookup[team?.teamNumber]?.updates) : communityUpdatesLookup[team?.teamNumber]?.updates;
                 var years = 1 + Number(selectedYear?.value) - Number(team?.rookieYear);
-                if (typeof team?.updates?.teamYearsNoCompeteLocal !== "undefined") { years -= team?.updates?.teamYearsNoCompeteLocal };
+                if (typeof team?.updates?.teamYearsNoCompeteLocal !== "undefined") { years -= team?.updates?.teamYearsNoCompeteLocal }
                 var yearsDisplay = "th";
-                if (years.toString().endsWith("1")) { yearsDisplay = "st" };
-                if (years.toString().endsWith("2")) { yearsDisplay = "nd" };
-                if (years.toString().endsWith("3")) { yearsDisplay = "rd" };
-                if (years.toString() === "11" || years.toString() === "12" || years.toString() === "13") { yearsDisplay = "th" };
-                if (years.toString() === "1") { yearsDisplay = "Rookie" };
+                if (years.toString().endsWith("1")) { yearsDisplay = "st" }
+                if (years.toString().endsWith("2")) { yearsDisplay = "nd" }
+                if (years.toString().endsWith("3")) { yearsDisplay = "rd" }
+                if (years.toString() === "11" || years.toString() === "12" || years.toString() === "13") { yearsDisplay = "th" }
+                if (years.toString() === "1") { yearsDisplay = "Rookie" }
                 if (years === 1) { team.yearsDisplay = yearsDisplay } else { team.yearsDisplay = `${years}${yearsDisplay}`; }
                 return team;
             })

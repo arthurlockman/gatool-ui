@@ -99,7 +99,7 @@ const AuthWidget = ({
         <Blocks
           visible={true}
           height={`${height}`}
-          width=""
+          width={`${height}`}
           ariaLabel="blocks-loading"
         />
       );
@@ -159,14 +159,14 @@ const AuthWidget = ({
     <span>
       <div className="d-block d-xl-none" style={{ marginRight: "5px" }}>
         {showSpinner ? (
-          <Blocks visible={true} height="31" width="" ariaLabel="blocks-loading" />
+          <Blocks visible={true} height="31" width="31" ariaLabel="blocks-loading" />
         ) : (
           <LoginButton />
         )}
       </div>
       <div className="d-none d-xl-block" style={{ marginRight: "10px" }}>
         {showSpinner ? (
-          <Blocks visible={true} height="45" width="" ariaLabel="blocks-loading" />
+          <Blocks visible={true} height="45" width="45" ariaLabel="blocks-loading" />
         ) : (
           <LoginButton />
         )}

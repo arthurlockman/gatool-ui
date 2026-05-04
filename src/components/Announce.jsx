@@ -34,7 +34,7 @@ function Announce({
     if (years.toString().endsWith("2")) { yearsDisplay = "nd" }
     if (years.toString().endsWith("3")) { yearsDisplay = "rd" }
     if (years.toString() === "11" || years.toString() === "12" || years.toString() === "13") { yearsDisplay = "th" }
-    if (years.toString() === "1") { yearsDisplay = "Rookie" };
+    if (years.toString() === "1") { yearsDisplay = "Rookie" }
     
     // Display remapped team number if available
     const displayTeamNumber = remapNumberToString ? remapNumberToString(team.teamNumber) : team.teamNumber;

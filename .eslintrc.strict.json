@@ -1,15 +1,38 @@
 {
+    "root": true,
+    "parserOptions": {
+        "ecmaVersion": 2022,
+        "sourceType": "module",
+        "ecmaFeatures": { "jsx": true }
+    },
+    "env": { "browser": true, "es2022": true },
+    "settings": { "react": { "version": "detect" } },
     "extends": [
-        "react-app",
-        "react-app/jest"
+        "eslint:recommended",
+        "plugin:react/recommended",
+        "plugin:react/jsx-runtime",
+        "plugin:react-hooks/recommended",
+        "plugin:jsx-a11y/recommended"
     ],
-    "plugins": [
-        "unused-imports"
-    ],
+    "plugins": ["unused-imports"],
     "rules": {
         "react-hooks/exhaustive-deps": "error",
-        "unused-imports/no-unused-imports": "error",
+        "react/prop-types": "off",
+        "react/no-unescaped-entities": "off",
+        "react/display-name": "off",
         "no-unused-vars": "off",
+        "no-irregular-whitespace": "off",
+        "no-empty": ["error", { "allowEmptyCatch": true }],
+        "no-compare-neg-zero": "off",
+        "no-unsafe-optional-chaining": "off",
+        "jsx-a11y/click-events-have-key-events": "off",
+        "jsx-a11y/no-static-element-interactions": "off",
+        "jsx-a11y/no-noninteractive-element-interactions": "off",
+        "jsx-a11y/interactive-supports-focus": "off",
+        "jsx-a11y/tabindex-no-positive": "off",
+        "jsx-a11y/label-has-associated-control": "off",
+        "jsx-a11y/no-autofocus": "off",
+        "unused-imports/no-unused-imports": "error",
         "unused-imports/no-unused-vars": [
             "warn",
             {

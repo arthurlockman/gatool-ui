@@ -18,7 +18,7 @@ import { SnackbarProvider } from 'notistack';
 
 // Suppress findDOMNode deprecation warnings from react-quill
 // This is a known issue with react-quill library that uses deprecated findDOMNode internally
-if (process.env.NODE_ENV === 'development') {
+if (import.meta.env.DEV) {
     const originalError = console.error;
     console.error = (...args) => {
         // Check if the warning is about findDOMNode and ReactQuill
