@@ -111,6 +111,12 @@ const LoginModal = ({ show, onHide, defaultEmail = "", onAuthenticated }) => {
 
   const close = () => {
     if (busy) return;
+    if (step === STEP_CODE) {
+      const ok = window.confirm(
+        "Cancel sign-in? You'll need to request a new code if you start over."
+      );
+      if (!ok) return;
+    }
     onHide();
   };
 
@@ -202,7 +208,13 @@ const LoginModal = ({ show, onHide, defaultEmail = "", onAuthenticated }) => {
   };
 
   return (
-    <Modal show={show} onHide={close} centered backdrop={busy ? "static" : true}>
+    <Modal
+      show={show}
+      onHide={close}
+      centered
+      backdrop={busy || step === STEP_CODE ? "static" : true}
+      keyboard={!busy && step !== STEP_CODE}
+    >
       <Modal.Header closeButton={!busy}>
         <Modal.Title>Sign in to gatool</Modal.Title>
       </Modal.Header>
