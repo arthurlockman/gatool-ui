@@ -1,0 +1,9 @@
+{
+  "message": "We are aware of a service degradation that happened around 2:45 PM Eastern time. We have addressed the issue and should have no further disruption this weekend.",
+  "onTime": "10:50",
+  "offTime": "15:35",
+  "onDate": "2026-04-16",
+  "offDate": "2026-04-16",
+  "variant": "warning",
+  "link": ""
+}

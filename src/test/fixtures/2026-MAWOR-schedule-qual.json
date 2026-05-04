@@ -1,0 +1,4608 @@
+{
+  "Schedule": {
+    "schedule": [
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T10:50:00",
+        "autoStartTime": "2026-04-04T10:46:39.553",
+        "matchVideoLink": "https://www.youtube.com/watch?v=0BDTCRF-liI",
+        "matchNumber": 1,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T10:46:39.553",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T10:49:51.277",
+        "description": "Qualification 1",
+        "scoreRedFinal": 265,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 49,
+        "scoreBlueFinal": 164,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 34,
+        "teams": [
+          {
+            "teamNumber": 1768,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5422,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 716,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5112,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 4628,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 7760,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T10:59:00",
+        "autoStartTime": "2026-04-04T11:03:06.867",
+        "matchVideoLink": "https://www.youtube.com/watch?v=hxv3YOISSeg",
+        "matchNumber": 2,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T11:03:06.867",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T11:06:13.347",
+        "description": "Qualification 2",
+        "scoreRedFinal": 401,
+        "scoreRedFoul": 10,
+        "scoreRedAuto": 60,
+        "scoreBlueFinal": 346,
+        "scoreBlueFoul": 5,
+        "scoreBlueAuto": 78,
+        "teams": [
+          {
+            "teamNumber": 237,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1757,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 190,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 10254,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 467,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 6762,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T11:08:00",
+        "autoStartTime": "2026-04-04T11:10:17.747",
+        "matchVideoLink": "https://www.youtube.com/watch?v=G4qWVDjjITw",
+        "matchNumber": 3,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T11:10:17.747",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T11:13:21.507",
+        "description": "Qualification 3",
+        "scoreRedFinal": 145,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 24,
+        "scoreBlueFinal": 67,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 22,
+        "teams": [
+          {
+            "teamNumber": 2262,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1740,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8567,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3634,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5491,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 97,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T11:17:00",
+        "autoStartTime": "2026-04-04T11:20:11.247",
+        "matchVideoLink": "https://www.youtube.com/watch?v=fZ4CsPF1-7Y",
+        "matchNumber": 4,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T11:20:11.247",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T11:23:56.757",
+        "description": "Qualification 4",
+        "scoreRedFinal": 327,
+        "scoreRedFoul": 15,
+        "scoreRedAuto": 67,
+        "scoreBlueFinal": 256,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 25,
+        "teams": [
+          {
+            "teamNumber": 4048,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8724,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2370,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 11483,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2079,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2168,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T11:26:00",
+        "autoStartTime": "2026-04-04T11:29:17.54",
+        "matchVideoLink": "https://www.youtube.com/watch?v=Xk_vhEkUAbE",
+        "matchNumber": 5,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T11:29:17.54",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T11:32:24.127",
+        "description": "Qualification 5",
+        "scoreRedFinal": 30,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 26,
+        "scoreBlueFinal": 129,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 21,
+        "teams": [
+          {
+            "teamNumber": 5494,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5347,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 10393,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1474,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 9644,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 348,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T11:35:00",
+        "autoStartTime": "2026-04-04T11:39:19.687",
+        "matchVideoLink": "https://www.youtube.com/watch?v=T2wHMX508JA",
+        "matchNumber": 6,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T11:39:19.687",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T11:42:27.397",
+        "description": "Qualification 6",
+        "scoreRedFinal": 387,
+        "scoreRedFoul": 15,
+        "scoreRedAuto": 35,
+        "scoreBlueFinal": 51,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 7,
+        "teams": [
+          {
+            "teamNumber": 3467,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1100,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8544,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 999,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 157,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1027,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T11:44:00",
+        "autoStartTime": "2026-04-04T11:49:52.833",
+        "matchVideoLink": "https://www.youtube.com/watch?v=tsGLnmrqBjs",
+        "matchNumber": 7,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T11:49:52.833",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T11:53:23.52",
+        "description": "Qualification 7",
+        "scoreRedFinal": 213,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 17,
+        "scoreBlueFinal": 546,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 101,
+        "teams": [
+          {
+            "teamNumber": 3205,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 6333,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1740,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5000,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 4628,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 190,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T11:53:00",
+        "autoStartTime": "2026-04-04T11:59:24.973",
+        "matchVideoLink": "https://www.youtube.com/watch?v=Aa6hoU9f6Wg",
+        "matchNumber": 8,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T11:59:24.973",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T12:02:36.64",
+        "description": "Qualification 8",
+        "scoreRedFinal": 80,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 24,
+        "scoreBlueFinal": 61,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 22,
+        "teams": [
+          {
+            "teamNumber": 97,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 6762,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8724,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 4048,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 716,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 7760,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T12:02:00",
+        "autoStartTime": "2026-04-04T12:11:10.177",
+        "matchVideoLink": "https://www.youtube.com/watch?v=9-wAmki6D5U",
+        "matchNumber": 9,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T12:11:10.177",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T12:14:16.86",
+        "description": "Qualification 9",
+        "scoreRedFinal": 93,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 35,
+        "scoreBlueFinal": 171,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 31,
+        "teams": [
+          {
+            "teamNumber": 2168,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 237,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8567,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 348,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 467,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5347,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T12:11:00",
+        "autoStartTime": "2026-04-04T12:18:56.16",
+        "matchVideoLink": "https://www.youtube.com/watch?v=Tpq1UJp0Ias",
+        "matchNumber": 10,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T12:18:56.16",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T12:21:59.02",
+        "description": "Qualification 10",
+        "scoreRedFinal": 149,
+        "scoreRedFoul": 15,
+        "scoreRedAuto": 32,
+        "scoreBlueFinal": 380,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 31,
+        "teams": [
+          {
+            "teamNumber": 5491,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5112,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 11483,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1768,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1027,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 10254,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T12:20:00",
+        "autoStartTime": "2026-04-04T12:28:17.463",
+        "matchVideoLink": "https://www.youtube.com/watch?v=ZA1eqqAfj_w",
+        "matchNumber": 11,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T12:28:17.463",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T12:31:40.357",
+        "description": "Qualification 11",
+        "scoreRedFinal": 30,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 13,
+        "scoreBlueFinal": 437,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 93,
+        "teams": [
+          {
+            "teamNumber": 2262,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3634,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 157,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2370,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3467,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 10393,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T12:29:00",
+        "autoStartTime": "2026-04-04T12:36:08.883",
+        "matchVideoLink": "https://www.youtube.com/watch?v=-HKKvbHQvMM",
+        "matchNumber": 12,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T12:36:08.883",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T12:39:34.727",
+        "description": "Qualification 12",
+        "scoreRedFinal": 215,
+        "scoreRedFoul": 5,
+        "scoreRedAuto": 44,
+        "scoreBlueFinal": 183,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 39,
+        "teams": [
+          {
+            "teamNumber": 5494,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 6333,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 9644,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5422,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8544,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1474,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T12:38:00",
+        "autoStartTime": "2026-04-04T12:44:14.217",
+        "matchVideoLink": "https://www.youtube.com/watch?v=9OjfV3y1mTU",
+        "matchNumber": 13,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T12:44:14.217",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T12:47:15.79",
+        "description": "Qualification 13",
+        "scoreRedFinal": 263,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 58,
+        "scoreBlueFinal": 194,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 44,
+        "teams": [
+          {
+            "teamNumber": 1100,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2079,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 999,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1757,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3205,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5000,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T12:47:00",
+        "autoStartTime": "2026-04-04T12:59:58.367",
+        "matchVideoLink": "https://www.youtube.com/watch?v=W-Qnhhdngbc",
+        "matchNumber": 14,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T12:59:58.367",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T13:02:59.383",
+        "description": "Qualification 14",
+        "scoreRedFinal": 247,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 53,
+        "scoreBlueFinal": 253,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 53,
+        "teams": [
+          {
+            "teamNumber": 4628,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 10254,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 716,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1768,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8567,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8724,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T12:56:00",
+        "autoStartTime": "2026-04-04T13:09:49.813",
+        "matchVideoLink": "https://www.youtube.com/watch?v=BC6YQhxSIFg",
+        "matchNumber": 15,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T13:09:49.813",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T13:12:50.463",
+        "description": "Qualification 15",
+        "scoreRedFinal": 84,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 36,
+        "scoreBlueFinal": 259,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 40,
+        "teams": [
+          {
+            "teamNumber": 1027,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 10393,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 237,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2168,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 190,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 157,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T13:05:00",
+        "autoStartTime": "2026-04-04T13:19:41.803",
+        "matchVideoLink": "https://www.youtube.com/watch?v=AHlKaYAXGlM",
+        "matchNumber": 16,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T13:19:41.803",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T13:22:47.13",
+        "description": "Qualification 16",
+        "scoreRedFinal": 127,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 16,
+        "scoreBlueFinal": 400,
+        "scoreBlueFoul": 5,
+        "scoreBlueAuto": 60,
+        "teams": [
+          {
+            "teamNumber": 9644,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 4048,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5491,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 348,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3467,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2262,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T14:00:00",
+        "autoStartTime": "2026-04-04T14:03:22.827",
+        "matchVideoLink": "https://www.youtube.com/watch?v=-5bP1B7szew",
+        "matchNumber": 17,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T14:03:22.827",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T14:07:02.793",
+        "description": "Qualification 17",
+        "scoreRedFinal": 354,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 76,
+        "scoreBlueFinal": 198,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 14,
+        "teams": [
+          {
+            "teamNumber": 5000,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 6333,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3634,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 999,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 7760,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5422,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T14:09:00",
+        "autoStartTime": "2026-04-04T14:12:31.073",
+        "matchVideoLink": "https://www.youtube.com/watch?v=qDI1VoiD-n4",
+        "matchNumber": 18,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T14:12:31.073",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T14:15:46.123",
+        "description": "Qualification 18",
+        "scoreRedFinal": 308,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 52,
+        "scoreBlueFinal": 247,
+        "scoreBlueFoul": 5,
+        "scoreBlueAuto": 41,
+        "teams": [
+          {
+            "teamNumber": 97,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2370,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3205,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8544,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1757,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 467,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T14:18:00",
+        "autoStartTime": "2026-04-04T14:21:05.3",
+        "matchVideoLink": "https://www.youtube.com/watch?v=txg7EeJI8x8",
+        "matchNumber": 19,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T14:21:05.3",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T14:24:12.08",
+        "description": "Qualification 19",
+        "scoreRedFinal": 227,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 38,
+        "scoreBlueFinal": 34,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 17,
+        "teams": [
+          {
+            "teamNumber": 2079,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5112,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 6762,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5494,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1474,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 11483,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T14:27:00",
+        "autoStartTime": "2026-04-04T14:29:16.947",
+        "matchVideoLink": "https://www.youtube.com/watch?v=hmtArFo6nuo",
+        "matchNumber": 20,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T14:29:16.947",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T14:32:26.113",
+        "description": "Qualification 20",
+        "scoreRedFinal": 252,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 17,
+        "scoreBlueFinal": 136,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 14,
+        "teams": [
+          {
+            "teamNumber": 1100,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5347,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 4048,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5491,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 348,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1740,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T14:36:00",
+        "autoStartTime": "2026-04-04T14:37:54.907",
+        "matchVideoLink": "https://www.youtube.com/watch?v=8pL8fNz0Ebo",
+        "matchNumber": 21,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T14:37:54.907",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T14:41:51.527",
+        "description": "Qualification 21",
+        "scoreRedFinal": 337,
+        "scoreRedFoul": 20,
+        "scoreRedAuto": 61,
+        "scoreBlueFinal": 252,
+        "scoreBlueFoul": 10,
+        "scoreBlueAuto": 69,
+        "teams": [
+          {
+            "teamNumber": 2168,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 999,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3467,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 10393,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 7760,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 190,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T14:45:00",
+        "autoStartTime": "2026-04-04T14:48:06.093",
+        "matchVideoLink": "https://www.youtube.com/watch?v=DySyVWoPIrA",
+        "matchNumber": 22,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T14:48:06.093",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T14:51:24.6",
+        "description": "Qualification 22",
+        "scoreRedFinal": 191,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 47,
+        "scoreBlueFinal": 248,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 66,
+        "teams": [
+          {
+            "teamNumber": 1027,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5000,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2262,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1757,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 157,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 10254,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T14:54:00",
+        "autoStartTime": "2026-04-04T15:00:38.053",
+        "matchVideoLink": "https://www.youtube.com/watch?v=M3RZIkTQE-k",
+        "matchNumber": 23,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T15:00:38.053",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T15:04:38.29",
+        "description": "Qualification 23",
+        "scoreRedFinal": 312,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 55,
+        "scoreBlueFinal": 257,
+        "scoreBlueFoul": 15,
+        "scoreBlueAuto": 40,
+        "teams": [
+          {
+            "teamNumber": 467,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8724,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3205,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3634,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5112,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5422,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T15:03:00",
+        "autoStartTime": "2026-04-04T15:13:40.51",
+        "matchVideoLink": "https://www.youtube.com/watch?v=TyGY1bEQLcE",
+        "matchNumber": 24,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T15:13:40.51",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T15:16:43.993",
+        "description": "Qualification 24",
+        "scoreRedFinal": 192,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 10,
+        "scoreBlueFinal": 117,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 21,
+        "teams": [
+          {
+            "teamNumber": 2079,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5347,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 4628,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 9644,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8544,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 6762,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T15:12:00",
+        "autoStartTime": "2026-04-04T15:21:55.56",
+        "matchVideoLink": "https://www.youtube.com/watch?v=L0TqbZmZ1Ek",
+        "matchNumber": 25,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T15:21:55.56",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T15:25:10.163",
+        "description": "Qualification 25",
+        "scoreRedFinal": 201,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 20,
+        "scoreBlueFinal": 79,
+        "scoreBlueFoul": 10,
+        "scoreBlueAuto": 11,
+        "teams": [
+          {
+            "teamNumber": 8567,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1100,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 11483,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 6333,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 716,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1474,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T15:21:00",
+        "autoStartTime": "2026-04-04T15:29:18.337",
+        "matchVideoLink": "https://www.youtube.com/watch?v=H1y6rXYw02c",
+        "matchNumber": 26,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T15:29:18.337",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T15:32:43.42",
+        "description": "Qualification 26",
+        "scoreRedFinal": 490,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 100,
+        "scoreBlueFinal": 136,
+        "scoreBlueFoul": 20,
+        "scoreBlueAuto": 18,
+        "teams": [
+          {
+            "teamNumber": 2370,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 237,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1768,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1740,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5494,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 97,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T15:30:00",
+        "autoStartTime": "2026-04-04T15:38:51.413",
+        "matchVideoLink": "https://www.youtube.com/watch?v=4yX-2z1UsEE",
+        "matchNumber": 27,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T15:38:51.413",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T15:43:57.563",
+        "description": "Qualification 27",
+        "scoreRedFinal": 522,
+        "scoreRedFoul": 5,
+        "scoreRedAuto": 117,
+        "scoreBlueFinal": 298,
+        "scoreBlueFoul": 5,
+        "scoreBlueAuto": 75,
+        "teams": [
+          {
+            "teamNumber": 3467,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 10254,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 7760,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 10393,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5000,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 4048,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T15:39:00",
+        "autoStartTime": "2026-04-04T15:48:15.913",
+        "matchVideoLink": "https://www.youtube.com/watch?v=rro3ICT6JF4",
+        "matchNumber": 28,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T15:48:15.913",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T15:51:26.997",
+        "description": "Qualification 28",
+        "scoreRedFinal": 109,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 36,
+        "scoreBlueFinal": 172,
+        "scoreBlueFoul": 20,
+        "scoreBlueAuto": 45,
+        "teams": [
+          {
+            "teamNumber": 2262,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 6762,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1757,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2168,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1027,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5112,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T15:48:00",
+        "autoStartTime": "2026-04-04T15:57:25.2",
+        "matchVideoLink": "https://www.youtube.com/watch?v=tCJFvngPTPc",
+        "matchNumber": 29,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T15:57:25.2",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T16:01:31.67",
+        "description": "Qualification 29",
+        "scoreRedFinal": 135,
+        "scoreRedFoul": 65,
+        "scoreRedAuto": 44,
+        "scoreBlueFinal": 70,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 25,
+        "teams": [
+          {
+            "teamNumber": 11483,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 467,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 999,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8544,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8724,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5347,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T15:57:00",
+        "autoStartTime": "2026-04-04T16:05:46.78",
+        "matchVideoLink": "https://www.youtube.com/watch?v=kVhsr0aWKVg",
+        "matchNumber": 30,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T16:05:46.78",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T16:09:00.593",
+        "description": "Qualification 30",
+        "scoreRedFinal": 242,
+        "scoreRedFoul": 15,
+        "scoreRedAuto": 50,
+        "scoreBlueFinal": 147,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 9,
+        "teams": [
+          {
+            "teamNumber": 1474,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1768,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3634,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 237,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5491,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5422,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T16:06:00",
+        "autoStartTime": "2026-04-04T16:14:55.73",
+        "matchVideoLink": "https://www.youtube.com/watch?v=WzS_x2VrccY",
+        "matchNumber": 31,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T16:14:55.73",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T16:18:10.477",
+        "description": "Qualification 31",
+        "scoreRedFinal": 52,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 37,
+        "scoreBlueFinal": 120,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 25,
+        "teams": [
+          {
+            "teamNumber": 6333,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 97,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 157,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 348,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3205,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8567,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T16:15:00",
+        "autoStartTime": "2026-04-04T16:24:43.557",
+        "matchVideoLink": "https://www.youtube.com/watch?v=x26KPSF8eQY",
+        "matchNumber": 32,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T16:24:43.557",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T16:27:44.437",
+        "description": "Qualification 32",
+        "scoreRedFinal": 433,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 89,
+        "scoreBlueFinal": 210,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 37,
+        "teams": [
+          {
+            "teamNumber": 190,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1740,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2079,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 716,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1100,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 9644,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T16:24:00",
+        "autoStartTime": "2026-04-04T16:33:39.393",
+        "matchVideoLink": "https://www.youtube.com/watch?v=aLByjXlXiqs",
+        "matchNumber": 33,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T16:33:39.393",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T16:37:27.453",
+        "description": "Qualification 33",
+        "scoreRedFinal": 272,
+        "scoreRedFoul": 45,
+        "scoreRedAuto": 47,
+        "scoreBlueFinal": 123,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 16,
+        "teams": [
+          {
+            "teamNumber": 2370,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 4628,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8544,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5494,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 4048,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5112,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T16:33:00",
+        "autoStartTime": "2026-04-04T16:41:51.373",
+        "matchVideoLink": "https://www.youtube.com/watch?v=9mh5-K-sB04",
+        "matchNumber": 34,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T16:41:51.373",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T16:44:51.527",
+        "description": "Qualification 34",
+        "scoreRedFinal": 266,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 55,
+        "scoreBlueFinal": 84,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 16,
+        "teams": [
+          {
+            "teamNumber": 10254,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5491,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1474,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 10393,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 999,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 6762,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T16:42:00",
+        "autoStartTime": "2026-04-04T16:51:50.54",
+        "matchVideoLink": "https://www.youtube.com/watch?v=1wQaMbxAmcw",
+        "matchNumber": 35,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T16:51:50.54",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T16:54:51.153",
+        "description": "Qualification 35",
+        "scoreRedFinal": 140,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 24,
+        "scoreBlueFinal": 65,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 9,
+        "teams": [
+          {
+            "teamNumber": 3205,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1768,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5347,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 157,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8567,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5000,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T16:51:00",
+        "autoStartTime": "2026-04-04T17:01:04.37",
+        "matchVideoLink": "https://www.youtube.com/watch?v=ZmILUD9Fods",
+        "matchNumber": 36,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T17:01:04.37",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T17:04:08.52",
+        "description": "Qualification 36",
+        "scoreRedFinal": 113,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 48,
+        "scoreBlueFinal": 548,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 110,
+        "teams": [
+          {
+            "teamNumber": 716,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8724,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1757,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3467,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5422,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 6333,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T17:00:00",
+        "autoStartTime": "2026-04-04T17:09:36.253",
+        "matchVideoLink": "https://www.youtube.com/watch?v=dbJheisbVLU",
+        "matchNumber": 37,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T17:09:36.253",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T17:13:12.153",
+        "description": "Qualification 37",
+        "scoreRedFinal": 289,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 37,
+        "scoreBlueFinal": 122,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 18,
+        "teams": [
+          {
+            "teamNumber": 348,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2079,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 237,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1027,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1740,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 4628,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T17:09:00",
+        "autoStartTime": "2026-04-04T17:19:47.81",
+        "matchVideoLink": "https://www.youtube.com/watch?v=BRlFvqNUqI0",
+        "matchNumber": 38,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T17:19:47.81",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T17:24:36.787",
+        "description": "Qualification 38",
+        "scoreRedFinal": 253,
+        "scoreRedFoul": 75,
+        "scoreRedAuto": 72,
+        "scoreBlueFinal": 173,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 49,
+        "teams": [
+          {
+            "teamNumber": 190,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5494,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1100,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 467,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2262,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2370,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T17:18:00",
+        "autoStartTime": "2026-04-04T17:29:56.913",
+        "matchVideoLink": "https://www.youtube.com/watch?v=TAkCVIL8y9o",
+        "matchNumber": 39,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T17:29:56.913",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T17:33:00.723",
+        "description": "Qualification 39",
+        "scoreRedFinal": 57,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 26,
+        "scoreBlueFinal": 77,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 37,
+        "teams": [
+          {
+            "teamNumber": 7760,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 97,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2168,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 11483,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 9644,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3634,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T17:27:00",
+        "autoStartTime": "2026-04-04T17:38:26.933",
+        "matchVideoLink": "https://www.youtube.com/watch?v=1OXCPACMK0I",
+        "matchNumber": 40,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T17:38:26.933",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T17:41:30.75",
+        "description": "Qualification 40",
+        "scoreRedFinal": 114,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 10,
+        "scoreBlueFinal": 124,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 26,
+        "teams": [
+          {
+            "teamNumber": 5347,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1474,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1757,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8724,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 10393,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5491,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T17:36:00",
+        "autoStartTime": "2026-04-04T17:46:43.437",
+        "matchVideoLink": "https://www.youtube.com/watch?v=jYO48BvmCKQ",
+        "matchNumber": 41,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T17:46:43.437",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T17:50:00.727",
+        "description": "Qualification 41",
+        "scoreRedFinal": 439,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 60,
+        "scoreBlueFinal": 50,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 13,
+        "teams": [
+          {
+            "teamNumber": 5000,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 999,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1740,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 6762,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8567,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 4628,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T17:45:00",
+        "autoStartTime": "2026-04-04T17:57:33.44",
+        "matchVideoLink": "https://www.youtube.com/watch?v=0Yxt4gvIuMc",
+        "matchNumber": 42,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T17:57:33.44",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T18:00:40.567",
+        "description": "Qualification 42",
+        "scoreRedFinal": 71,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 25,
+        "scoreBlueFinal": 251,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 27,
+        "teams": [
+          {
+            "teamNumber": 1027,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 4048,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 348,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 157,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 716,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2370,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T17:54:00",
+        "autoStartTime": "2026-04-04T18:05:32.033",
+        "matchVideoLink": "https://www.youtube.com/watch?v=XdWGQWsLmOY",
+        "matchNumber": 43,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T18:05:32.033",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T18:08:37.227",
+        "description": "Qualification 43",
+        "scoreRedFinal": 407,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 79,
+        "scoreBlueFinal": 135,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 33,
+        "teams": [
+          {
+            "teamNumber": 190,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2262,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5112,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 7760,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8544,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 6333,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T18:03:00",
+        "autoStartTime": "2026-04-04T18:13:32.597",
+        "matchVideoLink": "https://www.youtube.com/watch?v=tgB3y48OxX4",
+        "matchNumber": 44,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T18:13:32.597",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T18:17:20.04",
+        "description": "Qualification 44",
+        "scoreRedFinal": 127,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 41,
+        "scoreBlueFinal": 284,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 82,
+        "teams": [
+          {
+            "teamNumber": 5422,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 11483,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 97,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1100,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2168,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 10254,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T18:12:00",
+        "autoStartTime": "2026-04-04T18:22:50.283",
+        "matchVideoLink": "https://www.youtube.com/watch?v=ltan7b4T2-4",
+        "matchNumber": 45,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T18:22:50.283",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T18:27:28.257",
+        "description": "Qualification 45",
+        "scoreRedFinal": 420,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 76,
+        "scoreBlueFinal": 415,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 47,
+        "teams": [
+          {
+            "teamNumber": 467,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3467,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3634,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2079,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5494,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1768,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T18:21:00",
+        "autoStartTime": "2026-04-04T18:31:17.213",
+        "matchVideoLink": "https://www.youtube.com/watch?v=h9haz_Gwzh4",
+        "matchNumber": 46,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T18:31:17.213",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T18:34:23.86",
+        "description": "Qualification 46",
+        "scoreRedFinal": 169,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 32,
+        "scoreBlueFinal": 191,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 14,
+        "teams": [
+          {
+            "teamNumber": 9644,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 237,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5347,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3205,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 4048,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 999,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T18:30:00",
+        "autoStartTime": "2026-04-04T18:39:18.347",
+        "matchVideoLink": "https://www.youtube.com/watch?v=ijRuojGdipY",
+        "matchNumber": 47,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T18:39:18.347",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T18:42:42.85",
+        "description": "Qualification 47",
+        "scoreRedFinal": 203,
+        "scoreRedFoul": 5,
+        "scoreRedAuto": 67,
+        "scoreBlueFinal": 59,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 8,
+        "teams": [
+          {
+            "teamNumber": 6333,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1757,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1027,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1474,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2262,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 4628,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T18:39:00",
+        "autoStartTime": "2026-04-04T18:47:36.78",
+        "matchVideoLink": "https://www.youtube.com/watch?v=gN2c_gmSizg",
+        "matchNumber": 48,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T18:47:36.78",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T18:50:50.98",
+        "description": "Qualification 48",
+        "scoreRedFinal": 345,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 62,
+        "scoreBlueFinal": 98,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 19,
+        "teams": [
+          {
+            "teamNumber": 1740,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 10254,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2370,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 716,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2168,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8544,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T18:48:00",
+        "autoStartTime": "2026-04-04T18:57:02.097",
+        "matchVideoLink": "https://www.youtube.com/watch?v=aw-MaYAGVUk",
+        "matchNumber": 49,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T18:57:02.097",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T19:00:15.173",
+        "description": "Qualification 49",
+        "scoreRedFinal": 109,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 39,
+        "scoreBlueFinal": 145,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 48,
+        "teams": [
+          {
+            "teamNumber": 157,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 7760,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5491,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8567,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5494,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 467,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T18:57:00",
+        "autoStartTime": "2026-04-04T19:05:15.793",
+        "matchVideoLink": "https://www.youtube.com/watch?v=3Uasf1MI-2M",
+        "matchNumber": 50,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T19:05:15.793",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T19:08:41.503",
+        "description": "Qualification 50",
+        "scoreRedFinal": 150,
+        "scoreRedFoul": 15,
+        "scoreRedAuto": 20,
+        "scoreBlueFinal": 311,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 43,
+        "teams": [
+          {
+            "teamNumber": 6762,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3634,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3205,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1100,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1768,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 10393,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T19:06:00",
+        "autoStartTime": "2026-04-04T19:14:03.437",
+        "matchVideoLink": "https://www.youtube.com/watch?v=veMCbL6bO0M",
+        "matchNumber": 51,
+        "isReplay": false,
+        "actualStartTime": "2026-04-04T19:14:03.437",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-04T19:17:14.23",
+        "description": "Qualification 51",
+        "scoreRedFinal": 371,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 91,
+        "scoreBlueFinal": 300,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 37,
+        "teams": [
+          {
+            "teamNumber": 5422,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 348,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5000,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8724,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 11483,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 190,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T08:50:00",
+        "autoStartTime": "2026-04-05T08:40:05.07",
+        "matchVideoLink": "https://www.youtube.com/watch?v=utbFWDQ72TM",
+        "matchNumber": 52,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T08:40:05.07",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-05T08:51:20.693",
+        "description": "Qualification 52",
+        "scoreRedFinal": 225,
+        "scoreRedFoul": 5,
+        "scoreRedAuto": 37,
+        "scoreBlueFinal": 622,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 132,
+        "teams": [
+          {
+            "teamNumber": 5112,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 97,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 237,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3467,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 9644,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2079,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T08:59:00",
+        "autoStartTime": "2026-04-05T08:57:40.9",
+        "matchVideoLink": "https://www.youtube.com/watch?v=Y-eigv-pK9o",
+        "matchNumber": 53,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T08:57:40.9",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-05T09:01:23.62",
+        "description": "Qualification 53",
+        "scoreRedFinal": 77,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 21,
+        "scoreBlueFinal": 88,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 14,
+        "teams": [
+          {
+            "teamNumber": 5491,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 467,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2168,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 4628,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 6333,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 999,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T09:08:00",
+        "autoStartTime": "2026-04-05T09:05:55.46",
+        "matchVideoLink": "https://www.youtube.com/watch?v=telbf-WNKVs",
+        "matchNumber": 54,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T09:05:55.46",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-05T09:09:06.173",
+        "description": "Qualification 54",
+        "scoreRedFinal": 206,
+        "scoreRedFoul": 20,
+        "scoreRedAuto": 15,
+        "scoreBlueFinal": 50,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 11,
+        "teams": [
+          {
+            "teamNumber": 1740,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3634,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8544,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 6762,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1474,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1027,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T09:17:00",
+        "autoStartTime": "2026-04-05T09:13:40.893",
+        "matchVideoLink": "https://www.youtube.com/watch?v=DI9vyMTDu7U",
+        "matchNumber": 55,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T09:13:40.893",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-05T09:16:50.293",
+        "description": "Qualification 55",
+        "scoreRedFinal": 99,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 14,
+        "scoreBlueFinal": 411,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 74,
+        "teams": [
+          {
+            "teamNumber": 1757,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 348,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5494,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1768,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 190,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 4048,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T09:26:00",
+        "autoStartTime": "2026-04-05T13:28:33.81",
+        "matchVideoLink": null,
+        "matchNumber": 56,
+        "isReplay": true,
+        "actualStartTime": "2026-04-05T13:28:33.81",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-05T13:31:35.017",
+        "description": "Qualification 56",
+        "scoreRedFinal": 427,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 86,
+        "scoreBlueFinal": 157,
+        "scoreBlueFoul": 5,
+        "scoreBlueAuto": 13,
+        "teams": [
+          {
+            "teamNumber": 716,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 11483,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3467,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 237,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3205,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 157,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T09:35:00",
+        "autoStartTime": "2026-04-05T10:06:50.427",
+        "matchVideoLink": "https://www.youtube.com/watch?v=oDug-J12FaM",
+        "matchNumber": 57,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T10:06:50.427",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-05T10:11:02.337",
+        "description": "Qualification 57",
+        "scoreRedFinal": 392,
+        "scoreRedFoul": 45,
+        "scoreRedAuto": 110,
+        "scoreBlueFinal": 50,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 16,
+        "teams": [
+          {
+            "teamNumber": 2079,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5000,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8724,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 97,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 10393,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2262,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T09:44:00",
+        "autoStartTime": "2026-04-05T10:14:22.923",
+        "matchVideoLink": "https://www.youtube.com/watch?v=HecSG_Qco3Q",
+        "matchNumber": 58,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T10:14:22.923",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-05T10:17:25.54",
+        "description": "Qualification 58",
+        "scoreRedFinal": 183,
+        "scoreRedFoul": 15,
+        "scoreRedAuto": 28,
+        "scoreBlueFinal": 486,
+        "scoreBlueFoul": 5,
+        "scoreBlueAuto": 49,
+        "teams": [
+          {
+            "teamNumber": 8567,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 7760,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 9644,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2370,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5422,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1100,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T09:53:00",
+        "autoStartTime": "2026-04-05T10:21:48.207",
+        "matchVideoLink": "https://www.youtube.com/watch?v=01GBrHO69qw",
+        "matchNumber": 59,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T10:21:48.207",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-05T10:24:57.243",
+        "description": "Qualification 59",
+        "scoreRedFinal": 137,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 42,
+        "scoreBlueFinal": 281,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 58,
+        "teams": [
+          {
+            "teamNumber": 5112,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5347,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 6333,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 10254,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3634,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 348,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T10:02:00",
+        "autoStartTime": "2026-04-05T10:29:23.747",
+        "matchVideoLink": "https://www.youtube.com/watch?v=txjXD2QiHlY",
+        "matchNumber": 60,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T10:29:23.747",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-05T10:32:26.533",
+        "description": "Qualification 60",
+        "scoreRedFinal": 165,
+        "scoreRedFoul": 5,
+        "scoreRedAuto": 18,
+        "scoreBlueFinal": 669,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 148,
+        "teams": [
+          {
+            "teamNumber": 1474,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3205,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2168,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 4628,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1768,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3467,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T10:11:00",
+        "autoStartTime": "2026-04-05T10:37:30.25",
+        "matchVideoLink": "https://www.youtube.com/watch?v=TcohSWbQAic",
+        "matchNumber": 61,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T10:37:30.25",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-05T10:40:35.733",
+        "description": "Qualification 61",
+        "scoreRedFinal": 245,
+        "scoreRedFoul": 15,
+        "scoreRedAuto": 44,
+        "scoreBlueFinal": 130,
+        "scoreBlueFoul": 5,
+        "scoreBlueAuto": 27,
+        "teams": [
+          {
+            "teamNumber": 8544,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2262,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2079,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 999,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 237,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 716,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T10:20:00",
+        "autoStartTime": "2026-04-05T10:45:02.667",
+        "matchVideoLink": "https://www.youtube.com/watch?v=W2V8OYSSwiQ",
+        "matchNumber": 62,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T10:45:02.667",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-05T10:48:10.037",
+        "description": "Qualification 62",
+        "scoreRedFinal": 446,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 92,
+        "scoreBlueFinal": 274,
+        "scoreBlueFoul": 15,
+        "scoreBlueAuto": 63,
+        "teams": [
+          {
+            "teamNumber": 7760,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2370,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5000,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1757,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5491,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1100,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T10:29:00",
+        "autoStartTime": "2026-04-05T10:53:10.08",
+        "matchVideoLink": "https://www.youtube.com/watch?v=3HyeV9H11Bw",
+        "matchNumber": 63,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T10:53:10.08",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-05T10:56:13.037",
+        "description": "Qualification 63",
+        "scoreRedFinal": 99,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 17,
+        "scoreBlueFinal": 340,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 54,
+        "teams": [
+          {
+            "teamNumber": 157,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 6762,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5494,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8724,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5112,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 9644,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T10:38:00",
+        "autoStartTime": "2026-04-05T11:02:03.957",
+        "matchVideoLink": "https://www.youtube.com/watch?v=eu31k7teEKI",
+        "matchNumber": 64,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T11:02:03.957",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-05T11:05:19.47",
+        "description": "Qualification 64",
+        "scoreRedFinal": 480,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 77,
+        "scoreBlueFinal": 154,
+        "scoreBlueFoul": 5,
+        "scoreBlueAuto": 6,
+        "teams": [
+          {
+            "teamNumber": 5422,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 190,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1027,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5347,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 97,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8567,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T10:47:00",
+        "autoStartTime": "2026-04-05T11:10:34.74",
+        "matchVideoLink": "https://www.youtube.com/watch?v=Hpw-7-UZkuE",
+        "matchNumber": 65,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T11:10:34.74",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-05T11:13:39.587",
+        "description": "Qualification 65",
+        "scoreRedFinal": 265,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 47,
+        "scoreBlueFinal": 190,
+        "scoreBlueFoul": 5,
+        "scoreBlueAuto": 32,
+        "teams": [
+          {
+            "teamNumber": 10254,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 11483,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 10393,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 4048,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1740,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 467,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T10:56:00",
+        "autoStartTime": "2026-04-05T11:18:39.093",
+        "matchVideoLink": "https://www.youtube.com/watch?v=81c7oX2qsOU",
+        "matchNumber": 66,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T11:18:39.093",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-05T11:23:16.37",
+        "description": "Qualification 66",
+        "scoreRedFinal": 315,
+        "scoreRedFoul": 5,
+        "scoreRedAuto": 66,
+        "scoreBlueFinal": 119,
+        "scoreBlueFoul": 5,
+        "scoreBlueAuto": 43,
+        "teams": [
+          {
+            "teamNumber": 5000,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8544,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5491,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3634,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2168,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1757,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T11:05:00",
+        "autoStartTime": "2026-04-05T11:26:55.57",
+        "matchVideoLink": "https://www.youtube.com/watch?v=W_0cKbts-y8",
+        "matchNumber": 67,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T11:26:55.57",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-05T11:30:12.587",
+        "description": "Qualification 67",
+        "scoreRedFinal": 319,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 76,
+        "scoreBlueFinal": 145,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 26,
+        "teams": [
+          {
+            "teamNumber": 5112,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 348,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1768,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 999,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 9644,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2262,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T11:14:00",
+        "autoStartTime": "2026-04-05T11:36:11.563",
+        "matchVideoLink": "https://www.youtube.com/watch?v=7feteTkDFa0",
+        "matchNumber": 68,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T11:36:11.563",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-05T11:40:10.707",
+        "description": "Qualification 68",
+        "scoreRedFinal": 189,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 36,
+        "scoreBlueFinal": 513,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 88,
+        "teams": [
+          {
+            "teamNumber": 6762,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1100,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 6333,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 237,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3467,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8724,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T11:23:00",
+        "autoStartTime": "2026-04-05T11:45:18.28",
+        "matchVideoLink": "https://www.youtube.com/watch?v=hKAwZtX-uME",
+        "matchNumber": 69,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T11:45:18.28",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-05T11:48:24.5",
+        "description": "Qualification 69",
+        "scoreRedFinal": 110,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 28,
+        "scoreBlueFinal": 274,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 47,
+        "teams": [
+          {
+            "teamNumber": 10393,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 4628,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5422,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5347,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2370,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 11483,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T11:32:00",
+        "autoStartTime": "2026-04-05T11:53:55.363",
+        "matchVideoLink": "https://www.youtube.com/watch?v=9PVxfe2dC1g",
+        "matchNumber": 70,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T11:53:55.363",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-05T11:57:13.757",
+        "description": "Qualification 70",
+        "scoreRedFinal": 139,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 45,
+        "scoreBlueFinal": 275,
+        "scoreBlueFoul": 5,
+        "scoreBlueAuto": 68,
+        "teams": [
+          {
+            "teamNumber": 467,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 157,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1474,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 190,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 716,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 97,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T11:41:00",
+        "autoStartTime": "2026-04-05T12:01:49.077",
+        "matchVideoLink": "https://www.youtube.com/watch?v=DbXZ6rMON4o",
+        "matchNumber": 71,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T12:01:49.077",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-05T12:05:22.283",
+        "description": "Qualification 71",
+        "scoreRedFinal": 46,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 23,
+        "scoreBlueFinal": 332,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 52,
+        "teams": [
+          {
+            "teamNumber": 7760,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1027,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5494,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3205,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 10254,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2079,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T11:50:00",
+        "autoStartTime": "2026-04-05T12:09:38.163",
+        "matchVideoLink": "https://www.youtube.com/watch?v=kPPwrnHvaqA",
+        "matchNumber": 72,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T12:09:38.163",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-05T12:12:42.047",
+        "description": "Qualification 72",
+        "scoreRedFinal": 378,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 80,
+        "scoreBlueFinal": 252,
+        "scoreBlueFoul": 20,
+        "scoreBlueAuto": 38,
+        "teams": [
+          {
+            "teamNumber": 4048,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8567,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3467,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1740,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1757,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5112,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T11:59:00",
+        "autoStartTime": "2026-04-05T12:17:31.017",
+        "matchVideoLink": "https://www.youtube.com/watch?v=_kc-OArCDI0",
+        "matchNumber": 73,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T12:17:31.017",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-05T12:20:35.163",
+        "description": "Qualification 73",
+        "scoreRedFinal": 117,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 11,
+        "scoreBlueFinal": 119,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 15,
+        "teams": [
+          {
+            "teamNumber": 8544,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 999,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1768,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 6333,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2370,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 348,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T12:08:00",
+        "autoStartTime": "2026-04-05T12:26:12.043",
+        "matchVideoLink": "https://www.youtube.com/watch?v=I9Qx13fYReQ",
+        "matchNumber": 74,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T12:26:12.043",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-05T12:29:12.587",
+        "description": "Qualification 74",
+        "scoreRedFinal": 194,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 52,
+        "scoreBlueFinal": 279,
+        "scoreBlueFoul": 5,
+        "scoreBlueAuto": 55,
+        "teams": [
+          {
+            "teamNumber": 9644,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 10393,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 467,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 11483,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5000,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 237,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T12:17:00",
+        "autoStartTime": "2026-04-05T12:34:00.927",
+        "matchVideoLink": "https://www.youtube.com/watch?v=lhyVN7gZBiA",
+        "matchNumber": 75,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T12:34:00.927",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-05T12:37:00.107",
+        "description": "Qualification 75",
+        "scoreRedFinal": 45,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 16,
+        "scoreBlueFinal": 165,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 14,
+        "teams": [
+          {
+            "teamNumber": 4628,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2168,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5494,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 97,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1027,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1100,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T12:26:00",
+        "autoStartTime": "2026-04-05T12:45:00.513",
+        "matchVideoLink": "https://www.youtube.com/watch?v=M9QABKiVVM0",
+        "matchNumber": 76,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T12:45:00.513",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-05T12:49:29.277",
+        "description": "Qualification 76",
+        "scoreRedFinal": 410,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 69,
+        "scoreBlueFinal": 227,
+        "scoreBlueFoul": 15,
+        "scoreBlueAuto": 52,
+        "teams": [
+          {
+            "teamNumber": 8567,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 190,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 10254,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3634,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2079,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 4048,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T12:35:00",
+        "autoStartTime": "2026-04-05T12:54:14.033",
+        "matchVideoLink": "https://www.youtube.com/watch?v=MEzlj4Gk0Y4",
+        "matchNumber": 77,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T12:54:14.033",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-05T12:57:12.97",
+        "description": "Qualification 77",
+        "scoreRedFinal": 33,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 5,
+        "scoreBlueFinal": 264,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 20,
+        "teams": [
+          {
+            "teamNumber": 5491,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 6762,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 716,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2262,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5422,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3205,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T12:44:00",
+        "autoStartTime": "2026-04-05T13:07:50.91",
+        "matchVideoLink": "https://www.youtube.com/watch?v=usX5PCwuND4",
+        "matchNumber": 78,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T13:07:50.91",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-05T13:11:28.397",
+        "description": "Qualification 78",
+        "scoreRedFinal": 204,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 30,
+        "scoreBlueFinal": 276,
+        "scoreBlueFoul": 30,
+        "scoreBlueAuto": 28,
+        "teams": [
+          {
+            "teamNumber": 8724,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1474,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 7760,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5347,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 157,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1740,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      }
+    ]
+  }
+}

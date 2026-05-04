@@ -1,0 +1,419 @@
+{
+  "Schedule": {
+    "schedule": [
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T08:30:00",
+        "autoStartTime": null,
+        "matchVideoLink": null,
+        "matchNumber": 1,
+        "isReplay": null,
+        "actualStartTime": null,
+        "tournamentLevel": "Practice",
+        "postResultTime": null,
+        "description": "Practice 1",
+        "scoreRedFinal": null,
+        "scoreRedFoul": null,
+        "scoreRedAuto": null,
+        "scoreBlueFinal": null,
+        "scoreBlueFoul": null,
+        "scoreBlueAuto": null,
+        "teams": [
+          {
+            "teamNumber": 5347,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 4048,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 190,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3467,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8544,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8567,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T08:40:00",
+        "autoStartTime": null,
+        "matchVideoLink": null,
+        "matchNumber": 2,
+        "isReplay": null,
+        "actualStartTime": null,
+        "tournamentLevel": "Practice",
+        "postResultTime": null,
+        "description": "Practice 2",
+        "scoreRedFinal": null,
+        "scoreRedFoul": null,
+        "scoreRedAuto": null,
+        "scoreBlueFinal": null,
+        "scoreBlueFoul": null,
+        "scoreBlueAuto": null,
+        "teams": [
+          {
+            "teamNumber": 5422,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 9644,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3634,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 6333,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 999,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 10254,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T08:50:00",
+        "autoStartTime": null,
+        "matchVideoLink": null,
+        "matchNumber": 3,
+        "isReplay": null,
+        "actualStartTime": null,
+        "tournamentLevel": "Practice",
+        "postResultTime": null,
+        "description": "Practice 3",
+        "scoreRedFinal": null,
+        "scoreRedFoul": null,
+        "scoreRedAuto": null,
+        "scoreBlueFinal": null,
+        "scoreBlueFoul": null,
+        "scoreBlueAuto": null,
+        "teams": [
+          {
+            "teamNumber": 10254,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 237,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8724,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2370,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3467,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1740,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T09:00:00",
+        "autoStartTime": null,
+        "matchVideoLink": null,
+        "matchNumber": 4,
+        "isReplay": null,
+        "actualStartTime": null,
+        "tournamentLevel": "Practice",
+        "postResultTime": null,
+        "description": "Practice 4",
+        "scoreRedFinal": null,
+        "scoreRedFoul": null,
+        "scoreRedAuto": null,
+        "scoreBlueFinal": null,
+        "scoreBlueFoul": null,
+        "scoreBlueAuto": null,
+        "teams": [
+          {
+            "teamNumber": 348,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2168,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 190,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5000,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 7760,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5494,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T09:10:00",
+        "autoStartTime": null,
+        "matchVideoLink": null,
+        "matchNumber": 5,
+        "isReplay": null,
+        "actualStartTime": null,
+        "tournamentLevel": "Practice",
+        "postResultTime": null,
+        "description": "Practice 5",
+        "scoreRedFinal": null,
+        "scoreRedFoul": null,
+        "scoreRedAuto": null,
+        "scoreBlueFinal": null,
+        "scoreBlueFoul": null,
+        "scoreBlueAuto": null,
+        "teams": [
+          {
+            "teamNumber": 348,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1768,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5112,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3205,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3467,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2262,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T09:20:00",
+        "autoStartTime": null,
+        "matchVideoLink": null,
+        "matchNumber": 6,
+        "isReplay": null,
+        "actualStartTime": null,
+        "tournamentLevel": "Practice",
+        "postResultTime": null,
+        "description": "Practice 6",
+        "scoreRedFinal": null,
+        "scoreRedFoul": null,
+        "scoreRedAuto": null,
+        "scoreBlueFinal": null,
+        "scoreBlueFoul": null,
+        "scoreBlueAuto": null,
+        "teams": [
+          {
+            "teamNumber": 716,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5491,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1100,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 4628,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 157,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1757,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-04T09:30:00",
+        "autoStartTime": null,
+        "matchVideoLink": null,
+        "matchNumber": 7,
+        "isReplay": null,
+        "actualStartTime": null,
+        "tournamentLevel": "Practice",
+        "postResultTime": null,
+        "description": "Practice 7",
+        "scoreRedFinal": null,
+        "scoreRedFoul": null,
+        "scoreRedAuto": null,
+        "scoreBlueFinal": null,
+        "scoreBlueFoul": null,
+        "scoreBlueAuto": null,
+        "teams": [
+          {
+            "teamNumber": 190,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8724,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 716,
+            "station": "Red3",
+            "surrogate": true,
+            "dq": false
+          },
+          {
+            "teamNumber": 467,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 10254,
+            "station": "Blue2",
+            "surrogate": true,
+            "dq": false
+          },
+          {
+            "teamNumber": 2370,
+            "station": "Blue3",
+            "surrogate": true,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      }
+    ]
+  }
+}

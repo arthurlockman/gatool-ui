@@ -77,6 +77,28 @@ Configure `gatool-api` according to the local development instructions in that r
 
 Start the app using the directions above
 
+### Tests
+
+```bash
+npm test            # vitest watch mode
+npm run test:ci     # one-shot run with coverage
+```
+
+Most tests live next to the source they exercise (`src/utils/*.test.js`, `src/hooks/*.test.js`).
+
+#### API fixtures
+
+Hook tests use [MSW](https://mswjs.io/) to mock `api.gatool.org`. Mock responses come from JSON files committed under `src/test/fixtures/`, captured directly from prod with `scripts/capture-fixtures.sh`. The default capture targets are `2026 / MAWOR / team 190`; override with env vars:
+
+```bash
+./scripts/capture-fixtures.sh                         # 2026 / MAWOR / team 190
+YEAR=2025 EVENT=NYTR TEAM=254 ./scripts/capture-fixtures.sh
+```
+
+Re-run the script when you suspect an upstream contract change or when adding a hook test that needs an endpoint not yet captured. After capture, review `git diff -- src/test/fixtures/` — unintended diffs in committed fixtures usually indicate the upstream API changed shape.
+
+Read endpoints on `api.gatool.org` are open, so capture works without auth.
+
 ### Deploying
 
 GATool has two main active deployments: [beta](https://beta.gatool.org) and [production](https://gatool.org). Both are hosted on Azure web services and deployed automatically from GitHub.

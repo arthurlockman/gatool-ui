@@ -87,7 +87,7 @@ export function useCommunityUpdates({
                     selectedEvent?.value?.tbaEventKey ?? null
                   );
                   var request = await httpClient.getNoAuth(
-                    `/team/${effectiveTeamNumber}/updates`,
+                    `team/${effectiveTeamNumber}/updates`,
                     ftcMode ? ftcBaseURL : undefined
                   );
                   var teamDetails = { teamNumber: team?.teamNumber };
@@ -190,7 +190,7 @@ export function useCommunityUpdates({
                   [...demoTeamNumbers].map(async (teamNumber) => {
                     const effectiveTeamNumber = await getEffectiveTeamNumber(teamNumber, eventCode, tbaKey);
                     const request = await httpClient.getNoAuth(
-                      `/team/${effectiveTeamNumber}/updates`,
+                      `team/${effectiveTeamNumber}/updates`,
                       ftcMode ? ftcBaseURL : undefined
                     );
                     const teamDetails = { teamNumber };
@@ -251,7 +251,7 @@ export function useCommunityUpdates({
               //get updates for these teams
               var EIUpdates = EITeams.map(async (EITeam) => {
                 var request = await httpClient.getNoAuth(
-                  `/team/${EITeam?.teamNumber}/updates`,
+                  `team/${EITeam?.teamNumber}/updates`,
                   ftcMode ? ftcBaseURL : undefined
                 );
                 var teamDetails = { teamNumber: EITeam?.teamNumber };

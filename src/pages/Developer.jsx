@@ -289,7 +289,7 @@ function Developer({
   return (
     <>
       <br />
-      {user["https://gatool.org/roles"].indexOf("admin") >= 0 ? (
+      {user?.["https://gatool.org/roles"]?.indexOf("admin") >= 0 ? (
         <Tabs defaultActiveKey="tools" id="dev-tools-tabs" className="mb-3">
           <Tab eventKey="tools" title="Dev Tools">
             <Container>
