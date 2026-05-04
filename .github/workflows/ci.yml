@@ -45,6 +45,51 @@ jobs:
       env:
         CI: true
 
+    - name: Save head coverage summary
+      if: github.event_name == 'pull_request'
+      run: |
+        mkdir -p /tmp/coverage-head
+        cp coverage/coverage-summary.json /tmp/coverage-head/coverage-summary.json
+
+    - name: Check out base branch for coverage comparison
+      if: github.event_name == 'pull_request'
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.base_ref }}
+        path: base-ref
+        fetch-depth: 1
+
+    - name: Install base dependencies
+      if: github.event_name == 'pull_request'
+      working-directory: base-ref
+      run: npm ci
+      continue-on-error: true
+
+    - name: Run base tests with coverage
+      if: github.event_name == 'pull_request'
+      working-directory: base-ref
+      run: npm run test:ci
+      env:
+        CI: true
+      continue-on-error: true
+
+    - name: Compare coverage against base
+      if: github.event_name == 'pull_request'
+      run: |
+        BASE_SUMMARY=base-ref/coverage/coverage-summary.json
+        if [ ! -f "$BASE_SUMMARY" ]; then
+          echo "Base coverage summary missing; skipping regression check (likely no coverage on base yet)."
+          exit 0
+        fi
+        node scripts/check-coverage-not-decreased.mjs "$BASE_SUMMARY" /tmp/coverage-head/coverage-summary.json | tee coverage-diff.txt
+        {
+          echo "## Coverage regression check"
+          echo ""
+          echo '```'
+          cat coverage-diff.txt
+          echo '```'
+        } >> "$GITHUB_STEP_SUMMARY"
+
     - name: Coverage summary on Actions run page
       if: always()
       run: |
