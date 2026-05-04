@@ -71,9 +71,8 @@ const result = spawnSync(
     process.platform === "win32" ? "npx.cmd" : "npx",
     [
         "eslint",
-        "--no-eslintrc",
-        "--config", ".eslintrc.strict.json",
-        "--resolve-plugins-relative-to", ".",
+        "--config", "eslint.config.strict.mjs",
+        "--no-warn-ignored",
         "--max-warnings=0",
         ...lintable
     ],
