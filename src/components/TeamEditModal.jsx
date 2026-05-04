@@ -191,7 +191,7 @@ function TeamEditModal({
                             Team {updateTeam?.teamNumber} {nameShortLocal ? nameShortLocal : updateTeam?.nameShort}<br />
                             is <b><i>{awardsTextLocal ? awardsTextLocal : <>{originalAndSustaining.includes(String(updateTeam?.teamNumber)) ? "an Original and Sustaining Team " : ""}from<br />
                                 {organizationLocal ? organizationLocal : updateTeam?.organization}<br />
-                                in</>}</i></b> {cityStateLocal ? cityStateLocal : `${updateTeam?.city}, ${updateTeam?.stateProv}`}{updateTeam?.country !== "USA" ? `, ${updateTeam?.country}` : ""}<br />
+                                in</>}</i></b> {cityStateLocal ? cityStateLocal : `${updateTeam?.city}, ${updateTeam?.stateProv}`}{updateTeam?.country !== "USA"  && !cityStateLocal ? `, ${updateTeam?.country}` : ""}<br />
                         </Form.Label>
                         <Form.Control
                             className={awardsTextLocal ? "formHighlight" : ""}

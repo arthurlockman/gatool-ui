@@ -45,7 +45,7 @@ function CheatsheetPage() {
         : team?.city +
           ", " +
           team?.stateProv +
-          (team?.country === "USA" ? "" : " " + team?.country)
+          (team?.country === "USA" && !team?.updates?.cityStateLocal ? "" : " " + team?.country)
     }</h1>`;
     return {
       id: index,

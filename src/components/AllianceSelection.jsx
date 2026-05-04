@@ -650,7 +650,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         return (
             <>
                 {(asArrays?.nextChoice < asArrays.allianceSelectionOrder?.length && !isUnavailableCaptain && !skipped && !removed) &&
-                    (String(team?.teamNumber).startsWith(teamFilter) || teamFilter === "") && <div key={"availableButton" + team?.teamNumber} className={declined ? "availableTeam allianceDecline" : skipped ? "availableTeam allianceTeam allianceSkip" : "availableTeam allianceTeam"} title={declined ? ALLIANCE_DECLINED_TITLE : undefined} onClick={(e) => handleShow(team, declined ? "declined" : "show", e)}><b>{displayTeamNumber}</b></div>}
+                    (String(team?.teamNumber).startsWith(teamFilter) || teamFilter === "") && <div key={"availableButton" + team?.teamNumber} className={declined ? "availableTeam allianceDecline" : skipped ? "availableTeam allianceTeam allianceSkip" : "availableTeam allianceTeam"} title={declined ? ALLIANCE_DECLINED_TITLE : undefined} onClick={() => handleShow(team, declined ? "declined" : "show")}><b>{displayTeamNumber}</b></div>}
 
                 {(asArrays?.nextChoice >= asArrays.allianceSelectionOrder?.length || isUnavailableCaptain || skipped || removed) &&
                     (String(team?.teamNumber).startsWith(teamFilter) || teamFilter === "") && <div key={"availableButtonDisabled" + team?.teamNumber} className={declined ? "availableTeam allianceDecline" : removed ? "availableTeam allianceTeam allianceRemovedTeam" : skipped ? "availableTeam allianceTeam allianceSkip" : "availableTeam allianceTeam"} title={removed ? ALLIANCE_REMOVED_TITLE : declined ? ALLIANCE_DECLINED_TITLE : undefined}><b>{displayTeamNumber}</b></div>}
@@ -726,7 +726,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                         return (
                                                             <React.Fragment key={`backupTeam${team.teamNumber}`}>
                                                                 {(asArrays?.nextChoice < asArrays.allianceSelectionOrder?.length && !removed) &&
-                                                                <div className={declined ? "allianceDecline allianceTeam" : "allianceTeam"} title={declined ? ALLIANCE_DECLINED_TITLE : undefined} onClick={(e) => handleShow(team, declined ? "declined" : "show", e)}><b>{displayTeamNumber}</b></div>}
+                                                                <div className={declined ? "allianceDecline allianceTeam" : "allianceTeam"} title={declined ? ALLIANCE_DECLINED_TITLE : undefined} onClick={() => handleShow(team, declined ? "declined" : "show")}><b>{displayTeamNumber}</b></div>}
                                                                 {(asArrays?.nextChoice >= asArrays.allianceSelectionOrder?.length || removed) &&
                                                                     <div className={declined ? "allianceDecline allianceTeam" : removed ? "allianceTeam allianceRemovedTeam" : "allianceTeam"} title={removed ? ALLIANCE_REMOVED_TITLE : declined ? ALLIANCE_DECLINED_TITLE : undefined}><b>{displayTeamNumber}</b></div>}
                                                             </React.Fragment>
@@ -808,7 +808,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                                                             <div key={`${allianceName}captainAvailable`}
                                                                                                 className={captain?.declined ? "captainDecline allianceTeamChoice" : captain?.skipped ? "allianceTeam allianceSkip allianceTeamChoice" : round1?.teamNumber ? "allianceTeam allianceTeamChosen" : "allianceTeam allianceTeamChoice"}
                                                                                                 title={captain?.declined ? ALLIANCE_DECLINED_TITLE : undefined}
-                                                                                                onClick={(e) => handleShow(captain, captain.mode, e)}>
+                                                                                                onClick={() => handleShow(captain, captain.mode)}>
                                                                                                 {captain?.teamNumber ? <b>{remapNumberToString ? remapNumberToString(captain?.teamNumber) : captain?.teamNumber}</b> : <div>TBD</div>}
                                                                                             </div>
                                                                                         </Col>
@@ -885,7 +885,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                         return (
                                                             <React.Fragment key={`backupTeam${team.teamNumber}`}>
                                                                 {(asArrays?.nextChoice < asArrays.allianceSelectionOrder?.length && !removed) &&
-                                                                <div className={declined ? "allianceDecline allianceTeam" : "allianceTeam"} title={declined ? ALLIANCE_DECLINED_TITLE : undefined} onClick={(e) => handleShow(team, declined ? "declined" : "show", e)}><b>{displayTeamNumber}</b></div>}
+                                                                <div className={declined ? "allianceDecline allianceTeam" : "allianceTeam"} title={declined ? ALLIANCE_DECLINED_TITLE : undefined} onClick={() => handleShow(team, declined ? "declined" : "show")}><b>{displayTeamNumber}</b></div>}
                                                                 {(asArrays?.nextChoice >= asArrays.allianceSelectionOrder?.length || removed) &&
                                                                     <div className={declined ? "allianceDecline allianceTeam" : removed ? "allianceTeam allianceRemovedTeam" : "allianceTeam"} title={removed ? ALLIANCE_REMOVED_TITLE : declined ? ALLIANCE_DECLINED_TITLE : undefined}><b>{displayTeamNumber}</b></div>}
                                                             </React.Fragment>
@@ -934,7 +934,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                         {(allianceMode === "show" || allianceMode === "a1captain" || allianceMode === "captain") && <span className={"allianceAnnounceDialog"}>Team {remapNumberToString ? remapNumberToString(allianceTeam?.teamNumber) : allianceTeam?.teamNumber} {allianceTeam?.updates?.nameShortLocal ? allianceTeam?.updates.nameShortLocal : allianceTeam?.nameShort}<br />
                             is {allianceTeam?.updates?.awardsTextLocal ? allianceTeam?.updates?.awardsTextLocal : <>{(OriginalAndSustaining.indexOf(String(allianceTeam?.teamNumber)) >= 0) ? "an Original and Sustaining Team " : ""}from<br />
                                 {allianceTeam?.updates?.organizationLocal ? allianceTeam?.updates?.organizationLocal : allianceTeam?.organization}<br />
-                                in</>} {allianceTeam?.updates?.cityStateLocal ? allianceTeam?.updates?.cityStateLocal : `${allianceTeam?.city}, ${allianceTeam?.stateProv}`}{allianceTeam?.country !== "USA" ? `, ${allianceTeam?.country}` : ""}<br /></span>}
+                                in</>} {allianceTeam?.updates?.cityStateLocal ? allianceTeam?.updates?.cityStateLocal : `${allianceTeam?.city}, ${allianceTeam?.stateProv}`}{allianceTeam?.country !== "USA" && !allianceTeam?.updates?.cityStateLocal ? `, ${allianceTeam?.country}` : ""}<br /></span>}
                         {allianceMode === "accept" && <span className={"allianceAnnounceDialog"}>Team {remapNumberToString ? remapNumberToString(allianceTeam?.teamNumber) : allianceTeam?.teamNumber} {allianceTeam?.updates?.nameShortLocal ? allianceTeam?.updates?.nameShortLocal : allianceTeam?.nameShort}<br />
                             has been asked to join Alliance {asArrays.allianceSelectionOrder[asArrays.nextChoice]?.number}.<br />Do they accept?</span>}
                         {allianceMode === "decline" && <span className={"allianceAnnounceDialog"}>Team {remapNumberToString ? remapNumberToString(allianceTeam?.teamNumber) : allianceTeam?.teamNumber} {allianceTeam?.updates?.nameShortLocal ? allianceTeam?.updates?.nameShortLocal : allianceTeam?.nameShort}<br />
@@ -953,12 +953,12 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                     <Modal.Footer>
                         {(allianceMode === "show" || allianceMode === "accept") &&
 
-                            <Button id="acceptButton" variant="success" size="sm" style={{ marginBottom: "10px" }} onClick={(e) => { handleAccept(allianceTeam, allianceMode === "accept" ? "confirm" : "accept", e) }}>
+                            <Button id="acceptButton" variant="success" size="sm" style={{ marginBottom: "10px" }} onClick={() => { handleAccept(allianceTeam, allianceMode === "accept" ? "confirm" : "accept") }}>
                                 <HandThumbsUpFill /> Gratefully Accept
                             </Button>
                         }
                         {(allianceMode === "show" || allianceMode === "decline") &&
-                            <Button id="declineButton" variant="danger" size="sm" style={{ marginBottom: "10px" }} onClick={(e) => { handleDecline(allianceTeam, allianceMode === "decline" ? "confirm" : "decline", e) }}>
+                            <Button id="declineButton" variant="danger" size="sm" style={{ marginBottom: "10px" }} onClick={() => { handleDecline(allianceTeam, allianceMode === "decline" ? "confirm" : "decline") }}>
                                 <HandThumbsDownFill /> Respectfully Decline
                             </Button>
                         }
@@ -976,7 +976,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
 
                             <Button id="skipButton" variant="warning" size="sm" style={{
                                 marginBottom: "10px"
-                            }} onClick={(e) => { handleSkip(allianceTeam, allianceMode === "skip" ? "confirm" : "skip", e) }}>
+                            }} onClick={() => { handleSkip(allianceTeam, allianceMode === "skip" ? "confirm" : "skip") }}>
                                 <HandThumbsUpFill /> Skip Alliance
                             </Button>
                         }
@@ -986,7 +986,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                 marginBottom: "10px",
                                 backgroundColor: "orange",
                                 borderColor: "orange"
-                            }} onClick={(e) => { handleRemoveFromPlayoffs(allianceTeam, allianceMode === "remove" ? "confirm" : "remove", e) }}>
+                            }} onClick={() => { handleRemoveFromPlayoffs(allianceTeam, allianceMode === "remove" ? "confirm" : "remove") }}>
                                 <XSquare /> Remove team from Playoffs
                             </Button>
                         }

@@ -49,7 +49,7 @@ function Announce({
             </td>
             <td className={'col2'} style={{ backgroundColor: _.toLower(allianceColor) === "red" ? announceBackground.red : announceBackground.blue }}>
                 <span className={"teamName"}>{team?.updates?.nameShortLocal ? team?.updates?.nameShortLocal : team?.nameShort}</span><br />
-                <span>{team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : `${team?.city}, ${team?.stateProv}${team?.country !== "USA" ? `, ${team?.country}` : ""}`}</span><br />
+                <span>{team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : `${team?.city}, ${team?.stateProv}${team?.country !== "USA" && !team?.updates?.cityStateLocal ? `, ${team?.country}` : ""}`}</span><br />
                 {(team?.updates?.robotNameLocal || team?.robotName )&& <span className={"robotName"}>{team?.updates?.robotNameLocal?team?.updates?.robotNameLocal:team?.robotName}<br /></span>}
                 {team?.updates?.teamMottoLocal && (showMottoes || _.isNull(showMottoes)) && <span className={"mottoes"}>{team?.updates?.teamMottoLocal}<br /></span>}
                 {(((selectedEvent?.value?.champLevel === "CHAMPS" || selectedEvent?.value?.champLevel === "CMPDIV" || selectedEvent?.value?.champLevel === "CMPSUB") && showChampsStats) || (selectedEvent?.value?.champLevel === "" && showChampsStatsAtDistrictRegional)) &&
