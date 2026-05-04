@@ -64,9 +64,43 @@ export default defineConfig({
     outDir: "build",
     emptyOutDir: true,
     sourcemap: true,
+    chunkSizeWarningLimit: 1100,
     commonjsOptions: {
       // react-quill / quill 1.x mix CJS+ESM; let Rollup interop them.
       transformMixedEsModules: true,
+    },
+    rollupOptions: {
+      output: {
+        // Split heavy / stable vendor libs into their own chunks. Reduces
+        // any single chunk size, lets the browser parallelize fetches, and
+        // lets vendor chunks stay cached across app deploys.
+        manualChunks(id) {
+          if (!id.includes("node_modules")) return undefined;
+          // Match by path segment to avoid e.g. `react-bootstrap` matching the
+          // bare `/react/` rule and creating circular chunks.
+          const seg = (name) => id.includes(`/node_modules/${name}/`);
+          if (seg("xlsx")) return "vendor-xlsx";
+          if (seg("docxtemplater") || seg("pizzip") || seg("file-saver")) return "vendor-docx";
+          if (seg("react-quill") || seg("quill")) return "vendor-quill";
+          if (id.includes("/node_modules/@dnd-kit/")) return "vendor-dnd";
+          if (seg("react-bootstrap") || seg("bootstrap") || seg("react-bootstrap-icons")) return "vendor-bootstrap";
+          if (seg("lodash") || seg("lodash-es")) return "vendor-lodash";
+          if (seg("moment")) return "vendor-moment";
+          if (seg("marked")) return "vendor-marked";
+          if (seg("react-quizlet-flashcard")) return "vendor-flashcard";
+          if (
+            seg("react") ||
+            seg("react-dom") ||
+            seg("react-router") ||
+            seg("react-router-dom") ||
+            seg("scheduler") ||
+            id.includes("/node_modules/@remix-run/router/")
+          ) {
+            return "vendor-react";
+          }
+          return "vendor";
+        },
+      },
     },
   },
   optimizeDeps: {

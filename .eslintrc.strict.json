@@ -47,5 +47,25 @@
         "max-depth": ["error", { "max": 4 }],
         "max-params": ["error", { "max": 6 }],
         "max-nested-callbacks": ["error", { "max": 4 }]
-    }
+    },
+    "overrides": [
+        {
+            "files": ["**/*.test.js", "**/*.test.jsx", "src/setupTests.js"],
+            "globals": {
+                "describe": "readonly",
+                "it": "readonly",
+                "test": "readonly",
+                "expect": "readonly",
+                "vi": "readonly",
+                "beforeEach": "readonly",
+                "afterEach": "readonly",
+                "beforeAll": "readonly",
+                "afterAll": "readonly"
+            },
+            "rules": {
+                "max-lines-per-function": "off",
+                "max-nested-callbacks": "off"
+            }
+        }
+    ]
 }

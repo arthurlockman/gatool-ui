@@ -3,6 +3,8 @@ import BottomNavigation from "./components/BottomNavigation";
 import { Outlet, Route, Routes } from "react-router";
 import { BrowserRouter, useLocation } from "react-router-dom";
 import { ScrollContainerContext } from "./contextProviders/ScrollContainerContext";
+import { useEffect, useState, useRef, useMemo, useCallback } from "react";
+
 import SetupPage from "./pages/SetupPage";
 import SchedulePage from "./pages/SchedulePage";
 import TeamDataPage from "./pages/TeamDataPage";
@@ -14,7 +16,7 @@ import AwardsPage from "./pages/AwardsPage";
 import StatsPage from "./pages/StatsPage";
 import CheatsheetPage from "./pages/CheatsheetPage";
 import EmceePage from "./pages/EmceePage";
-import { useEffect, useState, useRef, useMemo, useCallback } from "react";
+import Developer from "./pages/Developer";
 import {
   compactReserveEditsForEvent,
 } from "./utils/playoffReserveEdits";
@@ -29,7 +31,6 @@ import { useEventSelection } from "./contexts/EventSelectionContext";
 import { useEventData } from "./contexts/EventDataContext";
 import { EventStoreProvider } from "./contexts/EventStoreProvider";
 import _ from "lodash";
-import Developer from "./pages/Developer";
 import { specialAwards, hallOfFame, FTCHallOfFame } from "./data/hallOfFame";
 import { originalAndSustaining, refreshRate } from "./data/appConfig";
 import { ftcRegions } from "./data/ftcRegions";
@@ -2638,7 +2639,7 @@ function App() {
               />
             </Route>
           </Routes>
-        </BrowserRouter>
+          </BrowserRouter>
         )}
       </EventStoreProvider>
     </div>
