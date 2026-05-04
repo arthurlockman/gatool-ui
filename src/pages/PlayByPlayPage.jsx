@@ -16,10 +16,11 @@ import { getAllianceLookupEntry } from "../utils/allianceLookup";
 import { matchHasPostedResult } from "../utils/playoffReserveEdits";
 import { applyPlayoffStationOrderToMatch } from "../utils/playoffStationOrderEdits";
 import { getPlayByPlayDisplayOrder } from "../utils/playByPlayDisplayOrder";
+import { useSettings } from "../contexts/SettingsContext";
+import { useEventData } from "contexts/EventDataContext";
+import { useEventActions } from "contexts/EventActionsContext";
 
 function PlayByPlayPage({
-  selectedEvent,
-  selectedYear,
   worldStats,
   ftcRegionHighScores,
   ftcLeagueHighScores,
@@ -27,21 +28,7 @@ function PlayByPlayPage({
   districts,
   ftcLeagues,
   eventNamesCY,
-  teamList,
-  rankings,
-  communityUpdates,
-  currentMatch,
-  playoffSchedule,
-  qualSchedule,
-  allianceCount,
-  alliances,
   setAlliances,
-  showNotes,
-  showMottoes,
-  showQualsStats,
-  showQualsStatsQuals,
-  swapScreen,
-  timeFormat,
   eventHighScores,
   backupTeam,
   setBackupTeam,
@@ -51,38 +38,18 @@ function PlayByPlayPage({
   playoffStationOrderEdits,
   upsertPlayoffStationOrderOverlay,
   removePlayoffStationOrderOverlay,
-  nextMatch,
-  previousMatch,
-  setMatchFromMenu,
-  practiceSchedule,
-  offlinePlayoffSchedule,
-  districtRankings,
-  regionalEventDetail,
-  getRegionalEventDetail,
   adHocMatch,
   setAdHocMatch,
   adHocMode,
-  hidePracticeSchedule,
-  teamReduction,
   qualsLength,
   playoffOnly,
-  getSchedule,
-  usePullDownToUpdate,
-  useSwipe,
-  eventLabel,
-  playoffCountOverride,
-  showInspection,
-  showWorldAndStatsOnAnnouncePlayByPlay,
-  highScoreMode,
-  EPA,
   eventMessage,
   eventBell,
   setEventBell,
-  ftcMode,
-  remapNumberToString,
-  remapStringToNumber,
-  useScrollMemory,
 }) {
+  const { selectedEvent, selectedYear, eventLabel, ftcMode, teamList, qualSchedule, playoffSchedule, practiceSchedule, offlinePlayoffSchedule, rankings, districtRankings, alliances, allianceCount, communityUpdates, currentMatch, remapNumberToString, remapStringToNumber, EPA, regionalEventDetail } = useEventData();
+  const { nextMatch, previousMatch, setMatchFromMenu, getSchedule, getRegionalEventDetail } = useEventActions();
+  const { swapScreen, hidePracticeSchedule, teamReduction, showInspection, usePullDownToUpdate, useSwipe, useScrollMemory } = useSettings();
   // Remember scroll position for Play by play page
   useScrollPosition('playbyplay', true, false, useScrollMemory);
   const scrollToTop = useScrollToTop();
@@ -558,7 +525,6 @@ function PlayByPlayPage({
               selectedEvent={selectedEvent}
               matchDetails={matchDetails}
               rawMatchDetailsForReserve={rawMatchDetailsForReserve}
-              timeFormat={timeFormat}
               inPlayoffs={inPlayoffs}
               alliances={alliances}
               setAlliances={setAlliances}
@@ -575,7 +541,6 @@ function PlayByPlayPage({
               adHocMatch={adHocMatch}
               setAdHocMatch={setAdHocMatch}
               adHocMode={adHocMode}
-              swapScreen={swapScreen}
               playoffOnly={playoffOnly}
               eventLabel={eventLabel}
               ftcMode={ftcMode}
@@ -600,10 +565,6 @@ function PlayByPlayPage({
                       inPlayoffs={inPlayoffs}
                       key={displayOrder[0]}
                       selectedEvent={selectedEvent}
-                      showNotes={showNotes}
-                      showMottoes={showMottoes}
-                      showQualsStats={showQualsStats}
-                      showQualsStatsQuals={showQualsStatsQuals}
                       adHocMode={adHocMode}
                       playoffOnly={playoffOnly}
                       ftcMode={ftcMode}
@@ -615,10 +576,6 @@ function PlayByPlayPage({
                       inPlayoffs={inPlayoffs}
                       key={displayOrder[1]}
                       selectedEvent={selectedEvent}
-                      showNotes={showNotes}
-                      showMottoes={showMottoes}
-                      showQualsStats={showQualsStats}
-                      showQualsStatsQuals={showQualsStatsQuals}
                       adHocMode={adHocMode}
                       playoffOnly={playoffOnly}
                       ftcMode={ftcMode}
@@ -632,10 +589,6 @@ function PlayByPlayPage({
                       inPlayoffs={inPlayoffs}
                       key={displayOrder[2]}
                       selectedEvent={selectedEvent}
-                      showNotes={showNotes}
-                      showMottoes={showMottoes}
-                      showQualsStats={showQualsStats}
-                      showQualsStatsQuals={showQualsStatsQuals}
                       adHocMode={adHocMode}
                       playoffOnly={playoffOnly}
                       ftcMode={ftcMode}
@@ -647,10 +600,6 @@ function PlayByPlayPage({
                       inPlayoffs={inPlayoffs}
                       key={displayOrder[3]}
                       selectedEvent={selectedEvent}
-                      showNotes={showNotes}
-                      showMottoes={showMottoes}
-                      showQualsStats={showQualsStats}
-                      showQualsStatsQuals={showQualsStatsQuals}
                       adHocMode={adHocMode}
                       playoffOnly={playoffOnly}
                       ftcMode={ftcMode}
@@ -665,10 +614,6 @@ function PlayByPlayPage({
                         inPlayoffs={inPlayoffs}
                         key={displayOrder[4]}
                         selectedEvent={selectedEvent}
-                        showNotes={showNotes}
-                        showMottoes={showMottoes}
-                        showQualsStats={showQualsStats}
-                        showQualsStatsQuals={showQualsStatsQuals}
                         adHocMode={adHocMode}
                         playoffOnly={playoffOnly}
                         ftcMode={ftcMode}
@@ -680,10 +625,6 @@ function PlayByPlayPage({
                         inPlayoffs={inPlayoffs}
                         key={displayOrder[5]}
                         selectedEvent={selectedEvent}
-                        showNotes={showNotes}
-                        showMottoes={showMottoes}
-                        showQualsStats={showQualsStats}
-                        showQualsStatsQuals={showQualsStatsQuals}
                         adHocMode={adHocMode}
                         playoffOnly={playoffOnly}
                         ftcMode={ftcMode}
@@ -702,10 +643,6 @@ function PlayByPlayPage({
                           inPlayoffs={inPlayoffs}
                           key={displayOrder[6]}
                           selectedEvent={selectedEvent}
-                          showNotes={showNotes}
-                          showMottoes={showMottoes}
-                          showQualsStats={showQualsStats}
-                          showQualsStatsQuals={showQualsStatsQuals}
                           adHocMode={adHocMode}
                           playoffOnly={playoffOnly}
                           ftcMode={ftcMode}
@@ -717,10 +654,6 @@ function PlayByPlayPage({
                           inPlayoffs={inPlayoffs}
                           key={displayOrder[7]}
                           selectedEvent={selectedEvent}
-                          showNotes={showNotes}
-                          showMottoes={showMottoes}
-                          showQualsStats={showQualsStats}
-                          showQualsStatsQuals={showQualsStatsQuals}
                           adHocMode={adHocMode}
                           playoffOnly={playoffOnly}
                           ftcMode={ftcMode}
@@ -748,9 +681,6 @@ function PlayByPlayPage({
               alliances={alliances}
               selectedEvent={selectedEvent}
               adHocMode={adHocMode}
-              playoffCountOverride={playoffCountOverride}
-              showWorldAndStatsOnAnnouncePlayByPlay={showWorldAndStatsOnAnnouncePlayByPlay}
-              highScoreMode={highScoreMode}
               ftcMode={ftcMode}
               worldStats={worldStats}
               ftcRegionHighScores={ftcRegionHighScores}

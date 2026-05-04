@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ main, beta ]
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,6 +21,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
@@ -26,6 +32,154 @@ jobs:
 
     - name: Install dependencies
       run: npm ci
+
+    - name: Lint
+      run: npm run lint
+
+    - name: Lint changed files (strict)
+      if: github.event_name == 'pull_request'
+      run: npm run lint:strict-changed
+
+    - name: Test
+      run: npm run test:ci
+      env:
+        CI: true
+
+    - name: Save head coverage summary
+      if: github.event_name == 'pull_request'
+      run: |
+        mkdir -p /tmp/coverage-head
+        cp coverage/coverage-summary.json /tmp/coverage-head/coverage-summary.json
+
+    - name: Check out base branch for coverage comparison
+      if: github.event_name == 'pull_request'
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.base_ref }}
+        path: base-ref
+        fetch-depth: 1
+
+    - name: Install base dependencies
+      if: github.event_name == 'pull_request'
+      working-directory: base-ref
+      run: npm ci
+      continue-on-error: true
+
+    - name: Run base tests with coverage
+      if: github.event_name == 'pull_request'
+      working-directory: base-ref
+      run: npm run test:ci
+      env:
+        CI: true
+      continue-on-error: true
+
+    - name: Compare coverage against base
+      if: github.event_name == 'pull_request'
+      id: coverage_check
+      run: |
+        BASE_SUMMARY=base-ref/coverage/coverage-summary.json
+        if [ ! -f "$BASE_SUMMARY" ]; then
+          echo "Base coverage summary missing; skipping regression check (likely no coverage on base yet)."
+          echo "status=skipped" >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+        set +e
+        node scripts/check-coverage-not-decreased.mjs "$BASE_SUMMARY" /tmp/coverage-head/coverage-summary.json | tee coverage-diff.txt
+        rc=${PIPESTATUS[0]}
+        set -e
+        {
+          echo "## Coverage regression check"
+          echo ""
+          echo '```'
+          cat coverage-diff.txt
+          echo '```'
+        } >> "$GITHUB_STEP_SUMMARY"
+        if [ "$rc" -ne 0 ]; then
+          echo "status=regressed" >> "$GITHUB_OUTPUT"
+        else
+          echo "status=ok" >> "$GITHUB_OUTPUT"
+        fi
+        exit "$rc"
+
+    - name: Comment on PR when coverage regresses
+      if: github.event_name == 'pull_request' && always() && steps.coverage_check.outputs.status == 'regressed'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const marker = '<!-- gatool-coverage-regression -->';
+          const diff = fs.existsSync('coverage-diff.txt')
+            ? fs.readFileSync('coverage-diff.txt', 'utf8')
+            : '(no diff available)';
+          const body = [
+            marker,
+            '### \u274c Test coverage decreased',
+            '',
+            'One or more coverage metrics dropped vs. `' + context.payload.pull_request.base.ref + '`. Please add tests so coverage does not regress.',
+            '',
+            '```',
+            diff.trim(),
+            '```',
+          ].join('\n');
+          const { owner, repo } = context.repo;
+          const issue_number = context.payload.pull_request.number;
+          const comments = await github.paginate(
+            github.rest.issues.listComments,
+            { owner, repo, issue_number, per_page: 100 }
+          );
+          const existing = comments.find((c) => c.body && c.body.includes(marker));
+          if (existing) {
+            await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+          } else {
+            await github.rest.issues.createComment({ owner, repo, issue_number, body });
+          }
+
+    - name: Resolve previous coverage-regression comment when fixed
+      if: github.event_name == 'pull_request' && steps.coverage_check.outputs.status == 'ok'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const marker = '<!-- gatool-coverage-regression -->';
+          const { owner, repo } = context.repo;
+          const issue_number = context.payload.pull_request.number;
+          const comments = await github.paginate(
+            github.rest.issues.listComments,
+            { owner, repo, issue_number, per_page: 100 }
+          );
+          const existing = comments.find((c) => c.body && c.body.includes(marker));
+          if (existing && !existing.body.includes('Resolved')) {
+            const body = marker + '\n### \u2705 Coverage regression resolved\n\nLatest run shows no coverage drop vs. base.';
+            await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+          }
+
+    - name: Coverage summary on Actions run page
+      if: always()
+      run: |
+        if [ -f coverage/coverage-summary.json ]; then
+          {
+            echo "## Test coverage"
+            echo ""
+            echo "| Metric | Covered | Total | % |"
+            echo "|---|---|---|---|"
+            node -e "
+              const t = require('./coverage/coverage-summary.json').total;
+              for (const k of ['statements','branches','functions','lines']) {
+                const m = t[k];
+                console.log(\`| \${k} | \${m.covered} | \${m.total} | \${m.pct}% |\`);
+              }
+            "
+          } >> "$GITHUB_STEP_SUMMARY"
+        fi
+
+    - name: Comment coverage on PR
+      if: github.event_name == 'pull_request'
+      uses: MishaKav/jest-coverage-comment@main
+      with:
+        coverage-summary-path: ./coverage/coverage-summary.json
+        title: Test coverage
+        summary-title: Coverage summary
+        hide-summary: false
+        hide-comment: false
 
     - name: Run build
       run: npm run build

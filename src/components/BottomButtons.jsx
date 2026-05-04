@@ -3,6 +3,7 @@ import FoulButtons from "./FoulButtons";
 import HighScoresSummary from "./HighScoresSummary";
 import { CaretLeftFill, CaretRightFill } from "react-bootstrap-icons";
 import PlayoffDetails from "../components/PlayoffDetails";
+import { useSettings } from "../contexts/SettingsContext";
 
 
 function BottomButtons({
@@ -15,10 +16,7 @@ function BottomButtons({
   alliances,
   selectedEvent,
   adHocMode,
-  playoffCountOverride,
-  highScoreMode,
   ftcMode,
-  showWorldAndStatsOnAnnouncePlayByPlay,
   worldStats,
   ftcRegionHighScores,
   ftcLeagueHighScores,
@@ -28,6 +26,7 @@ function BottomButtons({
   districts,
   ftcLeagues,
 }) {
+  const { showWorldAndStatsOnAnnouncePlayByPlay, highScoreMode } = useSettings();
     var matches = playoffSchedule?.schedule;
     var eventHighScore = eventHighScores?.highscores?.overallqual;
     if (!highScoreMode) {
@@ -48,7 +47,7 @@ function BottomButtons({
                     {!adHocMode && <Button size="lg" variant="outline-success" className={"gatool-button buttonNoWrap"} onClick={previousMatch}><span className={"d-none d-lg-block"}><CaretLeftFill /> Previous Match</span><span className={"d-block d-lg-none"}><CaretLeftFill /> <CaretLeftFill /></span></Button>}
                 </Col>
                 {matchDetails?.tournamentLevel.toLowerCase() === "playoff" && <Col xs={hasEventHighScore ? "5" : "8"} lg={hasEventHighScore ? "4" : "6"} className={"playoffDetails"}>
-                    <PlayoffDetails matchDetails={matchDetails} alliances={alliances} matches={matches} playoffCountOverride={playoffCountOverride} ftcMode={ftcMode}/>
+                    <PlayoffDetails matchDetails={matchDetails} alliances={alliances} matches={matches} ftcMode={ftcMode}/>
                 </Col>}
 
                 {hasEventHighScore && <Col xs={matchDetails?.tournamentLevel.toLowerCase() !== "playoff" ? "8" : "3"} lg={matchDetails?.tournamentLevel.toLowerCase() !== "playoff" ? "6" : "2"}>

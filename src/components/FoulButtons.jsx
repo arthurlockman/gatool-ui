@@ -9,8 +9,8 @@ import {
 import { useState } from "react";
 import _ from "lodash";
 import { useHotkeysContext, useHotkeys } from "react-hotkeys-hook";
-import { commonFouls } from "./Fouls";
-import { commonFoulsFTC } from "./FoulsFTC";
+import { commonFouls } from "../data/fouls";
+import { commonFoulsFTC } from "../data/foulsFTC";
 
 function FoulButtons({ currentYear, ftcMode = null }) {
   const [showFoul, setShowFoul] = useState(false);

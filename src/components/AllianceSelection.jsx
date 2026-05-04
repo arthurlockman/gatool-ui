@@ -4,7 +4,7 @@ import _ from "lodash";
 import { HandThumbsDownFill, HandThumbsUpFill, TrophyFill, XSquare } from "react-bootstrap-icons";
 import { useHotkeysContext, useHotkeys } from "react-hotkeys-hook";
 import { useEffect } from "react";
-import { originalAndSustaining, allianceSelectionBaseRounds } from "./Constants";
+import { originalAndSustaining, allianceSelectionBaseRounds } from "../data/appConfig";
 import useWindowDimensions from "hooks/UseWindowDimensions";
 
 const ALLIANCE_DECLINED_TITLE =
@@ -64,7 +64,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         } else {
             allianceSelectionOrderRounds.round2 = [];
         }
-    };
+    }
 
     allianceSelectionRounds.forEach((round, index) => {
         AllianceSelectionBaseRounds[round].forEach((alliance) => {
@@ -109,7 +109,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         enableScope('tabNavigation');
     }
 
-    const handleShow = (team, mode, e) => {
+    const handleShow = (team, mode) => {
         setAllianceTeam(team);
         setAllianceMode(mode || "show");
         setShow(true);
@@ -119,7 +119,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         disableScope('tabNavigation');
     }
 
-    const handleAccept = (team, mode, e) => {
+    const handleAccept = (team, mode) => {
         if (mode === "accept") {
             setAllianceTeam(team);
             setAllianceMode("accept");
@@ -186,7 +186,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
 
     }
 
-    const handleDecline = (team, mode, e) => {
+    const handleDecline = (team, mode) => {
         if (mode === "decline") {
             setAllianceTeam(team);
             setAllianceMode("decline");
@@ -205,7 +205,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
 
     }
 
-    const handleSkip = (team, mode, e) => {
+    const handleSkip = (team, mode) => {
         if (mode === "skip") {
             setAllianceTeam(team);
             setAllianceMode("skip");
@@ -271,7 +271,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
 
     }
 
-    const handleRemoveFromPlayoffs = (team, mode, e) => {
+    const handleRemoveFromPlayoffs = (team, mode) => {
         if (mode === "remove") {
             setAllianceTeam(team);
             setAllianceMode("remove");
@@ -552,13 +552,13 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
             team = _.merge(team, teamList?.teams[_.findIndex(teamList?.teams, { "teamNumber": team?.teamNumber })]);
             team.updates = communityUpdates[_.findIndex(communityUpdates, { "teamNumber": team?.teamNumber })]?.updates || team?.updates || {}
             var years = 1 + Number(selectedYear?.value) - Number(team?.rookieYear);
-            if (typeof team?.updates?.teamYearsNoCompeteLocal !== "undefined") { years -= team?.updates?.teamYearsNoCompeteLocal };
+            if (typeof team?.updates?.teamYearsNoCompeteLocal !== "undefined") { years -= team?.updates?.teamYearsNoCompeteLocal }
             var yearsDisplay = "th";
-            if (years.toString().endsWith("1")) { yearsDisplay = "st" };
-            if (years.toString().endsWith("2")) { yearsDisplay = "nd" };
-            if (years.toString().endsWith("3")) { yearsDisplay = "rd" };
-            if (years.toString() === "11" || years.toString() === "12" || years.toString() === "13") { yearsDisplay = "th" };
-            if (years.toString() === "1") { yearsDisplay = "Rookie" };
+            if (years.toString().endsWith("1")) { yearsDisplay = "st" }
+            if (years.toString().endsWith("2")) { yearsDisplay = "nd" }
+            if (years.toString().endsWith("3")) { yearsDisplay = "rd" }
+            if (years.toString() === "11" || years.toString() === "12" || years.toString() === "13") { yearsDisplay = "th" }
+            if (years.toString() === "1") { yearsDisplay = "Rookie" }
             if (years === 1) { team.yearsDisplay = yearsDisplay } else { team.yearsDisplay = `${years}${yearsDisplay}`; }
             return team;
         })

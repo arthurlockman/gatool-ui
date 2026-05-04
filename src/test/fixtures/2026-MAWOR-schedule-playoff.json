@@ -1,0 +1,950 @@
+{
+  "Schedule": {
+    "schedule": [
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T14:45:00",
+        "autoStartTime": "2026-04-05T14:50:04.327",
+        "matchVideoLink": "https://www.youtube.com/watch?v=nF4Iz3REsSQ",
+        "matchNumber": 1,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T14:50:04.327",
+        "tournamentLevel": "Playoff",
+        "postResultTime": "2026-04-05T14:53:06.29",
+        "description": "Match 1 (R1)",
+        "scoreRedFinal": 554,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 137,
+        "scoreBlueFinal": 34,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 23,
+        "teams": [
+          {
+            "teamNumber": 2262,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1768,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3467,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3205,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 6333,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 157,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T14:54:00",
+        "autoStartTime": "2026-04-05T15:00:42.367",
+        "matchVideoLink": "https://www.youtube.com/watch?v=D0Te7KbIiNE",
+        "matchNumber": 2,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T15:00:42.367",
+        "tournamentLevel": "Playoff",
+        "postResultTime": "2026-04-05T15:03:45.043",
+        "description": "Match 2 (R1)",
+        "scoreRedFinal": 337,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 44,
+        "scoreBlueFinal": 188,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 27,
+        "teams": [
+          {
+            "teamNumber": 1100,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2079,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 237,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1740,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 348,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 999,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T15:03:00",
+        "autoStartTime": "2026-04-05T15:09:07.49",
+        "matchVideoLink": "https://www.youtube.com/watch?v=dZDIwkjA3Hk",
+        "matchNumber": 3,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T15:09:07.49",
+        "tournamentLevel": "Playoff",
+        "postResultTime": "2026-04-05T15:12:13.283",
+        "description": "Match 3 (R1)",
+        "scoreRedFinal": 427,
+        "scoreRedFoul": 15,
+        "scoreRedAuto": 90,
+        "scoreBlueFinal": 280,
+        "scoreBlueFoul": 15,
+        "scoreBlueAuto": 61,
+        "teams": [
+          {
+            "teamNumber": 8544,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5000,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 190,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5422,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 9644,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 467,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T15:12:00",
+        "autoStartTime": "2026-04-05T15:16:43.39",
+        "matchVideoLink": "https://www.youtube.com/watch?v=4Tq2fJuFuiU",
+        "matchNumber": 4,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T15:16:43.39",
+        "tournamentLevel": "Playoff",
+        "postResultTime": "2026-04-05T15:19:43.567",
+        "description": "Match 4 (R1)",
+        "scoreRedFinal": 475,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 96,
+        "scoreBlueFinal": 331,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 56,
+        "teams": [
+          {
+            "teamNumber": 11483,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2370,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 10254,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8724,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5112,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1757,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T15:21:00",
+        "autoStartTime": "2026-04-05T15:26:52.863",
+        "matchVideoLink": "https://www.youtube.com/watch?v=VBuTH69sVN4",
+        "matchNumber": 5,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T15:26:52.863",
+        "tournamentLevel": "Playoff",
+        "postResultTime": "2026-04-05T15:31:34.87",
+        "description": "Match 5 (R2)",
+        "scoreRedFinal": 119,
+        "scoreRedFoul": 30,
+        "scoreRedAuto": 15,
+        "scoreBlueFinal": 127,
+        "scoreBlueFoul": 15,
+        "scoreBlueAuto": 18,
+        "teams": [
+          {
+            "teamNumber": 3205,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 6333,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 157,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1740,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 348,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 999,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T15:30:00",
+        "autoStartTime": "2026-04-05T15:38:10.083",
+        "matchVideoLink": "https://www.youtube.com/watch?v=F-UV7vRF_wM",
+        "matchNumber": 6,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T15:38:10.083",
+        "tournamentLevel": "Playoff",
+        "postResultTime": "2026-04-05T15:41:15.233",
+        "description": "Match 6 (R2)",
+        "scoreRedFinal": 268,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 35,
+        "scoreBlueFinal": 284,
+        "scoreBlueFoul": 10,
+        "scoreBlueAuto": 57,
+        "teams": [
+          {
+            "teamNumber": 5422,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 9644,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 467,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8724,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5112,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1757,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T15:39:00",
+        "autoStartTime": "2026-04-05T15:47:57.293",
+        "matchVideoLink": "https://www.youtube.com/watch?v=4niOrpdNYQc",
+        "matchNumber": 7,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T15:47:57.293",
+        "tournamentLevel": "Playoff",
+        "postResultTime": "2026-04-05T15:50:58.873",
+        "description": "Match 7 (R2)",
+        "scoreRedFinal": 481,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 96,
+        "scoreBlueFinal": 255,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 73,
+        "teams": [
+          {
+            "teamNumber": 1768,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8567,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3467,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1100,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2079,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 237,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T15:48:00",
+        "autoStartTime": "2026-04-05T15:58:50.087",
+        "matchVideoLink": "https://www.youtube.com/watch?v=rjEzGGyOfMk",
+        "matchNumber": 8,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T15:58:50.087",
+        "tournamentLevel": "Playoff",
+        "postResultTime": "2026-04-05T16:02:00.69",
+        "description": "Match 8 (R2)",
+        "scoreRedFinal": 256,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 106,
+        "scoreBlueFinal": 392,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 96,
+        "teams": [
+          {
+            "teamNumber": 8544,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5000,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 190,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 11483,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2370,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 10254,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T15:57:00",
+        "autoStartTime": "2026-04-05T16:26:10.087",
+        "matchVideoLink": "https://www.youtube.com/watch?v=nmCnZ7vROGs",
+        "matchNumber": 9,
+        "isReplay": true,
+        "actualStartTime": "2026-04-05T16:26:10.087",
+        "tournamentLevel": "Playoff",
+        "postResultTime": "2026-04-05T16:29:20.347",
+        "description": "Match 9 (R3)",
+        "scoreRedFinal": 232,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 57,
+        "scoreBlueFinal": 283,
+        "scoreBlueFoul": 15,
+        "scoreBlueAuto": 36,
+        "teams": [
+          {
+            "teamNumber": 1100,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2079,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 237,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8724,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5112,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1757,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T16:06:00",
+        "autoStartTime": "2026-04-05T16:36:45.58",
+        "matchVideoLink": "https://www.youtube.com/watch?v=Fg0oviUs1Rs",
+        "matchNumber": 10,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T16:36:45.58",
+        "tournamentLevel": "Playoff",
+        "postResultTime": "2026-04-05T16:39:57.58",
+        "description": "Match 10 (R3)",
+        "scoreRedFinal": 213,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 46,
+        "scoreBlueFinal": 191,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 38,
+        "teams": [
+          {
+            "teamNumber": 8544,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5000,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 190,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1740,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 348,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 999,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T16:18:00",
+        "autoStartTime": "2026-04-05T16:55:48.267",
+        "matchVideoLink": "https://www.youtube.com/watch?v=tgHe8KaJN0w",
+        "matchNumber": 11,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T16:55:48.267",
+        "tournamentLevel": "Playoff",
+        "postResultTime": "2026-04-05T16:58:55.7",
+        "description": "Match 11 (R4)",
+        "scoreRedFinal": 548,
+        "scoreRedFoul": 35,
+        "scoreRedAuto": 126,
+        "scoreBlueFinal": 412,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 82,
+        "teams": [
+          {
+            "teamNumber": 1768,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2262,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3467,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 11483,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2370,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 10254,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T16:27:00",
+        "autoStartTime": "2026-04-05T17:07:12.713",
+        "matchVideoLink": "https://www.youtube.com/watch?v=GqZ4O995erw",
+        "matchNumber": 12,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T17:07:12.713",
+        "tournamentLevel": "Playoff",
+        "postResultTime": "2026-04-05T17:10:45.247",
+        "description": "Match 12 (R4)",
+        "scoreRedFinal": 396,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 102,
+        "scoreBlueFinal": 246,
+        "scoreBlueFoul": 20,
+        "scoreBlueAuto": 31,
+        "teams": [
+          {
+            "teamNumber": 8544,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5000,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 190,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8724,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5112,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1757,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T16:48:00",
+        "autoStartTime": "2026-04-05T17:31:23.693",
+        "matchVideoLink": "https://www.youtube.com/watch?v=jZsR6SSDW_U",
+        "matchNumber": 13,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T17:31:23.693",
+        "tournamentLevel": "Playoff",
+        "postResultTime": "2026-04-05T17:36:21.747",
+        "description": "Match 13 (R5)",
+        "scoreRedFinal": 219,
+        "scoreRedFoul": 15,
+        "scoreRedAuto": 84,
+        "scoreBlueFinal": 257,
+        "scoreBlueFoul": 20,
+        "scoreBlueAuto": 78,
+        "teams": [
+          {
+            "teamNumber": 11483,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2370,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 10254,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8544,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5000,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 190,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T17:09:00",
+        "autoStartTime": "2026-04-05T18:02:07.863",
+        "matchVideoLink": "https://www.youtube.com/watch?v=ZWsm7atExWE",
+        "matchNumber": 14,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T18:02:07.863",
+        "tournamentLevel": "Playoff",
+        "postResultTime": "2026-04-05T18:05:44.34",
+        "description": "Final 1",
+        "scoreRedFinal": 619,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 95,
+        "scoreBlueFinal": 458,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 94,
+        "teams": [
+          {
+            "teamNumber": 1768,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8567,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3467,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5347,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5000,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 190,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": "2026-04-05T17:30:00",
+        "autoStartTime": "2026-04-05T18:27:23.59",
+        "matchVideoLink": "https://www.youtube.com/watch?v=WFj_FsFQRkM",
+        "matchNumber": 15,
+        "isReplay": false,
+        "actualStartTime": "2026-04-05T18:27:23.59",
+        "tournamentLevel": "Playoff",
+        "postResultTime": "2026-04-05T18:30:34.973",
+        "description": "Final 2",
+        "scoreRedFinal": 354,
+        "scoreRedFoul": 5,
+        "scoreRedAuto": 100,
+        "scoreBlueFinal": 319,
+        "scoreBlueFoul": 15,
+        "scoreBlueAuto": 97,
+        "teams": [
+          {
+            "teamNumber": 1768,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8567,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3467,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5347,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5000,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 190,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      },
+      {
+        "field": "Primary",
+        "startTime": null,
+        "autoStartTime": null,
+        "matchVideoLink": null,
+        "matchNumber": 16,
+        "isReplay": false,
+        "actualStartTime": null,
+        "tournamentLevel": "Playoff",
+        "postResultTime": null,
+        "description": "Final Tiebreaker",
+        "scoreRedFinal": null,
+        "scoreRedFoul": null,
+        "scoreRedAuto": null,
+        "scoreBlueFinal": null,
+        "scoreBlueFoul": null,
+        "scoreBlueAuto": null,
+        "teams": [
+          {
+            "teamNumber": 1768,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8567,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3467,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5347,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5000,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 190,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": null,
+        "districtCode": null,
+        "matchScores": null
+      }
+    ]
+  }
+}

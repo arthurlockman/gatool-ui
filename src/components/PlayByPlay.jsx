@@ -1,7 +1,9 @@
 import _ from "lodash";
 import useWindowDimensions from "hooks/UseWindowDimensions";
+import { useSettings } from "../contexts/SettingsContext";
 
-function PlayByPlay({ station, team, inPlayoffs, selectedEvent, showNotes, showMottoes, showQualsStats, showQualsStatsQuals, adHocMode, playoffOnly, ftcMode, remapNumberToString}) {
+function PlayByPlay({ station, team, inPlayoffs, selectedEvent, adHocMode, playoffOnly, ftcMode, remapNumberToString}) {
+    const { showNotes, showMottoes, showQualsStats, showQualsStatsQuals } = useSettings();
     const { height, width } = useWindowDimensions();
     
     // Guard against undefined station

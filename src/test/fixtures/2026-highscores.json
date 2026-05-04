@@ -1,0 +1,732 @@
+[
+  {
+    "level": "playoff",
+    "matchData": {
+      "event": {
+        "districtCode": null,
+        "eventCode": "DALY",
+        "type": "playoff"
+      },
+      "highScoreAlliance": "red",
+      "match": {
+        "field": "Primary",
+        "startTime": "2026-05-02T10:54:00",
+        "autoStartTime": "2026-05-02T11:34:55.94",
+        "matchVideoLink": "https://www.youtube.com/watch?v=2qqltrq1NtA",
+        "matchNumber": 14,
+        "isReplay": false,
+        "actualStartTime": "2026-05-02T11:34:55.94",
+        "tournamentLevel": "Playoff",
+        "postResultTime": "2026-05-02T11:38:21.363",
+        "description": "Final 1",
+        "scoreRedFinal": 964,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 150,
+        "scoreBlueFinal": 337,
+        "scoreBlueFoul": 20,
+        "scoreBlueAuto": 113,
+        "teams": [
+          {
+            "teamNumber": 4065,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 4414,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1323,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2073,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1156,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 6017,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": "DALY",
+        "districtCode": null,
+        "matchScores": null
+      }
+    },
+    "type": "TBAPenaltyFree",
+    "year": 2026,
+    "yearType": "2026TBAPenaltyFreeplayoff"
+  },
+  {
+    "level": "qual",
+    "matchData": {
+      "event": {
+        "districtCode": null,
+        "eventCode": "ARCHIMEDES",
+        "type": "qual"
+      },
+      "highScoreAlliance": "red",
+      "match": {
+        "field": "Primary",
+        "startTime": "2026-05-01T15:35:00",
+        "autoStartTime": "2026-05-01T15:39:22.283",
+        "matchVideoLink": "https://www.youtube.com/watch?v=pSID-_ESaoU",
+        "matchNumber": 108,
+        "isReplay": false,
+        "actualStartTime": "2026-05-01T15:39:22.283",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-05-01T15:42:26.47",
+        "description": "Qualification 108",
+        "scoreRedFinal": 885,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 189,
+        "scoreBlueFinal": 431,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 71,
+        "teams": [
+          {
+            "teamNumber": 9470,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1114,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 548,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3494,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 587,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2960,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": "ARCHIMEDES",
+        "districtCode": null,
+        "matchScores": null
+      }
+    },
+    "type": "TBAPenaltyFree",
+    "year": 2026,
+    "yearType": "2026TBAPenaltyFreequal"
+  },
+  {
+    "level": "playoff",
+    "matchData": {
+      "event": {
+        "districtCode": null,
+        "eventCode": "DALY",
+        "type": "playoff"
+      },
+      "highScoreAlliance": "red",
+      "match": {
+        "field": "Primary",
+        "startTime": "2026-05-02T10:54:00",
+        "autoStartTime": "2026-05-02T11:34:55.94",
+        "matchVideoLink": "https://www.youtube.com/watch?v=2qqltrq1NtA",
+        "matchNumber": 14,
+        "isReplay": false,
+        "actualStartTime": "2026-05-02T11:34:55.94",
+        "tournamentLevel": "Playoff",
+        "postResultTime": "2026-05-02T11:38:21.363",
+        "description": "Final 1",
+        "scoreRedFinal": 964,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 150,
+        "scoreBlueFinal": 337,
+        "scoreBlueFoul": 20,
+        "scoreBlueAuto": 113,
+        "teams": [
+          {
+            "teamNumber": 4065,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 4414,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1323,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2073,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1156,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 6017,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": "DALY",
+        "districtCode": null,
+        "matchScores": null
+      }
+    },
+    "type": "allianceContribution",
+    "year": 2026,
+    "yearType": "2026allianceContributionplayoff"
+  },
+  {
+    "level": "qual",
+    "matchData": {
+      "event": {
+        "districtCode": null,
+        "eventCode": "HOPPER",
+        "type": "qual"
+      },
+      "highScoreAlliance": "blue",
+      "match": {
+        "field": "Primary",
+        "startTime": "2026-04-30T10:32:00",
+        "autoStartTime": "2026-04-30T10:50:25.593",
+        "matchVideoLink": "https://www.youtube.com/watch?v=jRUEm3rYaZU",
+        "matchNumber": 20,
+        "isReplay": false,
+        "actualStartTime": "2026-04-30T10:50:25.593",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-30T10:53:31.75",
+        "description": "Qualification 20",
+        "scoreRedFinal": 535,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 59,
+        "scoreBlueFinal": 908,
+        "scoreBlueFoul": 5,
+        "scoreBlueAuto": 162,
+        "teams": [
+          {
+            "teamNumber": 3297,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8267,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 4613,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 6329,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 11270,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1706,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": "HOPPER",
+        "districtCode": null,
+        "matchScores": null
+      }
+    },
+    "type": "allianceContribution",
+    "year": 2026,
+    "yearType": "2026allianceContributionqual"
+  },
+  {
+    "level": "playoff",
+    "matchData": {
+      "event": {
+        "districtCode": null,
+        "eventCode": "CURIE",
+        "type": "playoff"
+      },
+      "highScoreAlliance": "blue",
+      "match": {
+        "field": "Primary",
+        "startTime": "2026-05-02T10:03:00",
+        "autoStartTime": "2026-05-02T10:32:19.39",
+        "matchVideoLink": "https://www.youtube.com/watch?v=K5iebCx-Q6U",
+        "matchNumber": 11,
+        "isReplay": false,
+        "actualStartTime": "2026-05-02T10:32:19.39",
+        "tournamentLevel": "Playoff",
+        "postResultTime": "2026-05-02T10:35:29.63",
+        "description": "Match 11 (R4)",
+        "scoreRedFinal": 689,
+        "scoreRedFoul": 5,
+        "scoreRedAuto": 117,
+        "scoreBlueFinal": 778,
+        "scoreBlueFoul": 5,
+        "scoreBlueAuto": 185,
+        "teams": [
+          {
+            "teamNumber": 5907,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 166,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 6369,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8613,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 6800,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 254,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": "CURIE",
+        "districtCode": null,
+        "matchScores": null
+      }
+    },
+    "type": "offsetting",
+    "year": 2026,
+    "yearType": "2026offsettingplayoff"
+  },
+  {
+    "level": "qual",
+    "matchData": {
+      "event": {
+        "districtCode": "CA",
+        "eventCode": "CANCMP",
+        "type": "qual"
+      },
+      "highScoreAlliance": "blue",
+      "match": {
+        "field": "Primary",
+        "startTime": "2026-04-10T12:38:00",
+        "autoStartTime": "2026-04-10T12:40:39.033",
+        "matchVideoLink": "https://www.youtube.com/watch?v=9ayLVjUvAw0",
+        "matchNumber": 2,
+        "isReplay": false,
+        "actualStartTime": "2026-04-10T12:40:39.033",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-10T12:43:54.313",
+        "description": "Qualification 2",
+        "scoreRedFinal": 537,
+        "scoreRedFoul": 5,
+        "scoreRedAuto": 25,
+        "scoreBlueFinal": 821,
+        "scoreBlueFoul": 5,
+        "scoreBlueAuto": 119,
+        "teams": [
+          {
+            "teamNumber": 581,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3501,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2813,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 846,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1323,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3045,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": "CANCMP",
+        "districtCode": "CA",
+        "matchScores": null
+      }
+    },
+    "type": "offsetting",
+    "year": 2026,
+    "yearType": "2026offsettingqual"
+  },
+  {
+    "level": "playoff",
+    "matchData": {
+      "event": {
+        "districtCode": null,
+        "eventCode": "DALY",
+        "type": "playoff"
+      },
+      "highScoreAlliance": "red",
+      "match": {
+        "field": "Primary",
+        "startTime": "2026-05-02T10:54:00",
+        "autoStartTime": "2026-05-02T11:34:55.94",
+        "matchVideoLink": "https://www.youtube.com/watch?v=2qqltrq1NtA",
+        "matchNumber": 14,
+        "isReplay": false,
+        "actualStartTime": "2026-05-02T11:34:55.94",
+        "tournamentLevel": "Playoff",
+        "postResultTime": "2026-05-02T11:38:21.363",
+        "description": "Final 1",
+        "scoreRedFinal": 964,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 150,
+        "scoreBlueFinal": 337,
+        "scoreBlueFoul": 20,
+        "scoreBlueAuto": 113,
+        "teams": [
+          {
+            "teamNumber": 4065,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 4414,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1323,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2073,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1156,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 6017,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": "DALY",
+        "districtCode": null,
+        "matchScores": null
+      }
+    },
+    "type": "overall",
+    "year": 2026,
+    "yearType": "2026overallplayoff"
+  },
+  {
+    "level": "qual",
+    "matchData": {
+      "event": {
+        "districtCode": null,
+        "eventCode": "HOPPER",
+        "type": "qual"
+      },
+      "highScoreAlliance": "blue",
+      "match": {
+        "field": "Primary",
+        "startTime": "2026-04-30T10:32:00",
+        "autoStartTime": "2026-04-30T10:50:25.593",
+        "matchVideoLink": "https://www.youtube.com/watch?v=jRUEm3rYaZU",
+        "matchNumber": 20,
+        "isReplay": false,
+        "actualStartTime": "2026-04-30T10:50:25.593",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-04-30T10:53:31.75",
+        "description": "Qualification 20",
+        "scoreRedFinal": 535,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 59,
+        "scoreBlueFinal": 908,
+        "scoreBlueFoul": 5,
+        "scoreBlueAuto": 162,
+        "teams": [
+          {
+            "teamNumber": 3297,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8267,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 4613,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 6329,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 11270,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1706,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": "HOPPER",
+        "districtCode": null,
+        "matchScores": null
+      }
+    },
+    "type": "overall",
+    "year": 2026,
+    "yearType": "2026overallqual"
+  },
+  {
+    "level": "playoff",
+    "matchData": {
+      "event": {
+        "districtCode": null,
+        "eventCode": "HOPPER",
+        "type": "playoff"
+      },
+      "highScoreAlliance": "blue",
+      "match": {
+        "field": "Primary",
+        "startTime": "2026-05-02T10:03:00",
+        "autoStartTime": "2026-05-02T10:16:31.18",
+        "matchVideoLink": "https://www.youtube.com/watch?v=IRDzeL0EzdE",
+        "matchNumber": 11,
+        "isReplay": false,
+        "actualStartTime": "2026-05-02T10:16:31.18",
+        "tournamentLevel": "Playoff",
+        "postResultTime": "2026-05-02T10:19:48.023",
+        "description": "Match 11 (R4)",
+        "scoreRedFinal": 590,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 138,
+        "scoreBlueFinal": 851,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 194,
+        "teams": [
+          {
+            "teamNumber": 11270,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1732,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8044,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 581,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1706,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 4143,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": "HOPPER",
+        "districtCode": null,
+        "matchScores": null
+      }
+    },
+    "type": "penaltyFree",
+    "year": 2026,
+    "yearType": "2026penaltyFreeplayoff"
+  },
+  {
+    "level": "qual",
+    "matchData": {
+      "event": {
+        "districtCode": null,
+        "eventCode": "ARCHIMEDES",
+        "type": "qual"
+      },
+      "highScoreAlliance": "red",
+      "match": {
+        "field": "Primary",
+        "startTime": "2026-05-01T15:35:00",
+        "autoStartTime": "2026-05-01T15:39:22.283",
+        "matchVideoLink": "https://www.youtube.com/watch?v=pSID-_ESaoU",
+        "matchNumber": 108,
+        "isReplay": false,
+        "actualStartTime": "2026-05-01T15:39:22.283",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2026-05-01T15:42:26.47",
+        "description": "Qualification 108",
+        "scoreRedFinal": 885,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 189,
+        "scoreBlueFinal": 431,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 71,
+        "teams": [
+          {
+            "teamNumber": 9470,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1114,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 548,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3494,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 587,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2960,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": "ARCHIMEDES",
+        "districtCode": null,
+        "matchScores": null
+      }
+    },
+    "type": "penaltyFree",
+    "year": 2026,
+    "yearType": "2026penaltyFreequal"
+  }
+]

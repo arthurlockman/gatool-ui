@@ -7,30 +7,14 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { Auth0Provider } from "@auth0/auth0-react";
+import { AuthProvider } from './contextProviders/AuthProvider';
 import { AuthClientContextProvider } from './contextProviders/AuthClientContext';
 import { ToastContainer } from 'react-toastify';
 import { OnlineStatusProvider } from './contextProviders/OnlineContext';
+import { SettingsProvider } from './contexts/SettingsContext';
+import { EventSelectionProvider } from './contexts/EventSelectionContext';
 import { HotkeysProvider } from 'react-hotkeys-hook'
 import { SnackbarProvider } from 'notistack';
-
-// Suppress findDOMNode deprecation warnings from react-quill
-// This is a known issue with react-quill library that uses deprecated findDOMNode internally
-if (process.env.NODE_ENV === 'development') {
-    const originalError = console.error;
-    console.error = (...args) => {
-        // Check if the warning is about findDOMNode and ReactQuill
-        const message = args[0];
-        if (
-            (typeof message === 'string' && message.includes('findDOMNode is deprecated')) ||
-            (typeof message === 'string' && message.includes('ReactQuill') && message.includes('findDOMNode'))
-        ) {
-            // Suppress this specific warning from react-quill
-            return;
-        }
-        originalError.apply(console, args);
-    };
-}
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -38,21 +22,17 @@ root.render(
     {/* see https://github.com/JohannesKlauss/react-hotkeys-hook/issues/854#issuecomment-1345235881 for why the 'none' scope is needed */}
     <HotkeysProvider initiallyActiveScopes={['matchNavigation', 'tabNavigation', 'none']}>
       <OnlineStatusProvider>
-        <Auth0Provider
-          domain={process.env.REACT_APP_AUTH0_LOGIN_DOMAIN || 'auth.gatool.org'}
-          clientId={process.env.REACT_APP_AUTH0_CLIENTID || 'afsE1dlAGS609U32NjmvNMaYSQmtO3NT'}
-          redirectUri={window.location.origin}
-          useRefreshTokens={true}
-          cacheLocation='localstorage'
-          connection={process.env.REACT_APP_AUTH0_CONNECTION || 'email'}
-          sessionCheckExpiryDays={7}
-        >
+        <AuthProvider>
           <AuthClientContextProvider>
             <SnackbarProvider>
-              <App />
+              <SettingsProvider>
+                <EventSelectionProvider>
+                  <App />
+                </EventSelectionProvider>
+              </SettingsProvider>
             </SnackbarProvider>
           </AuthClientContextProvider>
-        </Auth0Provider>
+        </AuthProvider>
         <ToastContainer
           position='bottom-right'
           autoClose={5000}

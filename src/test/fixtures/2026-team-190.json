@@ -1,0 +1,22 @@
+{
+  "teamCountTotal": 1,
+  "teamCountPage": 1,
+  "pageCurrent": 1,
+  "pageTotal": 1,
+  "teams": [
+    {
+      "teamNumber": 190,
+      "nameFull": "WPI/Jabil Healthcare&Mass Academy-Math & Science",
+      "nameShort": "Gompei and the HERD",
+      "city": "Worcester",
+      "stateProv": "Massachusetts",
+      "country": "USA",
+      "rookieYear": 1992,
+      "robotName": "",
+      "districtCode": "NE",
+      "schoolName": "Mass Academy-Math & Science",
+      "website": "",
+      "homeCMP": null
+    }
+  ]
+}

@@ -1,0 +1,732 @@
+[
+  {
+    "level": "playoff",
+    "matchData": {
+      "event": {
+        "districtCode": null,
+        "eventCode": "ININD",
+        "type": "playoff"
+      },
+      "highScoreAlliance": "red",
+      "match": {
+        "field": "Primary",
+        "startTime": "2025-07-12T14:00:00",
+        "autoStartTime": "2025-07-12T14:05:40.113",
+        "matchVideoLink": null,
+        "matchNumber": 1,
+        "isReplay": false,
+        "actualStartTime": "2025-07-12T14:05:40.113",
+        "tournamentLevel": "Playoff",
+        "postResultTime": "2025-07-12T14:09:50.707",
+        "description": "Match 1 (R1)",
+        "scoreRedFinal": 301,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 79,
+        "scoreBlueFinal": 224,
+        "scoreBlueFoul": 24,
+        "scoreBlueAuto": 16,
+        "teams": [
+          {
+            "teamNumber": 4028,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1690,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2056,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1732,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 111,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2826,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": "ININD",
+        "districtCode": null,
+        "matchScores": null
+      }
+    },
+    "type": "TBAPenaltyFree",
+    "year": 2025,
+    "yearType": "2025TBAPenaltyFreeplayoff"
+  },
+  {
+    "level": "qual",
+    "matchData": {
+      "event": {
+        "districtCode": null,
+        "eventCode": "ININD",
+        "type": "qual"
+      },
+      "highScoreAlliance": "blue",
+      "match": {
+        "field": "Primary",
+        "startTime": "2025-07-11T11:28:00",
+        "autoStartTime": "2025-07-11T11:52:39.673",
+        "matchVideoLink": null,
+        "matchNumber": 12,
+        "isReplay": false,
+        "actualStartTime": "2025-07-11T11:52:39.673",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2025-07-11T11:57:12.653",
+        "description": "Qualification 12",
+        "scoreRedFinal": 236,
+        "scoreRedFoul": 2,
+        "scoreRedAuto": 51,
+        "scoreBlueFinal": 294,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 54,
+        "teams": [
+          {
+            "teamNumber": 112,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3663,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5687,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 341,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 4499,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 422,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": "ININD",
+        "districtCode": null,
+        "matchScores": null
+      }
+    },
+    "type": "TBAPenaltyFree",
+    "year": 2025,
+    "yearType": "2025TBAPenaltyFreequal"
+  },
+  {
+    "level": "playoff",
+    "matchData": {
+      "event": {
+        "districtCode": null,
+        "eventCode": "ININD",
+        "type": "playoff"
+      },
+      "highScoreAlliance": "red",
+      "match": {
+        "field": "Primary",
+        "startTime": "2025-07-12T14:00:00",
+        "autoStartTime": "2025-07-12T14:05:40.113",
+        "matchVideoLink": null,
+        "matchNumber": 1,
+        "isReplay": false,
+        "actualStartTime": "2025-07-12T14:05:40.113",
+        "tournamentLevel": "Playoff",
+        "postResultTime": "2025-07-12T14:09:50.707",
+        "description": "Match 1 (R1)",
+        "scoreRedFinal": 301,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 79,
+        "scoreBlueFinal": 224,
+        "scoreBlueFoul": 24,
+        "scoreBlueAuto": 16,
+        "teams": [
+          {
+            "teamNumber": 4028,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1690,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2056,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1732,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 111,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2826,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": "ININD",
+        "districtCode": null,
+        "matchScores": null
+      }
+    },
+    "type": "allianceContribution",
+    "year": 2025,
+    "yearType": "2025allianceContributionplayoff"
+  },
+  {
+    "level": "qual",
+    "matchData": {
+      "event": {
+        "districtCode": null,
+        "eventCode": "ININD",
+        "type": "qual"
+      },
+      "highScoreAlliance": "blue",
+      "match": {
+        "field": "Primary",
+        "startTime": "2025-07-11T15:52:00",
+        "autoStartTime": "2025-07-11T16:31:59.563",
+        "matchVideoLink": null,
+        "matchNumber": 39,
+        "isReplay": false,
+        "actualStartTime": "2025-07-11T16:31:59.563",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2025-07-11T16:37:04.857",
+        "description": "Qualification 39",
+        "scoreRedFinal": 242,
+        "scoreRedFoul": 2,
+        "scoreRedAuto": 35,
+        "scoreBlueFinal": 321,
+        "scoreBlueFoul": 2,
+        "scoreBlueAuto": 79,
+        "teams": [
+          {
+            "teamNumber": 9245,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2481,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1768,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 422,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2056,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1706,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": "ININD",
+        "districtCode": null,
+        "matchScores": null
+      }
+    },
+    "type": "allianceContribution",
+    "year": 2025,
+    "yearType": "2025allianceContributionqual"
+  },
+  {
+    "level": "playoff",
+    "matchData": {
+      "event": {
+        "districtCode": "PNW",
+        "eventCode": "PNCMP",
+        "type": "playoff"
+      },
+      "highScoreAlliance": "red",
+      "match": {
+        "field": "Primary",
+        "startTime": "2025-04-05T13:18:00",
+        "autoStartTime": "2025-04-05T13:20:50.343",
+        "matchVideoLink": "https://www.youtube.com/watch?v=VNDcPCkshK4",
+        "matchNumber": 3,
+        "isReplay": false,
+        "actualStartTime": "2025-04-05T13:20:50.343",
+        "tournamentLevel": "Playoff",
+        "postResultTime": "2025-04-05T13:25:33.53",
+        "description": "Match 3 (R1)",
+        "scoreRedFinal": 259,
+        "scoreRedFoul": 2,
+        "scoreRedAuto": 64,
+        "scoreBlueFinal": 239,
+        "scoreBlueFoul": 2,
+        "scoreBlueAuto": 51,
+        "teams": [
+          {
+            "teamNumber": 9450,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 948,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1778,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5937,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2522,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 9023,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": "PNCMP",
+        "districtCode": "PNW",
+        "matchScores": null
+      }
+    },
+    "type": "offsetting",
+    "year": 2025,
+    "yearType": "2025offsettingplayoff"
+  },
+  {
+    "level": "qual",
+    "matchData": {
+      "event": {
+        "districtCode": null,
+        "eventCode": "ININD",
+        "type": "qual"
+      },
+      "highScoreAlliance": "blue",
+      "match": {
+        "field": "Primary",
+        "startTime": "2025-07-11T15:52:00",
+        "autoStartTime": "2025-07-11T16:31:59.563",
+        "matchVideoLink": null,
+        "matchNumber": 39,
+        "isReplay": false,
+        "actualStartTime": "2025-07-11T16:31:59.563",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2025-07-11T16:37:04.857",
+        "description": "Qualification 39",
+        "scoreRedFinal": 242,
+        "scoreRedFoul": 2,
+        "scoreRedAuto": 35,
+        "scoreBlueFinal": 321,
+        "scoreBlueFoul": 2,
+        "scoreBlueAuto": 79,
+        "teams": [
+          {
+            "teamNumber": 9245,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2481,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1768,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 422,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2056,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1706,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": "ININD",
+        "districtCode": null,
+        "matchScores": null
+      }
+    },
+    "type": "offsetting",
+    "year": 2025,
+    "yearType": "2025offsettingqual"
+  },
+  {
+    "level": "playoff",
+    "matchData": {
+      "event": {
+        "districtCode": null,
+        "eventCode": "ININD",
+        "type": "playoff"
+      },
+      "highScoreAlliance": "blue",
+      "match": {
+        "field": "Primary",
+        "startTime": "2025-07-12T16:45:00",
+        "autoStartTime": "2025-07-12T17:05:40.88",
+        "matchVideoLink": null,
+        "matchNumber": 15,
+        "isReplay": false,
+        "actualStartTime": "2025-07-12T17:05:40.88",
+        "tournamentLevel": "Playoff",
+        "postResultTime": "2025-07-12T17:12:53.797",
+        "description": "Final 2",
+        "scoreRedFinal": 250,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 72,
+        "scoreBlueFinal": 325,
+        "scoreBlueFoul": 68,
+        "scoreBlueAuto": 72,
+        "teams": [
+          {
+            "teamNumber": 4028,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1690,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2056,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 8044,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 868,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 422,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": "ININD",
+        "districtCode": null,
+        "matchScores": null
+      }
+    },
+    "type": "overall",
+    "year": 2025,
+    "yearType": "2025overallplayoff"
+  },
+  {
+    "level": "qual",
+    "matchData": {
+      "event": {
+        "districtCode": null,
+        "eventCode": "TUIS3",
+        "type": "qual"
+      },
+      "highScoreAlliance": "red",
+      "match": {
+        "field": "Primary",
+        "startTime": "2025-03-08T10:43:00",
+        "autoStartTime": "2025-03-08T11:04:22.73",
+        "matchVideoLink": "https://www.youtube.com/watch?v=rDufqSe9i-o",
+        "matchNumber": 8,
+        "isReplay": false,
+        "actualStartTime": "2025-03-08T11:04:22.73",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2025-03-08T11:12:24.603",
+        "description": "Qualification 8",
+        "scoreRedFinal": 374,
+        "scoreRedFoul": 278,
+        "scoreRedAuto": 31,
+        "scoreBlueFinal": 4,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 0,
+        "teams": [
+          {
+            "teamNumber": 10428,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 9609,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 9451,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 10425,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 9185,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 10548,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": "TUIS3",
+        "districtCode": null,
+        "matchScores": null
+      }
+    },
+    "type": "overall",
+    "year": 2025,
+    "yearType": "2025overallqual"
+  },
+  {
+    "level": "playoff",
+    "matchData": {
+      "event": {
+        "districtCode": null,
+        "eventCode": "ININD",
+        "type": "playoff"
+      },
+      "highScoreAlliance": "red",
+      "match": {
+        "field": "Primary",
+        "startTime": "2025-07-12T14:54:00",
+        "autoStartTime": "2025-07-12T15:00:07.33",
+        "matchVideoLink": null,
+        "matchNumber": 7,
+        "isReplay": false,
+        "actualStartTime": "2025-07-12T15:00:07.33",
+        "tournamentLevel": "Playoff",
+        "postResultTime": "2025-07-12T15:04:10.147",
+        "description": "Match 7 (R2)",
+        "scoreRedFinal": 297,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 72,
+        "scoreBlueFinal": 269,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 51,
+        "teams": [
+          {
+            "teamNumber": 4028,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1690,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2056,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 118,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 694,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3538,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": "ININD",
+        "districtCode": null,
+        "matchScores": null
+      }
+    },
+    "type": "penaltyFree",
+    "year": 2025,
+    "yearType": "2025penaltyFreeplayoff"
+  },
+  {
+    "level": "qual",
+    "matchData": {
+      "event": {
+        "districtCode": null,
+        "eventCode": "ININD",
+        "type": "qual"
+      },
+      "highScoreAlliance": "red",
+      "match": {
+        "field": "Primary",
+        "startTime": "2025-07-11T14:28:00",
+        "autoStartTime": "2025-07-11T14:49:59.797",
+        "matchVideoLink": null,
+        "matchNumber": 27,
+        "isReplay": false,
+        "actualStartTime": "2025-07-11T14:49:59.797",
+        "tournamentLevel": "Qualification",
+        "postResultTime": "2025-07-11T14:54:01.017",
+        "description": "Qualification 27",
+        "scoreRedFinal": 285,
+        "scoreRedFoul": 0,
+        "scoreRedAuto": 51,
+        "scoreBlueFinal": 247,
+        "scoreBlueFoul": 0,
+        "scoreBlueAuto": 57,
+        "teams": [
+          {
+            "teamNumber": 1706,
+            "station": "Red1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 1833,
+            "station": "Red2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 3276,
+            "station": "Red3",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 5687,
+            "station": "Blue1",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 4590,
+            "station": "Blue2",
+            "surrogate": false,
+            "dq": false
+          },
+          {
+            "teamNumber": 2491,
+            "station": "Blue3",
+            "surrogate": false,
+            "dq": false
+          }
+        ],
+        "eventCode": "ININD",
+        "districtCode": null,
+        "matchScores": null
+      }
+    },
+    "type": "penaltyFree",
+    "year": 2025,
+    "yearType": "2025penaltyFreequal"
+  }
+]
