@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import moment from "moment";
 import _ from "lodash";
 import ReactQuillWrapper from "components/ReactQuillWrapper";
-import 'react-quill/dist/quill.snow.css';
+import 'react-quill-new/dist/quill.snow.css';
 
 const modules = {
     toolbar: [

@@ -81,7 +81,7 @@ export default defineConfig({
           const seg = (name) => id.includes(`/node_modules/${name}/`);
           if (seg("xlsx")) return "vendor-xlsx";
           if (seg("docxtemplater") || seg("pizzip") || seg("file-saver")) return "vendor-docx";
-          if (seg("react-quill") || seg("quill")) return "vendor-quill";
+          if (seg("react-quill-new") || seg("quill")) return "vendor-quill";
           if (id.includes("/node_modules/@dnd-kit/")) return "vendor-dnd";
           if (seg("react-bootstrap") || seg("bootstrap") || seg("react-bootstrap-icons")) return "vendor-bootstrap";
           if (seg("lodash") || seg("lodash-es")) return "vendor-lodash";
