@@ -18,14 +18,29 @@ export const allianceShortNames = {
   "Dow ": "Dow",
   Ford: "Ford",
   Consumers: "Cons",
+  Lovelace: "Love",
+  Goodall: "Good",
+  Edison: "Edis",
+  Franklin: "Fran",
+  Jackson: "Jack",
+  Ross: "Ross",
 };
 
 // Update this after Champs each season
 export const hallOfFame = [
   {
+    Year: 2026,
+    Impact: 6352,
+    Challenge: "DECODE",
+    Winner1: 4414,
+    Winner2: 1323,
+    Winner3: 4065,
+    Winner4: 1358,
+    Winner5: null,
+  },{
     Year: 2025,
     Impact: 5985,
-    Challenge: "Reefscape Houston",
+    Challenge: "Reefscape",
     Winner1: 1323,
     Winner2: 2910,
     Winner3: 4272,
@@ -35,7 +50,7 @@ export const hallOfFame = [
   {
     Year: 2024,
     Impact: 2486,
-    Challenge: "Crescendo Houston",
+    Challenge: "Crescendo",
     Winner1: 1690,
     Winner2: 4522,
     Winner3: 9432,
@@ -45,7 +60,7 @@ export const hallOfFame = [
   {
     Year: 2023,
     Impact: 321,
-    Challenge: "Charged Up Houston",
+    Challenge: "Charged Up",
     Winner1: 1323,
     Winner2: 4414,
     Winner3: 4096,
@@ -55,7 +70,7 @@ export const hallOfFame = [
   {
     Year: 2022,
     Chairmans: 1629,
-    Challenge: "Rapid React Houston",
+    Challenge: "Rapid React",
     Winner1: 1619,
     Winner2: 254,
     Winner3: 3175,
@@ -407,6 +422,15 @@ export const hallOfFame = [
 // Update this after Champs each season
 export const FTCHallOfFame = [
   {
+    Year: 2026,
+    Inspire: 17792,
+    Challenge: "DECODE",
+    Winner1: 30030,
+    Winner2: 21087,
+    Winner3: 11228,
+    Winner4: null,
+    Winner5: null,
+  },{
     Year: 2025,
     Inspire: 18139,
     Challenge: "INTO THE DEEP",
