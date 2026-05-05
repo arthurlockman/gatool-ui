@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, act } from "@testing-library/react";
-import React from "react";
 import { OnlineStatusProvider, useOnlineStatus } from "./OnlineContext";
 
 // Helper component that reads the context value

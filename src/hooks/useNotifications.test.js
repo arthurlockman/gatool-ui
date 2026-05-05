@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { act, waitFor } from "@testing-library/react";
 import { http, HttpResponse } from "msw";
-import { SnackbarProvider, useSnackbar } from "notistack";
+import { SnackbarProvider } from "notistack";
 import { useNotifications } from "./useNotifications";
 import { renderHookWithProviders } from "../test/renderHook";
 import { createTestHttpClient } from "../test/httpClient";
