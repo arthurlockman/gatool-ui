@@ -683,7 +683,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                         <Row>
                             <Container fluid>
                                 <Row>
-                                    <Col xs={width < 600 ? 12 : inChamps ? 4 : 5}>
+                                    <Col xs={width < 600 ? 12 : 5}>
                                         <Container fluid className="allianceContainer">
                                             <Row>
                                                 <Col>
@@ -710,11 +710,11 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
 
                                         </Container>
                                     </Col>
-                                    {width >= 600 && <Col xs={2} >
+                                    {width >= 600 && !ftcMode && !inChamps && <Col xs={2} >
                                         <Container fluid className={"backupAlliancesTable"}>
                                             <Row>
                                                 <Col>
-                                                    <p><strong>{ftcMode ? "Top Ranked Teams" : "Backup Teams"}</strong><br />(Teams here are initially ranked {allianceCount?.count + 1} to {allianceCount?.count + 8} top to bottom. As Alliance Selection progresses, teams will rise up into this section as teams are selected.)</p>
+                                                    <p><strong>Backup Teams</strong><br />(Teams here are initially ranked {allianceCount?.count + 1} to {allianceCount?.count + 8} top to bottom. As Alliance Selection progresses, teams will rise up into this section as teams are selected.)</p>
                                                 </Col>
                                             </Row>
                                             <Row>
@@ -759,7 +759,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                 </Row>
                                             </Container>}
                                     </Col>}
-                                    <Col xs={width < 600 ? 12 : inChamps ? 6 : 5}>
+                                    <Col xs={width < 600 ? 12 : (ftcMode || inChamps) ? 7 : 5}>
                                         <Row className={"alliancesTeamsTable alliancesTeamsTableHeader"}>{currentRound >= 0 ? `Round ${currentRound} of ${allianceSelectionRounds?.length}` : asArrays?.nextChoice > 0 ? "Alliance Selection Complete" : "Alliance Selection not started"}</Row>
                                         <Container fluid className={"alliancesTeamsTable"}>
                                             {allianceDisplayOrder.map((row) => {
@@ -869,11 +869,11 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
 
                                         </Container>
                                     </Col>
-                                    {width < 600 && <Col xs={12} >
+                                    {width < 600 && !ftcMode && !inChamps && <Col xs={12} >
                                         <Container fluid className={"backupAlliancesTable"}>
                                             <Row>
                                                 <Col>
-                                                    <p><strong>{ftcMode ? "Top Ranked Teams" : "Backup Teams"}</strong><br />(Teams here are initially ranked {allianceCount?.count + 1} to {allianceCount?.count + 8} top to bottom. As Alliance Selection progresses, teams will rise up into this section as teams are selected.)</p>
+                                                    <p><strong>Backup Teams</strong><br />(Teams here are initially ranked {allianceCount?.count + 1} to {allianceCount?.count + 8} top to bottom. As Alliance Selection progresses, teams will rise up into this section as teams are selected.)</p>
                                                 </Col>
                                             </Row>
                                             <Row>

@@ -13,11 +13,13 @@ export const appUpdates = [
         </ul>
         <li>FRC:</li>
         <ul>
-        <li>Users can now reorder teams for unplayed matches during FRC Divisional and Einstein playoffs</li>
+        <li>Users can now reorder teams for unplayed matches during FRC Championship Division and Einstein playoffs</li>
+        <li>Removed Reserve Team list on Alliance Selection screen for FRC Championship Divisions</li>
         </ul>
         <li>FRC:</li>
         <ul>
         <li>Restored the third Alliance member during Champs Divisional playoffs and Finals tournaments for FTC</li>
+        <li>Removed Reserve Team list on Alliance Selection screen</li>
         </ul>
       </ul>
       </>
