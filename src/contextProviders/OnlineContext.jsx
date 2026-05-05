@@ -6,20 +6,15 @@ export const OnlineStatusProvider = ({ children }) => {
   const [onlineStatus, setOnlineStatus] = useState(navigator.onLine);
 
   useEffect(() => {
-    window.addEventListener("offline", () => {
-      setOnlineStatus(false);
-    });
-    window.addEventListener("online", () => {
-      setOnlineStatus(true);
-    });
+    const handleOffline = () => setOnlineStatus(false);
+    const handleOnline = () => setOnlineStatus(true);
+
+    window.addEventListener("offline", handleOffline);
+    window.addEventListener("online", handleOnline);
 
     return () => {
-      window.removeEventListener("offline", () => {
-        setOnlineStatus(false);
-      });
-      window.removeEventListener("online", () => {
-        setOnlineStatus(true);
-      });
+      window.removeEventListener("offline", handleOffline);
+      window.removeEventListener("online", handleOnline);
     };
   }, []);
 

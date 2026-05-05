@@ -56,7 +56,9 @@ export function useNotifications({
 
   // --- Service worker update snackbars ---
 
-  // Display an alert when there are updates to the app
+  // Display an alert when there are updates to the app.
+  // Use a stable key so re-triggers replace the existing snackbar instead of stacking.
+  const SW_UPDATE_SNACKBAR_KEY = "sw-update-available";
   useEffect(() => {
     const reload = () => {
       setShowReloaded(true);
@@ -65,6 +67,8 @@ export function useNotifications({
 
     if (showReload && waitingWorker) {
       enqueueSnackbar("A new version was released.", {
+        key: SW_UPDATE_SNACKBAR_KEY,
+        preventDuplicate: true,
         persist: true,
         variant: "success",
         action: (
@@ -80,7 +84,10 @@ export function useNotifications({
         ),
       });
     }
-  }, [waitingWorker, showReload, setShowReloaded, reloadPage, enqueueSnackbar]);
+    return () => {
+      closeSnackbar(SW_UPDATE_SNACKBAR_KEY);
+    };
+  }, [waitingWorker, showReload, setShowReloaded, reloadPage, enqueueSnackbar, closeSnackbar]);
 
   // Display update details after reload
   useEffect(() => {
