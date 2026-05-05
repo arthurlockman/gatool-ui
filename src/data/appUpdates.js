@@ -1,5 +1,28 @@
 export const appUpdates = [
   {
+    date: "May 4, 2026",
+    message: (
+      <>
+      <b>MAJOR REFACTORING OF THE APP CODEBASE</b><br />
+      <ul>
+        <li>ALL PROGRAMS:</li>
+        <ul>
+        <li>You can now use Passkeys or email OTP when authenticating</li>
+        <li>Choosing FIRST Championship in the Timeframe selector on Setup Page now works for both FRC and FTC</li>
+        <li>Internatinal teams' countries repeated in many placeswhen users entered updated city/state details. This no longer happens.</li>
+        </ul>
+        <li>FRC:</li>
+        <ul>
+        <li>Users can now reorder teams for unplayed matches during FRC Divisional and Einstein playoffs</li>
+        </ul>
+        <li>FRC:</li>
+        <ul>
+        <li>Restored the third Alliance member during Champs Divisional playoffs and Finals tournaments for FTC</li>
+        </ul>
+      </ul>
+      </>
+    ),
+  },{
     date: "April 29, 2026",
     message: (
       <ul>

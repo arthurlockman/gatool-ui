@@ -85,7 +85,7 @@ const LoginModal = ({ show, onHide, defaultEmail = "", onAuthenticated }) => {
         return;
       }
       setStep(STEP_CODE);
-      setInfo(`We emailed a 6-digit code to ${email}.`);
+      setInfo(`We emailed a 6-digit code to ${email}. Check your spam folder if you don't see it.`);
     } catch (e) {
       setError("Network error. Please try again.");
     } finally {
