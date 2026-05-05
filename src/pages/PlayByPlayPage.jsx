@@ -606,7 +606,7 @@ function PlayByPlayPage({
                       remapNumberToString={remapNumberToString}
                     />
                   </tr>
-                  {(!ftcMode || (inPlayoffs &&ftcMode && selectedEvent?.value?.champLevel === "CHAMPS")) && (
+                  {(!ftcMode || (inPlayoffs && ftcMode && (selectedEvent?.value?.champLevel === "CHAMPS" || selectedEvent?.value?.champLevel === "CMPDIV" || selectedEvent?.value?.champLevel === "CMPSUB"))) && (
                     <tr className={"gatool-playbyplay"}>
                       <PlayByPlay
                         station={displayOrder[4]}

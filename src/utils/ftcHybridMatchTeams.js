@@ -224,7 +224,7 @@ export function hydrateFtcPlayoffTeamsFromResults(match, results) {
   if (redNums.length === 0 && blueNums.length === 0) return;
 
   const teams = [];
-  redNums.slice(0, 2).forEach((n, i) => {
+  redNums.forEach((n, i) => {
     teams.push({
       teamNumber: n,
       station: `Red${i + 1}`,
@@ -232,7 +232,7 @@ export function hydrateFtcPlayoffTeamsFromResults(match, results) {
       dq: false,
     });
   });
-  blueNums.slice(0, 2).forEach((n, i) => {
+  blueNums.forEach((n, i) => {
     teams.push({
       teamNumber: n,
       station: `Blue${i + 1}`,

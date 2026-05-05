@@ -94,11 +94,11 @@ function swapTeamPayload(a, b) {
 }
 
 function playoffSortRowPaletteKey(station) {
-    if (!station) return "bench";
+    if (!station) return "reserve";
     const c = canonicalAllianceStation(station);
     if (/^Red[123]$/.test(c)) return "red";
     if (/^Blue[123]$/.test(c)) return "blue";
-    return "bench";
+    return "reserve";
 }
 
 function computeSideDragNext(prev, activeKey, overKey, isFieldStation) {
@@ -120,7 +120,7 @@ function computeSideDragNext(prev, activeKey, overKey, isFieldStation) {
     return arrayMove(items, ai, oi);
 }
 
-function getBenchTeamNumbersForSide(
+function getReserveTeamNumbersForSide(
     sideRows,
     matchDetails,
     alliances,
@@ -246,13 +246,13 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
             const t = teams.find((x) => canonicalAllianceStation(x?.station) === st);
             return _.cloneDeep(t || { station: st, teamNumber: null, surrogate: false, dq: false });
         });
-        const benchRedNums = getBenchTeamNumbersForSide(
+        const reserveRedNums = getReserveTeamNumbersForSide(
             fieldRed, matchDetails, alliances, remapNumberToString, remapStringToNumber, "Red"
         );
-        const benchRed = benchRedNums.map((n) => ({
+        const reserveRed = reserveRedNums.map((n) => ({
             station: null, teamNumber: n, surrogate: false, dq: false,
         }));
-        setRedItems(withSortKeys([...fieldRed, ...benchRed], "r"));
+        setRedItems(withSortKeys([...fieldRed, ...reserveRed], "r"));
 
         const visualBlue = getFieldStationsInPlayByPlayVisualOrder("Blue", ftcMode, swapScreen);
         visualBlueOrderRef.current = visualBlue;
@@ -260,13 +260,13 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
             const t = teams.find((x) => canonicalAllianceStation(x?.station) === st);
             return _.cloneDeep(t || { station: st, teamNumber: null, surrogate: false, dq: false });
         });
-        const benchBlueNums = getBenchTeamNumbersForSide(
+        const reserveBlueNums = getReserveTeamNumbersForSide(
             fieldBlue, matchDetails, alliances, remapNumberToString, remapStringToNumber, "Blue"
         );
-        const benchBlue = benchBlueNums.map((n) => ({
+        const reserveBlue = reserveBlueNums.map((n) => ({
             station: null, teamNumber: n, surrogate: false, dq: false,
         }));
-        setBlueItems(withSortKeys([...fieldBlue, ...benchBlue], "b"));
+        setBlueItems(withSortKeys([...fieldBlue, ...reserveBlue], "b"));
 
         const restClone = rest.map((t) => _.cloneDeep(t));
         restItemsRef.current = restClone;
@@ -364,7 +364,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
                         const isField = isRedFieldStation(t.station);
                         const fi = isField ? fieldIdx++ : -1;
                         const finalStation = isField ? (visualRedOrderRef.current[fi] ?? t.station) : t.station;
-                        const label = isField ? finalStation : "Bench / not on field";
+                        const label = isField ? finalStation : "Reserve / not on field";
                         return (
                             <SortableTeamRow
                                 key={t._sortKey}
@@ -389,7 +389,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
                         const isField = isBlueFieldStation(t.station);
                         const fi = isField ? fieldIdx++ : -1;
                         const finalStation = isField ? (visualBlueOrderRef.current[fi] ?? t.station) : t.station;
-                        const label = isField ? finalStation : "Bench / not on field";
+                        const label = isField ? finalStation : "Reserve / not on field";
                         return (
                             <SortableTeamRow
                                 key={t._sortKey}
@@ -745,9 +745,11 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
         allAllianceMembersKnown;
     const showTopBarChangeTeamsCol = adHocMode || inPractice;
     const showTopBarReorderStationsCol =
-        showTopBarAddTeamCol &&
+        !ftcMode &&
         inPlayoffs &&
         matchDetails &&
+        !matchHasPosted &&
+        allAllianceMembersKnown &&
         !(matchDetails?.description || "").includes("Bye Match");
     // Show a single combined button when either the add-team or reorder action is available.
     const showTopBarTeamOpsCol = showTopBarAddTeamCol || showTopBarReorderStationsCol;
@@ -767,10 +769,12 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
     eventTeams.unshift({ label: "None", value: null });
 
     // ── modal title adapts to tab + reserve state ─────────────────────────────
-    const modalTitle = 
+    const modalTitle =
         teamSelected?.isPlayoffReserve
-          ? "Remove reserve team"
-          : "Add / Reorder Teams";
+            ? "Remove reserve team"
+            : showTopBarAddTeamCol
+            ? "Add / Reorder Teams"
+            : "Reorder Teams";
 
     return (
         <>
@@ -835,7 +839,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
                     <Col className="promoteBackup" xs={1} onClick={handleShow}>
                         <ArrowUpSquareFill />
                         <br />
-                        Add/Reorder
+                        {showTopBarAddTeamCol ? "Add/Reorder" : "Reorder"}
                         <br />
                         Teams
                     </Col>

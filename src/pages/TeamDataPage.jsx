@@ -173,7 +173,6 @@ function TeamDataPage({
      * Stores the team updates for a specific team. If we are unable to save to gatool Cloud, it will store the update locally
      * for update later.
      * @param {string} mode - determines whether to send the update to gatool Cloud. "update" = send to cloud
-     * @param {*} e - the inbound event from clicking the button.
      */
     const handleSubmit = async (mode, formValue) => {
         var visits = _.cloneDeep(lastVisit);
@@ -273,7 +272,6 @@ function TeamDataPage({
     /**
      * Opens the team data screen so that a user can view and edit the team details
      * @param {object} team - The team to display
-     * @param {*} e  - the inbound event from clicking the button.
      */
     const handleShow = (team) => {
         if (isAuthenticated && user["https://gatool.org/roles"] && user["https://gatool.org/roles"].indexOf("user") >= 0) {
@@ -938,7 +936,7 @@ function TeamDataPage({
                     </tbody>
                 </Table>
                 {isAuthenticated && <><Button variant="warning" size="sm" onClick={handleResetClick} style={{ marginRight: "10px" }}>Reset sponsors and robot names</Button>
-                    <Button variant="success" size="sm" onClick={(e) => { clearVisits(false, e) }}>Reset visit times. Use at the start of each day.</Button><br /><br /></>}
+                    <Button variant="success" size="sm" onClick={() => { clearVisits(false) }}>Reset visit times. Use at the start of each day.</Button><br /><br /></>}
 
                 <Table responsive striped bordered size="sm" className={"teamTable"}>
                     <thead className="thead-default">
@@ -988,7 +986,7 @@ function TeamDataPage({
                     </tbody>
                 </Table>
                 {isAuthenticated && <Button variant="warning" size="sm" onClick={handleResetClick} style={{ marginRight: "10px" }}>Reset sponsors and robot names</Button>}
-                <Button variant="success" size="sm" onClick={(e) => { clearVisits(false, e) }}>Reset visit times. Use at the start of each day.</Button><br /><br /><br />
+                <Button variant="success" size="sm" onClick={() => { clearVisits(false) }}>Reset visit times. Use at the start of each day.</Button><br /><br /><br />
             </div></>}
             <Modal centered={true} show={showDownload} onHide={handleCloseDownload}>
                 <Modal.Header className={"allianceChoice"} closeVariant={"white"} closeButton>
@@ -1011,8 +1009,8 @@ function TeamDataPage({
                 updateTeam={updateTeam}
                 localUpdates={localUpdates}
                 isOnline={isOnline}
-                isAuthenticated={isAuthenticated}
-                user={user}
+                // isAuthenticated={isAuthenticated}
+                // user={user}
                 selectedEvent={selectedEvent}
                 selectedYear={selectedYear}
                 originalAndSustaining={originalAndSustaining}
@@ -1020,9 +1018,9 @@ function TeamDataPage({
                 updateClass={updateClass}
                 onSave={handleSubmit}
                 onTrack={handleTrack}
-                onClearVisits={(e) => { clearVisits(true, e) }}
+                onClearVisits={() => { clearVisits(true) }}
                 onHistory={handleHistory}
-                timeFormat={timeFormat}
+                // timeFormat={timeFormat}
             />
 
             <TeamHistoryModal
