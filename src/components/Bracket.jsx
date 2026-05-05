@@ -98,12 +98,19 @@ function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMat
 	// 8-Alliance Finals: series 14-18 are displayed as match numbers 14-18 in the bracket
 	// Access by array index (series - 1), so indices 13-18 for display matches 14-19
 	
-	// In FTC mode, find the final series (highest series number in finals range)
+	// In FTC mode, find the final series (highest series number in finals range that has a played match).
+	// We intentionally exclude stub matches created by bracket propagation (no actualStartTime/postResultTime/scores),
+	// because the propagation logic creates a phantom series 15 entry when series 14 is won, which would
+	// incorrectly push finalSeries to 15 even though no match was actually played there.
 	let finalSeries = 18; // Default to highest series in finals range
 	if (ftcMode) {
 		const scheduleToCheck = offlinePlayoffSchedule?.schedule || matches;
 		const finalsSeriesNumbers = scheduleToCheck
-			.filter((m) => m.series >= 14 && m.series <= 18)
+			.filter((m) =>
+				m.series >= 14 &&
+				m.series <= 18 &&
+				(m.actualStartTime != null || m.postResultTime != null || m.scoreRedFinal != null || m.scoreBlueFinal != null || m.redWins != null || m.blueWins != null)
+			)
 			.map((m) => m.series);
 		if (finalsSeriesNumbers.length > 0) {
 			finalSeries = Math.max(...finalsSeriesNumbers);
