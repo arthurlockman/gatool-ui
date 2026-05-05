@@ -357,7 +357,13 @@ describe("hydrateFtcPlayoffTeamsFromResults", () => {
     ]);
   });
 
-  it("limits to 2 robots per alliance", () => {
+  // FTC Championship Divisions and Einstein use 3-robot alliances; commit
+  // 682b8c1 ("Restoring third Alliance member for FTC Champs Divisions and
+  // Einstein") removed the previous 2-robot cap from
+  // hydrateFtcPlayoffTeamsFromResults so all robots in the score breakdown
+  // are reflected on the match. This test pins that intentional behavior so
+  // the cap doesn't get reintroduced silently.
+  it("includes all robots per alliance (3-robot FTC Champs alliances)", () => {
     const match = { teams: [] };
     hydrateFtcPlayoffTeamsFromResults(match, {
       alliances: [
@@ -365,7 +371,17 @@ describe("hydrateFtcPlayoffTeamsFromResults", () => {
         { robot1: 40, robot2: 50, robot3: 60 },
       ],
     });
-    expect(match.teams).toHaveLength(4);
-    expect(match.teams.map((t) => t.teamNumber)).toEqual([40, 50, 10, 20]);
+    expect(match.teams).toHaveLength(6);
+    expect(match.teams.map((t) => t.teamNumber)).toEqual([
+      40, 50, 60, 10, 20, 30,
+    ]);
+    expect(match.teams.map((t) => t.station)).toEqual([
+      "Red1",
+      "Red2",
+      "Red3",
+      "Blue1",
+      "Blue2",
+      "Blue3",
+    ]);
   });
 });

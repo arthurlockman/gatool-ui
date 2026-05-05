@@ -1,7 +1,6 @@
 import MainNavigation from "./components/MainNavigation";
 import BottomNavigation from "./components/BottomNavigation";
-import { Outlet, Route, Routes } from "react-router";
-import { BrowserRouter, useLocation } from "react-router-dom";
+import { BrowserRouter, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import { ScrollContainerContext } from "./contextProviders/ScrollContainerContext";
 import { useEffect, useState, useRef, useMemo, useCallback } from "react";
 
