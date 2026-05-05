@@ -488,9 +488,10 @@ function App() {
       enforcingMutualExclusivityRef.current = true;
       setSyncEvent(false);
       // Reset flag after state update
-      setTimeout(() => {
+      const id = setTimeout(() => {
         enforcingMutualExclusivityRef.current = false;
       }, 100);
+      return () => clearTimeout(id);
     }
   }, [screenMode, syncEvent, setSyncEvent]);
 
@@ -1578,9 +1579,14 @@ function App() {
             setSelectedEvent(userPrefs.selectedEvent);
             // Update ref immediately to prevent reloading on next sync
             lastSyncedEventCodeRef.current = serverEventCode;
-            // Reset flag after a short delay to allow state update to complete
-            setTimeout(() => {
+            // Reset flag after a short delay to allow state update to complete.
+            // Clear any prior pending reset before scheduling a new one.
+            if (screenModeSyncFlagTimeoutRef.current) {
+              clearTimeout(screenModeSyncFlagTimeoutRef.current);
+            }
+            screenModeSyncFlagTimeoutRef.current = setTimeout(() => {
               isScreenModeSyncRef.current = false;
+              screenModeSyncFlagTimeoutRef.current = null;
             }, 100);
           }
         } else if (userPrefs.selectedEvent === null) {
@@ -1754,6 +1760,7 @@ function App() {
   // Screen Mode: Poll user preferences at configured frequency and update local state
   // Note: useInterval doesn't support dynamic intervals, so we'll recreate it when frequency changes
   const screenModePollIntervalRef = useRef(null);
+  const screenModeSyncFlagTimeoutRef = useRef(null);
   const startScreenModePoll = () => {
     if (screenModePollIntervalRef.current) {
       clearInterval(screenModePollIntervalRef.current);
@@ -1769,6 +1776,10 @@ function App() {
     if (screenModePollIntervalRef.current) {
       clearInterval(screenModePollIntervalRef.current);
       screenModePollIntervalRef.current = null;
+    }
+    if (screenModeSyncFlagTimeoutRef.current) {
+      clearTimeout(screenModeSyncFlagTimeoutRef.current);
+      screenModeSyncFlagTimeoutRef.current = null;
     }
   };
 
@@ -1917,6 +1928,7 @@ function App() {
   // Track when event is loading to skip syncing during transitions
   const previousEventCodeRef = useRef(selectedEvent?.value?.code);
   const pendingEventSyncRef = useRef(false);
+  const eventLoadTimeoutRef = useRef(null);
   useEffect(() => {
     const currentEventCode = selectedEvent?.value?.code;
     if (currentEventCode !== previousEventCodeRef.current) {
@@ -1926,8 +1938,13 @@ function App() {
       if (syncEvent && isAuthenticated) {
         pendingEventSyncRef.current = true;
       }
+      // Cancel any in-flight loading timeout before scheduling a new one
+      if (eventLoadTimeoutRef.current) {
+        clearTimeout(eventLoadTimeoutRef.current);
+      }
       // Reset loading flag after a delay to allow event to finish loading
-      setTimeout(() => {
+      eventLoadTimeoutRef.current = setTimeout(() => {
+        eventLoadTimeoutRef.current = null;
         isEventLoadingRef.current = false;
         // If we have a pending event sync and no network operations, trigger sync
         if (pendingEventSyncRef.current && syncEvent && isAuthenticated) {
@@ -1940,6 +1957,12 @@ function App() {
         }
       }, 2000); // 2 seconds should be enough for event to load
     }
+    return () => {
+      if (eventLoadTimeoutRef.current) {
+        clearTimeout(eventLoadTimeoutRef.current);
+        eventLoadTimeoutRef.current = null;
+      }
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedEvent?.value?.code, syncEvent, isAuthenticated]);
 

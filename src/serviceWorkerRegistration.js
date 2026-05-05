@@ -52,15 +52,20 @@ export function register(config) {
   }
 }
 
+let _updateIntervalId = null;
+
 function registerValidSW(swUrl, config) {
   navigator.serviceWorker
     .register(swUrl)
     .then((registration) => {
-      // Check every hour if an update is available
-      setInterval(() => {
-        registration.update()
-        console.log('Checking for updates...')
-      }, 1000 * 60 * 60)
+      // Check every hour if an update is available.
+      // Guard prevents stacking if registerValidSW is called more than once.
+      if (_updateIntervalId === null) {
+        _updateIntervalId = setInterval(() => {
+          registration.update();
+          console.log('Checking for updates...');
+        }, 1000 * 60 * 60);
+      }
 
       registration.onupdatefound = () => {
         const installingWorker = registration.installing;
@@ -131,6 +136,10 @@ function checkValidServiceWorker(swUrl, config) {
 }
 
 export function unregister() {
+  if (_updateIntervalId !== null) {
+    clearInterval(_updateIntervalId);
+    _updateIntervalId = null;
+  }
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.ready
       .then((registration) => {
