@@ -9,6 +9,7 @@ function FinalsMatchIndicator({
 	getFinalsMatchWinnerForDisplay,
 	getFinalsMatchScoreForDisplay,
 	overtimeOffset = 0,
+	indicatorScale = 1,
 	colors = {
 		RED: "#FF0000",
 		BLUE: "#0000FF",
@@ -33,6 +34,11 @@ function FinalsMatchIndicator({
 	const redFontWeight = winner?.winner === "red" ? black : semibold;
 	const blueFontWeight = winner?.winner === "blue" ? black : semibold;
 
+	const r = 8 * indicatorScale;
+	const fontSize = `${14 * indicatorScale}px`;
+	const textOffsetY = 26 * indicatorScale;
+	const lineSpacing = 14 * indicatorScale;
+
 	return (
 		<g transform={`translate(${x - overtimeOffset}, ${y})`}>
 			<circle
@@ -40,9 +46,9 @@ function FinalsMatchIndicator({
 				fill={winnerColor}
 				cx="0"
 				cy="0"
-				r="8"
+				r={r}
 			/>
-			<text id={`finalsM${matchNumber - 9}Scores`} transform="matrix(1 0 0 1 0 26)">
+			<text id={`finalsM${matchNumber - 9}Scores`} transform={`matrix(1 0 0 1 0 ${textOffsetY})`}>
 				<tspan
 					x="0"
 					y="0"
@@ -50,19 +56,19 @@ function FinalsMatchIndicator({
 					fontFamily="'myriad-pro'"
 					fontWeight={redFontWeight}
 					fontStyle="normal"
-					fontSize="14px"
+					fontSize={fontSize}
 					textAnchor="middle"
 				>
 					{redScore}
 				</tspan>
 				<tspan
 					x="0"
-					y="14"
+					y={lineSpacing}
 					fill={BLUE}
 					fontFamily="'myriad-pro'"
 					fontWeight={blueFontWeight}
 					fontStyle="normal"
-					fontSize="14px"
+					fontSize={fontSize}
 					textAnchor="middle"
 				>
 					{blueScore}
