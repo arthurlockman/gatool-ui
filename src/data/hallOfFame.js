@@ -24,6 +24,8 @@ export const allianceShortNames = {
   Franklin: "Fran",
   Jackson: "Jack",
   Ross: "Ross",
+  Jemison: "Jem",
+  Ochoa: "Ocho"
 };
 
 // Update this after Champs each season

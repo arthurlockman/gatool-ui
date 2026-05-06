@@ -6,7 +6,7 @@ function Match({
 	x = 0,
 	y = 0,
 	matchNumber,
-	onClick,
+	onClick = null,
 	isCurrentMatch,
 	getMatchLabel,
 	getAllianceNameForDisplay,

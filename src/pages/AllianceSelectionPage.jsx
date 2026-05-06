@@ -3,6 +3,7 @@ import Bracket from "../components/Bracket";
 import FourAllianceBracket from "components/FourAllianceBracket";
 import FourAllianceBracketFTC from "components/FourAllianceBracketFTC";
 import SixAllianceBracket from "components/SixAllianceBracket";
+import DaVinciTournamentBracket from "components/DaVinciTournamentBracket";
 import TwoAllianceBracket from "components/TwollianceBracket";
 import moment from "moment/moment";
 import AllianceSelection from "../components/AllianceSelection";
@@ -231,7 +232,9 @@ function AllianceSelectionPage({
 
             {selectedEvent && (alliancesCount === 8) && playoffs &&
                 <Bracket offlinePlayoffSchedule={offlinePlayoffSchedule} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} currentMatch={currentMatch} qualsLength={qualsLength} nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} usePullDownToUpdate={usePullDownToUpdate} useSwipe={useSwipe} eventLabel={eventLabel} ftcMode={ftcMode} matches={matches} allianceNumbers={allianceNumbers} allianceName={allianceName} matchScore={matchScore} matchWinner={matchWinner} alliances={alliances} remapNumberToString={remapNumberToString} />}
-            {selectedEvent && (alliancesCount === 6) && playoffs &&
+            {selectedEvent && (alliancesCount === 6) && playoffs && selectedEvent?.value?.code === "FTCCMP1" &&
+                <DaVinciTournamentBracket offlinePlayoffSchedule={offlinePlayoffSchedule} currentMatch={currentMatch} qualsLength={qualsLength} nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} usePullDownToUpdate={usePullDownToUpdate} useSwipe={useSwipe} eventLabel={eventLabel} ftcMode={ftcMode} matches={matches} allianceNumbers={allianceNumbers} allianceName={allianceName} matchScore={matchScore} matchWinner={matchWinner} alliances={alliances} remapNumberToString={remapNumberToString} />}
+            {selectedEvent && (alliancesCount === 6) && playoffs && selectedEvent?.value?.code !== "FTCCMP1" &&
                 <SixAllianceBracket offlinePlayoffSchedule={offlinePlayoffSchedule} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} currentMatch={currentMatch} qualsLength={qualsLength} nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} usePullDownToUpdate={usePullDownToUpdate} useSwipe={useSwipe} eventLabel={eventLabel} ftcMode={ftcMode} matches={matches} allianceNumbers={allianceNumbers} allianceName={allianceName} matchScore={matchScore} matchWinner={matchWinner} alliances={alliances} remapNumberToString={remapNumberToString} />}
             {selectedEvent && (alliancesCount === 4) && playoffs && !ftcMode &&
                 <FourAllianceBracket currentMatch={currentMatch} qualsLength={qualsLength} nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} useSwipe={useSwipe} usePullDownToUpdate={usePullDownToUpdate} offlinePlayoffSchedule={offlinePlayoffSchedule} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} eventLabel={eventLabel} ftcMode={ftcMode} matches={matches} allianceNumbers={allianceNumbers} allianceName={allianceName} matchScore={matchScore} matchWinner={matchWinner} />}

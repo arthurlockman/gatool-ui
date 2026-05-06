@@ -21,7 +21,8 @@ export const appUpdates = [
         <ul>
         <li>Restored the third Alliance member during Champs Divisional playoffs and Finals tournaments for FTC</li>
         <li>Removed Reserve Team list on Alliance Selection screen</li>
-        <li>Added Inspire and daVinci winners</li>
+        <li>Added Inspire and da Vinci winners</li>
+        <li>Adding da Vinci Tournament Bracket for FTC</li>
         </ul>
       </ul>
       </>
