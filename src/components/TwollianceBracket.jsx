@@ -2,36 +2,15 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { useSwipeable } from "react-swipeable";
 import PlayoffMatch from "./PlayoffMatch";
 import FinalsMatchIndicator from "./FinalsMatchIndicator";
+import { GOLD, RED, BLUE, black, bold, PLAYOFF_MATCH_GRAY_BOX_CENTER_X, INDICATOR_SPACING } from "./bracketConstants";
+import { countConsecutiveFinalsSlotsFromWinnerGetter } from "../utils/bracketHelpers";
 
 function TwoAllianceBracket({ nextMatch, previousMatch, getSchedule, useSwipe, usePullDownToUpdate, eventLabel, ftcMode, matches, allianceNumbers, allianceName, matchScore, matchWinner }) {
-	//Ball colors
-	const GOLD = "#FFCA10";
-	const RED = "#FF0000";
-	const BLUE = "#0000FF";
-	const GREEN = "#09BA48";
-	//font weights
-	const black = "900";
-	const bold = "700";
-	const semibold = "600";
-	//const normal = "400";
-
-	var overtimeOffset = 0;
 	var tournamentWinner = {
 		"red": 0,
 		"blue": 0,
 		"winner": "",
 		"level": 0
-	}
-	if (matches[5]?.actualStartTime) {
-		overtimeOffset = 106;
-	} else if (matches[4]?.actualStartTime) {
-		overtimeOffset = 84;
-	} else if (matches[3]?.actualStartTime) {
-		overtimeOffset = 63;
-	} else if (matches[2]?.actualStartTime) {
-		overtimeOffset = 42;
-	} else if (matches[1]?.actualStartTime) {
-		overtimeOffset = 21;
 	}
 
 	// 2-Alliance Finals: series 1-6 (all matches are finals)
@@ -60,8 +39,6 @@ function TwoAllianceBracket({ nextMatch, previousMatch, getSchedule, useSwipe, u
 		tournamentWinner.winner = "blue";
 		tournamentWinner.level = matches[5]?.winner?.level;
 	}
-
-	const dotStart = 541;
 
 	// eslint-disable-next-line react-hooks/rules-of-hooks
 	const swipeHandlers = useSwipe ? useSwipeable(
@@ -121,66 +98,16 @@ function TwoAllianceBracket({ nextMatch, previousMatch, getSchedule, useSwipe, u
 					colors={{ RED, BLUE, GOLD, BLACK, WHITE }}
 					fontWeights={{ bold }}
 				/>
-				<FinalsMatchIndicator
-					x={dotStart}
-					y={320}
-					matchNumber={1}
-					getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
-					getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
-					overtimeOffset={overtimeOffset}
-					colors={{ RED, BLUE, GOLD, GREEN }}
-					fontWeights={{ black, semibold }}
-				/>
-				<FinalsMatchIndicator
-					x={dotStart + 42}
-					y={320}
-					matchNumber={2}
-					getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
-					getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
-					overtimeOffset={overtimeOffset}
-					colors={{ RED, BLUE, GOLD, GREEN }}
-					fontWeights={{ black, semibold }}
-				/>
-				<FinalsMatchIndicator
-					x={dotStart + 84}
-					y={320}
-					matchNumber={3}
-					getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
-					getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
-					overtimeOffset={overtimeOffset}
-					colors={{ RED, BLUE, GOLD, GREEN }}
-					fontWeights={{ black, semibold }}
-				/>
-				<FinalsMatchIndicator
-					x={dotStart + 126}
-					y={320}
-					matchNumber={4}
-					getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
-					getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
-					overtimeOffset={overtimeOffset}
-					colors={{ RED, BLUE, GOLD, GREEN }}
-					fontWeights={{ black, semibold }}
-				/>
-				<FinalsMatchIndicator
-					x={dotStart + 168}
-					y={320}
-					matchNumber={5}
-					getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
-					getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
-					overtimeOffset={overtimeOffset}
-					colors={{ RED, BLUE, GOLD, GREEN }}
-					fontWeights={{ black, semibold }}
-				/>
-				<FinalsMatchIndicator
-					x={dotStart + 210}
-					y={320}
-					matchNumber={6}
-					getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
-					getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
-					overtimeOffset={overtimeOffset}
-					colors={{ RED, BLUE, GOLD, GREEN }}
-					fontWeights={{ black, semibold }}
-				/>
+		<FinalsMatchIndicator
+			x={425 + PLAYOFF_MATCH_GRAY_BOX_CENTER_X}
+			y={315}
+			firstFinalsMatchNumber={1}
+			finalsCount={countConsecutiveFinalsSlotsFromWinnerGetter(getFinalsMatchWinnerForDisplay, 1, 6)}
+			indicatorSpacing={INDICATOR_SPACING}
+			indicatorScale={1.2}
+			getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
+			getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
+		/>
 
 
 

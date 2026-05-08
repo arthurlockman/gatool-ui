@@ -7,7 +7,7 @@ import { matchClassesBase } from "../data/matchClasses";
 import Match from "./Match";
 import PlayoffMatch from "./PlayoffMatch";
 import FinalsMatchIndicator from "./FinalsMatchIndicator";
-import { GOLD, RED, BLUE, GREEN, BLACK, WHITE, black, bold, semibold } from "./bracketConstants";
+import { GOLD, RED, BLUE, GREEN, BLACK, WHITE, black, bold, PLAYOFF_MATCH_GRAY_BOX_CENTER_X, INDICATOR_SPACING } from "./bracketConstants";
 import { getTeamByStation, getMatchLabel as getMatchLabelHelper, isCurrentMatchHelper, computeIsInFinalsView, getAllianceNumbersForDisplay as getAllianceNumbersForDisplayHelper, getAllianceNameForDisplay as getAllianceNameForDisplayHelper, getMatchScoreForDisplay as getMatchScoreForDisplayHelper, getMatchWinnerForDisplay as getMatchWinnerForDisplayHelper } from "../utils/bracketHelpers";
 import { useBracketState } from "../hooks/useBracketState";
 import WinnerSelectionModal from "./WinnerSelectionModal";
@@ -38,7 +38,6 @@ function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previous
 
 	const getMatchWinnerForDisplay = (bracketMatchNumber) => getMatchWinnerForDisplayHelper(bracketMatchNumber, ftcMode, offlinePlayoffSchedule, matches, originalMatchWinner);
 
-	var overtimeOffset = 0;
 	var tournamentWinner = {
 		"red": 0,
 		"blue": 0,
@@ -47,19 +46,6 @@ function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previous
 	}
 
 	const matchClasses = _.cloneDeep(matchClassesBase.fourAlliance)
-
-	
-	if (matches[10]?.actualStartTime) {
-		overtimeOffset = 75;
-	} else if (matches[9]?.actualStartTime) {
-		overtimeOffset = 60;
-	} else if (matches[8]?.actualStartTime) {
-		overtimeOffset = 45;
-	} else if (matches[7]?.actualStartTime) {
-		overtimeOffset = 30;
-	} else if (matches[6]?.actualStartTime) {
-		overtimeOffset = 15;
-	}
 
 	// FTC Finals: bracket match numbers 6, 7, 8, ... correspond to series 6, 7, 8, ...
 	// Each slot shows the (last) match in that series. Red (higher seed) wins with 1 victory, Blue needs 2.
@@ -372,78 +358,16 @@ function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previous
 							colors={{ RED, BLUE, GOLD, BLACK, WHITE }}
 							fontWeights={{ bold }}
 						/>
-						{shouldDisplayFinalsMatch(6) && (
-							<FinalsMatchIndicator
-								x={910}
-								y={370}
-								matchNumber={6}
-								getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
-								getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
-								overtimeOffset={overtimeOffset}
-								colors={{ RED, BLUE, GOLD, GREEN }}
-								fontWeights={{ black, semibold }}
-							/>
-						)}
-						{shouldDisplayFinalsMatch(7) && (
-							<FinalsMatchIndicator
-								x={940}
-								y={370}
-								matchNumber={7}
-								getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
-								getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
-								overtimeOffset={overtimeOffset}
-								colors={{ RED, BLUE, GOLD, GREEN }}
-								fontWeights={{ black, semibold }}
-							/>
-						)}
-						{shouldDisplayFinalsMatch(8) && (
-							<FinalsMatchIndicator
-								x={970}
-								y={370}
-								matchNumber={8}
-								getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
-								getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
-								overtimeOffset={overtimeOffset}
-								colors={{ RED, BLUE, GOLD, GREEN }}
-								fontWeights={{ black, semibold }}
-							/>
-						)}
-						{shouldDisplayFinalsMatch(9) && (
-							<FinalsMatchIndicator
-								x={1000}
-								y={370}
-								matchNumber={9}
-								getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
-								getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
-								overtimeOffset={overtimeOffset}
-								colors={{ RED, BLUE, GOLD, GREEN }}
-								fontWeights={{ black, semibold }}
-							/>
-						)}
-						{shouldDisplayFinalsMatch(10) && (
-							<FinalsMatchIndicator
-								x={1030}
-								y={370}
-								matchNumber={10}
-								getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
-								getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
-								overtimeOffset={overtimeOffset}
-								colors={{ RED, BLUE, GOLD, GREEN }}
-								fontWeights={{ black, semibold }}
-							/>
-						)}
-						{shouldDisplayFinalsMatch(11) && (
-							<FinalsMatchIndicator
-								x={1070}
-								y={370}
-								matchNumber={11}
-								getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
-								getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
-								overtimeOffset={overtimeOffset}
-								colors={{ RED, BLUE, GOLD, GREEN }}
-								fontWeights={{ black, semibold }}
-							/>
-						)}
+				<FinalsMatchIndicator
+					x={784 + PLAYOFF_MATCH_GRAY_BOX_CENTER_X}
+					y={367}
+					firstFinalsMatchNumber={6}
+					finalsCount={[6,7,8,9,10,11].filter(shouldDisplayFinalsMatch).length}
+					indicatorSpacing={INDICATOR_SPACING}
+					indicatorScale={1.2}
+					getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
+					getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
+				/>
 
 						<Match
 							x={533}

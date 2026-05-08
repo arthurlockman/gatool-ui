@@ -7,8 +7,8 @@ import { matchClassesBase } from "../data/matchClasses";
 import Match from "./Match";
 import PlayoffMatch from "./PlayoffMatch";
 import FinalsMatchIndicator from "./FinalsMatchIndicator";
-import { GOLD, RED, BLUE, GREEN, BLACK, WHITE, black, bold, semibold } from "./bracketConstants";
-import { getTeamByStation, getMatchLabel as getMatchLabelHelper, isCurrentMatchHelper, computeIsInFinalsView, getAllianceNumbersForDisplay as getAllianceNumbersForDisplayHelper, getAllianceNameForDisplay as getAllianceNameForDisplayHelper, getMatchScoreForDisplay as getMatchScoreForDisplayHelper, getMatchWinnerForDisplay as getMatchWinnerForDisplayHelper } from "../utils/bracketHelpers";
+import { GOLD, RED, BLUE, GREEN, BLACK, WHITE, black, bold, PLAYOFF_MATCH_GRAY_BOX_CENTER_X, INDICATOR_SPACING } from "./bracketConstants";
+import { getTeamByStation, getMatchLabel as getMatchLabelHelper, isCurrentMatchHelper, computeIsInFinalsView, getAllianceNumbersForDisplay as getAllianceNumbersForDisplayHelper, getAllianceNameForDisplay as getAllianceNameForDisplayHelper, getMatchScoreForDisplay as getMatchScoreForDisplayHelper, getMatchWinnerForDisplay as getMatchWinnerForDisplayHelper, countConsecutiveFinalsSlotsFromWinnerGetter } from "../utils/bracketHelpers";
 import { useBracketState } from "../hooks/useBracketState";
 import WinnerSelectionModal from "./WinnerSelectionModal";
 import { useSettings } from "../contexts/SettingsContext";
@@ -42,7 +42,6 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 
 	const getMatchWinnerForDisplay = (bracketMatchNumber) => getMatchWinnerForDisplayHelper(bracketMatchNumber, ftcMode, offlinePlayoffSchedule, matches, originalMatchWinner);
 
-	var overtimeOffset = 0;
 	var tournamentWinner = {
 		"red": 0,
 		"blue": 0,
@@ -70,20 +69,6 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 		matchClasses[tempClass].loserTo = match.loserTo;
 	})
 
-	if (matches) {
-		if (matches[18]?.actualStartTime) {
-			overtimeOffset = 75;
-		} else if (matches[17]?.actualStartTime) {
-			overtimeOffset = 60;
-		} else if (matches[16]?.actualStartTime) {
-			overtimeOffset = 45;
-		} else if (matches[15]?.actualStartTime) {
-			overtimeOffset = 30;
-		} else if (matches[14]?.actualStartTime) {
-			overtimeOffset = 15;
-		}
-		}
-
 	// 6-Alliance Finals: series 10-15 are displayed as match numbers 10-15 in the bracket
 	// In FTC mode, get all finals matches (series 10–15) sorted by series then match number, so bracket slots 10, 11, … map to Final 1, Final 2, …
 	const scheduleToCheckForFinals = offlinePlayoffSchedule?.schedule || matches;
@@ -98,14 +83,6 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 			return aMatchNum - bMatchNum;
 		}) : [];
 	
-	// Helper function to check if a bracket match number should be displayed in FTC mode
-	const shouldDisplayFinalsMatch = (bracketMatchNumber) => {
-		if (!ftcMode) return true; // In FRC mode, show all finals matches
-		// In FTC mode, only show matches from final series
-		// Map bracket position to match index: match 10 = index 0, match 11 = index 1, etc.
-		const positionIndex = bracketMatchNumber - 10;
-		return positionIndex < finalSeriesMatchesForDisplay.length;
-	};
 	
 	// Helper function to get score for a finals match position in FTC mode
 	const getFinalsMatchScoreForDisplay = (bracketMatchNumber, alliance) => {
@@ -444,78 +421,18 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 							colors={{ RED, BLUE, GOLD, BLACK, WHITE }}
 							fontWeights={{ bold }}
 						/>
-						{shouldDisplayFinalsMatch(10) && (
-							<FinalsMatchIndicator
-								x={1132}
-								y={451}
-								matchNumber={10}
-								getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
-								getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
-								overtimeOffset={overtimeOffset}
-								colors={{ RED, BLUE, GOLD, GREEN }}
-								fontWeights={{ black, semibold }}
-							/>
-						)}
-						{shouldDisplayFinalsMatch(11) && (
-							<FinalsMatchIndicator
-								x={1162}
-								y={451}
-								matchNumber={11}
-								getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
-								getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
-								overtimeOffset={overtimeOffset}
-								colors={{ RED, BLUE, GOLD, GREEN }}
-								fontWeights={{ black, semibold }}
-							/>
-						)}
-						{shouldDisplayFinalsMatch(12) && (
-							<FinalsMatchIndicator
-								x={1192}
-								y={451}
-								matchNumber={12}
-								getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
-								getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
-								overtimeOffset={overtimeOffset}
-								colors={{ RED, BLUE, GOLD, GREEN }}
-								fontWeights={{ black, semibold }}
-							/>
-						)}
-						{shouldDisplayFinalsMatch(13) && (
-							<FinalsMatchIndicator
-								x={1222}
-								y={451}
-								matchNumber={13}
-								getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
-								getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
-								overtimeOffset={overtimeOffset}
-								colors={{ RED, BLUE, GOLD, GREEN }}
-								fontWeights={{ black, semibold }}
-							/>
-						)}
-						{shouldDisplayFinalsMatch(14) && (
-							<FinalsMatchIndicator
-								x={1252}
-								y={451}
-								matchNumber={14}
-								getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
-								getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
-								overtimeOffset={overtimeOffset}
-								colors={{ RED, BLUE, GOLD, GREEN }}
-								fontWeights={{ black, semibold }}
-							/>
-						)}
-						{shouldDisplayFinalsMatch(15) && (
-							<FinalsMatchIndicator
-								x={1282}
-								y={451}
-								matchNumber={15}
-								getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
-								getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
-								overtimeOffset={overtimeOffset}
-								colors={{ RED, BLUE, GOLD, GREEN }}
-								fontWeights={{ black, semibold }}
-							/>
-						)}
+				<FinalsMatchIndicator
+					x={1024 + PLAYOFF_MATCH_GRAY_BOX_CENTER_X}
+					y={438}
+					firstFinalsMatchNumber={10}
+					finalsCount={ftcMode
+						? finalSeriesMatchesForDisplay.length
+						: countConsecutiveFinalsSlotsFromWinnerGetter(getFinalsMatchWinnerForDisplay, 10, 15)}
+					indicatorSpacing={INDICATOR_SPACING}
+					indicatorScale={1.2}
+					getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
+					getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
+				/>
 
 
 						<Match
