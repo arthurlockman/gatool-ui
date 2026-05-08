@@ -5,7 +5,8 @@ import Match from "./Match";
 import PlayoffMatch from "./PlayoffMatch";
 import FinalsMatchIndicator from "./FinalsMatchIndicator";
 import {
-  GOLD, RED, BLUE, GREEN, BLACK, WHITE, bold, semibold, black,
+  GOLD, RED, BLUE, GREEN, BLACK, WHITE, bold, black,
+  PLAYOFF_MATCH_GRAY_BOX_CENTER_X, INDICATOR_SPACING
 } from "./bracketConstants";
 import {
   isCurrentMatchHelper,
@@ -45,10 +46,6 @@ const FINALS_ROW_TOP        = TOP + AVAILABLE_H;
 const FINALS_Y              = FINALS_ROW_TOP+10;
 const FINALS_X              = (SVG_W - FINALS_MATCH_W) / 2;
 const SVG_H                 = FINALS_Y + FINALS_MATCH_H + 60;
-const INDICATOR_SCALE       = FINALS_SCALE;
-const INDICATOR_SPACING     = 34 * FINALS_SCALE;
-const FINALS_INDICATOR_BASE_X = FINALS_X + 102 * FINALS_SCALE;
-const FINALS_INDICATOR_Y      = FINALS_Y + FINALS_MATCH_H / 2 + 25;
 
 const DIVIDER_COLOR = "#DBDAD9";
 const matchXForRound = (round) => (round - 1) * COL_W + MATCH_X_OFFSET;
@@ -148,6 +145,15 @@ function DaVinciFinalsSection({
   const getSlotWinner = (bracketMatchNumber) =>
     getFinalsSlotWinner(finalSeriesMatches, bracketMatchNumber - 16);
 
+  // Center of the right-side score area in SVG space (native midpoint of x=153.6..230.5 = 192, scaled)
+  const indicatorCenterX = FINALS_X + PLAYOFF_MATCH_GRAY_BOX_CENTER_X * FINALS_SCALE;
+  // Dot y so the full dot+scores group is vertically centered in the box.
+  // Native box spans y=-10..158.1 (center=74.05). Indicator element spans -r..(textOffsetY+lineSpacing)=(-8..40), midpoint=16.
+  // So dot y = boxCenter - 16, scaled: FINALS_Y + (74.05 - 16) * FINALS_SCALE
+  const indicatorY = FINALS_Y + (86 + 28 / FINALS_SCALE) * FINALS_SCALE;
+  // Spacing scaled proportionally from 35px
+  const indicatorSpacing = INDICATOR_SPACING * FINALS_SCALE;
+
   return (
     <>
       <g transform={`translate(${FINALS_X}, ${FINALS_Y}) scale(${FINALS_SCALE})`}>
@@ -164,22 +170,17 @@ function DaVinciFinalsSection({
           fontWeights={{ bold }}
         />
       </g>
-      {[0, 1, 2, 3, 4, 5].map((slot) =>
-        slot < finalSeriesMatches.length ? (
-          <FinalsMatchIndicator
-            key={`finalsIndicator${slot}`}
-            x={FINALS_INDICATOR_BASE_X + slot * INDICATOR_SPACING}
-            y={FINALS_INDICATOR_Y}
-            matchNumber={16 + slot}
-            getFinalsMatchWinnerForDisplay={getSlotWinner}
-            getFinalsMatchScoreForDisplay={getSlotScore}
-            overtimeOffset={0}
-            indicatorScale={INDICATOR_SCALE}
-            colors={{ RED, BLUE, GOLD, GREEN }}
-            fontWeights={{ black, semibold }}
-          />
-        ) : null
-      )}
+      <FinalsMatchIndicator
+        x={indicatorCenterX}
+        y={indicatorY}
+        firstFinalsMatchNumber={16}
+        finalsCount={finalSeriesMatches.length}
+        indicatorSpacing={indicatorSpacing}
+
+        indicatorScale={FINALS_SCALE}
+        getFinalsMatchWinnerForDisplay={getSlotWinner}
+        getFinalsMatchScoreForDisplay={getSlotScore}
+      />
     </>
   );
 }

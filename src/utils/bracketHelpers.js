@@ -313,3 +313,89 @@ export const getMatchWinnerForDisplay = (bracketMatchNumber, ftcMode, offlinePla
 
 	return lastMatch.winner || originalMatchWinner(bracketMatchNumber);
 };
+
+/**
+ * True when a playoff row has a usable finals-indicator outcome (including ties).
+ * @param {object|null|undefined} matchRow
+ * @returns {boolean}
+ */
+const finalsRowHasIndicatorResult = (matchRow) => {
+	const w = matchRow?.winner?.winner;
+	return w === "red" || w === "blue" || w === "tie";
+};
+
+/**
+ * Resolves a match row for an FRC-style bracket match number: prefer `matchNumber` on
+ * the object, else `schedule[matchNumber - 1]` (1-based array used across the app).
+ * @param {Array<object>|null|undefined} schedule
+ * @param {number} matchNumber
+ * @returns {object|null|undefined}
+ */
+export const getFrcScheduleRowByMatchNumber = (schedule, matchNumber) => {
+	if (!schedule?.length || matchNumber < 1) return null;
+	const byField = schedule.find((m) => m?.matchNumber === matchNumber);
+	if (byField) return byField;
+	return schedule[matchNumber - 1] ?? null;
+};
+
+/**
+ * How many consecutive finals games (by match number) have a result, starting at
+ * `minMatchNumber` and not past `maxMatchNumber`. Stops at the first missing or
+ * not-yet-played game so the indicator row width matches the number of completed
+ * finals when read from the same source as `getMatch*` helpers.
+ *
+ * @param {Array<object>|null|undefined} schedule  typically `offlinePlayoffSchedule?.schedule || matches`
+ * @param {number} minMatchNumber
+ * @param {number} maxMatchNumber
+ * @returns {number}
+ */
+export const countConsecutiveFrcFinalsWithResults = (schedule, minMatchNumber, maxMatchNumber) => {
+	if (!schedule?.length) return 0;
+	let count = 0;
+	for (let mn = minMatchNumber; mn <= maxMatchNumber; mn++) {
+		const row = getFrcScheduleRowByMatchNumber(schedule, mn);
+		if (!finalsRowHasIndicatorResult(row)) break;
+		count++;
+	}
+	return count;
+};
+
+/**
+ * Counts consecutive finals slots using the same winner accessor as FinalsMatchIndicator.
+ * Use this for FRC finals rows when raw schedule rows may not match `matchWinner()` / helpers.
+ *
+ * @param {(mn: number) => object|null|undefined} getWinnerForBracketMatchNumber
+ * @param {number} minMatchNumber
+ * @param {number} maxMatchNumber
+ * @returns {number}
+ */
+export const countConsecutiveFinalsSlotsFromWinnerGetter = (
+	getWinnerForBracketMatchNumber,
+	minMatchNumber,
+	maxMatchNumber,
+) => {
+	let count = 0;
+	for (let mn = minMatchNumber; mn <= maxMatchNumber; mn++) {
+		const winnerObj = getWinnerForBracketMatchNumber(mn);
+		const w = winnerObj?.winner;
+		if (w !== "red" && w !== "blue" && w !== "tie") break;
+		count++;
+	}
+	return count;
+};
+
+/**
+ * For 2-alliance (all six matches are finals), count consecutive results from game 1.
+ * @param {Array<object>|null|undefined} matches
+ * @returns {number}
+ */
+export const countConsecutiveTwoAllianceFinalsWithResults = (matches) => {
+	if (!matches?.length) return 0;
+	let count = 0;
+	for (let i = 0; i < 6; i++) {
+		const row = getFrcScheduleRowByMatchNumber(matches, i + 1) ?? matches[i];
+		if (!finalsRowHasIndicatorResult(row)) break;
+		count++;
+	}
+	return count;
+};

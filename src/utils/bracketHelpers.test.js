@@ -10,6 +10,10 @@ import {
 	getAllianceNameForDisplay,
 	getMatchScoreForDisplay,
 	getMatchWinnerForDisplay,
+	getFrcScheduleRowByMatchNumber,
+	countConsecutiveFrcFinalsWithResults,
+	countConsecutiveFinalsSlotsFromWinnerGetter,
+	countConsecutiveTwoAllianceFinalsWithResults,
 } from "./bracketHelpers";
 
 const team = (station, teamNumber) => ({ station, teamNumber });
@@ -485,5 +489,87 @@ describe("getMatchWinnerForDisplay", () => {
 		const winner = { tieWinner: "blue", level: 2 };
 		const matches = [seriesMatch(4, 1, { winner })];
 		expect(getMatchWinnerForDisplay(4, true, null, matches, originalMatchWinner)).toBe(winner);
+	});
+});
+
+describe("countConsecutiveFinalsSlotsFromWinnerGetter", () => {
+	it("counts consecutive slots until first gap", () => {
+		const getter = (mn) => {
+			if (mn === 10) return { winner: "red" };
+			if (mn === 11) return { winner: "blue" };
+			if (mn === 12) return null;
+			return { winner: "red" };
+		};
+		expect(countConsecutiveFinalsSlotsFromWinnerGetter(getter, 10, 15)).toBe(2);
+	});
+
+	it("includes tie as played", () => {
+		const getter = (mn) => {
+			if (mn === 10) return { winner: "tie" };
+			return null;
+		};
+		expect(countConsecutiveFinalsSlotsFromWinnerGetter(getter, 10, 15)).toBe(1);
+	});
+});
+
+describe("getFrcScheduleRowByMatchNumber", () => {
+	it("finds by matchNumber field when present", () => {
+		const row = { matchNumber: 12, winner: { winner: "red" } };
+		const sched = [{ matchNumber: 99 }, row];
+		expect(getFrcScheduleRowByMatchNumber(sched, 12)).toBe(row);
+	});
+
+	it("falls back to 1-based index when matchNumber field missing", () => {
+		const sched = [{ foo: 1 }, { foo: 2 }, { foo: 3 }];
+		expect(getFrcScheduleRowByMatchNumber(sched, 2)).toEqual({ foo: 2 });
+	});
+
+	it("returns null for empty schedule or invalid match number", () => {
+		expect(getFrcScheduleRowByMatchNumber([], 1)).toBeNull();
+		expect(getFrcScheduleRowByMatchNumber(null, 1)).toBeNull();
+		expect(getFrcScheduleRowByMatchNumber([{ matchNumber: 1 }], 0)).toBeNull();
+	});
+});
+
+describe("countConsecutiveFrcFinalsWithResults", () => {
+	const row = (mn, w) => ({ matchNumber: mn, winner: { winner: w } });
+
+	it("returns 0 when schedule empty", () => {
+		expect(countConsecutiveFrcFinalsWithResults([], 10, 15)).toBe(0);
+	});
+
+	it("counts consecutive finals from minMatchNumber until first gap", () => {
+		const sched = [row(10, "red"), row(11, "blue"), row(12, "tie"), row(13, "red")];
+		expect(countConsecutiveFrcFinalsWithResults(sched, 10, 15)).toBe(4);
+	});
+
+	it("stops at first missing result even if later rows would have winners", () => {
+		const sched = [row(10, "red"), { matchNumber: 11, winner: {} }, row(12, "red")];
+		expect(countConsecutiveFrcFinalsWithResults(sched, 10, 15)).toBe(1);
+	});
+
+	it("counts ties as played", () => {
+		const sched = [row(10, "red"), row(11, "tie")];
+		expect(countConsecutiveFrcFinalsWithResults(sched, 10, 15)).toBe(2);
+	});
+});
+
+describe("countConsecutiveTwoAllianceFinalsWithResults", () => {
+	it("returns 0 when no matches", () => {
+		expect(countConsecutiveTwoAllianceFinalsWithResults([])).toBe(0);
+	});
+
+	it("counts consecutive games from match 1 using index fallback", () => {
+		const matches = [
+			{ winner: { winner: "red" } },
+			{ winner: { winner: "blue" } },
+			{ winner: { winner: "red" } },
+		];
+		expect(countConsecutiveTwoAllianceFinalsWithResults(matches)).toBe(3);
+	});
+
+	it("stops at first row without a decided winner", () => {
+		const matches = [{ winner: { winner: "red" } }, { winner: {} }];
+		expect(countConsecutiveTwoAllianceFinalsWithResults(matches)).toBe(1);
 	});
 });
