@@ -5,6 +5,7 @@ import moment from "moment";
 import _ from "lodash";
 import ReactQuillWrapper from "components/ReactQuillWrapper";
 import 'react-quill-new/dist/quill.snow.css';
+import { htmlToPlainText, normalizeQuillHtml } from "utils/quillUtils";
 
 const modules = {
     toolbar: [
@@ -44,7 +45,6 @@ const formats = [
     'italic',
     'underline',
     'list',
-    'bullet',
     'indent',
     'link',
 ];
@@ -81,7 +81,9 @@ function TeamEditModal({
     const [teamYearsNoCompeteLocal, setTeamYearsNoCompeteLocal] = useState("");
     const [awardsTextLocal, setAwardsTextLocal] = useState("");
     const [teamNotesLocal, setTeamNotesLocal] = useState("");
+    const [teamNotesLocalUpdated, setTeamNotesLocalUpdated] = useState("");
     const [teamNotes, setTeamNotes] = useState("");
+    const [teamNotesUpdated, setTeamNotesUpdated] = useState("");
     const [topSponsorsLocal, setTopSponsorsLocal] = useState("");
     const [topSponsorLocal, setTopSponsorLocal] = useState("");
 
@@ -98,6 +100,8 @@ function TeamEditModal({
             setAwardsTextLocal(updateTeam?.updates?.awardsTextLocal || "");
             setTeamNotesLocal(updateTeam?.updates?.teamNotesLocal || "");
             setTeamNotes(updateTeam?.updates?.teamNotes || "");
+            setTeamNotesLocalUpdated(updateTeam?.updates?.teamNotesLocalUpdated || "");
+            setTeamNotesUpdated(updateTeam?.updates?.teamNotesUpdated || "");
             setTopSponsorsLocal(updateTeam?.updates?.topSponsorsLocal || "");
             setTopSponsorLocal(updateTeam?.updates?.topSponsorLocal || "");
         }
@@ -115,11 +119,20 @@ function TeamEditModal({
         setAwardsTextLocal("");
         setTeamNotesLocal("");
         setTeamNotes("");
+        setTeamNotesLocalUpdated("");
+        setTeamNotesUpdated("");
         setTopSponsorsLocal("");
         setTopSponsorLocal("");
     }
 
     function collectFormValues() {
+        const normalizedNotesLocal = normalizeQuillHtml(teamNotesLocal);
+        const normalizedNotes = normalizeQuillHtml(teamNotes);
+        const savedNotesLocal = updateTeam?.updates?.teamNotesLocal || "";
+        const savedNotes = updateTeam?.updates?.teamNotes || "";
+        const notesLocalChanged = htmlToPlainText(normalizedNotesLocal) !== htmlToPlainText(savedNotesLocal);
+        const notesChanged = htmlToPlainText(normalizedNotes) !== htmlToPlainText(savedNotes);
+        const now = moment().format();
         return {
             nameShortLocal,
             cityStateLocal,
@@ -130,13 +143,15 @@ function TeamEditModal({
             robotNameLocal,
             awardsLocal: "",
             teamMottoLocal,
-            teamNotesLocal: teamNotesLocal === '<p><br></p>' ? "" : teamNotesLocal,
+            teamNotesLocal: normalizedNotesLocal,
+            teamNotesLocalUpdated: notesLocalChanged ? now : (teamNotesLocalUpdated || ""),
             teamYearsNoCompeteLocal,
             showRobotName,
-            teamNotes: teamNotes === '<p><br></p>' ? "" : teamNotes,
+            teamNotes: normalizedNotes,
+            teamNotesUpdated: notesChanged ? now : (teamNotesUpdated || ""),
             sayNumber,
             awardsTextLocal,
-            lastUpdate: moment().format(),
+            lastUpdate: now,
         };
     }
 
@@ -201,12 +216,13 @@ function TeamEditModal({
                             onChange={(e) => setAwardsTextLocal(e.target.value)} />
                     </Form.Group>
                     <Form.Group controlId="teamNotesLocal">
-                        <Form.Label className={"formLabel"}><b>Team Notes for Announce and Play-by-Play Screens (These notes are local notes and do not come from <i>FIRST</i>)</b></Form.Label>
+                        <Form.Label className={"formLabel"}><b>Team Notes for Announce and Play-by-Play Screens (These notes are local notes and do not come from <i>FIRST</i>)</b>{teamNotesLocal.replace(/<(.|\n)*?>/g, '').trim().length > 0 ? <><br /><i>Last updated: {teamNotesLocalUpdated ? moment(teamNotesLocalUpdated).fromNow() : "2026 or earlier"}</i></> : ""}</Form.Label>
                         {/* @ts-expect-error - ReactQuillWrapper accepts all ReactQuill props including className */}
-                        <ReactQuillWrapper className={teamNotesLocal.replace(/<(.|\n)*?>/g, '').trim().length === 0 ? "" : "formHighlight"} theme="snow" modules={modules2} formats={formats2} value={teamNotesLocal} placeholder={"Enter some new notes you would like to appear on the Announce Screen"} onChange={(e) => setTeamNotesLocal(e)} />
+                        <ReactQuillWrapper className={teamNotesLocal.replace(/<(.|\n)*?>/g, '').trim().length === 0 ? "" : "formHighlight"} theme="snow" modules={modules2} formats={formats2} value={teamNotesLocal} placeholder={"Enter some new notes you would like to appear on the Announce Screen"} onChange={(e) =>
+                             setTeamNotesLocal(e)} />
                     </Form.Group>
                     <Form.Group controlId="teamNotes">
-                        <Form.Label className={"formLabel"}><b>Team Notes for the Team Data Screen (These notes are local notes and do not come from <i>FIRST</i>)</b></Form.Label>
+                        <Form.Label className={"formLabel"}><b>Team Notes for the Team Data Screen (These notes are local notes and do not come from <i>FIRST</i>)</b>{teamNotes.replace(/<(.|\n)*?>/g, '').trim().length > 0 ? <><br /><i>Last updated: {teamNotesUpdated ? moment(teamNotesUpdated).fromNow() : "2026 or earlier"}</i></> : ""}</Form.Label>
                         {!ftcMode && <ButtonToolbar>
                             <Button className={"TBAButton"} onClick={() => { window.open(`https://www.thebluealliance.com/team/${updateTeam.teamNumber}`) }}>{`TBA Page for ${updateTeam.teamNumber}`}</Button>
                             <Button className={"TBAButton"} onClick={() => { window.open(`https://frc-events.firstinspires.org/${selectedYear.value}/team/${updateTeam.teamNumber}`) }}>{`FIRST Season details ${selectedYear.value}`}</Button>

@@ -937,6 +937,9 @@ function App() {
       `team/${teamNumber}/updates/history/`,
       ftcMode ? ftcBaseURL : undefined
     );
+    if (!result || typeof result.json !== "function" || result.status !== 200) {
+      return [];
+    }
     // @ts-ignore
     var history = await result.json();
     return history;
