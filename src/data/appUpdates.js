@@ -1,6 +1,6 @@
 export const appUpdates = [
   {
-    date: "May 4, 2026",
+    date: "May 8, 2026",
     message: (
       <>
       <b>MAJOR REFACTORING OF THE APP CODEBASE</b><br />
@@ -10,6 +10,7 @@ export const appUpdates = [
         <li>You can now use Passkeys or email OTP when authenticating</li>
         <li>Choosing FIRST Championship in the Timeframe selector on Setup Page now works for both FRC and FTC</li>
         <li>Internatinal teams' countries repeated in many placeswhen users entered updated city/state details. This no longer happens.</li>
+        <li>You can now see the date when Notes fields were last updated.</li>
         </ul>
         <li>FRC:</li>
         <ul>
