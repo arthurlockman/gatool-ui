@@ -1,18 +1,12 @@
-import React from "react";
 import { Container, Row } from "react-bootstrap";
 import { FlashcardArray } from "react-quizlet-flashcard";
+import "react-quizlet-flashcard/dist/index.css";
 import _ from "lodash";
 import { apiBaseUrl } from "../contextProviders/AuthClientContext";
+import { useEventData } from "contexts/EventDataContext";
 
-function CheatsheetPage({
-  teamList,
-  communityUpdates,
-  selectedEvent,
-  selectedYear,
-  robotImages,
-  eventLabel,
-  ftcMode,
-}) {
+function CheatsheetPage() {
+  const { teamList, communityUpdates, selectedEvent, selectedYear, eventLabel, ftcMode, robotImages } = useEventData();
   const sortedTeams = _.orderBy(teamList?.teams, "teamNumber", "asc");
   const cardStyle = {
     display: "flex",
@@ -21,12 +15,7 @@ function CheatsheetPage({
   };
 
   const cards = sortedTeams.map((team, index) => {
-    var card = {
-      id: 0,
-      frontHTML: "",
-      backHTML: "",
-      style: { width: "500px", height: "300px" },
-    };
+    const cardSize = { width: "500px", height: "300px" };
     var avatar = ftcMode?`<span class="team-avatar team-${team?.teamNumber}"></span>`:`<img src="${apiBaseUrl}${selectedYear.value}/avatars/team/${team?.teamNumber}/avatar.png" onerror="this.style.display='none'">&nbsp`;
     var robotImage = _.filter(robotImages, { teamNumber: team?.teamNumber })[0]
       ?.imageUrl
@@ -45,11 +34,8 @@ function CheatsheetPage({
         ]
       );
     }
-    card.id = index;
-    card.frontHTML = `<h1>${robotImage}<br /><b>${team.teamNumber}</b></h1>`;
-    card.frontContentStyle = cardStyle;
-    card.backContentStyle = cardStyle;
-    card.backHTML = `<h1>${avatar}<br /><b>${
+    const frontHTML = `<h1>${robotImage}<br /><b>${team.teamNumber}</b></h1>`;
+    const backHTML = `<h1>${avatar}<br /><b>${
       team?.updates?.nameShortLocal
         ? team?.updates?.nameShortLocal
         : team?.nameShort
@@ -59,9 +45,20 @@ function CheatsheetPage({
         : team?.city +
           ", " +
           team?.stateProv +
-          (team?.country === "USA" ? "" : " " + team?.country)
+          (team?.country === "USA" && !team?.updates?.cityStateLocal ? "" : " " + team?.country)
     }</h1>`;
-    return card;
+    return {
+      id: index,
+      style: cardSize,
+      front: {
+        html: <div dangerouslySetInnerHTML={{ __html: frontHTML }} />,
+        style: cardStyle,
+      },
+      back: {
+        html: <div dangerouslySetInnerHTML={{ __html: backHTML }} />,
+        style: cardStyle,
+      },
+    };
   });
 
   function downloadPDF(filePath) {
@@ -207,7 +204,7 @@ function CheatsheetPage({
             </h3>
           </Row>
           <Row>
-            <FlashcardArray cards={cards} />
+            <FlashcardArray deck={cards} />
           </Row>
           <Row>
             <br />

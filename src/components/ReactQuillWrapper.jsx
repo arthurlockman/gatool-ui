@@ -1,5 +1,5 @@
-import React, { forwardRef } from 'react';
-import ReactQuill from 'react-quill';
+import { forwardRef } from 'react';
+import ReactQuill from 'react-quill-new';
 
 /**
  * Wrapper component for ReactQuill that uses refs properly to avoid findDOMNode warnings.

@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { matchClassesBase } from "../components/Constants";
+import { matchClassesBase } from "../data/matchClasses";
 
 /**
  * Returns whether a playoff match has a known result (completed).
@@ -66,7 +66,7 @@ function setTeamsForStation(targetMatch, station, teamEntries) {
   targetMatch.teams = targetMatch.teams.filter(
     (t) => !t?.station?.startsWith(prefix)
   );
-  teamEntries.slice(0, 2).forEach((entry, i) => {
+  teamEntries.forEach((entry, i) => {
     targetMatch.teams.push({
       ..._.cloneDeep(entry),
       station: `${prefix}${positions[i] || i + 1}`,

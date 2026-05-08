@@ -1,12 +1,16 @@
-import React from "react";
-import { useAuth0 } from "@auth0/auth0-react";
 import { Button } from "react-bootstrap";
+import { useAuth } from "../contextProviders/AuthProvider";
 
-const LogoutButton = ({disabled = false}) => {
-  const { logout } = useAuth0();
+const LogoutButton = ({ disabled = false }) => {
+  const { logout } = useAuth();
 
   return (
-    <Button size="sm" variant="outline-danger" onClick={() => logout({ returnTo: window.location.origin })} disabled={disabled}>
+    <Button
+      size="sm"
+      variant="outline-danger"
+      onClick={() => logout()}
+      disabled={disabled}
+    >
       Log Out
     </Button>
   );

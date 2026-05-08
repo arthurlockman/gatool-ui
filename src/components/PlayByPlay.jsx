@@ -1,7 +1,9 @@
 import _ from "lodash";
 import useWindowDimensions from "hooks/UseWindowDimensions";
+import { useSettings } from "../contexts/SettingsContext";
 
-function PlayByPlay({ station, team, inPlayoffs, selectedEvent, showNotes, showMottoes, showQualsStats, showQualsStatsQuals, adHocMode, playoffOnly, ftcMode, remapNumberToString}) {
+function PlayByPlay({ station, team, inPlayoffs, selectedEvent, adHocMode, playoffOnly, ftcMode, remapNumberToString}) {
+    const { showNotes, showMottoes, showQualsStats, showQualsStatsQuals } = useSettings();
     const { height, width } = useWindowDimensions();
     
     // Guard against undefined station
@@ -33,7 +35,7 @@ function PlayByPlay({ station, team, inPlayoffs, selectedEvent, showNotes, showM
                         <p className={"playByPlayteamNumber"}>{displayTeamNumber}</p>
                         <p className={"playByPlaysayNumber"} >{team?.updates?.sayNumber}</p>
                         <p className={team?.updates?.organizationLocal ? (team?.updates?.organizationLocal?.length > 60 ? "playByPlayOrganization narrowFont" : "playByPlayOrganization") : (team?.organization?.length > 60 ? "playByPlayOrganization narrowFont" : "playByPlayOrganization")}>{team?.updates?.organizationLocal ? team?.updates?.organizationLocal : team?.organization}</p>
-                        <p className={"playByPlayCity"}>{team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : `${team?.city}, ${team?.stateProv}${team?.country !== "USA" ? `, ${team?.country}` : ""}`}</p>
+                        <p className={"playByPlayCity"}>{team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : `${team?.city}, ${team?.stateProv}${team?.country !== "USA" && !team?.updates?.cityStateLocal ? `, ${team?.country}` : ""}`}</p>
                         {(showMottoes || _.isNull(showMottoes)) && <p className={"playByPlayCity mottoes"}>{team?.updates?.teamMottoLocal}</p>}
                         {inPlayoffs && width < height && <p className={"playByPlayAlliance"}>{team?.alliance}{(selectedEvent?.value?.name.includes("OFFLINE") && !playoffOnly) ? <></> : <><br />{team.allianceRole}</>}</p>}
                     </>

@@ -24,7 +24,7 @@ export default function Contenteditable(props) {
     } else {
       contentEditableRef.current.textContent = announcementPlaceholder;
     }
-  });
+  }, [props.value, announcementPlaceholder]);
 
   return (
     <div

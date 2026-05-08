@@ -1,5 +1,6 @@
 
 import _ from "lodash";
+import { useSettings } from "../contexts/SettingsContext";
 
 const announceBackground = { "red": "#F7B3B4", "blue": "#98B4F4" }
 
@@ -7,26 +8,15 @@ function Announce({
   station,
   team,
   inPlayoffs,
-  awardsMenu,
   selectedYear,
   selectedEvent,
-  showNotesAnnounce,
-  showAwards,
-  showMinorAwards,
-  showSponsors,
-  autoHideSponsors,
-  showMottoes,
-  showChampsStats,
   eventNamesCY,
-  showDistrictChampsStats,
-  showChampsStatsAtDistrictRegional,
   playoffOnly,
-  ftcMode,
-  showBlueBanners,
   remapNumberToString,
   /** Fourth column: rank (quals) | matchup summary with rowspan (playoffs) | omit when rowspan continues */
   column4,
 }) {
+    const { awardsMenu, showNotesAnnounce, showAwards, showMinorAwards, showSponsors, autoHideSponsors, showMottoes, showChampsStats, showDistrictChampsStats, showChampsStatsAtDistrictRegional, showBlueBanners } = useSettings();
     const originalAndSustaining = ["20", "45", "126", "148", "151", "157", "190", "191", "250"];
     var allianceColor = station.slice(0, -1);
     var awardsYears = team?.awards ? Object.keys(team.awards) : []
@@ -44,7 +34,7 @@ function Announce({
     if (years.toString().endsWith("2")) { yearsDisplay = "nd" }
     if (years.toString().endsWith("3")) { yearsDisplay = "rd" }
     if (years.toString() === "11" || years.toString() === "12" || years.toString() === "13") { yearsDisplay = "th" }
-    if (years.toString() === "1") { yearsDisplay = "Rookie" };
+    if (years.toString() === "1") { yearsDisplay = "Rookie" }
     
     // Display remapped team number if available
     const displayTeamNumber = remapNumberToString ? remapNumberToString(team.teamNumber) : team.teamNumber;
@@ -59,7 +49,7 @@ function Announce({
             </td>
             <td className={'col2'} style={{ backgroundColor: _.toLower(allianceColor) === "red" ? announceBackground.red : announceBackground.blue }}>
                 <span className={"teamName"}>{team?.updates?.nameShortLocal ? team?.updates?.nameShortLocal : team?.nameShort}</span><br />
-                <span>{team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : `${team?.city}, ${team?.stateProv}${team?.country !== "USA" ? `, ${team?.country}` : ""}`}</span><br />
+                <span>{team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : `${team?.city}, ${team?.stateProv}${team?.country !== "USA" && !team?.updates?.cityStateLocal ? `, ${team?.country}` : ""}`}</span><br />
                 {(team?.updates?.robotNameLocal || team?.robotName )&& <span className={"robotName"}>{team?.updates?.robotNameLocal?team?.updates?.robotNameLocal:team?.robotName}<br /></span>}
                 {team?.updates?.teamMottoLocal && (showMottoes || _.isNull(showMottoes)) && <span className={"mottoes"}>{team?.updates?.teamMottoLocal}<br /></span>}
                 {(((selectedEvent?.value?.champLevel === "CHAMPS" || selectedEvent?.value?.champLevel === "CMPDIV" || selectedEvent?.value?.champLevel === "CMPSUB") && showChampsStats) || (selectedEvent?.value?.champLevel === "" && showChampsStatsAtDistrictRegional)) &&

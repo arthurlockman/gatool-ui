@@ -1,48 +1,23 @@
 import _ from "lodash";
-import { Alert, Button, Col, Container, Modal, Row } from "react-bootstrap";
-import { useState } from "react";
+import { Alert } from "react-bootstrap";
 import moment from "moment";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useSwipeable } from "react-swipeable";
-import { matchClassesBase } from "./Constants";
+import { matchClassesBase } from "../data/matchClasses";
 import Match from "./Match";
 import PlayoffMatch from "./PlayoffMatch";
 import FinalsMatchIndicator from "./FinalsMatchIndicator";
+import { GOLD, RED, BLUE, GREEN, BLACK, WHITE, black, bold, PLAYOFF_MATCH_GRAY_BOX_CENTER_X } from "./bracketConstants";
+import { getTeamByStation, countConsecutiveFinalsSlotsFromWinnerGetter } from "../utils/bracketHelpers";
+import { useBracketState } from "../hooks/useBracketState";
+import WinnerSelectionModal from "./WinnerSelectionModal";
 
 function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMatch, getSchedule, useSwipe, usePullDownToUpdate, offlinePlayoffSchedule, setOfflinePlayoffSchedule, eventLabel, ftcMode, matches, allianceNumbers, allianceName, matchScore, matchWinner }) {
-	const [showSelectWinner, setShowSelectWinner] = useState(false);
-	const [showConfirmWinner, setShowConfirmWinner] = useState(false);
-	const [winningAlliance, setWinningAlliance] = useState(null);
-	const [winnerMatch, setWinnerMatch] = useState(-1);
-
-	//Ball colors
-	const GOLD = "#FFCA10";
-	const RED = "#FF0000";
-	const BLUE = "#0000FF";
-	const GREEN = "#09BA48";
-	const BLACK = "#000000";
-	const WHITE = "#FFFFFF";
-	//font weights
-	const black = "900";
-	const bold = "700";
-	const semibold = "600";
-	//const normal = "400";
+	const { showSelectWinner, setShowSelectWinner, showConfirmWinner, winningAlliance, winnerMatch, setWinnerMatch, handleChooseWinner, handleClose, resetWinnerState } = useBracketState();
 
 	const currentPlayoffMatch = currentMatch - qualsLength;
 	const finalsStartMatch = 6; // First finals match for 4-alliance bracket
 
-	/**
-	 * This function finds a team by their station assignment
-	 * @param teams the array of team objects
-	 * @param station the station to find (e.g., "Red1", "Red2", "Red3", "Blue1", "Blue2", "Blue3")
-	 * @returns the team number or null if not found
-	 */
-	const getTeamByStation = (teams, station) => {
-		if (!teams || !Array.isArray(teams)) return null;
-		const team = teams.find((t) => t?.station?.toLowerCase() === station?.toLowerCase());
-		return team?.teamNumber || null;
-	};
-	
 	// Check if we're viewing any finals match (for gold background on "FINALS"/"BEST 2 of 3")
 	// In FTC mode, use series number comparison to handle tiebreakers correctly
 	let isInFinalsView = false;
@@ -58,7 +33,6 @@ function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMat
 		isInFinalsView = currentPlayoffMatch >= finalsStartMatch;
 	}
 
-	var overtimeOffset = 0;
 	var tournamentWinner = {
 		"red": 0,
 		"blue": 0,
@@ -67,19 +41,6 @@ function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMat
 	}
 
 	const matchClasses = _.cloneDeep(matchClassesBase.fourAlliance)
-
-
-	if (matches[10]?.actualStartTime) {
-		overtimeOffset = 75;
-	} else if (matches[9]?.actualStartTime) {
-		overtimeOffset = 60;
-	} else if (matches[8]?.actualStartTime) {
-		overtimeOffset = 45;
-	} else if (matches[7]?.actualStartTime) {
-		overtimeOffset = 30;
-	} else if (matches[6]?.actualStartTime) {
-		overtimeOffset = 15;
-	}
 
 	for (var finalsMatches = 6; finalsMatches < 12; finalsMatches++) {
 		if (matches[_.findIndex(matches, { "matchNumber": finalsMatches })]?.winner.winner === "red") {
@@ -116,11 +77,6 @@ function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMat
 		}
 	}
 
-	const handleChooseWinner = (winner) => {
-		setWinningAlliance(winner);
-		setShowSelectWinner(false);
-		setShowConfirmWinner(true);
-	}
 	const handleConfirmWinner = async () => {
 		console.log(winningAlliance);
 		const losingAlliance = winningAlliance === "red" ? "blue" : "red";
@@ -269,17 +225,8 @@ function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMat
 		}
 
 		await setOfflinePlayoffSchedule(tempMatches);
-		setWinnerMatch(-1)
-		setShowSelectWinner(false);
-		setShowConfirmWinner(false);
+		resetWinnerState();
 
-	}
-
-	// manages closing the modal
-	const handleClose = () => {
-		setWinnerMatch(-1);
-		setShowSelectWinner(false);
-		setShowConfirmWinner(false);
 	}
 
 	// eslint-disable-next-line react-hooks/rules-of-hooks
@@ -310,12 +257,12 @@ function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMat
 		// Get the current match object
 		const scheduleToCheck = offlinePlayoffSchedule?.schedule || matches;
 		const currentMatchObj = scheduleToCheck[currentPlayoffMatch - 1];
-		
+
 		if (!currentMatchObj || !currentMatchObj.series) {
 			// Fallback to ordinal comparison if series is not available
 			return currentPlayoffMatch === bracketMatchNumber;
 		}
-		
+
 		// In bracket display, match number equals series number
 		// Highlight if the current match's series matches the bracket match's series
 		// This ensures tiebreakers still highlight the original match
@@ -375,66 +322,16 @@ function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMat
 							colors={{ RED, BLUE, GOLD, BLACK, WHITE }}
 							fontWeights={{ bold }}
 						/>
-						<FinalsMatchIndicator
-							x={910}
-							y={370}
-							matchNumber={6}
-							getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
-							getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
-							overtimeOffset={overtimeOffset}
-							colors={{ RED, BLUE, GOLD, GREEN }}
-							fontWeights={{ black, semibold }}
-						/>
-						<FinalsMatchIndicator
-							x={940}
-							y={370}
-							matchNumber={7}
-							getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
-							getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
-							overtimeOffset={overtimeOffset}
-							colors={{ RED, BLUE, GOLD, GREEN }}
-							fontWeights={{ black, semibold }}
-						/>
-						<FinalsMatchIndicator
-							x={970}
-							y={370}
-							matchNumber={8}
-							getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
-							getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
-							overtimeOffset={overtimeOffset}
-							colors={{ RED, BLUE, GOLD, GREEN }}
-							fontWeights={{ black, semibold }}
-						/>
-						<FinalsMatchIndicator
-							x={1000}
-							y={370}
-							matchNumber={9}
-							getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
-							getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
-							overtimeOffset={overtimeOffset}
-							colors={{ RED, BLUE, GOLD, GREEN }}
-							fontWeights={{ black, semibold }}
-						/>
-						<FinalsMatchIndicator
-							x={1030}
-							y={370}
-							matchNumber={10}
-							getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
-							getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
-							overtimeOffset={overtimeOffset}
-							colors={{ RED, BLUE, GOLD, GREEN }}
-							fontWeights={{ black, semibold }}
-						/>
-						<FinalsMatchIndicator
-							x={1070}
-							y={370}
-							matchNumber={11}
-							getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
-							getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
-							overtimeOffset={overtimeOffset}
-							colors={{ RED, BLUE, GOLD, GREEN }}
-							fontWeights={{ black, semibold }}
-						/>
+				<FinalsMatchIndicator
+					x={784 + PLAYOFF_MATCH_GRAY_BOX_CENTER_X}
+					y={367}
+					firstFinalsMatchNumber={6}
+					finalsCount={countConsecutiveFinalsSlotsFromWinnerGetter(getFinalsMatchWinnerForDisplay, 6, 11)}
+					indicatorSpacing={32}
+					indicatorScale={1.2}
+					getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
+					getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
+				/>
 
 						<Match
 							x={533}
@@ -517,48 +414,19 @@ function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMat
 							fontWeights={{ bold }}
 						/>
 					</svg>
-					<Modal centered={true} show={showSelectWinner} size="lg" onHide={handleClose}>
-						<Modal.Header className={"allianceAccept"} closeVariant={"white"} closeButton>
-							<Modal.Title ><b>Select a winner for {matches[winnerMatch - 1]?.description}</b></Modal.Title>
-						</Modal.Header>
-						<Modal.Body>
-							<Container fluid>
-								<Row>
-									<Col style={{ backgroundColor: "red", color: "white", fontWeight: "bold", fontSize: "40px", textAlign: "center", padding: "50px 0" }} xs={(winnerMatch < 14) ? 5 : 4} onClick={() => { handleChooseWinner("red") }} variant="danger">{allianceName(winnerMatch, "red")}</Col>
-									{(winnerMatch < 14) &&
-										<Col xs={2}></Col>}
-									{((offlinePlayoffSchedule?.schedule?.length > 14) && (winnerMatch >= 14)) &&
-										<>
-											<Col xs={1}></Col>
-											<Col style={{ backgroundColor: "green", color: "white", fontWeight: "bold", fontSize: "40px", textAlign: "center", padding: "50px 0" }} xs={2} onClick={() => { handleChooseWinner("tie") }}>It's a Tie!</Col>
-											<Col xs={1}></Col>
-										</>
-									}
-									<Col style={{ backgroundColor: "blue", color: "white", fontWeight: "bold", fontSize: "40px", textAlign: "center", padding: "50px 0" }} xs={(winnerMatch < 14) ? 5 : 4} onClick={() => { handleChooseWinner("blue") }}>{allianceName(winnerMatch, "blue")}</Col>
-								</Row>
-							</Container>
-						</Modal.Body>
-						<Modal.Footer>
-							<Button variant="secondary" onClick={handleClose}>Close without selecting a winner</Button>
-						</Modal.Footer>
-					</Modal>
-					<Modal centered={true} show={showConfirmWinner} size="lg" onHide={handleClose}>
-						<Modal.Header className={"allianceAccept"} closeVariant={"white"} closeButton>
-							<Modal.Title ><b>Confirm winner for {matches[winnerMatch - 1]?.description}</b></Modal.Title>
-						</Modal.Header>
-						<Modal.Body>
-							<Container fluid>
-								<Row>
-									<Col xs={4}></Col>
-									<Col style={{ backgroundColor: winningAlliance === "blue" ? "blue" : winningAlliance === "red" ? "red" : "green", color: "white", fontWeight: "bold", fontSize: "40px", textAlign: "center", padding: "50px 0" }} xs={4} onClick={handleConfirmWinner}>{winningAlliance === "tie" ? "It's a tie!" : allianceName(winnerMatch, winningAlliance)}</Col>
-									<Col xs={4}></Col>
-								</Row>
-							</Container>
-						</Modal.Body>
-						<Modal.Footer>
-							<Button variant="secondary" onClick={handleClose}>Close without selecting a winner</Button>
-						</Modal.Footer>
-					</Modal>
+					<WinnerSelectionModal
+						showSelectWinner={showSelectWinner}
+						showConfirmWinner={showConfirmWinner}
+						winnerMatch={winnerMatch}
+						winningAlliance={winningAlliance}
+						matches={matches}
+						finalsStartMatch={14}
+						offlinePlayoffSchedule={offlinePlayoffSchedule}
+						getAllianceNameForDisplay={getAllianceNameForDisplay}
+						handleChooseWinner={handleChooseWinner}
+						handleConfirmWinner={handleConfirmWinner}
+						handleClose={handleClose}
+					/>
 				</>
 			}
 		</div>

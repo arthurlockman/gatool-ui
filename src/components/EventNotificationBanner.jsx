@@ -8,10 +8,17 @@ const EventNotificationBanner = ({
   eventBell = [],
   setEventBell = null,
 }) => {
+  const EVENT_BELL_MAX = 200;
+
   const handleEventBell = (signal) => {
     var bell = _.cloneDeep(eventBell);
-    if (_.indexOf(bell, JSON.stringify(signal)) === -1) {
-      bell.push(JSON.stringify(signal));
+    const serialized = JSON.stringify(signal);
+    if (_.indexOf(bell, serialized) === -1) {
+      bell.push(serialized);
+      // Prevent unbounded growth: keep only the most recent entries
+      if (bell.length > EVENT_BELL_MAX) {
+        bell = bell.slice(bell.length - EVENT_BELL_MAX);
+      }
       setEventBell(bell);
     }
   };

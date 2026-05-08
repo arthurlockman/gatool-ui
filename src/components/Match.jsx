@@ -6,7 +6,7 @@ function Match({
 	x = 0,
 	y = 0,
 	matchNumber,
-	onClick,
+	onClick = null,
 	isCurrentMatch,
 	getMatchLabel,
 	getAllianceNameForDisplay,
@@ -27,13 +27,15 @@ function Match({
 		bold: "700",
 	},
 }) {
-	const RED = colors?.RED || "#FF0000";
-	const BLUE = colors?.BLUE || "#0000FF";
-	const GOLD = colors?.GOLD || "#FFCA10";
-	const GREEN = colors?.GREEN || "#09BA48";
-	const BLACK = colors?.BLACK || "#000000";
-	const WHITE = colors?.WHITE || "#FFFFFF";
-	const bold = fontWeights?.bold || "700";
+	const {
+		RED = "#FF0000",
+		BLUE = "#0000FF",
+		GOLD = "#FFCA10",
+		GREEN = "#09BA48",
+		BLACK = "#000000",
+		WHITE = "#FFFFFF",
+	} = colors;
+	const { bold = "700" } = fontWeights;
 
 	// Relative coordinates within the match component
 	// These are relative to (0,0) at the top-left of the match box (x=65, y varies in absolute coordinates)

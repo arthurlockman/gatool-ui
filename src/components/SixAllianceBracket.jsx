@@ -1,143 +1,31 @@
 import _ from "lodash";
-import { Alert, Button, Col, Container, Modal, Row } from "react-bootstrap";
-import { useState } from "react";
+import { Alert } from "react-bootstrap";
 import moment from "moment";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useSwipeable } from "react-swipeable";
-import { matchClassesBase } from "./Constants";
-import { getAllianceLookupEntry } from "../utils/allianceLookup";
+import { matchClassesBase } from "../data/matchClasses";
 import Match from "./Match";
 import PlayoffMatch from "./PlayoffMatch";
 import FinalsMatchIndicator from "./FinalsMatchIndicator";
+import { GOLD, RED, BLUE, GREEN, BLACK, WHITE, black, bold, PLAYOFF_MATCH_GRAY_BOX_CENTER_X, INDICATOR_SPACING } from "./bracketConstants";
+import { getTeamByStation, getMatchLabel as getMatchLabelHelper, isCurrentMatchHelper, computeIsInFinalsView, getAllianceNumbersForDisplay as getAllianceNumbersForDisplayHelper, getAllianceNameForDisplay as getAllianceNameForDisplayHelper, getMatchScoreForDisplay as getMatchScoreForDisplayHelper, getMatchWinnerForDisplay as getMatchWinnerForDisplayHelper, countConsecutiveFinalsSlotsFromWinnerGetter } from "../utils/bracketHelpers";
+import { useBracketState } from "../hooks/useBracketState";
+import WinnerSelectionModal from "./WinnerSelectionModal";
+import { useSettings } from "../contexts/SettingsContext";
 
-function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMatch, qualsLength, nextMatch, previousMatch, getSchedule, usePullDownToUpdate, useSwipe, eventLabel, playoffCountOverride, ftcMode, matches, allianceNumbers, allianceName, matchScore, matchWinner, alliances, remapNumberToString }) {
-	const [showSelectWinner, setShowSelectWinner] = useState(false);
-	const [showConfirmWinner, setShowConfirmWinner] = useState(false);
-	const [winningAlliance, setWinningAlliance] = useState(null);
-	const [winnerMatch, setWinnerMatch] = useState(-1);
-
-	//Ball colors
-	const GOLD = "#FFCA10";
-	const RED = "#FF0000";
-	const BLUE = "#0000FF";
-	const GREEN = "#09BA48";
-	const BLACK = "#000000";
-	const WHITE = "#FFFFFF";
-	//font weights
-	const black = "900";
-	const bold = "700";
-	const semibold = "600";
-	//const normal = "400";
+function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMatch, qualsLength, nextMatch, previousMatch, getSchedule, usePullDownToUpdate, useSwipe, eventLabel, ftcMode, matches, allianceNumbers, allianceName, matchScore, matchWinner, alliances, remapNumberToString }) {
+	const { playoffCountOverride } = useSettings();
+	const { showSelectWinner, setShowSelectWinner, showConfirmWinner, winningAlliance, winnerMatch, setWinnerMatch, handleChooseWinner, handleClose, resetWinnerState } = useBracketState();
 
 
 	const currentPlayoffMatch = currentMatch - qualsLength;
 	const finalsStartMatch = 10; // First finals match for 6-alliance bracket
 	
-	// Helper function to check if a bracket match should be highlighted as the current match
-	// In FTC mode, highlights all matches in the same series as the current match
-	const isCurrentMatch = (bracketMatchNumber) => {
-		if (!ftcMode) {
-			// In FRC mode, use ordinal match number comparison
-			return currentPlayoffMatch === bracketMatchNumber;
-		}
-		
-		// In FTC mode, compare series numbers
-		// Get the current match object
-		const scheduleToCheck = offlinePlayoffSchedule?.schedule || matches;
-		const currentMatchObj = scheduleToCheck[currentPlayoffMatch - 1];
-		
-		if (!currentMatchObj || !currentMatchObj.series) {
-			// Fallback to ordinal comparison if series is not available
-			return currentPlayoffMatch === bracketMatchNumber;
-		}
-		
-		// In FTC mode, bracket match number equals series number
-		// Highlight if the current match's series matches the bracket match's series
-		return currentMatchObj.series === bracketMatchNumber;
-	};
+	const isCurrentMatch = (n) => isCurrentMatchHelper(n, currentPlayoffMatch, ftcMode, offlinePlayoffSchedule, matches);
 	
-	// Check if we're viewing any finals match (for gold background on "FINALS"/"BEST 2 of 3")
-	// In FTC mode, use series number comparison to handle tiebreakers correctly
-	let isInFinalsView = false;
-	if (ftcMode) {
-		const scheduleToCheck = offlinePlayoffSchedule?.schedule || matches;
-		const currentMatchObj = scheduleToCheck[currentPlayoffMatch - 1];
-		if (currentMatchObj?.series) {
-			isInFinalsView = currentMatchObj.series >= finalsStartMatch;
-		} else {
-			isInFinalsView = currentPlayoffMatch >= finalsStartMatch;
-		}
-	} else {
-		isInFinalsView = currentPlayoffMatch >= finalsStartMatch;
-	}
+	const isInFinalsView = computeIsInFinalsView(currentPlayoffMatch, finalsStartMatch, ftcMode, offlinePlayoffSchedule, matches);
 
-	/**
-	 * This function finds a team by their station assignment
-	 * @param teams the array of team objects
-	 * @param station the station to find (e.g., "Red1", "Red2", "Red3", "Blue1", "Blue2", "Blue3")
-	 * @returns the team number or null if not found
-	 */
-	const getTeamByStation = (teams, station) => {
-		if (!teams || !Array.isArray(teams)) return null;
-		const team = teams.find((t) => t?.station?.toLowerCase() === station?.toLowerCase());
-		return team?.teamNumber ?? team?.team ?? null;
-	};
-
-	/**
-	 * Counts tiebreaker matches for a given bracket match number in FTC mode
-	 * @param bracketMatchNumber The match number displayed on the bracket (1-9 for regular matches)
-	 * @returns The number of tiebreaker matches for this series, or 0 if none
-	 */
-	const getTiebreakerCount = (bracketMatchNumber) => {
-		if (!ftcMode) return 0;
-		
-		// In FTC mode, bracket match number equals series number
-		const series = bracketMatchNumber;
-		
-		// Try offlinePlayoffSchedule first (original uploaded schedule), then fall back to matches array
-		// Use originalMatchNumber if available (preserved before transformation), otherwise use matchNumber
-		const scheduleToCheck = offlinePlayoffSchedule?.schedule || matches;
-		
-		// Find all matches in this series
-		const seriesMatches = scheduleToCheck.filter(
-			(m) => m.series === series
-		);
-		
-		if (seriesMatches.length === 0) {
-			return 0;
-		}
-		
-		// Find the last match in the series (highest originalMatchNumber or matchNumber)
-		const lastMatch = seriesMatches.reduce((prev, current) => {
-			const prevMatchNum = prev.originalMatchNumber || prev.matchNumber;
-			const currentMatchNum = current.originalMatchNumber || current.matchNumber;
-			return (currentMatchNum > prevMatchNum) ? current : prev;
-		});
-		
-		// Use originalMatchNumber if available, otherwise matchNumber
-		const lastMatchNumber = lastMatch.originalMatchNumber || lastMatch.matchNumber;
-		
-		// If the last match's matchNumber > 1, there were tiebreakers
-		// The count is matchNumber - 1 (number of additional matches beyond the first)
-		if (lastMatchNumber > 1) {
-			return lastMatchNumber - 1;
-		}
-		
-		return 0;
-	};
-
-	/**
-	 * Formats the match label with tiebreaker indicator for FTC mode
-	 * @param bracketMatchNumber The match number displayed on the bracket
-	 * @returns Formatted match label (e.g., "MATCH 8" or "MATCH 8+1")
-	 */
-	const getMatchLabel = (bracketMatchNumber) => {
-		const baseLabel = `MATCH ${bracketMatchNumber}`;
-		if (!ftcMode) return baseLabel;
-		
-		const tiebreakerCount = getTiebreakerCount(bracketMatchNumber);
-		return tiebreakerCount > 0 ? `${baseLabel}+${tiebreakerCount}` : baseLabel;
-	};
+	const getMatchLabel = (bracketMatchNumber) => getMatchLabelHelper(bracketMatchNumber, ftcMode, offlinePlayoffSchedule, matches);
 
 	// Store original functions before we replace them
 	const originalMatchScore = matchScore;
@@ -145,219 +33,15 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 	const originalAllianceNumbers = allianceNumbers;
 	const originalAllianceName = allianceName;
 
-	/**
-	 * Gets the match to use for displaying teams/alliances for a bracket match
-	 * In FTC mode with tiebreakers, returns the last match in the series
-	 * Otherwise returns the match found by the original functions
-	 * @param bracketMatchNumber The match number displayed on the bracket
-	 * @returns The match object to use for team display
-	 */
-	const getMatchForTeamDisplay = (bracketMatchNumber) => {
-		if (!ftcMode) {
-			// In non-FTC mode, find match by matchNumber
-			const matchIndex = _.findIndex(matches, { "matchNumber": bracketMatchNumber });
-			return matches?.[matchIndex];
-		}
-		
-		// In FTC mode, bracket match number equals series number
-		const series = bracketMatchNumber;
-		const scheduleToCheck = offlinePlayoffSchedule?.schedule || matches;
-		
-		// Find all matches in this series
-		const seriesMatches = scheduleToCheck.filter(
-			(m) => m.series === series
-		);
-		
-		if (seriesMatches.length === 0) {
-			// Fallback to original lookup
-			const matchIndex = _.findIndex(matches, { "matchNumber": bracketMatchNumber });
-			return matches?.[matchIndex];
-		}
-		
-		// Find the last match in the series (highest originalMatchNumber or matchNumber)
-		const lastMatch = seriesMatches.reduce((prev, current) => {
-			const prevMatchNum = prev.originalMatchNumber || prev.matchNumber;
-			const currentMatchNum = current.originalMatchNumber || current.matchNumber;
-			return (currentMatchNum > prevMatchNum) ? current : prev;
-		});
-		
-		return lastMatch;
-	};
 
-	/**
-	 * Wrapper for allianceNumbers that uses the correct match from the series
-	 * @param bracketMatchNumber The match number displayed on the bracket
-	 * @param allianceColor The alliance color ("red" or "blue")
-	 * @returns The alliance numbers string
-	 */
-	const getAllianceNumbersForDisplay = (bracketMatchNumber, allianceColor) => {
-		if (!ftcMode) {
-			return originalAllianceNumbers(bracketMatchNumber, allianceColor);
-		}
-		
-		const match = getMatchForTeamDisplay(bracketMatchNumber);
-		if (!match) {
-			return originalAllianceNumbers(bracketMatchNumber, allianceColor);
-		}
-		
-		// Extract teams from the match and format them
-		if (match?.description?.includes("Bye Match")) {
-			return "Bye Match";
-		}
-		
-		if (!match?.teams || !alliances?.Lookup) {
-			return originalAllianceNumbers(bracketMatchNumber, allianceColor);
-		}
-		
-		const lookupTeam = getTeamByStation(match.teams, allianceColor === "red" ? "Red1" : "Blue1");
-		if (!lookupTeam) {
-			return originalAllianceNumbers(bracketMatchNumber, allianceColor);
-		}
-		
-		const targetAlliance = getAllianceLookupEntry(
-			alliances?.Lookup,
-			lookupTeam,
-			remapNumberToString
-		);
-		if (!targetAlliance) {
-			return originalAllianceNumbers(bracketMatchNumber, allianceColor);
-		}
-		
-		const allianceMembers = _.compact([
-			targetAlliance?.captain,
-			targetAlliance?.round1,
-			targetAlliance?.round2,
-			targetAlliance?.round3,
-			targetAlliance?.backup
-		]);
-		
-		return allianceMembers.join("  ");
-	};
+	const getAllianceNumbersForDisplay = (bracketMatchNumber, allianceColor) => getAllianceNumbersForDisplayHelper(bracketMatchNumber, allianceColor, ftcMode, offlinePlayoffSchedule, matches, originalAllianceNumbers, alliances, remapNumberToString);
 
-	/**
-	 * Wrapper for allianceName that uses the correct match from the series
-	 * @param bracketMatchNumber The match number displayed on the bracket
-	 * @param allianceColor The alliance color ("red" or "blue")
-	 * @returns The alliance name string
-	 */
-	const getAllianceNameForDisplay = (bracketMatchNumber, allianceColor) => {
-		if (!ftcMode) {
-			return originalAllianceName(bracketMatchNumber, allianceColor);
-		}
-		
-		const match = getMatchForTeamDisplay(bracketMatchNumber);
-		if (!match) {
-			return originalAllianceName(bracketMatchNumber, allianceColor);
-		}
-		
-		// Extract team from the match and get alliance name
-		if (!match?.teams || !alliances?.Lookup) {
-			return originalAllianceName(bracketMatchNumber, allianceColor);
-		}
-		
-		const lookupTeam = getTeamByStation(match.teams, allianceColor === "red" ? "Red1" : "Blue1");
-		if (!lookupTeam) {
-			return originalAllianceName(bracketMatchNumber, allianceColor);
-		}
-		
-		const targetAlliance = getAllianceLookupEntry(
-			alliances?.Lookup,
-			lookupTeam,
-			remapNumberToString
-		);
-		if (!targetAlliance) {
-			return originalAllianceName(bracketMatchNumber, allianceColor);
-		}
-		
-		let allianceNameStr = targetAlliance?.alliance || "";
-		
-		// Add tiebreaker indicator if applicable (for finals matches)
-		const tieLevel = 10; // For six-alliance bracket
-		if (bracketMatchNumber <= tieLevel || bracketMatchNumber === tieLevel + 6) {
-			if (match?.winner?.tieWinner === "red" && allianceColor === "red") {
-				allianceNameStr += ` (L${match.winner.level} WIN)`;
-			}
-		}
-		
-		return allianceNameStr;
-	};
+	const getAllianceNameForDisplay = (bracketMatchNumber, allianceColor) => getAllianceNameForDisplayHelper(bracketMatchNumber, allianceColor, ftcMode, offlinePlayoffSchedule, matches, originalAllianceName, alliances, remapNumberToString, 10);
 
-	/**
-	 * Wrapper for matchScore that returns the score from the last match in series if tiebreakers exist
-	 * @param bracketMatchNumber The match number displayed on the bracket
-	 * @param alliance The alliance color ("red" or "blue")
-	 * @returns The score for the alliance
-	 */
-	const getMatchScoreForDisplay = (bracketMatchNumber, alliance) => {
-		if (!ftcMode) {
-			return originalMatchScore(bracketMatchNumber, alliance);
-		}
-		
-		// In FTC mode, bracket match number equals series number
-		const series = bracketMatchNumber;
-		const scheduleToCheck = offlinePlayoffSchedule?.schedule || matches;
-		
-		// Find all matches in this series
-		const seriesMatches = scheduleToCheck.filter(
-			(m) => m.series === series
-		);
-		
-		if (seriesMatches.length === 0) {
-			return originalMatchScore(bracketMatchNumber, alliance);
-		}
-		
-		// Find the last match in the series (highest originalMatchNumber or matchNumber)
-		const lastMatch = seriesMatches.reduce((prev, current) => {
-			const prevMatchNum = prev.originalMatchNumber || prev.matchNumber;
-			const currentMatchNum = current.originalMatchNumber || current.matchNumber;
-			return (currentMatchNum > prevMatchNum) ? current : prev;
-		});
-		
-		// Always use the last match's score (even if no tiebreakers, lastMatch is still the correct match)
-		if (alliance === "red") {
-			return lastMatch.scoreRedFinal;
-		} else if (alliance === "blue") {
-			return lastMatch.scoreBlueFinal;
-		}
-		
-		return originalMatchScore(bracketMatchNumber, alliance);
-	};
+	const getMatchScoreForDisplay = (bracketMatchNumber, alliance) => getMatchScoreForDisplayHelper(bracketMatchNumber, alliance, ftcMode, offlinePlayoffSchedule, matches, originalMatchScore);
 
-	/**
-	 * Wrapper for matchWinner that returns the winner from the last match in series if tiebreakers exist
-	 * @param bracketMatchNumber The match number displayed on the bracket
-	 * @returns The winner object
-	 */
-	const getMatchWinnerForDisplay = (bracketMatchNumber) => {
-		if (!ftcMode) {
-			return originalMatchWinner(bracketMatchNumber);
-		}
-		
-		// In FTC mode, bracket match number equals series number
-		const series = bracketMatchNumber;
-		const scheduleToCheck = offlinePlayoffSchedule?.schedule || matches;
-		
-		// Find all matches in this series
-		const seriesMatches = scheduleToCheck.filter(
-			(m) => m.series === series
-		);
-		
-		if (seriesMatches.length === 0) {
-			return originalMatchWinner(bracketMatchNumber);
-		}
-		
-		// Find the last match in the series (highest originalMatchNumber or matchNumber)
-		const lastMatch = seriesMatches.reduce((prev, current) => {
-			const prevMatchNum = prev.originalMatchNumber || prev.matchNumber;
-			const currentMatchNum = current.originalMatchNumber || current.matchNumber;
-			return (currentMatchNum > prevMatchNum) ? current : prev;
-		});
-		
-		// Always use the last match's winner (even if no tiebreakers, lastMatch is still the correct match)
-		return lastMatch.winner || originalMatchWinner(bracketMatchNumber);
-	};
+	const getMatchWinnerForDisplay = (bracketMatchNumber) => getMatchWinnerForDisplayHelper(bracketMatchNumber, ftcMode, offlinePlayoffSchedule, matches, originalMatchWinner);
 
-	var overtimeOffset = 0;
 	var tournamentWinner = {
 		"red": 0,
 		"blue": 0,
@@ -385,20 +69,6 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 		matchClasses[tempClass].loserTo = match.loserTo;
 	})
 
-	if (matches) {
-		if (matches[18]?.actualStartTime) {
-			overtimeOffset = 75;
-		} else if (matches[17]?.actualStartTime) {
-			overtimeOffset = 60;
-		} else if (matches[16]?.actualStartTime) {
-			overtimeOffset = 45;
-		} else if (matches[15]?.actualStartTime) {
-			overtimeOffset = 30;
-		} else if (matches[14]?.actualStartTime) {
-			overtimeOffset = 15;
-		}
-		}
-
 	// 6-Alliance Finals: series 10-15 are displayed as match numbers 10-15 in the bracket
 	// In FTC mode, get all finals matches (series 10–15) sorted by series then match number, so bracket slots 10, 11, … map to Final 1, Final 2, …
 	const scheduleToCheckForFinals = offlinePlayoffSchedule?.schedule || matches;
@@ -413,14 +83,6 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 			return aMatchNum - bMatchNum;
 		}) : [];
 	
-	// Helper function to check if a bracket match number should be displayed in FTC mode
-	const shouldDisplayFinalsMatch = (bracketMatchNumber) => {
-		if (!ftcMode) return true; // In FRC mode, show all finals matches
-		// In FTC mode, only show matches from final series
-		// Map bracket position to match index: match 10 = index 0, match 11 = index 1, etc.
-		const positionIndex = bracketMatchNumber - 10;
-		return positionIndex < finalSeriesMatchesForDisplay.length;
-	};
 	
 	// Helper function to get score for a finals match position in FTC mode
 	const getFinalsMatchScoreForDisplay = (bracketMatchNumber, alliance) => {
@@ -531,11 +193,6 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 		}
 	}
 
-	const handleChooseWinner = (winner) => {
-		setWinningAlliance(winner);
-		setShowSelectWinner(false);
-		setShowConfirmWinner(true);
-	}
 	const handleConfirmWinner = async () => {
 		console.log(winningAlliance);
 		const losingAlliance = winningAlliance === "red" ? "blue" : "red";
@@ -684,17 +341,8 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 		}
 
 		await setOfflinePlayoffSchedule(tempMatches);
-		setWinnerMatch(-1)
-		setShowSelectWinner(false);
-		setShowConfirmWinner(false);
+		resetWinnerState();
 
-	}
-
-	// manages closing the modal
-	const handleClose = () => {
-		setWinnerMatch(-1);
-		setShowSelectWinner(false);
-		setShowConfirmWinner(false);
 	}
 
 	// eslint-disable-next-line react-hooks/rules-of-hooks
@@ -773,78 +421,18 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 							colors={{ RED, BLUE, GOLD, BLACK, WHITE }}
 							fontWeights={{ bold }}
 						/>
-						{shouldDisplayFinalsMatch(10) && (
-							<FinalsMatchIndicator
-								x={1132}
-								y={451}
-								matchNumber={10}
-								getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
-								getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
-								overtimeOffset={overtimeOffset}
-								colors={{ RED, BLUE, GOLD, GREEN }}
-								fontWeights={{ black, semibold }}
-							/>
-						)}
-						{shouldDisplayFinalsMatch(11) && (
-							<FinalsMatchIndicator
-								x={1162}
-								y={451}
-								matchNumber={11}
-								getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
-								getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
-								overtimeOffset={overtimeOffset}
-								colors={{ RED, BLUE, GOLD, GREEN }}
-								fontWeights={{ black, semibold }}
-							/>
-						)}
-						{shouldDisplayFinalsMatch(12) && (
-							<FinalsMatchIndicator
-								x={1192}
-								y={451}
-								matchNumber={12}
-								getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
-								getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
-								overtimeOffset={overtimeOffset}
-								colors={{ RED, BLUE, GOLD, GREEN }}
-								fontWeights={{ black, semibold }}
-							/>
-						)}
-						{shouldDisplayFinalsMatch(13) && (
-							<FinalsMatchIndicator
-								x={1222}
-								y={451}
-								matchNumber={13}
-								getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
-								getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
-								overtimeOffset={overtimeOffset}
-								colors={{ RED, BLUE, GOLD, GREEN }}
-								fontWeights={{ black, semibold }}
-							/>
-						)}
-						{shouldDisplayFinalsMatch(14) && (
-							<FinalsMatchIndicator
-								x={1252}
-								y={451}
-								matchNumber={14}
-								getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
-								getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
-								overtimeOffset={overtimeOffset}
-								colors={{ RED, BLUE, GOLD, GREEN }}
-								fontWeights={{ black, semibold }}
-							/>
-						)}
-						{shouldDisplayFinalsMatch(15) && (
-							<FinalsMatchIndicator
-								x={1282}
-								y={451}
-								matchNumber={15}
-								getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
-								getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
-								overtimeOffset={overtimeOffset}
-								colors={{ RED, BLUE, GOLD, GREEN }}
-								fontWeights={{ black, semibold }}
-							/>
-						)}
+				<FinalsMatchIndicator
+					x={1024 + PLAYOFF_MATCH_GRAY_BOX_CENTER_X}
+					y={438}
+					firstFinalsMatchNumber={10}
+					finalsCount={ftcMode
+						? finalSeriesMatchesForDisplay.length
+						: countConsecutiveFinalsSlotsFromWinnerGetter(getFinalsMatchWinnerForDisplay, 10, 15)}
+					indicatorSpacing={INDICATOR_SPACING}
+					indicatorScale={1.2}
+					getFinalsMatchWinnerForDisplay={getFinalsMatchWinnerForDisplay}
+					getFinalsMatchScoreForDisplay={getFinalsMatchScoreForDisplay}
+				/>
 
 
 						<Match
@@ -993,48 +581,19 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 						/>
 					</svg>
 				</>}
-			<Modal centered={true} show={showSelectWinner} size="lg" onHide={handleClose}>
-				<Modal.Header className={"allianceAccept"} closeVariant={"white"} closeButton>
-					<Modal.Title >{winnerMatch >= 0 ? <b>Select a winner for {matches[winnerMatch - 1]?.description}</b> : <b>Select a winner  </b>}</Modal.Title>
-				</Modal.Header>
-				<Modal.Body>
-					<Container fluid>
-						<Row>
-							<Col style={{ backgroundColor: "red", color: "white", fontWeight: "bold", fontSize: "40px", textAlign: "center", padding: "50px 0" }} xs={(winnerMatch < 14) ? 5 : 4} onClick={() => { handleChooseWinner("red") }} variant="danger">{getAllianceNameForDisplay(winnerMatch, "red")}</Col>
-							{(winnerMatch < 14) &&
-								<Col xs={2}></Col>}
-							{((offlinePlayoffSchedule?.schedule?.length > 14) && (winnerMatch >= 14)) &&
-								<>
-									<Col xs={1}></Col>
-									<Col style={{ backgroundColor: "green", color: "white", fontWeight: "bold", fontSize: "40px", textAlign: "center", padding: "50px 0" }} xs={2} onClick={() => { handleChooseWinner("tie") }}>It's a Tie!</Col>
-									<Col xs={1}></Col>
-								</>
-							}
-							<Col style={{ backgroundColor: "blue", color: "white", fontWeight: "bold", fontSize: "40px", textAlign: "center", padding: "50px 0" }} xs={(winnerMatch < 14) ? 5 : 4} onClick={() => { handleChooseWinner("blue") }}>{getAllianceNameForDisplay(winnerMatch, "blue")}</Col>
-						</Row>
-					</Container>
-				</Modal.Body>
-				<Modal.Footer>
-					<Button variant="secondary" onClick={handleClose}>Close without selecting a winner</Button>
-				</Modal.Footer>
-			</Modal>
-			<Modal centered={true} show={showConfirmWinner} size="lg" onHide={handleClose}>
-				<Modal.Header className={"allianceAccept"} closeVariant={"white"} closeButton>
-					<Modal.Title ><b>Confirm winner for {matches[winnerMatch - 1]?.description}</b></Modal.Title>
-				</Modal.Header>
-				<Modal.Body>
-					<Container fluid>
-						<Row>
-							<Col xs={4}></Col>
-							<Col style={{ backgroundColor: winningAlliance === "blue" ? "blue" : winningAlliance === "red" ? "red" : "green", color: "white", fontWeight: "bold", fontSize: "40px", textAlign: "center", padding: "50px 0" }} xs={4} onClick={handleConfirmWinner}>{winningAlliance === "tie" ? "It's a tie!" : getAllianceNameForDisplay(winnerMatch, winningAlliance)}</Col>
-							<Col xs={4}></Col>
-						</Row>
-					</Container>
-				</Modal.Body>
-				<Modal.Footer>
-					<Button variant="secondary" onClick={handleClose}>Close without selecting a winner</Button>
-				</Modal.Footer>
-			</Modal>
+			<WinnerSelectionModal
+				showSelectWinner={showSelectWinner}
+				showConfirmWinner={showConfirmWinner}
+				winnerMatch={winnerMatch}
+				winningAlliance={winningAlliance}
+				matches={matches}
+				finalsStartMatch={10}
+				offlinePlayoffSchedule={offlinePlayoffSchedule}
+				getAllianceNameForDisplay={getAllianceNameForDisplay}
+				handleChooseWinner={handleChooseWinner}
+				handleConfirmWinner={handleConfirmWinner}
+				handleClose={handleClose}
+			/>
 		</div>
 	)
 }

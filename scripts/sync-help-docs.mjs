@@ -120,6 +120,33 @@ function renderDocument(pages) {
       ${sections}
     </main>
   </div>
+  <script>
+    // In srcDoc iframes the document URL is about:srcdoc, so the browser's
+    // default hash-link behavior is unreliable (and absolute links would
+    // navigate the iframe to gatool.org / the wiki, which would render the
+    // SPA back inside the modal). Intercept all link clicks: scroll for
+    // hash anchors, open externally for everything else.
+    document.addEventListener("click", function (e) {
+      var a = e.target.closest && e.target.closest("a[href]");
+      if (!a) return;
+      var href = a.getAttribute("href");
+      if (!href) return;
+      if (href.charAt(0) === "#") {
+        e.preventDefault();
+        var id = href.slice(1);
+        if (!id) {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+          return;
+        }
+        var target = document.getElementById(id)
+          || document.querySelector('[name="' + CSS.escape(id) + '"]');
+        if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      }
+      e.preventDefault();
+      window.open(a.href, "_blank", "noopener");
+    });
+  </script>
 </body>
 </html>`;
 }

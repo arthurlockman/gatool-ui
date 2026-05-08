@@ -6,7 +6,7 @@ function PlayoffMatch({
 	x = 0,
 	y = 0,
 	matchNumber,
-	onClick,
+	onClick = null,
 	isCurrentMatch,
 	isInFinalsView,
 	getAllianceNameForDisplay,
@@ -99,37 +99,37 @@ function PlayoffMatch({
 					height={matchBoxHeight}
 					fill={(isCurrentMatch || isInFinalsView) ? GOLD : BLACK}
 				/>
-				{/* Match label (rotated) */}
-				<text
-					transform={`matrix(0 -1.0059 1 0 ${matchLabelX} ${matchLabelY})`}
-					fill={(isCurrentMatch || isInFinalsView) ? BLACK : WHITE}
-					fontFamily="'myriad-pro'"
-					fontWeight={bold}
-					fontStyle="normal"
-					fontSize="12.076px"
-					textAnchor="middle"
-					dominantBaseline="middle"
-				>
-					{ftcMode ? "FINALS" : "BEST 2 of 3"}
-				</text>
-				{/* Red alliance name and numbers */}
-				<text transform={`matrix(0.9941 0 0 1 ${allianceTextX} ${redAllianceTextY})`} textAnchor="middle">
-					<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle="normal" fontSize="12.1471px">
-						{getAllianceNameForDisplay(matchNumber, "red") || `Winner of M${matchNumber - 3}`}
-					</tspan>
-					<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={getAllianceNumbersForDisplay(matchNumber, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle="normal" fontSize="12.1471px">
-						{getAllianceNumbersForDisplay(matchNumber, "red")}
-					</tspan>
-				</text>
-				{/* Blue alliance name and numbers */}
-				<text transform={`matrix(0.9941 0 0 1 ${allianceTextX} ${blueAllianceTextY})`} textAnchor="middle">
-					<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle="normal" fontSize="12.1471px">
-						{getAllianceNameForDisplay(matchNumber, "blue") || `Winner of M${matchNumber - 1}`}
-					</tspan>
-					<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={getAllianceNumbersForDisplay(matchNumber, "blue").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle="normal" fontSize="12.1471px">
-						{getAllianceNumbersForDisplay(matchNumber, "blue")}
-					</tspan>
-				</text>
+			{/* Match label (rotated) */}
+			<text
+				transform={`matrix(0 -1.0059 1 0 ${matchLabelX} ${matchLabelY})`}
+				fill={(isCurrentMatch || isInFinalsView) ? BLACK : WHITE}
+				fontFamily="'myriad-pro'"
+				fontWeight={bold}
+				fontStyle="normal"
+				fontSize="12.076px"
+				textAnchor="middle"
+				dominantBaseline="middle"
+			>
+				{ftcMode ? "FINALS" : "BEST 2 of 3"}
+			</text>
+			{/* Red alliance name and numbers */}
+			<text transform={`matrix(0.9941 0 0 1 ${allianceTextX} ${redAllianceTextY})`} textAnchor="middle">
+				<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle="normal" fontSize="12.1471px">
+					{getAllianceNameForDisplay(matchNumber, "red") || `Winner of M${matchNumber - 3}`}
+				</tspan>
+				<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={getAllianceNumbersForDisplay(matchNumber, "red").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle="normal" fontSize="12.1471px">
+					{getAllianceNumbersForDisplay(matchNumber, "red")}
+				</tspan>
+			</text>
+			{/* Blue alliance name and numbers */}
+			<text transform={`matrix(0.9941 0 0 1 ${allianceTextX} ${blueAllianceTextY})`} textAnchor="middle">
+				<tspan x="0" y="0" fill="#FFFFFF" fontFamily="'myriad-pro'" fontWeight={bold} fontStyle="normal" fontSize="12.1471px">
+					{getAllianceNameForDisplay(matchNumber, "blue") || `Winner of M${matchNumber - 1}`}
+				</tspan>
+				<tspan x="0" y="14.58" fill="#FFFFFF" fontFamily={getAllianceNumbersForDisplay(matchNumber, "blue").length > 20 ? "'myriad-pro-condensed'" : "'myriad-pro'"} fontWeight={bold} fontStyle="normal" fontSize="12.1471px">
+					{getAllianceNumbersForDisplay(matchNumber, "blue")}
+				</tspan>
+			</text>
 				{/* Trophy icon - positioned relative to background origin */}
 				{/* Original absolute coords: x=1204.36, y=414.19. Background origin: x=1024, y=343.4 */}
 				{/* Relative: x=180.36, y=70.79 */}

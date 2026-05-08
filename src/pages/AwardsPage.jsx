@@ -4,10 +4,12 @@ import { Trophy } from "react-bootstrap-icons";
 import _ from "lodash";
 import { useHotkeysContext, useHotkeys } from "react-hotkeys-hook";
 import useWindowDimensions from "hooks/UseWindowDimensions";
+import { useEventData } from "contexts/EventDataContext";
 
 
 
-function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates, eventLabel, remapNumberToString }) {
+function AwardsPage() {
+  const { selectedEvent, selectedYear, teamList, communityUpdates, eventLabel, remapNumberToString } = useEventData();
     const originalAndSustaining = ["20", "45", "126", "148", "151", "157", "190", "191", "250"];
     const { disableScope, enableScope } = useHotkeysContext();
 
@@ -33,13 +35,13 @@ function AwardsPage({ selectedEvent, selectedYear, teamList, communityUpdates, e
             ? sorted.map((team) => {
                 team.updates = team?.updates ? _.merge(team.updates, communityUpdatesLookup[team?.teamNumber]?.updates) : communityUpdatesLookup[team?.teamNumber]?.updates;
                 var years = 1 + Number(selectedYear?.value) - Number(team?.rookieYear);
-                if (typeof team?.updates?.teamYearsNoCompeteLocal !== "undefined") { years -= team?.updates?.teamYearsNoCompeteLocal };
+                if (typeof team?.updates?.teamYearsNoCompeteLocal !== "undefined") { years -= team?.updates?.teamYearsNoCompeteLocal }
                 var yearsDisplay = "th";
-                if (years.toString().endsWith("1")) { yearsDisplay = "st" };
-                if (years.toString().endsWith("2")) { yearsDisplay = "nd" };
-                if (years.toString().endsWith("3")) { yearsDisplay = "rd" };
-                if (years.toString() === "11" || years.toString() === "12" || years.toString() === "13") { yearsDisplay = "th" };
-                if (years.toString() === "1") { yearsDisplay = "Rookie" };
+                if (years.toString().endsWith("1")) { yearsDisplay = "st" }
+                if (years.toString().endsWith("2")) { yearsDisplay = "nd" }
+                if (years.toString().endsWith("3")) { yearsDisplay = "rd" }
+                if (years.toString() === "11" || years.toString() === "12" || years.toString() === "13") { yearsDisplay = "th" }
+                if (years.toString() === "1") { yearsDisplay = "Rookie" }
                 if (years === 1) { team.yearsDisplay = yearsDisplay } else { team.yearsDisplay = `${years}${yearsDisplay}`; }
                 return team;
             })

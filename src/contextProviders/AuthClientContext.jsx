@@ -1,10 +1,10 @@
-import { useAuth0 } from "@auth0/auth0-react";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import { useOnlineStatus } from "./OnlineContext";
+import { useAuth } from "./AuthProvider";
+import { apiBaseUrl } from "./apiBase";
 
-export const apiBaseUrl =
-  process.env.REACT_APP_API_BASE || "https://api.gatool.org/v3/";
+export { apiBaseUrl };
 
 const FIVE_O_THREE_TOAST_THROTTLE_MS = 10000; // Only show one 503 toast per 10s when many requests fail
 let last503ToastAt = 0;
@@ -21,26 +21,72 @@ class AuthClient {
   setOperationsInProgress = null;
   operationsInProgress = 0;
   online = true;
+  _inflight = new Map();
 
   constructor(tokenGetter, setOperationsInProgress) {
     this.setOperationsInProgress = setOperationsInProgress;
     this.tokenGetter = tokenGetter;
   }
 
-  async get(path) {
+  // Clone a resolved GET result so each deduped caller gets an independent body.
+  // Non-Response results (e.g. timeout/abort shapes) are returned as-is.
+  _cloneGetResult(result) {
+    if (result && typeof result.clone === "function") return result.clone();
+    return result;
+  }
+
+  // Share a single in-flight GET promise across simultaneous callers for the
+  // same URL. Skipped entirely when the caller supplies an AbortSignal, since
+  // sharing a promise across differing lifecycles would let one caller's abort
+  // cancel another caller's request.
+  _dedupeGet(key, signal, runner) {
+    if (signal) return runner();
+    const existing = this._inflight.get(key);
+    if (existing) return existing.then((r) => this._cloneGetResult(r));
+    const p = runner();
+    this._inflight.set(key, p);
+    p.finally(() => {
+      if (this._inflight.get(key) === p) this._inflight.delete(key);
+    });
+    return p.then((r) => this._cloneGetResult(r));
+  }
+
+  clearInflight() {
+    this._inflight.clear();
+  }
+
+  async get(path, timeOut = 30000, signal) {
+    return this._dedupeGet(`GET:${apiBaseUrl}${path}`, signal, () =>
+      this._doGet(path, timeOut, signal)
+    );
+  }
+
+  async _doGet(path, timeOut, signal) {
     if (!this.online) {
       throw new Error("You are offline.");
     }
 
     this.operationStart();
-    var token = await this.getToken();
-    var response = await fetch(`${apiBaseUrl}${path}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }).finally(() => {
+    try {
+      var token = await this.getToken();
+      const timeoutSignal = AbortSignal.timeout(timeOut);
+      var response = await fetch(`${apiBaseUrl}${path}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        signal: signal ? AbortSignal.any([timeoutSignal, signal]) : timeoutSignal,
+      }).finally(() => {
+        this.operationDone();
+      });
+    } catch (e) {
       this.operationDone();
-    });
+      if (e?.name === "AbortError" && signal?.aborted) {
+        // Caller-initiated cancellation — silently swallow
+        return { status: 0, statusText: "Aborted", ok: false, _aborted: true };
+      }
+      console.log("Fetch timeout exceeded");
+      return { status: 408, statusText: "Request Timeout" };
+    }
     if (response.ok) return response;
     var errorText = `Received a ${response.status} error from backend: "${response.statusText}"`;
     if (response.status === 400) {
@@ -70,18 +116,27 @@ class AuthClient {
     throw new Error(errorText);
   }
 
-  async getNoAuth(path, customAPIBaseUrl, timeOut = 300000, headers) {
+  async getNoAuth(path, customAPIBaseUrl, timeOut = 300000, headers, signal) {
+    const base = customAPIBaseUrl || apiBaseUrl;
+    return this._dedupeGet(`GETNA:${base}${path}`, signal, () =>
+      this._doGetNoAuth(path, customAPIBaseUrl, timeOut, headers, signal)
+    );
+  }
+
+  async _doGetNoAuth(path, customAPIBaseUrl, timeOut, headers, signal) {
     if (!this.online) {
       throw new Error("You are offline.");
     }
 
     this.operationStart();
+    let response;
     try {
-      var options = {
-        signal: AbortSignal.timeout(timeOut),
+      const timeoutSignal = AbortSignal.timeout(timeOut);
+      const options = {
+        signal: signal ? AbortSignal.any([timeoutSignal, signal]) : timeoutSignal,
       };
       if (headers) options.headers = headers;
-      var response = await fetch(
+      response = await fetch(
         `${customAPIBaseUrl || apiBaseUrl}${path}`,
         options
       ).finally(() => {
@@ -90,36 +145,19 @@ class AuthClient {
       if (response.ok) return response;
     } catch (e) {
       this.operationDone();
+      if (e?.name === "AbortError" && signal?.aborted) {
+        return { status: 0, statusText: "Aborted", ok: false, _aborted: true };
+      }
       console.log("Fetch timeout exceeded");
       return { status: 408, statusText: "Request Timeout" };
     }
-    var errorText = `Received a ${response.status} error from backend: "${response.statusText}"`;
-    if (response.status === 400) {
-      if (path.includes("statbotics") || path.includes("ftcscout")) {
-        return response;
-      } else if (path.includes("/teams?teamNumber=")) {
-        return response;
-      } else {
-        errorText +=
-          " This is an error with the FIRST APIs, not one caused by gatool. These usually clear in a few minutes, so please try again soon.";
-      }
-    }
-    if (response.status === 401) {
-      errorText +=
-        " Your session may have expired. Please log out and log in again.";
-    }
-    if (response.status === 404) {
-      errorText += " We couldn't find " + path;
-      return response;
-    }
-    if (response.status === 500) {
-      if (path.includes("statbotics") || path.includes("ftcscout")) {
-        return response;
-      } else {
-        errorText +=
-          " Something happened in the backend that we don't understand. We have logged the request and will investigate soon.";
-      }
-    }
+    return this._handleNoAuthErrorResponse(response, path, customAPIBaseUrl);
+  }
+
+  _handleNoAuthErrorResponse(response, path, customAPIBaseUrl) {
+    const isExternalUpstream = path.includes("statbotics") || path.includes("ftcscout");
+    let errorText = `Received a ${response.status} error from backend: "${response.statusText}"`;
+
     if (response.status === 503) {
       if (path.includes("/elim/alliances")) {
         return { status: 204, statusText: "No Alliances loaded" };
@@ -134,11 +172,33 @@ class AuthClient {
       show503ToastIfNotThrottled(errorText);
       throw new Error(errorText);
     }
+
+    if (response.status === 400) {
+      if (isExternalUpstream || path.includes("/teams?teamNumber=")) {
+        return response;
+      }
+      errorText +=
+        " This is an error with the FIRST APIs, not one caused by gatool. These usually clear in a few minutes, so please try again soon.";
+    }
+    if (response.status === 401) {
+      errorText +=
+        " Your session may have expired. Please log out and log in again.";
+    }
+    if (response.status === 404) {
+      errorText += " We couldn't find " + path;
+      return response;
+    }
+    if (response.status === 500) {
+      if (isExternalUpstream) return response;
+      errorText +=
+        " Something happened in the backend that we don't understand. We have logged the request and will investigate soon.";
+    }
+
     toast.error(errorText);
     throw new Error(errorText);
   }
 
-  async put(path, body, customAPIBaseUrl) {
+  async put(path, body, customAPIBaseUrl, timeOut = 30000) {
     if (!this.online) {
       throw new Error("You are offline.");
     }
@@ -153,6 +213,7 @@ class AuthClient {
         },
         method: "PUT",
         body: JSON.stringify(body),
+        signal: AbortSignal.timeout(timeOut),
       }).finally(() => {
         this.operationDone();
       });
@@ -191,7 +252,7 @@ class AuthClient {
     throw new Error(errorText);
   }
 
-  async post(path, body) {
+  async post(path, body, timeOut = 30000) {
     if (!this.online) {
       throw new Error("You are offline.");
     }
@@ -206,6 +267,7 @@ class AuthClient {
         },
         method: "POST",
         body: body == null ? null : JSON.stringify(body),
+        signal: AbortSignal.timeout(timeOut),
       }).finally(() => {
         this.operationDone();
       });
@@ -239,7 +301,7 @@ class AuthClient {
     throw new Error(errorText);
   }
 
-  async postNoAuth(path, body, customAPIBaseUrl, headers) {
+  async postNoAuth(path, body, customAPIBaseUrl, headers, timeOut = 30000) {
     if (!this.online) {
       throw new Error("You are offline.");
     }
@@ -250,6 +312,7 @@ class AuthClient {
         headers: { ...headers, "Content-Type": "application/json" },
         method: "POST",
         body: body == null ? null : JSON.stringify(body),
+        signal: AbortSignal.timeout(timeOut),
       }).finally(() => {
         this.operationDone();
       });
@@ -283,7 +346,7 @@ class AuthClient {
     throw new Error(errorText);
   }
 
-  async delete(path) {
+  async delete(path, timeOut = 30000) {
     if (!this.online) {
       throw new Error("You are offline.");
     }
@@ -296,6 +359,7 @@ class AuthClient {
           Authorization: `Bearer ${token}`,
         },
         method: "DELETE",
+        signal: AbortSignal.timeout(timeOut),
       }).finally(() => {
         this.operationDone();
       });
@@ -349,14 +413,8 @@ class AuthClient {
   }
 
   async getToken() {
-    var tokenResponse = await this.tokenGetter({
-      audience: `https://${
-        process.env.REACT_APP_AUTH0_DOMAIN || "gatool.auth0.com"
-      }/userinfo`,
-      scope: "openid email profile offline_access",
-      detailedResponse: true,
-    });
-    return tokenResponse.id_token;
+    if (!this.tokenGetter) return null;
+    return await this.tokenGetter();
   }
 }
 
@@ -367,11 +425,11 @@ function UseAuthClient() {
 }
 
 function AuthClientContextProvider({ children }) {
-  const { getAccessTokenSilently } = useAuth0();
+  const { getAccessToken } = useAuth();
   const [operationsInProgress, setOperationsInProgress] = useState(0);
   const client = useMemo(() => {
-    return new AuthClient(getAccessTokenSilently, setOperationsInProgress);
-  }, [getAccessTokenSilently, setOperationsInProgress]);
+    return new AuthClient(getAccessToken, setOperationsInProgress);
+  }, [getAccessToken, setOperationsInProgress]);
 
   const isOnline = useOnlineStatus();
   useEffect(() => {
