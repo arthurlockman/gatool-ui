@@ -62,7 +62,7 @@ function Announce({
                         {team?.champsAppearances?.einsteinAppearances > 0 && <span>
                             {team?.champsAppearances?.einsteinAppearancesYears?.join(", ")}
                             <br /></span>}
-                        {team?.champsAppearances?.FOCAppearances > 0 && <span><b>Festival of Champions Team</b><br />{team?.champsAppearances?.FOCAppearancesYears?.join(", ")}</span>}
+                        {team?.champsAppearances?.FOCAppearances > 0 && <span><b>Festival of Champions Team</b><br />{team?.champsAppearances?.FOCAppearancesYears?.join(", ")}<br /></span>}
                     </span>}
                 {(((selectedEvent?.value?.champLevel === "DISTCHAMPS" || selectedEvent?.value?.champLevel === "DISTDIV") && showChampsStats) || (showDistrictChampsStats && inPlayoffs)) && <span className={"champs"}>
                     {team?.champsAppearances?.districtChampsAppearances > 0 && <span><b>{team?.champsAppearances?.districtChampsAppearances} District Champs Appearance{team?.champsAppearances?.districtChampsAppearances > 1 ? "s" : ""}</b><br /></span>}
