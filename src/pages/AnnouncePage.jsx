@@ -691,7 +691,6 @@ function AnnouncePage({
                           selectedEvent={selectedEvent}
                           eventNamesCY={eventNamesCY}
                           playoffOnly={playoffOnly}
-                          ftcMode={ftcMode}
                           remapNumberToString={remapNumberToString}
                           column4={column4}
                         />
