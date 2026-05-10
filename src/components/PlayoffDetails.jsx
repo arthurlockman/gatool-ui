@@ -7,7 +7,8 @@ function PlayoffDetails({
   matchDetails,
   alliances,
   matches,
-  ftcMode
+  ftcMode,
+  isDaVinci,
 }) {
   const { playoffCountOverride } = useSettings();
   const formatMatchClasses = (baseClasses) => {
@@ -29,25 +30,26 @@ function PlayoffDetails({
     alliances?.count === 8
       ? formatMatchClasses(_.cloneDeep(matchClassesBase.eightAlliance))
       : alliances?.count === 6
-      ? formatMatchClasses(_.cloneDeep(matchClassesBase.sixAlliance))
-      : alliances?.count === 4
-      ? formatMatchClasses(
-          _.cloneDeep(
-            ftcMode
-              ? matchClassesBase.fourAllianceFTC
-              : matchClassesBase.fourAlliance
-          )
-        )
-      : null;
+        ? formatMatchClasses(_.cloneDeep(matchClassesBase.sixAlliance))
+        : alliances?.count === 4
+          ? formatMatchClasses(
+              _.cloneDeep(
+                ftcMode
+                  ? matchClassesBase.fourAllianceFTC
+                  : matchClassesBase.fourAlliance,
+              ),
+            )
+          : null;
 
-  const finalsStart =
-    alliances?.count === 8
+  const finalsStart = isDaVinci
+    ? 16
+    : alliances?.count === 8
       ? 14
       : alliances?.count === 6
-      ? 10
-      : alliances?.count === 4
-      ? 6
-      : 1;
+        ? 10
+        : alliances?.count === 4
+          ? 6
+          : 1;
 
   const byeCount = [
     { bye: 0, replacementMatchClasses: [] },
@@ -126,7 +128,7 @@ function PlayoffDetails({
       });
       matchClasses[tempClass].winnerTo = match.winnerTo;
       matchClasses[tempClass].loserTo = match.loserTo;
-    }
+    },
   );
 
   var advantage = {};
@@ -135,26 +137,40 @@ function PlayoffDetails({
   var opponent = { winner: null, loser: null };
 
   // In FTC mode, use series number; otherwise use matchNumber
-  const currentMatchIdentifier = ftcMode ? matchDetails?.series : matchDetails?.matchNumber;
-  const currentMatchClass = currentMatchIdentifier ? _.filter(matchClasses, {
-    matchNumber: currentMatchIdentifier,
-  })[0] : null;
+  const currentMatchIdentifier =
+    ftcMode && !isDaVinci
+      ? matchDetails?.series
+      : ftcMode && isDaVinci && matchDetails?.series > 15
+        ? matchDetails?.series + matchDetails?.originalMatchNumber - 1
+        : matchDetails?.matchNumber;
+  const currentMatchClass = currentMatchIdentifier
+    ? _.filter(matchClasses, {
+        matchNumber: currentMatchIdentifier,
+      })[0]
+    : null;
 
   if (matchDetails?.tournamentLevel.toLowerCase() === "playoff") {
     // In FTC mode, Red (higher seed) starts with an advantage: Red has 0 losses, Blue has 1 loss
     // This means Red needs 1 win to win the series, Blue needs 2 wins
     // Initialize: Red starts with advantage of 1 (equivalent to Blue having 1 loss)
-    if (ftcMode && currentMatchIdentifier >= finalsStart) {
+    if (ftcMode && currentMatchIdentifier >= finalsStart && !isDaVinci) {
       advantage.red = 1;
       advantage.blue = 0;
     }
-    
-    if (currentMatchIdentifier > finalsStart) {
+
+    if (
+      currentMatchIdentifier > finalsStart ||
+      (isDaVinci && currentMatchIdentifier >= finalsStart)
+    ) {
       if (ftcMode) {
         // Count wins from all matches in series up to (but not including) the current series
-        // Note: We already set advantage.red = 1 above, so we're adding to that base
+        // Note: For non-da Vinci, we already set advantage.red = 1 above, so we're adding to that base
         const seriesNumbers = [];
-        for (var seriesNum = finalsStart; seriesNum < currentMatchIdentifier; seriesNum++) {
+        for (
+          var seriesNum = finalsStart;
+          seriesNum < currentMatchIdentifier;
+          seriesNum++
+        ) {
           seriesNumbers.push(seriesNum);
         }
         seriesNumbers.forEach((seriesNum) => {
@@ -163,8 +179,9 @@ function PlayoffDetails({
             // Find the last match in the series (highest matchNumber)
             const lastMatch = seriesMatches.reduce((prev, current) => {
               const prevMatchNum = prev.originalMatchNumber || prev.matchNumber;
-              const currentMatchNum = current.originalMatchNumber || current.matchNumber;
-              return (currentMatchNum > prevMatchNum) ? current : prev;
+              const currentMatchNum =
+                current.originalMatchNumber || current.matchNumber;
+              return currentMatchNum > prevMatchNum ? current : prev;
             });
             if (lastMatch?.winner?.winner === "red") {
               advantage.red += 1;
@@ -182,14 +199,14 @@ function PlayoffDetails({
           finalsMatches++
         ) {
           if (
-            matches[_.findIndex(matches, { matchNumber: finalsMatches })]?.winner
-              .winner === "red"
+            matches[_.findIndex(matches, { matchNumber: finalsMatches })]
+              ?.winner.winner === "red"
           ) {
             advantage.red += 1;
           }
           if (
-            matches[_.findIndex(matches, { matchNumber: finalsMatches })]?.winner
-              .winner === "blue"
+            matches[_.findIndex(matches, { matchNumber: finalsMatches })]
+              ?.winner.winner === "blue"
           ) {
             advantage.blue += 1;
           }
@@ -201,21 +218,31 @@ function PlayoffDetails({
       if (currentMatchClass) {
         var winnerMatch;
         var loserMatch;
-        
+
         if (ftcMode) {
           // In FTC mode, find matches by series number
-          winnerMatch = matches.find((m) => m.series === currentMatchClass?.winnerTo);
-          loserMatch = matches.find((m) => m.series === currentMatchClass?.loserTo);
+          winnerMatch = matches.find(
+            (m) => m.series === currentMatchClass?.winnerTo,
+          );
+          loserMatch = matches.find(
+            (m) => m.series === currentMatchClass?.loserTo,
+          );
         } else {
           // FRC mode: find matches by matchNumber
-          winnerMatch = matches[_.findIndex(matches, {
-            matchNumber: currentMatchClass?.winnerTo,
-          })];
-          loserMatch = matches[_.findIndex(matches, {
-            matchNumber: currentMatchClass?.loserTo,
-          })];
+          winnerMatch =
+            matches[
+              _.findIndex(matches, {
+                matchNumber: currentMatchClass?.winnerTo,
+              })
+            ];
+          loserMatch =
+            matches[
+              _.findIndex(matches, {
+                matchNumber: currentMatchClass?.loserTo,
+              })
+            ];
         }
-        
+
         var winnerOpponent = {};
         winnerOpponent.alliance = currentMatchClass?.winnerVs;
         if (winnerOpponent.alliance === "blue") {
@@ -225,7 +252,7 @@ function PlayoffDetails({
         } else {
           winnerOpponent.lookup = -1;
         }
-        
+
         var loserOpponent = {};
         loserOpponent.alliance = currentMatchClass?.loserVs;
         if (loserOpponent.alliance === "blue") {
@@ -254,94 +281,96 @@ function PlayoffDetails({
 
   return (
     <>
-      {currentMatchIdentifier &&
-        currentMatchIdentifier <= finalsStart - 1 && (
-          <>
-            Winner <ArrowRight />{" "}
-            {currentMatchClass?.winnerTo <= finalsStart - 1
-              ? `M${currentMatchClass?.winnerTo}${
-                  opponent?.winner
-                    ? ` vs ${opponent?.winner.replace(" ", " ")}`
-                    : ""
-                }`
-              : "Finals"}
-            <br />
-            Losing Alliance{" "}
-            {currentMatchClass?.loserTo ? (
-              <>
-                <ArrowRight /> M{currentMatchClass?.loserTo}
-                {opponent?.loser
-                  ? ` vs ${opponent?.loser.replace(" ", " ")}`
-                  : ""}{" "}
-              </>
-            ) : (
-              " eliminated"
-            )}{" "}
-          </>
-        )}
-      {currentMatchIdentifier &&
-        currentMatchIdentifier === finalsStart && (
-          <>
-            {ftcMode ? (
-              <span className="redAllianceTeam">
-                FINALS MATCH 1<br />
-                ADVANTAGE RED
-              </span>
-            ) : (
-              <>FINALS MATCH 1</>
-            )}
-          </>
-        )}
-      {currentMatchIdentifier &&
-        currentMatchIdentifier === finalsStart + 1 && (
-          <span
-            className={`${
-              ftcMode
-                ? (() => {
-                    // In FTC mode, find the previous series' last match
-                    const prevSeries = currentMatchIdentifier - 1;
-                    const prevSeriesMatches = matches.filter((m) => m.series === prevSeries);
-                    if (prevSeriesMatches.length > 0) {
-                      const lastMatch = prevSeriesMatches.reduce((prev, current) => {
-                        const prevMatchNum = prev.originalMatchNumber || prev.matchNumber;
-                        const currentMatchNum = current.originalMatchNumber || current.matchNumber;
-                        return (currentMatchNum > prevMatchNum) ? current : prev;
-                      });
-                      return lastMatch?.winner?.winner || "";
-                    }
-                    return "";
-                  })()
-                : matches[
-                    _.findIndex(matches, {
-                      matchNumber: currentMatchIdentifier - 1,
-                    })
-                  ]?.winner.winner
-            }AllianceTeam`}
-          >
-            FINALS MATCH 2<br />
-            {advantage.red === advantage.blue && "EVEN"}
-            {advantage.red > advantage.blue && "ADVANTAGE RED"}
-            {advantage.blue > advantage.red && "ADVANTAGE BLUE"}
-          </span>
-        )}
-      {currentMatchIdentifier &&
-        currentMatchIdentifier >= finalsStart + 2 && (
-          <span
-            className={
-              advantage?.red > advantage?.blue
-                ? "redAllianceTeam"
-                : advantage?.blue > advantage?.red
+      {currentMatchIdentifier && currentMatchIdentifier <= finalsStart - 1 && (
+        <>
+          Winner <ArrowRight />{" "}
+          {currentMatchClass?.winnerTo <= finalsStart - 1
+            ? `M${currentMatchClass?.winnerTo}${
+                opponent?.winner
+                  ? ` vs ${opponent?.winner.replace(" ", " ")}`
+                  : ""
+              }`
+            : "Finals"}
+          <br />
+          Losing Alliance{" "}
+          {currentMatchClass?.loserTo ? (
+            <>
+              <ArrowRight /> M{currentMatchClass?.loserTo}
+              {opponent?.loser
+                ? ` vs ${opponent?.loser.replace(" ", " ")}`
+                : ""}{" "}
+            </>
+          ) : (
+            " eliminated"
+          )}{" "}
+        </>
+      )}
+      {currentMatchIdentifier && currentMatchIdentifier === finalsStart && (
+        <>
+          {ftcMode && !isDaVinci ? (
+            <span className="redAllianceTeam">
+              FINALS MATCH 1<br />
+              ADVANTAGE RED
+            </span>
+          ) : (
+            <>FINALS MATCH 1</>
+          )}
+        </>
+      )}
+      {currentMatchIdentifier && currentMatchIdentifier === finalsStart + 1 && (
+        <span
+          className={`${
+            ftcMode
+              ? (() => {
+                  // In FTC mode, find the previous series' last match
+                  const prevSeries = currentMatchIdentifier - 1;
+                  const prevSeriesMatches = matches.filter(
+                    (m) => m.series === prevSeries,
+                  );
+                  if (prevSeriesMatches.length > 0) {
+                    const lastMatch = prevSeriesMatches.reduce(
+                      (prev, current) => {
+                        const prevMatchNum =
+                          prev.originalMatchNumber || prev.matchNumber;
+                        const currentMatchNum =
+                          current.originalMatchNumber || current.matchNumber;
+                        return currentMatchNum > prevMatchNum ? current : prev;
+                      },
+                    );
+                    return lastMatch?.winner?.winner || "";
+                  }
+                  return "";
+                })()
+              : matches[
+                  _.findIndex(matches, {
+                    matchNumber: currentMatchIdentifier - 1,
+                  })
+                ]?.winner.winner
+          }AllianceTeam`}
+        >
+          FINALS MATCH 2<br />
+          {advantage.red === advantage.blue && "EVEN"}
+          {advantage.red > advantage.blue && "ADVANTAGE RED"}
+          {advantage.blue > advantage.red && "ADVANTAGE BLUE"}
+        </span>
+      )}
+      {currentMatchIdentifier && currentMatchIdentifier >= finalsStart + 2 && (
+        <span
+          className={
+            advantage?.red > advantage?.blue
+              ? "redAllianceTeam"
+              : advantage?.blue > advantage?.red
                 ? "blueAllianceTeam"
                 : "tieAllianceTeam"
-            }
-          >
-            {_.toUpper(matchDetails.description)}
-            <br />
-            {advantage?.red === advantage?.blue && "EVEN"}
-            {advantage?.red > advantage?.blue && "ADVANTAGE RED"}
-            {advantage?.blue > advantage?.red && "ADVANTAGE BLUE"}
-          </span>
-        )}
+          }
+        >
+          {_.toUpper(matchDetails.description)}
+          <br />
+          {advantage?.red === advantage?.blue && "EVEN"}
+          {advantage?.red > advantage?.blue && "ADVANTAGE RED"}
+          {advantage?.blue > advantage?.red && "ADVANTAGE BLUE"}
+        </span>
+      )}
     </>
   );
 }

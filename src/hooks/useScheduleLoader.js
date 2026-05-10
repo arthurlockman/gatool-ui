@@ -834,7 +834,9 @@ export function useScheduleLoader(deps, opts = {}) {
     }
 
     // FTC: extend schedule with partially populated matches from bracket propagation (winners/losers to downstream series)
-    if (ftcMode && playoffschedule?.schedule?.length > 0 && Array.isArray(playoffschedule.schedule)) {
+    // Skip for da Vinci (FTCCMP1) — it uses a round-robin format, not an elimination bracket
+    const isDaVinci = selectedEvent?.value?.code === "FTCCMP1";
+    if (ftcMode && !isDaVinci && playoffschedule?.schedule?.length > 0 && Array.isArray(playoffschedule.schedule)) {
       let allianceCountForPlayoff = 6;
       if (playoffCountOverride?.value != null) {
         allianceCountForPlayoff = parseInt(playoffCountOverride.value, 10);

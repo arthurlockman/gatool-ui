@@ -12,17 +12,26 @@ import { useEventData } from "contexts/EventDataContext";
 import { useEventActions } from "contexts/EventActionsContext";
 
 function EmceePage() {
-  const { selectedEvent, playoffSchedule, qualSchedule, practiceSchedule, offlinePlayoffSchedule, alliances, currentMatch, eventLabel, ftcMode, remapNumberToString } = useEventData();
+  const {
+    selectedEvent,
+    playoffSchedule,
+    qualSchedule,
+    practiceSchedule,
+    offlinePlayoffSchedule,
+    alliances,
+    currentMatch,
+    eventLabel,
+    ftcMode,
+    remapNumberToString,
+  } = useEventData();
   const { nextMatch, previousMatch, getSchedule } = useEventActions();
-  const { reverseEmcee, hidePracticeSchedule, usePullDownToUpdate, useSwipe } = useSettings();
+  const { reverseEmcee, hidePracticeSchedule, usePullDownToUpdate, useSwipe } =
+    useSettings();
   const { height, width } = useWindowDimensions();
+  const isDaVinci = selectedEvent?.value?.code === "FTCCMP1";
 
   const lookupAllianceEntryWithData = (teamNumber, alliancesData) => {
-    if (
-      _.isNull(teamNumber) ||
-      teamNumber === undefined ||
-      teamNumber === ""
-    ) {
+    if (_.isNull(teamNumber) || teamNumber === undefined || teamNumber === "") {
       return null;
     }
     const L = alliancesData?.Lookup;
@@ -48,9 +57,9 @@ function EmceePage() {
           if (r != null && r !== "") out.push(`${r}`);
         }
         return out;
-      })
+      }),
     );
-  
+
   /**
    * This function finds a team by their station assignment
    * @param teams the array of team objects
@@ -59,7 +68,9 @@ function EmceePage() {
    */
   const getTeamByStation = (teams, station) => {
     if (!teams || !Array.isArray(teams)) return null;
-    const team = teams.find((t) => t?.station?.toLowerCase() === station?.toLowerCase());
+    const team = teams.find(
+      (t) => t?.station?.toLowerCase() === station?.toLowerCase(),
+    );
     return team?.teamNumber ?? team?.team ?? null;
   };
 
@@ -80,7 +91,7 @@ function EmceePage() {
           const e = lookupAllianceEntryWithData(teamNumber, alliancesData);
           return e?.alliance ? [e.alliance] : [];
         })
-        .filter(Boolean)
+        .filter(Boolean),
     );
     if (lookupAlliances.length === 1) {
       return lookupAlliances[0].replace("Alliance ", "A");
@@ -102,7 +113,7 @@ function EmceePage() {
       const allianceTeamNumbers = expandTeamIdStrings(slots).sort();
 
       const isSubset = targetExpanded.every((id) =>
-        allianceTeamNumbers.includes(id)
+        allianceTeamNumbers.includes(id),
       );
 
       if (isSubset) {
@@ -132,25 +143,26 @@ function EmceePage() {
     alliances?.count === 8
       ? formatMatchClasses(_.cloneDeep(matchClassesBase.eightAlliance))
       : alliances?.count === 6
-      ? formatMatchClasses(_.cloneDeep(matchClassesBase.sixAlliance))
-      : alliances?.count === 4
-      ? formatMatchClasses(
-          _.cloneDeep(
-            ftcMode
-              ? matchClassesBase.fourAllianceFTC
-              : matchClassesBase.fourAlliance
-          )
-        )
-      : null;
+        ? formatMatchClasses(_.cloneDeep(matchClassesBase.sixAlliance))
+        : alliances?.count === 4
+          ? formatMatchClasses(
+              _.cloneDeep(
+                ftcMode
+                  ? matchClassesBase.fourAllianceFTC
+                  : matchClassesBase.fourAlliance,
+              ),
+            )
+          : null;
 
-  const finalsStart =
-    alliances?.count === 8
+  const finalsStart = isDaVinci
+    ? 16
+    : alliances?.count === 8
       ? 14
       : alliances?.count === 6
-      ? 10
-      : alliances?.count === 4
-      ? 6
-      : null;
+        ? 10
+        : alliances?.count === 4
+          ? 6
+          : null;
 
   var schedule = [];
   var qualMatchLength = 0;
@@ -222,7 +234,7 @@ function EmceePage() {
     const blue1Team = getTeamByStation(match?.teams, "Blue1");
     const blue2Team = getTeamByStation(match?.teams, "Blue2");
     const blue3Team = getTeamByStation(match?.teams, "Blue3");
-    
+
     if (red1Team) {
       allianceName = ftcMode
         ? lookupAllianceEntry(red1Team)?.alliance ||
@@ -287,34 +299,40 @@ function EmceePage() {
     let matchNumberToUse = matchNumber;
     if (ftcMode) {
       // Find the match by matchNumber first, then get its series
-      const currentMatchData = matches.find((m) => m.matchNumber === matchNumber);
+      const currentMatchData = matches.find(
+        (m) => m.matchNumber === matchNumber,
+      );
       if (currentMatchData?.series) {
         matchNumberToUse = currentMatchData.series;
       }
     }
-    
+
     const currentMatchClass = _.filter(matchClasses, {
       matchNumber: matchNumberToUse,
     })[0];
-    
+
     if (!currentMatchClass) return "";
-    
+
     // Get the "from" field which tells us which match they came from
-    const fromText = allianceColor === "red" 
-      ? currentMatchClass?.red?.from 
-      : currentMatchClass?.blue?.from;
-    
+    const fromText =
+      allianceColor === "red"
+        ? currentMatchClass?.red?.from
+        : currentMatchClass?.blue?.from;
+
     const currentMatch = matches.find((m) => m.matchNumber === matchNumber);
-    const currentTeamNumbers = currentMatch?.teams
-      ?.filter((t) => t.station?.startsWith(allianceColor === "red" ? "Red" : "Blue"))
-      .map((t) => t.teamNumber)
-      .sort() || [];
-    
+    const currentTeamNumbers =
+      currentMatch?.teams
+        ?.filter((t) =>
+          t.station?.startsWith(allianceColor === "red" ? "Red" : "Blue"),
+        )
+        .map((t) => t.teamNumber)
+        .sort() || [];
+
     // Find upper bracket match they lost (if any)
     let upperBracketLossMatch = null;
     // Find lower bracket match they won (if any)
     let lowerBracketWinMatch = null;
-    
+
     // First, try to parse the "from" field as a fallback for when teams aren't assigned yet
     if (fromText) {
       if (fromText.includes("Lost M")) {
@@ -329,7 +347,7 @@ function EmceePage() {
         }
       }
     }
-    
+
     // Then try to determine dynamically by searching backwards through matches
     // This will override the fromText if we can find better data
     if (currentTeamNumbers.length > 0) {
@@ -340,14 +358,15 @@ function EmceePage() {
         const searchStart = currentSeries - 1;
         for (let series = searchStart; series > 0; series--) {
           const seriesMatches = matches.filter((m) => m.series === series);
-          const prevMatch = seriesMatches.length > 0
-            ? seriesMatches.sort((a, b) => {
-                const aMatchNum = a.originalMatchNumber || a.matchNumber;
-                const bMatchNum = b.originalMatchNumber || b.matchNumber;
-                return bMatchNum - aMatchNum;
-              })[0]
-            : null;
-          
+          const prevMatch =
+            seriesMatches.length > 0
+              ? seriesMatches.sort((a, b) => {
+                  const aMatchNum = a.originalMatchNumber || a.matchNumber;
+                  const bMatchNum = b.originalMatchNumber || b.matchNumber;
+                  return bMatchNum - aMatchNum;
+                })[0]
+              : null;
+
           if (prevMatch?.teams) {
             const redTeamNumbers = prevMatch.teams
               .filter((t) => t.station?.startsWith("Red"))
@@ -357,26 +376,36 @@ function EmceePage() {
               .filter((t) => t.station?.startsWith("Blue"))
               .map((t) => t.teamNumber)
               .sort();
-            
+
             if (prevMatch?.winner?.winner) {
               const winningAlliance = prevMatch.winner.winner;
               const losingAlliance = winningAlliance === "red" ? "blue" : "red";
-              const winningTeamNumbers = winningAlliance === "red" ? redTeamNumbers : blueTeamNumbers;
-              const losingTeamNumbers = losingAlliance === "red" ? redTeamNumbers : blueTeamNumbers;
-              
+              const winningTeamNumbers =
+                winningAlliance === "red" ? redTeamNumbers : blueTeamNumbers;
+              const losingTeamNumbers =
+                losingAlliance === "red" ? redTeamNumbers : blueTeamNumbers;
+
               // Check if they won this match
-              if (JSON.stringify(currentTeamNumbers) === JSON.stringify(winningTeamNumbers)) {
+              if (
+                JSON.stringify(currentTeamNumbers) ===
+                JSON.stringify(winningTeamNumbers)
+              ) {
                 lowerBracketWinMatch = series;
                 break;
               }
               // Check if they lost this match
-              else if (JSON.stringify(currentTeamNumbers) === JSON.stringify(losingTeamNumbers)) {
+              else if (
+                JSON.stringify(currentTeamNumbers) ===
+                JSON.stringify(losingTeamNumbers)
+              ) {
                 upperBracketLossMatch = series;
                 break;
               }
             } else if (
-              JSON.stringify(currentTeamNumbers) === JSON.stringify(redTeamNumbers) ||
-              JSON.stringify(currentTeamNumbers) === JSON.stringify(blueTeamNumbers)
+              JSON.stringify(currentTeamNumbers) ===
+                JSON.stringify(redTeamNumbers) ||
+              JSON.stringify(currentTeamNumbers) ===
+                JSON.stringify(blueTeamNumbers)
             ) {
               // Teams match but no winner yet
               upperBracketLossMatch = series;
@@ -398,26 +427,36 @@ function EmceePage() {
               .filter((t) => t.station?.startsWith("Blue"))
               .map((t) => t.teamNumber)
               .sort();
-            
+
             if (prevMatch?.winner?.winner) {
               const winningAlliance = prevMatch.winner.winner;
               const losingAlliance = winningAlliance === "red" ? "blue" : "red";
-              const winningTeamNumbers = winningAlliance === "red" ? redTeamNumbers : blueTeamNumbers;
-              const losingTeamNumbers = losingAlliance === "red" ? redTeamNumbers : blueTeamNumbers;
-              
+              const winningTeamNumbers =
+                winningAlliance === "red" ? redTeamNumbers : blueTeamNumbers;
+              const losingTeamNumbers =
+                losingAlliance === "red" ? redTeamNumbers : blueTeamNumbers;
+
               // Check if they won this match
-              if (JSON.stringify(currentTeamNumbers) === JSON.stringify(winningTeamNumbers)) {
+              if (
+                JSON.stringify(currentTeamNumbers) ===
+                JSON.stringify(winningTeamNumbers)
+              ) {
                 lowerBracketWinMatch = i;
                 break;
               }
               // Check if they lost this match
-              else if (JSON.stringify(currentTeamNumbers) === JSON.stringify(losingTeamNumbers)) {
+              else if (
+                JSON.stringify(currentTeamNumbers) ===
+                JSON.stringify(losingTeamNumbers)
+              ) {
                 upperBracketLossMatch = i;
                 break;
               }
             } else if (
-              JSON.stringify(currentTeamNumbers) === JSON.stringify(redTeamNumbers) ||
-              JSON.stringify(currentTeamNumbers) === JSON.stringify(blueTeamNumbers)
+              JSON.stringify(currentTeamNumbers) ===
+                JSON.stringify(redTeamNumbers) ||
+              JSON.stringify(currentTeamNumbers) ===
+                JSON.stringify(blueTeamNumbers)
             ) {
               // Teams match but no winner yet
               upperBracketLossMatch = i;
@@ -427,7 +466,7 @@ function EmceePage() {
         }
       }
     }
-    
+
     // Build the display text
     const parts = [];
 
@@ -452,24 +491,33 @@ function EmceePage() {
       return `A${shortName}`;
     };
 
-    const currentAllianceDisplay = getAllianceNumberByTeams(currentTeamNumbers, alliances);
-    
+    const currentAllianceDisplay = getAllianceNumberByTeams(
+      currentTeamNumbers,
+      alliances,
+    );
+
     // If they won a lower bracket match, only show that (don't show upper bracket loss)
     if (lowerBracketWinMatch) {
       const wonMatch = getSourceMatch(lowerBracketWinMatch);
-      
+
       let losingTeamNumbers = [];
       let allianceDisplay = null;
-      
+
       if (wonMatch?.teams) {
         if (wonMatch.winner?.winner) {
           // If winner is known, opponent is the losing side in that source match.
-          const losingAlliance = wonMatch.winner.winner === "red" ? "blue" : "red";
+          const losingAlliance =
+            wonMatch.winner.winner === "red" ? "blue" : "red";
           allianceDisplay = getAllianceDisplayForSide(wonMatch, losingAlliance);
-          losingTeamNumbers = wonMatch.teams
-            ?.filter((t) => t.station?.startsWith(losingAlliance === "red" ? "Red" : "Blue"))
-            .map((t) => t.teamNumber)
-            .sort() || [];
+          losingTeamNumbers =
+            wonMatch.teams
+              ?.filter((t) =>
+                t.station?.startsWith(
+                  losingAlliance === "red" ? "Red" : "Blue",
+                ),
+              )
+              .map((t) => t.teamNumber)
+              .sort() || [];
         } else {
           // If no explicit winner, determine by figuring out which team is NOT the current team
           const redTeamNumbers = wonMatch.teams
@@ -480,18 +528,33 @@ function EmceePage() {
             .filter((t) => t.station?.startsWith("Blue"))
             .map((t) => t.teamNumber)
             .sort();
-          
+
           // The losing team is the one that ISN'T the current team
-          if (JSON.stringify(currentTeamNumbers) === JSON.stringify(redTeamNumbers)) {
+          if (
+            JSON.stringify(currentTeamNumbers) ===
+            JSON.stringify(redTeamNumbers)
+          ) {
             losingTeamNumbers = blueTeamNumbers;
-          } else if (JSON.stringify(currentTeamNumbers) === JSON.stringify(blueTeamNumbers)) {
+          } else if (
+            JSON.stringify(currentTeamNumbers) ===
+            JSON.stringify(blueTeamNumbers)
+          ) {
             losingTeamNumbers = redTeamNumbers;
           } else {
             // Couldn't determine, try both and see if we can find an alliance
-            const redAlliance = getAllianceNumberByTeams(redTeamNumbers, alliances);
-            const blueAlliance = getAllianceNumberByTeams(blueTeamNumbers, alliances);
+            const redAlliance = getAllianceNumberByTeams(
+              redTeamNumbers,
+              alliances,
+            );
+            const blueAlliance = getAllianceNumberByTeams(
+              blueTeamNumbers,
+              alliances,
+            );
             // Use whichever is found (prefer the one that's not the current team's alliance)
-            const currentAlliance = getAllianceNumberByTeams(currentTeamNumbers, alliances);
+            const currentAlliance = getAllianceNumberByTeams(
+              currentTeamNumbers,
+              alliances,
+            );
             if (redAlliance && redAlliance !== currentAlliance) {
               losingTeamNumbers = redTeamNumbers;
             } else if (blueAlliance && blueAlliance !== currentAlliance) {
@@ -500,10 +563,13 @@ function EmceePage() {
           }
         }
       }
-      
+
       // Always try to display alliance info, use fallback if needed
       if (!allianceDisplay) {
-        allianceDisplay = getAllianceNumberByTeams(losingTeamNumbers, alliances);
+        allianceDisplay = getAllianceNumberByTeams(
+          losingTeamNumbers,
+          alliances,
+        );
       }
       if (
         allianceDisplay &&
@@ -512,7 +578,10 @@ function EmceePage() {
         wonMatch?.winner?.winner
       ) {
         const oppositeSide = wonMatch.winner.winner;
-        const oppositeDisplay = getAllianceDisplayForSide(wonMatch, oppositeSide);
+        const oppositeDisplay = getAllianceDisplayForSide(
+          wonMatch,
+          oppositeSide,
+        );
         if (oppositeDisplay && oppositeDisplay !== currentAllianceDisplay) {
           allianceDisplay = oppositeDisplay;
         }
@@ -524,19 +593,27 @@ function EmceePage() {
     } else if (upperBracketLossMatch) {
       // Only show upper bracket loss if they didn't win a lower bracket match
       const lostMatch = getSourceMatch(upperBracketLossMatch);
-      
+
       let winningTeamNumbers = [];
       let allianceDisplay = null;
-      
+
       if (lostMatch?.teams) {
         if (lostMatch.winner?.winner) {
           // If winner is known, opponent is the winning side in that source match.
           const winningAlliance = lostMatch.winner.winner;
-          allianceDisplay = getAllianceDisplayForSide(lostMatch, winningAlliance);
-          winningTeamNumbers = lostMatch.teams
-            ?.filter((t) => t.station?.startsWith(winningAlliance === "red" ? "Red" : "Blue"))
-            .map((t) => t.teamNumber)
-            .sort() || [];
+          allianceDisplay = getAllianceDisplayForSide(
+            lostMatch,
+            winningAlliance,
+          );
+          winningTeamNumbers =
+            lostMatch.teams
+              ?.filter((t) =>
+                t.station?.startsWith(
+                  winningAlliance === "red" ? "Red" : "Blue",
+                ),
+              )
+              .map((t) => t.teamNumber)
+              .sort() || [];
         } else {
           // If no explicit winner, determine by figuring out which team is NOT the current team
           const redTeamNumbers = lostMatch.teams
@@ -547,18 +624,33 @@ function EmceePage() {
             .filter((t) => t.station?.startsWith("Blue"))
             .map((t) => t.teamNumber)
             .sort();
-          
+
           // The winning team is the one that ISN'T the current team
-          if (JSON.stringify(currentTeamNumbers) === JSON.stringify(redTeamNumbers)) {
+          if (
+            JSON.stringify(currentTeamNumbers) ===
+            JSON.stringify(redTeamNumbers)
+          ) {
             winningTeamNumbers = blueTeamNumbers;
-          } else if (JSON.stringify(currentTeamNumbers) === JSON.stringify(blueTeamNumbers)) {
+          } else if (
+            JSON.stringify(currentTeamNumbers) ===
+            JSON.stringify(blueTeamNumbers)
+          ) {
             winningTeamNumbers = redTeamNumbers;
           } else {
             // Couldn't determine, try both and see if we can find an alliance
-            const redAlliance = getAllianceNumberByTeams(redTeamNumbers, alliances);
-            const blueAlliance = getAllianceNumberByTeams(blueTeamNumbers, alliances);
+            const redAlliance = getAllianceNumberByTeams(
+              redTeamNumbers,
+              alliances,
+            );
+            const blueAlliance = getAllianceNumberByTeams(
+              blueTeamNumbers,
+              alliances,
+            );
             // Use whichever is found (prefer the one that's not the current team's alliance)
-            const currentAlliance = getAllianceNumberByTeams(currentTeamNumbers, alliances);
+            const currentAlliance = getAllianceNumberByTeams(
+              currentTeamNumbers,
+              alliances,
+            );
             if (redAlliance && redAlliance !== currentAlliance) {
               winningTeamNumbers = redTeamNumbers;
             } else if (blueAlliance && blueAlliance !== currentAlliance) {
@@ -567,10 +659,13 @@ function EmceePage() {
           }
         }
       }
-      
+
       // Always try to display alliance info, use fallback if needed
       if (!allianceDisplay) {
-        allianceDisplay = getAllianceNumberByTeams(winningTeamNumbers, alliances);
+        allianceDisplay = getAllianceNumberByTeams(
+          winningTeamNumbers,
+          alliances,
+        );
       }
       if (
         allianceDisplay &&
@@ -579,7 +674,10 @@ function EmceePage() {
         lostMatch?.winner?.winner
       ) {
         const oppositeSide = lostMatch.winner.winner === "red" ? "blue" : "red";
-        const oppositeDisplay = getAllianceDisplayForSide(lostMatch, oppositeSide);
+        const oppositeDisplay = getAllianceDisplayForSide(
+          lostMatch,
+          oppositeSide,
+        );
         if (oppositeDisplay && oppositeDisplay !== currentAllianceDisplay) {
           allianceDisplay = oppositeDisplay;
         }
@@ -589,12 +687,12 @@ function EmceePage() {
       }
       parts.push(`Lost to ${allianceDisplay} in M${upperBracketLossMatch}`);
     }
-    
+
     // If no parts found, return original text or empty
     if (parts.length === 0) {
       return fromText || "";
     }
-    
+
     return (
       <>
         {parts.map((part, index) => (
@@ -681,12 +779,12 @@ function EmceePage() {
 
       if (winnerOpponent.lookup >= 0) {
         opponent.winner = lookupAllianceEntry(
-          winnerMatch?.teams[winnerOpponent.lookup]?.teamNumber
+          winnerMatch?.teams[winnerOpponent.lookup]?.teamNumber,
         )?.alliance;
       }
       if (loserOpponent.lookup >= 0) {
         opponent.loser = lookupAllianceEntry(
-          loserMatch?.teams[loserOpponent.lookup]?.teamNumber
+          loserMatch?.teams[loserOpponent.lookup]?.teamNumber,
         )?.alliance;
       }
     }
@@ -780,13 +878,13 @@ function EmceePage() {
                 {_.replace(
                   schedule[currentMatch - 1]?.description,
                   "(R",
-                  "(Round "
+                  "(Round ",
                 ) || ""}
               </Col>
             </Row>
             {!reverseEmcee && (
               <Row>
-                {playoffMatchNumber <= 13 && (
+                {playoffMatchNumber <= 13 && !isDaVinci && (
                   <Col
                     xs={2}
                     className={`davidPriceDetail${smallScreen}${portrait} redAllianceTeam`}
@@ -795,13 +893,13 @@ function EmceePage() {
                   </Col>
                 )}
                 <Col
-                  xs={playoffMatchNumber > 13 ? 6 : 4}
+                  xs={playoffMatchNumber > 13 || isDaVinci ? 6 : 4}
                   className={`redAllianceTeam`}
                 >
                   <div className={`davidPrice${smallScreen}`}>
                     {allianceName(
                       schedule[currentMatch - 1]?.matchNumber,
-                      "red"
+                      "red",
                     )?.shortName || ""}
                   </div>
                   <div
@@ -811,19 +909,19 @@ function EmceePage() {
                     {
                       allianceName(
                         schedule[currentMatch - 1]?.matchNumber,
-                        "red"
+                        "red",
                       )?.captain
                     }
                   </div>
                 </Col>
                 <Col
-                  xs={playoffMatchNumber > 13 ? 6 : 4}
+                  xs={playoffMatchNumber > 13 || isDaVinci ? 6 : 4}
                   className={`blueAllianceTeam`}
                 >
                   <div className={`davidPrice${smallScreen}`}>
                     {allianceName(
                       schedule[currentMatch - 1]?.matchNumber,
-                      "blue"
+                      "blue",
                     )?.shortName || ""}
                   </div>
                   <div
@@ -833,12 +931,12 @@ function EmceePage() {
                     {
                       allianceName(
                         schedule[currentMatch - 1]?.matchNumber,
-                        "blue"
+                        "blue",
                       )?.captain
                     }
                   </div>
                 </Col>
-                {playoffMatchNumber <= 13 && (
+                {playoffMatchNumber <= 13 && !isDaVinci && (
                   <Col
                     xs={2}
                     className={`davidPriceDetail${smallScreen}${portrait} blueAllianceTeam`}
@@ -851,7 +949,7 @@ function EmceePage() {
 
             {reverseEmcee && (
               <Row>
-                {playoffMatchNumber <= 13 && (
+                {playoffMatchNumber <= 13 && !isDaVinci && (
                   <Col
                     xs={2}
                     className={`davidPriceDetail${smallScreen}${portrait} blueAllianceTeam`}
@@ -860,13 +958,13 @@ function EmceePage() {
                   </Col>
                 )}
                 <Col
-                  xs={playoffMatchNumber > 13 ? 6 : 4}
+                  xs={playoffMatchNumber > 13 || isDaVinci ? 6 : 4}
                   className={`blueAllianceTeam`}
                 >
                   <div className={`davidPrice${smallScreen}`}>
                     {allianceName(
                       schedule[currentMatch - 1]?.matchNumber,
-                      "blue"
+                      "blue",
                     )?.shortName || ""}
                   </div>
                   <div
@@ -876,19 +974,19 @@ function EmceePage() {
                     {
                       allianceName(
                         schedule[currentMatch - 1]?.matchNumber,
-                        "blue"
+                        "blue",
                       )?.captain
                     }
                   </div>
                 </Col>
                 <Col
-                  xs={playoffMatchNumber > 13 ? 6 : 4}
+                  xs={playoffMatchNumber > 13 || isDaVinci ? 6 : 4}
                   className={`redAllianceTeam`}
                 >
                   <div className={`davidPrice${smallScreen}`}>
                     {allianceName(
                       schedule[currentMatch - 1]?.matchNumber,
-                      "red"
+                      "red",
                     )?.shortName || ""}
                   </div>
                   <div
@@ -898,12 +996,12 @@ function EmceePage() {
                     {
                       allianceName(
                         schedule[currentMatch - 1]?.matchNumber,
-                        "red"
+                        "red",
                       )?.captain
                     }
                   </div>
                 </Col>
-                {playoffMatchNumber <= 13 && (
+                {playoffMatchNumber <= 13 && !isDaVinci && (
                   <Col
                     xs={2}
                     className={`davidPriceDetail${smallScreen}${portrait} redAllianceTeam`}
@@ -914,19 +1012,23 @@ function EmceePage() {
               </Row>
             )}
 
-            <Row>
-              <Col
-                xs={12}
-                className={`davidPriceDetail${smallScreen}${portrait}`}
-              >
-                <PlayoffDetails
-                  matchDetails={matchDetails}
-                  alliances={alliances}
-                  matches={matches}
-                  ftcMode={ftcMode}
-                />
-              </Col>
-            </Row>
+            {(!isDaVinci && playoffMatchNumber <= 13) ||
+              (isDaVinci && playoffMatchNumber >= 16 && (
+                <Row>
+                  <Col
+                    xs={12}
+                    className={`davidPriceDetail${smallScreen}${portrait}`}
+                  >
+                    <PlayoffDetails
+                      matchDetails={matchDetails}
+                      alliances={alliances}
+                      matches={matches}
+                      ftcMode={ftcMode}
+                      isDaVinci={isDaVinci}
+                    />
+                  </Col>
+                </Row>
+              ))}
           </Container>
         </>
       )}
