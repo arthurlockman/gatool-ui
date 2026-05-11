@@ -242,21 +242,35 @@ export function extendFTCPlayoffScheduleWithPartialMatches(
     if (winnerTeams.length === 0 && loserTeams.length === 0) continue;
 
     // Propagate winner to winnerTo (create target series match if not present – e.g. Series 5 when API only has 1–4)
+    // Do not overwrite if the target match already has real API team data at that station
     if (mc.winnerTo?.matchNumber != null && mc.winnerTo?.station && winnerTeams.length > 0) {
       const targetSeries = mc.winnerTo.matchNumber;
       const targetStation = mc.winnerTo.station.toLowerCase();
-      const predictedStartTime = getPredictedStartTime(schedule, targetSeries);
-      const targetMatch = ensureMatchForSeries(bySeries, targetSeries, matchClasses, predictedStartTime);
-      setTeamsForStation(targetMatch, targetStation, winnerTeams);
+      const stationPrefix = targetStation === "red" ? "Red" : "Blue";
+      const existingAtStation = (bySeries[targetSeries]?.[0]?.teams || []).some(
+        (t) => t?.station?.startsWith(stationPrefix)
+      );
+      if (!existingAtStation) {
+        const predictedStartTime = getPredictedStartTime(schedule, targetSeries);
+        const targetMatch = ensureMatchForSeries(bySeries, targetSeries, matchClasses, predictedStartTime);
+        setTeamsForStation(targetMatch, targetStation, winnerTeams);
+      }
     }
 
     // Propagate loser to loserTo
+    // Do not overwrite if the target match already has real API team data at that station
     if (mc.loserTo?.matchNumber != null && mc.loserTo?.station && loserTeams.length > 0) {
       const targetSeries = mc.loserTo.matchNumber;
       const targetStation = mc.loserTo.station.toLowerCase();
-      const predictedStartTime = getPredictedStartTime(schedule, targetSeries);
-      const targetMatch = ensureMatchForSeries(bySeries, targetSeries, matchClasses, predictedStartTime);
-      setTeamsForStation(targetMatch, targetStation, loserTeams);
+      const stationPrefix = targetStation === "red" ? "Red" : "Blue";
+      const existingAtStation = (bySeries[targetSeries]?.[0]?.teams || []).some(
+        (t) => t?.station?.startsWith(stationPrefix)
+      );
+      if (!existingAtStation) {
+        const predictedStartTime = getPredictedStartTime(schedule, targetSeries);
+        const targetMatch = ensureMatchForSeries(bySeries, targetSeries, matchClasses, predictedStartTime);
+        setTeamsForStation(targetMatch, targetStation, loserTeams);
+      }
     }
   }
 
