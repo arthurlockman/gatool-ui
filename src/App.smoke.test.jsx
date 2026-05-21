@@ -9,9 +9,10 @@
 // Strategy
 // --------
 // App.jsx pulls auth + event selection from context. Driving those through
-// the real providers requires Auth0, network refreshes, and async localforage
-// hydration — all noise unrelated to "did this page render?". So we mock the
-// two relevant context modules to return synchronous, stable values:
+// the real providers requires the auth flow, network refreshes, and async
+// localforage hydration — all noise unrelated to "did this page render?".
+// So we mock the two relevant context modules to return synchronous, stable
+// values:
 //
 //   - `useAuth`  → not loading, not authenticated user
 //                  (App and pages must still render in this state)
@@ -86,7 +87,6 @@ vi.mock("react-loader-spinner", () => ({ Blocks: () => null }));
 
 vi.mock("./contextProviders/AuthProvider", () => ({
   useAuth: () => mockAuth,
-  useAuth0: () => mockAuth,
   AuthProvider: ({ children }) => children,
   initialsAvatar: () => "",
 }));

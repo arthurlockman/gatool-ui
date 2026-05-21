@@ -115,7 +115,7 @@ function Developer({
 
   /**
    * This function receives a file from the upload button and parses the user list from the CSV.
-   * It then returns Auth0 formatted JSON, which is displays to the user in a Text Area on screen.
+   * It then returns formatted JSON, which is displayed to the user in a Text Area on screen.
    * It also destroys and recreates the button, and then re-attaches the proper event listener.
    *
    * @function handleUserUpload
@@ -133,17 +133,17 @@ function Developer({
         workbook = read(data, { type: "array" });
         const worksheet = workbook.Sheets[workbook.SheetNames[0]];
         const users = utils.sheet_to_json(worksheet);
-        let auth0Users = [];
+        let formattedUserList = [];
         try {
           if (users.length > 0) {
-            auth0Users = users.map((user) => {
+            formattedUserList = users.map((user) => {
               return {
                 user_id: user["Email Address"].toLowerCase(),
                 email: user["Email Address"],
                 email_verified: false,
               };
             });
-            setFormattedUsers(JSON.stringify(auth0Users));
+            setFormattedUsers(JSON.stringify(formattedUserList));
             setLoadedUsers("success");
           } else {
             setFormattedUsers("No users in file");
@@ -432,7 +432,7 @@ function Developer({
                         navigator.clipboard.writeText(formattedUsers);
                         downloadObjectAsJson(
                           JSON.parse(formattedUsers),
-                          "Auth0JSON" + moment().format("MMDDYYYY_HHmmss")
+                          "GatoolUsers" + moment().format("MMDDYYYY_HHmmss")
                         );
                         setLoadedUsers("info");
                       }
