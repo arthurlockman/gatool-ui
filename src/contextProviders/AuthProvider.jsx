@@ -242,7 +242,6 @@ export function AuthProvider({ children }) {
       getAccessTokenSilently: async () => {
         const t = await getAccessToken();
         if (!t) throw new Error("Not authenticated");
-        // Mimic Auth0 detailedResponse shape for the one Developer.jsx callsite
         return { id_token: t, access_token: t };
       },
     }),
@@ -282,6 +281,3 @@ export function useAuth() {
   if (!ctx) throw new Error("useAuth must be used inside <AuthProvider>");
   return ctx;
 }
-
-// Back-compat alias so the codebase can switch incrementally if desired.
-export const useAuth0 = useAuth;

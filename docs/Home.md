@@ -32,12 +32,12 @@ You will need a login to access the tool's team details editor. See the [Game An
 - **Modern Web Browser**: Chrome, Firefox, Safari, or Edge (latest versions)
 - **Internet Connection**: Required for initial setup and data sync (optional after initial load)
 - **Recommended Screen Size**: 10" tablet or larger for best experience
-- **Authentication**: Google OAuth or Auth0 account
+- **Authentication**: Google OAuth or gatool account
 
 ## Getting Started
 
 1. **Navigate to gatool**: Visit [gatool.org](https://gatool.org)
-2. **[Optional] Sign In**: Use your authorized Google account or Auth0 credentials
+2. **[Optional] Sign In**: Use your authorized Google account or gatool credentials
 3. **Select Mode**: Choose FRC or FTC mode based on your event
 4. **Select Year**: Choose the competition season
 5. **Select Event**: Pick your event from the dropdown list
