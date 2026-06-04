@@ -187,7 +187,7 @@ function SortableTeamRow({ id, teamNumber, orderHint, station }) {
 
 // ─── TopButtons ───────────────────────────────────────────────────────────────
 
-function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatchFromMenu, selectedEvent, matchDetails, rawMatchDetailsForReserve = null, alliances, setAlliances, rankings, inPlayoffs, backupTeam, setBackupTeam, upsertPlayoffReserveOverlay, removePlayoffReserveOverlay, playoffReserveEdits, playoffStationOrderEdits, upsertPlayoffStationOrderOverlay, removePlayoffStationOrderOverlay, teamList, adHocMatch, setAdHocMatch, adHocMode, playoffOnly, eventLabel, ftcMode, remapNumberToString, remapStringToNumber }) {
+function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatchFromMenu, selectedEvent, matchDetails, rawMatchDetailsForReserve = null, alliances, setAlliances, rankings, inPlayoffs, backupTeam, setBackupTeam, upsertPlayoffReserveOverlay, removePlayoffReserveOverlay, playoffReserveEdits, playoffStationOrderEdits, upsertPlayoffStationOrderOverlay, removePlayoffStationOrderOverlay, teamList, adHocMatch, setAdHocMatch, adHocMode, adHocRedAlliance, setAdHocRedAlliance, adHocBlueAlliance, setAdHocBlueAlliance, playoffOnly, eventLabel, ftcMode, remapNumberToString, remapStringToNumber, allianceSelectionArrays }) {
     const { swapScreen } = useSettings();
 
     // ── shared modal state ────────────────────────────────────────────────────
@@ -752,7 +752,8 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
         allAllianceMembersKnown &&
         !(matchDetails?.description || "").includes("Bye Match");
     // Show a single combined button when either the add-team or reorder action is available.
-    const showTopBarTeamOpsCol = showTopBarAddTeamCol || showTopBarReorderStationsCol;
+    // In test match (adHoc) mode, this button is hidden — users configure teams via "Change Teams" instead.
+    const showTopBarTeamOpsCol = !adHocMode && (showTopBarAddTeamCol || showTopBarReorderStationsCol);
     const promoteCount =
         (showTopBarTeamOpsCol ? 1 : 0) +
         (showTopBarChangeTeamsCol ? 1 : 0);
@@ -1051,6 +1052,12 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
                     adHocMatch={adHocMatch}
                     onStationChange={setAdHocMatch}
                     eventTeams={eventTeams}
+                    allianceSelectionArrays={allianceSelectionArrays}
+                    alliances={alliances}
+                    selectedRedAlliance={adHocRedAlliance}
+                    setSelectedRedAlliance={setAdHocRedAlliance}
+                    selectedBlueAlliance={adHocBlueAlliance}
+                    setSelectedBlueAlliance={setAdHocBlueAlliance}
                 />
             </Row>
         </>
