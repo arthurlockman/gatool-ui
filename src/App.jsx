@@ -303,6 +303,7 @@ function App() {
     rankingsOverride, setRankingsOverride,
     allianceCount, setAllianceCount,
     playoffCountOverride, setPlayoffCountOverride,
+    allianceSelectionRoundOrder, setAllianceSelectionRoundOrder,
     // Multi-screen sync
     syncEvent, setSyncEvent,
     screenMode, setScreenMode,
@@ -336,6 +337,8 @@ function App() {
   );
   // Live data: changes after every match; do not persist
   const [regionalEventDetail, setRegionalEventDetail] = useState(null);
+  const [adHocRedAlliance, setAdHocRedAlliance] = useState(null);
+  const [adHocBlueAlliance, setAdHocBlueAlliance] = useState(null);
   const [adHocMatch, setAdHocMatch] = useState([
     { teamNumber: null, station: "Red1", surrogate: false, dq: false },
     { teamNumber: null, station: "Red2", surrogate: false, dq: false },
@@ -1047,6 +1050,7 @@ function App() {
       if (!shouldPreserveOfflineData) {
         await setTeamReduction(null);
         await setPlayoffCountOverride(null);
+        await setAllianceSelectionRoundOrder(null);
         setAllianceSelectionArrays({});
         setAllianceSelection(false);
       } else {
@@ -1076,6 +1080,8 @@ function App() {
           setPlayoffStationOrderEdits(nextStation);
         }
       }
+      setAdHocRedAlliance(null);
+      setAdHocBlueAlliance(null);
       setAdHocMatch([
         { teamNumber: null, station: "Red1", surrogate: false, dq: false },
         { teamNumber: null, station: "Red2", surrogate: false, dq: false },
@@ -2545,6 +2551,10 @@ function App() {
                     adHocMatch={adHocMatch}
                     setAdHocMatch={setAdHocMatch}
                     adHocMode={adHocMode}
+                    adHocRedAlliance={adHocRedAlliance}
+                    setAdHocRedAlliance={setAdHocRedAlliance}
+                    adHocBlueAlliance={adHocBlueAlliance}
+                    setAdHocBlueAlliance={setAdHocBlueAlliance}
                     qualsLength={qualsLength}
                     playoffOnly={playoffOnly}
                     eventMessage={eventMessage}
@@ -2559,6 +2569,7 @@ function App() {
                     playoffStationOrderEdits={playoffStationOrderEdits}
                     upsertPlayoffStationOrderOverlay={upsertPlayoffStationOrderOverlay}
                     removePlayoffStationOrderOverlay={removePlayoffStationOrderOverlay}
+                    allianceSelectionArrays={allianceSelectionArrays}
                   />
                 }
               />
@@ -2581,6 +2592,10 @@ function App() {
                     adHocMatch={adHocMatch}
                     setAdHocMatch={setAdHocMatch}
                     adHocMode={adHocMode}
+                    adHocRedAlliance={adHocRedAlliance}
+                    setAdHocRedAlliance={setAdHocRedAlliance}
+                    adHocBlueAlliance={adHocBlueAlliance}
+                    setAdHocBlueAlliance={setAdHocBlueAlliance}
                     qualsLength={qualsLength}
                     playoffOnly={playoffOnly}
                     eventMessage={eventMessage}
@@ -2592,6 +2607,7 @@ function App() {
                     playoffStationOrderEdits={playoffStationOrderEdits}
                     upsertPlayoffStationOrderOverlay={upsertPlayoffStationOrderOverlay}
                     removePlayoffStationOrderOverlay={removePlayoffStationOrderOverlay}
+                    allianceSelectionArrays={allianceSelectionArrays}
                   />
                 }
               />

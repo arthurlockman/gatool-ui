@@ -45,12 +45,17 @@ function AnnouncePage({
   adHocMatch,
   setAdHocMatch,
   adHocMode,
+  adHocRedAlliance,
+  setAdHocRedAlliance,
+  adHocBlueAlliance,
+  setAdHocBlueAlliance,
   qualsLength,
   playoffOnly,
   eventMessage,
   eventBell,
   setEventBell,
   alliancePartnerConnectionsCache,
+  allianceSelectionArrays,
 }) {
   const { selectedEvent, selectedYear, eventLabel, ftcMode, teamList, qualSchedule, playoffSchedule, practiceSchedule, offlinePlayoffSchedule, rankings, districtRankings, alliances, allianceCount, communityUpdates, currentMatch, remapNumberToString, remapStringToNumber, regionalEventDetail } = useEventData();
   const { nextMatch, previousMatch, setMatchFromMenu, getSchedule, getRegionalEventDetail } = useEventActions();
@@ -113,6 +118,17 @@ function AnnouncePage({
     return map;
   }, [communityUpdates]);
 
+  function getAdHocAllianceInfo(teamNumber) {
+    if (!teamNumber || !allianceSelectionArrays?.alliances) return null;
+    for (const a of allianceSelectionArrays.alliances) {
+      if (a.captain?.teamNumber === teamNumber) return { alliance: a.name, role: "Captain" };
+      if (a.round1?.teamNumber === teamNumber) return { alliance: a.name, role: "Round 1 Selection" };
+      if (a.round2?.teamNumber === teamNumber) return { alliance: a.name, role: "Round 2 Selection" };
+      if (a.round3?.teamNumber === teamNumber) return { alliance: a.name, role: "Round 3 Selection" };
+    }
+    return null;
+  }
+
   function updateTeamDetails(station, matchDetails) {
     var team = {};
     var alliance = station.slice(0, station.length - 1);
@@ -146,6 +162,13 @@ function AnnouncePage({
       );
       team.alliance = announceAllianceEntry?.alliance ?? null;
       team.allianceRole = announceAllianceEntry?.role ?? null;
+      if (adHocMode && !team.alliance) {
+        const adHocInfo = getAdHocAllianceInfo(team?.teamNumber);
+        if (adHocInfo) {
+          team.alliance = adHocInfo.alliance;
+          team.allianceRole = adHocInfo.role;
+        }
+      }
 
       var teamDistrictRanks =
         _.filter(districtRankings?.districtRanks, {
@@ -544,11 +567,16 @@ function AnnouncePage({
               adHocMatch={adHocMatch}
               setAdHocMatch={setAdHocMatch}
               adHocMode={adHocMode}
+              adHocRedAlliance={adHocRedAlliance}
+              setAdHocRedAlliance={setAdHocRedAlliance}
+              adHocBlueAlliance={adHocBlueAlliance}
+              setAdHocBlueAlliance={setAdHocBlueAlliance}
               playoffOnly={playoffOnly}
               eventLabel={eventLabel}
               ftcMode={ftcMode}
               remapNumberToString={remapNumberToString}
               remapStringToNumber={remapStringToNumber}
+              allianceSelectionArrays={allianceSelectionArrays}
             />
             <NotificationBanner notification={notification} />
             <EventNotificationBanner

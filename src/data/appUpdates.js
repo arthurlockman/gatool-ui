@@ -1,5 +1,27 @@
 export const appUpdates = [
   {
+    date: "June 3, 2026",
+    message: (
+      <>
+      <b>OFFSEASON UPDATES</b><br />
+      <ul>
+        <li>FRC:</li>
+        <ul>
+          <li>Test Match mode:</li>
+          <ul>
+            <li>Users can now add a 4th team to an Alliance in Test Match mode</li>
+            <li>Users can now add choose Alliances in Test Match mode</li>
+          </ul>
+        <li>Alliance Selection:</li>
+          <ul>
+            <li>Alliance Selection now supports more than 8 Alliances</li>
+            <li>Alliance Selection now supports changing the order of the Alliance Selection rounds</li>
+          </ul>
+        </ul>
+      </ul>
+      </>
+    ),
+  },{
     date: "May 8, 2026",
     message: (
       <>

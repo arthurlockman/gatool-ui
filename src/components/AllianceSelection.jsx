@@ -6,6 +6,7 @@ import { useHotkeysContext, useHotkeys } from "react-hotkeys-hook";
 import { useEffect } from "react";
 import { originalAndSustaining, allianceSelectionBaseRounds } from "../data/appConfig";
 import useWindowDimensions from "hooks/UseWindowDimensions";
+import { useSettings } from "../contexts/SettingsContext";
 
 const ALLIANCE_DECLINED_TITLE =
     "Not eligible to be selected (previously declined an alliance offer).";
@@ -20,6 +21,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
     const [allianceMode, setAllianceMode] = useState(null);
     const { disableScope, enableScope } = useHotkeysContext();
     const { width } = useWindowDimensions();
+    const { allianceSelectionRoundOrder } = useSettings();
 
 
     var availColumns = [[], [], [], [], []];
@@ -66,13 +68,23 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         }
     }
 
+    const buildRoundSequence = (roundKey, roundIndex) => {
+        const count = allianceCount?.count || 8;
+        const customDir = allianceSelectionRoundOrder?.[roundKey];
+        if (customDir) {
+            const seq = customDir === "descending"
+                ? Array.from({ length: count }, (_, i) => count - i)
+                : Array.from({ length: count }, (_, i) => i + 1);
+            return seq.map(number => ({ number, round: roundIndex + 1 }));
+        }
+        return AllianceSelectionBaseRounds[roundKey]
+            .filter(alliance => alliance <= count)
+            .map(number => ({ number, round: roundIndex + 1 }));
+    };
+
     allianceSelectionRounds.forEach((round, index) => {
-        AllianceSelectionBaseRounds[round].forEach((alliance) => {
-            if (alliance <= allianceCount?.count) {
-                allianceSelectionOrderRounds[round].push({ number: alliance, round: index + 1 });
-            }
-        })
-    })
+        allianceSelectionOrderRounds[round] = buildRoundSequence(round, index);
+    });
 
     allianceSelectionRounds.forEach((round) => {
         allianceSelectionOrder = _.concat(allianceSelectionOrder, allianceSelectionOrderRounds[round]);
@@ -84,11 +96,14 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         return _.findIndex(teamList?.teams, { "teamNumber": team?.teamNumber }) >= 0;
     });
 
-    if (allianceCount?.count <= 4) {
-        allianceDisplayOrder = [[1, 4], [2, 3]]
-    } else if (allianceCount?.count <= 6) {
-        allianceDisplayOrder = [[1, 6], [2, 5], [3, 4]]
-    } else { allianceDisplayOrder = [[1, 8], [2, 7], [3, 6], [4, 5]] }
+    {
+        const count = allianceCount?.count || 8;
+        for (let i = 1; i <= Math.ceil(count / 2); i++) {
+            const pair = [i];
+            if (count + 1 - i !== i) pair.push(count + 1 - i);
+            allianceDisplayOrder.push(pair);
+        }
+    }
 
     const resetFilter = () => {
         const filterControl = document.getElementById("filterControl");
@@ -411,96 +426,25 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [useFourTeamAlliances])
+    }, [useFourTeamAlliances, allianceSelectionRoundOrder])
 
     // Initialize alliance selection arrays when needed
     useEffect(() => {
         if (selectedEvent && rankings && teamList && allianceCount?.count > 0 && communityUpdates) {
             if (!allianceSelectionArrays || _.isEmpty(allianceSelectionArrays) || allianceSelectionArrays?.allianceCount !== allianceCount?.count) {
                 const sortedAndRankedTeams = _.orderBy(sortedTeams, ["rank"], ["asc"]);
+                const maxAlliances = Math.min(allianceCount?.count || 8, 16);
                 const newAsArrays = {
-                    alliances: [
-                        {
-                            "number": 1,
-                            "captain": sortedAndRankedTeams[0],
-                            "round1": null,
-                            "round2": null,
-                            "round3": null,
-                            "backup": null,
-                            "backupReplaced": null,
-                            "name": "Alliance 1"
-                        },
-                        {
-                            "number": 2,
-                            "captain": sortedAndRankedTeams[1],
-                            "round1": null,
-                            "round2": null,
-                            "round3": null,
-                            "backup": null,
-                            "backupReplaced": null,
-                            "name": "Alliance 2"
-                        },
-                        {
-                            "number": 3,
-                            "captain": sortedAndRankedTeams[2],
-                            "round1": null,
-                            "round2": null,
-                            "round3": null,
-                            "backup": null,
-                            "backupReplaced": null,
-                            "name": "Alliance 3"
-                        },
-                        {
-                            "number": 4,
-                            "captain": sortedAndRankedTeams[3],
-                            "round1": null,
-                            "round2": null,
-                            "round3": null,
-                            "backup": null,
-                            "backupReplaced": null,
-                            "name": "Alliance 4"
-                        },
-                        {
-                            "number": 5,
-                            "captain": 5 <= allianceCount?.count ? sortedAndRankedTeams[4] : null,
-                            "round1": null,
-                            "round2": null,
-                            "round3": null,
-                            "backup": null,
-                            "backupReplaced": null,
-                            "name": "Alliance 5"
-                        },
-                        {
-                            "number": 6,
-                            "captain": 6 <= allianceCount?.count ? sortedAndRankedTeams[5] : null,
-                            "round1": null,
-                            "round2": null,
-                            "round3": null,
-                            "backup": null,
-                            "backupReplaced": null,
-                            "name": "Alliance 6"
-                        },
-                        {
-                            "number": 7,
-                            "captain": 7 <= allianceCount?.count ? sortedAndRankedTeams[6] : null,
-                            "round1": null,
-                            "round2": null,
-                            "round3": null,
-                            "backup": null,
-                            "backupReplaced": null,
-                            "name": "Alliance 7"
-                        },
-                        {
-                            "number": 8,
-                            "captain": 8 <= allianceCount?.count ? sortedAndRankedTeams[7] : null,
-                            "round1": null,
-                            "round2": null,
-                            "round3": null,
-                            "backup": null,
-                            "backupReplaced": null,
-                            "name": "Alliance 8"
-                        }
-                    ],
+                    alliances: Array.from({ length: maxAlliances }, (_, i) => ({
+                        number: i + 1,
+                        captain: (i + 1) <= allianceCount?.count ? sortedAndRankedTeams[i] : null,
+                        round1: null,
+                        round2: null,
+                        round3: null,
+                        backup: null,
+                        backupReplaced: null,
+                        name: `Alliance ${i + 1}`,
+                    })),
                     allianceCount: allianceCount?.count,
                     rankedTeams: _.orderBy(sortedAndRankedTeams, ["rank", "asc"]),
                     availableTeams: _.orderBy(sortedAndRankedTeams, ["teamNumber", "asc"]),
@@ -523,7 +467,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectedEvent, rankings, teamList, allianceCount, communityUpdates, allianceSelectionArrays])
+    }, [selectedEvent, rankings, teamList, allianceCount, communityUpdates, allianceSelectionArrays, allianceSelectionRoundOrder])
 
     useHotkeys('return', () => document.getElementById("acceptButton")?.click(), { scopes: 'allianceAccept' });
     useHotkeys('d', () => document.getElementById("declineButton")?.click(), { scopes: 'allianceDecline' });

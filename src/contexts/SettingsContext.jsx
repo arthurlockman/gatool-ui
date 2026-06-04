@@ -143,6 +143,10 @@ export function SettingsProvider({ children }) {
     "setting:playoffCountOverride",
     null
   );
+  const [allianceSelectionRoundOrder, setAllianceSelectionRoundOrder] = usePersistentState(
+    "setting:allianceSelectionRoundOrder",
+    null
+  );
 
   // Multi-screen sync
   const [syncEvent, setSyncEvent] = usePersistentState(
@@ -202,6 +206,7 @@ export function SettingsProvider({ children }) {
     rankingsOverride, setRankingsOverride,
     allianceCount, setAllianceCount,
     playoffCountOverride, setPlayoffCountOverride,
+    allianceSelectionRoundOrder, setAllianceSelectionRoundOrder,
     // Multi-screen sync
     syncEvent, setSyncEvent,
     screenMode, setScreenMode,
@@ -219,7 +224,7 @@ export function SettingsProvider({ children }) {
     teamReduction, reverseEmcee, useSwipe, usePullDownToUpdate, useScrollMemory,
     useFourTeamAlliances,
     eventFilters, regionFilters, timeFilter,
-    rankingsOverride, allianceCount, playoffCountOverride,
+    rankingsOverride, allianceCount, playoffCountOverride, allianceSelectionRoundOrder,
     syncEvent, screenMode, screenModeSyncFrequency,
     backgroundDataRefresh, backgroundDataRefreshFrequency,
     // Setters are stable (from useState) — no need to include them, but including for safety
@@ -232,7 +237,7 @@ export function SettingsProvider({ children }) {
     setTeamReduction, setReverseEmcee, setUseSwipe, setUsePullDownToUpdate, setUseScrollMemory,
     setUseFourTeamAlliances,
     setEventFilters, setRegionFilters, setTimeFilter,
-    setRankingsOverride, setAllianceCount, setPlayoffCountOverride,
+    setRankingsOverride, setAllianceCount, setPlayoffCountOverride, setAllianceSelectionRoundOrder,
     setSyncEvent, setScreenMode, setScreenModeSyncFrequency,
     setBackgroundDataRefresh, setBackgroundDataRefreshFrequency,
   ]);
