@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import AllianceSelectionPage from "./AllianceSelectionPage";
 
 // ─── Context / hook mocks ─────────────────────────────────────────────────────
@@ -173,5 +173,26 @@ describe("AllianceSelectionPage – 4-team alliances switch", () => {
         });
         render(<AllianceSelectionPage {...baseProps()} />);
         expect(screen.getByText("Use 4 team Alliances for playoffs")).toBeInTheDocument();
+    });
+});
+
+describe("AllianceSelectionPage – round order modal descending label", () => {
+    beforeEach(() => {
+        setupMocks();
+    });
+
+    it("shows 'Alliance N → 1' label using allianceCount in the round order modal", () => {
+        // allianceCount.count = 8 per setupMocks; round 2 defaults to descending
+        render(<AllianceSelectionPage {...baseProps()} />);
+        fireEvent.click(screen.getByText("Reorder Alliance Selection"));
+        // Round 2 defaults to descending — its select displays the descending label as the value
+        expect(screen.getByText("Alliance 8 → 1")).toBeInTheDocument();
+    });
+
+    it("uses playoffCountOverride value when set", () => {
+        setupMocks({ settingsOverrides: { playoffCountOverride: { value: 6, label: 6 } } });
+        render(<AllianceSelectionPage {...baseProps()} />);
+        fireEvent.click(screen.getByText("Reorder Alliance Selection"));
+        expect(screen.getByText("Alliance 6 → 1")).toBeInTheDocument();
     });
 });

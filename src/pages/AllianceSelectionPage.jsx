@@ -64,9 +64,10 @@ function AllianceSelectionPage({
         : (inChamps ? ["round1", "round2", "round3"] : ["round1", "round2"]);
 
     const defaultRoundDirection = { round1: "ascending", round2: "descending", round3: "ascending" };
+    const effectiveAllianceCount = playoffCountOverride?.value ?? allianceCount?.count;
     const roundDirectionOptions = [
-        { value: "ascending", label: "Ascending (Alliance 1 first)" },
-        { value: "descending", label: "Descending (highest Alliance first)" },
+        { value: "ascending", label: `Alliance 1 \u2192 ${effectiveAllianceCount ?? "?"}` },
+        { value: "descending", label: `Alliance ${effectiveAllianceCount ?? "?"} \u2192 1` },
     ];
 
     const openRoundOrderModal = () => {
