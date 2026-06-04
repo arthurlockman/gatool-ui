@@ -32,7 +32,7 @@ function AllianceSelectionPage({
 }) {
   const { selectedEvent, selectedYear, qualSchedule, playoffSchedule, offlinePlayoffSchedule, alliances, rankings, teamList, allianceCount, communityUpdates, practiceSchedule, currentMatch, eventLabel, ftcMode, remapNumberToString } = useEventData();
   const { getRanks, loadEvent, nextMatch, previousMatch, getSchedule } = useEventActions();
-    const { timeFormat, useSwipe, usePullDownToUpdate, useFourTeamAlliances, useScrollMemory, rankingsOverride,
+    const { timeFormat, useSwipe, usePullDownToUpdate, useFourTeamAlliances, setUseFourTeamAlliances, useScrollMemory, rankingsOverride,
         playoffCountOverride, setPlayoffCountOverride, allianceSelectionRoundOrder, setAllianceSelectionRoundOrder } = useSettings();
     /**
      * This function finds a team by their station assignment
@@ -119,7 +119,8 @@ function AllianceSelectionPage({
 
     const handleReset = () => {
         // @ts-ignore
-        document.getElementById("filterControl").value = "";
+        const filterControl = document.getElementById("filterControl");
+        if (filterControl) filterControl.value = "";
         setTeamFilter("");
         setAllianceSelectionArrays({});
     }
@@ -259,7 +260,7 @@ function AllianceSelectionPage({
                 <div>
                     {isOffseason && (
                         <Alert variant="warning">
-                            <Row className="align-items-center">
+                            <Row className="align-items-center justify-content-center">
                                 <Col xs="auto"><b>Alliance Count Override:</b></Col>
                                 <Col xs={3}>
                                     <Select classNamePrefix="gatool-rs"
@@ -272,6 +273,14 @@ function AllianceSelectionPage({
                                         Reorder Alliance Selection
                                     </Button>
                                 </Col>
+                                {!ftcMode && (
+                                    <Col xs="auto" className="d-flex align-items-center gap-2">
+                                        <Switch
+                                            checked={useFourTeamAlliances === null ? false : useFourTeamAlliances}
+                                            onChange={setUseFourTeamAlliances} />
+                                        <b>Use 4 team Alliances for playoffs</b>
+                                    </Col>
+                                )}
                             </Row>
                         </Alert>
                     )}

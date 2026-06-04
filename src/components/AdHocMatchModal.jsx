@@ -349,7 +349,7 @@ function AdHocMatchModal({ show, onHide, adHocMatch, onStationChange, eventTeams
         }
 
         return stations.map(([label, station, tabIndex]) =>
-            stationSelect(label, station, tabIndex, bgColor)
+            <div key={station}>{stationSelect(label, station, tabIndex, bgColor)}</div>
         );
     };
 
