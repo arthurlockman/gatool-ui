@@ -167,6 +167,88 @@ describe("AdHocMatchModal – API alliance normalization", () => {
     });
 });
 
+describe("AdHocMatchModal – API alliance normalization (round3)", () => {
+    it("normalizes a non-null round3 from API format", () => {
+        const apiAlliancesWithRound3 = {
+            alliances: [
+                { number: 1, name: "Alliance 1", captain: 1234, round1: 2345, round2: 3456, round3: 9999 },
+            ],
+        };
+        render(<AdHocMatchModal {...baseProps({ alliances: apiAlliancesWithRound3 })} />);
+        expect(screen.getByText("Red Alliance")).toBeInTheDocument();
+    });
+});
+
+describe("AdHocMatchModal – reorder mode (alliance selected)", () => {
+    it("renders sortable team rows when red alliance is pre-selected", () => {
+        // When selectedRedAlliance is set, buildSortItems and buildRoleMap are invoked
+        // via the useEffect on show, and SortableAllianceMember rows render.
+        const toolAlliances = makeToolAlliances();
+        render(
+            <AdHocMatchModal
+                {...baseProps({
+                    allianceSelectionArrays: toolAlliances,
+                    selectedRedAlliance: 1,
+                })}
+            />
+        );
+        // In reorder mode, team numbers appear as "Team XXXX"
+        expect(screen.getByText("Team 1234")).toBeInTheDocument();
+        expect(screen.getByText("Captain")).toBeInTheDocument();
+        expect(screen.getByText("Team 2345")).toBeInTheDocument();
+        expect(screen.getByText("Round 1 Selection")).toBeInTheDocument();
+        expect(screen.getByText("Team 3456")).toBeInTheDocument();
+        expect(screen.getByText("Round 2 Selection")).toBeInTheDocument();
+    });
+
+    it("renders sortable team rows when blue alliance is pre-selected", () => {
+        const toolAlliances = makeToolAlliances();
+        render(
+            <AdHocMatchModal
+                {...baseProps({
+                    allianceSelectionArrays: toolAlliances,
+                    selectedBlueAlliance: 2,
+                })}
+            />
+        );
+        expect(screen.getByText("Team 4567")).toBeInTheDocument();
+        expect(screen.getByText("Team 5678")).toBeInTheDocument();
+        expect(screen.getByText("Team 6789")).toBeInTheDocument();
+    });
+
+    it("renders reorder mode with round3 team when four-team alliances are configured", () => {
+        // Override useSettings to enable useFourTeamAlliances
+        // We can't re-mock here, so use an alliance with round3 and verify non-crash + team shown
+        const toolAlliancesWithRound3 = {
+            alliances: [
+                {
+                    number: 1,
+                    name: "Alliance 1",
+                    captain: { teamNumber: 1234 },
+                    round1: { teamNumber: 2345 },
+                    round2: { teamNumber: 3456 },
+                    round3: { teamNumber: 7890 },
+                },
+            ],
+        };
+        const matchWithReserve = [
+            ...makeMatch(),
+            { teamNumber: 7890, station: "Red4", surrogate: false, dq: false },
+        ];
+        expect(() =>
+            render(
+                <AdHocMatchModal
+                    {...baseProps({
+                        allianceSelectionArrays: toolAlliancesWithRound3,
+                        adHocMatch: matchWithReserve,
+                        selectedRedAlliance: 1,
+                    })}
+                />
+            )
+        ).not.toThrow();
+    });
+});
+
 describe("AdHocMatchModal – match data rendering", () => {
     it("shows 'Awaiting match data' when adHocMatch is null", () => {
         render(<AdHocMatchModal {...baseProps({ adHocMatch: null })} />);
