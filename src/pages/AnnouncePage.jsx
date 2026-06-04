@@ -122,7 +122,7 @@ function AnnouncePage({
       ]?.alliance;
 
 
-    if (station.slice(-1) !== "4") {
+    if (station.slice(-1) !== "4" || adHocMode) {
       team =
         matchDetails?.teams[
         _.findIndex(matchDetails?.teams, { station: station })
@@ -174,7 +174,7 @@ function AnnouncePage({
       }
     }
 
-    if (station?.slice(-1) === "4") {
+    if (station?.slice(-1) === "4" && !adHocMode) {
 
       if (inPlayoffs || selectedEvent?.value?.champLevel === "CHAMPS") {
         var playoffTeams = matchDetails?.teams.map((team) => {
@@ -309,56 +309,12 @@ function AnnouncePage({
         matchNumber: 1,
         field: "Primary",
         tournamentLevel: "Practice",
-        teams: [
-          {
-            teamNumber: adHocMatch[0]?.teamNumber
-              ? adHocMatch[0]?.teamNumber
-              : null,
-            station: "Red1",
-            surrogate: false,
-            dq: false,
-          },
-          {
-            teamNumber: adHocMatch[1]?.teamNumber
-              ? adHocMatch[1]?.teamNumber
-              : null,
-            station: "Red2",
-            surrogate: false,
-            dq: false,
-          },
-          {
-            teamNumber: adHocMatch[2]?.teamNumber
-              ? adHocMatch[2]?.teamNumber
-              : null,
-            station: "Red3",
-            surrogate: false,
-            dq: false,
-          },
-          {
-            teamNumber: adHocMatch[3]?.teamNumber
-              ? adHocMatch[3]?.teamNumber
-              : null,
-            station: "Blue1",
-            surrogate: false,
-            dq: false,
-          },
-          {
-            teamNumber: adHocMatch[4]?.teamNumber
-              ? adHocMatch[4]?.teamNumber
-              : null,
-            station: "Blue2",
-            surrogate: false,
-            dq: false,
-          },
-          {
-            teamNumber: adHocMatch[5]?.teamNumber
-              ? adHocMatch[5]?.teamNumber
-              : null,
-            station: "Blue3",
-            surrogate: false,
-            dq: false,
-          },
-        ],
+        teams: adHocMatch.map((t) => ({
+          teamNumber: t.teamNumber || null,
+          station: t.station,
+          surrogate: false,
+          dq: false,
+        })),
         isReplay: false,
         matchVideoLink: null,
         scoreRedFinal: null,

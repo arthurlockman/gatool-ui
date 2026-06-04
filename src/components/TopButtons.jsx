@@ -752,7 +752,8 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
         allAllianceMembersKnown &&
         !(matchDetails?.description || "").includes("Bye Match");
     // Show a single combined button when either the add-team or reorder action is available.
-    const showTopBarTeamOpsCol = showTopBarAddTeamCol || showTopBarReorderStationsCol;
+    // In test match (adHoc) mode, this button is hidden — users configure teams via "Change Teams" instead.
+    const showTopBarTeamOpsCol = !adHocMode && (showTopBarAddTeamCol || showTopBarReorderStationsCol);
     const promoteCount =
         (showTopBarTeamOpsCol ? 1 : 0) +
         (showTopBarChangeTeamsCol ? 1 : 0);
