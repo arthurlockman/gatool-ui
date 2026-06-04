@@ -187,7 +187,7 @@ function SortableTeamRow({ id, teamNumber, orderHint, station }) {
 
 // ─── TopButtons ───────────────────────────────────────────────────────────────
 
-function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatchFromMenu, selectedEvent, matchDetails, rawMatchDetailsForReserve = null, alliances, setAlliances, rankings, inPlayoffs, backupTeam, setBackupTeam, upsertPlayoffReserveOverlay, removePlayoffReserveOverlay, playoffReserveEdits, playoffStationOrderEdits, upsertPlayoffStationOrderOverlay, removePlayoffStationOrderOverlay, teamList, adHocMatch, setAdHocMatch, adHocMode, playoffOnly, eventLabel, ftcMode, remapNumberToString, remapStringToNumber }) {
+function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatchFromMenu, selectedEvent, matchDetails, rawMatchDetailsForReserve = null, alliances, setAlliances, rankings, inPlayoffs, backupTeam, setBackupTeam, upsertPlayoffReserveOverlay, removePlayoffReserveOverlay, playoffReserveEdits, playoffStationOrderEdits, upsertPlayoffStationOrderOverlay, removePlayoffStationOrderOverlay, teamList, adHocMatch, setAdHocMatch, adHocMode, adHocRedAlliance, setAdHocRedAlliance, adHocBlueAlliance, setAdHocBlueAlliance, playoffOnly, eventLabel, ftcMode, remapNumberToString, remapStringToNumber, allianceSelectionArrays }) {
     const { swapScreen } = useSettings();
 
     // ── shared modal state ────────────────────────────────────────────────────
@@ -1052,6 +1052,12 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
                     adHocMatch={adHocMatch}
                     onStationChange={setAdHocMatch}
                     eventTeams={eventTeams}
+                    allianceSelectionArrays={allianceSelectionArrays}
+                    alliances={alliances}
+                    selectedRedAlliance={adHocRedAlliance}
+                    setSelectedRedAlliance={setAdHocRedAlliance}
+                    selectedBlueAlliance={adHocBlueAlliance}
+                    setSelectedBlueAlliance={setAdHocBlueAlliance}
                 />
             </Row>
         </>

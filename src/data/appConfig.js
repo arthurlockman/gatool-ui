@@ -57,15 +57,31 @@ export const allianceSelectionOrderBase = [
 ];
 
 export const allianceSelectionBaseRounds = {
-  round1: [1, 2, 3, 4, 5, 6, 7, 8],
-  round2: [8, 7, 6, 5, 4, 3, 2, 1],
-  round3: [1, 2, 3, 4, 5, 6, 7, 8],
-  round4: [8, 7, 6, 5, 4, 3, 2, 1],
+  round1: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+  round2: [16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1],
+  round3: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+  round4: [16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1],
 };
 
 export const refreshRate = 15; //Refresh rate in seconds for auto update
 
 export const playoffOverrideMenu = [
+  { value: 8, label: 8 },
+  { value: 7, label: 7 },
+  { value: 6, label: 6 },
+  { value: 5, label: 5 },
+  { value: 4, label: 4 },
+];
+
+export const playoffOverrideMenuOffseason = [
+  { value: 16, label: 16 },
+  { value: 15, label: 15 },
+  { value: 14, label: 14 },
+  { value: 13, label: 13 },
+  { value: 12, label: 12 },
+  { value: 11, label: 11 },
+  { value: 10, label: 10 },
+  { value: 9, label: 9 },
   { value: 8, label: 8 },
   { value: 7, label: 7 },
   { value: 6, label: 6 },
