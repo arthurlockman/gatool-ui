@@ -87,6 +87,20 @@ function BottomNavigation({ ftcMode }) {
             style={{ cursor: "pointer" }}
                 onClick={() => {
                   setURL({
+                    title: "Nexus API",
+                    url: "https://frc.nexus/en/api",
+                  });
+                }}
+              >
+                <i>
+                  <b>Nexus</b>
+                </i>
+              </span>{", by "}
+              <span
+                className="app-footer-link"
+            style={{ cursor: "pointer" }}
+                onClick={() => {
+                  setURL({
                     title: "Caster's Tool",
                     url: "https://casterstool.com",
                   });
