@@ -303,7 +303,7 @@ function App() {
     rankingsOverride, setRankingsOverride,
     allianceCount, setAllianceCount,
     playoffCountOverride, setPlayoffCountOverride,
-    allianceSelectionRoundOrder, setAllianceSelectionRoundOrder,
+    _allianceSelectionRoundOrder, setAllianceSelectionRoundOrder,
     // Multi-screen sync
     syncEvent, setSyncEvent,
     screenMode, setScreenMode,
