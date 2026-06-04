@@ -49,7 +49,7 @@ function PlayByPlayPage({
 }) {
   const { selectedEvent, selectedYear, eventLabel, ftcMode, teamList, qualSchedule, playoffSchedule, practiceSchedule, offlinePlayoffSchedule, rankings, districtRankings, alliances, allianceCount, communityUpdates, currentMatch, remapNumberToString, remapStringToNumber, EPA, regionalEventDetail } = useEventData();
   const { nextMatch, previousMatch, setMatchFromMenu, getSchedule, getRegionalEventDetail } = useEventActions();
-  const { swapScreen, hidePracticeSchedule, teamReduction, showInspection, usePullDownToUpdate, useSwipe, useScrollMemory } = useSettings();
+  const { swapScreen, hidePracticeSchedule, teamReduction, showInspection, usePullDownToUpdate, useSwipe, useScrollMemory, useFourTeamAlliances } = useSettings();
   // Remember scroll position for Play by play page
   useScrollPosition('playbyplay', true, false, useScrollMemory);
   const scrollToTop = useScrollToTop();
@@ -123,7 +123,7 @@ function PlayByPlayPage({
       matchDetails?.teams[
         _.findIndex(matchDetails?.teams, { station: `${alliance}1` })
       ]?.alliance;
-    if (station.slice(-1) !== "4") {
+    if (station.slice(-1) !== "4" || adHocMode) {
       team =
         matchDetails?.teams[
         _.findIndex(matchDetails?.teams, { station: station })
@@ -176,7 +176,7 @@ function PlayByPlayPage({
       }
     }
 
-    if (station.slice(-1) === "4") {
+    if (station.slice(-1) === "4" && !adHocMode) {
       if (inPlayoffs) {
         var playoffTeams = matchDetails?.teams.map((team) => {
           return { teamNumber: team?.teamNumber, alliance: team.alliance };
@@ -333,56 +333,12 @@ function PlayByPlayPage({
       matchNumber: 1,
       field: "Primary",
       tournamentLevel: "Practice",
-      teams: [
-        {
-          teamNumber: adHocMatch[0]?.teamNumber
-            ? adHocMatch[0]?.teamNumber
-            : null,
-          station: "Red1",
-          surrogate: false,
-          dq: false,
-        },
-        {
-          teamNumber: adHocMatch[1]?.teamNumber
-            ? adHocMatch[1]?.teamNumber
-            : null,
-          station: "Red2",
-          surrogate: false,
-          dq: false,
-        },
-        {
-          teamNumber: adHocMatch[2]?.teamNumber
-            ? adHocMatch[2]?.teamNumber
-            : null,
-          station: "Red3",
-          surrogate: false,
-          dq: false,
-        },
-        {
-          teamNumber: adHocMatch[3]?.teamNumber
-            ? adHocMatch[3]?.teamNumber
-            : null,
-          station: "Blue1",
-          surrogate: false,
-          dq: false,
-        },
-        {
-          teamNumber: adHocMatch[4]?.teamNumber
-            ? adHocMatch[4]?.teamNumber
-            : null,
-          station: "Blue2",
-          surrogate: false,
-          dq: false,
-        },
-        {
-          teamNumber: adHocMatch[5]?.teamNumber
-            ? adHocMatch[5]?.teamNumber
-            : null,
-          station: "Blue3",
-          surrogate: false,
-          dq: false,
-        },
-      ],
+      teams: adHocMatch.map((t) => ({
+        teamNumber: t.teamNumber || null,
+        station: t.station,
+        surrogate: false,
+        dq: false,
+      })),
       isReplay: false,
       matchVideoLink: null,
       scoreRedFinal: null,
@@ -633,7 +589,8 @@ function PlayByPlayPage({
                     </tr>
                   )}
                   {((inPlayoffs && !ftcMode) ||
-                    selectedEvent?.value?.champLevel === "CHAMPS") &&
+                    selectedEvent?.value?.champLevel === "CHAMPS" ||
+                    (adHocMode && useFourTeamAlliances && !ftcMode)) &&
                     (!_.isEmpty(teamDetails["Red4"]) ||
                       !_.isEmpty(teamDetails["Blue4"])) && (
                       <tr className={"gatool-playbyplay"}>
