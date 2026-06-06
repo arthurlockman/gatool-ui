@@ -15,7 +15,7 @@ import {
   EventSelectionProvider,
   useEventSelection,
 } from "../contexts/EventSelectionContext";
-import { SettingsProvider } from "../contexts/SettingsContext";
+import { SettingsProvider, useSettings } from "../contexts/SettingsContext";
 import { useRankingsAlliances } from "./useRankingsAlliances";
 
 const BASE = "https://api.gatool.org/v3";
@@ -40,14 +40,17 @@ function makeWrapper({
   selectedEvent = MAWOR_EVENT,
   selectedYear = YEAR_2026,
   ftcMode = null,
+  allianceCount: allianceCountSeed = undefined,
 } = {}) {
   function Seeder({ children }) {
     const ctx = useEventSelection();
+    const { setAllianceCount } = useSettings();
     const [seeded, setSeeded] = useState(false);
     useEffect(() => {
       ctx.setSelectedEvent(selectedEvent);
       ctx.setSelectedYear(selectedYear);
       ctx.setFTCMode(ftcMode);
+      if (allianceCountSeed !== undefined) setAllianceCount(allianceCountSeed);
       setSeeded(true);
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -247,6 +250,217 @@ describe("useRankingsAlliances (FRC)", () => {
     expect(deps.setPlayoffs).not.toHaveBeenCalled();
   });
 
+  it("getRanks: uses TBA endpoint for OffSeason events", async () => {
+    const tbaRankings = {
+      rankings: {
+        rankings: [
+          { teamNumber: 1277, rank: 1, wins: 8, losses: 2, ties: 0 },
+          { teamNumber: 126, rank: 2, wins: 7, losses: 3, ties: 0 },
+        ],
+      },
+    };
+    server.use(
+      http.get(`${BASE}/2026/offseason/rankings/2026bcwpi/`, () =>
+        HttpResponse.json(tbaRankings)
+      )
+    );
+    const { result, deps } = await renderRA(
+      {},
+      {
+        selectedEvent: {
+          value: { code: "BCWPI", name: "BattleCry", type: "OffSeason", tbaEventKey: "2026bcwpi" },
+          label: "BattleCry",
+        },
+      }
+    );
+
+    await result.current.getRanks();
+
+    await waitFor(() => expect(deps.setRankings).toHaveBeenCalled());
+    const committed = deps.setRankings.mock.calls.at(-1)[0];
+    expect(committed.ranks).toHaveLength(2);
+    expect(committed.ranks[0].teamNumber).toBe(1277);
+  });
+
+  it("getRanks: uses TBA endpoint for OffSeasonWithAzureSync events", async () => {
+    const tbaRankings = {
+      rankings: {
+        rankings: [{ teamNumber: 190, rank: 1, wins: 9, losses: 1, ties: 0 }],
+      },
+    };
+    server.use(
+      http.get(`${BASE}/2026/offseason/rankings/2026bcwpi/`, () =>
+        HttpResponse.json(tbaRankings)
+      )
+    );
+    const { result, deps } = await renderRA(
+      {},
+      {
+        selectedEvent: {
+          value: { code: "BCWPI", name: "BattleCry", type: "OffSeasonWithAzureSync", tbaEventKey: "2026bcwpi" },
+          label: "BattleCry",
+        },
+      }
+    );
+
+    await result.current.getRanks();
+
+    await waitFor(() => expect(deps.setRankings).toHaveBeenCalled());
+    const committed = deps.setRankings.mock.calls.at(-1)[0];
+    expect(committed.ranks).toHaveLength(1);
+    expect(committed.ranks[0].teamNumber).toBe(190);
+  });
+
+  it("getAlliances: uses TBA endpoint for OffSeason events", async () => {
+    const tbaAlliances = {
+      alliances: [
+        { number: 1, name: "Alliance 1", captain: 1277, round1: 126, round2: 5494 },
+        { number: 2, name: "Alliance 2", captain: 190, round1: 3467, round2: 8085 },
+      ],
+      count: 2,
+    };
+    server.use(
+      http.get(`${BASE}/2026/offseason/alliances/2026bcwpi/`, () =>
+        HttpResponse.json(tbaAlliances)
+      )
+    );
+    const { result, deps } = await renderRA(
+      {},
+      {
+        selectedEvent: {
+          value: { code: "BCWPI", name: "BattleCry", type: "OffSeason", tbaEventKey: "2026bcwpi" },
+          label: "BattleCry",
+        },
+      }
+    );
+
+    await result.current.getAlliances();
+
+    await waitFor(() => expect(deps.setAlliances).toHaveBeenCalled());
+    const committed = deps.setAlliances.mock.calls.at(-1)[0];
+    expect(committed.alliances).toHaveLength(2);
+    expect(committed.alliances[0].captain).toBe(1277);
+    expect(deps.setPlayoffs).toHaveBeenCalledWith(true);
+  });
+
+  it("getAlliances: uses TBA endpoint for OffSeasonWithAzureSync events", async () => {
+    const tbaAlliances = {
+      alliances: [
+        { number: 1, name: "Alliance 1", captain: 190, round1: 1277, round2: 126 },
+      ],
+      count: 1,
+    };
+    server.use(
+      http.get(`${BASE}/2026/offseason/alliances/2026bcwpi/`, () =>
+        HttpResponse.json(tbaAlliances)
+      )
+    );
+    const { result, deps } = await renderRA(
+      {},
+      {
+        selectedEvent: {
+          value: { code: "BCWPI", name: "BattleCry", type: "OffSeasonWithAzureSync", tbaEventKey: "2026bcwpi" },
+          label: "BattleCry",
+        },
+      }
+    );
+
+    await result.current.getAlliances();
+
+    await waitFor(() => expect(deps.setAlliances).toHaveBeenCalled());
+    const committed = deps.setAlliances.mock.calls.at(-1)[0];
+    expect(committed.alliances).toHaveLength(1);
+    expect(committed.alliances[0].captain).toBe(190);
+    expect(deps.setPlayoffs).toHaveBeenCalledWith(true);
+  });
+
+  it("getAlliances: falls back to TBA when FRC returns fewer alliances than expected count", async () => {
+    // FRC returns only 1 alliance but the event expects 4 → fall back to TBA.
+    const frcIncompleteAlliances = {
+      Alliances: [
+        { number: 1, name: "Alliance 1", captain: 190, round1: 1277, round2: 126 },
+      ],
+      count: 1,
+    };
+    const tbaAlliances = {
+      alliances: [
+        { number: 1, name: "Alliance 1", captain: 190, round1: 1277, round2: 126 },
+        { number: 2, name: "Alliance 2", captain: 3467, round1: 1768, round2: 5494 },
+        { number: 3, name: "Alliance 3", captain: 8085, round1: 2523, round2: 6328 },
+        { number: 4, name: "Alliance 4", captain: 4048, round1: 1519, round2: 2168 },
+      ],
+      count: 4,
+    };
+    server.use(
+      http.get(`${BASE}/2026/alliances/BCWPI`, () =>
+        HttpResponse.json(frcIncompleteAlliances)
+      ),
+      http.get(`${BASE}/2026/offseason/alliances/2026bcwpi/`, () =>
+        HttpResponse.json(tbaAlliances)
+      )
+    );
+    const { result, deps } = await renderRA(
+      {},
+      {
+        selectedEvent: {
+          value: { code: "BCWPI", name: "BattleCry", type: "OffSeasonWithAzureSync", tbaEventKey: "2026bcwpi" },
+          label: "BattleCry",
+        },
+        allianceCount: { count: 4 },
+      }
+    );
+
+    await result.current.getAlliances();
+
+    await waitFor(() => expect(deps.setAlliances).toHaveBeenCalled());
+    const committed = deps.setAlliances.mock.calls.at(-1)[0];
+    // Should have 4 alliances from TBA, not 1 from FRC.
+    expect(committed.alliances).toHaveLength(4);
+    expect(committed.alliances[0].captain).toBe(190);
+    expect(committed.alliances[1].captain).toBe(3467);
+    expect(committed.dataSource).toBe("TBA");
+    expect(deps.setPlayoffs).toHaveBeenCalledWith(true);
+  });
+
+  it("getAlliances: uses FRC data when alliance count matches expected count", async () => {
+    // FRC returns 4 alliances and event expects 4 → use FRC, do NOT call TBA.
+    const frcAlliances = {
+      Alliances: [
+        { number: 1, name: "Alliance 1", captain: 190, round1: 1277, round2: 126 },
+        { number: 2, name: "Alliance 2", captain: 3467, round1: 1768, round2: 5494 },
+        { number: 3, name: "Alliance 3", captain: 8085, round1: 2523, round2: 6328 },
+        { number: 4, name: "Alliance 4", captain: 4048, round1: 1519, round2: 2168 },
+      ],
+      count: 4,
+    };
+    const tbaSpy = vi.fn(() => HttpResponse.json({ alliances: [], count: 0 }));
+    server.use(
+      http.get(`${BASE}/2026/alliances/BCWPI`, () =>
+        HttpResponse.json(frcAlliances)
+      ),
+      http.get(`${BASE}/2026/offseason/alliances/2026bcwpi/`, tbaSpy)
+    );
+    const { result, deps } = await renderRA(
+      {},
+      {
+        selectedEvent: {
+          value: { code: "BCWPI", name: "BattleCry", type: "OffSeasonWithAzureSync", tbaEventKey: "2026bcwpi" },
+          label: "BattleCry",
+        },
+        allianceCount: { count: 4 },
+      }
+    );
+
+    await result.current.getAlliances();
+
+    await waitFor(() => expect(deps.setAlliances).toHaveBeenCalled());
+    const committed = deps.setAlliances.mock.calls.at(-1)[0];
+    // Should use FRC data (4 alliances), TBA should NOT be called.
+    expect(committed.alliances).toHaveLength(4);
+    expect(committed.dataSource).toBe("FRC");
+    expect(tbaSpy).not.toHaveBeenCalled();
+  });
+
   it("getDistrictRanks: fetches and commits district rankings with lastUpdate", async () => {
     const districtPayload = {
       districtRanks: [
@@ -274,5 +488,63 @@ describe("useRankingsAlliances (FRC)", () => {
     const committed = deps.setDistrictRankings.mock.calls[0][0];
     expect(committed.districtRanks).toEqual(districtPayload.districtRanks);
     expect(committed.lastUpdate).toEqual(expect.any(String));
+  });
+
+  it("getDistrictRanks: does not commit rankings on non-200 response", async () => {
+    server.use(
+      http.get(
+        `${BASE}/:year/district/rankings/:district`,
+        () => new HttpResponse(null, { status: 404 })
+      )
+    );
+    const { result, deps } = await renderRA();
+
+    await result.current.getDistrictRanks();
+
+    // Allow any pending microtasks to flush.
+    await new Promise((r) => setTimeout(r, 0));
+    expect(deps.setDistrictRankings).not.toHaveBeenCalled();
+  });
+});
+
+describe("useRankingsAlliances – resetRankingsAlliancesState", () => {
+  beforeEach(() => {
+    vi.spyOn(console, "log").mockImplementation(() => {});
+  });
+
+  it("clears rankings, allianceCount, rankingsOverride, alliances, playoffs, and districtRankings when preserveOfflineData is false", async () => {
+    const { result, deps } = await renderRA();
+
+    await result.current.resetRankingsAlliancesState(false);
+
+    await new Promise((r) => setTimeout(r, 0));
+    expect(deps.setRankings).toHaveBeenCalledWith(null);
+    expect(deps.setAlliances).toHaveBeenCalledWith(null);
+    expect(deps.setDistrictRankings).toHaveBeenCalledWith(null);
+    expect(deps.setPlayoffs).toHaveBeenCalledWith(false);
+  });
+
+  it("preserves rankings and alliances (does not clear them) when preserveOfflineData is true", async () => {
+    const { result, deps } = await renderRA();
+
+    await result.current.resetRankingsAlliancesState(true);
+
+    await new Promise((r) => setTimeout(r, 0));
+    expect(deps.setRankings).not.toHaveBeenCalled();
+    expect(deps.setAlliances).not.toHaveBeenCalled();
+    // playoffs and districtRankings are always reset
+    expect(deps.setPlayoffs).toHaveBeenCalledWith(false);
+    expect(deps.setDistrictRankings).toHaveBeenCalledWith(null);
+  });
+
+  it("always resets playoffs to false regardless of preserveOfflineData", async () => {
+    const { result: r1 } = await renderRA();
+    const { result: r2, deps: deps2 } = await renderRA();
+
+    await r1.current.resetRankingsAlliancesState(false);
+    await r2.current.resetRankingsAlliancesState(true);
+
+    await new Promise((r) => setTimeout(r, 0));
+    expect(deps2.setPlayoffs).toHaveBeenCalledWith(false);
   });
 });

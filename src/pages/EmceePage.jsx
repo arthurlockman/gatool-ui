@@ -25,7 +25,7 @@ function EmceePage() {
     remapNumberToString,
   } = useEventData();
   const { nextMatch, previousMatch, getSchedule } = useEventActions();
-  const { reverseEmcee, hidePracticeSchedule, usePullDownToUpdate, useSwipe } =
+  const { reverseEmcee, hidePracticeSchedule, usePullDownToUpdate, useSwipe, nonStandardPlayoffs } =
     useSettings();
   const { height, width } = useWindowDimensions();
   const isDaVinci = selectedEvent?.value?.code === "FTCCMP1";
@@ -1012,7 +1012,7 @@ function EmceePage() {
               </Row>
             )}
 
-            {(!isDaVinci && playoffMatchNumber <= 13) ||
+            {!nonStandardPlayoffs && ((!isDaVinci && playoffMatchNumber <= 13) ||
               (isDaVinci && playoffMatchNumber >= 16 && (
                 <Row>
                   <Col
@@ -1028,7 +1028,7 @@ function EmceePage() {
                     />
                   </Col>
                 </Row>
-              ))}
+              )))}
           </Container>
         </>
       )}

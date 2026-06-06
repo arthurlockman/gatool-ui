@@ -201,26 +201,31 @@ function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMat
 			};
 		}
 
+		const setTeamNum = (match, station, num) => {
+			const t = match?.teams?.find((tm) => tm.station === station);
+			if (t) t.teamNumber = num;
+		};
+
 		if (winnerTo <= 14) {
 			if (winnerTo) {
-				tempMatches.schedule[winnerTo - 1].teams[_.findIndex(tempMatches.schedule[winnerTo - 1].teams, { "station": `${winnerStation}1` })].teamNumber = tempTeams[winningAlliance][0];
-				tempMatches.schedule[winnerTo - 1].teams[_.findIndex(tempMatches.schedule[winnerTo - 1].teams, { "station": `${winnerStation}2` })].teamNumber = tempTeams[winningAlliance][1];
-				tempMatches.schedule[winnerTo - 1].teams[_.findIndex(tempMatches.schedule[winnerTo - 1].teams, { "station": `${winnerStation}3` })].teamNumber = tempTeams[winningAlliance][2];
+				setTeamNum(tempMatches.schedule[winnerTo - 1], `${winnerStation}1`, tempTeams[winningAlliance][0]);
+				setTeamNum(tempMatches.schedule[winnerTo - 1], `${winnerStation}2`, tempTeams[winningAlliance][1]);
+				setTeamNum(tempMatches.schedule[winnerTo - 1], `${winnerStation}3`, tempTeams[winningAlliance][2]);
 			}
 
 			if (loserTo) {
-				tempMatches.schedule[loserTo - 1].teams[_.findIndex(tempMatches.schedule[loserTo - 1].teams, { "station": `${loserStation}1` })].teamNumber = tempTeams[losingAlliance][0];
-				tempMatches.schedule[loserTo - 1].teams[_.findIndex(tempMatches.schedule[loserTo - 1].teams, { "station": `${loserStation}2` })].teamNumber = tempTeams[losingAlliance][1];
-				tempMatches.schedule[loserTo - 1].teams[_.findIndex(tempMatches.schedule[loserTo - 1].teams, { "station": `${loserStation}3` })].teamNumber = tempTeams[losingAlliance][2];
+				setTeamNum(tempMatches.schedule[loserTo - 1], `${loserStation}1`, tempTeams[losingAlliance][0]);
+				setTeamNum(tempMatches.schedule[loserTo - 1], `${loserStation}2`, tempTeams[losingAlliance][1]);
+				setTeamNum(tempMatches.schedule[loserTo - 1], `${loserStation}3`, tempTeams[losingAlliance][2]);
 			}
 		} else {
 			if (winnerTo) {
-				tempMatches.schedule[winnerTo - 1].teams[_.findIndex(tempMatches.schedule[winnerTo - 1].teams, { "station": `Red1` })].teamNumber = tempTeams["red"][0];
-				tempMatches.schedule[winnerTo - 1].teams[_.findIndex(tempMatches.schedule[winnerTo - 1].teams, { "station": `Red2` })].teamNumber = tempTeams["red"][1];
-				tempMatches.schedule[winnerTo - 1].teams[_.findIndex(tempMatches.schedule[winnerTo - 1].teams, { "station": `Red3` })].teamNumber = tempTeams["red"][2];
-				tempMatches.schedule[loserTo - 1].teams[_.findIndex(tempMatches.schedule[loserTo - 1].teams, { "station": `Blue1` })].teamNumber = tempTeams["blue"][0];
-				tempMatches.schedule[loserTo - 1].teams[_.findIndex(tempMatches.schedule[loserTo - 1].teams, { "station": `Blue2` })].teamNumber = tempTeams["blue"][1];
-				tempMatches.schedule[loserTo - 1].teams[_.findIndex(tempMatches.schedule[loserTo - 1].teams, { "station": `Blue3` })].teamNumber = tempTeams["blue"][2];
+				setTeamNum(tempMatches.schedule[winnerTo - 1], `Red1`, tempTeams["red"][0]);
+				setTeamNum(tempMatches.schedule[winnerTo - 1], `Red2`, tempTeams["red"][1]);
+				setTeamNum(tempMatches.schedule[winnerTo - 1], `Red3`, tempTeams["red"][2]);
+				setTeamNum(tempMatches.schedule[loserTo - 1], `Blue1`, tempTeams["blue"][0]);
+				setTeamNum(tempMatches.schedule[loserTo - 1], `Blue2`, tempTeams["blue"][1]);
+				setTeamNum(tempMatches.schedule[loserTo - 1], `Blue3`, tempTeams["blue"][2]);
 			}
 		}
 

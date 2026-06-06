@@ -8,7 +8,11 @@ import _ from "lodash";
 function coerceTeamNumberValue(v) {
   if (v == null || v === "") return null;
   if (typeof v === "number" && !Number.isNaN(v)) return v;
-  if (typeof v === "string" && /^\d+$/.test(v.trim())) return parseInt(v.trim(), 10);
+  if (typeof v === "string") {
+    // Strip TBA-style "frc" prefix (e.g. "frc1277" → 1277) before attempting numeric parse.
+    const stripped = v.trim().replace(/^frc/i, "");
+    if (/^\d+$/.test(stripped)) return parseInt(stripped, 10);
+  }
   return v;
 }
 

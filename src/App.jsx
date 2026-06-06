@@ -295,6 +295,7 @@ function App() {
     usePullDownToUpdate, setUsePullDownToUpdate,
     useScrollMemory, setUseScrollMemory,
     useFourTeamAlliances, setUseFourTeamAlliances,
+    nonStandardPlayoffs, setNonStandardPlayoffs,
     // Event list filters
     eventFilters, setEventFilters,
     regionFilters, setRegionFilters,
@@ -900,6 +901,7 @@ function App() {
       ftcMode: ftcMode,
       useCheesyArena: useCheesyArena,
       useFourTeamAlliances: useFourTeamAlliances,
+      nonStandardPlayoffs: nonStandardPlayoffs,
       useFTCOffline: useFTCOffline,
       FTCKey: FTCKey,
       FTCServerURL: FTCServerURL,
@@ -1727,6 +1729,9 @@ function App() {
         }
         if (userPrefs.useFourTeamAlliances !== undefined && userPrefs.useFourTeamAlliances !== useFourTeamAlliances) {
           setUseFourTeamAlliances(userPrefs.useFourTeamAlliances);
+        }
+        if (userPrefs.nonStandardPlayoffs !== undefined && userPrefs.nonStandardPlayoffs !== nonStandardPlayoffs) {
+          setNonStandardPlayoffs(userPrefs.nonStandardPlayoffs);
         }
         if (userPrefs.useFTCOffline !== undefined && userPrefs.useFTCOffline !== useFTCOffline) {
           setUseFTCOffline(userPrefs.useFTCOffline);
