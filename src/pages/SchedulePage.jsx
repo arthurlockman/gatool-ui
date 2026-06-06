@@ -377,7 +377,7 @@ function SchedulePage({
 
         if (forPlayoffs) {
           // inject bye matches into schedule for playoff display
-          if (playoffOffset?.bye > 0) {
+          if (playoffOffset?.bye > 0 && innerSchedule.length > 0) {
             var matchTime = innerSchedule[0].startTime;
             _.forEach(playoffOffset.insertionOrder, (item, index) => {
               innerSchedule.splice(

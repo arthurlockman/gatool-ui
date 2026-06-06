@@ -196,6 +196,7 @@ export function useRankingsAlliances(deps) {
       undefined,
       signal()
     );
+    if (result.status !== 200) return;
     districtranks = await result.json();
     districtranks.lastUpdate = moment().format();
     setDistrictRankings(districtranks);
@@ -209,11 +210,13 @@ export function useRankingsAlliances(deps) {
     const getRanksEpoch = getRanksEpochRef.current;
     var result = null;
     var ranks = null;
+    var ranksDataSource = "FRC";
     if (selectedEvent?.value?.code.includes("OFFLINE")) {
       ranks = { rankings: { Rankings: [] } };
     } else if (!selectedEvent?.value?.code.includes("PRACTICE")) {
       ranks = { rankings: { Rankings: [] } };
       if (useCheesyArena && cheesyArenaAvailable) {
+        ranksDataSource = "Cheesy Arena";
         result = await fetchLocal("http://10.0.100.5:8080/api/rankings");
         if (result.status === 200) {
           var data = await result.json();
@@ -232,6 +235,7 @@ export function useRankingsAlliances(deps) {
         FTCOfflineAvailable &&
         ftcMode?.value === "FTCLocal"
       ) {
+        ranksDataSource = "FTC Local Server";
         console.log("Using FTC Local Server for ranks");
         const rankingsResult = await httpClient.getNoAuth(
           `/api/v1/events/${selectedEvent?.value.code}/rankings/`,
@@ -259,6 +263,7 @@ export function useRankingsAlliances(deps) {
         selectedEvent?.value?.type === "OffSeason" &&
         !ftcMode
       ) {
+        ranksDataSource = "TBA";
         console.log("Using TBA for Offseason Event Rankings");
         const eventKey = selectedEvent?.value?.tbaEventKey;
 
@@ -286,7 +291,43 @@ export function useRankingsAlliances(deps) {
             ranks = { rankings: { Rankings: [] } };
           }
         }
+      } else if (
+        !useFTCOffline &&
+        selectedEvent?.value?.type === "OffSeasonWithAzureSync" &&
+        !ftcMode
+      ) {
+        // OffSeasonWithAzureSync: FRC primary, TBA fallback.
+        let frcRankingsResult = null;
+        result = await httpClient.getNoAuth(
+          `${selectedYear?.value}/rankings/${selectedEvent?.value.code}`,
+          undefined,
+          undefined,
+          undefined,
+          signal()
+        );
+        if (result.status === 200) {
+          frcRankingsResult = await result.json();
+        }
+        const frcHasRankings =
+          (frcRankingsResult?.Rankings?.length > 0) ||
+          (frcRankingsResult?.rankings?.Rankings?.length > 0) ||
+          (frcRankingsResult?.rankings?.rankings?.length > 0);
+        if (frcHasRankings) {
+          ranks = frcRankingsResult;
+          ranksDataSource = ftcMode ? "FTC API" : "FRC";
+        } else if (selectedEvent?.value?.tbaEventKey) {
+          console.log("FRC returned no rankings; falling back to TBA for OffSeasonWithAzureSync");
+          const tbaRankings = await fetchTBARankings(
+            selectedEvent?.value?.tbaEventKey,
+            selectedYear?.value
+          );
+          if (tbaRankings?.rankings?.rankings?.length > 0) {
+            ranks = { rankings: { rankings: tbaRankings.rankings.rankings } };
+            ranksDataSource = "TBA";
+          }
+        }
       } else if (!useFTCOffline) {
+        ranksDataSource = ftcMode ? "FTC API" : "FRC";
         result = await httpClient.getNoAuth(
           `${selectedYear?.value}/rankings/${selectedEvent?.value.code}`,
           ftcMode ? ftcBaseURL : undefined,
@@ -380,6 +421,8 @@ export function useRankingsAlliances(deps) {
       });
     }
 
+    ranks.dataSource = ranksDataSource;
+
     ranks.lastModified = ranks.headers
       ? moment(ranks?.headers["last-modified"]).format()
       : moment().format();
@@ -415,17 +458,19 @@ export function useRankingsAlliances(deps) {
 
   // --- getAlliances ---
 
-  async function getAlliances(allianceTemp) {
+  async function getAlliances(allianceTemp, overrideExpectedCount = null) {
     console.log("Getting Alliances");
     getAlliancesEpochRef.current += 1;
     const getAlliancesEpoch = getAlliancesEpochRef.current;
     var result = null;
     var alliancesData = allianceTemp || { Alliances: [] };
+    var alliancesDataSource = "FRC";
     if (
       !selectedEvent?.value?.code.includes("PRACTICE") &&
       !selectedEvent?.value?.code.includes("OFFLINE")
     ) {
       if (useCheesyArena && cheesyArenaAvailable) {
+        alliancesDataSource = "Cheesy Arena";
         result = await fetchLocal("http://10.0.100.5:8080/api/alliances");
         var data = await result.json();
         if (data.length > 0) {
@@ -449,6 +494,7 @@ export function useRankingsAlliances(deps) {
         FTCOfflineAvailable &&
         ftcMode?.value === "FTCLocal"
       ) {
+        alliancesDataSource = "FTC Local Server";
         console.log("Using FTC Local Server for Alliances");
         const allianceResult = await httpClient.getNoAuth(
           `/api/v1/events/${selectedEvent?.value.code}/elim/alliances/`,
@@ -474,6 +520,7 @@ export function useRankingsAlliances(deps) {
         selectedEvent?.value?.type === "OffSeason" &&
         !ftcMode
       ) {
+        alliancesDataSource = "TBA";
         console.log("Using TBA for Offseason Event Alliances");
         const eventKey = selectedEvent?.value?.tbaEventKey;
 
@@ -499,7 +546,47 @@ export function useRankingsAlliances(deps) {
             );
           }
         }
+      } else if (
+        !useFTCOffline &&
+        selectedEvent?.value?.type === "OffSeasonWithAzureSync" &&
+        !ftcMode
+      ) {
+        // OffSeasonWithAzureSync: FRC primary, TBA fallback.
+        let frcHasAlliances = false;
+        result = await httpClient.getNoAuth(
+          `${selectedYear?.value}/alliances/${selectedEvent?.value.code}`,
+          undefined,
+          undefined,
+          undefined,
+          signal()
+        );
+        if (result.status === 200) {
+          const frcAlliancesResult = await result.json();
+          const frcAlliances = frcAlliancesResult?.alliances ?? frcAlliancesResult?.Alliances;
+          const frcCount = frcAlliances?.length ?? 0;
+          const expectedCount = overrideExpectedCount ?? allianceCount?.count ?? 0;
+          // Accept FRC data only when it's non-empty AND matches (or exceeds) the
+          // expected alliance count. A partial list means alliance selection is still
+          // in progress on FRC — fall back to TBA which may already have the full set.
+          if (frcCount > 0 && (expectedCount === 0 || frcCount >= expectedCount)) {
+            alliancesData = frcAlliancesResult;
+            alliancesDataSource = "FRC";
+            frcHasAlliances = true;
+          }
+        }
+        if (!frcHasAlliances && selectedEvent?.value?.tbaEventKey) {
+          console.log("FRC returned incomplete or no alliances; falling back to TBA for OffSeasonWithAzureSync");
+          const tbaAlliances = await fetchTBAAlliances(
+            selectedEvent?.value?.tbaEventKey,
+            selectedYear?.value
+          );
+          if (tbaAlliances?.alliances?.length > 0) {
+            alliancesData = { Alliances: tbaAlliances.alliances, count: tbaAlliances.count };
+            alliancesDataSource = "TBA";
+          }
+        }
       } else if (!useFTCOffline) {
+        alliancesDataSource = ftcMode ? "FTC API" : "FRC";
         result = await httpClient.getNoAuth(
           `${selectedYear?.value}/alliances/${selectedEvent?.value.code}`,
           ftcMode ? ftcBaseURL : undefined,
@@ -670,6 +757,7 @@ export function useRankingsAlliances(deps) {
       alliancesData.Lookup = allianceLookup;
     }
 
+    alliancesData.dataSource = alliancesDataSource;
     alliancesData.lastUpdate = moment().format();
     console.log(`${alliancesData?.alliances?.length} Alliances loaded.`);
     if (getAlliancesEpoch !== getAlliancesEpochRef.current) {
@@ -742,6 +830,7 @@ export function useRankingsAlliances(deps) {
         await setRankings(null);
         await setAllianceCount(null);
         await setRankingsOverride(null);
+        await setAlliances(null);
       }
       await setPlayoffs(false);
       await setDistrictRankings(null);

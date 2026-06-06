@@ -68,10 +68,31 @@ function makeDeps(overrides = {}) {
   };
 }
 
-function setEvent({ code = "MAWOR", name = "MAWOR Test Event", type = "Regional" } = {}) {
-  eventSelectionState.selectedEvent = { value: { code, name, type } };
+function setEvent({ code = "MAWOR", name = "MAWOR Test Event", type = "Regional", tbaEventKey = undefined } = {}) {
+  eventSelectionState.selectedEvent = { value: { code, name, type, tbaEventKey } };
   eventSelectionState.selectedYear = { value: "2026" };
   eventSelectionState.ftcMode = null;
+}
+
+function makeNexusPlayoffMatch(matchNumber) {
+  return {
+    matchNumber,
+    tournamentLevel: "Playoff",
+    description: `Playoff ${matchNumber}`,
+    startTime: "2026-06-01T10:00:00",
+    actualStartTime: null,
+    postResultTime: null,
+    scoreRedFinal: null,
+    scoreBlueFinal: null,
+    teams: [
+      { teamNumber: 1234, station: "Red1", surrogate: false, dq: false },
+      { teamNumber: 2345, station: "Red2", surrogate: false, dq: false },
+      { teamNumber: 3456, station: "Red3", surrogate: false, dq: false },
+      { teamNumber: 4567, station: "Blue1", surrogate: false, dq: false },
+      { teamNumber: 5678, station: "Blue2", surrogate: false, dq: false },
+      { teamNumber: 6789, station: "Blue3", surrogate: false, dq: false },
+    ],
+  };
 }
 
 beforeEach(() => {
@@ -293,6 +314,7 @@ describe("useScheduleLoader (FRC)", () => {
   });
 
   it("uses event-scoped abort signal for fetches", async () => {
+
     setEvent();
     const controller = new AbortController();
     const seenSignals = [];
@@ -309,4 +331,291 @@ describe("useScheduleLoader (FRC)", () => {
     // The signal observed by MSW should be a real AbortSignal.
     expect(seenSignals[0]).toBeInstanceOf(AbortSignal);
   });
+});
+
+describe("useScheduleLoader – FRC Nexus offseason fallback", () => {
+  beforeEach(() => {
+    eventSelectionState.selectedEvent = null;
+    eventSelectionState.selectedYear = null;
+    eventSelectionState.ftcMode = null;
+    settingsState.playoffCountOverride = null;
+    settingsState.autoAdvance = false;
+    settingsState.autoUpdate = false;
+  });
+
+  it("uses Nexus playoff matches when TBA returns no playoff matches", async () => {
+    setEvent({
+      code: "BCWPI",
+      name: "BattleCry at WPI",
+      type: "OffSeason",
+      tbaEventKey: "2026bcwpi",
+    });
+
+    // TBA returns qual matches only (no playoffs)
+    server.use(
+      http.get(`${BASE}/2026/offseason/schedule/hybrid/2026bcwpi/`, () =>
+        HttpResponse.json({
+          Schedule: {
+            schedule: [
+              { matchNumber: 1, tournamentLevel: "Qualification", teams: [] },
+            ],
+          },
+        })
+      ),
+      http.get(`${BASE}/2026/nexus/schedule/bcwpi`, () =>
+        HttpResponse.json({
+          Schedule: {
+            schedule: [
+              makeNexusPlayoffMatch(1),
+              makeNexusPlayoffMatch(2),
+            ],
+          },
+        })
+      )
+    );
+
+    const deps = makeDeps();
+    const { result } = renderHook(() => useScheduleLoader(deps));
+    await result.current.getSchedule(true);
+
+    await waitFor(() => expect(deps.setPlayoffSchedule).toHaveBeenCalled());
+    const playoff = deps.setPlayoffSchedule.mock.calls.at(-1)[0];
+    expect(Array.isArray(playoff.schedule)).toBe(true);
+    expect(playoff.schedule.length).toBe(2);
+    expect(playoff.schedule[0].tournamentLevel).toBe("Playoff");
+    // Score fields are stripped from Nexus matches — bracket structure is not guaranteed
+    expect(playoff.schedule[0].scoreRedFinal).toBeNull();
+    expect(playoff.schedule[0].scoreBlueFinal).toBeNull();
+  });
+
+  it("uses Nexus when TBA returns an empty schedule", async () => {
+    setEvent({
+      code: "BCWPI",
+      name: "BattleCry at WPI",
+      type: "OffSeason",
+      tbaEventKey: "2026bcwpi",
+    });
+
+    server.use(
+      http.get(`${BASE}/2026/offseason/schedule/hybrid/2026bcwpi/`, () =>
+        HttpResponse.json({ Schedule: { schedule: [] } })
+      ),
+      http.get(`${BASE}/2026/nexus/schedule/bcwpi`, () =>
+        HttpResponse.json({
+          Schedule: { schedule: [makeNexusPlayoffMatch(1)] },
+        })
+      )
+    );
+
+    const deps = makeDeps();
+    const { result } = renderHook(() => useScheduleLoader(deps));
+    await result.current.getSchedule(true);
+
+    await waitFor(() => expect(deps.setPlayoffSchedule).toHaveBeenCalled());
+    const playoff = deps.setPlayoffSchedule.mock.calls.at(-1)[0];
+    expect(playoff.schedule.length).toBe(1);
+  });
+
+  it("prefers TBA when it returns playoff matches (Nexus not called)", async () => {
+    setEvent({
+      code: "BCWPI",
+      name: "BattleCry at WPI",
+      type: "OffSeason",
+      tbaEventKey: "2026bcwpi",
+    });
+
+    let nexusCalled = false;
+    server.use(
+      http.get(`${BASE}/2026/offseason/schedule/hybrid/2026bcwpi/`, () =>
+        HttpResponse.json({
+          Schedule: {
+            schedule: [makeNexusPlayoffMatch(1), makeNexusPlayoffMatch(2)],
+          },
+        })
+      ),
+      http.get(`${BASE}/2026/nexus/schedule/bcwpi`, () => {
+        nexusCalled = true;
+        return HttpResponse.json({ Schedule: { schedule: [] } });
+      })
+    );
+
+    const deps = makeDeps();
+    const { result } = renderHook(() => useScheduleLoader(deps));
+    await result.current.getSchedule(true);
+
+    await waitFor(() => expect(deps.setPlayoffSchedule).toHaveBeenCalled());
+    expect(nexusCalled).toBe(false);
+    const playoff = deps.setPlayoffSchedule.mock.calls.at(-1)[0];
+    expect(playoff.schedule.length).toBe(2);
+  });
+
+  it("derives Nexus event code by stripping year from TBA key", async () => {
+    setEvent({
+      code: "MAWOR1",
+      name: "WPI Offseason",
+      type: "OffSeason",
+      tbaEventKey: "2026mawor1",
+    });
+
+    let capturedUrl = null;
+    server.use(
+      http.get(`${BASE}/2026/offseason/schedule/hybrid/2026mawor1/`, () =>
+        HttpResponse.json({ Schedule: { schedule: [] } })
+      ),
+      http.get(`${BASE}/2026/nexus/schedule/:code`, ({ params }) => {
+        capturedUrl = params.code;
+        return HttpResponse.json({ Schedule: { schedule: [] } });
+      })
+    );
+
+    const deps = makeDeps();
+    const { result } = renderHook(() => useScheduleLoader(deps));
+    await result.current.getSchedule(true);
+
+    await waitFor(() => expect(deps.setPlayoffSchedule).toHaveBeenCalled());
+    expect(capturedUrl).toBe("mawor1");
+  });
+
+  it("OffSeasonWithAzureSync: uses FRC as primary source when schedule is available", async () => {
+    setEvent({
+      code: "BCWPI",
+      name: "BattleCry at WPI",
+      type: "OffSeasonWithAzureSync",
+      tbaEventKey: "2026bcwpi",
+    });
+
+    let tbaCalled = false;
+    server.use(
+      // FRC has qual and playoff data
+      http.get(`${BASE}/2026/schedule/hybrid/BCWPI/qual`, () =>
+        HttpResponse.json({
+          Schedule: {
+            schedule: [
+              { matchNumber: 1, tournamentLevel: "Qualification", description: "Qual 1",
+                startTime: "2026-06-01T09:00:00", actualStartTime: "2026-06-01T09:00:00",
+                postResultTime: "2026-06-01T09:10:00", teams: [] },
+            ],
+          },
+        })
+      ),
+      http.get(`${BASE}/2026/schedule/hybrid/BCWPI/playoff`, () =>
+        HttpResponse.json({
+          Schedule: {
+            schedule: [makeNexusPlayoffMatch(1), makeNexusPlayoffMatch(2)],
+          },
+        })
+      ),
+      http.get(`${BASE}/2026/scores/BCWPI/qual`, () =>
+        HttpResponse.json({ MatchScores: [] })
+      ),
+      http.get(`${BASE}/2026/scores/BCWPI/playoff`, () =>
+        HttpResponse.json({ MatchScores: [] })
+      ),
+      http.get(`${BASE}/2026/offseason/schedule/hybrid/2026bcwpi/`, () => {
+        tbaCalled = true;
+        return HttpResponse.json({ Schedule: { schedule: [] } });
+      })
+    );
+
+    const deps = makeDeps();
+    const { result } = renderHook(() => useScheduleLoader(deps));
+    await result.current.getSchedule(true);
+
+    await waitFor(() => expect(deps.setPlayoffSchedule).toHaveBeenCalled());
+    // FRC data was used — TBA should not have been called
+    expect(tbaCalled).toBe(false);
+    const playoff = deps.setPlayoffSchedule.mock.calls.at(-1)[0];
+    expect(playoff.schedule.length).toBe(2);
+  });
+
+  it("also applies Nexus fallback for OffSeasonWithAzureSync events (FRC empty → TBA empty → Nexus)", async () => {
+    setEvent({
+      code: "BCWPI",
+      name: "BattleCry at WPI",
+      type: "OffSeasonWithAzureSync",
+      tbaEventKey: "2026bcwpi",
+    });
+
+    // FRC returns 404 for unknown event code (no fixture); TBA returns empty; Nexus has 1 playoff match.
+    server.use(
+      http.get(`${BASE}/2026/offseason/schedule/hybrid/2026bcwpi/`, () =>
+        HttpResponse.json({ Schedule: { schedule: [] } })
+      ),
+      http.get(`${BASE}/2026/nexus/schedule/bcwpi`, () =>
+        HttpResponse.json({
+          Schedule: { schedule: [makeNexusPlayoffMatch(1)] },
+        })
+      )
+    );
+
+    const deps = makeDeps();
+    const { result } = renderHook(() => useScheduleLoader(deps));
+    await result.current.getSchedule(true);
+
+    await waitFor(() => expect(deps.setPlayoffSchedule).toHaveBeenCalled());
+    const playoff = deps.setPlayoffSchedule.mock.calls.at(-1)[0];
+    expect(playoff.schedule.length).toBe(1);
+  });
+
+  it("passes Nexus match descriptions through verbatim without transformation", async () => {
+    setEvent({
+      code: "BCWPI",
+      name: "BattleCry at WPI",
+      type: "OffSeason",
+      tbaEventKey: "2026bcwpi",
+    });
+
+    server.use(
+      http.get(`${BASE}/2026/offseason/schedule/hybrid/2026bcwpi/`, () =>
+        HttpResponse.json({ Schedule: { schedule: [] } })
+      ),
+      http.get(`${BASE}/2026/nexus/schedule/bcwpi`, () =>
+        HttpResponse.json({
+          Schedule: {
+            schedule: [
+              { ...makeNexusPlayoffMatch(1), description: "Playoff 1" },
+              { ...makeNexusPlayoffMatch(2), description: "Playoff 2" },
+            ],
+          },
+        })
+      )
+    );
+
+    const deps = makeDeps();
+    const { result } = renderHook(() => useScheduleLoader(deps));
+    await result.current.getSchedule(true);
+
+    await waitFor(() => expect(deps.setPlayoffSchedule).toHaveBeenCalled());
+    const playoff = deps.setPlayoffSchedule.mock.calls.at(-1)[0];
+    expect(playoff.schedule[0].description).toBe("Playoff 1");
+    expect(playoff.schedule[1].description).toBe("Playoff 2");
+  });
+
+  it("handles Nexus returning 204 (no content) gracefully", async () => {
+    setEvent({
+      code: "BCWPI",
+      name: "BattleCry at WPI",
+      type: "OffSeason",
+      tbaEventKey: "2026bcwpi",
+    });
+
+    server.use(
+      http.get(`${BASE}/2026/offseason/schedule/hybrid/2026bcwpi/`, () =>
+        HttpResponse.json({ Schedule: { schedule: [] } })
+      ),
+      http.get(`${BASE}/2026/nexus/schedule/bcwpi`, () =>
+        new HttpResponse(null, { status: 204 })
+      )
+    );
+
+    const deps = makeDeps();
+    const { result } = renderHook(() => useScheduleLoader(deps));
+    await result.current.getSchedule(true);
+
+    await waitFor(() => expect(deps.setPlayoffSchedule).toHaveBeenCalled());
+    const playoff = deps.setPlayoffSchedule.mock.calls.at(-1)[0];
+    // No Nexus data — playoff schedule stays empty
+    expect(playoff.schedule).toEqual([]);
+  });
+
 });

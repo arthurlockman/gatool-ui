@@ -23,8 +23,15 @@ describe("extractAllianceSlotTeamNumber", () => {
     expect(extractAllianceSlotTeamNumber("  42  ")).toBe(42);
   });
 
-  it("returns non-numeric strings as-is", () => {
-    expect(extractAllianceSlotTeamNumber("frc254")).toBe("frc254");
+  it("strips frc prefix and parses to integer", () => {
+    expect(extractAllianceSlotTeamNumber("frc254")).toBe(254);
+    expect(extractAllianceSlotTeamNumber("FRC1114")).toBe(1114);
+    expect(extractAllianceSlotTeamNumber("frc0")).toBe(0);
+  });
+
+  it("returns truly non-numeric strings as-is", () => {
+    expect(extractAllianceSlotTeamNumber("team-foo")).toBe("team-foo");
+    expect(extractAllianceSlotTeamNumber("frc")).toBe("frc");
   });
 
   it("extracts teamNumber from object slot", () => {

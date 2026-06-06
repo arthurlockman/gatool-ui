@@ -1,5 +1,18 @@
 export const appUpdates = [
   {
+    date: "June 5, 2026",
+    message: (
+      <>
+      <b>OFFSEASON UPDATES</b><br />
+      <ul>
+        <li>FRC:</li>
+        <ul>
+          <li>When using a registered FRC event, if gatool cannot get event data from FIRST API, we will now attempt to load event data from TBA API. If that fails, we will fall back to Nexus API for schedule.</li>
+        </ul>
+      </ul>
+      </>
+    ),
+  },{
     date: "June 3, 2026",
     message: (
       <>

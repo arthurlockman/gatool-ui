@@ -26,11 +26,11 @@ function BottomButtons({
   districts,
   ftcLeagues,
 }) {
-  const { showWorldAndStatsOnAnnouncePlayByPlay, highScoreMode } = useSettings();
+  const { showWorldAndStatsOnAnnouncePlayByPlay, highScoreMode, nonStandardPlayoffs } = useSettings();
     var matches = playoffSchedule?.schedule;
     var eventHighScore = eventHighScores?.highscores?.overallqual;
     if (!highScoreMode) {
-        if (matchDetails?.tournamentLevel.toLowerCase() === "playoff") {
+        if (matchDetails?.tournamentLevel?.toLowerCase() === "playoff") {
             eventHighScore = eventHighScores?.highscores?.overallplayoff;
         }
     } else
@@ -39,7 +39,9 @@ function BottomButtons({
         }
     const hasEventHighScore = Number(eventHighScore?.score) > 0;
     const isDaVinci = selectedEvent?.value?.code === "FTCCMP1";
-
+    const isPlayoff = matchDetails?.tournamentLevel?.toLowerCase() === "playoff";
+    const showPlayoffDetails = !nonStandardPlayoffs && isPlayoff &&
+      (!isDaVinci || matchDetails?.series >= 16);
 
     return (
       <>
@@ -61,8 +63,7 @@ function BottomButtons({
               </Button>
             )}
           </Col>
-          {matchDetails?.tournamentLevel.toLowerCase() === "playoff" &&
-            (!isDaVinci || (isDaVinci && matchDetails?.series >= 16)) && (
+          {showPlayoffDetails && (
               <Col
                 xs={hasEventHighScore ? "5" : "8"}
                 lg={hasEventHighScore ? "4" : "6"}
@@ -80,27 +81,15 @@ function BottomButtons({
 
           {hasEventHighScore && (
             <Col
-              xs={
-                matchDetails?.tournamentLevel.toLowerCase() !== "playoff"
-                  ? "8"
-                  : isDaVinci && matchDetails?.series < 16
-                    ? "8"
-                    : "3"
-              }
-              lg={
-                matchDetails?.tournamentLevel.toLowerCase() !== "playoff"
-                  ? "6"
-                  : isDaVinci && matchDetails?.series < 16
-                    ? "6"
-                    : "2"
-              }
+              xs={showPlayoffDetails ? "3" : "8"}
+              lg={showPlayoffDetails ? "2" : "6"}
             >
               <div className="border rounded p-2 h-100 gatool-highscores-summary-panel gatool-highscores-summary--event">
                 <p className="mb-0">
                   <b>
                     {highScoreMode
                       ? "Event"
-                      : matchDetails?.tournamentLevel.toLowerCase() ===
+                      : matchDetails?.tournamentLevel?.toLowerCase() ===
                           "playoff"
                         ? "Playoffs"
                         : "Quals"}{" "}
@@ -114,8 +103,7 @@ function BottomButtons({
             </Col>
           )}
 
-          {matchDetails?.tournamentLevel.toLowerCase() !== "playoff" &&
-            !hasEventHighScore && (
+          {!showPlayoffDetails && !hasEventHighScore && (
               <Col xs={"8"} lg={"6"}>
                 <h4 className="gatool-awaiting-inline">
                   {currentMatch === 1

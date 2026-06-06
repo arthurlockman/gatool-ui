@@ -92,8 +92,10 @@ export function useScheduleLoader(deps, opts = {}) {
    * Remaps a string team identifier to its numeric team number (e.g., "TeamA" -> 9990)
    */
   const remapStringToNumber = (teamString) => {
-    if (!teamRemappings) return Number(teamString);
-    return Number(teamRemappings.strings[teamString]) || Number(teamString) || null;
+    // Strip TBA-style "frc" prefix (e.g. "frc1277" → 1277) before numeric conversion.
+    const stripped = typeof teamString === "string" ? teamString.replace(/^frc/i, "") : teamString;
+    if (!teamRemappings) return Number(stripped) || null;
+    return Number(teamRemappings.strings[teamString]) || Number(stripped) || null;
   };
 
   /**
@@ -121,6 +123,35 @@ export function useScheduleLoader(deps, opts = {}) {
     } catch (error) {
       console.error("Error fetching TBA matches:", error);
       return [];
+    }
+  };
+
+  /**
+   * Helper function to fetch FRC Nexus schedule for an offseason event.
+   * Used as a fallback when TBA returns no playoff schedule.
+   * @param {string} nexusEventCode Event code without year prefix (e.g. "mawor1")
+   * @param {string} year Competition year
+   * @returns HybridScheduleResponse or null
+   */
+  const fetchNexusMatches = async (nexusEventCode, year) => {
+    try {
+      console.log(`Fetching FRC Nexus schedule for event: ${year}${nexusEventCode}`);
+      const result = await httpClient.getNoAuth(
+        `${year}/nexus/schedule/${nexusEventCode}`,
+        undefined,
+        undefined,
+        undefined,
+        signal()
+      );
+      if (result.status === 200) {
+        // @ts-ignore
+        const matches = await result.json();
+        return matches;
+      }
+      return null;
+    } catch (error) {
+      console.error("Error fetching FRC Nexus matches:", error);
+      return null;
     }
   };
 
@@ -158,6 +189,9 @@ export function useScheduleLoader(deps, opts = {}) {
     var playoffschedule = null;
     var playoffScores = null;
     var qualslength = 0;
+    var qualScheduleFromTBA = false;
+    var playoffScheduleFromTBA = false;
+    var playoffUsedNexus = false;
 
     console.log(
       `Fetching Practice Schedule for ${selectedEvent?.value?.name}...`
@@ -173,14 +207,15 @@ export function useScheduleLoader(deps, opts = {}) {
       selectedEvent?.value?.type === "OffSeason" &&
       selectedEvent?.value?.tbaEventKey
     ) {
-      // Skip practice schedule for TBA offseason events - TBA doesn't provide practice matches
+      // Skip practice schedule for TBA-primary offseason events — TBA doesn't provide practice matches.
+      // OffSeasonWithAzureSync falls through to the FRC practice path below.
       console.log("Skipping practice schedule for TBA offseason event");
       practiceschedule = { schedule: { schedule: [] } };
     } else if (!selectedEvent?.value?.code.includes("PRACTICE") && !ftcMode) {
       if (useCheesyArena && cheesyArenaAvailable) {
         // get schedule from Cheesy Arena
         var result = await fetchLocal("http://10.0.100.5:8080/api/matches/practice");
-        var data = await result.json();
+        var data = result.status === 200 ? await result.json() : [];
         if (data.length > 0) {
           // reformat data to match FIRST API format
           practiceschedule = {
@@ -260,7 +295,7 @@ export function useScheduleLoader(deps, opts = {}) {
         result = await fetchLocal(
           "http://10.0.100.5:8080/api/matches/qualification"
         );
-        data = await result.json();
+        data = result.status === 200 ? await result.json() : [];
         if (data.length > 0) {
           // reformat data to match FIRST API format
           qualschedule = {
@@ -416,6 +451,56 @@ export function useScheduleLoader(deps, opts = {}) {
             }
           }
         }
+      } else if (
+        !useFTCOffline &&
+        selectedEvent?.value?.type === "OffSeasonWithAzureSync" &&
+        !ftcMode
+      ) {
+        // OffSeasonWithAzureSync: FRC is the primary source (event data is Azure-synced).
+        // Fall back to TBA if FRC returns no schedule.
+        const qualsResult = await httpClient.getNoAuth(
+          `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/qual`,
+          undefined,
+          undefined,
+          undefined,
+          signal()
+        );
+        if (qualsResult.status === 200) {
+          // @ts-ignore
+          qualschedule = await qualsResult.json();
+        }
+        const frcHasQualData =
+          (qualschedule?.Schedule?.schedule?.length > 0) ||
+          (qualschedule?.schedule?.schedule?.length > 0) ||
+          (Array.isArray(qualschedule?.schedule) && qualschedule.schedule.length > 0);
+        if (!frcHasQualData && selectedEvent?.value?.tbaEventKey) {
+          console.log("FRC returned no qual schedule; falling back to TBA for OffSeasonWithAzureSync");
+          const tbaMatches = await fetchTBAMatches(selectedEvent?.value?.tbaEventKey, selectedYear?.value);
+          if (tbaMatches?.Schedule?.schedule?.length > 0) {
+            const qualMatches = tbaMatches.Schedule.schedule
+              .filter((match) => match.tournamentLevel === "Qual")
+              .sort((a, b) => a.matchNumber - b.matchNumber);
+            if (qualMatches.length > 0) {
+              const remappedMatches = qualMatches.map((match) => {
+                if (match.teams) {
+                  return {
+                    ...match,
+                    teams: match.teams.map((team) => {
+                      if (typeof team.teamNumber === "string") {
+                        const numericTeam = remapStringToNumber(team.teamNumber);
+                        if (numericTeam) return { ...team, teamNumber: numericTeam };
+                      }
+                      return team;
+                    }),
+                  };
+                }
+                return match;
+              });
+              qualschedule = { schedule: { schedule: remappedMatches } };
+              qualScheduleFromTBA = true;
+            }
+          }
+        }
       } else if (!useFTCOffline) {
         const qualsResult = await httpClient.getNoAuth(
           `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/qual`,
@@ -456,7 +541,7 @@ export function useScheduleLoader(deps, opts = {}) {
       !selectedEvent?.value?.code.includes("PRACTICE") &&
       !useFTCOffline &&
       qualschedule?.schedule?.schedule?.length > 0 &&
-      !(selectedEvent?.value?.type === "OffSeason")
+      selectedEvent?.value?.type !== "OffSeason" && !qualScheduleFromTBA
     ) {
       const qualsScoresResult = await httpClient.getNoAuth(
         `${selectedYear?.value}/scores/${selectedEvent?.value.code}/qual`,
@@ -498,7 +583,7 @@ export function useScheduleLoader(deps, opts = {}) {
       match.winner = winner(match, ftcMode);
       if (
         qualScores?.MatchScores &&
-        !(selectedEvent?.value?.type === "OffSeason")
+        selectedEvent?.value?.type !== "OffSeason" && !qualScheduleFromTBA
       ) {
         const matchResults = qualScores.MatchScores.filter((scoreMatch) => {
           return scoreMatch.matchNumber === match.matchNumber;
@@ -526,7 +611,7 @@ export function useScheduleLoader(deps, opts = {}) {
             );
           });
         }
-      } else if (selectedEvent?.value?.type === "OffSeason") {
+      } else if (selectedEvent?.value?.type === "OffSeason" || qualScheduleFromTBA) {
         match.scores = match?.matchScores || [];
         if (match?.matchScores) {
           delete match.matchScores;
@@ -579,6 +664,20 @@ export function useScheduleLoader(deps, opts = {}) {
     }
 
     qualschedule.completedMatchCount = completedMatchCount;
+
+    if (useCheesyArena && cheesyArenaAvailable) {
+      qualschedule.dataSource = "Cheesy Arena";
+    } else if (useFTCOffline) {
+      qualschedule.dataSource = "FTC Local Server";
+    } else if (ftcMode) {
+      qualschedule.dataSource = "FTC API";
+    } else if (selectedEvent?.value?.type === "OffSeason") {
+      qualschedule.dataSource = "TBA";
+    } else if (selectedEvent?.value?.type === "OffSeasonWithAzureSync") {
+      qualschedule.dataSource = qualScheduleFromTBA ? "TBA" : "FRC";
+    } else {
+      qualschedule.dataSource = "FRC";
+    }
 
     qualschedule.lastUpdate = moment().format();
 
@@ -778,6 +877,150 @@ export function useScheduleLoader(deps, opts = {}) {
             }
           }
         }
+
+        // FRC Nexus fallback: if TBA returned no playoff matches, try Nexus
+        if (!playoffschedule?.schedule?.length) {
+          // Derive Nexus event code: TBA key minus the 4-digit year prefix,
+          // or fall back to the lowercase FIRST event code
+          const nexusEventCode = eventKey
+            ? eventKey.replace(/^\d{4}/, "")
+            : selectedEvent?.value?.code?.toLowerCase();
+
+          if (nexusEventCode) {
+            console.log(`TBA returned no playoff matches; trying FRC Nexus for ${nexusEventCode}`);
+            const nexusMatches = await fetchNexusMatches(nexusEventCode, selectedYear?.value);
+
+            if (nexusMatches?.Schedule?.schedule?.length > 0) {
+              const nexusPlayoffMatches = nexusMatches.Schedule.schedule
+                .filter((match) => match.tournamentLevel === "Playoff")
+                .sort((a, b) => a.matchNumber - b.matchNumber);
+
+              if (nexusPlayoffMatches.length > 0) {
+                const remappedMatches = nexusPlayoffMatches.map((match) => {
+                  // Remap string team numbers; preserve description verbatim from Nexus.
+                  // Strip score fields — Nexus bracket structure is not guaranteed to
+                  // match the FRC double-elimination format the app uses for scoring.
+                  const remappedTeams = match.teams
+                    ? match.teams.map((team) => {
+                        if (typeof team.teamNumber === 'string') {
+                          const numericTeam = remapStringToNumber(team.teamNumber);
+                          if (numericTeam) return { ...team, teamNumber: numericTeam };
+                        }
+                        return team;
+                      })
+                    : match.teams;
+                  return {
+                    ...match,
+                    teams: remappedTeams,
+                    scoreRedFinal: null,
+                    scoreBlueFinal: null,
+                    scoreRedAuto: null,
+                    scoreBlueAuto: null,
+                    scoreRedFoul: null,
+                    scoreBlueFoul: null,
+                    scores: null,
+                    matchScores: null,
+                  };
+                });
+
+                playoffschedule = { schedule: remappedMatches };
+                playoffUsedNexus = true;
+                console.log(`Loaded ${remappedMatches.length} playoff matches from FRC Nexus`);
+              }
+            }
+          }
+        }
+      } else if (
+        !useFTCOffline &&
+        selectedEvent?.value?.type === "OffSeasonWithAzureSync" &&
+        !ftcMode
+      ) {
+        // OffSeasonWithAzureSync: FRC primary → TBA → Nexus fallback for playoffs.
+        const playoffResult = await httpClient.getNoAuth(
+          `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/playoff`,
+          undefined,
+          undefined,
+          undefined,
+          signal()
+        );
+        if (playoffResult.status === 200) {
+          // @ts-ignore
+          playoffschedule = await playoffResult.json();
+        }
+        const frcHasPlayoffData =
+          (playoffschedule?.Schedule?.schedule?.length > 0) ||
+          (playoffschedule?.schedule?.schedule?.length > 0) ||
+          (Array.isArray(playoffschedule?.schedule) && playoffschedule.schedule.length > 0);
+        if (!frcHasPlayoffData && selectedEvent?.value?.tbaEventKey) {
+          console.log("FRC returned no playoff schedule; falling back to TBA for OffSeasonWithAzureSync");
+          const tbaMatches = await fetchTBAMatches(selectedEvent?.value?.tbaEventKey, selectedYear?.value);
+          if (tbaMatches?.Schedule?.schedule?.length > 0) {
+            const playoffMatches = tbaMatches.Schedule.schedule
+              .filter((match) => match.tournamentLevel === "Playoff")
+              .sort((a, b) => a.matchNumber - b.matchNumber);
+            if (playoffMatches.length > 0) {
+              const remappedMatches = playoffMatches.map((match) => {
+                if (match.teams) {
+                  return {
+                    ...match,
+                    teams: match.teams.map((team) => {
+                      if (typeof team.teamNumber === "string") {
+                        const numericTeam = remapStringToNumber(team.teamNumber);
+                        if (numericTeam) return { ...team, teamNumber: numericTeam };
+                      }
+                      return team;
+                    }),
+                  };
+                }
+                return match;
+              });
+              playoffschedule = { schedule: remappedMatches };
+              playoffScheduleFromTBA = true;
+            }
+          }
+          // Nexus fallback if TBA also returned no playoff matches
+          if (!playoffScheduleFromTBA) {
+            const nexusEventCode = selectedEvent?.value?.tbaEventKey?.replace(/^\d{4}/, "")
+              || selectedEvent?.value?.code?.toLowerCase();
+            if (nexusEventCode) {
+              console.log(`TBA returned no playoff matches; trying FRC Nexus for ${nexusEventCode} (OffSeasonWithAzureSync)`);
+              const nexusMatches = await fetchNexusMatches(nexusEventCode, selectedYear?.value);
+              if (nexusMatches?.Schedule?.schedule?.length > 0) {
+                const nexusPlayoffMatches = nexusMatches.Schedule.schedule
+                  .filter((match) => match.tournamentLevel === "Playoff")
+                  .sort((a, b) => a.matchNumber - b.matchNumber);
+                if (nexusPlayoffMatches.length > 0) {
+                  const remappedMatches = nexusPlayoffMatches.map((match) => {
+                    const remappedTeams = match.teams
+                      ? match.teams.map((team) => {
+                          if (typeof team.teamNumber === "string") {
+                            const numericTeam = remapStringToNumber(team.teamNumber);
+                            if (numericTeam) return { ...team, teamNumber: numericTeam };
+                          }
+                          return team;
+                        })
+                      : match.teams;
+                    return {
+                      ...match,
+                      teams: remappedTeams,
+                      scoreRedFinal: null,
+                      scoreBlueFinal: null,
+                      scoreRedAuto: null,
+                      scoreBlueAuto: null,
+                      scoreRedFoul: null,
+                      scoreBlueFoul: null,
+                      scores: null,
+                      matchScores: null,
+                    };
+                  });
+                  playoffschedule = { schedule: remappedMatches };
+                  playoffUsedNexus = true;
+                  console.log(`Loaded ${remappedMatches.length} playoff matches from FRC Nexus (OffSeasonWithAzureSync fallback)`);
+                }
+              }
+            }
+          }
+        }
       } else if (!useFTCOffline) {
         const playoffResult = await httpClient.getNoAuth(
           `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/playoff`,
@@ -869,7 +1112,7 @@ export function useScheduleLoader(deps, opts = {}) {
     if (
       !selectedEvent?.value?.code.includes("PRACTICE") &&
       !useFTCOffline &&
-      !(selectedEvent?.value?.type === "OffSeason") &&
+      selectedEvent?.value?.type !== "OffSeason" && !playoffScheduleFromTBA &&
       playoffschedule?.schedule?.length > 0
     ) {
       const playoffScoresResult = await httpClient.getNoAuth(
@@ -914,7 +1157,7 @@ export function useScheduleLoader(deps, opts = {}) {
           //figure out how to match scores to match
           if (
             playoffScores?.MatchScores &&
-            !(selectedEvent?.value?.type === "OffSeason")
+            selectedEvent?.value?.type !== "OffSeason" && !playoffScheduleFromTBA
           ) {
             const matchResults = playoffScores.MatchScores.filter(
               (scoreMatch) => {
@@ -933,7 +1176,7 @@ export function useScheduleLoader(deps, opts = {}) {
                 hydrateFtcPlayoffTeamsFromResults(match, results);
               }
             }
-          } else if (selectedEvent?.value?.type === "OffSeason") {
+          } else if (selectedEvent?.value?.type === "OffSeason" || playoffScheduleFromTBA) {
             match.scores = match?.matchScores || [];
             if (match?.matchScores) {
               delete match.matchScores;
@@ -946,7 +1189,7 @@ export function useScheduleLoader(deps, opts = {}) {
 
       if (playoffScores?.MatchScores) {
         _.forEach(playoffScores.MatchScores, (score) => {
-          if (score.alliances[0].totalPoints === score.alliances[1].totalPoints) {
+          if (score.alliances?.[0]?.totalPoints === score.alliances?.[1]?.totalPoints) {
             const matchIndex = _.findIndex(
               playoffschedule.schedule,
               (m) =>
@@ -1004,6 +1247,19 @@ export function useScheduleLoader(deps, opts = {}) {
     }
 
     //setEventHighScores(highScores);
+    if (useCheesyArena && cheesyArenaAvailable) {
+      playoffschedule.dataSource = "Cheesy Arena";
+    } else if (useFTCOffline) {
+      playoffschedule.dataSource = "FTC Local Server";
+    } else if (ftcMode) {
+      playoffschedule.dataSource = "FTC API";
+    } else if (selectedEvent?.value?.type === "OffSeason") {
+      playoffschedule.dataSource = playoffUsedNexus ? "Nexus" : "TBA";
+    } else if (selectedEvent?.value?.type === "OffSeasonWithAzureSync") {
+      playoffschedule.dataSource = playoffUsedNexus ? "Nexus" : playoffScheduleFromTBA ? "TBA" : "FRC";
+    } else {
+      playoffschedule.dataSource = "FRC";
+    }
     playoffschedule.lastUpdate = moment().format();
     console.log(
       `There are ${playoffschedule?.schedule.length} playoff matches loaded.`
