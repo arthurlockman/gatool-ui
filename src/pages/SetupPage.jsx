@@ -9,7 +9,7 @@ import { useOnlineStatus } from "../contextProviders/OnlineContext";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { isSafari, isChrome, fullBrowserVersion, browserVersion, isIOS, browserName, isDesktop, isTablet, isMobile } from "react-device-detect";
-import { playoffOverrideMenu } from "data/appConfig";
+import { playoffOverrideMenu, playoffOverrideMenuOffseason } from "data/appConfig";
 import { useSettings } from "contexts/SettingsContext";
 import { useEventData } from "contexts/EventDataContext";
 import { useEventActions } from "contexts/EventActionsContext";
@@ -527,7 +527,14 @@ function SetupPage({
                         {selectedEvent?.value.dateStart && <p><b>Event Start: </b>{moment(selectedEvent?.value.dateStart, 'YYYY-MM-DDTHH:mm:ss').format('ddd, MMM Do YYYY')}</p>}
                         {selectedEvent?.value.dateEnd && <p><b>Event End: </b>{moment(selectedEvent?.value.dateEnd, 'YYYY-MM-DDTHH:mm:ss').format('ddd, MMM Do YYYY')}</p>}
                         <Alert variant={"danger"}><b>ADVANCED EVENT SETTINGS:</b><br />If your event includes non-competing teams in the team list, indicate the number of non-competing teams here. <b>THIS IS A RARE CONDITION</b><Select classNamePrefix="gatool-rs" options={teamReducer} value={teamReduction ? teamReduction : teamReducer[0]} onChange={setTeamReduction} isDisabled={!teamList?.teamCountTotal} /><br />
-                            If your event requires a reduced Alliance Count, you can override the Alliance Count here. <b>THIS SHOULD ONLY APPLY TO EVENTS WITH LESS THAN 26 TEAMS. </b><Select classNamePrefix="gatool-rs" options={playoffOverrideMenu} value={playoffCountOverride ? playoffCountOverride : (allianceCount?.menu ? allianceCount.menu : playoffOverrideMenu[0])} onChange={setPlayoffCountOverride} />
+                            {selectedEvent?.value?.type?.includes("OffSeason")
+                                ? "If your event requires a non-standard Alliance Count, you can override the Alliance Count here."
+                                : <span>If your event requires a reduced Alliance Count, you can override the Alliance Count here. <b>THIS SHOULD ONLY APPLY TO EVENTS WITH LESS THAN 26 TEAMS.</b></span>
+                            }
+                            <Select classNamePrefix="gatool-rs"
+                                options={selectedEvent?.value?.type?.includes("OffSeason") ? playoffOverrideMenuOffseason : playoffOverrideMenu}
+                                value={playoffCountOverride ? playoffCountOverride : (allianceCount?.menu ? allianceCount.menu : (selectedEvent?.value?.type?.includes("OffSeason") ? playoffOverrideMenuOffseason[0] : playoffOverrideMenu[0]))}
+                                onChange={setPlayoffCountOverride} />
                         </Alert>
                         <div>
                             {!ftcMode && (

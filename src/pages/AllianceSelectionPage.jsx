@@ -1,4 +1,5 @@
 import { Alert, Col, Row, Container, Modal, Button } from "react-bootstrap";
+import Select from "react-select";
 import Bracket from "../components/Bracket";
 import FourAllianceBracket from "components/FourAllianceBracket";
 import FourAllianceBracketFTC from "components/FourAllianceBracketFTC";
@@ -7,6 +8,7 @@ import DaVinciTournamentBracket from "components/DaVinciTournamentBracket";
 import TwoAllianceBracket from "components/TwollianceBracket";
 import moment from "moment/moment";
 import AllianceSelection from "../components/AllianceSelection";
+import { playoffOverrideMenuOffseason } from "../data/appConfig";
 import { useState, useEffect, useRef } from "react";
 import Switch from "react-switch";
 import { useHotkeysContext, useHotkeys } from "react-hotkeys-hook";
@@ -30,7 +32,8 @@ function AllianceSelectionPage({
 }) {
   const { selectedEvent, selectedYear, qualSchedule, playoffSchedule, offlinePlayoffSchedule, alliances, rankings, teamList, allianceCount, communityUpdates, practiceSchedule, currentMatch, eventLabel, ftcMode, remapNumberToString } = useEventData();
   const { getRanks, loadEvent, nextMatch, previousMatch, getSchedule } = useEventActions();
-    const { timeFormat, useSwipe, usePullDownToUpdate, useFourTeamAlliances, useScrollMemory, rankingsOverride } = useSettings();
+    const { timeFormat, useSwipe, usePullDownToUpdate, useFourTeamAlliances, setUseFourTeamAlliances, useScrollMemory, rankingsOverride,
+        playoffCountOverride, setPlayoffCountOverride, allianceSelectionRoundOrder, setAllianceSelectionRoundOrder } = useSettings();
     /**
      * This function finds a team by their station assignment
      * @param teams the array of team objects
@@ -46,6 +49,42 @@ function AllianceSelectionPage({
     const [overrideAllianceSelection, setOverrideAllianceSelection] = useState(false);
     const [resetAllianceSelection, setResetAllianceSelection] = useState(false);
     const [teamFilter, setTeamFilter] = useState("");
+    const [showRoundOrderModal, setShowRoundOrderModal] = useState(false);
+    const [roundOrderDraft, setRoundOrderDraft] = useState(null);
+
+    const isOffseason = selectedEvent?.value?.type?.includes("OffSeason");
+    const inChamps = !!(
+        selectedEvent?.value?.champLevel === "CHAMPS" ||
+        selectedEvent?.value?.champLevel === "CMPDIV" ||
+        selectedEvent?.value?.champLevel === "CMPSUB" ||
+        useFourTeamAlliances
+    );
+    const allianceSelectionRounds = ftcMode
+        ? (inChamps ? ["round1", "round2"] : ["round1"])
+        : (inChamps ? ["round1", "round2", "round3"] : ["round1", "round2"]);
+
+    const defaultRoundDirection = { round1: "ascending", round2: "descending", round3: "ascending" };
+    const effectiveAllianceCount = playoffCountOverride?.value ?? allianceCount?.count;
+    const roundDirectionOptions = [
+        { value: "ascending", label: `Alliance 1 \u2192 ${effectiveAllianceCount ?? "?"}` },
+        { value: "descending", label: `Alliance ${effectiveAllianceCount ?? "?"} \u2192 1` },
+    ];
+
+    const openRoundOrderModal = () => {
+        const current = allianceSelectionRoundOrder || {};
+        const draft = {};
+        allianceSelectionRounds.forEach((r) => {
+            draft[r] = current[r] || defaultRoundDirection[r] || "ascending";
+        });
+        setRoundOrderDraft(draft);
+        setShowRoundOrderModal(true);
+    };
+
+    const saveRoundOrder = () => {
+        setAllianceSelectionRoundOrder(roundOrderDraft);
+        setAllianceSelectionArrays({});
+        setShowRoundOrderModal(false);
+    };
     const [waitingForRankingsUpdate, setWaitingForRankingsUpdate] = useState(false);
     const previousRankingsRef = useRef(null);
     const { disableScope, enableScope } = useHotkeysContext();
@@ -81,7 +120,8 @@ function AllianceSelectionPage({
 
     const handleReset = () => {
         // @ts-ignore
-        document.getElementById("filterControl").value = "";
+        const filterControl = document.getElementById("filterControl");
+        if (filterControl) filterControl.value = "";
         setTeamFilter("");
         setAllianceSelectionArrays({});
     }
@@ -219,6 +259,32 @@ function AllianceSelectionPage({
                 </div>}
             {selectedEvent && ((qualSchedule?.schedule?.length > 0 || qualSchedule?.schedule?.schedule?.length > 0 || practiceSchedule?.schedule?.length > 0) && !playoffs && (allianceSelection || overrideAllianceSelection)) &&
                 <div>
+                    {isOffseason && (
+                        <Alert variant="warning">
+                            <Row className="align-items-center justify-content-center">
+                                <Col xs="auto"><b>Alliance Count Override:</b></Col>
+                                <Col xs={3}>
+                                    <Select classNamePrefix="gatool-rs"
+                                        options={playoffOverrideMenuOffseason}
+                                        value={playoffCountOverride ? playoffCountOverride : (allianceCount?.menu ? allianceCount.menu : playoffOverrideMenuOffseason[0])}
+                                        onChange={setPlayoffCountOverride} />
+                                </Col>
+                                <Col xs="auto">
+                                    <Button size="sm" variant="info" onClick={openRoundOrderModal}>
+                                        Reorder Alliance Selection
+                                    </Button>
+                                </Col>
+                                {!ftcMode && (
+                                    <Col xs="auto" className="d-flex align-items-center gap-2">
+                                        <Switch
+                                            checked={useFourTeamAlliances === null ? false : useFourTeamAlliances}
+                                            onChange={setUseFourTeamAlliances} />
+                                        <b>Use 4 team Alliances for playoffs</b>
+                                    </Col>
+                                )}
+                            </Row>
+                        </Alert>
+                    )}
                     {!allianceCount || !allianceCount?.count || allianceCount?.count <= 0 ? (
                         <Alert variant="danger">
                             <h4>Alliance Count Required</h4>
@@ -242,6 +308,30 @@ function AllianceSelectionPage({
                 <FourAllianceBracketFTC currentMatch={currentMatch} qualsLength={qualsLength} nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} useSwipe={useSwipe} usePullDownToUpdate={usePullDownToUpdate} offlinePlayoffSchedule={offlinePlayoffSchedule} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} eventLabel={eventLabel} ftcMode={ftcMode} matches={matches} allianceNumbers={allianceNumbers} allianceName={allianceName} matchScore={matchScore} matchWinner={matchWinner} alliances={alliances} remapNumberToString={remapNumberToString} />}
             {selectedEvent && (alliancesCount === 2) && playoffs &&
                 <TwoAllianceBracket nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} useSwipe={useSwipe} usePullDownToUpdate={usePullDownToUpdate} eventLabel={eventLabel} ftcMode={ftcMode} matches={matches} allianceNumbers={allianceNumbers} allianceName={allianceName} matchScore={matchScore} matchWinner={matchWinner} />}
+            <Modal centered={true} show={showRoundOrderModal} onHide={() => setShowRoundOrderModal(false)}>
+                <Modal.Header className={"allianceSelectionDecline"} closeVariant={"white"} closeButton>
+                    <Modal.Title>Configure Alliance Selection Round Order</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>Choose the selection direction for each round. <strong>Saving will reset Alliance Selection.</strong></p>
+                    {roundOrderDraft && allianceSelectionRounds.map((roundKey, idx) => (
+                        <Row key={roundKey} className="align-items-center mb-2">
+                            <Col xs={3}><b>Round {idx + 1}:</b></Col>
+                            <Col xs={9}>
+                                <Select classNamePrefix="gatool-rs"
+                                    options={roundDirectionOptions}
+                                    value={roundDirectionOptions.find(o => o.value === roundOrderDraft[roundKey])}
+                                    onChange={(opt) => setRoundOrderDraft(prev => ({ ...prev, [roundKey]: opt.value }))} />
+                            </Col>
+                        </Row>
+                    ))}
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="danger" size="sm" onClick={saveRoundOrder}>Save &amp; Reset Alliance Selection</Button>
+                    <Button size="sm" onClick={() => setShowRoundOrderModal(false)}>Cancel</Button>
+                </Modal.Footer>
+            </Modal>
+
             <Modal centered={true} show={resetAllianceSelection} onHide={handleClose}>
                 <Modal.Header className={"allianceSelectionDecline"} closeVariant={"white"} closeButton>
                     <Modal.Title>
