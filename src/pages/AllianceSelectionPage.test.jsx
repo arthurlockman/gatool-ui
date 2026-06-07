@@ -30,6 +30,14 @@ vi.mock("../components/AllianceSelection", () => ({
     default: () => <div data-testid="alliance-selection-stub" />,
 }));
 
+// Bracket components are complex; stub them all out
+vi.mock("../components/Bracket", () => ({ default: () => <div data-testid="bracket-stub" /> }));
+vi.mock("../components/SixAllianceBracket", () => ({ default: () => <div data-testid="six-alliance-bracket-stub" /> }));
+vi.mock("../components/FourAllianceBracket", () => ({ default: () => <div data-testid="four-alliance-bracket-stub" /> }));
+vi.mock("../components/FourAllianceBracketFTC", () => ({ default: () => <div data-testid="four-alliance-bracket-ftc-stub" /> }));
+vi.mock("../components/TwoAllianceBracket", () => ({ default: () => <div data-testid="two-alliance-bracket-stub" /> }));
+vi.mock("../components/DaVinciTournamentBracket", () => ({ default: () => <div data-testid="davinci-bracket-stub" /> }));
+
 import { useSettings } from "../contexts/SettingsContext";
 import { useEventData } from "contexts/EventDataContext";
 import { useEventActions } from "contexts/EventActionsContext";
@@ -94,6 +102,7 @@ function setupMocks({ eventOverrides = {}, settingsOverrides = {} } = {}) {
         setPlayoffCountOverride: vi.fn(),
         allianceSelectionRoundOrder: null,
         setAllianceSelectionRoundOrder: vi.fn(),
+        nonStandardPlayoffs: false,
         ...settingsOverrides,
     });
 
@@ -194,5 +203,47 @@ describe("AllianceSelectionPage – round order modal descending label", () => {
         render(<AllianceSelectionPage {...baseProps()} />);
         fireEvent.click(screen.getByText("Reorder Alliance Selection"));
         expect(screen.getByText("Alliance 6 → 1")).toBeInTheDocument();
+    });
+});
+
+describe("AllianceSelectionPage – nonStandardPlayoffs", () => {
+    beforeEach(() => {
+        setupMocks();
+    });
+
+    it("shows info alert when nonStandardPlayoffs is enabled in playoffs mode", () => {
+        setupMocks({ settingsOverrides: { nonStandardPlayoffs: true } });
+        render(<AllianceSelectionPage {...baseProps({ playoffs: true })} />);
+        expect(screen.getByText(/Nonstandard playoff format is enabled/)).toBeInTheDocument();
+    });
+
+    it("does not show info alert when nonStandardPlayoffs is false in playoffs mode", () => {
+        setupMocks({ settingsOverrides: { nonStandardPlayoffs: false } });
+        render(<AllianceSelectionPage {...baseProps({ playoffs: true })} />);
+        expect(screen.queryByText(/Nonstandard playoff format is enabled/)).not.toBeInTheDocument();
+    });
+
+    it("does not show info alert when nonStandardPlayoffs is enabled but not in playoffs mode", () => {
+        setupMocks({ settingsOverrides: { nonStandardPlayoffs: true } });
+        render(<AllianceSelectionPage {...baseProps({ playoffs: false })} />);
+        expect(screen.queryByText(/Nonstandard playoff format is enabled/)).not.toBeInTheDocument();
+    });
+
+    it("hides bracket and shows info alert instead of bracket when nonStandardPlayoffs is enabled", () => {
+        setupMocks({ settingsOverrides: { nonStandardPlayoffs: true } });
+        render(<AllianceSelectionPage {...baseProps({ playoffs: true })} />);
+        expect(screen.queryByTestId("bracket-stub")).not.toBeInTheDocument();
+        expect(screen.getByText(/Nonstandard playoff format is enabled/)).toBeInTheDocument();
+    });
+
+    it("shows bracket when nonStandardPlayoffs is false in playoffs mode", () => {
+        setupMocks({
+            settingsOverrides: { nonStandardPlayoffs: false },
+            eventOverrides: {
+                alliances: { alliances: Array(8).fill({ captain: null, round1: null }), Lookup: {} },
+            },
+        });
+        render(<AllianceSelectionPage {...baseProps({ playoffs: true })} />);
+        expect(screen.getByTestId("bracket-stub")).toBeInTheDocument();
     });
 });

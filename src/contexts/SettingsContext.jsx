@@ -115,6 +115,10 @@ export function SettingsProvider({ children }) {
     "setting:useFourTeamAlliances",
     null
   );
+  const [nonStandardPlayoffs, setNonStandardPlayoffs] = usePersistentState(
+    "setting:nonStandardPlayoffs",
+    null
+  );
 
   // Event list filters
   const [eventFilters, setEventFilters] = usePersistentState(
@@ -198,6 +202,7 @@ export function SettingsProvider({ children }) {
     usePullDownToUpdate, setUsePullDownToUpdate,
     useScrollMemory, setUseScrollMemory,
     useFourTeamAlliances, setUseFourTeamAlliances,
+    nonStandardPlayoffs, setNonStandardPlayoffs,
     // Event list filters
     eventFilters, setEventFilters,
     regionFilters, setRegionFilters,
@@ -223,6 +228,7 @@ export function SettingsProvider({ children }) {
     highScoreMode, autoUpdate, awardsMenu, showQualsStats, showQualsStatsQuals,
     teamReduction, reverseEmcee, useSwipe, usePullDownToUpdate, useScrollMemory,
     useFourTeamAlliances,
+    nonStandardPlayoffs,
     eventFilters, regionFilters, timeFilter,
     rankingsOverride, allianceCount, playoffCountOverride, allianceSelectionRoundOrder,
     syncEvent, screenMode, screenModeSyncFrequency,
@@ -236,6 +242,7 @@ export function SettingsProvider({ children }) {
     setHighScoreMode, setAutoUpdate, setAwardsMenu, setShowQualsStats, setShowQualsStatsQuals,
     setTeamReduction, setReverseEmcee, setUseSwipe, setUsePullDownToUpdate, setUseScrollMemory,
     setUseFourTeamAlliances,
+    setNonStandardPlayoffs,
     setEventFilters, setRegionFilters, setTimeFilter,
     setRankingsOverride, setAllianceCount, setPlayoffCountOverride, setAllianceSelectionRoundOrder,
     setSyncEvent, setScreenMode, setScreenModeSyncFrequency,

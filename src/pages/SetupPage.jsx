@@ -132,7 +132,7 @@ function SetupPage({
   setUseOsTheme,
   appearanceDark,
 }) {
-  const { selectedEvent, selectedYear, eventLabel, ftcMode, teamList, qualSchedule, playoffSchedule, rankings, allianceCount } = useEventData();
+  const { selectedEvent, selectedYear, eventLabel, ftcMode, teamList, qualSchedule, playoffSchedule, rankings, alliances, allianceCount } = useEventData();
   const { setSelectedEvent, setSelectedYear, setFTCMode, getSchedule, getCommunityUpdates, getTeamList, getAlliances } = useEventActions();
     const {
         timeFormat, setTimeFormat, showSponsors, setShowSponsors, autoHideSponsors, setAutoHideSponsors,
@@ -156,6 +156,7 @@ function SetupPage({
         screenModeSyncFrequency, setScreenModeSyncFrequency,
         backgroundDataRefresh, setBackgroundDataRefresh,
         backgroundDataRefreshFrequency, setBackgroundDataRefreshFrequency,
+        nonStandardPlayoffs, setNonStandardPlayoffs,
     } = useSettings();
     const isOnline = useOnlineStatus();
     const PWASupported = (isChrome && Number(browserVersion) >= 76) || (isSafari && Number(browserVersion) >= 15 && Number(fullBrowserVersion.split(".")[1]) >= 4);
@@ -227,23 +228,26 @@ function SetupPage({
         return filterTemp
     }
 
-    const uploadLocalUpdates = () => {
-        var localUpdatesTemp = _.cloneDeep(localUpdates);
-        localUpdatesTemp.forEach(async function (update) {
-            var response = await putTeamData(update.teamNumber, update.update);
-            var errorText = "";
-            if (response.status !== 204) {
-                errorText = `Your update for team ${update.teamNumber} was not successful. We have preserved the change locally, and you can send it later from here.`;
-                toast.error(errorText);
-                throw new Error(errorText);
-            } else {
-                errorText = `Your update for team ${update.teamNumber} was successful.`;
-                localUpdatesTemp.splice(_.findIndex(localUpdatesTemp, { "teamNumber": update.teamNumber }), 1)
-                toast.success(errorText);
-            }
-        })
-
-        setLocalUpdates(localUpdatesTemp);
+    const uploadLocalUpdates = async () => {
+        const localUpdatesTemp = _.cloneDeep(localUpdates);
+        const results = await Promise.allSettled(
+            localUpdatesTemp.map(async (update) => {
+                const response = await putTeamData(update.teamNumber, update.update);
+                if (response.status !== 204) {
+                    const errorText = `Your update for team ${update.teamNumber} was not successful. We have preserved the change locally, and you can send it later from here.`;
+                    toast.error(errorText);
+                    throw new Error(errorText);
+                }
+                toast.success(`Your update for team ${update.teamNumber} was successful.`);
+                return update.teamNumber;
+            })
+        );
+        const successfulTeams = new Set(
+            results
+                .filter((r) => r.status === "fulfilled")
+                .map((r) => r.value)
+        );
+        setLocalUpdates(localUpdatesTemp.filter((u) => !successfulTeams.has(u.teamNumber)));
     }
 
     const deleteLocalUpdates = () => {
@@ -527,6 +531,12 @@ function SetupPage({
                         {selectedEvent?.value.dateStart && <p><b>Event Start: </b>{moment(selectedEvent?.value.dateStart, 'YYYY-MM-DDTHH:mm:ss').format('ddd, MMM Do YYYY')}</p>}
                         {selectedEvent?.value.dateEnd && <p><b>Event End: </b>{moment(selectedEvent?.value.dateEnd, 'YYYY-MM-DDTHH:mm:ss').format('ddd, MMM Do YYYY')}</p>}
                         <Alert variant={"danger"}><b>ADVANCED EVENT SETTINGS:</b><br />If your event includes non-competing teams in the team list, indicate the number of non-competing teams here. <b>THIS IS A RARE CONDITION</b><Select classNamePrefix="gatool-rs" options={teamReducer} value={teamReduction ? teamReduction : teamReducer[0]} onChange={setTeamReduction} isDisabled={!teamList?.teamCountTotal} /><br />
+                        {(selectedEvent?.value?.type === "OffSeason" || selectedEvent?.value?.type === "OffSeasonWithAzureSync") && <>
+                                <label style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "8px" }}>
+                                    <Switch checked={nonStandardPlayoffs === null ? false : nonStandardPlayoffs} onChange={setNonStandardPlayoffs} />
+                                    <span><b>Use nonstandard playoff format</b> — Enable when the event uses a playoff bracket or format that differs from the standard double-elimination bracket.</span>
+                                </label><br />
+                            </>}
                             {selectedEvent?.value?.type?.includes("OffSeason")
                                 ? "If your event requires a non-standard Alliance Count, you can override the Alliance Count here."
                                 : <span>If your event requires a reduced Alliance Count, you can override the Alliance Count here. <b>THIS SHOULD ONLY APPLY TO EVENTS WITH LESS THAN 26 TEAMS.</b></span>
@@ -534,7 +544,13 @@ function SetupPage({
                             <Select classNamePrefix="gatool-rs"
                                 options={selectedEvent?.value?.type?.includes("OffSeason") ? playoffOverrideMenuOffseason : playoffOverrideMenu}
                                 value={playoffCountOverride ? playoffCountOverride : (allianceCount?.menu ? allianceCount.menu : (selectedEvent?.value?.type?.includes("OffSeason") ? playoffOverrideMenuOffseason[0] : playoffOverrideMenu[0]))}
-                                onChange={setPlayoffCountOverride} />
+                                onChange={(val) => { setPlayoffCountOverride(val); getAlliances(undefined, val?.value); }} />
+                                {!ftcMode && (selectedEvent?.value?.type === "OffSeason" || selectedEvent?.value?.type === "OffSeasonWithAzureSync") && 
+                                <><br/><label style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "8px" }}>
+                                <Switch checked={useFourTeamAlliances === null ? false : useFourTeamAlliances} onChange={setUseFourTeamAlliances} />
+                                <span><b>Use 4 team Alliances for playoffs</b></span>
+                            </label></>
+                                }
                         </Alert>
                         <div>
                             {!ftcMode && (
@@ -566,12 +582,13 @@ function SetupPage({
                         {selectedEvent?.value.allianceCount === "SixAlliance" && <p><b>Playoff Type: </b>6 Alliance Playoffs</p>}
                         {selectedEvent?.value.allianceCount === "FourAlliance" && <p><b>Playoff Type: </b>4 Alliance Playoff</p>}
                         {selectedEvent?.value.allianceCount === "TwoAlliance" && <p><b>Playoff Type: </b>Best 2 out of 3 Playoff</p>}
-                        {qualSchedule?.scheduleLastModified && <p><b>Quals Schedule last updated: </b><br />{moment(qualSchedule?.scheduleLastModified).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
-                        {qualSchedule?.matchesLastModified && <p><b>Quals Results last updated: </b><br />{moment(qualSchedule?.matchesLastModified).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
-                        {playoffSchedule?.scheduleLastModified && <p><b>Playoff Schedule last updated: </b><br />{moment(playoffSchedule?.scheduleLastModified).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
-                        {playoffSchedule?.matchesLastModified && <p><b>Playoff Results last updated: </b><br />{moment(playoffSchedule?.matchesLastModified).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
-                        {teamList?.lastUpdate && <p><b>Team List last updated: </b><br />{moment(teamList?.lastUpdate).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
-                        {rankings?.lastModified && <p><b>Rankings last updated: </b><br />{moment(rankings?.lastModified).format("ddd, MMM Do YYYY, " + timeFormat.value)}</p>}
+                        {qualSchedule?.scheduleLastModified && <p><b>Quals Schedule last updated: </b><br />{moment(qualSchedule?.scheduleLastModified).format("ddd, MMM Do YYYY, " + timeFormat.value)}{qualSchedule?.dataSource && <> <span className="data-source-badge">via {qualSchedule.dataSource}</span></>}</p>}
+                        {qualSchedule?.matchesLastModified && <p><b>Quals Results last updated: </b><br />{moment(qualSchedule?.matchesLastModified).format("ddd, MMM Do YYYY, " + timeFormat.value)}{qualSchedule?.dataSource && <> <span className="data-source-badge">via {qualSchedule.dataSource}</span></>}</p>}
+                        {playoffSchedule?.scheduleLastModified && <p><b>Playoff Schedule last updated: </b><br />{moment(playoffSchedule?.scheduleLastModified).format("ddd, MMM Do YYYY, " + timeFormat.value)}{playoffSchedule?.dataSource && <> <span className="data-source-badge">via {playoffSchedule.dataSource}</span></>}</p>}
+                        {playoffSchedule?.matchesLastModified && <p><b>Playoff Results last updated: </b><br />{moment(playoffSchedule?.matchesLastModified).format("ddd, MMM Do YYYY, " + timeFormat.value)}{playoffSchedule?.dataSource && <> <span className="data-source-badge">via {playoffSchedule.dataSource}</span></>}</p>}
+                        {teamList?.lastUpdate && <p><b>Team List last updated: </b><br />{moment(teamList?.lastUpdate).format("ddd, MMM Do YYYY, " + timeFormat.value)}{selectedEvent?.value?.type === "OffSeason" && <> <span className="data-source-badge">via TBA</span></>}</p>}
+                        {rankings?.lastModified && <p><b>Rankings last updated: </b><br />{moment(rankings?.lastModified).format("ddd, MMM Do YYYY, " + timeFormat.value)}{rankings?.dataSource && <> <span className="data-source-badge">via {rankings.dataSource}</span></>}</p>}
+                        {alliances?.lastUpdate && <p><b>Alliances last updated: </b><br />{moment(alliances?.lastUpdate).format("ddd, MMM Do YYYY, " + timeFormat.value)}{alliances?.dataSource && <> <span className="data-source-badge">via {alliances.dataSource}</span></>}</p>}
                         {((isAuthenticated && user["https://gatool.org/roles"] && (user["https://gatool.org/roles"].indexOf("user") >= 0)) && localUpdates.length > 0) &&
                             <Alert>
                                 <p><b>You have {localUpdates.length === 1 ? "an update for team" : "updates for teams"} {_.sortBy(updatedTeamList).join(", ")} that can be uploaded to gatool Cloud.</b></p>
@@ -1038,14 +1055,6 @@ function SetupPage({
                                         <b>Enable Test Match Mode. If you enable this mode, you will need to enter team numbers on the Announce Screen. This will disable match navigation.</b>
                                     </td>
                                 </tr>
-                                {!ftcMode && (selectedEvent?.value?.type === "OffSeason" || selectedEvent?.value?.type === "OffSeasonWithAzureSync") && <tr>
-                                    <td>
-                                        <Switch checked={useFourTeamAlliances === null ? false : useFourTeamAlliances} onChange={setUseFourTeamAlliances} />
-                                    </td>
-                                    <td>
-                                        <b>Use 4 team Alliances for playoffs</b>
-                                    </td>
-                                </tr>}
                                 {!ftcMode && selectedEvent?.value?.type === "OffSeason" && <tr>
                                     <td>
                                         <Switch checked={useCheesyArena === null ? false : useCheesyArena} onChange={handleUseCheesy} />

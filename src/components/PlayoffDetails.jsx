@@ -121,7 +121,7 @@ function PlayoffDetails({
   ];
 
   _.forEach(
-    byeCount[playoffCountOverride?.value || 8].replacementMatchClasses,
+    (byeCount[playoffCountOverride?.value || 8] ?? byeCount[8]).replacementMatchClasses,
     (match) => {
       var tempClass = _.findIndex(matchClasses, {
         matchNumber: match.matchNumber,
@@ -149,7 +149,7 @@ function PlayoffDetails({
       })[0]
     : null;
 
-  if (matchDetails?.tournamentLevel.toLowerCase() === "playoff") {
+  if (matchDetails?.tournamentLevel?.toLowerCase() === "playoff") {
     // In FTC mode, Red (higher seed) starts with an advantage: Red has 0 losses, Blue has 1 loss
     // This means Red needs 1 win to win the series, Blue needs 2 wins
     // Initialize: Red starts with advantage of 1 (equivalent to Blue having 1 loss)
