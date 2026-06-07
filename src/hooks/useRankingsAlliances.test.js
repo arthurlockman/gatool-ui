@@ -8,6 +8,17 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { waitFor } from "@testing-library/react";
 import { http, HttpResponse } from "msw";
 
+// Prevent usePersistentState from loading stale event state from previous
+// tests via localforage and overwriting Seeder-injected context values.
+vi.mock("localforage", () => ({
+  default: {
+    getItem: vi.fn().mockResolvedValue(null),
+    setItem: vi.fn().mockResolvedValue(null),
+    removeItem: vi.fn().mockResolvedValue(null),
+    clear: vi.fn().mockResolvedValue(null),
+  },
+}));
+
 import { renderHookWithProviders } from "../test/renderHook";
 import { createTestHttpClient } from "../test/httpClient";
 import { server } from "../test/server";
