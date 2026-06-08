@@ -8,6 +8,7 @@ export const appUpdates = [
         <li>FTC:</li>
         <ul>
           <li>3-Team Alliances are now supported for FTC events</li>
+          <li>Proper support for offseason demo teams in FTC events</li>
         </ul>
       </ul>
       </>

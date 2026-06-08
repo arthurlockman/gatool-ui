@@ -539,7 +539,7 @@ function SetupPage({
                             </>}
                             {selectedEvent?.value?.type?.includes("OffSeason")
                                 ? "If your event requires a non-standard Alliance Count, you can override the Alliance Count here."
-                                : <span>If your event requires a reduced Alliance Count, you can override the Alliance Count here. <b>THIS SHOULD ONLY APPLY TO EVENTS WITH LESS THAN 26 TEAMS.</b></span>
+                                : <span>If your event requires a reduced Alliance Count, you can override the Alliance Count here. {!ftcMode && <b>THIS SHOULD ONLY APPLY TO EVENTS WITH LESS THAN 26 TEAMS.</b>}</span>
                             }
                             <Select classNamePrefix="gatool-rs"
                                 options={selectedEvent?.value?.type?.includes("OffSeason") ? playoffOverrideMenuOffseason : playoffOverrideMenu}
@@ -551,7 +551,7 @@ function SetupPage({
                                 <span><b>Use 4 team Alliances for playoffs</b></span>
                             </label></>
                                 }
-                                {ftcMode && ["2", "4", "7", "10", "17"].includes(selectedEvent?.value?.type) &&
+                                {ftcMode && ["0", "10", "17"].includes(selectedEvent?.value?.type) &&
                                 <><br/><label style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "8px" }}>
                                 <Switch checked={useFourTeamAlliances === null ? false : useFourTeamAlliances} onChange={setUseFourTeamAlliances} />
                                 <span><b>Use 3 team Alliances for playoffs</b></span>
