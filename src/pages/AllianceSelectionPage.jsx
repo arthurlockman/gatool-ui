@@ -53,6 +53,7 @@ function AllianceSelectionPage({
     const [roundOrderDraft, setRoundOrderDraft] = useState(null);
 
     const isOffseason = selectedEvent?.value?.type?.includes("OffSeason");
+    const isFTCThreeTeamEligible = !!(ftcMode && ["2", "4", "7", "10", "17"].includes(selectedEvent?.value?.type));
     const inChamps = !!(
         selectedEvent?.value?.champLevel === "CHAMPS" ||
         selectedEvent?.value?.champLevel === "CMPDIV" ||
@@ -259,7 +260,7 @@ function AllianceSelectionPage({
                 </div>}
             {selectedEvent && ((qualSchedule?.schedule?.length > 0 || qualSchedule?.schedule?.schedule?.length > 0 || practiceSchedule?.schedule?.length > 0) && !playoffs && (allianceSelection || overrideAllianceSelection)) &&
                 <div>
-                    {isOffseason && (
+                    {(isOffseason || isFTCThreeTeamEligible) && (
                         <Alert variant="warning">
                             <Row className="align-items-center justify-content-center">
                                 <Col xs="auto"><b>Alliance Count Override:</b></Col>
@@ -274,12 +275,12 @@ function AllianceSelectionPage({
                                         Reorder Alliance Selection
                                     </Button>
                                 </Col>
-                                {!ftcMode && (
+                                {(!ftcMode || isFTCThreeTeamEligible) && (
                                     <Col xs="auto" className="d-flex align-items-center gap-2">
                                         <Switch
                                             checked={useFourTeamAlliances === null ? false : useFourTeamAlliances}
                                             onChange={setUseFourTeamAlliances} />
-                                        <b>Use 4 team Alliances for playoffs</b>
+                                        <b>{ftcMode ? "Use 3 team Alliances" : "Use 4 team Alliances for playoffs"}</b>
                                     </Col>
                                 )}
                             </Row>
