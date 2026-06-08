@@ -259,7 +259,7 @@ function makeFTCEvent(type) {
 
 describe("AllianceSelectionPage – FTC 3-team alliances switch", () => {
     beforeEach(() => {
-        setupMocks({ eventOverrides: { ftcMode: true, selectedEvent: makeFTCEvent("2") } });
+        setupMocks({ eventOverrides: { ftcMode: true, selectedEvent: makeFTCEvent("10") } });
     });
 
     it.each(["0", "10", "17"])(
@@ -310,7 +310,7 @@ describe("AllianceSelectionPage – FTC 3-team alliances switch", () => {
 
     it("shows the switch checked when useFourTeamAlliances is true in FTC mode", () => {
         setupMocks({
-            eventOverrides: { ftcMode: true, selectedEvent: makeFTCEvent("2") },
+            eventOverrides: { ftcMode: true, selectedEvent: makeFTCEvent("10") },
             settingsOverrides: { useFourTeamAlliances: true },
         });
         render(<AllianceSelectionPage {...baseProps()} />);
