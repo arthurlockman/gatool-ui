@@ -545,10 +545,16 @@ function SetupPage({
                                 options={selectedEvent?.value?.type?.includes("OffSeason") ? playoffOverrideMenuOffseason : playoffOverrideMenu}
                                 value={playoffCountOverride ? playoffCountOverride : (allianceCount?.menu ? allianceCount.menu : (selectedEvent?.value?.type?.includes("OffSeason") ? playoffOverrideMenuOffseason[0] : playoffOverrideMenu[0]))}
                                 onChange={(val) => { setPlayoffCountOverride(val); getAlliances(undefined, val?.value); }} />
-                                {!ftcMode && (selectedEvent?.value?.type === "OffSeason" || selectedEvent?.value?.type === "OffSeasonWithAzureSync") && 
+                                {!ftcMode && (selectedEvent?.value?.type === "OffSeason" || selectedEvent?.value?.type === "OffSeasonWithAzureSync") &&
                                 <><br/><label style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "8px" }}>
                                 <Switch checked={useFourTeamAlliances === null ? false : useFourTeamAlliances} onChange={setUseFourTeamAlliances} />
                                 <span><b>Use 4 team Alliances for playoffs</b></span>
+                            </label></>
+                                }
+                                {ftcMode && ["2", "4", "7", "10", "17"].includes(selectedEvent?.value?.type) &&
+                                <><br/><label style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "8px" }}>
+                                <Switch checked={useFourTeamAlliances === null ? false : useFourTeamAlliances} onChange={setUseFourTeamAlliances} />
+                                <span><b>Use 3 team Alliances for playoffs</b></span>
                             </label></>
                                 }
                         </Alert>

@@ -247,3 +247,80 @@ describe("AllianceSelectionPage – nonStandardPlayoffs", () => {
         expect(screen.getByTestId("bracket-stub")).toBeInTheDocument();
     });
 });
+
+// ─── FTC 3-team alliances ─────────────────────────────────────────────────────
+
+function makeFTCEvent(type) {
+    return {
+        value: { type, code: `FTC${type}`, champLevel: "" },
+        label: `FTC Event type ${type}`,
+    };
+}
+
+describe("AllianceSelectionPage – FTC 3-team alliances switch", () => {
+    beforeEach(() => {
+        setupMocks({ eventOverrides: { ftcMode: true, selectedEvent: makeFTCEvent("2") } });
+    });
+
+    it.each(["2", "4", "7", "10", "17"])(
+        "shows '3 team Alliances' switch for FTC event type %s",
+        (type) => {
+            useEventData.mockReturnValue({ ...useEventData(), ftcMode: true, selectedEvent: makeFTCEvent(type) });
+            render(<AllianceSelectionPage {...baseProps()} />);
+            expect(screen.getByText("Use 3 team Alliances")).toBeInTheDocument();
+        }
+    );
+
+    it.each(["2", "4", "7", "10", "17"])(
+        "shows Alliance Count Override for FTC event type %s",
+        (type) => {
+            useEventData.mockReturnValue({ ...useEventData(), ftcMode: true, selectedEvent: makeFTCEvent(type) });
+            render(<AllianceSelectionPage {...baseProps()} />);
+            expect(screen.getByText("Alliance Count Override:")).toBeInTheDocument();
+        }
+    );
+
+    it.each(["2", "4", "7", "10", "17"])(
+        "shows Reorder Alliance Selection button for FTC event type %s",
+        (type) => {
+            useEventData.mockReturnValue({ ...useEventData(), ftcMode: true, selectedEvent: makeFTCEvent(type) });
+            render(<AllianceSelectionPage {...baseProps()} />);
+            expect(screen.getByText("Reorder Alliance Selection")).toBeInTheDocument();
+        }
+    );
+
+    it("does not show alliance controls for non-eligible FTC type (League Meet = '1')", () => {
+        useEventData.mockReturnValue({ ...useEventData(), ftcMode: true, selectedEvent: makeFTCEvent("1") });
+        render(<AllianceSelectionPage {...baseProps()} />);
+        expect(screen.queryByText("Use 3 team Alliances")).not.toBeInTheDocument();
+        expect(screen.queryByText("Alliance Count Override:")).not.toBeInTheDocument();
+        expect(screen.queryByText("Reorder Alliance Selection")).not.toBeInTheDocument();
+    });
+
+    it("does not show alliance controls for non-eligible FTC type (FIRST Championship = '6')", () => {
+        useEventData.mockReturnValue({ ...useEventData(), ftcMode: true, selectedEvent: makeFTCEvent("6") });
+        render(<AllianceSelectionPage {...baseProps()} />);
+        expect(screen.queryByText("Use 3 team Alliances")).not.toBeInTheDocument();
+    });
+
+    it("does not show 'Use 4 team Alliances for playoffs' label in FTC mode", () => {
+        render(<AllianceSelectionPage {...baseProps()} />);
+        expect(screen.queryByText("Use 4 team Alliances for playoffs")).not.toBeInTheDocument();
+    });
+
+    it("shows the switch checked when useFourTeamAlliances is true in FTC mode", () => {
+        setupMocks({
+            eventOverrides: { ftcMode: true, selectedEvent: makeFTCEvent("2") },
+            settingsOverrides: { useFourTeamAlliances: true },
+        });
+        render(<AllianceSelectionPage {...baseProps()} />);
+        expect(screen.getByText("Use 3 team Alliances")).toBeInTheDocument();
+        const checkbox = document.querySelector("input[type='checkbox']");
+        expect(checkbox?.checked).toBe(true);
+    });
+
+    it("does not show alliance controls in playoffs mode (controls only in selection phase)", () => {
+        render(<AllianceSelectionPage {...baseProps({ playoffs: true })} />);
+        expect(screen.queryByText("Use 3 team Alliances")).not.toBeInTheDocument();
+    });
+});

@@ -1,5 +1,18 @@
 export const appUpdates = [
   {
+    date: "June 7, 2026",
+    message: (
+      <>
+      <b>OFFSEASON UPDATES</b><br />
+      <ul>
+        <li>FTC:</li>
+        <ul>
+          <li>3-Team Alliances are now supported for FTC events</li>
+        </ul>
+      </ul>
+      </>
+    ),
+  },{
     date: "June 5, 2026",
     message: (
       <>
