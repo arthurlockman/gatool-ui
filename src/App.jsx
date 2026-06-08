@@ -600,8 +600,11 @@ function App() {
    * @returns {Promise<string>} The effective team number for API calls
    */
   const getEffectiveTeamNumber = async (teamNumber, eventCode = null, tbaEventKey = null) => {
-    // Check if team number is a demo team (9970-9999) and NOT in FTC mode
-    if (teamNumber >= 9970 && teamNumber <= 9999 && !ftcMode) {
+    // FRC demo teams: 9970-9999 (non-FTC mode)
+    // FTC demo teams: 99900-99999 (FTC mode)
+    const isFRCDemo = !ftcMode && teamNumber >= 9970 && teamNumber <= 9999;
+    const isFTCDemo = ftcMode && teamNumber >= 99900 && teamNumber <= 99999;
+    if (isFRCDemo || isFTCDemo) {
       // Use eventCode if available
       if (eventCode) {
         return `${eventCode}_${teamNumber}`;

@@ -590,7 +590,7 @@ function PlayByPlayPage({
                       remapNumberToString={remapNumberToString}
                     />
                   </tr>
-                  {(!ftcMode || (inPlayoffs && ftcMode && (selectedEvent?.value?.champLevel === "CHAMPS" || selectedEvent?.value?.champLevel === "CMPDIV" || selectedEvent?.value?.champLevel === "CMPSUB"))) && (
+                  {(!ftcMode || (inPlayoffs && ftcMode && (selectedEvent?.value?.champLevel === "CHAMPS" || selectedEvent?.value?.champLevel === "CMPDIV" || selectedEvent?.value?.champLevel === "CMPSUB")) || (inPlayoffs && ftcMode && useFourTeamAlliances) || (adHocMode && ftcMode)) && (
                     <tr className={"gatool-playbyplay"}>
                       <PlayByPlay
                         station={displayOrder[4]}

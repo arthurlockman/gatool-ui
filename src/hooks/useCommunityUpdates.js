@@ -160,8 +160,12 @@ export function useCommunityUpdates({
                 teamNumber: typeof team.teamNumber === 'string' ? parseInt(team.teamNumber) : team.teamNumber
               }));
 
-              // Demo teams (9970-9999) are always keyed by event in the API. Always fetch their
+              // Demo teams are always keyed by event in the API. Always fetch their
               // community updates from the event-prefixed endpoint so edits don't get overwritten by bulk data.
+              // FRC demo teams: 9970-9999. FTC demo teams: 99900-99999.
+              const isDemoTeam = ftcMode
+                ? (n) => n >= 99900 && n <= 99999
+                : (n) => n >= 9970 && n <= 9999;
               const demoTeamNumbers = new Set();
               const collectDemoTeams = (scheduleObj) => {
                 const matchList = Array.isArray(scheduleObj) ? scheduleObj : (scheduleObj?.schedule ?? []);
@@ -170,7 +174,7 @@ export function useCommunityUpdates({
                   const list = match?.teams ?? match?.schedule?.teams ?? [];
                   (Array.isArray(list) ? list : []).forEach((t) => {
                     const num = t?.teamNumber;
-                    if (num != null && num >= 9970 && num <= 9999) demoTeamNumbers.add(num);
+                    if (num != null && isDemoTeam(num)) demoTeamNumbers.add(num);
                   });
                 });
               };
@@ -178,10 +182,8 @@ export function useCommunityUpdates({
               collectDemoTeams(playoffSchedule?.schedule ?? playoffSchedule);
               (teamList?.teams ?? []).forEach((t) => {
                 const num = t?.teamNumber;
-                if (num != null && num >= 9970 && num <= 9999) demoTeamNumbers.add(num);
+                if (num != null && isDemoTeam(num)) demoTeamNumbers.add(num);
               });
-              // Remove any demo teams from bulk response so we always use event-keyed data for them
-              const isDemoTeam = (n) => n >= 9970 && n <= 9999;
               teams = (teams || []).filter((t) => !isDemoTeam(t.teamNumber));
               if (demoTeamNumbers.size > 0) {
                 const eventCode = selectedEvent?.value?.code ?? null;
