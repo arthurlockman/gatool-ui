@@ -8,7 +8,7 @@ import DaVinciTournamentBracket from "components/DaVinciTournamentBracket";
 import TwoAllianceBracket from "components/TwollianceBracket";
 import moment from "moment/moment";
 import AllianceSelection from "../components/AllianceSelection";
-import { playoffOverrideMenuOffseason } from "../data/appConfig";
+import { playoffOverrideMenuFTC, playoffOverrideMenuOffseason } from "../data/appConfig";
 import { useState, useEffect, useRef } from "react";
 import Switch from "react-switch";
 import { useHotkeysContext, useHotkeys } from "react-hotkeys-hook";
@@ -266,8 +266,8 @@ function AllianceSelectionPage({
                                 <Col xs="auto"><b>Alliance Count Override:</b></Col>
                                 <Col xs={3}>
                                     <Select classNamePrefix="gatool-rs"
-                                        options={playoffOverrideMenuOffseason}
-                                        value={playoffCountOverride ? playoffCountOverride : (allianceCount?.menu ? allianceCount.menu : playoffOverrideMenuOffseason[0])}
+                                        options={ftcMode ? playoffOverrideMenuFTC : playoffOverrideMenuOffseason}
+                                        value={playoffCountOverride ? playoffCountOverride : (allianceCount?.menu ? allianceCount.menu : (ftcMode ? playoffOverrideMenuFTC[0] : playoffOverrideMenuOffseason[0]))}
                                         onChange={setPlayoffCountOverride} />
                                 </Col>
                                 <Col xs="auto">
