@@ -53,7 +53,7 @@ function AllianceSelectionPage({
     const [roundOrderDraft, setRoundOrderDraft] = useState(null);
 
     const isOffseason = selectedEvent?.value?.type?.includes("OffSeason");
-    const isFTCThreeTeamEligible = !!(ftcMode && ["2", "4", "7", "10", "17"].includes(selectedEvent?.value?.type));
+    const isFTCThreeTeamEligible = !!(ftcMode && ["0", "10", "17"].includes(selectedEvent?.value?.type));
     const inChamps = !!(
         selectedEvent?.value?.champLevel === "CHAMPS" ||
         selectedEvent?.value?.champLevel === "CMPDIV" ||
