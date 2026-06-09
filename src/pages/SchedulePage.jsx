@@ -13,7 +13,7 @@ import { toast } from "react-toastify";
 import _ from "lodash";
 import Switch from "react-switch";
 import { useState } from "react";
-import { playoffOverrideMenu } from "data/appConfig";
+import { playoffOverrideMenu, playoffOverrideMenuFTC } from "data/appConfig";
 import ScoresDetailsModal, { rankPointDisplay } from "components/ScoresDetailsModal";
 import AdjustAlliancesModal from "components/AdjustAlliancesModal";
 import {
@@ -629,13 +629,13 @@ function SchedulePage({
                                   a Playoff Schedule.
                                 </b>
                                 <Select
-                                  options={playoffOverrideMenu}
+                                  options={ftcMode ? playoffOverrideMenuFTC : playoffOverrideMenu}
                                   value={
                                     playoffCountOverride
                                       ? playoffCountOverride
                                       : allianceCount?.menu
                                       ? allianceCount.menu
-                                      : playoffOverrideMenu[0]
+                                      : ftcMode ? playoffOverrideMenuFTC[0] : playoffOverrideMenu[0]
                                   }
                                   onChange={setPlayoffCountOverride}
                                 />
@@ -832,13 +832,13 @@ function SchedulePage({
                             Playoff Schedule.
                           </b>
                           <Select
-                            options={playoffOverrideMenu}
+                            options={ftcMode ? playoffOverrideMenuFTC : playoffOverrideMenu}
                             value={
                               playoffCountOverride
                                 ? playoffCountOverride
                                 : allianceCount?.menu
                                 ? allianceCount.menu
-                                : playoffOverrideMenu[0]
+                                : ftcMode ? playoffOverrideMenuFTC[0] : playoffOverrideMenu[0]
                             }
                             onChange={setPlayoffCountOverride}
                           />

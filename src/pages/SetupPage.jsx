@@ -9,7 +9,7 @@ import { useOnlineStatus } from "../contextProviders/OnlineContext";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { isSafari, isChrome, fullBrowserVersion, browserVersion, isIOS, browserName, isDesktop, isTablet, isMobile } from "react-device-detect";
-import { playoffOverrideMenu, playoffOverrideMenuOffseason } from "data/appConfig";
+import { playoffOverrideMenu, playoffOverrideMenuFTC, playoffOverrideMenuOffseason } from "data/appConfig";
 import { useSettings } from "contexts/SettingsContext";
 import { useEventData } from "contexts/EventDataContext";
 import { useEventActions } from "contexts/EventActionsContext";
@@ -295,6 +295,9 @@ function SetupPage({
         setTimeFilter({ label: "All Events", value: "all" });
         setSelectedEvent(null);
         setSelectedYear(checked.value === "FRC" ? supportedYears[0] : FTCSupportedYears[0]);
+        setNonStandardPlayoffs(null);
+        setPlayoffCountOverride(null);
+        setUseFourTeamAlliances(null);
     }
 
     const handleEventNotification = (property, index, value, user) => {
@@ -542,8 +545,8 @@ function SetupPage({
                                 : <span>If your event requires a reduced Alliance Count, you can override the Alliance Count here. {!ftcMode && <b>THIS SHOULD ONLY APPLY TO EVENTS WITH LESS THAN 26 TEAMS.</b>}</span>
                             }
                             <Select classNamePrefix="gatool-rs"
-                                options={selectedEvent?.value?.type?.includes("OffSeason") ? playoffOverrideMenuOffseason : playoffOverrideMenu}
-                                value={playoffCountOverride ? playoffCountOverride : (allianceCount?.menu ? allianceCount.menu : (selectedEvent?.value?.type?.includes("OffSeason") ? playoffOverrideMenuOffseason[0] : playoffOverrideMenu[0]))}
+                                options={ftcMode ? playoffOverrideMenuFTC : (selectedEvent?.value?.type?.includes("OffSeason") ? playoffOverrideMenuOffseason : playoffOverrideMenu)}
+                                value={playoffCountOverride ? playoffCountOverride : (allianceCount?.menu ? allianceCount.menu : (ftcMode ? playoffOverrideMenuFTC[0] : (selectedEvent?.value?.type?.includes("OffSeason") ? playoffOverrideMenuOffseason[0] : playoffOverrideMenu[0])))}
                                 onChange={(val) => { setPlayoffCountOverride(val); getAlliances(undefined, val?.value); }} />
                                 {!ftcMode && (selectedEvent?.value?.type === "OffSeason" || selectedEvent?.value?.type === "OffSeasonWithAzureSync") &&
                                 <><br/><label style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "8px" }}>

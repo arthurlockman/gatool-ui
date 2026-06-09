@@ -73,6 +73,13 @@ export const playoffOverrideMenu = [
   { value: 4, label: 4 },
 ];
 
+export const playoffOverrideMenuFTC = [
+  { value: 8, label: 8 },
+  { value: 6, label: 6 },
+  { value: 4, label: 4 },
+  { value: 2, label: 2 },
+];
+
 export const playoffOverrideMenuOffseason = [
   { value: 16, label: 16 },
   { value: 15, label: 15 },
