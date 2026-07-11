@@ -1,5 +1,21 @@
 export const appUpdates = [
   {
+    date: "June 22, 2026",
+    message: (
+      <>
+      <b>OFFSEASON UPDATES</b><br />
+      <ul>
+        <li>FIRST Global:</li>
+        <ul>
+          <li>Adding support for FIRST Global</li>
+          <li>Users can now select FIRST Global and filter matches by Field Set</li>
+          <li>Team data can be updated per country</li>
+          <li>Includes Cheat Sheet and flash cards for FIRST Global</li>
+        </ul>
+      </ul>
+      </>
+    ),
+  },{
     date: "June 7, 2026",
     message: (
       <>

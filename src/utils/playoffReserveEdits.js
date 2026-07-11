@@ -100,7 +100,10 @@ function scheduleMatchMatchesPending(m, pending, ftcMode) {
   const tl1 = String(m.tournamentLevel || "").toLowerCase();
   const tl2 = String(pending.tournamentLevel || "").toLowerCase();
   if (tl1 !== tl2) return false;
-  if (ftcMode) {
+  // FTC uses series-based matching; FRC and FIRST Global use matchNumber
+  // FTC uses series-based matching; FRC and FIRST Global use matchNumber
+  const useSeries = !!ftcMode && ftcMode?.value !== "FIRSTGlobal";
+  if (useSeries) {
     const pSer = pending.series;
     const mSer = m.series;
     if (pSer != null && mSer != null && Number(pSer) !== Number(mSer)) {

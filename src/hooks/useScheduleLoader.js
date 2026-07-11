@@ -17,8 +17,8 @@ import { extendFTCPlayoffScheduleWithPartialMatches } from "../utils/ftcPlayoffS
 import { prunePlayoffReserveSetsAfterPostedMatches } from "../utils/playoffReserveEdits";
 import { useEventSelection } from "../contexts/EventSelectionContext";
 import { useSettings } from "../contexts/SettingsContext";
+import { getApiBaseUrl, isFirstGlobalMode, fgBaseURL } from "../utils/programConstants";
 
-const ftcBaseURL = "https://api.gatool.org/ftc/v2/";
 
 /**
  * Hook that owns the getSchedule function — the core schedule-fetching orchestrator.
@@ -59,6 +59,7 @@ export function useScheduleLoader(deps, opts = {}) {
     training,
     // State setters
     setQualSchedule,
+    setQualScheduleAllFields,
     setPlayoffSchedule,
     setPracticeSchedule,
     setQualsLength,
@@ -189,6 +190,8 @@ export function useScheduleLoader(deps, opts = {}) {
     var playoffschedule = null;
     var playoffScores = null;
     var qualslength = 0;
+    var firstGlobalTotalQuals = null; // total qual count across all fields (used for qualsLength when fieldset filter is active)
+    var firstGlobalAllQuals = null; // all-fields normalized qual matches (used for completedMatchCount)
     var qualScheduleFromTBA = false;
     var playoffScheduleFromTBA = false;
     var playoffUsedNexus = false;
@@ -244,7 +247,7 @@ export function useScheduleLoader(deps, opts = {}) {
         // get the practice schedule from FIRST API
         const practiceResult = await httpClient.getNoAuth(
           `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/practice`,
-          ftcMode ? ftcBaseURL : undefined,
+          getApiBaseUrl(ftcMode),
           undefined,
           undefined,
           signal()
@@ -502,9 +505,12 @@ export function useScheduleLoader(deps, opts = {}) {
           }
         }
       } else if (!useFTCOffline) {
+        const qualPath = isFirstGlobalMode(ftcMode)
+          ? `${selectedYear?.value}/matches/t2`
+          : `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/qual`;
         const qualsResult = await httpClient.getNoAuth(
-          `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/qual`,
-          ftcMode ? ftcBaseURL : undefined,
+          qualPath,
+          getApiBaseUrl(ftcMode),
           undefined,
           undefined,
           signal()
@@ -512,6 +518,31 @@ export function useScheduleLoader(deps, opts = {}) {
         if (qualsResult.status === 200) {
           // @ts-ignore
           qualschedule = await qualsResult.json();
+          // FIRST Global: normalize { matches: [...] } → { schedule: { schedule: [...] } },
+          // populate actualStartTime/startTime from autoStartTime for played matches,
+          // and filter by selected fieldset using the fieldNumber property
+          if (isFirstGlobalMode(ftcMode)) {
+            const allMatches = qualschedule?.matches || qualschedule?.schedule?.schedule || [];
+            const fieldset = selectedEvent?.value?.fieldset;
+            const normalized = allMatches.map((match) => {
+              const hasResult = match.scoreRedFinal != null || match.scoreBlueFinal != null;
+              return {
+                ...match,
+                startTime: match.startTime || match.autoStartTime,
+                actualStartTime: match.actualStartTime || (hasResult ? match.autoStartTime : null),
+              };
+            });
+            const hasFieldsetFilter = fieldset && selectedEvent?.value?.fieldsetIndex !== -1;
+            // Store the complete unfiltered schedule for high score computation across all fields
+            setQualScheduleAllFields(hasFieldsetFilter ? { schedule: { schedule: normalized } } : null);
+            // Always track total qual count so qualsLength reflects all fields (not just filtered fieldset)
+            firstGlobalTotalQuals = normalized.length;
+            firstGlobalAllQuals = normalized;
+            const filtered = hasFieldsetFilter
+              ? normalized.filter((match) => fieldset.includes(match.fieldNumber))
+              : normalized;
+            qualschedule = { schedule: { schedule: filtered } };
+          }
         }
       }
     } else {
@@ -543,9 +574,12 @@ export function useScheduleLoader(deps, opts = {}) {
       qualschedule?.schedule?.schedule?.length > 0 &&
       selectedEvent?.value?.type !== "OffSeason" && !qualScheduleFromTBA
     ) {
+      const qualScorePath = isFirstGlobalMode(ftcMode)
+        ? `${selectedYear?.value}/scores/t2`
+        : `${selectedYear?.value}/scores/${selectedEvent?.value.code}/qual`;
       const qualsScoresResult = await httpClient.getNoAuth(
-        `${selectedYear?.value}/scores/${selectedEvent?.value.code}/qual`,
-        ftcMode ? ftcBaseURL : undefined,
+        qualScorePath,
+        getApiBaseUrl(ftcMode),
         undefined,
         undefined,
         signal()
@@ -590,10 +624,14 @@ export function useScheduleLoader(deps, opts = {}) {
         })[0];
         if (matchResults) {
           match.scores = matchResults;
-          match.scoreRedFinal = matchResults.alliances?.[1]?.totalPoints;
-          match.scoreBlueFinal = matchResults.alliances?.[0]?.totalPoints;
+          // FIRST Global: alliances[0]=Red, alliances[1]=Blue (named via .alliance field)
+          // FRC/FTC: alliances[0]=Blue, alliances[1]=Red
+          const redIdx = matchResults.alliances?.[0]?.alliance === "Red" ? 0 : 1;
+          const blueIdx = redIdx === 0 ? 1 : 0;
+          match.scoreRedFinal = matchResults.alliances?.[redIdx]?.totalPoints;
+          match.scoreBlueFinal = matchResults.alliances?.[blueIdx]?.totalPoints;
           // @ts-ignore - FRC may use "BonusAchieved" or "Achieved" in key names for ranking points
-          match.redRP = _.pickBy(matchResults.alliances[1], (value, key) => {
+          match.redRP = _.pickBy(matchResults.alliances[redIdx], (value, key) => {
             return (
               key === "rp" ||
               key.endsWith("BonusAchieved") ||
@@ -602,7 +640,7 @@ export function useScheduleLoader(deps, opts = {}) {
             );
           });
           // @ts-ignore
-          match.blueRP = _.pickBy(matchResults.alliances[0], (value, key) => {
+          match.blueRP = _.pickBy(matchResults.alliances[blueIdx], (value, key) => {
             return (
               key === "rp" ||
               key.endsWith("BonusAchieved") ||
@@ -653,9 +691,12 @@ export function useScheduleLoader(deps, opts = {}) {
     var completedMatchCount = 0;
 
     if (qualschedule?.schedule?.length > 0) {
+      // For FIRST Global, count completed matches across ALL fields so that lastMatchPlayed
+      // places playoff positions correctly (totalQuals + playoffPlayed), not filtered count.
+      const countSource = firstGlobalAllQuals ?? qualschedule.schedule;
       completedMatchCount =
-        qualschedule?.schedule?.length -
-        _.filter(qualschedule.schedule, { actualStartTime: null }).length;
+        countSource.length -
+        _.filter(countSource, { actualStartTime: null }).length;
       // clear the Practice schedule if there is one loaded and there are matches in the schedule
       if (moment().isAfter(qualschedule?.schedule[0].startTime)) {
         console.log("It's after matches start. Resetting Practice Schedule");
@@ -669,6 +710,8 @@ export function useScheduleLoader(deps, opts = {}) {
       qualschedule.dataSource = "Cheesy Arena";
     } else if (useFTCOffline) {
       qualschedule.dataSource = "FTC Local Server";
+    } else if (isFirstGlobalMode(ftcMode)) {
+      qualschedule.dataSource = "FIRST Global";
     } else if (ftcMode) {
       qualschedule.dataSource = "FTC API";
     } else if (selectedEvent?.value?.type === "OffSeason") {
@@ -701,7 +744,9 @@ export function useScheduleLoader(deps, opts = {}) {
     ) {
       qualslength = practiceschedule?.schedule?.length;
     } else if (qualschedule?.schedule?.length > 0) {
-      qualslength = qualschedule?.schedule?.length;
+      // For FIRST Global, use the total qual count across all fields so that
+      // playoff match numbers are correct regardless of which fieldset is filtered
+      qualslength = firstGlobalTotalQuals ?? qualschedule?.schedule?.length;
     } else if (isOfflineEvent && qualSchedule?.schedule?.length > 0) {
       // Use the existing uploaded schedule length for OFFLINE events
       qualslength = qualSchedule?.schedule?.length;
@@ -1022,16 +1067,52 @@ export function useScheduleLoader(deps, opts = {}) {
           }
         }
       } else if (!useFTCOffline) {
-        const playoffResult = await httpClient.getNoAuth(
-          `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/playoff`,
-          ftcMode ? ftcBaseURL : undefined,
-          undefined,
-          undefined,
-          signal()
-        );
-        if (playoffResult.status === 200) {
-          // @ts-ignore
-          playoffschedule = await playoffResult.json();
+        if (isFirstGlobalMode(ftcMode)) {
+          // FIRST Global: combine t3 (playoff) and t4 (finals) into one schedule
+          const [t3Result, t4Result] = await Promise.all([
+            httpClient.getNoAuth(`${selectedYear?.value}/matches/t3`, fgBaseURL, undefined, undefined, signal()),
+            httpClient.getNoAuth(`${selectedYear?.value}/matches/t4`, fgBaseURL, undefined, undefined, signal()),
+          ]);
+          let combinedMatches = [];
+          const normalizeFGMatch = (m, matchNumberOverride) => {
+            const hasResult = m.scoreRedFinal != null || m.scoreBlueFinal != null;
+            return {
+              ...m,
+              matchNumber: matchNumberOverride ?? m.matchNumber,
+              startTime: m.startTime || m.autoStartTime,
+              actualStartTime: m.actualStartTime || (hasResult ? m.autoStartTime : null),
+            };
+          };
+          if (t3Result.status === 200) {
+            const t3Data = await t3Result.json();
+            const t3Matches = t3Data?.matches || t3Data?.schedule?.schedule || t3Data?.schedule || [];
+            combinedMatches = combinedMatches.concat(
+              (Array.isArray(t3Matches) ? t3Matches : []).map((m) => normalizeFGMatch(m))
+            );
+          }
+          const roundRobinCount = combinedMatches.length;
+          if (t4Result.status === 200) {
+            const t4Data = await t4Result.json();
+            const t4Matches = t4Data?.matches || t4Data?.schedule?.schedule || t4Data?.schedule || [];
+            // Renumber t4 finals matches to follow t3 (e.g., 1→17, 2→18, 3→19)
+            const renumbered = (Array.isArray(t4Matches) ? t4Matches : []).map((m) =>
+              normalizeFGMatch(m, m.matchNumber + roundRobinCount)
+            );
+            combinedMatches = combinedMatches.concat(renumbered);
+          }
+          playoffschedule = { schedule: combinedMatches };
+        } else {
+          const playoffResult = await httpClient.getNoAuth(
+            `${selectedYear?.value}/schedule/hybrid/${selectedEvent?.value.code}/playoff`,
+            getApiBaseUrl(ftcMode),
+            undefined,
+            undefined,
+            signal()
+          );
+          if (playoffResult.status === 200) {
+            // @ts-ignore
+            playoffschedule = await playoffResult.json();
+          }
         }
       }
     } else {
@@ -1079,7 +1160,7 @@ export function useScheduleLoader(deps, opts = {}) {
     // FTC: extend schedule with partially populated matches from bracket propagation (winners/losers to downstream series)
     // Skip for da Vinci (FTCCMP1) — it uses a round-robin format, not an elimination bracket
     const isDaVinci = selectedEvent?.value?.code === "FTCCMP1";
-    if (ftcMode && !isDaVinci && playoffschedule?.schedule?.length > 0 && Array.isArray(playoffschedule.schedule)) {
+    if (ftcMode && !isFirstGlobalMode(ftcMode) && !isDaVinci && playoffschedule?.schedule?.length > 0 && Array.isArray(playoffschedule.schedule)) {
       let allianceCountForPlayoff = 6;
       if (playoffCountOverride?.value != null) {
         allianceCountForPlayoff = parseInt(playoffCountOverride.value, 10);
@@ -1115,21 +1196,49 @@ export function useScheduleLoader(deps, opts = {}) {
       selectedEvent?.value?.type !== "OffSeason" && !playoffScheduleFromTBA &&
       playoffschedule?.schedule?.length > 0
     ) {
-      const playoffScoresResult = await httpClient.getNoAuth(
-        `${selectedYear?.value}/scores/${selectedEvent?.value.code}/playoff`,
-        ftcMode ? ftcBaseURL : undefined,
-        undefined,
-        undefined,
-        signal()
-      );
-      if (playoffScoresResult.status === 200) {
-        // @ts-ignore
-        playoffScores = await playoffScoresResult.json();
-        if (playoffScores.matchScores) {
-          playoffScores = { MatchScores: playoffScores.matchScores };
+      if (isFirstGlobalMode(ftcMode)) {
+        // FIRST Global: fetch scores for t3 and t4, combine
+        // t4 scores need matchNumber renumbered to follow t3 (same as schedule)
+        const [t3Scores, t4Scores] = await Promise.all([
+          httpClient.getNoAuth(`${selectedYear?.value}/scores/t3`, fgBaseURL, undefined, undefined, signal()),
+          httpClient.getNoAuth(`${selectedYear?.value}/scores/t4`, fgBaseURL, undefined, undefined, signal()),
+        ]);
+        let combinedScores = [];
+        let t3ScoreCount = 0;
+        if (t3Scores.status === 200) {
+          const data = await t3Scores.json();
+          const scores = data?.MatchScores || data?.matchScores || [];
+          t3ScoreCount = scores.length;
+          combinedScores = combinedScores.concat(scores);
         }
+        if (t4Scores.status === 200) {
+          const data = await t4Scores.json();
+          const scores = data?.MatchScores || data?.matchScores || [];
+          // Renumber t4 scores to follow t3 (e.g., 1→17, 2→18)
+          const renumbered = scores.map((s) => ({
+            ...s,
+            matchNumber: s.matchNumber + t3ScoreCount,
+          }));
+          combinedScores = combinedScores.concat(renumbered);
+        }
+        playoffScores = { MatchScores: combinedScores };
       } else {
-        playoffScores = { MatchScores: [] };
+        const playoffScoresResult = await httpClient.getNoAuth(
+          `${selectedYear?.value}/scores/${selectedEvent?.value.code}/playoff`,
+          getApiBaseUrl(ftcMode),
+          undefined,
+          undefined,
+          signal()
+        );
+        if (playoffScoresResult.status === 200) {
+          // @ts-ignore
+          playoffScores = await playoffScoresResult.json();
+          if (playoffScores.matchScores) {
+            playoffScores = { MatchScores: playoffScores.matchScores };
+          }
+        } else {
+          playoffScores = { MatchScores: [] };
+        }
       }
     } else if (
       selectedEvent?.value?.code === "PRACTICE1" ||
@@ -1146,8 +1255,8 @@ export function useScheduleLoader(deps, opts = {}) {
       // adds the winner to the schedule.
       playoffschedule.schedule = playoffschedule.schedule.map(
         (match, index) => {
-          //fix the match number fro FTC matches
-          if (ftcMode) {
+          //fix the match number for FTC matches (FTC uses series-based numbering)
+          if (ftcMode && !isFirstGlobalMode(ftcMode)) {
             // Preserve original matchNumber before overwriting (needed for tiebreaker detection)
             if (!match.originalMatchNumber) {
               match.originalMatchNumber = match.matchNumber;
@@ -1161,7 +1270,8 @@ export function useScheduleLoader(deps, opts = {}) {
           ) {
             const matchResults = playoffScores.MatchScores.filter(
               (scoreMatch) => {
-                const foundMatch = !ftcMode ? scoreMatch.matchNumber === match.matchNumber : (scoreMatch.matchNumber === match.originalMatchNumber) && (scoreMatch.matchSeries === match.series);
+                const useSeries = ftcMode && !isFirstGlobalMode(ftcMode);
+                const foundMatch = !useSeries ? scoreMatch.matchNumber === match.matchNumber : (scoreMatch.matchNumber === match.originalMatchNumber) && (scoreMatch.matchSeries === match.series);
                 return foundMatch
               }
             )[0];
@@ -1170,9 +1280,11 @@ export function useScheduleLoader(deps, opts = {}) {
             const results = matchResults || (ftcMatchResults && (ftcMatchResults.redScore != null || ftcMatchResults.blueScore != null) ? ftcMatchResults : null);
             if (results) {
               match.scores = results;
-              match.scoreRedFinal = results.alliances?.[1]?.totalPoints ?? results.redScore;
-              match.scoreBlueFinal = results.alliances?.[0]?.totalPoints ?? results.blueScore;
-              if (ftcMode) {
+              const pRedIdx = results.alliances?.[0]?.alliance === "Red" ? 0 : 1;
+              const pBlueIdx = pRedIdx === 0 ? 1 : 0;
+              match.scoreRedFinal = results.alliances?.[pRedIdx]?.totalPoints ?? results.redScore;
+              match.scoreBlueFinal = results.alliances?.[pBlueIdx]?.totalPoints ?? results.blueScore;
+              if (ftcMode && !isFirstGlobalMode(ftcMode)) {
                 hydrateFtcPlayoffTeamsFromResults(match, results);
               }
             }
@@ -1234,10 +1346,12 @@ export function useScheduleLoader(deps, opts = {}) {
     }
 
     if (options.updateCurrentMatch !== false && ((loadingEvent && autoAdvance) || autoUpdate)) {
+      // Use total qual count for FIRST Global so the edge-case guard matches total-based positions
+      const effectiveQualCount = firstGlobalTotalQuals ?? qualschedule?.schedule.length;
       if (
-        lastMatchPlayed === qualschedule?.schedule.length + 1 ||
+        lastMatchPlayed === effectiveQualCount + 1 ||
         lastMatchPlayed ===
-        qualschedule?.schedule.length + playoffschedule?.schedule.length + 2
+        effectiveQualCount + playoffschedule?.schedule.length + 2
       ) {
         lastMatchPlayed -= 1;
       }
@@ -1251,6 +1365,8 @@ export function useScheduleLoader(deps, opts = {}) {
       playoffschedule.dataSource = "Cheesy Arena";
     } else if (useFTCOffline) {
       playoffschedule.dataSource = "FTC Local Server";
+    } else if (isFirstGlobalMode(ftcMode)) {
+      playoffschedule.dataSource = "FIRST Global";
     } else if (ftcMode) {
       playoffschedule.dataSource = "FTC API";
     } else if (selectedEvent?.value?.type === "OffSeason") {

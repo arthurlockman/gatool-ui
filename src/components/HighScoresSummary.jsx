@@ -1,5 +1,6 @@
 import _ from "lodash";
 import { Row, Col } from "react-bootstrap";
+import { useEventData } from "contexts/EventDataContext";
 
 /**
  * Picks the higher-scoring of qual vs playoff for a given category (e.g. TBAPenaltyFree or overall).
@@ -31,6 +32,12 @@ function HighScoresSummary({
   districts,
   ftcLeagues,
 }) {
+  const { firstGlobalMode, remapNumberToString } = useEventData();
+  function formatAllianceMembers(raw) {
+    if (!firstGlobalMode || !raw) return raw;
+    return String(raw).replace(/\d+/g, (num) => remapNumberToString(Number(num)));
+  }
+
   const year = selectedYear?.value;
   const isFTC = !!selectedEvent?.value?.regionCode;
   const districtCode = selectedEvent?.value?.districtCode;
@@ -180,7 +187,7 @@ function HighScoresSummary({
     return (
       <div className="mb-2">
         <div style={{ fontSize: "1.5rem" }}><b>{entry.score}</b></div>
-        <div>{prefix}<br />{entry.matchName}<br/>({entry.allianceMembers})</div>
+        <div>{prefix}<br />{entry.matchName}<br/>({formatAllianceMembers(entry.allianceMembers)})</div>
       </div>
     );
   };

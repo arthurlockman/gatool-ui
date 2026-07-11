@@ -1,5 +1,6 @@
 import _ from "lodash";
 import { matchClassesBase } from "../data/matchClasses";
+import { isFtcLayout } from "./programConstants";
 
 /**
  * Returns whether a playoff match has a known result (completed).
@@ -84,7 +85,7 @@ function getMatchClassesForBracket(allianceCount, ftcMode) {
   const base = matchClassesBase;
   if (allianceCount === 8) return _.cloneDeep(base.eightAlliance);
   if (allianceCount === 6) return _.cloneDeep(base.sixAlliance);
-  if (allianceCount === 4) return _.cloneDeep(ftcMode ? base.fourAllianceFTC : base.fourAlliance);
+  if (allianceCount === 4) return _.cloneDeep(isFtcLayout(ftcMode) ? base.fourAllianceFTC : base.fourAlliance);
   return null;
 }
 

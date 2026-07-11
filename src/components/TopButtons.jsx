@@ -822,7 +822,7 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
                         <Select
                             classNamePrefix="gatool-rs"
                             options={matchMenu}
-                            value={currentMatch ? matchMenu[currentMatch - 1] : matchMenu[0]}
+                            value={currentMatch ? (matchMenu.find(m => m.value === currentMatch) ?? matchMenu[0]) : matchMenu[0]}
                             onChange={handleMatchSelection}
                             classNames={{
                                 option: (props) =>

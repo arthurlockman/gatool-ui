@@ -44,7 +44,7 @@ function SchedulePage({
   setQualsLength,
   setEventLabel,
 }) {
-  const { selectedEvent, playoffSchedule, qualSchedule, practiceSchedule, offlinePlayoffSchedule, alliances, eventLabel, allianceCount, ftcMode, remapNumberToString } = useEventData();
+  const { selectedEvent, playoffSchedule, qualSchedule, qualScheduleAllFields, practiceSchedule, offlinePlayoffSchedule, alliances, eventLabel, allianceCount, ftcMode, firstGlobalMode, remapNumberToString } = useEventData();
   const { setSelectedEvent, getTeamList, loadEvent, getAlliances } = useEventActions();
   const { hidePracticeSchedule, useScrollMemory, playoffCountOverride, setPlayoffCountOverride } = useSettings();
   const [showAdjustAlliances, setShowAdjustAlliances] = useState(false);
@@ -891,7 +891,7 @@ function SchedulePage({
                   <th className="col1">
                     <b>Station 2</b>
                   </th>
-                  {!ftcMode && (
+                  {(!ftcMode || firstGlobalMode) && (
                     <th className="col1">
                       <b>Station 3</b>
                     </th>
@@ -989,7 +989,7 @@ function SchedulePage({
                             {match?.scoreBlueFinal}
                           </span>
                         </td>
-                        {!ftcMode && (
+                        {(!ftcMode || firstGlobalMode) && (
                           <>
                             <td>
                               <span className={redStyle}>
@@ -1020,7 +1020,7 @@ function SchedulePage({
                             </td>
                           </>
                         )}
-                        {ftcMode && (
+                        {(ftcMode && !firstGlobalMode) && (
                           <>
                             <td>
                               <span className={redStyle}>
@@ -1139,7 +1139,7 @@ function SchedulePage({
                           </span>
                         </td>
 
-                        {!ftcMode && (
+                        {(!ftcMode || firstGlobalMode) && (
                           <>
                             <td>
                               <span className={redStyle}>
@@ -1170,7 +1170,7 @@ function SchedulePage({
                             </td>
                           </>
                         )}
-                        {ftcMode && (
+                        {(ftcMode && !firstGlobalMode) && (
                           <>
                             <td>
                               <span className={redStyle}>
@@ -1199,7 +1199,12 @@ function SchedulePage({
                 {playoffSchedule &&
                   playoffSchedule?.schedule?.length > 0 &&
                   playoffSchedule.schedule.map((match, index) => {
-                    let qualMatchCount = qualSchedule?.schedule?.length;
+                    // For FIRST Global, use total qual count across all fields so playoff event
+                    // match numbers continue from the full qual sequence, not just the filtered fieldset.
+                    let qualMatchCount = (firstGlobalMode && qualScheduleAllFields?.schedule?.schedule?.length) ||
+                      qualSchedule?.schedule?.length ||
+                      qualSchedule?.schedule?.schedule?.length ||
+                      0;
                     const { redStyle, blueStyle, winnerStyle } =
                       getPlayoffScheduleRowStyles(match, ftcMode);
                     const showPlayoffResultHighlight =
@@ -1243,7 +1248,7 @@ function SchedulePage({
                             {match?.scoreBlueFinal}
                           </span>
                         </td>
-                        {!ftcMode && (
+                        {(!ftcMode || firstGlobalMode) && (
                           <>
                             <td>
                               <span className={redStyle}>
@@ -1274,7 +1279,7 @@ function SchedulePage({
                             </td>
                           </>
                         )}
-                        {ftcMode && (
+                        {(ftcMode && !firstGlobalMode) && (
                           <>
                             <td>
                               <span className={redStyle}>

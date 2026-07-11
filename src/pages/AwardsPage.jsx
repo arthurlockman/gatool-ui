@@ -9,7 +9,7 @@ import { useEventData } from "contexts/EventDataContext";
 
 
 function AwardsPage() {
-  const { selectedEvent, selectedYear, teamList, communityUpdates, eventLabel, remapNumberToString } = useEventData();
+  const { selectedEvent, selectedYear, teamList, communityUpdates, eventLabel, remapNumberToString, firstGlobalMode } = useEventData();
     const originalAndSustaining = ["20", "45", "126", "148", "151", "157", "190", "191", "250"];
     const { disableScope, enableScope } = useHotkeysContext();
 
@@ -160,11 +160,11 @@ function AwardsPage() {
                         </Modal.Header>
                         <Modal.Body>
                             <span className={"allianceAnnounceDialog"}>Team {remapNumberToString ? remapNumberToString(awardTeam?.teamNumber) : awardTeam?.teamNumber} {awardTeam?.updates?.nameShortLocal ? awardTeam.updates.nameShortLocal : awardTeam?.nameShort}<br />
-                                is {awardTeam?.updates?.awardsTextLocal ? awardTeam?.updates?.awardsTextLocal : <>{originalAndSustaining.includes(String(awardTeam?.teamNumber)) ? "an Original and Sustaining Team " : ""}from<br />
+                                is {awardTeam?.updates?.awardsTextLocal ? awardTeam?.updates?.awardsTextLocal : <>{(!firstGlobalMode && originalAndSustaining.includes(String(awardTeam?.teamNumber))) ? "an Original and Sustaining Team " : ""}from<br />
                                     {awardTeam?.updates?.organizationLocal ? awardTeam?.updates?.organizationLocal : awardTeam?.organization}<br />
-                                    in</>} {awardTeam?.updates?.cityStateLocal ? awardTeam?.updates?.cityStateLocal : `${awardTeam?.city}, ${awardTeam?.stateProv}`}{awardTeam?.country !== "USA" && !awardTeam?.updates?.cityStateLocal ? `, ${awardTeam?.country}` : ""}<br />
+                                    in</>} {awardTeam?.updates?.cityStateLocal ? awardTeam?.updates?.cityStateLocal : (firstGlobalMode ? "" : `${awardTeam?.city}, ${awardTeam?.stateProv}${awardTeam?.country !== "USA" ? `, ${awardTeam?.country}` : ""}`)}<br />
                                 <br />
-                                Founded in {awardTeam?.rookieYear}, this is their {awardTeam?.yearsDisplay} season competing with <i><b>FIRST</b></i>. </span>
+                                {!firstGlobalMode && <>Founded in {awardTeam?.rookieYear}, this is their {awardTeam?.yearsDisplay} season competing with <i><b>FIRST</b></i>. </>}</span>
                         </Modal.Body>
                         <Modal.Footer>
                             <Button variant="success" onClick={handleClose} id={"congratulationsButton"}>
