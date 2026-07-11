@@ -1,15 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { act, waitFor } from "@testing-library/react";
+import { useEffect, useState } from "react";
 import { http, HttpResponse, delay } from "msw";
 import localforage from "localforage";
 import { useEventListLoader } from "./useEventListLoader";
-import { useEventSelection } from "../contexts/EventSelectionContext";
+import { useEventSelection, EventSelectionProvider } from "../contexts/EventSelectionContext";
 import { renderHookWithProviders } from "../test/renderHook";
 import { createTestHttpClient } from "../test/httpClient";
 import { server } from "../test/server";
 import { loadFixture } from "../test/fixtures";
+import { fgBaseURL } from "../utils/programConstants";
 
 const BASE = "https://api.gatool.org/v3";
+const FG_MODE = { value: "FIRSTGlobal", label: "FIRST Global" };
 
 const SUPPORTED_YEARS = [
   { value: "2026", label: "2026" },
@@ -324,6 +327,127 @@ describe("useEventListLoader", () => {
     expect(setters.setDistricts).toHaveBeenCalledWith([
       { label: "Israel", value: "ISR" },
     ]);
+  });
+});
+
+describe("useEventListLoader — FIRST Global fieldsets", () => {
+  function FGSeeder({ children }) {
+    const sel = useEventSelection();
+    const [seeded, setSeeded] = useState(false);
+    useEffect(() => {
+      sel.setFTCMode(FG_MODE);
+      sel.setSelectedYear({ value: "2025", label: "2025 FIRST Global" });
+      setSeeded(true);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+    if (!seeded) return null;
+    return children;
+  }
+
+  function setupFGHook(overrides = {}) {
+    const httpClient = createTestHttpClient();
+    const setters = {
+      setEvents: vi.fn(),
+      setEventsLoading: vi.fn(),
+      setFTCTypes: vi.fn(),
+      setEventNamesCY: vi.fn(),
+      setDistricts: vi.fn(),
+      updateFtcRegions: vi.fn(),
+    };
+    const deps = {
+      httpClient,
+      useFTCOffline: false,
+      FTCServerURL: "",
+      FTCKey: null,
+      isOnline: true,
+      training: { events: { events: [] } },
+      supportedYears: [{ value: "2025", label: "2025 FIRST Global" }],
+      eventsLoading: "",
+      eventnames: {},
+      regionLookup: {},
+      ...setters,
+      ...overrides,
+    };
+
+    function Wrapper({ children }) {
+      return (
+        <EventSelectionProvider>
+          <FGSeeder>{children}</FGSeeder>
+        </EventSelectionProvider>
+      );
+    }
+
+    const utils = renderHookWithProviders(
+      () => {
+        const sel = useEventSelection();
+        const api = useEventListLoader(deps);
+        return { sel, ...api };
+      },
+      { wrapper: Wrapper }
+    );
+
+    return { ...utils, httpClient, setters, deps };
+  }
+
+  beforeEach(async () => {
+    vi.spyOn(console, "log").mockImplementation(() => {});
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    await localforage.clear();
+  });
+
+  it("getEvents builds field-set pseudo-events from the fieldsets API", async () => {
+    server.use(
+      http.get(`${fgBaseURL}2025/fieldsets`, () =>
+        HttpResponse.json([
+          [1],
+          [2, 3],
+        ])
+      )
+    );
+
+    const { result, setters } = setupFGHook();
+
+    await waitFor(() => expect(result.current.sel.ftcMode?.value).toBe("FIRSTGlobal"));
+
+    await act(async () => {
+      await result.current.getEvents();
+    });
+
+    await waitFor(() => expect(setters.setEvents).toHaveBeenCalled());
+
+    const events = setters.setEvents.mock.calls.at(-1)[0];
+    expect(events).toHaveLength(3);
+
+    expect(events[0].label).toBe("Field 1");
+    expect(events[0].value.code).toBe("FG2025-0");
+    expect(events[0].value.fieldset).toEqual([1]);
+    expect(events[0].value.type).toBe("FIRSTGlobal");
+
+    expect(events[1].label).toBe("Fields 2 & 3");
+    expect(events[1].value.fieldset).toEqual([2, 3]);
+
+    expect(events[2].label).toBe("All Fields");
+    expect(events[2].value.code).toBe("FG2025-all");
+    expect(events[2].value.fieldsetIndex).toBe(-1);
+  });
+
+  it("getEvents returns an empty list when fieldsets API fails", async () => {
+    server.use(
+      http.get(`${fgBaseURL}2025/fieldsets`, () =>
+        HttpResponse.json({ error: "not found" }, { status: 404 })
+      )
+    );
+
+    const { result, setters } = setupFGHook();
+
+    await waitFor(() => expect(result.current.sel.ftcMode?.value).toBe("FIRSTGlobal"));
+
+    await act(async () => {
+      await result.current.getEvents();
+    });
+
+    await waitFor(() => expect(setters.setEvents).toHaveBeenCalled());
+    expect(setters.setEvents.mock.calls.at(-1)[0]).toEqual([]);
   });
 });
 

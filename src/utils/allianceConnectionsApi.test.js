@@ -1,11 +1,20 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import {
   getConnectionsEventKey,
   allianceRosterToConnectionKey,
   ConnectionsApiError,
+  fetchAllianceConnections,
 } from "./allianceConnectionsApi";
 
-// Note: fetchAllianceConnections is intentionally NOT covered here — it makes
-// network calls and will be exercised at the hook level with MSW later.
+function jsonResponse(body, { status = 200, contentType = "application/json" } = {}) {
+  return {
+    ok: status >= 200 && status < 300,
+    status,
+    headers: { get: (name) => (name === "content-type" ? contentType : null) },
+    json: async () => body,
+    text: async () => (typeof body === "string" ? body : JSON.stringify(body)),
+  };
+}
 
 describe("getConnectionsEventKey", () => {
   it("returns null when selectedEvent or selectedYear is missing", () => {
@@ -154,5 +163,191 @@ describe("ConnectionsApiError", () => {
     const err = new ConnectionsApiError("oops");
     expect(err.status).toBeNull();
     expect(err.detail).toBeNull();
+  });
+});
+
+describe("fetchAllianceConnections", () => {
+  beforeEach(() => {
+    vi.stubGlobal("fetch", vi.fn());
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.useRealTimers();
+  });
+
+  it("returns [] without calling fetch when fewer than 2 teams are provided", async () => {
+    expect(await fetchAllianceConnections("2024nytr", [254])).toEqual([]);
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it("returns [] when eventKey cannot be split into year and event code", async () => {
+    expect(await fetchAllianceConnections("bad", [254, 1678])).toEqual([]);
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it("fetches matchups, dedupes/sorts team numbers, and normalizes camelCase items", async () => {
+    fetch.mockResolvedValue(
+      jsonResponse([
+        {
+          teamA: 254,
+          teamB: 1678,
+          teamAName: "The Cheesy Poofs",
+          teamBName: "Citrus Circuits",
+          partneredAt: [
+            {
+              eventKey: "2023gal",
+              eventName: "Galileo",
+              year: 2023,
+              stage: "quals",
+              result: "win",
+            },
+          ],
+        },
+      ])
+    );
+
+    const result = await fetchAllianceConnections("2024nytr", [1678, 254, 254]);
+
+    expect(fetch).toHaveBeenCalledWith(
+      expect.stringMatching(/\/2024\/matchups\/nytr\/254,1678$/),
+      expect.objectContaining({ signal: expect.any(AbortSignal) })
+    );
+    expect(result).toEqual([
+      {
+        team_a: 254,
+        team_b: 1678,
+        team_a_name: "The Cheesy Poofs",
+        team_b_name: "Citrus Circuits",
+        partnered_at: [
+          {
+            event_key: "2023gal",
+            event_name: "Galileo",
+            year: 2023,
+            stage: "quals",
+            result: "win",
+          },
+        ],
+      },
+    ]);
+  });
+
+  it("accepts snake_case API payloads and data.details wrappers", async () => {
+    fetch.mockResolvedValue(
+      jsonResponse({
+        details: [
+          {
+            team_a: 111,
+            team_b: 222,
+            team_a_name: "A",
+            team_b_name: "B",
+            partnered_at: [{ event_key: "2022tx", event_name: "Texas", year: 2022 }],
+          },
+        ],
+      })
+    );
+
+    const result = await fetchAllianceConnections("2025txcmp", [222, 111]);
+    expect(result[0].team_a).toBe(111);
+    expect(result[0].partnered_at[0].event_key).toBe("2022tx");
+  });
+
+  it("returns [] for successful responses with no matchup items", async () => {
+    fetch.mockResolvedValue(jsonResponse([]));
+    expect(await fetchAllianceConnections("2024nytr", [254, 1678])).toEqual([]);
+  });
+
+  it("throws ConnectionsApiError using server detail as the message when provided", async () => {
+    fetch.mockResolvedValue(
+      jsonResponse({ detail: "slow down" }, { status: 429 })
+    );
+
+    await expect(
+      fetchAllianceConnections("2024nytr", [254, 1678])
+    ).rejects.toMatchObject({
+      name: "ConnectionsApiError",
+      status: 429,
+      detail: "slow down",
+      message: "slow down",
+    });
+  });
+
+  it("uses plain-text error bodies as the thrown message", async () => {
+    vi.useFakeTimers();
+    fetch.mockResolvedValue(
+      jsonResponse("service unavailable", {
+        status: 503,
+        contentType: "text/plain",
+      })
+    );
+
+    const promise = fetchAllianceConnections("2024nytr", [254, 1678]);
+    const assertion = expect(promise).rejects.toMatchObject({
+      status: 503,
+      message: "service unavailable",
+      detail: "service unavailable",
+    });
+
+    await vi.advanceTimersByTimeAsync(400);
+    await vi.advanceTimersByTimeAsync(800);
+    await vi.advanceTimersByTimeAsync(1600);
+    await assertion;
+  });
+
+  it("retries transient 503 responses before succeeding", async () => {
+    vi.useFakeTimers();
+    fetch
+      .mockResolvedValueOnce(jsonResponse(null, { status: 503, contentType: "text/plain" }))
+      .mockResolvedValueOnce(jsonResponse([]));
+
+    const promise = fetchAllianceConnections("2024nytr", [254, 1678]);
+    await vi.advanceTimersByTimeAsync(400);
+    const result = await promise;
+
+    expect(fetch).toHaveBeenCalledTimes(2);
+    expect(result).toEqual([]);
+  });
+
+  it("retries network failures and throws ConnectionsApiError after exhausting retries", async () => {
+    vi.useFakeTimers();
+    fetch.mockRejectedValue(new TypeError("Failed to fetch"));
+
+    const promise = fetchAllianceConnections("2024nytr", [254, 1678]);
+    const assertion = expect(promise).rejects.toMatchObject({
+      name: "ConnectionsApiError",
+      message: expect.stringContaining("Network error"),
+    });
+
+    await vi.advanceTimersByTimeAsync(400);
+    await vi.advanceTimersByTimeAsync(800);
+    await vi.advanceTimersByTimeAsync(1600);
+    await assertion;
+
+    expect(fetch).toHaveBeenCalledTimes(4);
+  });
+
+  it("uses a generic status message when the error body has no detail", async () => {
+    fetch.mockResolvedValue(jsonResponse({}, { status: 404 }));
+
+    await expect(
+      fetchAllianceConnections("2024nytr", [254, 1678])
+    ).rejects.toMatchObject({
+      status: 404,
+      message: "Resource not found.",
+    });
+  });
+
+  it("rejects when the caller aborts during a retry delay", async () => {
+    vi.useFakeTimers();
+    const controller = new AbortController();
+    fetch.mockRejectedValueOnce(new TypeError("Failed to fetch"));
+
+    const promise = fetchAllianceConnections("2024nytr", [254, 1678], controller.signal);
+    const assertion = expect(promise).rejects.toMatchObject({ name: "AbortError" });
+
+    await vi.advanceTimersByTimeAsync(100);
+    controller.abort();
+    await vi.advanceTimersByTimeAsync(300);
+    await assertion;
   });
 });

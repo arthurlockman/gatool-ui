@@ -167,3 +167,37 @@ describe("DaVinciTournamentBracket", () => {
 		expect(() => renderBracket({ useSwipe: true, usePullDownToUpdate: true })).not.toThrow();
 	});
 });
+
+describe("DaVinciTournamentBracket — FIRST Global mode", () => {
+	const fgMode = { value: "FIRSTGlobal", label: "FIRST Global" };
+
+	function fgMatches() {
+		return Array.from({ length: 16 }, (_, i) => makeMatch(i + 1));
+	}
+
+	it("renders the FIRST Global subtitle", () => {
+		renderBracket({ ftcMode: fgMode, matches: fgMatches() });
+		expect(screen.getByText(/FIRST Global Round Robin/i)).toBeInTheDocument();
+	});
+
+	it("renders 4 round headers (not 5)", () => {
+		renderBracket({ ftcMode: fgMode, matches: fgMatches() });
+		for (let r = 1; r <= 4; r++) {
+			expect(screen.getByText(`ROUND ${r}`)).toBeInTheDocument();
+		}
+		expect(screen.queryByText("ROUND 5")).not.toBeInTheDocument();
+	});
+
+	it("renders MATCH labels for all 16 round-robin matches", () => {
+		renderBracket({ ftcMode: fgMode, matches: fgMatches() });
+		for (let m = 1; m <= 16; m++) {
+			expect(screen.getByText(`MATCH ${m}`)).toBeInTheDocument();
+		}
+	});
+
+	it("renders alliance placeholder names from the FG schedule", () => {
+		renderBracket({ ftcMode: fgMode, matches: fgMatches() });
+		expect(screen.getAllByText("Alliance 1").length).toBeGreaterThanOrEqual(1);
+		expect(screen.getAllByText("Alliance 8").length).toBeGreaterThanOrEqual(1);
+	});
+});

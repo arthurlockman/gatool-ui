@@ -86,6 +86,7 @@ function setupMocks({ eventOverrides = {}, settingsOverrides = {} } = {}) {
         currentMatch: 1,
         eventLabel: "Test Offseason Event",
         ftcMode: false,
+        firstGlobalMode: false,
         remapNumberToString: (n) => String(n),
         ...eventOverrides,
     });
@@ -322,5 +323,29 @@ describe("AllianceSelectionPage – FTC 3-team alliances switch", () => {
     it("does not show alliance controls in playoffs mode (controls only in selection phase)", () => {
         render(<AllianceSelectionPage {...baseProps({ playoffs: true })} />);
         expect(screen.queryByText("Use 3 team Alliances")).not.toBeInTheDocument();
+    });
+});
+
+describe("AllianceSelectionPage – FIRST Global playoffs bracket", () => {
+    const fgFtcMode = { value: "FIRSTGlobal", label: "FIRST Global" };
+
+    beforeEach(() => {
+        setupMocks({
+            eventOverrides: {
+                selectedEvent: {
+                    value: { type: "FIRSTGlobal", code: "FG2025-0", champLevel: null },
+                    label: "Field 1",
+                },
+                ftcMode: fgFtcMode,
+                firstGlobalMode: true,
+                alliances: { alliances: Array(8).fill({ captain: null }), Lookup: {} },
+            },
+        });
+    });
+
+    it("renders DaVinci bracket (not standard 8-alliance bracket) in playoffs mode", () => {
+        render(<AllianceSelectionPage {...baseProps({ playoffs: true })} />);
+        expect(screen.getByTestId("davinci-bracket-stub")).toBeInTheDocument();
+        expect(screen.queryByTestId("bracket-stub")).not.toBeInTheDocument();
     });
 });

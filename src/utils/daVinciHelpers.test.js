@@ -4,6 +4,9 @@ import {
 	getFinalsSlotScore,
 	getFinalsSlotWinner,
 	DA_VINCI_SCHEDULE,
+	FG_ROUND_ROBIN_SCHEDULE,
+	getFGFinalsMatches,
+	computeFGTournamentWinner,
 } from "./daVinciHelpers";
 
 // ---- helpers ----
@@ -229,5 +232,69 @@ describe("DA_VINCI_SCHEDULE", () => {
 			expect(seen.has(key)).toBe(false);
 			seen.add(key);
 		});
+	});
+});
+
+// ---- FIRST Global helpers ----
+
+describe("FG_ROUND_ROBIN_SCHEDULE", () => {
+	it("has exactly 16 round-robin matches", () => {
+		expect(FG_ROUND_ROBIN_SCHEDULE).toHaveLength(16);
+	});
+
+	it("covers match numbers 1–16 each exactly once", () => {
+		const nums = FG_ROUND_ROBIN_SCHEDULE.map((m) => m.matchNumber).sort((a, b) => a - b);
+		expect(nums).toEqual(Array.from({ length: 16 }, (_, i) => i + 1));
+	});
+
+	it("has 4 rounds with 4 matches each", () => {
+		for (let round = 1; round <= 4; round++) {
+			expect(FG_ROUND_ROBIN_SCHEDULE.filter((m) => m.round === round)).toHaveLength(4);
+		}
+	});
+});
+
+describe("getFGFinalsMatches", () => {
+	it("returns empty array when matches is null", () => {
+		expect(getFGFinalsMatches(null, 16)).toEqual([]);
+	});
+
+	it("returns only matches after the round-robin count", () => {
+		const matches = [
+			makeMatch(1, 16),
+			makeMatch(1, 17),
+			makeMatch(1, 18),
+		];
+		const finals = getFGFinalsMatches(matches, 16);
+		expect(finals).toHaveLength(2);
+		expect(finals.map((m) => m.matchNumber)).toEqual([17, 18]);
+	});
+});
+
+describe("computeFGTournamentWinner", () => {
+	it("returns no winner until a side reaches 2 victories", () => {
+		const finals = [makeMatch(1, 17, { winner: winner("red") })];
+		expect(computeFGTournamentWinner(finals).winner).toBe("");
+	});
+
+	it("red wins best-of-3 with 2 victories", () => {
+		const finals = [
+			makeMatch(1, 17, { winner: winner("red") }),
+			makeMatch(1, 18, { winner: winner("red") }),
+		];
+		const result = computeFGTournamentWinner(finals);
+		expect(result.winner).toBe("red");
+		expect(result.red).toBe(2);
+	});
+
+	it("blue wins best-of-3 with 2 victories", () => {
+		const finals = [
+			makeMatch(1, 17, { winner: winner("blue") }),
+			makeMatch(1, 18, { winner: winner("red") }),
+			makeMatch(1, 19, { winner: winner("blue") }),
+		];
+		const result = computeFGTournamentWinner(finals);
+		expect(result.winner).toBe("blue");
+		expect(result.blue).toBe(2);
 	});
 });
