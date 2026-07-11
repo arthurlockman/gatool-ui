@@ -152,7 +152,7 @@ function RoundRobinMatches({
 }
 
 function RoundRobinFinalsSection({
-  finalsMatchNumber, svgW,
+  finalsMatchNumber, 
   isCurrentMatch, isInFinalsView,
   getAllianceNameForDisplay, getAllianceNumbersForDisplay,
   tournamentWinner, ftcMode,
