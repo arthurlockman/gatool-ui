@@ -260,7 +260,7 @@ function AllianceSelectionPage({
                             }
                         </Alert>}
                 </div>}
-            {selectedEvent && ((qualSchedule?.schedule?.length > 0 || qualSchedule?.schedule?.schedule?.length > 0 || practiceSchedule?.schedule?.length > 0) && playoffs && (allianceSelection || overrideAllianceSelection)) &&
+            {selectedEvent && ((qualSchedule?.schedule?.length > 0 || qualSchedule?.schedule?.schedule?.length > 0 || practiceSchedule?.schedule?.length > 0) && !playoffs && (allianceSelection || overrideAllianceSelection)) &&
                 <div>
                     {(isOffseason || isFTCThreeTeamEligible) && (
                         <Alert variant="warning">
