@@ -12,7 +12,7 @@ const ALLIANCE_DECLINED_TITLE =
     "Not eligible to be selected (previously declined an alliance offer).";
 const ALLIANCE_REMOVED_TITLE = "Removed from playoff participation.";
 
-function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays, handleReset, teamFilter, setTeamFilter, ftcMode, remapNumberToString, useFourTeamAlliances, setResetAllianceSelection, isResetModalOpen = false }) {
+function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, allianceCount, communityUpdates, allianceSelectionArrays, setAllianceSelectionArrays, handleReset, teamFilter, setTeamFilter, ftcMode, firstGlobalMode, remapNumberToString, useFourTeamAlliances, setResetAllianceSelection, isResetModalOpen = false }) {
     const OriginalAndSustaining = _.cloneDeep(originalAndSustaining);
     const AllianceSelectionBaseRounds = _.cloneDeep(allianceSelectionBaseRounds);
 
@@ -45,23 +45,25 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         selectedEvent?.value?.champLevel === "CHAMPS" ||
             selectedEvent?.value?.champLevel === "CMPDIV" ||
             selectedEvent?.value?.champLevel === "CMPSUB" ||
-            useFourTeamAlliances
+            useFourTeamAlliances ||
+            firstGlobalMode
             ? true
             : false;
 
     // Determine alliance selection rounds based on mode and championship level
     var allianceSelectionRounds;
-    if (ftcMode) {
+    if (ftcMode && !firstGlobalMode) {
         allianceSelectionRounds = inChamps ? ["round1", "round2"] : ["round1"];
     } else {
         allianceSelectionRounds = inChamps ? ["round1", "round2", "round3"] : ["round1", "round2"];
     }
 
     var allianceSelectionOrder = [];
-    var allianceSelectionOrderRounds = ftcMode ? { round1: [] } : { round1: [], round2: [] };
+    const isFtcRoundLayout = !!(ftcMode && !firstGlobalMode);
+    var allianceSelectionOrderRounds = isFtcRoundLayout ? { round1: [] } : { round1: [], round2: [] };
 
     if (inChamps) {
-        if (!ftcMode) {
+        if (!isFtcRoundLayout) {
             allianceSelectionOrderRounds.round3 = [];
         } else {
             allianceSelectionOrderRounds.round2 = [];
@@ -414,8 +416,8 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         if (allianceSelectionArrays && allianceSelectionArrays.allianceCount > 0) {
             // Check if the current stored rounds configuration matches what it should be
             const expectedRounds = inChamps
-                ? (ftcMode ? ["round1", "round2"] : ["round1", "round2", "round3"])
-                : (ftcMode ? ["round1"] : ["round1", "round2"]);
+                ? (isFtcRoundLayout ? ["round1", "round2"] : ["round1", "round2", "round3"])
+                : (isFtcRoundLayout ? ["round1"] : ["round1", "round2"]);
 
             const currentRounds = Object.keys(allianceSelectionArrays.rounds || {});
 
@@ -772,7 +774,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                                                     </Row>}
 
                                                                                 <Row>
-                                                                                    <Col xs={inChamps && !ftcMode ? 4 : !inChamps && ftcMode ? 12 : 6} className={(asArrays.allianceSelectionOrder[asArrays?.nextChoice]?.number === allianceNumber) && (asArrays.allianceSelectionOrder[asArrays?.nextChoice]?.round === 1) ? "alliancedrop nextAllianceChoice" : "alliancedrop"}>
+                                                                                    <Col xs={inChamps && !isFtcRoundLayout ? 4 : !inChamps && isFtcRoundLayout ? 12 : 6} className={(asArrays.allianceSelectionOrder[asArrays?.nextChoice]?.number === allianceNumber) && (asArrays.allianceSelectionOrder[asArrays?.nextChoice]?.round === 1) ? "alliancedrop nextAllianceChoice" : "alliancedrop"}>
                                                                                         <div><b>1<sup>st</sup> pick</b></div>
                                                                                         <div key={`${allianceName}round1`}
                                                                                             className={round1?.declined ? "allianceDecline allianceTeamChoice" : round1?.teamNumber ? "allianceTeam allianceTeamChosen" : "allianceTeam allianceTeamChoice"}
@@ -780,8 +782,8 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                                                         </div>
                                                                                     </Col>
 
-                                                                                    {((inChamps && ftcMode) || !ftcMode) &&
-                                                                                        <Col xs={inChamps && !ftcMode ? 4 : 6} className={(asArrays.allianceSelectionOrder[asArrays?.nextChoice]?.number === allianceNumber) && (asArrays.allianceSelectionOrder[asArrays?.nextChoice]?.round === 2) ? "alliancedrop nextAllianceChoice" : "alliancedrop"}>
+                                                                                    {((inChamps && isFtcRoundLayout) || !isFtcRoundLayout) &&
+                                                                                        <Col xs={inChamps && !isFtcRoundLayout ? 4 : 6} className={(asArrays.allianceSelectionOrder[asArrays?.nextChoice]?.number === allianceNumber) && (asArrays.allianceSelectionOrder[asArrays?.nextChoice]?.round === 2) ? "alliancedrop nextAllianceChoice" : "alliancedrop"}>
                                                                                             <div><b>2<sup>nd</sup> pick</b></div>
                                                                                             <div key={`${allianceName}round2`}
                                                                                                 className={round2?.declined ? "allianceDecline allianceTeamChoice" : round2?.teamNumber ? "allianceTeam allianceTeamChosen" : "allianceTeam allianceTeamChoice"}
@@ -790,7 +792,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                                                                                         </Col>}
 
 
-                                                                                    {inChamps && !ftcMode &&
+                                                                                    {inChamps && !isFtcRoundLayout &&
                                                                                         <Col xs={inChamps ? 4 : 6} className={(asArrays.allianceSelectionOrder[asArrays?.nextChoice]?.number === allianceNumber) && (asArrays.allianceSelectionOrder[asArrays?.nextChoice]?.round === 3) ? "alliancedrop nextAllianceChoice" : "alliancedrop"}>
                                                                                             <div><b>3<sup>rd</sup> pick</b></div>
                                                                                             <div key={`${allianceName}round3`}
@@ -876,9 +878,9 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                     </Modal.Header>
                     <Modal.Body>
                         {(allianceMode === "show" || allianceMode === "a1captain" || allianceMode === "captain") && <span className={"allianceAnnounceDialog"}>Team {remapNumberToString ? remapNumberToString(allianceTeam?.teamNumber) : allianceTeam?.teamNumber} {allianceTeam?.updates?.nameShortLocal ? allianceTeam?.updates.nameShortLocal : allianceTeam?.nameShort}<br />
-                            is {allianceTeam?.updates?.awardsTextLocal ? allianceTeam?.updates?.awardsTextLocal : <>{(OriginalAndSustaining.indexOf(String(allianceTeam?.teamNumber)) >= 0) ? "an Original and Sustaining Team " : ""}from<br />
+                            is {allianceTeam?.updates?.awardsTextLocal ? allianceTeam?.updates?.awardsTextLocal : <>{(!firstGlobalMode && OriginalAndSustaining.indexOf(String(allianceTeam?.teamNumber)) >= 0) ? "an Original and Sustaining Team " : ""}from<br />
                                 {allianceTeam?.updates?.organizationLocal ? allianceTeam?.updates?.organizationLocal : allianceTeam?.organization}<br />
-                                in</>} {allianceTeam?.updates?.cityStateLocal ? allianceTeam?.updates?.cityStateLocal : `${allianceTeam?.city}, ${allianceTeam?.stateProv}`}{allianceTeam?.country !== "USA" && !allianceTeam?.updates?.cityStateLocal ? `, ${allianceTeam?.country}` : ""}<br /></span>}
+                                in</>} {allianceTeam?.updates?.cityStateLocal ? allianceTeam?.updates?.cityStateLocal : (firstGlobalMode ? "" : `${allianceTeam?.city}, ${allianceTeam?.stateProv}${allianceTeam?.country !== "USA" ? `, ${allianceTeam?.country}` : ""}`)}<br /></span>}
                         {allianceMode === "accept" && <span className={"allianceAnnounceDialog"}>Team {remapNumberToString ? remapNumberToString(allianceTeam?.teamNumber) : allianceTeam?.teamNumber} {allianceTeam?.updates?.nameShortLocal ? allianceTeam?.updates?.nameShortLocal : allianceTeam?.nameShort}<br />
                             has been asked to join Alliance {asArrays.allianceSelectionOrder[asArrays.nextChoice]?.number}.<br />Do they accept?</span>}
                         {allianceMode === "decline" && <span className={"allianceAnnounceDialog"}>Team {remapNumberToString ? remapNumberToString(allianceTeam?.teamNumber) : allianceTeam?.teamNumber} {allianceTeam?.updates?.nameShortLocal ? allianceTeam?.updates?.nameShortLocal : allianceTeam?.nameShort}<br />

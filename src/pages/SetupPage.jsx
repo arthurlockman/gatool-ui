@@ -77,6 +77,7 @@ const ftcModeOptions = [
     { value: "FRC", label: "FRC" },
     { value: "FTCOnline", label: "FTC Online" },
     { value: "FTCLocal", label: "FTC Local Server" },
+    { value: "FIRSTGlobal", label: "FIRST Global" },
 ];
 
 
@@ -93,6 +94,7 @@ function SetupPage({
   setAdHocMode,
   supportedYears,
   FTCSupportedYears,
+  FGSupportedYears,
   reloadPage,
   setLoadingCommunityUpdates,
   systemMessage,
@@ -294,7 +296,12 @@ function SetupPage({
         setRegionFilters([]);
         setTimeFilter({ label: "All Events", value: "all" });
         setSelectedEvent(null);
-        setSelectedYear(checked.value === "FRC" ? supportedYears[0] : FTCSupportedYears[0]);
+        const yearList = checked.value === "FRC"
+            ? supportedYears
+            : checked.value === "FIRSTGlobal"
+                ? FGSupportedYears
+                : FTCSupportedYears;
+        setSelectedYear(yearList[0]);
         setNonStandardPlayoffs(null);
         setPlayoffCountOverride(null);
         setUseFourTeamAlliances(null);
@@ -380,10 +387,10 @@ function SetupPage({
                 <Col sm={2}>
                     <b>Choose a program...</b><br /><Select classNamePrefix="gatool-rs" options={ftcModeOptions} value={ftcMode === false ? { label: "FRC", value: "FRC" } : ftcMode} onChange={handleFTCMode} placeholder="Select a program" isDisabled={false} />
                 </Col>
-                <Col sm={3}><b>Choose a year...</b><br /><Select classNamePrefix="gatool-rs" options={ftcMode === false ? supportedYears : (ftcMode ? FTCSupportedYears : [])} value={selectedYear} onChange={setSelectedYear} isDisabled={!isOnline || ftcMode === null} placeholder={ftcMode === null ? "Select program first" : "Select a year"} />
+                <Col sm={3}><b>Choose a year...</b><br /><Select classNamePrefix="gatool-rs" options={ftcMode === false ? supportedYears : (ftcMode?.value === "FIRSTGlobal" ? FGSupportedYears : (ftcMode ? FTCSupportedYears : []))} value={selectedYear} onChange={setSelectedYear} isDisabled={!isOnline || ftcMode === null} placeholder={ftcMode === null ? "Select program first" : "Select a year"} />
                 </Col>
                 <Col sm={7}>
-                    {eventList && <span><b>...then choose an event.</b><br /><Select classNamePrefix="gatool-rs"
+                    {eventList && <span><b>...then choose {ftcMode?.value === "FIRSTGlobal" ? "a field set" : "an event"}.</b><br /><Select classNamePrefix="gatool-rs"
                         options={filterEvents(eventList)}
                         placeholder={ftcMode === null ? "Select program first" : !selectedYear ? "Select season first" : (eventList?.length > 0 ? "Select an event" : "Loading event list")}
                         value={selectedEvent}
@@ -455,7 +462,7 @@ function SetupPage({
                         isDisabled={!isOnline || ftcMode === null || !selectedYear} /></span>}
                 </Col>
             </Row>
-            {eventList && !useFTCOffline && <Row className="setupPageFilters">
+            {eventList && !useFTCOffline && ftcMode?.value !== "FIRSTGlobal" && <Row className="setupPageFilters">
                 <Col sm={4}><b>Filter by event timeframe here...</b><br />
                     <Select classNamePrefix="gatool-rs" options={ftcMode ? filterTimeFTC : filterTime} value={timeFilter ? timeFilter : ftcMode ? filterTimeFTC[0] : filterTime[0]} onChange={setTimeFilter} isDisabled={!isOnline || ftcMode === null || !selectedYear} />
                 </Col>
@@ -573,7 +580,18 @@ function SetupPage({
                                     alt="REEFSCAPE℠ presented by Haas Logo"
                                 />
                             )}
-                            {ftcMode && (
+                            {ftcMode && ftcMode?.value === "FIRSTGlobal" && (
+                                <img
+                                    style={{ width: "100%" }}
+                                    src={
+                                        appearanceDark
+                                            ? "/images/FIRST-Global-2026-Logo.png"
+                                            : "/images/FIRST-Global-2026-Logo.png"
+                                    }
+                                    alt="DECODE℠ presented by RTX Logo"
+                                />
+                            )}
+                            {ftcMode && ftcMode?.value !== "FIRSTGlobal" && (
                                 <img
                                     style={{ width: "100%" }}
                                     src={

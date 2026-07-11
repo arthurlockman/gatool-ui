@@ -4,6 +4,7 @@ import HighScoresSummary from "./HighScoresSummary";
 import { CaretLeftFill, CaretRightFill } from "react-bootstrap-icons";
 import PlayoffDetails from "../components/PlayoffDetails";
 import { useSettings } from "../contexts/SettingsContext";
+import { useEventData } from "contexts/EventDataContext";
 
 
 function BottomButtons({
@@ -27,10 +28,15 @@ function BottomButtons({
   ftcLeagues,
 }) {
   const { showWorldAndStatsOnAnnouncePlayByPlay, highScoreMode, nonStandardPlayoffs } = useSettings();
+  const { firstGlobalMode, remapNumberToString } = useEventData();
+  function formatAllianceMembers(raw) {
+    if (!firstGlobalMode || !raw) return raw;
+    return String(raw).replace(/\d+/g, (num) => remapNumberToString(Number(num)));
+  }
     var matches = playoffSchedule?.schedule;
     var eventHighScore = eventHighScores?.highscores?.overallqual;
     if (!highScoreMode) {
-        if (matchDetails?.tournamentLevel?.toLowerCase() === "playoff") {
+        if (matchDetails?.tournamentLevel?.toLowerCase() === "playoff" || matchDetails?.tournamentLevel?.toLowerCase() === "finals") {
             eventHighScore = eventHighScores?.highscores?.overallplayoff;
         }
     } else
@@ -39,7 +45,7 @@ function BottomButtons({
         }
     const hasEventHighScore = Number(eventHighScore?.score) > 0;
     const isDaVinci = selectedEvent?.value?.code === "FTCCMP1";
-    const isPlayoff = matchDetails?.tournamentLevel?.toLowerCase() === "playoff";
+    const isPlayoff = matchDetails?.tournamentLevel?.toLowerCase() === "playoff" || matchDetails?.tournamentLevel?.toLowerCase() === "finals";
     const showPlayoffDetails = !nonStandardPlayoffs && isPlayoff &&
       (!isDaVinci || matchDetails?.series >= 16);
 
@@ -96,7 +102,7 @@ function BottomButtons({
                     High Score: {eventHighScore?.score}
                     <br />
                     in {eventHighScore?.matchName}
-                    <br />({eventHighScore?.allianceMembers})
+                    <br />({formatAllianceMembers(eventHighScore?.allianceMembers)})
                   </b>
                 </p>
               </div>

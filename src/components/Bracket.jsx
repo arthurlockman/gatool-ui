@@ -12,6 +12,7 @@ import { getTeamByStation, getMatchLabel as getMatchLabelHelper, isCurrentMatchH
 import { useBracketState } from "../hooks/useBracketState";
 import WinnerSelectionModal from "./WinnerSelectionModal";
 import { useSettings } from "../contexts/SettingsContext";
+import { isFtcLayout } from "../utils/programConstants";
 
 function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMatch, qualsLength, nextMatch, previousMatch, getSchedule, usePullDownToUpdate, useSwipe, eventLabel, ftcMode, matches, allianceNumbers, allianceName, matchScore, matchWinner, alliances, remapNumberToString }) {
 	const { playoffCountOverride } = useSettings();
@@ -88,7 +89,7 @@ function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMat
 	// because the propagation logic creates a phantom series 15 entry when series 14 is won, which would
 	// incorrectly push finalSeries to 15 even though no match was actually played there.
 	let finalSeries = 18; // Default to highest series in finals range
-	if (ftcMode) {
+	if (isFtcLayout(ftcMode)) {
 		const scheduleToCheck = offlinePlayoffSchedule?.schedule || matches;
 		const finalsSeriesNumbers = scheduleToCheck
 			.filter((m) =>
@@ -104,7 +105,7 @@ function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMat
 	
 	// In FTC mode, get all matches from the final series sorted by match number
 	const scheduleToCheckForFinals = offlinePlayoffSchedule?.schedule || matches;
-	const finalSeriesMatchesForDisplay = ftcMode ? scheduleToCheckForFinals
+	const finalSeriesMatchesForDisplay = isFtcLayout(ftcMode) ? scheduleToCheckForFinals
 		.filter((m) => m.series === finalSeries)
 		.sort((a, b) => {
 			const aMatchNum = a.originalMatchNumber || a.matchNumber;
@@ -115,7 +116,7 @@ function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMat
 	
 	// Helper function to get score for a finals match position in FTC mode
 	const getFinalsMatchScoreForDisplay = (bracketMatchNumber, alliance) => {
-		if (!ftcMode) {
+		if (!isFtcLayout(ftcMode)) {
 			return getMatchScoreForDisplay(bracketMatchNumber, alliance);
 		}
 		// Map bracket position to match index: match 14 = index 0, match 15 = index 1, etc.
@@ -133,7 +134,7 @@ function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMat
 	
 	// Helper function to get winner for a finals match position in FTC mode
 	const getFinalsMatchWinnerForDisplay = (bracketMatchNumber) => {
-		if (!ftcMode) {
+		if (!isFtcLayout(ftcMode)) {
 			return getMatchWinnerForDisplay(bracketMatchNumber);
 		}
 		// Map bracket position to match index: match 14 = index 0, match 15 = index 1, etc.
@@ -144,7 +145,7 @@ function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMat
 	};
 	
 	// Only calculate tournament winner from matches in the final series (or all finals matches in FRC mode)
-	if (ftcMode) {
+	if (isFtcLayout(ftcMode)) {
 		// In FTC mode, only count matches from the final series
 		const scheduleToCheck = offlinePlayoffSchedule?.schedule || matches;
 		const finalSeriesMatches = scheduleToCheck.filter((m) => m.series === finalSeries);
@@ -171,8 +172,8 @@ function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMat
 	}
 	
 	// FTC: Red (higher seed) wins with 1 victory, Blue (lower seed) needs 2 victories
-	// FRC: Both alliances need 2 victories (best of 3)
-	if (ftcMode) {
+	// FRC/FG: Both alliances need 2 victories (best of 3)
+	if (isFtcLayout(ftcMode)) {
 		if (tournamentWinner.red >= 1) {
 			tournamentWinner.winner = "red";
 		} else if (tournamentWinner.blue >= 2) {
@@ -187,7 +188,7 @@ function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMat
 	}
 	
 	// Check for tiebreaker winner from the final series
-	if (ftcMode) {
+	if (isFtcLayout(ftcMode)) {
 		const scheduleToCheck = offlinePlayoffSchedule?.schedule || matches;
 		const finalSeriesMatches = scheduleToCheck.filter((m) => m.series === finalSeries);
 		if (finalSeriesMatches.length > 0) {
@@ -474,7 +475,7 @@ function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMat
 					x={1024 + PLAYOFF_MATCH_GRAY_BOX_CENTER_X}
 					y={438}
 					firstFinalsMatchNumber={14}
-					finalsCount={ftcMode
+					finalsCount={isFtcLayout(ftcMode)
 						? finalSeriesMatchesForDisplay.length
 						: countConsecutiveFinalsSlotsFromWinnerGetter(getFinalsMatchWinnerForDisplay, 14, 19)}
 					indicatorSpacing={INDICATOR_SPACING}

@@ -1,6 +1,7 @@
 
 import _ from "lodash";
 import { useSettings } from "../contexts/SettingsContext";
+import { getFirstGlobalFlagUrl } from "../utils/countryFlag";
 
 const announceBackground = { "red": "#F7B3B4", "blue": "#98B4F4" }
 
@@ -42,14 +43,14 @@ function Announce({
     return (
         <><tr key={station} className={`gatool-announce ${_.toLower(allianceColor)}Alliance`} >
             <td className={'col1'} style={{ backgroundColor: _.toLower(allianceColor) === "red" ? announceBackground.red : announceBackground.blue }}>
-                <span className={"announceTeamNumber"} ><b>{displayTeamNumber}</b></span><br />
+                <span className={"announceTeamNumber"} >{team?.countryCode && <img src={getFirstGlobalFlagUrl(team.countryCode)} alt={team.countryCode} style={{ height: "1.2em", verticalAlign: "middle", marginRight: "0.2em" }} />}<b>{displayTeamNumber}</b></span><br />
                 {team?.updates?.sayNumber && <span className={"playByPlaysayNumber"}>{team.updates?.sayNumber}<br /></span>}
-                <span >{team?.rookieYear}<br />({years === 1 ? "" : years}{yearsDisplay} season)</span>
+                {selectedEvent?.value?.type !== "FIRSTGlobal" && <span >{team?.rookieYear}<br />({years === 1 ? "" : years}{yearsDisplay} season)</span>}
                 {(inPlayoffs || team.alliance) && <p className={"announceAlliance"}>{team.alliance}{(selectedEvent?.value?.name.includes("OFFLINE") && !playoffOnly) ? <></> : <><br />{team.allianceRole}</>}</p>}
             </td>
             <td className={'col2'} style={{ backgroundColor: _.toLower(allianceColor) === "red" ? announceBackground.red : announceBackground.blue }}>
                 <span className={"teamName"}>{team?.updates?.nameShortLocal ? team?.updates?.nameShortLocal : team?.nameShort}</span><br />
-                <span>{team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : `${team?.city}, ${team?.stateProv}${team?.country !== "USA" && !team?.updates?.cityStateLocal ? `, ${team?.country}` : ""}`}</span><br />
+                {(team?.updates?.cityStateLocal || team?.city || selectedEvent?.value?.type !== "FIRSTGlobal") && <><span>{team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : `${team?.city}, ${team?.stateProv}${team?.country !== "USA" && !team?.updates?.cityStateLocal ? `, ${team?.country}` : ""}`}</span><br /></>}
                 {(team?.updates?.robotNameLocal || team?.robotName )&& <span className={"robotName"}>{team?.updates?.robotNameLocal?team?.updates?.robotNameLocal:team?.robotName}<br /></span>}
                 {team?.updates?.teamMottoLocal && (showMottoes || _.isNull(showMottoes)) && <span className={"mottoes"}>{team?.updates?.teamMottoLocal}<br /></span>}
                 {(((selectedEvent?.value?.champLevel === "CHAMPS" || selectedEvent?.value?.champLevel === "CMPDIV" || selectedEvent?.value?.champLevel === "CMPSUB") && showChampsStats) || (selectedEvent?.value?.champLevel === "" && showChampsStatsAtDistrictRegional)) &&
@@ -118,7 +119,7 @@ function Announce({
                         <p className={"sponsors"} >{team?.updates?.topSponsorsLocal ? team?.updates?.topSponsorsLocal : team?.topSponsors}</p>)
                 }
                 <p className={`HOF${allianceColor}`}>
-                    {originalAndSustaining.includes(String(team?.teamNumber)) && <span>Original and Sustaining Team<br /></span>}
+                    {selectedEvent?.value?.type !== "FIRSTGlobal" && originalAndSustaining.includes(String(team?.teamNumber)) && <span>Original and Sustaining Team<br /></span>}
                     {team?.hallOfFame ? team?.hallOfFame.map((award) => {
                         return <span key={award.year + award.type + award.challenge} className={`HOF${allianceColor} ${(award.type === "chairmans" || award.type === "impact") ? "HOF" : ""}`}>{award.year} {award.type === "chairmans" ? "Chairman's Award" : award.type === "impact" ? "FIRST Impact Award" : "Winner"} {award.challenge}<br /></span>
                     }) : ""}

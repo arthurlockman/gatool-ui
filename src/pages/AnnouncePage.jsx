@@ -7,6 +7,7 @@ import TopButtons from "../components/TopButtons";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useSwipeable } from "react-swipeable";
 import moment from "moment";
+import { isFtcLayout } from "../utils/programConstants";
 import { useEffect, useMemo, useRef } from "react";
 import NotificationBanner from "components/NotificationBanner";
 import EventNotificationBanner from "components/EventNotificationBanner";
@@ -57,7 +58,7 @@ function AnnouncePage({
   alliancePartnerConnectionsCache,
   allianceSelectionArrays,
 }) {
-  const { selectedEvent, selectedYear, eventLabel, ftcMode, teamList, qualSchedule, playoffSchedule, practiceSchedule, offlinePlayoffSchedule, rankings, districtRankings, alliances, allianceCount, communityUpdates, currentMatch, remapNumberToString, remapStringToNumber, regionalEventDetail } = useEventData();
+  const { selectedEvent, selectedYear, eventLabel, ftcMode, firstGlobalMode, teamList, qualSchedule, qualScheduleAllFields, playoffSchedule, practiceSchedule, offlinePlayoffSchedule, rankings, districtRankings, alliances, allianceCount, communityUpdates, currentMatch, remapNumberToString, remapStringToNumber, regionalEventDetail } = useEventData();
   const { nextMatch, previousMatch, setMatchFromMenu, getSchedule, getRegionalEventDetail } = useEventActions();
   const { hidePracticeSchedule, teamReduction, showInspection, usePullDownToUpdate, useSwipe, useScrollMemory } = useSettings();
   // Remember scroll position for Announce page
@@ -144,24 +145,31 @@ function AnnouncePage({
         _.findIndex(matchDetails?.teams, { station: station })
         ];
       // Reverse-map the team number to get the actual team number for lookups
+      // For FG, rankings are keyed by numeric teamNumber, not the remapped country code
       const lookupTeamNumber = remapNumberToString(team?.teamNumber);
-
+      const rankingsKey = firstGlobalMode ? team?.teamNumber : lookupTeamNumber;
 
       team = _.merge(
         team,
         teamListLookup[team?.teamNumber],
-        rankingsLookup[lookupTeamNumber],
+        rankingsLookup[rankingsKey],
         communityUpdates ? communityUpdatesLookup[team?.teamNumber] : undefined
       );
 
+      // FIRST Global: hide rank during playoffs/finals
+      if (firstGlobalMode && inPlayoffs) {
+        team.rank = null;
+      }
       team.rankStyle = rankHighlight(team?.rank, allianceCount || { count: 8 });
       const announceAllianceEntry = getAllianceLookupEntry(
         alliances?.Lookup,
         team?.teamNumber,
         remapNumberToString
       );
-      team.alliance = announceAllianceEntry?.alliance ?? null;
-      team.allianceRole = announceAllianceEntry?.role ?? null;
+      // FIRST Global: only show alliance info during playoffs (all teams are drafted, so quals would show alliances for everyone)
+      const suppressAlliance = firstGlobalMode && !inPlayoffs;
+      team.alliance = suppressAlliance ? null : (announceAllianceEntry?.alliance ?? null);
+      team.allianceRole = suppressAlliance ? null : (announceAllianceEntry?.role ?? null);
       if (adHocMode && !team.alliance) {
         const adHocInfo = getAdHocAllianceInfo(team?.teamNumber);
         if (adHocInfo) {
@@ -237,6 +245,10 @@ function AnnouncePage({
             communityUpdates?.length > 0 ? communityUpdatesLookup[remapStringToNumber(lookupRemainingTeam)] : null
           );
 
+          // FIRST Global: hide rank during playoffs/finals
+          if (firstGlobalMode && inPlayoffs) {
+            team.rank = null;
+          }
           team.rankStyle = rankHighlight(
             team?.rank,
             allianceCount || { count: 8 }
@@ -312,8 +324,12 @@ function AnnouncePage({
     schedule = _.concat(schedule, offlinePlayoffSchedule?.schedule);
   }
 
-  // Handle nested structure (standard from API/uploads) or flat structure (legacy)
-  if (qualSchedule?.schedule?.schedule?.length > 0) {
+  // FIRST Global with fieldset filter: use all-fields qual schedule so playoff match positions
+  // are based on the total qual count (not filtered count), keeping currentMatch consistent.
+  const allFieldsQuals = firstGlobalMode && qualScheduleAllFields?.schedule?.schedule;
+  if (allFieldsQuals?.length > 0) {
+    schedule = _.concat(schedule, allFieldsQuals);
+  } else if (qualSchedule?.schedule?.schedule?.length > 0) {
     schedule = _.concat(schedule, qualSchedule?.schedule?.schedule);
   } else if (qualSchedule?.schedule?.length > 0) {
     schedule = _.concat(schedule, qualSchedule?.schedule);
@@ -368,9 +384,7 @@ function AnnouncePage({
   }
 
   var inPlayoffs = matchDetails?.tournamentLevel
-    ? matchDetails?.tournamentLevel.toLowerCase() === "playoff"
-      ? true
-      : false
+    ? (matchDetails?.tournamentLevel.toLowerCase() === "playoff" || matchDetails?.tournamentLevel.toLowerCase() === "finals")
     : false;
 
   matchDetails = applyPlayoffStationOrderToMatch(
@@ -380,26 +394,42 @@ function AnnouncePage({
     ftcMode
   );
 
+  const fieldset = selectedEvent?.value?.fieldset;
+  const hasFieldsetFilter = firstGlobalMode && fieldset && selectedEvent?.value?.fieldsetIndex !== -1;
+  const totalQualsCount = allFieldsQuals?.length ?? qualSchedule?.schedule?.schedule?.length ?? qualSchedule?.schedule?.length;
   const matchMenu = schedule.map((match, index) => {
-    var tag = `${match?.description} of ${qualSchedule?.schedule?.length}`;
+    var tag = `${match?.description} of ${totalQualsCount}`;
     if (
       (match?.tournamentLevel &&
-        match?.tournamentLevel?.toLowerCase() === "playoff") ||
+        match?.tournamentLevel?.toLowerCase() === "playoff" ||
+        match?.tournamentLevel?.toLowerCase() === "finals") ||
       (match?.tournamentLevel &&
         match?.tournamentLevel?.toLowerCase() === "practice")
     ) {
       tag = match?.description;
+    }
+    // FIRST Global: append field number to match description (only when not filtering — filtered view shows only the relevant field)
+    if (match?.fieldNumber != null && !hasFieldsetFilter) {
+      tag += ` (Field ${match.fieldNumber})`;
     }
     return {
       value: index + 1,
       label: tag,
       matchCompleted: matchHasPostedResult(match),
     };
+  }).filter((entry) => {
+    // When FIRST Global fieldset filter is active, hide qual matches from other fields
+    if (!hasFieldsetFilter) return true;
+    const match = schedule[entry.value - 1];
+    const isPlayoff = match?.tournamentLevel?.toLowerCase() === "playoff" ||
+      match?.tournamentLevel?.toLowerCase() === "finals";
+    if (isPlayoff) return true;
+    return !match?.fieldNumber || fieldset.includes(match.fieldNumber);
   });
 
-  var displayOrder = !ftcMode
-    ? ["Red1", "Red2", "Red3", "Red4", "Blue1", "Blue2", "Blue3", "Blue4"]
-    : ["Red1", "Red2", "Red3", "Blue1", "Blue2", "Blue3"];
+  var displayOrder = isFtcLayout(ftcMode)
+    ? ["Red1", "Red2", "Red3", "Blue1", "Blue2", "Blue3"]
+    : ["Red1", "Red2", "Red3", "Red4", "Blue1", "Blue2", "Blue3", "Blue4"];
   const teamDetails = useMemo(() => {
     const details = [];
     if (teamList && matchDetails) {
@@ -588,14 +618,14 @@ function AnnouncePage({
               <table className={"table table-responsive"}>
                 <thead>
                   <tr key={"header"}>
-                    <td>Team #</td>
+                    <td>{firstGlobalMode ? "Country" : "Team #"}</td>
                     <td>Team Name</td>
                     <td>Organization, Sponsors & Awards</td>
-                    <td>
+                    {!(firstGlobalMode && inPlayoffs) && <td>
                       {showPlayoffMatchupColumn
                         ? "Prior Partnerships"
                         : "Rank"}
-                    </td>
+                    </td>}
                   </tr>
                 </thead>
                 <tbody>
@@ -657,6 +687,11 @@ function AnnouncePage({
                           column4 = { type: "omit" };
                         }
                       }
+                    }
+
+                    // FIRST Global playoffs/finals: hide the rank column entirely
+                    if (!column4 && firstGlobalMode && inPlayoffs) {
+                      column4 = { type: "omit" };
                     }
 
                     if (

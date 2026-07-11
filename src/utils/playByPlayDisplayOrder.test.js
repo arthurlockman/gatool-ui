@@ -36,23 +36,23 @@ describe("getPlayByPlayDisplayOrder", () => {
 });
 
 describe("getFieldStationsInPlayByPlayVisualOrder", () => {
-  it("returns red stations 1-3 in visual order for FRC default", () => {
+  it("returns red stations 1-4 in visual order for FRC default", () => {
     // From FRC default: Blue1, Red3, Blue2, Red2, Blue3, Red1, Blue4, Red4
-    // Red[123] in order: Red3, Red2, Red1
+    // Red[1234] in order: Red3, Red2, Red1, Red4
     expect(getFieldStationsInPlayByPlayVisualOrder("Red", false, false)).toEqual([
-      "Red3", "Red2", "Red1",
+      "Red3", "Red2", "Red1", "Red4",
     ]);
   });
 
-  it("returns blue stations 1-3 in visual order for FRC default", () => {
+  it("returns blue stations 1-4 in visual order for FRC default", () => {
     expect(getFieldStationsInPlayByPlayVisualOrder("Blue", false, false)).toEqual([
-      "Blue1", "Blue2", "Blue3",
+      "Blue1", "Blue2", "Blue3", "Blue4",
     ]);
   });
 
-  it("excludes station 4 even in FRC mode (top-to-bottom of red 1-3 only)", () => {
+  it("includes station 4 in FRC mode", () => {
     const reds = getFieldStationsInPlayByPlayVisualOrder("Red", false, false);
-    expect(reds).not.toContain("Red4");
+    expect(reds).toContain("Red4");
   });
 
   it("returns red stations in visual order for FTC default", () => {

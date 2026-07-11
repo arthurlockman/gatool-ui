@@ -26,9 +26,11 @@ export function useMatchNavigation(deps) {
     currentMatch,
     adHocMode,
     qualSchedule,
+    qualScheduleAllFields,
     playoffSchedule,
     practiceSchedule,
     offlinePlayoffSchedule,
+    firstGlobalMode,
     setCurrentMatch,
     setAdHocMatch,
     getSchedule,
@@ -40,6 +42,48 @@ export function useMatchNavigation(deps) {
 
   // Event selection comes from context now (Phase 8).
   const { selectedEvent, ftcMode } = useEventSelection();
+
+  /**
+   * For FIRST Global with fieldset filter, advance past qual matches not in the selected fieldset.
+   * Returns the next valid match number, or null if no valid next match exists.
+   */
+  function nextFieldsetMatch(from) {
+    const fieldset = selectedEvent?.value?.fieldset;
+    const fieldsetIndex = selectedEvent?.value?.fieldsetIndex;
+    if (!firstGlobalMode || !fieldset || fieldsetIndex === -1 || !qualScheduleAllFields) return from + 1;
+    const allQuals = qualScheduleAllFields.schedule?.schedule ?? [];
+    const playoffs = playoffSchedule?.schedule ?? [];
+    const fullSchedule = [...allQuals, ...playoffs];
+    let next = from + 1;
+    while (next <= fullSchedule.length) {
+      const match = fullSchedule[next - 1];
+      const isPlayoff = match?.tournamentLevel?.toLowerCase() === "playoff" ||
+        match?.tournamentLevel?.toLowerCase() === "finals";
+      if (isPlayoff || !match?.fieldNumber || fieldset.includes(match.fieldNumber)) break;
+      next++;
+    }
+    // If we walked past the end of the schedule, no valid next match exists
+    return next <= fullSchedule.length ? next : null;
+  }
+
+  function prevFieldsetMatch(from) {
+    const fieldset = selectedEvent?.value?.fieldset;
+    const fieldsetIndex = selectedEvent?.value?.fieldsetIndex;
+    if (!firstGlobalMode || !fieldset || fieldsetIndex === -1 || !qualScheduleAllFields) return from - 1;
+    const allQuals = qualScheduleAllFields.schedule?.schedule ?? [];
+    const playoffs = playoffSchedule?.schedule ?? [];
+    const fullSchedule = [...allQuals, ...playoffs];
+    let prev = from - 1;
+    while (prev >= 1) {
+      const match = fullSchedule[prev - 1];
+      const isPlayoff = match?.tournamentLevel?.toLowerCase() === "playoff" ||
+        match?.tournamentLevel?.toLowerCase() === "finals";
+      if (isPlayoff || !match?.fieldNumber || fieldset.includes(match.fieldNumber)) break;
+      prev--;
+    }
+    // If we walked before the start of the schedule, no valid previous match exists
+    return prev >= 1 ? prev : null;
+  }
 
   /**
    * Advances to the next match. Refreshes scores, ranks and world stats when appropriate.
@@ -79,15 +123,19 @@ export function useMatchNavigation(deps) {
         }
       }
 
+      const totalQualCount = (firstGlobalMode && qualScheduleAllFields?.schedule?.schedule?.length) ||
+        qualSchedule?.schedule?.length ||
+        qualSchedule?.schedule?.schedule?.length;
       if (
         currentMatch <
-        (qualSchedule?.schedule?.length ||
-          qualSchedule?.schedule?.schedule?.length) +
-        playoffSchedule?.schedule?.length
+        totalQualCount + playoffSchedule?.schedule?.length
       ) {
-        setCurrentMatch(currentMatch + 1);
-        if (!selectedEvent?.value?.code.includes("OFFLINE")) {
-          getSchedule();
+        const nextMatchNum = nextFieldsetMatch(currentMatch);
+        if (nextMatchNum != null) {
+          setCurrentMatch(nextMatchNum);
+          if (!selectedEvent?.value?.code.includes("OFFLINE")) {
+            getSchedule();
+          }
         }
       }
       getSystemMessages();
@@ -106,20 +154,23 @@ export function useMatchNavigation(deps) {
     if (currentMatch == null) return;
     if (!adHocMode) {
       if (currentMatch > 1) {
-        if (practiceSchedule?.schedule?.length > 0) {
-          setAdHocMatch(
-            practiceSchedule?.schedule[currentMatch - 2]?.teams ||
-            practiceSchedule?.schedule?.schedule?.teams
-          );
+        const prevMatchNum = prevFieldsetMatch(currentMatch);
+        if (prevMatchNum != null) {
+          if (practiceSchedule?.schedule?.length > 0) {
+            setAdHocMatch(
+              practiceSchedule?.schedule[currentMatch - 2]?.teams ||
+              practiceSchedule?.schedule?.schedule?.teams
+            );
+          }
+          setCurrentMatch(prevMatchNum);
+          if (!selectedEvent?.value?.code.includes("OFFLINE")) {
+            getSchedule();
+          }
+          getSystemMessages();
+          getEventMessages();
+          getWorldStats();
+          if (!ftcMode && selectedEvent?.value?.districtCode) getFrcDistrictHighScores();
         }
-        setCurrentMatch(currentMatch - 1);
-        if (!selectedEvent?.value?.code.includes("OFFLINE")) {
-          getSchedule();
-        }
-        getSystemMessages();
-        getEventMessages();
-        getWorldStats();
-        if (!ftcMode && selectedEvent?.value?.districtCode) getFrcDistrictHighScores();
       }
     }
   }

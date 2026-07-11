@@ -4,12 +4,14 @@ import { eventNames, FTCEventNames } from "../data/eventNames";
 import _ from "lodash";
 import moment from "moment";
 import { useEventSelection } from "../contexts/EventSelectionContext";
+import { getApiBaseUrl, isFirstGlobalMode } from "../utils/programConstants";
 
 const ftcBaseURL = "https://api.gatool.org/ftc/v2/";
 
 export function useHighScores({
   httpClient,
   qualSchedule,
+  qualScheduleAllFields,
   playoffSchedule,
   useFTCOffline,
   isOnline,
@@ -38,6 +40,11 @@ export function useHighScores({
    * @returns sets the world high scores
    */
   async function getWorldStats() {
+    // FIRST Global: no high scores endpoint
+    if (isFirstGlobalMode(ftcMode)) {
+      setWorldStats(null);
+      return;
+    }
     // Skip external API calls when in FTC offline mode without internet
     if (useFTCOffline && (!isOnline || manualOfflineMode)) {
       console.log("FTC Offline mode: Skipping World High Scores API call while offline" + (manualOfflineMode ? " (manual override)" : ""));
@@ -47,7 +54,7 @@ export function useHighScores({
 
     var result = await httpClient.getNoAuth(
       `${selectedYear?.value}/highscores`,
-      ftcMode ? ftcBaseURL : undefined
+      getApiBaseUrl(ftcMode)
     );
     if (result.status === 404 || result.status === 500) {
       setWorldStats(null);
@@ -435,8 +442,12 @@ export function useHighScores({
     }
 
     // Process qualification matches
-    if (qualSchedule?.schedule && Array.isArray(qualSchedule.schedule)) {
-      qualSchedule.schedule.forEach(match => {
+    // Handle both flat { schedule: [...] } and nested { schedule: { schedule: [...] } } structures
+    const qualMatches = Array.isArray(qualSchedule?.schedule)
+      ? qualSchedule.schedule
+      : qualSchedule?.schedule?.schedule;
+    if (Array.isArray(qualMatches)) {
+      qualMatches.forEach(match => {
         processMatch(match, 'qual', 'qual');
       });
     }
@@ -482,8 +493,12 @@ export function useHighScores({
       return;
     }
 
+    // FIRST Global: use the complete unfiltered schedule so high scores span all fields
+    const scheduleForHighScores = isFirstGlobalMode(ftcMode) && qualScheduleAllFields
+      ? qualScheduleAllFields
+      : qualSchedule;
     const highscores = calculateEventHighScores(
-      qualSchedule,
+      scheduleForHighScores,
       playoffSchedule,
       year,
       code,

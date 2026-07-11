@@ -1,4 +1,5 @@
 import _ from "lodash";
+import { useEventData } from "contexts/EventDataContext";
 
 function StatsMatch({
   highScores,
@@ -8,6 +9,13 @@ function StatsMatch({
   tableType,
   backgroundColorOverride = undefined,
 }) {
+  const { firstGlobalMode, remapNumberToString } = useEventData();
+
+  function formatAllianceMembers(raw) {
+    if (!firstGlobalMode || !raw) return raw;
+    return String(raw).replace(/\d+/g, (num) => remapNumberToString(Number(num)));
+  }
+
   const style =
     backgroundColorOverride != null
       ? { backgroundColor: backgroundColorOverride }
@@ -33,7 +41,7 @@ function StatsMatch({
             : highScores[matchType]?.eventName}
           <br />
           {highScores[matchType]?.alliance} Alliance
-          <br />({highScores[matchType].allianceMembers})<br />
+          <br />({formatAllianceMembers(highScores[matchType].allianceMembers)})<br />
         </td>
       )}
       {(!highScores || _.keys(highScores[matchType])?.length === 0) && (

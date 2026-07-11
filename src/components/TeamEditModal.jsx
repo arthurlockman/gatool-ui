@@ -65,6 +65,7 @@ function TeamEditModal({
     selectedYear,
     originalAndSustaining,
     ftcMode,
+    firstGlobalMode,
     updateClass,
     onSave,
     onTrack,
@@ -160,10 +161,10 @@ function TeamEditModal({
     return (
         <Modal centered={true} fullscreen={true} show={show} size="lg" onHide={onHide} contentClassName="gatool-team-edit-modal">
             <Modal.Header className={_.find(localUpdates, { "teamNumber": updateTeam.teamNumber }) ? "redAlliance" : "allianceChoice"} closeVariant={"white"} closeButton>
-                <Modal.Title >{_.find(localUpdates, { "teamNumber": updateTeam.teamNumber }) ? <i> You have a locally saved update for Team {updateTeam.teamNumber}. Please upload to gatool Cloud{!isOnline ? <> when you are online again.</> : <>.</>}</i> : `Editing Team ${updateTeam.teamNumber}'s Details`}</Modal.Title>
+                <Modal.Title >{_.find(localUpdates, { "teamNumber": updateTeam.teamNumber }) ? <i> You have a locally saved update for Team {updateTeam?.displayTeamNumber || updateTeam.teamNumber}. Please upload to gatool Cloud{!isOnline ? <> when you are online again.</> : <>.</>}</i> : `Editing Team ${updateTeam?.displayTeamNumber || updateTeam.teamNumber}'s Details`}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <p>Use this form to update team information for <b>Team {updateTeam.teamNumber}.</b> Editable fields are shown below. Your changes will be stored locally on your machine and should not be erased if you close your browser. We do recommend using the Save to Home Screen feature on Android and iOS, and the Save App feature from Chrome on desktop, if you are offline.</p>
+                <p>Use this form to update team information for <b>Team {updateTeam?.displayTeamNumber || updateTeam.teamNumber}.</b> Editable fields are shown below. Your changes will be stored locally on your machine and should not be erased if you close your browser. We do recommend using the Save to Home Screen feature on Android and iOS, and the Save App feature from Chrome on desktop, if you are offline.</p>
                 <p>Items <span className={"teamTableHighlight"}><b>highlighted in green</b></span> have local changes. <b>Motto</b>, {ftcMode ? <></> : <><b>Robot Name</b>,</>} <b>pronounciation guides</b> and <b>Notes</b> do not exist in TIMS, so they are always local. To reset any value to the TIMS value, simply delete it here and tap DONE.</p>
                 <p>You can upload this form to gatool Cloud, or keep the values locally for later upload, using the buttons at the bottom of this screen.</p>
                 <p onClick={(e) => onHistory(updateTeam, e)}><b><CalendarPlusFill /> Tap here to see prior team data updates.</b></p>
@@ -178,8 +179,8 @@ function TeamEditModal({
                         <Form.Control className={organizationLocal ? "formHighlight" : ""} type="text" placeholder={updateTeam.organization} value={organizationLocal} onChange={(e) => setOrganizationLocal(e.target.value)} />
                     </Form.Group>
                     <Form.Group controlId="cityState">
-                        <Form.Label className={"formLabel"}><b>City/State ({`${updateTeam?.city}, ${updateTeam?.stateProv}${(updateTeam?.country !== "USA") ? ", " + updateTeam?.country : ""}`}) in TIMS)</b></Form.Label>
-                        <Form.Control className={cityStateLocal ? "formHighlight" : ""} type="text" placeholder={`${updateTeam?.city}, ${updateTeam?.stateProv} ${(updateTeam?.country !== "USA") ? " " + updateTeam?.country : ""}`} value={cityStateLocal} onChange={(e) => setCityStateLocal(e.target.value)} />
+                        <Form.Label className={"formLabel"}><b>City/State {firstGlobalMode ? "" : `(${updateTeam?.city}, ${updateTeam?.stateProv}${(updateTeam?.country !== "USA") ? ", " + updateTeam?.country : ""}) in TIMS`})</b></Form.Label>
+                        <Form.Control className={cityStateLocal ? "formHighlight" : ""} type="text" placeholder={firstGlobalMode ? "Enter city/state if known" : `${updateTeam?.city}, ${updateTeam?.stateProv} ${(updateTeam?.country !== "USA") ? " " + updateTeam?.country : ""}`} value={cityStateLocal} onChange={(e) => setCityStateLocal(e.target.value)} />
                     </Form.Group>
                     <Form.Group controlId="sayNumber">
                         <Form.Label className={"formLabel"}><b>How to pronounce the team number (some teams are particular)</b></Form.Label>
@@ -203,15 +204,15 @@ function TeamEditModal({
                     <Form.Group controlId="awardsText">
                         <Form.Label className={"formLabel"}>
                             <b>Award/Alliance Selection text</b> (editable portion in <b><i>bold and italic</i></b> below):<br />
-                            Team {updateTeam?.teamNumber} {nameShortLocal ? nameShortLocal : updateTeam?.nameShort}<br />
-                            is <b><i>{awardsTextLocal ? awardsTextLocal : <>{originalAndSustaining.includes(String(updateTeam?.teamNumber)) ? "an Original and Sustaining Team " : ""}from<br />
+                            Team {updateTeam?.displayTeamNumber || updateTeam?.teamNumber} {nameShortLocal ? nameShortLocal : updateTeam?.nameShort}<br />
+                            is <b><i>{awardsTextLocal ? awardsTextLocal : <>{(!firstGlobalMode && originalAndSustaining.includes(String(updateTeam?.teamNumber))) ? "an Original and Sustaining Team " : ""}from<br />
                                 {organizationLocal ? organizationLocal : updateTeam?.organization}<br />
-                                in</>}</i></b> {cityStateLocal ? cityStateLocal : `${updateTeam?.city}, ${updateTeam?.stateProv}`}{updateTeam?.country !== "USA"  && !cityStateLocal ? `, ${updateTeam?.country}` : ""}<br />
+                                in</>}</i></b> {cityStateLocal ? cityStateLocal : (firstGlobalMode ? "" : `${updateTeam?.city}, ${updateTeam?.stateProv}${updateTeam?.country !== "USA" ? `, ${updateTeam?.country}` : ""}`)}<br />
                         </Form.Label>
                         <Form.Control
                             className={awardsTextLocal ? "formHighlight" : ""}
                             type="text"
-                            placeholder={`${originalAndSustaining.includes(String(updateTeam?.teamNumber)) ? "an Original and Sustaining Team " : ""}from ${organizationLocal ? organizationLocal : updateTeam?.organization} in`}
+                            placeholder={`${(!firstGlobalMode && originalAndSustaining.includes(String(updateTeam?.teamNumber))) ? "an Original and Sustaining Team " : ""}from ${organizationLocal ? organizationLocal : updateTeam?.organization} in`}
                             value={awardsTextLocal}
                             onChange={(e) => setAwardsTextLocal(e.target.value)} />
                     </Form.Group>
@@ -228,7 +229,7 @@ function TeamEditModal({
                             <Button className={"TBAButton"} onClick={() => { window.open(`https://frc-events.firstinspires.org/${selectedYear.value}/team/${updateTeam.teamNumber}`) }}>{`FIRST Season details ${selectedYear.value}`}</Button>
                             <Button className={"TBAButton"} onClick={() => { window.open(`https://frc-events.firstinspires.org/${selectedYear.value - 1}/team/${updateTeam.teamNumber}`) }}>{`FIRST Season details ${selectedYear.value - 1}`}</Button>
                         </ButtonToolbar>}
-                        {ftcMode && <ButtonToolbar>
+                        {ftcMode && !firstGlobalMode && <ButtonToolbar>
                             <Button className={"TBAButton"} onClick={() => { window.open(`https://ftcscout.org/teams/${updateTeam.teamNumber}`) }}>{`FTC Scout Page for ${updateTeam.teamNumber}`}</Button>
                             <Button className={"TBAButton"} onClick={() => { window.open(`https://ftc-events.firstinspires.org/${selectedYear.value}/team/${updateTeam.teamNumber}`) }}>{`FIRST Season details ${selectedYear.value}`}</Button>
                             <Button className={"TBAButton"} onClick={() => { window.open(`https://ftc-events.firstinspires.org/${selectedYear.value - 1}/team/${updateTeam.teamNumber}`) }}>{`FIRST Season details ${selectedYear.value - 1}`}</Button>

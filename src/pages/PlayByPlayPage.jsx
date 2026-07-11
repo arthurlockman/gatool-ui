@@ -52,7 +52,7 @@ function PlayByPlayPage({
   setEventBell,
   allianceSelectionArrays,
 }) {
-  const { selectedEvent, selectedYear, eventLabel, ftcMode, teamList, qualSchedule, playoffSchedule, practiceSchedule, offlinePlayoffSchedule, rankings, districtRankings, alliances, allianceCount, communityUpdates, currentMatch, remapNumberToString, remapStringToNumber, EPA, regionalEventDetail } = useEventData();
+  const { selectedEvent, selectedYear, eventLabel, ftcMode, firstGlobalMode, teamList, qualSchedule, qualScheduleAllFields, playoffSchedule, practiceSchedule, offlinePlayoffSchedule, rankings, districtRankings, alliances, allianceCount, communityUpdates, currentMatch, remapNumberToString, remapStringToNumber, EPA, regionalEventDetail } = useEventData();
   const { nextMatch, previousMatch, setMatchFromMenu, getSchedule, getRegionalEventDetail } = useEventActions();
   const { swapScreen, hidePracticeSchedule, teamReduction, showInspection, usePullDownToUpdate, useSwipe, useScrollMemory, useFourTeamAlliances } = useSettings();
   // Remember scroll position for Play by play page
@@ -139,6 +139,8 @@ function PlayByPlayPage({
       matchDetails?.teams[
         _.findIndex(matchDetails?.teams, { station: `${alliance}1` })
       ]?.alliance;
+    // FIRST Global: only show alliance info during playoffs
+    const suppressAlliance = firstGlobalMode && !inPlayoffs;
     if (station.slice(-1) !== "4" || adHocMode) {
       team =
         matchDetails?.teams[
@@ -146,24 +148,30 @@ function PlayByPlayPage({
         ];
 
       // Reverse-map the team number to get the actual team number for lookups
+      // For FG, rankings are keyed by numeric teamNumber, not the remapped country code
       const lookupTeamNumber = remapNumberToString(team?.teamNumber);
+      const rankingsKey = firstGlobalMode ? team?.teamNumber : lookupTeamNumber;
 
       team = _.merge(
         team,
         teamListLookup[team?.teamNumber],
-        rankings?.ranks?.length > 0 ? rankingsLookup[lookupTeamNumber] : null,
+        rankings?.ranks?.length > 0 ? rankingsLookup[rankingsKey] : null,
         EPA?.length > 0 ? epaLookup[team?.teamNumber] : null,
         communityUpdates?.length > 0 ? communityUpdatesLookup[team?.teamNumber] : null
       );
 
+      // FIRST Global: hide rank during playoffs/finals
+      if (firstGlobalMode && inPlayoffs) {
+        team.rank = null;
+      }
       team.rankStyle = rankHighlight(team?.rank, allianceCount || { count: 8 });
       const pbpAllianceEntry = getAllianceLookupEntry(
         alliances?.Lookup,
         team?.teamNumber,
         remapNumberToString
       );
-      team.alliance = pbpAllianceEntry?.alliance ?? null;
-      team.allianceRole = pbpAllianceEntry?.role ?? null;
+      team.alliance = suppressAlliance ? null : (pbpAllianceEntry?.alliance ?? null);
+      team.allianceRole = suppressAlliance ? null : (pbpAllianceEntry?.role ?? null);
       if (adHocMode && !team.alliance) {
         const adHocInfo = getAdHocAllianceInfo(team?.teamNumber);
         if (adHocInfo) {
@@ -245,8 +253,8 @@ function PlayByPlayPage({
             lookupRemainingTeam,
             remapNumberToString
           );
-          team.alliance = pbpRemEntry?.alliance ?? null;
-          team.allianceRole = pbpRemEntry?.role ?? null;
+          team.alliance = suppressAlliance ? null : (pbpRemEntry?.alliance ?? null);
+          team.allianceRole = suppressAlliance ? null : (pbpRemEntry?.role ?? null);
 
           if (selectedEvent?.value?.districtCode) {
             teamDistrictRanks =
@@ -311,8 +319,12 @@ function PlayByPlayPage({
     schedule = _.concat(schedule, offlinePlayoffSchedule?.schedule);
   }
 
-  // Handle nested structure (standard from API/uploads) or flat structure (legacy)
-  if (qualSchedule?.schedule?.schedule?.length > 0) {
+  // FIRST Global with fieldset filter: use all-fields qual schedule so playoff match positions
+  // are based on the total qual count (not filtered count), keeping currentMatch consistent.
+  const allFieldsQuals = firstGlobalMode && qualScheduleAllFields?.schedule?.schedule;
+  if (allFieldsQuals?.length > 0) {
+    schedule = _.concat(schedule, allFieldsQuals);
+  } else if (qualSchedule?.schedule?.schedule?.length > 0) {
     schedule = _.concat(schedule, qualSchedule?.schedule?.schedule);
   } else if (qualSchedule?.schedule?.length > 0) {
     schedule = _.concat(schedule, qualSchedule?.schedule);
@@ -322,8 +334,16 @@ function PlayByPlayPage({
     schedule = _.concat(schedule, playoffSchedule?.schedule);
   }
 
+  // FIRST Global: team high scores must use all fields, not just the selected fieldset
+  const scheduleForHighScores = firstGlobalMode && qualScheduleAllFields
+    ? [
+        ...(qualScheduleAllFields.schedule?.schedule ?? qualScheduleAllFields.schedule ?? []),
+        ...(playoffSchedule?.schedule ?? []),
+      ]
+    : schedule;
+
   var scores = [];
-  _.forEach(schedule, (match) => {
+  _.forEach(scheduleForHighScores, (match) => {
     _.forEach(match?.teams, (team) => {
       var row = {};
       row.teamNumber = team.teamNumber;
@@ -394,9 +414,7 @@ function PlayByPlayPage({
   }
 
   var inPlayoffs = matchDetails?.tournamentLevel
-    ? matchDetails?.tournamentLevel.toLowerCase() === "playoff"
-      ? true
-      : false
+    ? (matchDetails?.tournamentLevel.toLowerCase() === "playoff" || matchDetails?.tournamentLevel.toLowerCase() === "finals")
     : false;
 
   matchDetails = applyPlayoffStationOrderToMatch(
@@ -409,21 +427,37 @@ function PlayByPlayPage({
    *  works from schedule station assignments, not visual reorder. */
   const rawMatchDetailsForReserve = schedule[currentMatch - 1] ?? null;
 
+  const fieldset = selectedEvent?.value?.fieldset;
+  const hasFieldsetFilter = firstGlobalMode && fieldset && selectedEvent?.value?.fieldsetIndex !== -1;
+  const totalQualsCount = allFieldsQuals?.length ?? qualSchedule?.schedule?.schedule?.length ?? qualSchedule?.schedule?.length;
   const matchMenu = schedule.map((match, index) => {
-    var tag = `${match?.description} of ${qualSchedule?.schedule?.length}`;
+    var tag = `${match?.description} of ${totalQualsCount}`;
     if (
       (match?.tournamentLevel &&
-        match?.tournamentLevel?.toLowerCase() === "playoff") ||
+        match?.tournamentLevel?.toLowerCase() === "playoff" ||
+        match?.tournamentLevel?.toLowerCase() === "finals") ||
       (match?.tournamentLevel &&
         match?.tournamentLevel?.toLowerCase() === "practice")
     ) {
       tag = match?.description;
+    }
+    // FIRST Global: append field number to match description (only when not filtering — filtered view shows only the relevant field)
+    if (match?.fieldNumber != null && !hasFieldsetFilter) {
+      tag += ` (Field ${match.fieldNumber})`;
     }
     return {
       value: index + 1,
       label: tag,
       matchCompleted: matchHasPostedResult(match),
     };
+  }).filter((entry) => {
+    // When FIRST Global fieldset filter is active, hide qual matches from other fields
+    if (!hasFieldsetFilter) return true;
+    const match = schedule[entry.value - 1];
+    const isPlayoff = match?.tournamentLevel?.toLowerCase() === "playoff" ||
+      match?.tournamentLevel?.toLowerCase() === "finals";
+    if (isPlayoff) return true;
+    return !match?.fieldNumber || fieldset.includes(match.fieldNumber);
   });
 
   var teamDetails = [];
@@ -552,6 +586,7 @@ function PlayByPlayPage({
                       adHocMode={adHocMode}
                       playoffOnly={playoffOnly}
                       ftcMode={ftcMode}
+                      firstGlobalMode={firstGlobalMode}
                       remapNumberToString={remapNumberToString}
                     />
                     <PlayByPlay
@@ -563,6 +598,7 @@ function PlayByPlayPage({
                       adHocMode={adHocMode}
                       playoffOnly={playoffOnly}
                       ftcMode={ftcMode}
+                      firstGlobalMode={firstGlobalMode}
                       remapNumberToString={remapNumberToString}
                     />
                   </tr>
@@ -576,6 +612,7 @@ function PlayByPlayPage({
                       adHocMode={adHocMode}
                       playoffOnly={playoffOnly}
                       ftcMode={ftcMode}
+                      firstGlobalMode={firstGlobalMode}
                       remapNumberToString={remapNumberToString}
                     />
                     <PlayByPlay
@@ -587,10 +624,11 @@ function PlayByPlayPage({
                       adHocMode={adHocMode}
                       playoffOnly={playoffOnly}
                       ftcMode={ftcMode}
+                      firstGlobalMode={firstGlobalMode}
                       remapNumberToString={remapNumberToString}
                     />
                   </tr>
-                  {(!ftcMode || (inPlayoffs && ftcMode && (selectedEvent?.value?.champLevel === "CHAMPS" || selectedEvent?.value?.champLevel === "CMPDIV" || selectedEvent?.value?.champLevel === "CMPSUB")) || (inPlayoffs && ftcMode && useFourTeamAlliances) || (adHocMode && ftcMode)) && (
+                  {(!ftcMode || firstGlobalMode || (inPlayoffs && ftcMode && (selectedEvent?.value?.champLevel === "CHAMPS" || selectedEvent?.value?.champLevel === "CMPDIV" || selectedEvent?.value?.champLevel === "CMPSUB")) || (inPlayoffs && ftcMode && useFourTeamAlliances) || (adHocMode && ftcMode)) && (
                     <tr className={"gatool-playbyplay"}>
                       <PlayByPlay
                         station={displayOrder[4]}
@@ -601,6 +639,7 @@ function PlayByPlayPage({
                         adHocMode={adHocMode}
                         playoffOnly={playoffOnly}
                         ftcMode={ftcMode}
+                        firstGlobalMode={firstGlobalMode}
                         remapNumberToString={remapNumberToString}
                       />
                       <PlayByPlay
@@ -612,11 +651,12 @@ function PlayByPlayPage({
                         adHocMode={adHocMode}
                         playoffOnly={playoffOnly}
                         ftcMode={ftcMode}
+                        firstGlobalMode={firstGlobalMode}
                         remapNumberToString={remapNumberToString}
                       />
                     </tr>
                   )}
-                  {((inPlayoffs && !ftcMode) ||
+                  {((inPlayoffs && (!ftcMode || firstGlobalMode)) ||
                     selectedEvent?.value?.champLevel === "CHAMPS" ||
                     (adHocMode && useFourTeamAlliances && !ftcMode)) &&
                     (!_.isEmpty(teamDetails["Red4"]) ||
@@ -631,6 +671,7 @@ function PlayByPlayPage({
                           adHocMode={adHocMode}
                           playoffOnly={playoffOnly}
                           ftcMode={ftcMode}
+                          firstGlobalMode={firstGlobalMode}
                           remapNumberToString={remapNumberToString}
                         />
                         <PlayByPlay
@@ -642,6 +683,7 @@ function PlayByPlayPage({
                           adHocMode={adHocMode}
                           playoffOnly={playoffOnly}
                           ftcMode={ftcMode}
+                          firstGlobalMode={firstGlobalMode}
                           remapNumberToString={remapNumberToString}
                         />
                       </tr>

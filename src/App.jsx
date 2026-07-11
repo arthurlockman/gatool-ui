@@ -33,6 +33,7 @@ import _ from "lodash";
 import { specialAwards, hallOfFame, FTCHallOfFame } from "./data/hallOfFame";
 import { originalAndSustaining, refreshRate } from "./data/appConfig";
 import { ftcRegions } from "./data/ftcRegions";
+import { getApiBaseUrl, isFirstGlobalMode, getTeamUpdatesBaseUrl } from "./utils/programConstants";
 import { appUpdates } from "./data/appUpdates";
 import { useOnlineStatus } from "./contextProviders/OnlineContext";
 import { toast } from "react-toastify";
@@ -89,7 +90,12 @@ const FTCSupportedYears = [
   // { label: "2022", value: "2022", program: "FTC" },
 ];
 
+const FGSupportedYears = [
+  { label: "2025 FIRST Global", value: "2025", program: "FG" },
+];
+
 const ftcBaseURL = "https://api.gatool.org/ftc/v2/";
+const fgBaseURL = "https://api.gatool.org/v3/firstglobal/";
 
 // Pages that should remember scroll position
 const pagesWithScrollMemory = ['schedule', 'teamdata', 'ranks', 'announce', 'playbyplay', 'allianceselection'];
@@ -222,6 +228,12 @@ function App() {
   );
   const [qualSchedule, setQualSchedule] = usePersistentState(
     "cache:qualSchedule",
+    null
+  );
+  // FIRST Global only: the full unfiltered qual schedule (all fields), used for high score computation.
+  // qualSchedule is filtered to the selected fieldset; this holds every match.
+  const [qualScheduleAllFields, setQualScheduleAllFields] = usePersistentState(
+    "cache:qualScheduleAllFields",
     null
   );
   const [practiceSchedule, setPracticeSchedule] = usePersistentState(
@@ -560,6 +572,7 @@ function App() {
   } = useHighScores({
     httpClient,
     qualSchedule,
+    qualScheduleAllFields,
     playoffSchedule,
     useFTCOffline,
     isOnline,
@@ -593,13 +606,23 @@ function App() {
   /**
    * Helper function to get the effective team number for API calls
    * For FRC demo teams (9970-9999), prepend the event code or TBA key
+   * For FIRST Global teams, prepend "FG" and use country code as identifier
    * FTC teams are not modified
-   * @param {number} teamNumber The team number
+   * @param {number|string} teamNumber The team number (or country code for FG)
    * @param {string} eventCode The FIRST event code (optional)
    * @param {string} tbaEventKey The TBA event key (optional)
+   * @param {object} teamData Optional team data object (used for FG country code lookup)
    * @returns {Promise<string>} The effective team number for API calls
    */
-  const getEffectiveTeamNumber = async (teamNumber, eventCode = null, tbaEventKey = null) => {
+  const getEffectiveTeamNumber = async (teamNumber, eventCode = null, tbaEventKey = null, teamData = null) => {
+    // FIRST Global: use "FG" prefix with country code
+    if (isFirstGlobalMode(ftcMode)) {
+      // Look up country code from teamRemappings (numbers map: teamNumber → countryCode),
+      // then from teamData, then fall back to raw teamNumber
+      const remapped = teamRemappings?.numbers?.[teamNumber];
+      const identifier = remapped || teamData?.country || teamData?.countryCode || teamNumber;
+      return `FG${identifier}`;
+    }
     // FRC demo teams: 9970-9999 (non-FTC mode)
     // FTC demo teams: 99900-99999 (FTC mode)
     const isFRCDemo = !ftcMode && teamNumber >= 9970 && teamNumber <= 9999;
@@ -667,6 +690,8 @@ function App() {
   // without relying on static constants.
   useEffect(() => {
     if (!selectedYear || !isOnline) return;
+    // Skip prior-year event name lookups for FIRST Global (single event per year)
+    if (isFirstGlobalMode(ftcMode)) return;
     const isFTC = !!ftcMode;
     const cache = isFTC ? priorYearEventNamesFTC : priorYearEventNamesFRC;
     const setter = isFTC ? setPriorYearEventNamesFTC : setPriorYearEventNamesFRC;
@@ -809,17 +834,18 @@ function App() {
    * @param {object} data the data to be put to gatool Cloud
    * @returns {Promise<object>} result
    */
-  async function putTeamData(teamNumber, data) {
+  async function putTeamData(teamNumber, data, teamData = null) {
     // Get effective team number (with event prefix for demo teams 9970-9999, same as Offseason/playoff bye)
     const effectiveTeamNumber = await getEffectiveTeamNumber(
       teamNumber,
       selectedEvent?.value?.code,
-      selectedEvent?.value?.tbaEventKey ?? null
+      selectedEvent?.value?.tbaEventKey ?? null,
+      teamData
     );
     var result = await httpClient.put(
       `team/${effectiveTeamNumber}/updates`,
       data,
-      ftcMode ? ftcBaseURL : undefined
+      getTeamUpdatesBaseUrl(ftcMode)
     );
     return result;
   }
@@ -943,7 +969,7 @@ function App() {
   async function getTeamHistory(teamNumber) {
     var result = await httpClient.getNoAuth(
       `team/${teamNumber}/updates/history/`,
-      ftcMode ? ftcBaseURL : undefined
+      getTeamUpdatesBaseUrl(ftcMode)
     );
     if (!result || typeof result.json !== "function" || result.status !== 200) {
       return [];
@@ -961,14 +987,14 @@ function App() {
     getSystemMessages();
     getEventMessages();
     getWorldStats();
-    if (ftcMode) {
+    if (ftcMode && !isFirstGlobalMode(ftcMode)) {
       getFTCRegionHighScores();
       if (selectedEvent?.value?.leagueCode) {
         getFTCLeagueHighScores();
       } else {
         setFtcLeagueHighScores(null);
       }
-    } else if (selectedEvent?.value?.districtCode) {
+    } else if (!ftcMode && selectedEvent?.value?.districtCode) {
       getFrcDistrictHighScores();
     } else {
       setFrcDistrictHighScores(null);
@@ -1112,8 +1138,8 @@ function App() {
           selectedYear.value
         );
         await setTeamRemappings(remappings);
-      } else {
-        // Clear remappings for non-TBA events
+      } else if (!isFirstGlobalMode(ftcMode)) {
+        // Clear remappings for non-TBA events (FG remappings are built from team list)
         await setTeamRemappings(null);
       }
 
@@ -1159,14 +1185,15 @@ function App() {
       }
     }
 
-    var allianceMultiplier = ftcMode ? 1 : 2;
+    var allianceMultiplier = (ftcMode && !isFirstGlobalMode(ftcMode)) ? 1 : 2;
     if (
       selectedEvent?.value?.champLevel === "CHAMPS" ||
       selectedEvent?.value?.champLevel === "CMPDIV" ||
       selectedEvent?.value?.champLevel === "CMPSUB" ||
-      useFourTeamAlliances
+      useFourTeamAlliances ||
+      isFirstGlobalMode(ftcMode)
     ) {
-      allianceMultiplier += 1; // Champs have an extra alliance member (4 teams instead of 3)
+      allianceMultiplier += 1; // 4-team alliances (Champs, FIRST Global)
     }
 
     allianceCountTemp.allianceSelectionLength =
@@ -1217,9 +1244,9 @@ function App() {
     // Only load events if both program (ftcMode) and season (selectedYear) are selected
     // ftcMode !== null ensures a program has been explicitly selected (false = FRC, object = FTC modes)
     if (httpClient && selectedYear && ftcMode !== null) {
-      if (ftcMode) {
+      if (ftcMode && !isFirstGlobalMode(ftcMode)) {
         getFTCLeagues();
-      } else {
+      } else if (!ftcMode) {
         getDistricts();
       }
       getEvents();
@@ -1230,7 +1257,7 @@ function App() {
   // Load FTC avatars composed CSS when in ftcMode (season+1 for next-season avatar styles)
   useEffect(() => {
     const linkId = "ftc-avatars-composed-css";
-    if (!ftcMode || !selectedYear?.value) {
+    if (!ftcMode || isFirstGlobalMode(ftcMode) || !selectedYear?.value) {
       const existing = document.getElementById(linkId);
       if (existing) existing.remove();
       return;
@@ -1252,6 +1279,23 @@ function App() {
       if (el) el.remove();
     };
   }, [ftcMode, selectedYear?.value]);
+
+  // FIRST Global: build teamRemappings from team list so country codes display instead of team numbers
+  useEffect(() => {
+    if (isFirstGlobalMode(ftcMode) && teamList?.teams?.length > 0) {
+      const numbers = {};
+      const strings = {};
+      teamList.teams.forEach((team) => {
+        const code = team.country || team.countryCode || `${team.teamNumber}`;
+        numbers[team.teamNumber] = code;
+        strings[code] = team.teamNumber;
+      });
+      setTeamRemappings({ numbers, strings });
+    } else if (isFirstGlobalMode(ftcMode) && !teamList?.teams?.length) {
+      setTeamRemappings(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ftcMode, teamList?.teams?.length]);
 
   // Refresh team list when showBlueBanners is enabled to fetch blue banner data
   useEffect(() => {
@@ -1360,8 +1404,10 @@ function App() {
         _.every(teamsWithMatches, (team) => team.matchesPlayed >= matchesPerTeam) &&
         teamsWithMatches.length >= actualCompetingTeamsCount;
 
+      const totalQualLength = (isFirstGlobalMode(ftcMode) && qualScheduleAllFields?.schedule?.schedule?.length) ||
+        qualSchedule?.schedule?.length;
       if (
-        qualSchedule?.schedule?.length === qualSchedule?.completedMatchCount &&
+        totalQualLength === qualSchedule?.completedMatchCount &&
         (teamsWithExpectedMatches >= expectedTeamCount ||
           (ftcMode && allCompetingTeamsComplete))
       ) {
@@ -1373,6 +1419,7 @@ function App() {
   }, [
     rankings,
     qualSchedule,
+    qualScheduleAllFields,
     teamList,
     teamReduction,
     playoffSchedule,
@@ -2295,9 +2342,11 @@ function App() {
     currentMatch,
     adHocMode,
     qualSchedule,
+    qualScheduleAllFields,
     playoffSchedule,
     practiceSchedule,
     offlinePlayoffSchedule,
+    firstGlobalMode: isFirstGlobalMode(ftcMode),
     setCurrentMatch,
     setAdHocMatch,
     getSystemMessages,
@@ -2330,6 +2379,7 @@ function App() {
     training,
     // State setters
     setQualSchedule,
+    setQualScheduleAllFields,
     setPlayoffSchedule,
     setPracticeSchedule,
     setQualsLength,
@@ -2347,14 +2397,17 @@ function App() {
   };
 
   // --- Event Data Context (read-mostly state) ---
+  const firstGlobalMode = isFirstGlobalMode(ftcMode);
   const eventDataValue = useMemo(
     () => ({
       selectedEvent,
       selectedYear,
       eventLabel,
       ftcMode,
+      firstGlobalMode,
       teamList,
       qualSchedule,
+      qualScheduleAllFields,
       playoffSchedule,
       practiceSchedule,
       offlinePlayoffSchedule,
@@ -2377,8 +2430,10 @@ function App() {
       selectedYear,
       eventLabel,
       ftcMode,
+      firstGlobalMode,
       teamList,
       qualSchedule,
+      qualScheduleAllFields,
       playoffSchedule,
       practiceSchedule,
       offlinePlayoffSchedule,
@@ -2447,6 +2502,7 @@ function App() {
                     setAdHocMode={setAdHocMode}
                     supportedYears={supportedYears}
                     FTCSupportedYears={FTCSupportedYears}
+                    FGSupportedYears={FGSupportedYears}
                     reloadPage={reloadPage}
                     setLoadingCommunityUpdates={setLoadingCommunityUpdates}
                     systemMessage={systemMessage}

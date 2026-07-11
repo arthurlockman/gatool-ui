@@ -30,7 +30,7 @@ function AllianceSelectionPage({
   setOfflinePlayoffSchedule,
   qualsLength,
 }) {
-  const { selectedEvent, selectedYear, qualSchedule, playoffSchedule, offlinePlayoffSchedule, alliances, rankings, teamList, allianceCount, communityUpdates, practiceSchedule, currentMatch, eventLabel, ftcMode, remapNumberToString } = useEventData();
+  const { selectedEvent, selectedYear, qualSchedule, playoffSchedule, offlinePlayoffSchedule, alliances, rankings, teamList, allianceCount, communityUpdates, practiceSchedule, currentMatch, eventLabel, ftcMode, firstGlobalMode, remapNumberToString } = useEventData();
   const { getRanks, loadEvent, nextMatch, previousMatch, getSchedule } = useEventActions();
     const { timeFormat, useSwipe, usePullDownToUpdate, useFourTeamAlliances, setUseFourTeamAlliances, useScrollMemory, rankingsOverride,
         playoffCountOverride, setPlayoffCountOverride, allianceSelectionRoundOrder, setAllianceSelectionRoundOrder, nonStandardPlayoffs } = useSettings();
@@ -53,14 +53,16 @@ function AllianceSelectionPage({
     const [roundOrderDraft, setRoundOrderDraft] = useState(null);
 
     const isOffseason = selectedEvent?.value?.type?.includes("OffSeason");
-    const isFTCThreeTeamEligible = !!(ftcMode && ["0", "10", "17"].includes(selectedEvent?.value?.type));
+    const isFtcStyleLayout = !!(ftcMode && !firstGlobalMode);
+    const isFTCThreeTeamEligible = !!(isFtcStyleLayout && ["0", "10", "17"].includes(selectedEvent?.value?.type));
     const inChamps = !!(
         selectedEvent?.value?.champLevel === "CHAMPS" ||
         selectedEvent?.value?.champLevel === "CMPDIV" ||
         selectedEvent?.value?.champLevel === "CMPSUB" ||
-        useFourTeamAlliances
+        useFourTeamAlliances ||
+        firstGlobalMode
     );
-    const allianceSelectionRounds = ftcMode
+    const allianceSelectionRounds = isFtcStyleLayout
         ? (inChamps ? ["round1", "round2"] : ["round1"])
         : (inChamps ? ["round1", "round2", "round3"] : ["round1", "round2"]);
 
@@ -258,7 +260,7 @@ function AllianceSelectionPage({
                             }
                         </Alert>}
                 </div>}
-            {selectedEvent && ((qualSchedule?.schedule?.length > 0 || qualSchedule?.schedule?.schedule?.length > 0 || practiceSchedule?.schedule?.length > 0) && !playoffs && (allianceSelection || overrideAllianceSelection)) &&
+            {selectedEvent && ((qualSchedule?.schedule?.length > 0 || qualSchedule?.schedule?.schedule?.length > 0 || practiceSchedule?.schedule?.length > 0) && playoffs && (allianceSelection || overrideAllianceSelection)) &&
                 <div>
                     {(isOffseason || isFTCThreeTeamEligible) && (
                         <Alert variant="warning">
@@ -266,8 +268,8 @@ function AllianceSelectionPage({
                                 <Col xs="auto"><b>Alliance Count Override:</b></Col>
                                 <Col xs={3}>
                                     <Select classNamePrefix="gatool-rs"
-                                        options={ftcMode ? playoffOverrideMenuFTC : playoffOverrideMenuOffseason}
-                                        value={playoffCountOverride ? playoffCountOverride : (allianceCount?.menu ? allianceCount.menu : (ftcMode ? playoffOverrideMenuFTC[0] : playoffOverrideMenuOffseason[0]))}
+                                        options={isFtcStyleLayout ? playoffOverrideMenuFTC : playoffOverrideMenuOffseason}
+                                        value={playoffCountOverride ? playoffCountOverride : (allianceCount?.menu ? allianceCount.menu : (isFtcStyleLayout ? playoffOverrideMenuFTC[0] : playoffOverrideMenuOffseason[0]))}
                                         onChange={setPlayoffCountOverride} />
                                 </Col>
                                 <Col xs="auto">
@@ -275,12 +277,12 @@ function AllianceSelectionPage({
                                         Reorder Alliance Selection
                                     </Button>
                                 </Col>
-                                {(!ftcMode || isFTCThreeTeamEligible) && (
+                                {(!isFtcStyleLayout || isFTCThreeTeamEligible) && (
                                     <Col xs="auto" className="d-flex align-items-center gap-2">
                                         <Switch
                                             checked={useFourTeamAlliances === null ? false : useFourTeamAlliances}
                                             onChange={setUseFourTeamAlliances} />
-                                        <b>{ftcMode ? "Use 3 team Alliances" : "Use 4 team Alliances for playoffs"}</b>
+                                        <b>{isFtcStyleLayout ? "Use 3 team Alliances" : "Use 4 team Alliances for playoffs"}</b>
                                     </Col>
                                 )}
                             </Row>
@@ -293,7 +295,7 @@ function AllianceSelectionPage({
                             <p>The Alliance Count determines how many alliances will participate in playoffs (typically 2, 4, 6, or 8 alliances).</p>
                         </Alert>
                     ) : (
-                        <AllianceSelection selectedYear={selectedYear} selectedEvent={selectedEvent} rankings={rankings} teamList={teamList} allianceCount={allianceCount} communityUpdates={communityUpdates} allianceSelectionArrays={allianceSelectionArrays} setAllianceSelectionArrays={setAllianceSelectionArrays} handleReset={handleReset} teamFilter={teamFilter} setTeamFilter={setTeamFilter} ftcMode={ftcMode} remapNumberToString={remapNumberToString} useFourTeamAlliances={useFourTeamAlliances} setResetAllianceSelection={setResetAllianceSelection} isResetModalOpen={resetAllianceSelection} />
+                        <AllianceSelection selectedYear={selectedYear} selectedEvent={selectedEvent} rankings={rankings} teamList={teamList} allianceCount={allianceCount} communityUpdates={communityUpdates} allianceSelectionArrays={allianceSelectionArrays} setAllianceSelectionArrays={setAllianceSelectionArrays} handleReset={handleReset} teamFilter={teamFilter} setTeamFilter={setTeamFilter} ftcMode={ftcMode} firstGlobalMode={firstGlobalMode} remapNumberToString={remapNumberToString} useFourTeamAlliances={useFourTeamAlliances} setResetAllianceSelection={setResetAllianceSelection} isResetModalOpen={resetAllianceSelection} />
                     )}
                 </div>}
 
@@ -306,15 +308,17 @@ function AllianceSelectionPage({
                     </Col>
                 </Row>
             )}
-            {selectedEvent && (alliancesCount === 8) && playoffs && !nonStandardPlayoffs &&
+            {selectedEvent && (alliancesCount === 8) && playoffs && !nonStandardPlayoffs && !firstGlobalMode &&
                 <Bracket offlinePlayoffSchedule={offlinePlayoffSchedule} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} currentMatch={currentMatch} qualsLength={qualsLength} nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} usePullDownToUpdate={usePullDownToUpdate} useSwipe={useSwipe} eventLabel={eventLabel} ftcMode={ftcMode} matches={matches} allianceNumbers={allianceNumbers} allianceName={allianceName} matchScore={matchScore} matchWinner={matchWinner} alliances={alliances} remapNumberToString={remapNumberToString} />}
+            {selectedEvent && (alliancesCount === 8) && playoffs && !nonStandardPlayoffs && firstGlobalMode &&
+                <DaVinciTournamentBracket offlinePlayoffSchedule={offlinePlayoffSchedule} currentMatch={currentMatch} qualsLength={qualsLength} nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} usePullDownToUpdate={usePullDownToUpdate} useSwipe={useSwipe} eventLabel={eventLabel} ftcMode={ftcMode} matches={matches} allianceNumbers={allianceNumbers} allianceName={allianceName} matchScore={matchScore} matchWinner={matchWinner} alliances={alliances} remapNumberToString={remapNumberToString} />}
             {selectedEvent && (alliancesCount === 6) && playoffs && !nonStandardPlayoffs && selectedEvent?.value?.code === "FTCCMP1" &&
                 <DaVinciTournamentBracket offlinePlayoffSchedule={offlinePlayoffSchedule} currentMatch={currentMatch} qualsLength={qualsLength} nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} usePullDownToUpdate={usePullDownToUpdate} useSwipe={useSwipe} eventLabel={eventLabel} ftcMode={ftcMode} matches={matches} allianceNumbers={allianceNumbers} allianceName={allianceName} matchScore={matchScore} matchWinner={matchWinner} alliances={alliances} remapNumberToString={remapNumberToString} />}
             {selectedEvent && (alliancesCount === 6) && playoffs && !nonStandardPlayoffs && selectedEvent?.value?.code !== "FTCCMP1" &&
                 <SixAllianceBracket offlinePlayoffSchedule={offlinePlayoffSchedule} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} currentMatch={currentMatch} qualsLength={qualsLength} nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} usePullDownToUpdate={usePullDownToUpdate} useSwipe={useSwipe} eventLabel={eventLabel} ftcMode={ftcMode} matches={matches} allianceNumbers={allianceNumbers} allianceName={allianceName} matchScore={matchScore} matchWinner={matchWinner} alliances={alliances} remapNumberToString={remapNumberToString} />}
-            {selectedEvent && (alliancesCount === 4) && playoffs && !ftcMode && !nonStandardPlayoffs &&
+            {selectedEvent && (alliancesCount === 4) && playoffs && !isFtcStyleLayout && !nonStandardPlayoffs &&
                 <FourAllianceBracket currentMatch={currentMatch} qualsLength={qualsLength} nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} useSwipe={useSwipe} usePullDownToUpdate={usePullDownToUpdate} offlinePlayoffSchedule={offlinePlayoffSchedule} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} eventLabel={eventLabel} ftcMode={ftcMode} matches={matches} allianceNumbers={allianceNumbers} allianceName={allianceName} matchScore={matchScore} matchWinner={matchWinner} />}
-            {selectedEvent && (alliancesCount === 4) && playoffs && ftcMode && !nonStandardPlayoffs &&
+            {selectedEvent && (alliancesCount === 4) && playoffs && isFtcStyleLayout && !nonStandardPlayoffs &&
                 <FourAllianceBracketFTC currentMatch={currentMatch} qualsLength={qualsLength} nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} useSwipe={useSwipe} usePullDownToUpdate={usePullDownToUpdate} offlinePlayoffSchedule={offlinePlayoffSchedule} setOfflinePlayoffSchedule={setOfflinePlayoffSchedule} eventLabel={eventLabel} ftcMode={ftcMode} matches={matches} allianceNumbers={allianceNumbers} allianceName={allianceName} matchScore={matchScore} matchWinner={matchWinner} alliances={alliances} remapNumberToString={remapNumberToString} />}
             {selectedEvent && (alliancesCount === 2) && playoffs && !nonStandardPlayoffs &&
                 <TwoAllianceBracket nextMatch={nextMatch} previousMatch={previousMatch} getSchedule={getSchedule} useSwipe={useSwipe} usePullDownToUpdate={usePullDownToUpdate} eventLabel={eventLabel} ftcMode={ftcMode} matches={matches} allianceNumbers={allianceNumbers} allianceName={allianceName} matchScore={matchScore} matchWinner={matchWinner} />}

@@ -8,6 +8,7 @@ import { normalizeFtcGatoolAllianceRow } from "../utils/ftcHybridMatchTeams";
 import { fetchLocal } from "../utils/fetchLocal";
 import { useEventSelection } from "../contexts/EventSelectionContext";
 import { useSettings } from "../contexts/SettingsContext";
+import { getApiBaseUrl, isFirstGlobalMode } from "../utils/programConstants";
 import _ from "lodash";
 import moment from "moment";
 
@@ -191,7 +192,7 @@ export function useRankingsAlliances(deps) {
     var districtranks = null;
     result = await httpClient.getNoAuth(
       `${selectedYear?.value}/district/rankings/${selectedEvent?.value.districtCode}`,
-      ftcMode ? ftcBaseURL : undefined,
+      getApiBaseUrl(ftcMode),
       undefined,
       undefined,
       signal()
@@ -327,10 +328,13 @@ export function useRankingsAlliances(deps) {
           }
         }
       } else if (!useFTCOffline) {
-        ranksDataSource = ftcMode ? "FTC API" : "FRC";
+        ranksDataSource = isFirstGlobalMode(ftcMode) ? "FIRST Global" : (ftcMode ? "FTC API" : "FRC");
+        const rankingsPath = isFirstGlobalMode(ftcMode)
+          ? `${selectedYear?.value}/rankings/t2`
+          : `${selectedYear?.value}/rankings/${selectedEvent?.value.code}`;
         result = await httpClient.getNoAuth(
-          `${selectedYear?.value}/rankings/${selectedEvent?.value.code}`,
-          ftcMode ? ftcBaseURL : undefined,
+          rankingsPath,
+          getApiBaseUrl(ftcMode),
           undefined,
           undefined,
           signal()
@@ -361,8 +365,8 @@ export function useRankingsAlliances(deps) {
       delete ranks.ranks.rankings;
     }
 
-    // Filter out FTC rankings entries that haven't played any matches yet
-    if (ftcMode && ranks?.ranks && Array.isArray(ranks.ranks)) {
+    // Filter out FTC rankings entries that haven't played any matches yet (skip for FIRST Global)
+    if (ftcMode && !isFirstGlobalMode(ftcMode) && ranks?.ranks && Array.isArray(ranks.ranks)) {
       const originalCount = ranks.ranks.length;
       ranks.ranks = ranks.ranks.filter((rank) => {
         return rank.matchesCounted !== undefined && rank.matchesCounted !== null && rank.matchesCounted > 0;
@@ -443,7 +447,7 @@ export function useRankingsAlliances(deps) {
     if (ranks?.ranks?.length > 0 || (isOfflineEvent && rankings?.ranks?.length > 0)) {
       if (!ftcMode) {
         getEPA();
-      } else if (ftcMode) {
+      } else if (ftcMode && !isFirstGlobalMode(ftcMode)) {
         getEPAFTC();
       }
       if (selectedEvent?.value.districtCode) {
@@ -586,10 +590,13 @@ export function useRankingsAlliances(deps) {
           }
         }
       } else if (!useFTCOffline) {
-        alliancesDataSource = ftcMode ? "FTC API" : "FRC";
+        alliancesDataSource = isFirstGlobalMode(ftcMode) ? "FIRST Global" : (ftcMode ? "FTC API" : "FRC");
+        const alliancesPath = isFirstGlobalMode(ftcMode)
+          ? `${selectedYear?.value}/alliances/t3`
+          : `${selectedYear?.value}/alliances/${selectedEvent?.value.code}`;
         result = await httpClient.getNoAuth(
-          `${selectedYear?.value}/alliances/${selectedEvent?.value.code}`,
-          ftcMode ? ftcBaseURL : undefined,
+          alliancesPath,
+          getApiBaseUrl(ftcMode),
           undefined,
           undefined,
           signal()

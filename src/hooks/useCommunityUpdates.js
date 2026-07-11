@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import _ from "lodash";
 import moment from "moment";
 import { useEventSelection } from "../contexts/EventSelectionContext";
+import { getApiBaseUrl, isFirstGlobalMode, getTeamUpdatesBaseUrl } from "../utils/programConstants";
 
 const ftcBaseURL = "https://api.gatool.org/ftc/v2/";
 const training = _.cloneDeep(trainingData);
@@ -88,7 +89,7 @@ export function useCommunityUpdates({
                   );
                   var request = await httpClient.getNoAuth(
                     `team/${effectiveTeamNumber}/updates`,
-                    ftcMode ? ftcBaseURL : undefined
+                    getTeamUpdatesBaseUrl(ftcMode)
                   );
                   var teamDetails = { teamNumber: team?.teamNumber };
                   if (request.status === 200) {
@@ -143,13 +144,43 @@ export function useCommunityUpdates({
               console.log("no teams loaded yet");
               teams = [];
             }
+          } else if (isFirstGlobalMode(ftcMode) && teamList?.teams?.length > 0) {
+            // FIRST Global: no bulk communityUpdates endpoint; fetch per-team
+            // Pass team object so getEffectiveTeamNumber can use team.country
+            // directly, avoiding a race with teamRemappings
+            const fgTeams = await Promise.all(
+              teamList.teams.map(async (team) => {
+                const effectiveTeamNumber = await getEffectiveTeamNumber(
+                  team?.teamNumber,
+                  selectedEvent?.value?.code ?? null,
+                  null,
+                  team,
+                );
+                const request = await httpClient.getNoAuth(
+                  `team/${effectiveTeamNumber}/updates`,
+                  getTeamUpdatesBaseUrl(ftcMode)
+                );
+                const teamDetails = { teamNumber: team?.teamNumber };
+                if (request.status === 200) {
+                  const teamUpdate = await request?.json();
+                  teamDetails.updates = _.merge(
+                    _.cloneDeep(communityUpdateTemplate),
+                    teamUpdate?.updates ?? {}
+                  );
+                } else {
+                  teamDetails.updates = _.cloneDeep(communityUpdateTemplate);
+                }
+                return teamDetails;
+              })
+            );
+            teams = fgTeams;
           } else if (
             !selectedEvent?.value?.code.includes("PRACTICE") &&
             !useFTCOffline
           ) {
             result = await httpClient.getNoAuth(
               `${selectedYear?.value}/communityUpdates/${selectedEvent?.value.code}`,
-              ftcMode ? ftcBaseURL : undefined
+              getApiBaseUrl(ftcMode)
             );
             if (result.status === 200) {
               // @ts-ignore
@@ -193,7 +224,7 @@ export function useCommunityUpdates({
                     const effectiveTeamNumber = await getEffectiveTeamNumber(teamNumber, eventCode, tbaKey);
                     const request = await httpClient.getNoAuth(
                       `team/${effectiveTeamNumber}/updates`,
-                      ftcMode ? ftcBaseURL : undefined
+                      getTeamUpdatesBaseUrl(ftcMode)
                     );
                     const teamDetails = { teamNumber };
                     if (request.status === 200) {
@@ -254,7 +285,7 @@ export function useCommunityUpdates({
               var EIUpdates = EITeams.map(async (EITeam) => {
                 var request = await httpClient.getNoAuth(
                   `team/${EITeam?.teamNumber}/updates`,
-                  ftcMode ? ftcBaseURL : undefined
+                  getTeamUpdatesBaseUrl(ftcMode)
                 );
                 var teamDetails = { teamNumber: EITeam?.teamNumber };
                 if (request?.status === 200) {

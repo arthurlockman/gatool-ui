@@ -1,8 +1,9 @@
 import _ from "lodash";
 import useWindowDimensions from "hooks/UseWindowDimensions";
 import { useSettings } from "../contexts/SettingsContext";
+import { getFirstGlobalFlagUrl } from "../utils/countryFlag";
 
-function PlayByPlay({ station, team, inPlayoffs, selectedEvent, adHocMode, playoffOnly, ftcMode, remapNumberToString}) {
+function PlayByPlay({ station, team, inPlayoffs, selectedEvent, adHocMode, playoffOnly, ftcMode, firstGlobalMode, remapNumberToString}) {
     const { showNotes, showMottoes, showQualsStats, showQualsStatsQuals } = useSettings();
     const { height, width } = useWindowDimensions();
     
@@ -32,10 +33,10 @@ function PlayByPlay({ station, team, inPlayoffs, selectedEvent, adHocMode, playo
             <td className={`col2 ${allianceColor.toLowerCase()}AlliancePlayByPlay align-middle`} align="center" >
                 {team?.teamNumber && (team?.teamNumber !== 0) &&
                     <>
-                        <p className={"playByPlayteamNumber"}>{displayTeamNumber}</p>
+                        <p className={"playByPlayteamNumber"}>{team?.countryCode && <img src={getFirstGlobalFlagUrl(team.countryCode)} alt={team.countryCode} style={{ height: "1em", verticalAlign: "middle", marginRight: "0.2em" }} />}{displayTeamNumber}</p>
                         <p className={"playByPlaysayNumber"} >{team?.updates?.sayNumber}</p>
                         <p className={team?.updates?.organizationLocal ? (team?.updates?.organizationLocal?.length > 60 ? "playByPlayOrganization narrowFont" : "playByPlayOrganization") : (team?.organization?.length > 60 ? "playByPlayOrganization narrowFont" : "playByPlayOrganization")}>{team?.updates?.organizationLocal ? team?.updates?.organizationLocal : team?.organization}</p>
-                        <p className={"playByPlayCity"}>{team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : `${team?.city}, ${team?.stateProv}${team?.country !== "USA" && !team?.updates?.cityStateLocal ? `, ${team?.country}` : ""}`}</p>
+                        {(team?.updates?.cityStateLocal || team?.city || !firstGlobalMode) && <p className={"playByPlayCity"}>{team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : `${team?.city}, ${team?.stateProv}${team?.country !== "USA" && !team?.updates?.cityStateLocal ? `, ${team?.country}` : ""}`}</p>}
                         {(showMottoes || _.isNull(showMottoes)) && <p className={"playByPlayCity mottoes"}>{team?.updates?.teamMottoLocal}</p>}
                         {(inPlayoffs || team?.alliance) && width < height && <p className={"playByPlayAlliance"}>{team?.alliance}{(selectedEvent?.value?.name.includes("OFFLINE") && !playoffOnly) ? <></> : <><br />{team.allianceRole}</>}</p>}
                     </>
@@ -55,7 +56,7 @@ function PlayByPlay({ station, team, inPlayoffs, selectedEvent, adHocMode, playo
                                 <table className={"wltTable"}>
                                     <tbody>
                                         <tr>
-                                            <td className={"wltCol"} style={team?.rankStyle}>Rank {team?.rank}<br />AV RP {team?.sortOrder1}</td><td className={"wltCol"}>Qual Avg<br />{Math.floor(team?.qualAverage*100)/100}</td><td className={"wltCol"}>W-L-T<br />{team?.wins}-{team?.losses}-{team?.ties}</td><td className={"wltCol"}>{ftcMode?'OPA':'EPA'}<br />{team?.epa?.epa?.total_points?.mean>=0 ? team?.epa?.epa?.total_points?.mean : "TBD"}</td><td className={"wltCol"}>Season<br />{team?.epa?.record?.wins>=0 ? `${team?.epa?.record?.wins}-${team?.epa?.record?.losses}-${team?.epa?.record?.ties}` : `TBD`}</td>
+                                            <td className={"wltCol"} style={team?.rankStyle}>Rank {team?.rank}<br />AV RP {team?.sortOrder1}</td><td className={"wltCol"}>Qual Avg<br />{Math.floor(team?.qualAverage*100)/100}</td><td className={"wltCol"}>W-L-T<br />{team?.wins}-{team?.losses}-{team?.ties}</td>{!firstGlobalMode && <td className={"wltCol"}>{ftcMode?'OPA':'EPA'}<br />{team?.epa?.epa?.total_points?.mean>=0 ? team?.epa?.epa?.total_points?.mean : "TBD"}</td>}{!firstGlobalMode && <td className={"wltCol"}>Season<br />{team?.epa?.record?.wins>=0 ? `${team?.epa?.record?.wins}-${team?.epa?.record?.losses}-${team?.epa?.record?.ties}` : `TBD`}</td>}
                                         </tr>
                                         <tr><td colSpan={6}>Team high score: {team?.highScore?.score} in {team?.highScore?.description.replace(" ", " ")}</td>
                                         </tr>
@@ -80,7 +81,7 @@ function PlayByPlay({ station, team, inPlayoffs, selectedEvent, adHocMode, playo
                             ? "No team selected"
                             : inPlayoffs
                                 ? "TBD"
-                                : (ftcMode ? "No third Alliance member" : "No fourth Alliance member")}
+                                : (ftcMode && !firstGlobalMode ? "No third Alliance member" : "No fourth Alliance member")}
                     </div>
                 </>}
             </td>

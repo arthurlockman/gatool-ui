@@ -23,6 +23,7 @@ import useScrollPosition from "../hooks/useScrollPosition";
 import { useSettings } from "../contexts/SettingsContext";
 import { useEventData } from "contexts/EventDataContext";
 import { useEventActions } from "contexts/EventActionsContext";
+import { getFirstGlobalFlagUrl } from "../utils/countryFlag";
 
 /** Blue banner stats are a nested object; SheetJS leaves those cells blank unless stringified. */
 const BLUE_BANNER_EXPORT_ROWS = [
@@ -84,7 +85,7 @@ function TeamDataPage({
   isAuthenticated,
   getTeamHistory,
 }) {
-  const { selectedEvent, selectedYear, teamList, rankings, communityUpdates, allianceCount, qualSchedule, playoffSchedule, eventLabel, ftcMode, remapNumberToString } = useEventData();
+  const { selectedEvent, selectedYear, teamList, rankings, communityUpdates, allianceCount, qualSchedule, playoffSchedule, eventLabel, ftcMode, firstGlobalMode, remapNumberToString } = useEventData();
   const { getCommunityUpdates, getTeamList } = useEventActions();
     const { monthsWarning, timeFormat, useScrollMemory } = useSettings();
     const [currentTime, setCurrentTime] = useState(moment());
@@ -873,9 +874,14 @@ function TeamDataPage({
         let extended = teamList.teams.map((teamRow) => {
             const teamRowCopy = { ...teamRow };
             // Calculate rank inline to avoid dependency on getTeamRank function
-            var team = find(rankings?.ranks, { "teamNumber": remapNumberToString(teamRowCopy?.teamNumber) });
+            // For FG, rankings use numeric teamNumber directly; for TBA offseason, use remapped string
+            const rankLookupNumber = firstGlobalMode
+                ? teamRowCopy?.teamNumber
+                : remapNumberToString(teamRowCopy?.teamNumber);
+            var team = find(rankings?.ranks, { "teamNumber": rankLookupNumber });
             teamRowCopy.rank = team?.rank;
             teamRowCopy.citySort = teamRowCopy?.country + teamRowCopy?.stateProv + teamRowCopy?.city;
+            teamRowCopy.countrySort = teamRowCopy?.displayTeamNumber || teamRowCopy?.country || `${teamRowCopy?.teamNumber}`;
             var update = find(communityUpdates, { "teamNumber": teamRowCopy.teamNumber });
             var localUpdate = _.find(localUpdates, { "teamNumber": teamRowCopy?.teamNumber });
             teamRowCopy.updates = localUpdate ? localUpdate.update : update?.updates;
@@ -941,16 +947,19 @@ function TeamDataPage({
                 <Table responsive striped bordered size="sm" className={"teamTable"}>
                     <thead className="thead-default">
                         <tr className={"teamTableHeader"}>
-                            <th onClick={() => (teamSort === "teamNumber") ? setTeamSort("-teamNumber") : setTeamSort("teamNumber")}><b>Team #{teamSort === "teamNumber" ? <SortNumericDown /> : ""}{teamSort === "-teamNumber" ? <SortNumericUp /> : ""}</b></th>
+                            <th onClick={() => {
+                                const sortKey = firstGlobalMode ? "countrySort" : "teamNumber";
+                                setTeamSort(teamSort === sortKey ? `-${sortKey}` : sortKey);
+                            }}><b>{firstGlobalMode ? "Country" : "Team #"}{(teamSort === "teamNumber" || teamSort === "countrySort") ? <SortAlphaDown /> : ""}{(teamSort === "-teamNumber" || teamSort === "-countrySort") ? <SortAlphaUp /> : ""}</b></th>
                             <th onClick={() => (teamSort === "rank") ? setTeamSort("-rank") : setTeamSort("rank")}> <b>Rank{teamSort === "rank" ? <SortNumericDown /> : ""}{teamSort === "-rank" ? <SortNumericUp /> : ""}</b></th>
                             <th onClick={() => (teamSort === "nameShort") ? setTeamSort("-nameShort") : setTeamSort("nameShort")}><b>Team Name{teamSort === "nameShort" ? <SortAlphaDown /> : ""}{teamSort === "-nameShort" ? <SortAlphaUp /> : ""}</b></th>
                             <th onClick={() => (teamSort === "citySort") ? setTeamSort("-citySort") : setTeamSort("citySort")}><b>City{teamSort === "citySort" ? <SortAlphaDown /> : ""}{teamSort === "-citySort" ? <SortAlphaUp /> : ""}</b></th>
-                            {(selectedEvent?.value?.type === "Championship" || selectedEvent?.value?.type === "ChampionshipDivision") ?
+                            {!firstGlobalMode && ((selectedEvent?.value?.type === "Championship" || selectedEvent?.value?.type === "ChampionshipDivision") ?
                                 <th><b>Top Sponsor</b></th> :
                                 <th><b>Top Sponsors</b></th>
-                            }
-                            <th onClick={() => (teamSort === "organization") ? setTeamSort("-organization") : setTeamSort("organization")}><b>Organization{teamSort === "organization" ? <SortAlphaDown /> : ""}{teamSort === "-organization" ? <SortAlphaUp /> : ""}</b></th>
-                            <th onClick={() => (teamSort === "rookieYear") ? setTeamSort("-rookieYear") : setTeamSort("rookieYear")}><b>Rookie Year{teamSort === "rookieYear" ? <SortNumericDown /> : ""}{teamSort === "-rookieYear" ? <SortNumericUp /> : ""}</b></th>
+                            )}
+                            {!firstGlobalMode && <th onClick={() => (teamSort === "organization") ? setTeamSort("-organization") : setTeamSort("organization")}><b>Organization{teamSort === "organization" ? <SortAlphaDown /> : ""}{teamSort === "-organization" ? <SortAlphaUp /> : ""}</b></th>}
+                            {!firstGlobalMode && <th onClick={() => (teamSort === "rookieYear") ? setTeamSort("-rookieYear") : setTeamSort("rookieYear")}><b>Rookie Year{teamSort === "rookieYear" ? <SortNumericDown /> : ""}{teamSort === "-rookieYear" ? <SortNumericUp /> : ""}</b></th>}
                             <th onClick={() => (teamSort === "robotNameLocal") ? setTeamSort("-robotNameLocal") : setTeamSort("robotNameLocal")}><b>Robot Name{teamSort === "robotNameLocal" ? <SortAlphaDown /> : ""}{teamSort === "-robotNameLocal" ? <SortAlphaUp /> : ""}</b></th>
                             <th  ><b>Additional Notes</b></th>
                         </tr>
@@ -965,20 +974,22 @@ function TeamDataPage({
                                 <td style={rankHighlight(team?.rank ? team?.rank : 100, allianceCount || { "count": 8 })}>{team?.rank}</td>
                                 
                                 <td className={updateHighlightClass(team?.updates?.nameShortLocal)} style={updateHighlight(team?.updates?.nameShortLocal)}>
-                                    {ftcMode
-                                        ? <span className={`team-avatar team-${team?.teamNumber}`}></span>
-                                        : <TeamAvatar src={`${apiBaseUrl}${selectedYear.value}/avatars/team/${team?.teamNumber}/avatar.png`} teamNumber={team?.teamNumber} />
+                                    {firstGlobalMode
+                                        ? <img src={getFirstGlobalFlagUrl(team?.countryCode)} alt={team?.countryCode} style={{ height: "1.5em", verticalAlign: "middle" }} />
+                                        : ftcMode
+                                            ? <span className={`team-avatar team-${team?.teamNumber}`}></span>
+                                            : <TeamAvatar src={`${apiBaseUrl}${selectedYear.value}/avatars/team/${team?.teamNumber}/avatar.png`} teamNumber={team?.teamNumber} />
                                     }
                                     <br />
                                     {teamName}
                                 </td>
-                                <td className={updateHighlightClass(team?.updates?.cityStateLocal)} style={updateHighlight(team?.updates?.cityStateLocal)}>{team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : cityState} </td>
-                                {(selectedEvent?.value?.type === "Championship" || selectedEvent?.value?.type === "ChampionshipDivision") ?
+                                <td className={updateHighlightClass(team?.updates?.cityStateLocal)} style={updateHighlight(team?.updates?.cityStateLocal)}>{team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : (firstGlobalMode ? "" : cityState)} </td>
+                                {!firstGlobalMode && ((selectedEvent?.value?.type === "Championship" || selectedEvent?.value?.type === "ChampionshipDivision") ?
                                     <td className={updateHighlightClass(team?.updates?.topSponsorLocal)} style={updateHighlight(team?.updates?.topSponsorLocal)}>{team?.updates?.topSponsorLocal ? team?.updates?.topSponsorLocal : team?.topSponsor}</td> :
                                     <td className={updateHighlightClass(team?.updates?.topSponsorsLocal)} style={updateHighlight(team?.updates?.topSponsorsLocal)}>{team?.updates?.topSponsorsLocal ? team?.updates?.topSponsorsLocal : team?.topSponsors}</td>
-                                }
-                                <td className={updateHighlightClass(team?.updates?.organizationLocal)} style={updateHighlight(team?.updates?.organizationLocal)}>{team?.updates?.organizationLocal ? team?.updates?.organizationLocal : team?.organization}</td>
-                                <td>{team?.rookieYear}</td>
+                                )}
+                                {!firstGlobalMode && <td className={updateHighlightClass(team?.updates?.organizationLocal)} style={updateHighlight(team?.updates?.organizationLocal)}>{team?.updates?.organizationLocal ? team?.updates?.organizationLocal : team?.organization}</td>}
+                                {!firstGlobalMode && <td>{team?.rookieYear}</td>}
                                 <td className={updateHighlightClass(team?.updates?.robotNameLocal)} style={updateHighlight(team?.updates?.robotNameLocal)}>{team?.updates?.robotNameLocal ? team?.updates?.robotNameLocal : team?.robotName}</td>
                                 <td align="left" className={["teamNotes", updateHighlightClass(!_.isEmpty(team?.updates?.teamNotes))].filter(Boolean).join(" ")} style={updateHighlight(!_.isEmpty(team?.updates?.teamNotes))} dangerouslySetInnerHTML={{ __html: team?.updates?.teamNotes }}></td>
                             </tr>
@@ -1015,6 +1026,7 @@ function TeamDataPage({
                 selectedYear={selectedYear}
                 originalAndSustaining={originalAndSustaining}
                 ftcMode={ftcMode}
+                firstGlobalMode={firstGlobalMode}
                 updateClass={updateClass}
                 onSave={handleSubmit}
                 onTrack={handleTrack}
