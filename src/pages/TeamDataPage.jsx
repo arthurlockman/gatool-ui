@@ -895,7 +895,7 @@ function TeamDataPage({
         }
 
         return extended;
-    }, [teamList?.teams, communityUpdates, localUpdates, teamSort, rankings?.ranks, remapNumberToString]);
+    }, [teamList?.teams, communityUpdates, localUpdates, teamSort, rankings?.ranks, remapNumberToString, firstGlobalMode]);
 
     return (
         <Container fluid>

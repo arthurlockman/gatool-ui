@@ -33,7 +33,7 @@ import _ from "lodash";
 import { specialAwards, hallOfFame, FTCHallOfFame } from "./data/hallOfFame";
 import { originalAndSustaining, refreshRate } from "./data/appConfig";
 import { ftcRegions } from "./data/ftcRegions";
-import { getApiBaseUrl, isFirstGlobalMode, getTeamUpdatesBaseUrl } from "./utils/programConstants";
+import { isFirstGlobalMode, getTeamUpdatesBaseUrl } from "./utils/programConstants";
 import { appUpdates } from "./data/appUpdates";
 import { useOnlineStatus } from "./contextProviders/OnlineContext";
 import { toast } from "react-toastify";
