@@ -12,7 +12,6 @@ import { getApiBaseUrl, isFirstGlobalMode } from "../utils/programConstants";
 import _ from "lodash";
 import moment from "moment";
 
-const ftcBaseURL = "https://api.gatool.org/ftc/v2/";
 
 // --- Pure conformer helpers ---
 

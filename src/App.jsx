@@ -95,7 +95,7 @@ const FGSupportedYears = [
 ];
 
 const ftcBaseURL = "https://api.gatool.org/ftc/v2/";
-const fgBaseURL = "https://api.gatool.org/v3/firstglobal/";
+//const fgBaseURL = "https://api.gatool.org/v3/firstglobal/";
 
 // Pages that should remember scroll position
 const pagesWithScrollMemory = ['schedule', 'teamdata', 'ranks', 'announce', 'playbyplay', 'allianceselection'];

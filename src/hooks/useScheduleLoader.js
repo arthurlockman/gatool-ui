@@ -19,7 +19,6 @@ import { useEventSelection } from "../contexts/EventSelectionContext";
 import { useSettings } from "../contexts/SettingsContext";
 import { getApiBaseUrl, isFirstGlobalMode, fgBaseURL } from "../utils/programConstants";
 
-const ftcBaseURL = "https://api.gatool.org/ftc/v2/";
 
 /**
  * Hook that owns the getSchedule function — the core schedule-fetching orchestrator.

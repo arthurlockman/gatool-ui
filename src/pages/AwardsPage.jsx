@@ -9,7 +9,7 @@ import { useEventData } from "contexts/EventDataContext";
 
 
 function AwardsPage() {
-  const { selectedEvent, selectedYear, teamList, communityUpdates, eventLabel, remapNumberToString, ftcMode, firstGlobalMode } = useEventData();
+  const { selectedEvent, selectedYear, teamList, communityUpdates, eventLabel, remapNumberToString, firstGlobalMode } = useEventData();
     const originalAndSustaining = ["20", "45", "126", "148", "151", "157", "190", "191", "250"];
     const { disableScope, enableScope } = useHotkeysContext();
 

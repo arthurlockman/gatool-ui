@@ -4,8 +4,6 @@ import calculateBlueBanners from "../utils/calculateBlueBanners";
 import { useEventSelection } from "../contexts/EventSelectionContext";
 import { getApiBaseUrl, isFirstGlobalMode } from "../utils/programConstants";
 
-const ftcBaseURL = "https://api.gatool.org/ftc/v2/";
-
 /**
  * Trims whitespace from each element in an array.
  * @param {string[]} arr
