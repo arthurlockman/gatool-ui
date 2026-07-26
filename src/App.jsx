@@ -318,7 +318,7 @@ function App() {
   const [alliancePartnerConnectionsCache, setAlliancePartnerConnectionsCache] =
     useState({});
   const [lastVisit, setLastVisit] = usePersistentState("cache:lastVisit", {});
-  const [localUpdates, setLocalUpdates] = usePersistentState(
+  const [localUpdates, setLocalUpdates, saveLocalUpdates] = usePersistentState(
     "cache:localUpdates",
     []
   );
@@ -2520,6 +2520,7 @@ function App() {
                     putTeamData={putTeamData}
                     localUpdates={localUpdates}
                     setLocalUpdates={setLocalUpdates}
+                    saveLocalUpdates={saveLocalUpdates}
                     originalAndSustaining={originalAndSustaining}
                     user={user}
                     isAuthenticated={isAuthenticated}
