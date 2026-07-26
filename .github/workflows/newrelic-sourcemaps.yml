@@ -1,0 +1,67 @@
+name: New Relic sourcemaps
+
+on:
+  push:
+    branches: [ main, beta ]
+  workflow_dispatch:
+
+# Serialize uploads per branch. Unlike a deploy, a newer run does NOT supersede
+# an older one: each run uploads its own commit's content-hashed filenames, and
+# clients can still be running the earlier build (the service worker caches
+# hashed assets). Cancelling would permanently drop that build's sourcemaps.
+concurrency:
+  group: newrelic-sourcemaps-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      # Not a secret — already public in public/newrelic.js.
+      NEW_RELIC_BROWSER_APP_ID: "1431858641"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 22.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Must match the Cloudflare Pages build command exactly (including the
+      # `prebuild` wiki sync) so Rollup produces identical content hashes.
+      # SOURCEMAP=hidden adds .map files without changing any emitted JS bytes.
+      - name: Build with hidden sourcemaps
+        run: npm run build
+        env:
+          SOURCEMAP: hidden
+
+      - name: Resolve deploy base URL
+        id: target
+        run: |
+          if [ "${{ github.ref_name }}" = "main" ]; then
+            echo "base_url=https://gatool.org" >> "$GITHUB_OUTPUT"
+          else
+            echo "base_url=https://beta.gatool.org" >> "$GITHUB_OUTPUT"
+          fi
+
+      # The API key is passed via NR_API_KEY in the environment, not as a CLI
+      # argument — argv is world-readable via /proc on the runner.
+      - name: Publish sourcemaps to New Relic
+        run: |
+          node scripts/publish-sourcemaps.mjs \
+            --base-url="${{ steps.target.outputs.base_url }}" \
+            --application-id="$NEW_RELIC_BROWSER_APP_ID" \
+            --repo-url="${{ github.server_url }}/${{ github.repository }}" \
+            --build-commit="${{ github.sha }}"
+        env:
+          NR_API_KEY: ${{ secrets.NEW_RELIC_API_KEY }}

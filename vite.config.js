@@ -63,7 +63,13 @@ export default defineConfig({
   build: {
     outDir: "build",
     emptyOutDir: true,
-    sourcemap: true,
+    // Sourcemaps are opt-in via env so the Cloudflare Pages build emits none
+    // (nothing to serve publicly). The New Relic sourcemap workflow sets
+    // SOURCEMAP=hidden. 'hidden' emits .map files but omits the
+    // //# sourceMappingURL comment, so the emitted JS is byte-identical to a
+    // no-sourcemap build — which is what lets CI reproduce Cloudflare's
+    // content hashes. New Relic matches on javascriptUrl, not the comment.
+    sourcemap: process.env.SOURCEMAP === "hidden" ? "hidden" : false,
     chunkSizeWarningLimit: 1100,
     commonjsOptions: {
       // react-quill / quill 1.x mix CJS+ESM; let Rollup interop them.
