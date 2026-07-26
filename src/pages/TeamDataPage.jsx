@@ -24,6 +24,19 @@ import { useSettings } from "../contexts/SettingsContext";
 import { useEventData } from "contexts/EventDataContext";
 import { useEventActions } from "contexts/EventActionsContext";
 
+/**
+ * Message for an update that couldn't reach gatool Cloud. Only promise the user
+ * a local copy when the local write actually landed — the browser can refuse or
+ * drop local storage mid-session (Safari drops the IndexedDB connection under
+ * memory pressure), and telling someone their edit is safe when it isn't means
+ * they lose it silently on reload.
+ */
+function cloudSaveFailedMessage(teamNumber, persistedLocally) {
+    return persistedLocally
+        ? `Your update for team ${teamNumber} was not successful. We have saved the change locally, and you can send it later from here or the Settings page.`
+        : `Your update for team ${teamNumber} could not be sent to gatool Cloud, and your browser would not save it on this device either. This change will be lost if you reload — try again, or refresh the page and re-enter it.`;
+}
+
 /** Blue banner stats are a nested object; SheetJS leaves those cells blank unless stringified. */
 const BLUE_BANNER_EXPORT_ROWS = [
     ["regionalWins", "regionalWinsYears", "Regional Win", "Regional Wins"],
@@ -79,6 +92,7 @@ function TeamDataPage({
   putTeamData,
   localUpdates,
   setLocalUpdates,
+  saveLocalUpdates,
   originalAndSustaining,
   user,
   isAuthenticated,
@@ -201,10 +215,9 @@ function TeamDataPage({
                         localUpdatesTemp.splice(failedItemIndex, 1);
                     }
                     localUpdatesTemp.push({ "teamNumber": updateTeam.teamNumber, "update": update.updates });
-                    await setLocalUpdates(localUpdatesTemp);
+                    var persistedFailed = await saveLocalUpdates(localUpdatesTemp);
 
-                    var errorText = `Your update for team ${updateTeam.teamNumber} was not successful. We have saved the change locally, and you can send it later from here or the Settings page.`;
-                    toast.error(errorText);
+                    toast.error(cloudSaveFailedMessage(updateTeam.teamNumber, persistedFailed));
                 } else {
                     // Update succeeded - remove from local updates
                     var successItemIndex = _.findIndex(localUpdatesTemp, { "teamNumber": updateTeam.teamNumber });
@@ -228,10 +241,9 @@ function TeamDataPage({
                     localUpdatesTemp.splice(errorItemIndex, 1);
                 }
                 localUpdatesTemp.push({ "teamNumber": updateTeam.teamNumber, "update": update.updates });
-                await setLocalUpdates(localUpdatesTemp);
+                var persistedError = await saveLocalUpdates(localUpdatesTemp);
 
-                var errorText = `Your update for team ${updateTeam.teamNumber} was not successful. We have saved the change locally, and you can send it later from here or the Settings page.`;
-                toast.error(errorText);
+                toast.error(cloudSaveFailedMessage(updateTeam.teamNumber, persistedError));
                 console.error('Error updating team data:', error);
             });
 
@@ -241,8 +253,12 @@ function TeamDataPage({
                 localUpdatesTemp.splice(itemExists, 1);
             }
             localUpdatesTemp.push({ "teamNumber": updateTeam.teamNumber, "update": update.updates });
-            toast.success(`We have stored your update for team ${updateTeam.teamNumber}. Remember that this update is only visible to you until you save it to gatool Cloud.`)
-            setLocalUpdates(localUpdatesTemp);
+            var persistedLocalOnly = await saveLocalUpdates(localUpdatesTemp);
+            if (persistedLocalOnly) {
+                toast.success(`We have stored your update for team ${updateTeam.teamNumber}. Remember that this update is only visible to you until you save it to gatool Cloud.`)
+            } else {
+                toast.error(`Your browser would not save the update for team ${updateTeam.teamNumber} on this device. It will be lost if you reload — try refreshing the page and entering it again.`)
+            }
         }
 
         await setLastVisit(visits);
