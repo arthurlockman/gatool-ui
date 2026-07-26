@@ -1,4 +1,4 @@
-import { defineConfig, transformWithEsbuild } from "vite";
+import { defineConfig, transformWithOxc } from "vite";
 import react from "@vitejs/plugin-react";
 import jsconfigPaths from "vite-jsconfig-paths";
 import { VitePWA } from "vite-plugin-pwa";
@@ -19,9 +19,9 @@ function jsAsJsx() {
     async transform(code, id) {
       if (!id.startsWith(root)) return null;
       if (!id.endsWith(".js")) return null;
-      return transformWithEsbuild(code, id, {
-        loader: "jsx",
-        jsx: "automatic",
+      return transformWithOxc(code, id, {
+        lang: "jsx",
+        jsx: { runtime: "automatic" },
       });
     },
   };
@@ -111,11 +111,14 @@ export default defineConfig({
   },
   optimizeDeps: {
     // Pre-bundle Quill so dev import works without manual interop.
-    include: ["react-quill", "quill"],
-    esbuildOptions: {
+    include: ["react-quill-new", "quill"],
+    rolldownOptions: {
       // Some node_modules ship `.js` files containing JSX-ish content; this
-      // matches CRA's permissive Babel pipeline.
-      loader: { ".js": "jsx" },
+      // matches CRA's permissive Babel pipeline. (Vite 8 replaced the esbuild
+      // dep optimizer with rolldown, so `esbuildOptions.loader` is gone.)
+      moduleTypes: {
+        ".js": "jsx",
+      },
     },
   },
   test: {
