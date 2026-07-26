@@ -171,6 +171,25 @@ const missing = verified.filter((m) => !m.ok);
 const tooBig = verified.filter((m) => m.ok && m.size > MAX_MAP_BYTES);
 const publishable = verified.filter((m) => m.ok && m.size <= MAX_MAP_BYTES);
 
+/** Status code from whichever layer produced the error (superagent sets .status). */
+function errorStatus(err) {
+  return err?.status ?? err?.response?.status ?? err?.response?.statusCode;
+}
+
+function describeError(err) {
+  const status = errorStatus(err);
+  const message = err?.message || "";
+  if (message && status) return `${message} (HTTP ${status})`;
+  if (message) return message;
+  if (status) return `HTTP ${status}`;
+  return String(err);
+}
+
+/** Transient conditions worth a retry. Other 4xx will fail again identically. */
+function isRetryable(status) {
+  return status === 429 || (status >= 500 && status < 600);
+}
+
 async function upload(m) {
   let lastError;
   for (let attempt = 1; attempt <= 3; attempt++) {
@@ -191,18 +210,28 @@ async function upload(m) {
       return { ...m, uploaded: true };
     } catch (err) {
       lastError = err;
+      const status = errorStatus(err);
+      // 409 means New Relic already has a sourcemap for this javascriptUrl.
+      // Asset URLs are content-hashed, so an existing entry was built from
+      // identical bytes and is already correct. Vendor chunks hash off
+      // node_modules alone, so they keep their filename across commits and
+      // conflict on every deploy that doesn't bump a dependency — that is the
+      // normal steady state, not a failure.
+      if (status === 409) return { ...m, alreadyPresent: true };
+      if (status !== undefined && !isRetryable(status)) break;
       if (attempt < 3) await new Promise((resolve) => setTimeout(resolve, 2000 * attempt));
     }
   }
-  return { ...m, uploaded: false, error: lastError?.message || String(lastError) };
+  return { ...m, uploaded: false, error: describeError(lastError) };
 }
 
 const uploaded = dryRun
   ? publishable.map((m) => ({ ...m, uploaded: true }))
   : await pool(publishable, CONCURRENCY, upload);
 
-const failed = uploaded.filter((m) => !m.uploaded);
-const succeeded = uploaded.length - failed.length;
+const alreadyPresent = uploaded.filter((m) => m.alreadyPresent);
+const failed = uploaded.filter((m) => !m.uploaded && !m.alreadyPresent);
+const succeeded = uploaded.filter((m) => m.uploaded).length;
 
 // --- report ---
 const lines = [
@@ -212,6 +241,11 @@ const lines = [
   `- Application ID: \`${applicationId}\``,
   `- Uploaded: **${succeeded}/${maps.length}**`,
 ];
+if (alreadyPresent.length) {
+  lines.push(
+    `- Already in New Relic (unchanged since a previous deploy): **${alreadyPresent.length}**`
+  );
+}
 if (tooBig.length) lines.push(`- Skipped (>50MB): ${tooBig.map((m) => m.rel).join(", ")}`);
 if (missing.length) {
   lines.push(
