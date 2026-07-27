@@ -18,6 +18,7 @@ import { ArrowClockwise, Trash, Copy, Plus, BellFill, CaretUpFill, CaretDownFill
 import NotificationBanner from "components/NotificationBanner";
 import { Link } from "react-router-dom";
 import { Range } from "react-range";
+import { canEditTeamData } from "../utils/roleAccess";
 
 
 const filterTime = [
@@ -161,6 +162,8 @@ function SetupPage({
         nonStandardPlayoffs, setNonStandardPlayoffs,
     } = useSettings();
     const isOnline = useOnlineStatus();
+    const firstGlobalMode = ftcMode?.value === "FIRSTGlobal";
+    const canEdit = canEditTeamData({ isAuthenticated, user, firstGlobalMode });
     const PWASupported = (isChrome && Number(browserVersion) >= 76) || (isSafari && Number(browserVersion) >= 15 && Number(fullBrowserVersion.split(".")[1]) >= 4);
 
     const [deleteSavedModal, setDeleteSavedModal] = useState(false);
@@ -231,6 +234,7 @@ function SetupPage({
     }
 
     const uploadLocalUpdates = async () => {
+        if (!canEdit) return;
         const localUpdatesTemp = _.cloneDeep(localUpdates);
         const results = await Promise.allSettled(
             localUpdatesTemp.map(async (update) => {
@@ -616,10 +620,15 @@ function SetupPage({
                         {teamList?.lastUpdate && <p><b>Team List last updated: </b><br />{moment(teamList?.lastUpdate).format("ddd, MMM Do YYYY, " + timeFormat.value)}{selectedEvent?.value?.type === "OffSeason" && <> <span className="data-source-badge">via TBA</span></>}</p>}
                         {rankings?.lastModified && <p><b>Rankings last updated: </b><br />{moment(rankings?.lastModified).format("ddd, MMM Do YYYY, " + timeFormat.value)}{rankings?.dataSource && <> <span className="data-source-badge">via {rankings.dataSource}</span></>}</p>}
                         {alliances?.lastUpdate && <p><b>Alliances last updated: </b><br />{moment(alliances?.lastUpdate).format("ddd, MMM Do YYYY, " + timeFormat.value)}{alliances?.dataSource && <> <span className="data-source-badge">via {alliances.dataSource}</span></>}</p>}
-                        {((isAuthenticated && user["https://gatool.org/roles"] && (user["https://gatool.org/roles"].indexOf("user") >= 0)) && localUpdates.length > 0) &&
+                        {(canEdit && localUpdates.length > 0) &&
                             <Alert>
                                 <p><b>You have {localUpdates.length === 1 ? "an update for team" : "updates for teams"} {_.sortBy(updatedTeamList).join(", ")} that can be uploaded to gatool Cloud.</b></p>
                                 <span><Button disabled={!isOnline} style={{ width: "45%" }} onClick={uploadLocalUpdates}>Upload to gatool Cloud now</Button>  <Button disabled={!isOnline} variant={"warning"} style={{ width: "50%" }} onClick={deleteLocalUpdates}>Delete stored updates</Button></span>
+                            </Alert>
+                        }
+                        {firstGlobalMode && !canEdit &&
+                            <Alert variant="secondary">
+                                <b>FIRST Global team data is read-only for this account.</b>{localUpdates.length > 0 && <> Existing local updates cannot be uploaded without FIRST Global write access.</>}
                             </Alert>
                         }
                         <Alert variant={"warning"}>

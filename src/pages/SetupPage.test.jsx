@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import SetupPage from "./SetupPage";
 
 vi.mock("contexts/EventDataContext", () => ({ useEventData: vi.fn() }));
@@ -188,6 +189,18 @@ function setupMocks(overrides = {}) {
   });
 }
 
+function setupFirstGlobalEvent() {
+  setupMocks({
+    selectedEvent: {
+      value: { code: "FG2026", name: "FIRST Global", type: "FIRSTGlobal" },
+      label: "FIRST Global",
+    },
+    eventLabel: "FIRST Global",
+    ftcMode: { value: "FIRSTGlobal", label: "FIRST Global" },
+    teamList: { teams: [] },
+  });
+}
+
 describe("SetupPage", () => {
   beforeEach(() => {
     setupMocks();
@@ -217,5 +230,56 @@ describe("SetupPage", () => {
     vi.mocked(useOnlineStatus).mockReturnValue(false);
     render(<SetupPage {...setupProps()} />);
     expect(screen.getByText(/you're offline/i)).toBeInTheDocument();
+  });
+
+  it("blocks queued FIRST Global uploads for a user without write access", () => {
+    setupFirstGlobalEvent();
+    const putTeamData = vi.fn();
+    render(<SetupPage {...setupProps({
+      isAuthenticated: true,
+      user: { "https://gatool.org/roles": ["user"] },
+      localUpdates: [{ teamNumber: 1, update: { robotNameLocal: "Bot" } }],
+      putTeamData,
+    })} />);
+
+    expect(screen.getByText(/FIRST Global team data is read-only/i)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /upload to gatool Cloud now/i })).not.toBeInTheDocument();
+    expect(putTeamData).not.toHaveBeenCalled();
+  });
+
+  it("uploads queued FIRST Global updates for a write-enabled user", async () => {
+    setupFirstGlobalEvent();
+    const putTeamData = vi.fn().mockResolvedValue({ status: 204 });
+    const setLocalUpdates = vi.fn();
+    render(<SetupPage {...setupProps({
+      isAuthenticated: true,
+      user: { "https://gatool.org/roles": ["user", "firstglobal-write"] },
+      localUpdates: [{ teamNumber: 1, update: { robotNameLocal: "Bot" } }],
+      putTeamData,
+      setLocalUpdates,
+    })} />);
+
+    fireEvent.click(screen.getByRole("button", { name: /upload to gatool Cloud now/i }));
+    await waitFor(() => expect(putTeamData).toHaveBeenCalledWith(1, { robotNameLocal: "Bot" }));
+    expect(setLocalUpdates).toHaveBeenCalledWith([]);
+  });
+
+  it("allows an admin to upload queued FIRST Global updates", async () => {
+    setupFirstGlobalEvent();
+    const putTeamData = vi.fn().mockResolvedValue({ status: 204 });
+    render(
+      <MemoryRouter>
+        <SetupPage {...setupProps({
+          isAuthenticated: true,
+          user: { "https://gatool.org/roles": ["admin"] },
+          localUpdates: [{ teamNumber: 1, update: { robotNameLocal: "Bot" } }],
+          putTeamData,
+        })} />
+      </MemoryRouter>
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: /upload to gatool Cloud now/i }));
+    await waitFor(() => expect(putTeamData).toHaveBeenCalled());
+    expect(screen.queryByText(/FIRST Global team data is read-only/i)).not.toBeInTheDocument();
   });
 });
