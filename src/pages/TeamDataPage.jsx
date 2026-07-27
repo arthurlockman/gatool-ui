@@ -24,6 +24,7 @@ import { useSettings } from "../contexts/SettingsContext";
 import { useEventData } from "contexts/EventDataContext";
 import { useEventActions } from "contexts/EventActionsContext";
 import { getFirstGlobalFlagUrl } from "../utils/countryFlag";
+import { canEditTeamData } from "../utils/roleAccess";
 
 /** Blue banner stats are a nested object; SheetJS leaves those cells blank unless stringified. */
 const BLUE_BANNER_EXPORT_ROWS = [
@@ -92,6 +93,7 @@ function TeamDataPage({
     const [clockRunning, setClockRunning] = useState(true);
     const { disableScope, enableScope } = useHotkeysContext();
     const isOnline = useOnlineStatus();
+    const canEdit = canEditTeamData({ isAuthenticated, user, firstGlobalMode });
 
     // Remember scroll position for Teams page
     useScrollPosition('teams', true, false, useScrollMemory);
@@ -124,6 +126,17 @@ function TeamDataPage({
     const [showSaveToCloud, setShowSaveToCloud] = useState(false);
     const [teamsToReset, setTeamsToReset] = useState([]);
     const [resetNotes, setResetNotes] = useState(false);
+
+    useEffect(() => {
+        if (canEdit || (!show && !showHistory && !showResetConfirm && !showSaveToCloud)) return;
+        setUpdateTeam(null);
+        setShow(false);
+        setShowHistory(false);
+        setShowResetConfirm(false);
+        setShowSaveToCloud(false);
+        enableScope('tabNavigation');
+        setClockRunning(true);
+    }, [canEdit, enableScope, show, showHistory, showResetConfirm, showSaveToCloud]);
 
     const { start, stop } = useInterval(
         () => {
@@ -176,6 +189,7 @@ function TeamDataPage({
      * @param {string} mode - determines whether to send the update to gatool Cloud. "update" = send to cloud
      */
     const handleSubmit = async (mode, formValue) => {
+        if (!canEdit) return;
         var visits = _.cloneDeep(lastVisit);
         visits[`${updateTeam.teamNumber}`] = moment().format();
         var communityUpdatesTemp = _.cloneDeep(communityUpdates);
@@ -254,7 +268,7 @@ function TeamDataPage({
     }
 
     const handleRestoreData = async (data) => {
-        console.log(data);
+        if (!canEdit) return;
         var resp = await putTeamData(data.team.teamNumber, data.update);
         if (resp.status !== 204) {
             var errorText = `Your update for team ${data.team.teamNumber} was not successful.`;
@@ -275,7 +289,7 @@ function TeamDataPage({
      * @param {object} team - The team to display
      */
     const handleShow = (team) => {
-        if (isAuthenticated && user["https://gatool.org/roles"] && user["https://gatool.org/roles"].indexOf("user") >= 0) {
+        if (canEdit) {
             setUpdateTeam(team);
             setShow(true);
             disableScope('tabNavigation');
@@ -284,7 +298,7 @@ function TeamDataPage({
     }
 
     const handleHistory = async (team) => {
-        if (isAuthenticated && user["https://gatool.org/roles"] && user["https://gatool.org/roles"].indexOf("user") >= 0) {
+        if (canEdit) {
             var history = await getTeamHistory(team.teamNumber);
             setShowHistory(true);
             setTeamHistory(_.orderBy(history, ['modifiedDate'], ['desc']));
@@ -530,6 +544,7 @@ function TeamDataPage({
 
     // This function clicks the hidden file upload button
     function clickRestoreBackup() {
+        if (!canEdit) return;
         document.getElementById("BackupFiles").click();
     }
 
@@ -550,6 +565,7 @@ function TeamDataPage({
     // Excel file's content. The file must have been previously exported from gatool.
     // It will only update data that Game Announcers control in the Team Data page.
     function handleRestoreBackup(e) {
+        if (!canEdit) return;
         var files = e.target.files;
         var i, f, currentUpdate, newUpdate;
         for (i = 0; i !== files.length; ++i) {
@@ -697,6 +713,7 @@ function TeamDataPage({
      * Handles the reset button click - finds teams to reset and shows confirmation dialog
      */
     const handleResetClick = () => {
+        if (!canEdit) return;
         const teamsToResetList = findTeamsToReset();
         setTeamsToReset(teamsToResetList);
         setResetNotes(false); // Reset the checkbox to default
@@ -708,6 +725,7 @@ function TeamDataPage({
      * Handles the confirmation to proceed with reset
      */
     const handleResetProceed = async () => {
+        if (!canEdit) return;
         setShowResetConfirm(false);
 
         // Clone local updates and remove sponsor and robot name fields
@@ -798,6 +816,7 @@ function TeamDataPage({
      * Handles saving changes to gatool Cloud
      */
     const handleSaveToCloud = async () => {
+        if (!canEdit) return;
         setShowSaveToCloud(false);
         enableScope('tabNavigation');
 
@@ -911,7 +930,7 @@ function TeamDataPage({
             </div>}
             {selectedEvent && teamList?.teams.length > 0 && <><div>
                 <h4>{eventLabel || selectedEvent?.label}</h4>
-                <p className={"leftTable"}>This table is {(isAuthenticated && user["https://gatool.org/roles"] && user["https://gatool.org/roles"].indexOf("user") >= 0) ? <>editable and sortable. Tap on a team number to change data for a specific team. Edits you make are local to this browser, and they will persist here if you do not clear your browser cache. You can save your changes to the gatool Cloud on the team details page or on the Setup Screen. </> : <>sortable. </>}Cells <span className={"teamTableHighlight"}>highlighted in green</span> have been modified, either by you or by other gatool users.</p>
+                <p className={"leftTable"}>This table is {canEdit ? <>editable and sortable. Tap on a team number to change data for a specific team. Edits you make are local to this browser, and they will persist here if you do not clear your browser cache. You can save your changes to the gatool Cloud on the team details page or on the Setup Screen. </> : <>sortable. </>}Cells <span className={"teamTableHighlight"}>highlighted in green</span> have been modified, either by you or by other gatool users. {firstGlobalMode && !canEdit && <><b>FIRST Global team data is read-only for this account.</b> Editing requires FIRST Global write access.</>}</p>
                 <Table responsive className={"leftTable topBorderLine"}>
                     <thead>
                         <tr>
@@ -921,7 +940,7 @@ function TeamDataPage({
                             <td>
                                 <span className="gatool-tap-link" onClick={downloadTeamInfoSheets}><img style={{ float: "left" }} width="30" src="images/wordicon.png" alt="Word Logo" /> <b>Tap here to download a merged document (docx).</b></span>
                             </td>
-                            {(isAuthenticated && user["https://gatool.org/roles"] && user["https://gatool.org/roles"].indexOf("user") >= 0) && <td>
+                            {canEdit && <td>
                                 <span className="gatool-tap-link" onClick={clickRestoreBackup}><input type="file" id="BackupFiles" onChange={handleRestoreBackup} className={"hiddenInput"} /><b><img style={{ float: "left" }} width="30" src="images/excelicon.png" alt="Excel Logo" /> Tap here to restore team data from Excel</b></span>
                             </td>}
                         </tr>
@@ -935,13 +954,13 @@ function TeamDataPage({
                             <td>
                                 <p>This merged doc contains all of the information in your Teams List, merged onto a template you can print and distribute to teams. <i>Note: this will save to Files on iOS 13+</i></p>
                             </td>
-                            {(isAuthenticated && user["https://gatool.org/roles"] && user["https://gatool.org/roles"].indexOf("user") >= 0) && <td>
+                            {canEdit && <td>
                                 <p>You can export your teams data to Excel using the button on the left, and then restore it from backup here. This is handy in low or no network situations, where you may be unable to update changes to gatool Cloud. <i>Note: Be careful if you modify the Excel file and then import it here.</i></p>
                             </td>}
                         </tr>
                     </tbody>
                 </Table>
-                {isAuthenticated && <><Button variant="warning" size="sm" onClick={handleResetClick} style={{ marginRight: "10px" }}>Reset sponsors and robot names</Button>
+                {canEdit && <><Button variant="warning" size="sm" onClick={handleResetClick} style={{ marginRight: "10px" }}>Reset sponsors and robot names</Button>
                     <Button variant="success" size="sm" onClick={() => { clearVisits(false) }}>Reset visit times. Use at the start of each day.</Button><br /><br /></>}
 
                 <Table responsive striped bordered size="sm" className={"teamTable"}>
@@ -970,7 +989,7 @@ function TeamDataPage({
                             var teamName = team?.updates?.nameShortLocal ? team?.updates?.nameShortLocal : team?.nameShort;
 
                             return <tr key={`teamDataRow${team?.teamNumber}`}>
-                                <TeamTimer team={team} lastVisit={lastVisit} monthsWarning={monthsWarning} handleShow={handleShow} currentTime={currentTime} />
+                                <TeamTimer team={team} lastVisit={lastVisit} monthsWarning={monthsWarning} handleShow={handleShow} currentTime={currentTime} editable={canEdit} />
                                 <td style={rankHighlight(team?.rank ? team?.rank : 100, allianceCount || { "count": 8 })}>{team?.rank}</td>
                                 
                                 <td className={updateHighlightClass(team?.updates?.nameShortLocal)} style={updateHighlight(team?.updates?.nameShortLocal)}>
@@ -996,7 +1015,7 @@ function TeamDataPage({
                         })}
                     </tbody>
                 </Table>
-                {isAuthenticated && <Button variant="warning" size="sm" onClick={handleResetClick} style={{ marginRight: "10px" }}>Reset sponsors and robot names</Button>}
+                {canEdit && <Button variant="warning" size="sm" onClick={handleResetClick} style={{ marginRight: "10px" }}>Reset sponsors and robot names</Button>}
                 <Button variant="success" size="sm" onClick={() => { clearVisits(false) }}>Reset visit times. Use at the start of each day.</Button><br /><br /><br />
             </div></>}
             <Modal centered={true} show={showDownload} onHide={handleCloseDownload}>
@@ -1015,7 +1034,7 @@ function TeamDataPage({
             </Modal>
 
             <TeamEditModal
-                show={show}
+                show={show && canEdit}
                 onHide={handleClose}
                 updateTeam={updateTeam}
                 localUpdates={localUpdates}
@@ -1036,7 +1055,7 @@ function TeamDataPage({
             />
 
             <TeamHistoryModal
-                show={showHistory}
+                show={showHistory && canEdit}
                 onHide={handleCloseHistory}
                 updateTeam={updateTeam}
                 teamHistory={teamHistory}
@@ -1046,7 +1065,7 @@ function TeamDataPage({
                 onRestore={handleRestoreData}
             />
 
-            <Modal centered={true} show={showResetConfirm} onHide={handleResetCancel}>
+            <Modal centered={true} show={showResetConfirm && canEdit} onHide={handleResetCancel}>
                 <Modal.Header className={"allianceChoice"} closeVariant={"white"} closeButton>
                     <Modal.Title>Reset Sponsors and Robot Names</Modal.Title>
                 </Modal.Header>
@@ -1087,7 +1106,7 @@ function TeamDataPage({
                 </Modal.Footer>
             </Modal>
 
-            <Modal centered={true} show={showSaveToCloud} onHide={handleSaveToCloudCancel}>
+            <Modal centered={true} show={showSaveToCloud && canEdit} onHide={handleSaveToCloudCancel}>
                 <Modal.Header className={"allianceChoice"} closeVariant={"white"} closeButton>
                     <Modal.Title>Save Changes to gatool Cloud?</Modal.Title>
                 </Modal.Header>

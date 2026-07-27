@@ -1,6 +1,6 @@
 import { useAuth } from "../contextProviders/AuthProvider";
 import { useEffect, useState } from "react";
-import { read, utils } from "xlsx";
+import Select from "react-select";
 import {
   Alert,
   Button,
@@ -15,6 +15,27 @@ import moment from "moment";
 import _ from "lodash";
 import { toast } from "react-toastify";
 import NotificationBanner from "components/NotificationBanner";
+import { UseAuthClient } from "../contextProviders/AuthClientContext";
+
+const BASE_ROLES = [
+  { name: "user", label: "User", description: "Base application access" },
+  { name: "admin", label: "Admin", description: "System administrator access" },
+];
+const MIN_USER_QUERY_LENGTH = 2;
+const USER_SEARCH_DEBOUNCE_MS = 300;
+
+async function fetchUsers(httpClient, query, signal) {
+  const response = await httpClient.get(
+    `system/users?query=${encodeURIComponent(query)}&limit=20`,
+    30000,
+    signal
+  );
+  if (response?._aborted) return null;
+  if (response?.status !== 200 || typeof response.json !== "function") {
+    throw new Error(response?.statusText || "Could not load users");
+  }
+  return response.json();
+}
 
 function Developer({
   putNotifications,
@@ -27,10 +48,20 @@ function Developer({
   getUserPrefs,
 }) {
   const { user, getAccessToken } = useAuth();
+  const [httpClient] = UseAuthClient();
+  const isAdmin = user?.["https://gatool.org/roles"]?.includes("admin");
 
   const [token, setToken] = useState(null);
-  const [formattedUsers, setFormattedUsers] = useState(null);
-  const [loadedUsers, setLoadedUsers] = useState(null);
+  const [availableRoles, setAvailableRoles] = useState([]);
+  const [rolesLoading, setRolesLoading] = useState(false);
+  const [rolesError, setRolesError] = useState("");
+  const [userQuery, setUserQuery] = useState("");
+  const [userOptions, setUserOptions] = useState([]);
+  const [usersLoading, setUsersLoading] = useState(false);
+  const [usersError, setUsersError] = useState("");
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [updatingRole, setUpdatingRole] = useState("");
+  const [roleResult, setRoleResult] = useState(null);
   const [formattedMessage, setFormattedMessage] = useState({
     message: "",
     expiry: moment(),
@@ -87,101 +118,110 @@ function Developer({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /**
-   * This function clicks the hidden file upload button
-   * @function  clickLoadUsers
-   */
-  function clickLoadUsers() {
-    document.getElementById("userUpload").click();
-  }
-
-  /**
-   * This function clears the file input by removing and recreating the file input button
-   *
-   * @function clearFileInput
-   * @param {string} id - The ID to delete and recreate
-   */
-  function clearFileInput(id) {
-    const oldInput = document.getElementById(id);
-    const newInput = document.createElement("input");
-    newInput.type = "file";
-    newInput.id = oldInput.id;
-    // @ts-ignore
-    newInput.name = oldInput.name;
-    newInput.className = oldInput.className;
-    newInput.style.cssText = oldInput.style.cssText;
-    oldInput.parentNode.replaceChild(newInput, oldInput);
-  }
-
-  /**
-   * This function receives a file from the upload button and parses the user list from the CSV.
-   * It then returns formatted JSON, which is displayed to the user in a Text Area on screen.
-   * It also destroys and recreates the button, and then re-attaches the proper event listener.
-   *
-   * @function handleUserUpload
-   * @param {*} e - The file upload event, which contains a pointer to the file.
-   */
-  function handleUserUpload(e) {
-    let files = e.target.files;
-    let f = files[0];
-    let reader = new FileReader();
-    reader.onload = function (e) {
-      //@ts-ignore
-      const data = new Uint8Array(e.target.result);
-      let workbook;
-      try {
-        workbook = read(data, { type: "array" });
-        const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-        const users = utils.sheet_to_json(worksheet);
-        let formattedUserList = [];
-        try {
-          if (users.length > 0) {
-            formattedUserList = users.map((user) => {
-              return {
-                user_id: user["Email Address"].toLowerCase(),
-                email: user["Email Address"],
-                email_verified: false,
-              };
-            });
-            setFormattedUsers(JSON.stringify(formattedUserList));
-            setLoadedUsers("success");
-          } else {
-            setFormattedUsers("No users in file");
-            setLoadedUsers("danger");
-          }
-        } catch (err) {
-          setFormattedUsers(err.message);
-          setLoadedUsers("danger");
+  useEffect(() => {
+    if (!isAdmin) return;
+    let active = true;
+    setRolesLoading(true);
+    setRolesError("");
+    httpClient
+      .get("system/roles")
+      .then(async (response) => {
+        if (response?.status !== 200 || typeof response.json !== "function") {
+          throw new Error(response?.statusText || "Could not load roles");
         }
-      } catch (err) {
-        setFormattedUsers(err.message);
-        setLoadedUsers("danger");
-      }
-      clearFileInput("userUpload");
-      document
-        .getElementById("userUpload")
-        .addEventListener("change", handleUserUpload);
+        const roles = await response.json();
+        if (active) setAvailableRoles(Array.isArray(roles) ? roles : []);
+      })
+      .catch(() => {
+        if (active) setRolesError("Could not load manageable roles.");
+      })
+      .finally(() => {
+        if (active) setRolesLoading(false);
+      });
+    return () => {
+      active = false;
     };
-    reader.readAsArrayBuffer(f);
-  }
+  }, [httpClient, isAdmin]);
 
-  /**
-   * This function creates a downloadable file from an object
-   * @function downloadObjectAsJson
-   * @param {string} exportName - The name of the file
-   * @param {Object} exportObj - The object you want to include in the file
-   */
-  function downloadObjectAsJson(exportObj, exportName) {
-    const dataStr =
-      "data:text/json;charset=utf-8," +
-      encodeURIComponent(JSON.stringify(exportObj));
-    const downloadAnchorNode = document.createElement("a");
-    downloadAnchorNode.setAttribute("href", dataStr);
-    downloadAnchorNode.setAttribute("download", exportName + ".json");
-    document.body.appendChild(downloadAnchorNode); // required for firefox
-    downloadAnchorNode.click();
-    downloadAnchorNode.remove();
-  }
+  useEffect(() => {
+    const query = userQuery.trim();
+    if (query.length < MIN_USER_QUERY_LENGTH) {
+      setUserOptions([]);
+      setUsersError("");
+      setUsersLoading(false);
+      return;
+    }
+
+    const controller = new AbortController();
+    const timeout = window.setTimeout(async () => {
+      setUsersLoading(true);
+      setUsersError("");
+      try {
+        const users = await fetchUsers(httpClient, query, controller.signal);
+        if (users) {
+          setUserOptions(
+            users.map((entry) => ({
+              value: entry.email,
+              label: entry.email,
+              user: entry,
+            }))
+          );
+        }
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          setUserOptions([]);
+          setUsersError("Could not load users.");
+        }
+      } finally {
+        if (!controller.signal.aborted) setUsersLoading(false);
+      }
+    }, USER_SEARCH_DEBOUNCE_MS);
+
+    return () => {
+      window.clearTimeout(timeout);
+      controller.abort();
+    };
+  }, [httpClient, userQuery]);
+
+  const handleRoleChange = async (role, granted) => {
+    if (!selectedUser) return;
+    const email = selectedUser.email;
+    const path = `system/users/${encodeURIComponent(email)}/roles/${encodeURIComponent(role.name)}`;
+    setUpdatingRole(role.name);
+    setRoleResult(null);
+    try {
+      const response = granted
+        ? await httpClient.put(path)
+        : await httpClient.delete(path);
+      if (response?.status < 200 || response?.status >= 300) {
+        throw new Error(response?.statusText || "Could not update role");
+      }
+
+      const updatedUser = response.status === 200 && typeof response.json === "function"
+        ? await response.json()
+        : (await fetchUsers(httpClient, email))?.find(
+            (entry) => entry.email.toLowerCase() === email.toLowerCase()
+          );
+      if (!updatedUser) throw new Error("Updated user could not be reloaded");
+      setSelectedUser(updatedUser);
+      setUserOptions((options) =>
+        options.map((option) =>
+          option.value === email ? { ...option, user: updatedUser } : option
+        )
+      );
+      setRoleResult({
+        variant: "success",
+        message: `${role.label || role.name} ${granted ? "granted" : "revoked"}.`,
+      });
+    } catch (error) {
+      setRoleResult({
+        variant: "danger",
+        message: error.message || "Could not update role.",
+      });
+    } finally {
+      setUpdatingRole("");
+    }
+  };
 
   /**
    * This function handles setting parts of the form value
@@ -289,7 +329,7 @@ function Developer({
   return (
     <>
       <br />
-      {user?.["https://gatool.org/roles"]?.indexOf("admin") >= 0 ? (
+      {isAdmin ? (
         <Tabs defaultActiveKey="tools" id="dev-tools-tabs" className="mb-3">
           <Tab eventKey="tools" title="Dev Tools">
             <Container>
@@ -395,59 +435,100 @@ function Developer({
                 </div>
               )}
               <br />
-              <div>
-                <input
-                  type="file"
-                  id="userUpload"
-                  onChange={handleUserUpload}
-                  className={"hiddenInput"}
+              <h3>Role Editor</h3>
+              <Form.Group className="mb-3" controlId="user-role-search">
+                <Form.Label>User email</Form.Label>
+                <Select
+                  aria-label="User email"
+                  inputValue={userQuery}
+                  value={
+                    selectedUser
+                      ? {
+                          value: selectedUser.email,
+                          label: selectedUser.email,
+                          user: selectedUser,
+                        }
+                      : null
+                  }
+                  options={userOptions}
+                  isLoading={usersLoading}
+                  isDisabled={Boolean(updatingRole)}
+                  isClearable
+                  filterOption={null}
+                  onInputChange={(value, action) => {
+                    if (action.action === "input-change") {
+                      setUserQuery(value);
+                      setSelectedUser(null);
+                      setRoleResult(null);
+                    }
+                  }}
+                  onChange={(option) => {
+                    setSelectedUser(option?.user || null);
+                    setUserQuery("");
+                    setRoleResult(null);
+                  }}
+                  placeholder="Type at least 2 characters"
+                  noOptionsMessage={() => {
+                    if (usersError) return usersError;
+                    if (userQuery.trim().length < MIN_USER_QUERY_LENGTH) {
+                      return "Type at least 2 characters";
+                    }
+                    return "No users found";
+                  }}
+                  loadingMessage={() => "Searching users..."}
                 />
-              </div>
+              </Form.Group>
 
-              <Button style={{ cursor: "pointer" }} onClick={clickLoadUsers}>
-                <img
-                  style={{ float: "left" }}
-                  width="50"
-                  src="images/excelicon.png"
-                  alt="Excel Logo"
-                />
-                {loadedUsers ? (
-                  <>Load new user list</>
-                ) : (
-                  <>Load user list from Mailchimp</>
-                )}
-              </Button>
-              <div>
-                <Form.Control
-                  as="textarea"
-                  rows={3}
-                  value={formattedUsers ? formattedUsers : ""}
-                  readOnly
-                />
-                {loadedUsers && (
-                  <Button
-                    variant={loadedUsers ? loadedUsers : "primary"}
-                    onClick={() => {
-                      if (loadedUsers !== "danger") {
-                        navigator.clipboard.writeText(formattedUsers);
-                        downloadObjectAsJson(
-                          JSON.parse(formattedUsers),
-                          "GatoolUsers" + moment().format("MMDDYYYY_HHmmss")
-                        );
-                        setLoadedUsers("info");
-                      }
-                    }}
-                  >
-                    {loadedUsers === "info" ? (
-                      <>Users have been downloaded</>
-                    ) : loadedUsers === "danger" ? (
-                      <>Error in file</>
-                    ) : (
-                      <>Download users to JSON file</>
-                    )}
-                  </Button>
-                )}
-              </div>
+              {selectedUser && (
+                <div className="mb-3">
+                  <h4>{selectedUser.email}</h4>
+                  <p className="text-muted mb-2">
+                    Created: {selectedUser.createdAt ? moment(selectedUser.createdAt).format("MMM D, YYYY, h:mm a") : "Unknown"}
+                    {" | "}
+                    Last login: {selectedUser.lastLoginAt ? moment(selectedUser.lastLoginAt).format("MMM D, YYYY, h:mm a") : "Never"}
+                  </p>
+                  <p className="mb-2">
+                    Assigned roles: {selectedUser.roles?.length ? selectedUser.roles.join(", ") : "None"}
+                  </p>
+
+                  {BASE_ROLES.map((role) => (
+                    <Form.Check
+                      key={role.name}
+                      id={`user-role-${role.name}`}
+                      type="checkbox"
+                      className="mb-2"
+                      label={`${role.label} - ${role.description}`}
+                      checked={selectedUser.roles?.includes(role.name) || false}
+                      disabled
+                      readOnly
+                    />
+                  ))}
+
+                  {rolesLoading && <p>Loading manageable roles...</p>}
+                  {rolesError && <Alert variant="danger">{rolesError}</Alert>}
+                  {availableRoles
+                    .filter((role) => !BASE_ROLES.some((baseRole) => baseRole.name === role.name))
+                    .map((role) => (
+                      <Form.Check
+                        key={role.name}
+                        id={`user-role-${role.name}`}
+                        type="checkbox"
+                        className="mb-2"
+                        label={`${role.label || role.name}${role.description ? ` - ${role.description}` : ""}`}
+                        checked={selectedUser.roles?.includes(role.name) || false}
+                        disabled={Boolean(updatingRole)}
+                        onChange={(event) => handleRoleChange(role, event.target.checked)}
+                      />
+                    ))}
+
+                  {updatingRole && <p>Updating role...</p>}
+                  {roleResult && (
+                    <Alert className="mt-3" variant={roleResult.variant}>
+                      {roleResult.message}
+                    </Alert>
+                  )}
+                </div>
+              )}
             </Container>
           </Tab>
           <Tab eventKey="notifications" title="Notifications">

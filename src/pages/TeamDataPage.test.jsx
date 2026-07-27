@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import TeamDataPage from "./TeamDataPage";
 
 vi.mock("contexts/EventDataContext", () => ({ useEventData: vi.fn() }));
@@ -34,10 +34,21 @@ vi.mock("react-interval-hook", () => ({
 }));
 vi.mock("../components/TeamAvatar", () => ({ default: () => null }));
 vi.mock("components/TeamTimer", () => ({
-  default: ({ team }) => <td>{team?.teamNumber}</td>,
+  default: ({ team, handleShow, editable }) => (
+    <td onClick={editable ? () => handleShow(team) : undefined}>{team?.teamNumber}</td>
+  ),
 }));
-vi.mock("components/TeamEditModal", () => ({ default: () => null }));
-vi.mock("components/TeamHistoryModal", () => ({ default: () => null }));
+vi.mock("components/TeamEditModal", () => ({
+  default: ({ show, updateTeam, onHistory }) => show ? (
+    <div>
+      Team edit open
+      <button onClick={() => onHistory(updateTeam)}>Show team history</button>
+    </div>
+  ) : null,
+}));
+vi.mock("components/TeamHistoryModal", () => ({
+  default: ({ show }) => show ? <div>Team history open</div> : null,
+}));
 
 import { useEventData } from "contexts/EventDataContext";
 import { useEventActions } from "contexts/EventActionsContext";
@@ -75,6 +86,23 @@ function setupMocks(overrides = {}) {
     firstGlobalMode: false,
     remapNumberToString: (n) => String(n),
     ...overrides,
+  });
+}
+
+const testTeam = {
+  teamNumber: 254,
+  nameShort: "Poofs",
+  organization: "Bellarmine",
+  city: "San Jose",
+  stateProv: "CA",
+  country: "USA",
+};
+
+function setupFirstGlobal() {
+  setupMocks({
+    firstGlobalMode: true,
+    ftcMode: { value: "FIRSTGlobal", label: "FIRST Global" },
+    teamList: { teams: [testTeam] },
   });
 }
 
@@ -126,5 +154,50 @@ describe("TeamDataPage", () => {
     expect(screen.getByText("254")).toBeInTheDocument();
     expect(screen.getByText("Poofs")).toBeInTheDocument();
     expect(screen.getByText(/tap to download this table as excel/i)).toBeInTheDocument();
+  });
+
+  it("keeps FIRST Global data read-only for a user without write access", () => {
+    setupFirstGlobal();
+    render(<TeamDataPage {...teamDataProps({
+      isAuthenticated: true,
+      user: { "https://gatool.org/roles": ["user"] },
+    })} />);
+
+    expect(screen.getByText(/FIRST Global team data is read-only/i)).toBeInTheDocument();
+    expect(screen.getByText(/tap to download this table as excel/i)).toBeInTheDocument();
+    expect(screen.queryByText(/restore team data from Excel/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /reset sponsors and robot names/i })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByText("254"));
+    expect(screen.queryByText("Team edit open")).not.toBeInTheDocument();
+  });
+
+  it("allows FIRST Global editing and history for a write-enabled user", async () => {
+    setupFirstGlobal();
+    const getTeamHistory = vi.fn().mockResolvedValue([]);
+    render(<TeamDataPage {...teamDataProps({
+      isAuthenticated: true,
+      user: { "https://gatool.org/roles": ["user", "firstglobal-write"] },
+      getTeamHistory,
+    })} />);
+
+    expect(screen.getByText(/restore team data from Excel/i)).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: /reset sponsors and robot names/i })).toHaveLength(2);
+    fireEvent.click(screen.getByText("254"));
+    expect(screen.getByText("Team edit open")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /show team history/i }));
+    await waitFor(() => expect(getTeamHistory).toHaveBeenCalledWith(254));
+    expect(screen.getByText("Team history open")).toBeInTheDocument();
+  });
+
+  it("allows an admin to edit FIRST Global data without the write role", () => {
+    setupFirstGlobal();
+    render(<TeamDataPage {...teamDataProps({
+      isAuthenticated: true,
+      user: { "https://gatool.org/roles": ["admin"] },
+    })} />);
+
+    fireEvent.click(screen.getByText("254"));
+    expect(screen.getByText("Team edit open")).toBeInTheDocument();
+    expect(screen.queryByText(/FIRST Global team data is read-only/i)).not.toBeInTheDocument();
   });
 });
