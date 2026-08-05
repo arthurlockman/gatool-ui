@@ -11,11 +11,20 @@ import _ from "lodash";
 import { useHotkeysContext, useHotkeys } from "react-hotkeys-hook";
 import { commonFouls } from "../data/fouls";
 import { commonFoulsFTC } from "../data/foulsFTC";
+import { commonFoulsFirstGlobal } from "../data/foulsFirstGlobal";
+import { isFirstGlobalMode } from "../utils/programConstants";
 
 function FoulButtons({ currentYear, ftcMode = null }) {
   const [showFoul, setShowFoul] = useState(false);
   const [foul, setFoul] = useState(null);
   const { disableScope, enableScope } = useHotkeysContext();
+
+  const firstGlobalMode = isFirstGlobalMode(ftcMode);
+  const foulData = firstGlobalMode
+    ? commonFoulsFirstGlobal
+    : ftcMode
+    ? commonFoulsFTC
+    : commonFouls;
 
   const handleShow = (foul) => {
     setShowFoul(true);
@@ -49,11 +58,7 @@ function FoulButtons({ currentYear, ftcMode = null }) {
         }}
       >
         {_.filter(
-          _.sortBy(ftcMode ? commonFoulsFTC : commonFouls, [
-            "card",
-            "code",
-            "rp",
-          ]),
+          _.sortBy(foulData, ["card", "code", "rp"]),
           (foul) => {
             return foul.card === "red" || foul.card === "yellow";
           }
@@ -83,11 +88,7 @@ function FoulButtons({ currentYear, ftcMode = null }) {
           );
         })}
         {_.filter(
-          _.sortBy(ftcMode ? commonFoulsFTC : commonFouls, [
-            "card",
-            "code",
-            "rp",
-          ]),
+          _.sortBy(foulData, ["card", "code", "rp"]),
           (foul) => {
             return foul.card !== "red" && foul.card !== "yellow";
           }
@@ -111,37 +112,39 @@ function FoulButtons({ currentYear, ftcMode = null }) {
           );
         })}
 
-        <Button
-          className={"foulButtons"}
-          key={"foulLookup"}
-          onClick={() => {
-            handleShow({
-              year: currentYear,
-              code: "LOOKUP",
-              name: "Lookup Foul",
-              level: null,
-              card: null,
-              rp: null,
-              text: (
-                <div style={{ height: "calc(100vh - 200px)" }}>
-                  <iframe
-                    width="100%"
-                    height="100%"
-                    src={
-                      ftcMode
-                        ? "https://ftc.game/cm-html"
-                        : `https://frctools.com/${currentYear}`
-                    }
-                    title="Foul Lookup"
-                  />
-                </div>
-              ),
-              violation: <></>,
-            });
-          }}
-        >
-          Lookup Foul...
-        </Button>
+        {!firstGlobalMode && (
+          <Button
+            className={"foulButtons"}
+            key={"foulLookup"}
+            onClick={() => {
+              handleShow({
+                year: currentYear,
+                code: "LOOKUP",
+                name: "Lookup Foul",
+                level: null,
+                card: null,
+                rp: null,
+                text: (
+                  <div style={{ height: "calc(100vh - 200px)" }}>
+                    <iframe
+                      width="100%"
+                      height="100%"
+                      src={
+                        ftcMode
+                          ? "https://ftc.game/cm-html"
+                          : `https://frctools.com/${currentYear}`
+                      }
+                      title="Foul Lookup"
+                    />
+                  </div>
+                ),
+                violation: <></>,
+              });
+            }}
+          >
+            Lookup Foul...
+          </Button>
+        )}
       </ButtonToolbar>
       <Modal
         centered={true}
