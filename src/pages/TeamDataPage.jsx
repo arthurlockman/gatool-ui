@@ -23,6 +23,8 @@ import useScrollPosition from "../hooks/useScrollPosition";
 import { useSettings } from "../contexts/SettingsContext";
 import { useEventData } from "contexts/EventDataContext";
 import { useEventActions } from "contexts/EventActionsContext";
+import { getFirstGlobalFlagUrl } from "../utils/countryFlag";
+import { canEditTeamData } from "../utils/roleAccess";
 
 /**
  * Message for an update that couldn't reach gatool Cloud. Only promise the user
@@ -98,13 +100,14 @@ function TeamDataPage({
   isAuthenticated,
   getTeamHistory,
 }) {
-  const { selectedEvent, selectedYear, teamList, rankings, communityUpdates, allianceCount, qualSchedule, playoffSchedule, eventLabel, ftcMode, remapNumberToString } = useEventData();
+  const { selectedEvent, selectedYear, teamList, rankings, communityUpdates, allianceCount, qualSchedule, playoffSchedule, eventLabel, ftcMode, firstGlobalMode, remapNumberToString } = useEventData();
   const { getCommunityUpdates, getTeamList } = useEventActions();
     const { monthsWarning, timeFormat, useScrollMemory } = useSettings();
     const [currentTime, setCurrentTime] = useState(moment());
     const [clockRunning, setClockRunning] = useState(true);
     const { disableScope, enableScope } = useHotkeysContext();
     const isOnline = useOnlineStatus();
+    const canEdit = canEditTeamData({ isAuthenticated, user, firstGlobalMode });
 
     // Remember scroll position for Teams page
     useScrollPosition('teams', true, false, useScrollMemory);
@@ -137,6 +140,17 @@ function TeamDataPage({
     const [showSaveToCloud, setShowSaveToCloud] = useState(false);
     const [teamsToReset, setTeamsToReset] = useState([]);
     const [resetNotes, setResetNotes] = useState(false);
+
+    useEffect(() => {
+        if (canEdit || (!show && !showHistory && !showResetConfirm && !showSaveToCloud)) return;
+        setUpdateTeam(null);
+        setShow(false);
+        setShowHistory(false);
+        setShowResetConfirm(false);
+        setShowSaveToCloud(false);
+        enableScope('tabNavigation');
+        setClockRunning(true);
+    }, [canEdit, enableScope, show, showHistory, showResetConfirm, showSaveToCloud]);
 
     const { start, stop } = useInterval(
         () => {
@@ -189,6 +203,7 @@ function TeamDataPage({
      * @param {string} mode - determines whether to send the update to gatool Cloud. "update" = send to cloud
      */
     const handleSubmit = async (mode, formValue) => {
+        if (!canEdit) return;
         var visits = _.cloneDeep(lastVisit);
         visits[`${updateTeam.teamNumber}`] = moment().format();
         var communityUpdatesTemp = _.cloneDeep(communityUpdates);
@@ -269,7 +284,7 @@ function TeamDataPage({
     }
 
     const handleRestoreData = async (data) => {
-        console.log(data);
+        if (!canEdit) return;
         var resp = await putTeamData(data.team.teamNumber, data.update);
         if (resp.status !== 204) {
             var errorText = `Your update for team ${data.team.teamNumber} was not successful.`;
@@ -290,7 +305,7 @@ function TeamDataPage({
      * @param {object} team - The team to display
      */
     const handleShow = (team) => {
-        if (isAuthenticated && user["https://gatool.org/roles"] && user["https://gatool.org/roles"].indexOf("user") >= 0) {
+        if (canEdit) {
             setUpdateTeam(team);
             setShow(true);
             disableScope('tabNavigation');
@@ -299,7 +314,7 @@ function TeamDataPage({
     }
 
     const handleHistory = async (team) => {
-        if (isAuthenticated && user["https://gatool.org/roles"] && user["https://gatool.org/roles"].indexOf("user") >= 0) {
+        if (canEdit) {
             var history = await getTeamHistory(team.teamNumber);
             setShowHistory(true);
             setTeamHistory(_.orderBy(history, ['modifiedDate'], ['desc']));
@@ -545,6 +560,7 @@ function TeamDataPage({
 
     // This function clicks the hidden file upload button
     function clickRestoreBackup() {
+        if (!canEdit) return;
         document.getElementById("BackupFiles").click();
     }
 
@@ -565,6 +581,7 @@ function TeamDataPage({
     // Excel file's content. The file must have been previously exported from gatool.
     // It will only update data that Game Announcers control in the Team Data page.
     function handleRestoreBackup(e) {
+        if (!canEdit) return;
         var files = e.target.files;
         var i, f, currentUpdate, newUpdate;
         for (i = 0; i !== files.length; ++i) {
@@ -712,6 +729,7 @@ function TeamDataPage({
      * Handles the reset button click - finds teams to reset and shows confirmation dialog
      */
     const handleResetClick = () => {
+        if (!canEdit) return;
         const teamsToResetList = findTeamsToReset();
         setTeamsToReset(teamsToResetList);
         setResetNotes(false); // Reset the checkbox to default
@@ -723,6 +741,7 @@ function TeamDataPage({
      * Handles the confirmation to proceed with reset
      */
     const handleResetProceed = async () => {
+        if (!canEdit) return;
         setShowResetConfirm(false);
 
         // Clone local updates and remove sponsor and robot name fields
@@ -813,6 +832,7 @@ function TeamDataPage({
      * Handles saving changes to gatool Cloud
      */
     const handleSaveToCloud = async () => {
+        if (!canEdit) return;
         setShowSaveToCloud(false);
         enableScope('tabNavigation');
 
@@ -889,9 +909,14 @@ function TeamDataPage({
         let extended = teamList.teams.map((teamRow) => {
             const teamRowCopy = { ...teamRow };
             // Calculate rank inline to avoid dependency on getTeamRank function
-            var team = find(rankings?.ranks, { "teamNumber": remapNumberToString(teamRowCopy?.teamNumber) });
+            // For FG, rankings use numeric teamNumber directly; for TBA offseason, use remapped string
+            const rankLookupNumber = firstGlobalMode
+                ? teamRowCopy?.teamNumber
+                : remapNumberToString(teamRowCopy?.teamNumber);
+            var team = find(rankings?.ranks, { "teamNumber": rankLookupNumber });
             teamRowCopy.rank = team?.rank;
             teamRowCopy.citySort = teamRowCopy?.country + teamRowCopy?.stateProv + teamRowCopy?.city;
+            teamRowCopy.countrySort = teamRowCopy?.displayTeamNumber || teamRowCopy?.country || `${teamRowCopy?.teamNumber}`;
             var update = find(communityUpdates, { "teamNumber": teamRowCopy.teamNumber });
             var localUpdate = _.find(localUpdates, { "teamNumber": teamRowCopy?.teamNumber });
             teamRowCopy.updates = localUpdate ? localUpdate.update : update?.updates;
@@ -905,7 +930,7 @@ function TeamDataPage({
         }
 
         return extended;
-    }, [teamList?.teams, communityUpdates, localUpdates, teamSort, rankings?.ranks, remapNumberToString]);
+    }, [teamList?.teams, communityUpdates, localUpdates, teamSort, rankings?.ranks, remapNumberToString, firstGlobalMode]);
 
     return (
         <Container fluid>
@@ -921,7 +946,7 @@ function TeamDataPage({
             </div>}
             {selectedEvent && teamList?.teams.length > 0 && <><div>
                 <h4>{eventLabel || selectedEvent?.label}</h4>
-                <p className={"leftTable"}>This table is {(isAuthenticated && user["https://gatool.org/roles"] && user["https://gatool.org/roles"].indexOf("user") >= 0) ? <>editable and sortable. Tap on a team number to change data for a specific team. Edits you make are local to this browser, and they will persist here if you do not clear your browser cache. You can save your changes to the gatool Cloud on the team details page or on the Setup Screen. </> : <>sortable. </>}Cells <span className={"teamTableHighlight"}>highlighted in green</span> have been modified, either by you or by other gatool users.</p>
+                <p className={"leftTable"}>This table is {canEdit ? <>editable and sortable. Tap on a team number to change data for a specific team. Edits you make are local to this browser, and they will persist here if you do not clear your browser cache. You can save your changes to the gatool Cloud on the team details page or on the Setup Screen. </> : <>sortable. </>}Cells <span className={"teamTableHighlight"}>highlighted in green</span> have been modified, either by you or by other gatool users. {firstGlobalMode && !canEdit && <><b>FIRST Global team data is read-only for this account.</b> Editing requires FIRST Global write access.</>}</p>
                 <Table responsive className={"leftTable topBorderLine"}>
                     <thead>
                         <tr>
@@ -931,7 +956,7 @@ function TeamDataPage({
                             <td>
                                 <span className="gatool-tap-link" onClick={downloadTeamInfoSheets}><img style={{ float: "left" }} width="30" src="images/wordicon.png" alt="Word Logo" /> <b>Tap here to download a merged document (docx).</b></span>
                             </td>
-                            {(isAuthenticated && user["https://gatool.org/roles"] && user["https://gatool.org/roles"].indexOf("user") >= 0) && <td>
+                            {canEdit && <td>
                                 <span className="gatool-tap-link" onClick={clickRestoreBackup}><input type="file" id="BackupFiles" onChange={handleRestoreBackup} className={"hiddenInput"} /><b><img style={{ float: "left" }} width="30" src="images/excelicon.png" alt="Excel Logo" /> Tap here to restore team data from Excel</b></span>
                             </td>}
                         </tr>
@@ -945,28 +970,31 @@ function TeamDataPage({
                             <td>
                                 <p>This merged doc contains all of the information in your Teams List, merged onto a template you can print and distribute to teams. <i>Note: this will save to Files on iOS 13+</i></p>
                             </td>
-                            {(isAuthenticated && user["https://gatool.org/roles"] && user["https://gatool.org/roles"].indexOf("user") >= 0) && <td>
+                            {canEdit && <td>
                                 <p>You can export your teams data to Excel using the button on the left, and then restore it from backup here. This is handy in low or no network situations, where you may be unable to update changes to gatool Cloud. <i>Note: Be careful if you modify the Excel file and then import it here.</i></p>
                             </td>}
                         </tr>
                     </tbody>
                 </Table>
-                {isAuthenticated && <><Button variant="warning" size="sm" onClick={handleResetClick} style={{ marginRight: "10px" }}>Reset sponsors and robot names</Button>
+                {canEdit && <><Button variant="warning" size="sm" onClick={handleResetClick} style={{ marginRight: "10px" }}>Reset sponsors and robot names</Button>
                     <Button variant="success" size="sm" onClick={() => { clearVisits(false) }}>Reset visit times. Use at the start of each day.</Button><br /><br /></>}
 
                 <Table responsive striped bordered size="sm" className={"teamTable"}>
                     <thead className="thead-default">
                         <tr className={"teamTableHeader"}>
-                            <th onClick={() => (teamSort === "teamNumber") ? setTeamSort("-teamNumber") : setTeamSort("teamNumber")}><b>Team #{teamSort === "teamNumber" ? <SortNumericDown /> : ""}{teamSort === "-teamNumber" ? <SortNumericUp /> : ""}</b></th>
+                            <th onClick={() => {
+                                const sortKey = firstGlobalMode ? "countrySort" : "teamNumber";
+                                setTeamSort(teamSort === sortKey ? `-${sortKey}` : sortKey);
+                            }}><b>{firstGlobalMode ? "Country" : "Team #"}{(teamSort === "teamNumber" || teamSort === "countrySort") ? <SortAlphaDown /> : ""}{(teamSort === "-teamNumber" || teamSort === "-countrySort") ? <SortAlphaUp /> : ""}</b></th>
                             <th onClick={() => (teamSort === "rank") ? setTeamSort("-rank") : setTeamSort("rank")}> <b>Rank{teamSort === "rank" ? <SortNumericDown /> : ""}{teamSort === "-rank" ? <SortNumericUp /> : ""}</b></th>
                             <th onClick={() => (teamSort === "nameShort") ? setTeamSort("-nameShort") : setTeamSort("nameShort")}><b>Team Name{teamSort === "nameShort" ? <SortAlphaDown /> : ""}{teamSort === "-nameShort" ? <SortAlphaUp /> : ""}</b></th>
                             <th onClick={() => (teamSort === "citySort") ? setTeamSort("-citySort") : setTeamSort("citySort")}><b>City{teamSort === "citySort" ? <SortAlphaDown /> : ""}{teamSort === "-citySort" ? <SortAlphaUp /> : ""}</b></th>
-                            {(selectedEvent?.value?.type === "Championship" || selectedEvent?.value?.type === "ChampionshipDivision") ?
+                            {!firstGlobalMode && ((selectedEvent?.value?.type === "Championship" || selectedEvent?.value?.type === "ChampionshipDivision") ?
                                 <th><b>Top Sponsor</b></th> :
                                 <th><b>Top Sponsors</b></th>
-                            }
-                            <th onClick={() => (teamSort === "organization") ? setTeamSort("-organization") : setTeamSort("organization")}><b>Organization{teamSort === "organization" ? <SortAlphaDown /> : ""}{teamSort === "-organization" ? <SortAlphaUp /> : ""}</b></th>
-                            <th onClick={() => (teamSort === "rookieYear") ? setTeamSort("-rookieYear") : setTeamSort("rookieYear")}><b>Rookie Year{teamSort === "rookieYear" ? <SortNumericDown /> : ""}{teamSort === "-rookieYear" ? <SortNumericUp /> : ""}</b></th>
+                            )}
+                            {!firstGlobalMode && <th onClick={() => (teamSort === "organization") ? setTeamSort("-organization") : setTeamSort("organization")}><b>Organization{teamSort === "organization" ? <SortAlphaDown /> : ""}{teamSort === "-organization" ? <SortAlphaUp /> : ""}</b></th>}
+                            {!firstGlobalMode && <th onClick={() => (teamSort === "rookieYear") ? setTeamSort("-rookieYear") : setTeamSort("rookieYear")}><b>Rookie Year{teamSort === "rookieYear" ? <SortNumericDown /> : ""}{teamSort === "-rookieYear" ? <SortNumericUp /> : ""}</b></th>}
                             <th onClick={() => (teamSort === "robotNameLocal") ? setTeamSort("-robotNameLocal") : setTeamSort("robotNameLocal")}><b>Robot Name{teamSort === "robotNameLocal" ? <SortAlphaDown /> : ""}{teamSort === "-robotNameLocal" ? <SortAlphaUp /> : ""}</b></th>
                             <th  ><b>Additional Notes</b></th>
                         </tr>
@@ -977,31 +1005,33 @@ function TeamDataPage({
                             var teamName = team?.updates?.nameShortLocal ? team?.updates?.nameShortLocal : team?.nameShort;
 
                             return <tr key={`teamDataRow${team?.teamNumber}`}>
-                                <TeamTimer team={team} lastVisit={lastVisit} monthsWarning={monthsWarning} handleShow={handleShow} currentTime={currentTime} />
+                                <TeamTimer team={team} lastVisit={lastVisit} monthsWarning={monthsWarning} handleShow={handleShow} currentTime={currentTime} editable={canEdit} />
                                 <td style={rankHighlight(team?.rank ? team?.rank : 100, allianceCount || { "count": 8 })}>{team?.rank}</td>
                                 
                                 <td className={updateHighlightClass(team?.updates?.nameShortLocal)} style={updateHighlight(team?.updates?.nameShortLocal)}>
-                                    {ftcMode
-                                        ? <span className={`team-avatar team-${team?.teamNumber}`}></span>
-                                        : <TeamAvatar src={`${apiBaseUrl}${selectedYear.value}/avatars/team/${team?.teamNumber}/avatar.png`} teamNumber={team?.teamNumber} />
+                                    {firstGlobalMode
+                                        ? <img src={getFirstGlobalFlagUrl(team?.countryCode)} alt={team?.countryCode} style={{ height: "1.5em", verticalAlign: "middle" }} />
+                                        : ftcMode
+                                            ? <span className={`team-avatar team-${team?.teamNumber}`}></span>
+                                            : <TeamAvatar src={`${apiBaseUrl}${selectedYear.value}/avatars/team/${team?.teamNumber}/avatar.png`} teamNumber={team?.teamNumber} />
                                     }
                                     <br />
                                     {teamName}
                                 </td>
-                                <td className={updateHighlightClass(team?.updates?.cityStateLocal)} style={updateHighlight(team?.updates?.cityStateLocal)}>{team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : cityState} </td>
-                                {(selectedEvent?.value?.type === "Championship" || selectedEvent?.value?.type === "ChampionshipDivision") ?
+                                <td className={updateHighlightClass(team?.updates?.cityStateLocal)} style={updateHighlight(team?.updates?.cityStateLocal)}>{team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : (firstGlobalMode ? "" : cityState)} </td>
+                                {!firstGlobalMode && ((selectedEvent?.value?.type === "Championship" || selectedEvent?.value?.type === "ChampionshipDivision") ?
                                     <td className={updateHighlightClass(team?.updates?.topSponsorLocal)} style={updateHighlight(team?.updates?.topSponsorLocal)}>{team?.updates?.topSponsorLocal ? team?.updates?.topSponsorLocal : team?.topSponsor}</td> :
                                     <td className={updateHighlightClass(team?.updates?.topSponsorsLocal)} style={updateHighlight(team?.updates?.topSponsorsLocal)}>{team?.updates?.topSponsorsLocal ? team?.updates?.topSponsorsLocal : team?.topSponsors}</td>
-                                }
-                                <td className={updateHighlightClass(team?.updates?.organizationLocal)} style={updateHighlight(team?.updates?.organizationLocal)}>{team?.updates?.organizationLocal ? team?.updates?.organizationLocal : team?.organization}</td>
-                                <td>{team?.rookieYear}</td>
+                                )}
+                                {!firstGlobalMode && <td className={updateHighlightClass(team?.updates?.organizationLocal)} style={updateHighlight(team?.updates?.organizationLocal)}>{team?.updates?.organizationLocal ? team?.updates?.organizationLocal : team?.organization}</td>}
+                                {!firstGlobalMode && <td>{team?.rookieYear}</td>}
                                 <td className={updateHighlightClass(team?.updates?.robotNameLocal)} style={updateHighlight(team?.updates?.robotNameLocal)}>{team?.updates?.robotNameLocal ? team?.updates?.robotNameLocal : team?.robotName}</td>
                                 <td align="left" className={["teamNotes", updateHighlightClass(!_.isEmpty(team?.updates?.teamNotes))].filter(Boolean).join(" ")} style={updateHighlight(!_.isEmpty(team?.updates?.teamNotes))} dangerouslySetInnerHTML={{ __html: team?.updates?.teamNotes }}></td>
                             </tr>
                         })}
                     </tbody>
                 </Table>
-                {isAuthenticated && <Button variant="warning" size="sm" onClick={handleResetClick} style={{ marginRight: "10px" }}>Reset sponsors and robot names</Button>}
+                {canEdit && <Button variant="warning" size="sm" onClick={handleResetClick} style={{ marginRight: "10px" }}>Reset sponsors and robot names</Button>}
                 <Button variant="success" size="sm" onClick={() => { clearVisits(false) }}>Reset visit times. Use at the start of each day.</Button><br /><br /><br />
             </div></>}
             <Modal centered={true} show={showDownload} onHide={handleCloseDownload}>
@@ -1020,7 +1050,7 @@ function TeamDataPage({
             </Modal>
 
             <TeamEditModal
-                show={show}
+                show={show && canEdit}
                 onHide={handleClose}
                 updateTeam={updateTeam}
                 localUpdates={localUpdates}
@@ -1031,6 +1061,7 @@ function TeamDataPage({
                 selectedYear={selectedYear}
                 originalAndSustaining={originalAndSustaining}
                 ftcMode={ftcMode}
+                firstGlobalMode={firstGlobalMode}
                 updateClass={updateClass}
                 onSave={handleSubmit}
                 onTrack={handleTrack}
@@ -1040,7 +1071,7 @@ function TeamDataPage({
             />
 
             <TeamHistoryModal
-                show={showHistory}
+                show={showHistory && canEdit}
                 onHide={handleCloseHistory}
                 updateTeam={updateTeam}
                 teamHistory={teamHistory}
@@ -1050,7 +1081,7 @@ function TeamDataPage({
                 onRestore={handleRestoreData}
             />
 
-            <Modal centered={true} show={showResetConfirm} onHide={handleResetCancel}>
+            <Modal centered={true} show={showResetConfirm && canEdit} onHide={handleResetCancel}>
                 <Modal.Header className={"allianceChoice"} closeVariant={"white"} closeButton>
                     <Modal.Title>Reset Sponsors and Robot Names</Modal.Title>
                 </Modal.Header>
@@ -1091,7 +1122,7 @@ function TeamDataPage({
                 </Modal.Footer>
             </Modal>
 
-            <Modal centered={true} show={showSaveToCloud} onHide={handleSaveToCloudCancel}>
+            <Modal centered={true} show={showSaveToCloud && canEdit} onHide={handleSaveToCloudCancel}>
                 <Modal.Header className={"allianceChoice"} closeVariant={"white"} closeButton>
                     <Modal.Title>Save Changes to gatool Cloud?</Modal.Title>
                 </Modal.Header>

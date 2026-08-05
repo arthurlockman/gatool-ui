@@ -32,7 +32,7 @@ function RanksPage({
   allianceSelection,
   setAllianceSelectionArrays,
 }) {
-  const { selectedEvent, teamList, rankings, allianceCount, districtRankings, selectedYear, eventLabel, communityUpdates, ftcMode, remapNumberToString, remapStringToNumber, EPA, regionalEventDetail, playoffs } = useEventData();
+  const { selectedEvent, teamList, rankings, allianceCount, districtRankings, selectedYear, eventLabel, communityUpdates, ftcMode, firstGlobalMode, remapNumberToString, remapStringToNumber, EPA, regionalEventDetail, playoffs } = useEventData();
   const { getRanks, getRegionalEventDetail } = useEventActions();
   const { useScrollMemory, rankingsOverride, setRankingsOverride } = useSettings();
   // Remember scroll position for Ranks page
@@ -623,7 +623,7 @@ function RanksPage({
                       {rankSort === "-matchesPlayed" ? <SortNumericDown /> : ""}
                     </b>
                   </th>
-                  <th
+                  {!firstGlobalMode && <th
                     onClick={() =>
                       rankSort === "losses"
                         ? setRankSort("-losses")
@@ -635,8 +635,8 @@ function RanksPage({
                       {rankSort === "losses" ? <SortAlphaUp /> : ""}
                       {rankSort === "-losses" ? <SortAlphaDown /> : ""}
                     </b>
-                  </th>
-                  <th
+                  </th>}
+                  {!firstGlobalMode && <th
                     onClick={() =>
                       rankSort === "epaVal"
                         ? setRankSort("-epaVal")
@@ -648,7 +648,7 @@ function RanksPage({
                       {rankSort === "epaVal" ? <SortNumericUp /> : ""}
                       {rankSort === "-epaVal" ? <SortNumericDown /> : ""}
                     </b>
-                  </th>
+                  </th>}
                   {selectedEvent?.value?.districtCode && (
                     <th
                       onClick={() =>
@@ -760,8 +760,8 @@ function RanksPage({
                         <td>{Math.floor(rankRow.qualAverage * 100) / 100}</td>
                         <td>{rankRow.dq}</td>
                         <td>{rankRow.matchesPlayed}</td>
-                        <td>{rankRow.season}</td>
-                        <td>{rankRow.epaVal}</td>
+                        {!firstGlobalMode && <td>{rankRow.season}</td>}
+                        {!firstGlobalMode && <td>{rankRow.epaVal}</td>}
                         {selectedEvent?.value?.districtCode && (
                           <td
                             style={

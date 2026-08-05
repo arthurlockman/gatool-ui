@@ -111,3 +111,61 @@ export const DA_VINCI_SCHEDULE = [
 	{ matchNumber: 14, round: 5, redPlaceHolder: "Jackson",  bluePlaceHolder: "Edison" },
 	{ matchNumber: 15, round: 5, redPlaceHolder: "Lovelace", bluePlaceHolder: "Franklin" },
 ];
+
+/**
+ * FIRST Global round-robin schedule: 8 alliances, 16 matches across 4 rounds,
+ * then top 2 compete in a best-of-3 finals (t4).
+ */
+export const FG_ROUND_ROBIN_SCHEDULE = [
+	// Round 1
+	{ matchNumber: 1,  round: 1, redPlaceHolder: "Alliance 4", bluePlaceHolder: "Alliance 7" },
+	{ matchNumber: 2,  round: 1, redPlaceHolder: "Alliance 5", bluePlaceHolder: "Alliance 6" },
+	{ matchNumber: 3,  round: 1, redPlaceHolder: "Alliance 3", bluePlaceHolder: "Alliance 8" },
+	{ matchNumber: 4,  round: 1, redPlaceHolder: "Alliance 1", bluePlaceHolder: "Alliance 2" },
+	// Round 2
+	{ matchNumber: 5,  round: 2, redPlaceHolder: "Alliance 5", bluePlaceHolder: "Alliance 4" },
+	{ matchNumber: 6,  round: 2, redPlaceHolder: "Alliance 3", bluePlaceHolder: "Alliance 6" },
+	{ matchNumber: 7,  round: 2, redPlaceHolder: "Alliance 2", bluePlaceHolder: "Alliance 7" },
+	{ matchNumber: 8,  round: 2, redPlaceHolder: "Alliance 1", bluePlaceHolder: "Alliance 8" },
+	// Round 3
+	{ matchNumber: 9,  round: 3, redPlaceHolder: "Alliance 3", bluePlaceHolder: "Alliance 4" },
+	{ matchNumber: 10, round: 3, redPlaceHolder: "Alliance 2", bluePlaceHolder: "Alliance 5" },
+	{ matchNumber: 11, round: 3, redPlaceHolder: "Alliance 1", bluePlaceHolder: "Alliance 6" },
+	{ matchNumber: 12, round: 3, redPlaceHolder: "Alliance 7", bluePlaceHolder: "Alliance 8" },
+	// Round 4
+	{ matchNumber: 13, round: 4, redPlaceHolder: "Alliance 2", bluePlaceHolder: "Alliance 3" },
+	{ matchNumber: 14, round: 4, redPlaceHolder: "Alliance 1", bluePlaceHolder: "Alliance 4" },
+	{ matchNumber: 15, round: 4, redPlaceHolder: "Alliance 5", bluePlaceHolder: "Alliance 8" },
+	{ matchNumber: 16, round: 4, redPlaceHolder: "Alliance 6", bluePlaceHolder: "Alliance 7" },
+];
+
+/**
+ * Returns the finals matches for FIRST Global (t4 matches, no series).
+ * These are the last matches in the combined schedule after the round-robin.
+ * @param {Array|null} matches
+ * @param {number} roundRobinMatchCount — number of round-robin matches (16 for FG)
+ * @returns {Array}
+ */
+export function getFGFinalsMatches(matches, roundRobinMatchCount) {
+	if (!matches) return [];
+	return matches
+		.filter((m) => m.matchNumber > roundRobinMatchCount)
+		.sort((a, b) => (a.matchNumber ?? 0) - (b.matchNumber ?? 0));
+}
+
+/**
+ * Computes the FIRST Global tournament winner from finals matches.
+ * Best of 3: first to 2 wins.
+ * @param {Array} finalsMatches
+ * @returns {{ red: number, blue: number, winner: string, level: number }}
+ */
+export function computeFGTournamentWinner(finalsMatches) {
+	const result = { red: 0, blue: 0, winner: "", level: 0 };
+	for (const fm of finalsMatches) {
+		if (fm?.winner?.winner === "red") result.red += 1;
+		if (fm?.winner?.winner === "blue") result.blue += 1;
+	}
+	if (result.red >= 2) result.winner = "red";
+	else if (result.blue >= 2) result.winner = "blue";
+	return result;
+}

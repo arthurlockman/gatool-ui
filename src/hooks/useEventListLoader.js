@@ -7,6 +7,7 @@ import { useEventSelection } from "../contexts/EventSelectionContext";
 const paleYellow = "#fdfaed";
 const paleBlue = "#effdff";
 const ftcBaseURL = "https://api.gatool.org/ftc/v2/";
+const fgBaseURL = "https://api.gatool.org/v3/firstglobal/";
 
 const timezones = _.cloneDeep(timeZones);
 
@@ -185,7 +186,90 @@ export function useEventListLoader(deps) {
       );
       try {
         let result;
-        if (useFTCOffline) {
+        const isFirstGlobal = ftcMode?.value === "FIRSTGlobal";
+
+        if (isFirstGlobal) {
+          // FIRST Global: fetch fieldsets and create pseudo-events
+          const val = await httpClient.getNoAuth(
+            `${selectedYear?.value}/fieldsets`,
+            fgBaseURL
+          );
+          if (val.status === 200) {
+            const fieldsets = await val.json();
+            // fieldsets is a 2D array of field indices, e.g. [[1,2],[3,4],[5]]
+            const events = [];
+            if (Array.isArray(fieldsets)) {
+              fieldsets.forEach((fields, idx) => {
+                const fieldLabel = fields.length === 1
+                  ? `Field ${fields[0]}`
+                  : `Fields ${fields[0]} & ${fields[fields.length - 1]}`;
+                events.push({
+                  eventId: `fg-fieldset-${idx}`,
+                  code: `FG${selectedYear?.value}-${idx}`,
+                  divisionCode: null,
+                  name: fieldLabel,
+                  remote: false,
+                  hybrid: false,
+                  fieldCount: fields.length,
+                  published: true,
+                  type: "FIRSTGlobal",
+                  typeName: "FIRST Global",
+                  regionCode: null,
+                  leagueCode: null,
+                  districtCode: null,
+                  venue: null,
+                  address: null,
+                  city: null,
+                  stateprov: null,
+                  country: null,
+                  website: null,
+                  liveStreamUrl: null,
+                  coordinates: null,
+                  webcasts: null,
+                  timezone: null,
+                  dateStart: null,
+                  dateEnd: null,
+                  fieldset: fields,
+                  fieldsetIndex: idx,
+                });
+              });
+              // Add "All Fields" option
+              const allFields = fieldsets.flat();
+              events.push({
+                eventId: `fg-fieldset-all`,
+                code: `FG${selectedYear?.value}-all`,
+                divisionCode: null,
+                name: "All Fields",
+                remote: false,
+                hybrid: false,
+                fieldCount: allFields.length,
+                published: true,
+                type: "FIRSTGlobal",
+                typeName: "FIRST Global",
+                regionCode: null,
+                leagueCode: null,
+                districtCode: null,
+                venue: null,
+                address: null,
+                city: null,
+                stateprov: null,
+                country: null,
+                website: null,
+                liveStreamUrl: null,
+                coordinates: null,
+                webcasts: null,
+                timezone: null,
+                dateStart: null,
+                dateEnd: null,
+                fieldset: allFields,
+                fieldsetIndex: -1,
+              });
+            }
+            result = { events };
+          } else {
+            result = { events: [] };
+          }
+        } else if (useFTCOffline) {
           const val = await httpClient.getNoAuth(
             `/api/v1/events/`,
             FTCServerURL

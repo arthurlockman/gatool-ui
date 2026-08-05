@@ -80,9 +80,13 @@ const addScoreType = (scores) => {
 };
 
 function ScoresDetailsModal({ show, onHide, scoresMatch }) {
+  // Detect alliance order: FG has alliances[0]=Red, FRC/FTC has alliances[0]=Blue
+  const redIdx = scoresMatch?.scores?.alliances?.[0]?.alliance === "Red" ? 0 : 1;
+  const blueIdx = redIdx === 0 ? 1 : 0;
+
   const scoresRow = (key, rowKey) => {
-    const redAlliance = scoresMatch?.scores?.alliances?.[1];
-    const blueAlliance = scoresMatch?.scores?.alliances?.[0];
+    const redAlliance = scoresMatch?.scores?.alliances?.[redIdx];
+    const blueAlliance = scoresMatch?.scores?.alliances?.[blueIdx];
     const redVal = redAlliance?.[key.key];
     const blueVal = blueAlliance?.[key.key];
     return (
@@ -105,8 +109,8 @@ function ScoresDetailsModal({ show, onHide, scoresMatch }) {
   };
 
   const expandScoresRow = (key) => {
-    const redAlliance = scoresMatch?.scores?.alliances?.[1];
-    const blueAlliance = scoresMatch?.scores?.alliances?.[0];
+    const redAlliance = scoresMatch?.scores?.alliances?.[redIdx];
+    const blueAlliance = scoresMatch?.scores?.alliances?.[blueIdx];
     const redRow = redAlliance?.[key.key];
     const blueRow = blueAlliance?.[key.key];
     const safeRedRow = redRow != null && typeof redRow === "object" && !Array.isArray(redRow) ? redRow : {};

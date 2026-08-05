@@ -22,43 +22,59 @@ import {
   getFinalsSlotScore,
   getFinalsSlotWinner,
   DA_VINCI_SCHEDULE,
+  FG_ROUND_ROBIN_SCHEDULE,
+  getFGFinalsMatches,
+  computeFGTournamentWinner,
 } from "../utils/daVinciHelpers";
+import { isFirstGlobalMode } from "../utils/programConstants";
 
-// ---- Layout constants ----
+// ---- Layout helpers ----
 const MATCH_SCALE      = 1.8;
-const MATCH_NATIVE_W   = 194.07;
 const MATCH_NATIVE_H   = 72.46;
+const MATCH_NATIVE_W   = 194.07;
 const MATCH_W          = MATCH_NATIVE_W * MATCH_SCALE;
 const MATCH_HEIGHT     = MATCH_NATIVE_H * MATCH_SCALE;
 const COL_W            = 340;
 const MATCH_X_OFFSET   = (COL_W - MATCH_W) / 2 + 15;
-const SVG_W            = 5 * COL_W;
 const TOP              = 145;
 const V_SPACING        = 55;
-const AVAILABLE_H      = 3 * MATCH_HEIGHT + 4 * V_SPACING;
 
 const FINALS_MATCH_NATIVE_H = 168.1;
 const FINALS_MATCH_NATIVE_W = 240.5;
 const FINALS_SCALE          = 1.8;
 const FINALS_MATCH_H        = FINALS_MATCH_NATIVE_H * FINALS_SCALE;
 const FINALS_MATCH_W        = FINALS_MATCH_NATIVE_W * FINALS_SCALE;
-const FINALS_ROW_TOP        = TOP + AVAILABLE_H;
-const FINALS_Y              = FINALS_ROW_TOP+10;
-const FINALS_X              = (SVG_W - FINALS_MATCH_W) / 2;
-const SVG_H                 = FINALS_Y + FINALS_MATCH_H + 60;
 
 const DIVIDER_COLOR = "#DBDAD9";
 const matchXForRound = (round) => (round - 1) * COL_W + MATCH_X_OFFSET;
 const matchYForSlot  = (slot)  => TOP + V_SPACING + slot * (MATCH_HEIGHT + V_SPACING);
 const dividerX       = (round) => round * COL_W - 5;
 
+/**
+ * Compute layout dimensions based on the round-robin configuration.
+ * @param {number} numRounds
+ * @param {number} matchesPerRound
+ */
+function computeLayout(numRounds, matchesPerRound) {
+  const svgW = numRounds * COL_W;
+  const availableH = matchesPerRound * MATCH_HEIGHT + (matchesPerRound + 1) * V_SPACING;
+  const finalsRowTop = TOP + availableH;
+  const finalsY = finalsRowTop + 10;
+  const finalsX = (svgW - FINALS_MATCH_W) / 2;
+  const svgH = finalsY + FINALS_MATCH_H + 60;
+  return { svgW, svgH, availableH, finalsX, finalsY };
+}
+
 // ---- Sub-components ----
 
-function DaVinciBracketBackground({ svgW, svgH, top, availableH, eventLabel }) {
+function RoundRobinBackground({ svgW, svgH, top, availableH, eventLabel, numRounds, title }) {
+  const roundLabels = Array.from({ length: numRounds }, (_, i) => `ROUND ${i + 1}`);
+  // Dividers between columns (numRounds - 1 dividers)
+  const dividers = Array.from({ length: numRounds - 1 }, (_, i) => i + 1);
   return (
     <g id="background">
       <rect x="1" fill="#FFFFFF" width={svgW - 2} height={svgH} />
-      {[1, 2, 3, 4].map((round) => (
+      {dividers.map((round) => (
         <rect
           key={`divider${round}`}
           x={dividerX(round)}
@@ -83,9 +99,9 @@ function DaVinciBracketBackground({ svgW, svgH, top, availableH, eventLabel }) {
         fontFamily="'myriad-pro'" fontWeight={bold} fontStyle="normal"
         fontSize="28px" fill="#555555"
       >
-        da Vinci Tournament Round Robin
+        {title}
       </text>
-      {["ROUND 1", "ROUND 2", "ROUND 3", "ROUND 4", "ROUND 5"].map((label, i) => (
+      {roundLabels.map((label, i) => (
         <text
           key={`header${i}`}
           x={i * COL_W + COL_W / 2} y="163"
@@ -99,15 +115,16 @@ function DaVinciBracketBackground({ svgW, svgH, top, availableH, eventLabel }) {
   );
 }
 
-function DaVinciRoundMatches({
+function RoundRobinMatches({
+  schedule, matchesPerRound,
   isCurrentMatch, getMatchLabel,
   getAllianceNameForDisplay, getAllianceNumbersForDisplay,
   getMatchWinnerForDisplay, getMatchScoreForDisplay,
 }) {
   return (
     <>
-      {DA_VINCI_SCHEDULE.map(({ matchNumber, round, redPlaceHolder, bluePlaceHolder }) => {
-        const slot = (matchNumber - 1) % 3;
+      {schedule.map(({ matchNumber, round, redPlaceHolder, bluePlaceHolder }) => {
+        const slot = (matchNumber - 1) % matchesPerRound;
         return (
           <g
             key={`match${matchNumber}`}
@@ -134,33 +151,29 @@ function DaVinciRoundMatches({
   );
 }
 
-function DaVinciFinalsSection({
+function RoundRobinFinalsSection({
+  finalsMatchNumber, 
   isCurrentMatch, isInFinalsView,
   getAllianceNameForDisplay, getAllianceNumbersForDisplay,
   tournamentWinner, ftcMode,
-  finalSeriesMatches,
+  finalSeriesMatches, finalsX, finalsY,
 }) {
   const getSlotScore  = (bracketMatchNumber, alliance) =>
-    getFinalsSlotScore(finalSeriesMatches, bracketMatchNumber - 16, alliance);
+    getFinalsSlotScore(finalSeriesMatches, bracketMatchNumber - finalsMatchNumber, alliance);
   const getSlotWinner = (bracketMatchNumber) =>
-    getFinalsSlotWinner(finalSeriesMatches, bracketMatchNumber - 16);
+    getFinalsSlotWinner(finalSeriesMatches, bracketMatchNumber - finalsMatchNumber);
 
-  // Center of the right-side score area in SVG space (native midpoint of x=153.6..230.5 = 192, scaled)
-  const indicatorCenterX = FINALS_X + PLAYOFF_MATCH_GRAY_BOX_CENTER_X * FINALS_SCALE;
-  // Dot y so the full dot+scores group is vertically centered in the box.
-  // Native box spans y=-10..158.1 (center=74.05). Indicator element spans -r..(textOffsetY+lineSpacing)=(-8..40), midpoint=16.
-  // So dot y = boxCenter - 16, scaled: FINALS_Y + (74.05 - 16) * FINALS_SCALE
-  const indicatorY = FINALS_Y + (86 + 28 / FINALS_SCALE) * FINALS_SCALE;
-  // Spacing scaled proportionally from 35px
+  const indicatorCenterX = finalsX + PLAYOFF_MATCH_GRAY_BOX_CENTER_X * FINALS_SCALE;
+  const indicatorY = finalsY + (86 + 28 / FINALS_SCALE) * FINALS_SCALE;
   const indicatorSpacing = INDICATOR_SPACING * FINALS_SCALE;
 
   return (
     <>
-      <g transform={`translate(${FINALS_X}, ${FINALS_Y}) scale(${FINALS_SCALE})`}>
+      <g transform={`translate(${finalsX}, ${finalsY}) scale(${FINALS_SCALE})`}>
         <PlayoffMatch
           x={0} y={0}
-          matchNumber={16}
-          isCurrentMatch={isCurrentMatch(16)}
+          matchNumber={finalsMatchNumber}
+          isCurrentMatch={isCurrentMatch(finalsMatchNumber)}
           isInFinalsView={isInFinalsView}
           getAllianceNameForDisplay={getAllianceNameForDisplay}
           getAllianceNumbersForDisplay={getAllianceNumbersForDisplay}
@@ -173,10 +186,9 @@ function DaVinciFinalsSection({
       <FinalsMatchIndicator
         x={indicatorCenterX}
         y={indicatorY}
-        firstFinalsMatchNumber={16}
+        firstFinalsMatchNumber={finalsMatchNumber}
         finalsCount={finalSeriesMatches.length}
         indicatorSpacing={indicatorSpacing}
-
         indicatorScale={FINALS_SCALE}
         getFinalsMatchWinnerForDisplay={getSlotWinner}
         getFinalsMatchScoreForDisplay={getSlotScore}
@@ -188,9 +200,9 @@ function DaVinciFinalsSection({
 // ---- Main component ----
 
 /**
- * Da Vinci Tournament Bracket for FTCCMP1.
- * 6 Division Champions play a 15-match round-robin (5 rounds × 3 matches),
- * then the top 2 (RR1 red, RR2 blue) compete in a best-of-3 Event Finals.
+ * Round-robin tournament bracket.
+ * Supports both the da Vinci Tournament (FTCCMP1: 6 alliances, 5 rounds × 3 matches)
+ * and FIRST Global (8 alliances, 4 rounds × 4 matches).
  */
 function DaVinciTournamentBracket({
   offlinePlayoffSchedule,
@@ -211,35 +223,82 @@ function DaVinciTournamentBracket({
   alliances,
   remapNumberToString,
 }) {
+  const isFG = isFirstGlobalMode(ftcMode);
+
+  // Pick configuration based on program
+  const roundRobinSchedule = isFG ? FG_ROUND_ROBIN_SCHEDULE : DA_VINCI_SCHEDULE;
+  const matchesPerRound = isFG ? 4 : 3;
+  const numRounds = isFG ? 4 : 5;
+  const finalsMatchNumber = roundRobinSchedule.length + 1; // 17 for FG, 16 for daVinci
+  const bracketTitle = isFG ? "FIRST Global Round Robin" : "da Vinci Tournament Round Robin";
+
+  const { svgW, svgH, availableH, finalsX, finalsY } = computeLayout(numRounds, matchesPerRound);
+
   const currentPlayoffMatch = currentMatch - qualsLength;
 
   const isCurrentMatch = (n) =>
-    isCurrentMatchHelper(n, currentPlayoffMatch, ftcMode, offlinePlayoffSchedule, matches);
+    isFG
+      ? currentPlayoffMatch === n
+      : isCurrentMatchHelper(n, currentPlayoffMatch, ftcMode, offlinePlayoffSchedule, matches);
 
-  const isInFinalsView = computeIsInFinalsView(
-    currentPlayoffMatch, 16, ftcMode, offlinePlayoffSchedule, matches,
-  );
+  const isInFinalsView = isFG
+    ? currentPlayoffMatch >= finalsMatchNumber
+    : computeIsInFinalsView(currentPlayoffMatch, finalsMatchNumber, ftcMode, offlinePlayoffSchedule, matches);
 
   const getMatchLabel = (n) => `MATCH ${n}`;
 
   const getAllianceNumbersForDisplay = (n, color) =>
-    getAllianceNumbersForDisplayHelper(
-      n, color, ftcMode, offlinePlayoffSchedule, matches, allianceNumbers, alliances, remapNumberToString,
-    );
+    isFG
+      ? (function() {
+          // For FG, look up teams directly from the match in the schedule
+          const match = matches?.[n - 1];
+          if (!match?.teams) return allianceNumbers(n, color);
+          const prefix = color === "red" ? "Red" : "Blue";
+          const teamNums = match.teams
+            .filter((t) => t.station?.startsWith(prefix))
+            .map((t) => remapNumberToString ? remapNumberToString(t.teamNumber) : t.teamNumber);
+          return teamNums.join("  ") || allianceNumbers(n, color);
+        })()
+      : getAllianceNumbersForDisplayHelper(
+          n, color, ftcMode, offlinePlayoffSchedule, matches, allianceNumbers, alliances, remapNumberToString,
+        );
 
   const getAllianceNameForDisplay = (n, color) =>
-    getAllianceNameForDisplayHelper(
-      n, color, ftcMode, offlinePlayoffSchedule, matches, allianceName, alliances, remapNumberToString, 16,
-    );
+    isFG
+      ? (function() {
+          const match = matches?.[n - 1];
+          if (!match?.teams || !alliances?.Lookup) return allianceName(n, color);
+          const prefix = color === "red" ? "Red1" : "Blue1";
+          const team = match.teams.find((t) => t.station === prefix);
+          if (!team) return allianceName(n, color);
+          const entry = alliances.Lookup?.[team.teamNumber];
+          return entry?.alliance ?? allianceName(n, color);
+        })()
+      : getAllianceNameForDisplayHelper(
+          n, color, ftcMode, offlinePlayoffSchedule, matches, allianceName, alliances, remapNumberToString, finalsMatchNumber,
+        );
 
   const getMatchScoreForDisplay = (n, alliance) =>
-    getMatchScoreForDisplayHelper(n, alliance, ftcMode, offlinePlayoffSchedule, matches, matchScore);
+    isFG
+      ? (function() {
+          const match = matches?.[n - 1];
+          if (!match) return matchScore(n, alliance);
+          return alliance === "red" ? match.scoreRedFinal : match.scoreBlueFinal;
+        })()
+      : getMatchScoreForDisplayHelper(n, alliance, ftcMode, offlinePlayoffSchedule, matches, matchScore);
 
   const getMatchWinnerForDisplay = (n) =>
-    getMatchWinnerForDisplayHelper(n, ftcMode, offlinePlayoffSchedule, matches, matchWinner);
+    isFG
+      ? matches?.[n - 1]?.winner ?? matchWinner(n)
+      : getMatchWinnerForDisplayHelper(n, ftcMode, offlinePlayoffSchedule, matches, matchWinner);
 
-  const finalSeriesMatches = getFinalSeriesMatches(offlinePlayoffSchedule, matches, ftcMode);
-  const tournamentWinner   = computeDaVinciTournamentWinner(finalSeriesMatches);
+  // Finals handling
+  const finalSeriesMatches = isFG
+    ? getFGFinalsMatches(matches, roundRobinSchedule.length)
+    : getFinalSeriesMatches(offlinePlayoffSchedule, matches, ftcMode);
+  const tournamentWinner = isFG
+    ? computeFGTournamentWinner(finalSeriesMatches)
+    : computeDaVinciTournamentWinner(finalSeriesMatches);
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const swipeHandlers = useSwipe ? useSwipeable({
@@ -267,15 +326,17 @@ function DaVinciTournamentBracket({
           version="1.1" id="davinci-bracket"
           xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink"
           x="0px" y="0px"
-          viewBox={`0 0 ${SVG_W} ${SVG_H}`}
-          enableBackground={`new 0 0 ${SVG_W} ${SVG_H}`}
+          viewBox={`0 0 ${svgW} ${svgH}`}
+          enableBackground={`new 0 0 ${svgW} ${svgH}`}
           xmlSpace="preserve"
         >
-          <DaVinciBracketBackground
-            svgW={SVG_W} svgH={SVG_H} top={TOP} availableH={AVAILABLE_H}
-            eventLabel={eventLabel}
+          <RoundRobinBackground
+            svgW={svgW} svgH={svgH} top={TOP} availableH={availableH}
+            eventLabel={eventLabel} numRounds={numRounds} title={bracketTitle}
           />
-          <DaVinciRoundMatches
+          <RoundRobinMatches
+            schedule={roundRobinSchedule}
+            matchesPerRound={matchesPerRound}
             isCurrentMatch={isCurrentMatch}
             getMatchLabel={getMatchLabel}
             getAllianceNameForDisplay={getAllianceNameForDisplay}
@@ -283,7 +344,9 @@ function DaVinciTournamentBracket({
             getMatchWinnerForDisplay={getMatchWinnerForDisplay}
             getMatchScoreForDisplay={getMatchScoreForDisplay}
           />
-          <DaVinciFinalsSection
+          <RoundRobinFinalsSection
+            finalsMatchNumber={finalsMatchNumber}
+            svgW={svgW}
             isCurrentMatch={isCurrentMatch}
             isInFinalsView={isInFinalsView}
             getAllianceNameForDisplay={getAllianceNameForDisplay}
@@ -291,6 +354,8 @@ function DaVinciTournamentBracket({
             tournamentWinner={tournamentWinner}
             ftcMode={ftcMode}
             finalSeriesMatches={finalSeriesMatches}
+            finalsX={finalsX}
+            finalsY={finalsY}
           />
         </svg>
       )}

@@ -1,5 +1,6 @@
 import _ from "lodash";
 import { getAllianceLookupEntry } from "../utils/allianceLookup";
+import { isFtcLayout } from "./programConstants";
 
 /**
  * Finds a team by their station assignment
@@ -42,7 +43,7 @@ export const findLastMatchInSeries = (scheduleToCheck, series) => {
  * @returns The number of tiebreaker matches for this series, or 0 if none
  */
 export const getTiebreakerCount = (bracketMatchNumber, ftcMode, offlinePlayoffSchedule, matches) => {
-	if (!ftcMode) return 0;
+	if (!isFtcLayout(ftcMode)) return 0;
 
 	const series = bracketMatchNumber;
 	const scheduleToCheck = offlinePlayoffSchedule?.schedule || matches;
@@ -69,7 +70,7 @@ export const getTiebreakerCount = (bracketMatchNumber, ftcMode, offlinePlayoffSc
  */
 export const getMatchLabel = (bracketMatchNumber, ftcMode, offlinePlayoffSchedule, matches) => {
 	const baseLabel = `MATCH ${bracketMatchNumber}`;
-	if (!ftcMode) return baseLabel;
+	if (!isFtcLayout(ftcMode)) return baseLabel;
 
 	const tiebreakerCount = getTiebreakerCount(bracketMatchNumber, ftcMode, offlinePlayoffSchedule, matches);
 	return tiebreakerCount > 0 ? `${baseLabel}+${tiebreakerCount}` : baseLabel;
@@ -86,7 +87,7 @@ export const getMatchLabel = (bracketMatchNumber, ftcMode, offlinePlayoffSchedul
  * @returns true if this bracket match should be highlighted
  */
 export const isCurrentMatchHelper = (bracketMatchNumber, currentPlayoffMatch, ftcMode, offlinePlayoffSchedule, matches) => {
-	if (!ftcMode) {
+	if (!isFtcLayout(ftcMode)) {
 		return currentPlayoffMatch === bracketMatchNumber;
 	}
 
@@ -110,7 +111,7 @@ export const isCurrentMatchHelper = (bracketMatchNumber, currentPlayoffMatch, ft
  * @returns true if currently viewing a finals match
  */
 export const computeIsInFinalsView = (currentPlayoffMatch, finalsStartMatch, ftcMode, offlinePlayoffSchedule, matches) => {
-	if (ftcMode) {
+	if (isFtcLayout(ftcMode)) {
 		const scheduleToCheck = offlinePlayoffSchedule?.schedule || matches;
 		const currentMatchObj = scheduleToCheck[currentPlayoffMatch - 1];
 		if (currentMatchObj?.series) {
@@ -133,7 +134,7 @@ export const computeIsInFinalsView = (currentPlayoffMatch, finalsStartMatch, ftc
  * @returns The match object to use for team display
  */
 export const getMatchForTeamDisplay = (bracketMatchNumber, ftcMode, offlinePlayoffSchedule, matches) => {
-	if (!ftcMode) {
+	if (!isFtcLayout(ftcMode)) {
 		const matchIndex = _.findIndex(matches, { "matchNumber": bracketMatchNumber });
 		return matches?.[matchIndex];
 	}
@@ -163,7 +164,7 @@ export const getMatchForTeamDisplay = (bracketMatchNumber, ftcMode, offlinePlayo
  * @returns The alliance numbers string
  */
 export const getAllianceNumbersForDisplay = (bracketMatchNumber, allianceColor, ftcMode, offlinePlayoffSchedule, matches, originalAllianceNumbers, alliances, remapNumberToString) => {
-	if (!ftcMode) {
+	if (!isFtcLayout(ftcMode)) {
 		return originalAllianceNumbers(bracketMatchNumber, allianceColor);
 	}
 
@@ -219,7 +220,7 @@ export const getAllianceNumbersForDisplay = (bracketMatchNumber, allianceColor, 
  * @returns The alliance name string
  */
 export const getAllianceNameForDisplay = (bracketMatchNumber, allianceColor, ftcMode, offlinePlayoffSchedule, matches, originalAllianceName, alliances, remapNumberToString, tieLevel) => {
-	if (!ftcMode) {
+	if (!isFtcLayout(ftcMode)) {
 		return originalAllianceName(bracketMatchNumber, allianceColor);
 	}
 
@@ -268,7 +269,7 @@ export const getAllianceNameForDisplay = (bracketMatchNumber, allianceColor, ftc
  * @returns The score for the alliance
  */
 export const getMatchScoreForDisplay = (bracketMatchNumber, alliance, ftcMode, offlinePlayoffSchedule, matches, originalMatchScore) => {
-	if (!ftcMode) {
+	if (!isFtcLayout(ftcMode)) {
 		return originalMatchScore(bracketMatchNumber, alliance);
 	}
 
@@ -299,7 +300,7 @@ export const getMatchScoreForDisplay = (bracketMatchNumber, alliance, ftcMode, o
  * @returns The winner object
  */
 export const getMatchWinnerForDisplay = (bracketMatchNumber, ftcMode, offlinePlayoffSchedule, matches, originalMatchWinner) => {
-	if (!ftcMode) {
+	if (!isFtcLayout(ftcMode)) {
 		return originalMatchWinner(bracketMatchNumber);
 	}
 

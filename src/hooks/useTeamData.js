@@ -2,8 +2,7 @@ import _ from "lodash";
 import moment from "moment";
 import calculateBlueBanners from "../utils/calculateBlueBanners";
 import { useEventSelection } from "../contexts/EventSelectionContext";
-
-const ftcBaseURL = "https://api.gatool.org/ftc/v2/";
+import { getApiBaseUrl, isFirstGlobalMode } from "../utils/programConstants";
 
 /**
  * Trims whitespace from each element in an array.
@@ -257,7 +256,7 @@ export function useTeamData(deps, opts = {}) {
           var adHocTeams = adHocTeamList.map(async (team) => {
             var request = await httpClient.getNoAuth(
               `${selectedYear?.value}/teams?teamNumber=${team}`,
-              ftcMode ? ftcBaseURL : undefined,
+              getApiBaseUrl(ftcMode),
               undefined,
               undefined,
               signal()
@@ -306,10 +305,13 @@ export function useTeamData(deps, opts = {}) {
         !useFTCOffline &&
         selectedEvent?.value?.type !== "OffSeason"
       ) {
-        // get the team list from FIRST API
+        // get the team list from FIRST API (or FIRST Global API)
+        const teamPath = isFirstGlobalMode(ftcMode)
+          ? `${selectedYear?.value}/teams`
+          : `${selectedYear?.value}/teams?eventCode=${selectedEvent?.value?.code}`;
         result = await httpClient.getNoAuth(
-          `${selectedYear?.value}/teams?eventCode=${selectedEvent?.value?.code}`,
-          ftcMode ? ftcBaseURL : undefined,
+          teamPath,
+          getApiBaseUrl(ftcMode),
           undefined,
           undefined,
           signal()
@@ -389,6 +391,15 @@ export function useTeamData(deps, opts = {}) {
         delete teams.Teams;
       }
 
+      // --- FIRST Global: set displayTeamNumber to country code, fill in nameShort from nameFull ---
+      if (isFirstGlobalMode(ftcMode) && teams?.teams?.length > 0) {
+        teams.teams = teams.teams.map((team) => ({
+          ...team,
+          displayTeamNumber: team.country || team.countryCode || `${team.teamNumber}`,
+          nameShort: team.nameShort || team.nameFull || `Team ${team.teamNumber}`,
+        }));
+      }
+
       // --- District EI/RAS enrichment ---
       var districtEvents = null;
       if (
@@ -403,7 +414,7 @@ export function useTeamData(deps, opts = {}) {
           try {
             var request = await httpClient.getNoAuth(
               `${selectedYear?.value}/awards/event/${event?.value?.code}`,
-              ftcMode ? ftcBaseURL : undefined,
+              getApiBaseUrl(ftcMode),
               undefined,
               undefined,
               signal()
@@ -444,7 +455,7 @@ export function useTeamData(deps, opts = {}) {
             var EITeamData = tempTeams.map(async (teamNumber) => {
               var request = await httpClient.getNoAuth(
                 `${selectedYear?.value}/teams?teamNumber=${teamNumber}`,
-                ftcMode ? ftcBaseURL : undefined,
+                getApiBaseUrl(ftcMode),
                 undefined,
                 undefined,
                 signal()
@@ -599,7 +610,9 @@ export function useTeamData(deps, opts = {}) {
         };
       });
 
-      if (useFTCOffline && (!isOnline || manualOfflineMode)) {
+      if (isFirstGlobalMode(ftcMode)) {
+        console.log("FIRST Global mode: Skipping queryAwards (not available for FG)");
+      } else if (useFTCOffline && (!isOnline || manualOfflineMode)) {
         console.log(
           "FTC Offline mode: Skipping queryAwards API call while offline" +
             (manualOfflineMode ? " (manual override)" : "") +
@@ -608,7 +621,7 @@ export function useTeamData(deps, opts = {}) {
       } else if (teams?.teams.length > 0) {
         try {
           const teamNumbers = teams.teams.map((t) => t?.teamNumber);
-          const baseURL = ftcMode ? ftcBaseURL : undefined;
+          const baseURL = getApiBaseUrl(ftcMode);
 
           var req = await httpClient.postNoAuth(
             `${selectedYear?.value}/queryAwards`,
@@ -845,7 +858,7 @@ export function useTeamData(deps, opts = {}) {
         const teamNumbers = teams.teams.map((t) => t?.teamNumber);
         let historyMap = {};
         try {
-          const baseURL = ftcMode ? ftcBaseURL : undefined;
+          const baseURL = getApiBaseUrl(ftcMode);
           const historyResult = await httpClient.postNoAuth(
             `${selectedYear?.value}/queryHistory`,
             { teams: teamNumbers },
@@ -1153,6 +1166,11 @@ export function useTeamData(deps, opts = {}) {
    * Fetches EPA data for FTC teams from FTCScout.
    */
   async function getEPAFTC() {
+    // FIRST Global: no FTCScout data available
+    if (isFirstGlobalMode(ftcMode)) {
+      setEPA([]);
+      return;
+    }
     if (useFTCOffline && (!isOnline || manualOfflineMode)) {
       console.log(
         "FTC Offline mode: Skipping FTCScout API calls while offline" +
@@ -1186,7 +1204,7 @@ export function useTeamData(deps, opts = {}) {
 
       var epaData = await httpClient.getNoAuth(
         `${selectedYear?.value}/ftcscout/quick-stats/${team?.teamNumber}`,
-        ftcMode ? ftcBaseURL : undefined,
+        getApiBaseUrl(ftcMode),
         undefined,
         undefined,
         signal()
@@ -1196,7 +1214,7 @@ export function useTeamData(deps, opts = {}) {
         epaArray = await epaData.json();
         var seasonResult = await httpClient.getNoAuth(
           `${selectedYear?.value}/ftcscout/events/${team?.teamNumber}`,
-          ftcMode ? ftcBaseURL : undefined,
+          getApiBaseUrl(ftcMode),
           undefined,
           undefined,
           signal()
