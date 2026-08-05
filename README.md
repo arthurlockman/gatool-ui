@@ -82,6 +82,16 @@ Read endpoints on `api.gatool.org` are open, so capture works without auth.
 
 ### Deploying
 
-GATool has two main active deployments: [beta](https://beta.gatool.org) and [production](https://gatool.org). Both are hosted on Azure web services and deployed automatically from GitHub.
+GATool has two main active deployments: [beta](https://beta.gatool.org) and [production](https://gatool.org). Both are hosted on Cloudflare Pages and deployed automatically from GitHub.
 
 To deploy to beta, commit and push to the beta branch. To send things to production, [make a pull request from beta to the main branch](https://github.com/arthurlockman/gatool-ui/compare/main...beta?expand=1) and merge. Merging the changes will create a new production deployment.
+
+### Sourcemaps
+
+Production builds emit no sourcemaps, so nothing is exposed publicly. The
+`.github/workflows/newrelic-sourcemaps.yml` workflow rebuilds each `main`/`beta` push with
+`SOURCEMAP=hidden` — which emits `.map` files without altering a single emitted JS byte, so the
+content hashes match what Cloudflare deployed — then verifies every filename against the live site
+before uploading the maps to New Relic. This de-minifies stack traces in the Errors inbox.
+
+To generate sourcemaps locally, run `SOURCEMAP=hidden npm run build`.

@@ -20,6 +20,38 @@ const REFRESH_LEAD_SECONDS = 60; // refresh this many seconds before expiry
 
 const AuthContext = createContext(null);
 
+// The browser can refuse or drop local storage mid-session (Safari drops the
+// IndexedDB connection under memory pressure; private mode and quota limits
+// behave similarly). Session persistence is a convenience — losing it must
+// never fail a login, a refresh, or a logout, so every storage touch below is
+// best-effort and degrades to a memory-only session.
+async function readStored(key) {
+  try {
+    return await localforage.getItem(key);
+  } catch (e) {
+    console.warn(`Could not read "${key}" from local storage.`, e);
+    return null;
+  }
+}
+
+async function writeStored(key, value) {
+  try {
+    await localforage.setItem(key, value);
+    return true;
+  } catch (e) {
+    console.warn(`Could not write "${key}" to local storage.`, e);
+    return false;
+  }
+}
+
+async function removeStored(key) {
+  try {
+    await localforage.removeItem(key);
+  } catch (e) {
+    console.warn(`Could not remove "${key}" from local storage.`, e);
+  }
+}
+
 // Build a deterministic SVG initials avatar — used as the fallback when the
 // user has no Gravatar set (Gravatar 404s with d=404).
 export function initialsAvatar(email) {
@@ -140,8 +172,16 @@ export function AuthProvider({ children }) {
     async (tokenResp) => {
       accessTokenRef.current = tokenResp.accessToken;
       expiresAtRef.current = Date.now() + tokenResp.expiresIn * 1000;
-      await localforage.setItem(REFRESH_KEY, tokenResp.refreshToken);
-      await localforage.setItem(LAST_EMAIL_KEY, tokenResp.email);
+      // Best-effort: if storage is unavailable the user is still signed in for
+      // this tab, they just won't be remembered after a reload. Failing here
+      // would surface as "Network error" in LoginModal on a successful login.
+      const persisted = await writeStored(REFRESH_KEY, tokenResp.refreshToken);
+      await writeStored(LAST_EMAIL_KEY, tokenResp.email);
+      if (!persisted) {
+        console.warn(
+          "Signed in, but the session could not be saved locally; it will end when this page is closed."
+        );
+      }
       setLastEmail(tokenResp.email);
       setUser(buildUser(tokenResp.email, tokenResp.roles));
       scheduleRefresh(tokenResp.expiresIn);
@@ -153,13 +193,13 @@ export function AuthProvider({ children }) {
     accessTokenRef.current = null;
     expiresAtRef.current = 0;
     clearRefreshTimer();
-    await localforage.removeItem(REFRESH_KEY);
+    await removeStored(REFRESH_KEY);
     setUser(null);
   }, [clearRefreshTimer]);
 
   const refreshNow = useCallback(async () => {
     if (refreshPromiseRef.current) return refreshPromiseRef.current;
-    const refreshToken = await localforage.getItem(REFRESH_KEY);
+    const refreshToken = await readStored(REFRESH_KEY);
     if (!refreshToken) return null;
 
     const p = (async () => {
@@ -194,7 +234,7 @@ export function AuthProvider({ children }) {
     let cancelled = false;
     (async () => {
       try {
-        const lastEmailStored = await localforage.getItem(LAST_EMAIL_KEY);
+        const lastEmailStored = await readStored(LAST_EMAIL_KEY);
         if (lastEmailStored && !cancelled) setLastEmail(lastEmailStored);
         await refreshNow();
       } catch (e) {
@@ -211,7 +251,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const logout = useCallback(async () => {
-    const refreshToken = await localforage.getItem(REFRESH_KEY);
+    const refreshToken = await readStored(REFRESH_KEY);
     if (refreshToken) {
       // best-effort revoke
       try {
