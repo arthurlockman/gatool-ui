@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { usePersistentState } from "./UsePersistentState";
 import { useEventSelection } from "../contexts/EventSelectionContext";
-
-const ftcBaseURL = "https://api.gatool.org/ftc/v2/";
+import {ftcBaseURL} from "../utils/programConstants";
 
 export function useFTCOfflineMode({ httpClient, isOnline }) {
   const { ftcMode, selectedYear } = useEventSelection();
