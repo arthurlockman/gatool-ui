@@ -55,6 +55,8 @@ import { useCommunityUpdates } from "hooks/useCommunityUpdates";
 import { useCheesyArenaStatus } from "hooks/useCheesyArena";
 import { useFTCOfflineMode } from "hooks/useFTCOfflineMode";
 import { useEventListLoader } from "hooks/useEventListLoader";
+import {ftcBaseURL} from "./utils/programConstants";
+
 
 export const TabStates = {
   NotReady: "notready",
@@ -93,8 +95,6 @@ const FGSupportedYears = [
   { label: "2025 FIRST Global", value: "2025", program: "FG" },
 ];
 
-const ftcBaseURL = "https://api.gatool.org/ftc/v2/";
-//const fgBaseURL = "https://api.gatool.org/v3/firstglobal/";
 
 // Pages that should remember scroll position
 const pagesWithScrollMemory = ['schedule', 'teamdata', 'ranks', 'announce', 'playbyplay', 'allianceselection'];

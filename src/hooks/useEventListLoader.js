@@ -3,11 +3,11 @@ import moment from "moment";
 import { useRef } from "react";
 import { timeZones } from "../data/timeZones";
 import { useEventSelection } from "../contexts/EventSelectionContext";
+import {ftcBaseURL, fgBaseURL} from "../utils/programConstants";
+
 
 const paleYellow = "#fdfaed";
 const paleBlue = "#effdff";
-const ftcBaseURL = "https://api.gatool.org/ftc/v2/";
-const fgBaseURL = "https://api.gatool.org/v3/firstglobal/";
 
 const timezones = _.cloneDeep(timeZones);
 

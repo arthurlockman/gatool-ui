@@ -8,7 +8,6 @@ import moment from "moment";
 import { useEventSelection } from "../contexts/EventSelectionContext";
 import { getApiBaseUrl, isFirstGlobalMode, getTeamUpdatesBaseUrl } from "../utils/programConstants";
 
-// const ftcBaseURL = "https://api.gatool.org/ftc/v2/";
 const training = _.cloneDeep(trainingData);
 
 export function useCommunityUpdates({
