@@ -4,9 +4,7 @@ import { eventNames, FTCEventNames } from "../data/eventNames";
 import _ from "lodash";
 import moment from "moment";
 import { useEventSelection } from "../contexts/EventSelectionContext";
-import { getApiBaseUrl, isFirstGlobalMode } from "../utils/programConstants";
-
-const ftcBaseURL = "https://api.gatool.org/ftc/v2/";
+import { getApiBaseUrl, isFirstGlobalMode, ftcBaseURL } from "../utils/programConstants";
 
 export function useHighScores({
   httpClient,
