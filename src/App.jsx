@@ -80,17 +80,16 @@ const supportedYears = [
   { label: "2026 REBUILT℠ presented by Haas", value: "2026", program: "FRC" },
   { label: "2025 REEFSCAPE℠ presented by Haas", value: "2025", program: "FRC" },
   { label: "2024 CRESCENDO℠", value: "2024", program: "FRC" },
-  //{ label: "2023 CHARGED UP℠ presented by Haas", value: "2023", program: "FRC"  },
 ];
 
 const FTCSupportedYears = [
+  { label: "2026/27 BIOBUZZ℠ presented by RTX", value: "2026", program: "FTC" },
   { label: "2025/26 DECODE℠ presented by RTX", value: "2025", program: "FTC" },
   { label: "2024/25 INTO THE DEEP℠", value: "2024", program: "FTC" },
-  { label: "2023", value: "2023", program: "FTC" },
-  // { label: "2022", value: "2022", program: "FTC" },
 ];
 
 const FGSupportedYears = [
+  { label: "2026 FIRST Global", value: "2026", program: "FG" },
   { label: "2025 FIRST Global", value: "2025", program: "FG" },
 ];
 
