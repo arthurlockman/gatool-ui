@@ -1,4 +1,4 @@
-// Tests for useTeamData (FRC paths only).
+// Tests for useTeamData team-loading paths.
 //
 // useTeamData is a large domain hook that owns all team-data fetching for
 // gatool. State lives in App.jsx and is passed in via deps; this hook owns
@@ -32,6 +32,7 @@ vi.mock("../contexts/EventSelectionContext", () => ({
 import { useTeamData } from "./useTeamData";
 
 const BASE = "https://api.gatool.org/v3";
+const FG_BASE = `${BASE}/firstglobal`;
 
 function makeDeps(overrides = {}) {
   return {
@@ -242,6 +243,129 @@ describe("useTeamData (FRC) — getTeamList", () => {
     const teams = deps.setTeamList.mock.calls[0][0];
     expect(teams.teams).toEqual([]);
     expect(teams.teamCountTotal).toBe(0);
+  });
+});
+
+describe("useTeamData (FIRST Global) — getTeamList", () => {
+  it("requests and merges three seasons of awards by country code", async () => {
+    setSelection({
+      year: "2025",
+      ftcMode: { value: "FIRSTGlobal", label: "FIRST Global" },
+      event: {
+        code: "FG2025-all",
+        name: "FIRST Global 2025",
+        type: "FIRSTGlobal",
+        champLevel: null,
+      },
+    });
+
+    server.use(
+      http.get(`${FG_BASE}/:year/teams`, () =>
+        HttpResponse.json({
+          teamCountTotal: 2,
+          teams: [
+            {
+              teamNumber: 2,
+              countryCode: "al",
+              country: "ALB",
+              nameFull: "Albania",
+            },
+            {
+              teamNumber: 78,
+              countryCode: "10",
+              country: "XKX",
+              nameFull: "Team Hope (Refugees)",
+            },
+          ],
+        })
+      ),
+      http.post(`${FG_BASE}/:year/queryAwards`, async ({ request }) => {
+        const body = await request.json();
+        expect(body.teams).toEqual(["AL", "10"]);
+        return HttpResponse.json({
+          AL: {
+            2025: {
+              awards: [
+                {
+                  awardId: 19,
+                  teamNumber: 2,
+                  eventCode: "2025_FGC-FGC-CMP",
+                  name: "Social Media Challenge Award",
+                },
+              ],
+            },
+            2024: {
+              awards: [
+                {
+                  awardId: 23,
+                  teamNumber: 2,
+                  eventCode: "2024_FGC-FGC-CMP",
+                  name: "Video Storytelling Award",
+                },
+              ],
+            },
+          },
+          10: {
+            2025: {
+              awards: [
+                {
+                  awardId: 18,
+                  teamNumber: 78,
+                  eventCode: "2025_FGC-FGC-CMP",
+                  name: "Video Storytelling Award",
+                },
+              ],
+            },
+          },
+        });
+      })
+    );
+
+    const deps = makeDeps({
+      halloffame: [
+        {
+          Year: 2025,
+          Challenge: "Eco Equilibrium",
+          Winner1: "AL",
+          Winner2: "10",
+          Winner3: null,
+          Winner4: null,
+          Winner5: null,
+        },
+      ],
+    });
+    const { result } = renderHookWithProviders(() => useTeamData(deps));
+
+    await result.current.getTeamList();
+    await waitFor(() => expect(deps.setTeamList).toHaveBeenCalled());
+
+    const teams = deps.setTeamList.mock.calls[0][0].teams;
+    const albania = teams.find((team) => team.countryCode === "al");
+    const teamHope = teams.find((team) => team.countryCode === "10");
+
+    expect(albania.awards["2025"].awards[0]).toMatchObject({
+      name: "Social Media Challenge Award",
+      year: "2025",
+      eventName: "FIRST Global Challenge",
+    });
+    expect(albania.awards["2024"].awards[0]).toMatchObject({
+      name: "Video Storytelling Award",
+      year: "2024",
+    });
+    expect(teamHope.awards["2025"].awards[0]).toMatchObject({
+      name: "Video Storytelling Award",
+      teamNumber: 78,
+    });
+    expect(albania.hallOfFame).toContainEqual({
+      year: 2025,
+      challenge: "Eco Equilibrium",
+      type: "winner",
+    });
+    expect(teamHope.hallOfFame).toContainEqual({
+      year: 2025,
+      challenge: "Eco Equilibrium",
+      type: "winner",
+    });
   });
 });
 

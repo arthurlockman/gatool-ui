@@ -30,7 +30,7 @@ import { useEventSelection } from "./contexts/EventSelectionContext";
 import { useEventData } from "./contexts/EventDataContext";
 import { EventStoreProvider } from "./contexts/EventStoreProvider";
 import _ from "lodash";
-import { specialAwards, hallOfFame, FTCHallOfFame } from "./data/hallOfFame";
+import { specialAwards, hallOfFame, FTCHallOfFame, FGCHallOfFame } from "./data/hallOfFame";
 import { originalAndSustaining, refreshRate } from "./data/appConfig";
 import { ftcRegions } from "./data/ftcRegions";
 import { isFirstGlobalMode, getTeamUpdatesBaseUrl } from "./utils/programConstants";
@@ -93,6 +93,7 @@ const FTCSupportedYears = [
 const FGSupportedYears = [
   { label: "2026 FIRST Global", value: "2026", program: "FG" },
   { label: "2025 FIRST Global", value: "2025", program: "FG" },
+  { label: "2024 FIRST Global", value: "2024", program: "FG" },
 ];
 
 
@@ -526,9 +527,11 @@ function App() {
     ..._.cloneDeep(priorYearEventNames),
     ...(selectedYear && eventNamesCY ? { [selectedYear.value]: eventNamesCY } : {}),
   };
-  const halloffame = ftcMode
-    ? _.cloneDeep(FTCHallOfFame)
-    : _.cloneDeep(hallOfFame);
+  const halloffame = isFirstGlobalMode(ftcMode)
+    ? _.cloneDeep(FGCHallOfFame)
+    : ftcMode
+      ? _.cloneDeep(FTCHallOfFame)
+      : _.cloneDeep(hallOfFame);
 
   // Cheesy Arena status (hook owns state + status probe)
   const {
