@@ -584,6 +584,74 @@ export const FTCHallOfFame = [
   },
 ];
 
+// Update this after the FIRST Global Challenge each season.
+// Country codes are stable across seasons; FIRST Global team numbers are not.
+export const FGCHallOfFame = [
+  {
+    Year: 2025,
+    Challenge: "Eco Equilibrium",
+    Winner1: "CM",
+    Winner2: "MX",
+    Winner3: "PA",
+    Winner4: "VE",
+    Winner5: null,
+  },
+  {
+    Year: 2024,
+    Challenge: "Feeding the Future",
+    Winner1: "CK",
+    Winner2: "CN",
+    Winner3: "MD",
+    Winner4: "MG",
+    Winner5: null,
+  },
+  {
+    Year: 2023,
+    Challenge: "Hydrogen Horizons",
+    Winner1: "10",
+    Winner2: "CN",
+    Winner3: "ER",
+    Winner4: "VN",
+    Winner5: null,
+  },
+  {
+    Year: 2022,
+    Challenge: "Carbon Capture",
+    Winner1: "BW",
+    Winner2: "BZ",
+    Winner3: "CH",
+    Winner4: "LT",
+    Winner5: null,
+  },
+  {
+    Year: 2019,
+    Challenge: "Ocean Opportunities",
+    Winner1: "10",
+    Winner2: "BY",
+    Winner3: "MD",
+    Winner4: "NO",
+    Winner5: null,
+  },
+  {
+    Year: 2018,
+    Challenge: "Energy Impact",
+    Winner1: "DE",
+    Winner2: "RO",
+    Winner3: "SG",
+    Winner4: null,
+    Winner5: null,
+  },
+  {
+    Year: 2017,
+    Challenge: "H2O Flow",
+    Winner1: "FI",
+    Winner2: null,
+    Winner3: null,
+    Winner4: null,
+    Winner5: null,
+  },
+];
+
 export const specialAwards = [
   {
     Year: 2021,
@@ -884,4 +952,3 @@ export const specialAwards = [
     ],
   },
 ];
-

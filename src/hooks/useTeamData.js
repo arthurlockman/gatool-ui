@@ -610,9 +610,7 @@ export function useTeamData(deps, opts = {}) {
         };
       });
 
-      if (isFirstGlobalMode(ftcMode)) {
-        console.log("FIRST Global mode: Skipping queryAwards (not available for FG)");
-      } else if (useFTCOffline && (!isOnline || manualOfflineMode)) {
+      if (useFTCOffline && (!isOnline || manualOfflineMode)) {
         console.log(
           "FTC Offline mode: Skipping queryAwards API call while offline" +
             (manualOfflineMode ? " (manual override)" : "") +
@@ -620,13 +618,20 @@ export function useTeamData(deps, opts = {}) {
         );
       } else if (teams?.teams.length > 0) {
         try {
-          const teamNumbers = teams.teams.map((t) => t?.teamNumber);
+          const firstGlobalMode = isFirstGlobalMode(ftcMode);
+          const teamIdentifiers = teams.teams
+            .map((team) =>
+              firstGlobalMode
+                ? team?.countryCode?.toUpperCase()
+                : team?.teamNumber
+            )
+            .filter((identifier) => identifier !== null && identifier !== undefined);
           const baseURL = getApiBaseUrl(ftcMode);
 
           var req = await httpClient.postNoAuth(
             `${selectedYear?.value}/queryAwards`,
             {
-              teams: teamNumbers,
+              teams: teamIdentifiers,
             },
             baseURL
           );
@@ -637,7 +642,10 @@ export function useTeamData(deps, opts = {}) {
 
             newTeams = teams.teams.map((team) => {
               const teamNum = team?.teamNumber;
+              const countryCode = team?.countryCode?.toUpperCase();
               const teamAwards =
+                (countryCode && awards[countryCode]) ||
+                (countryCode && awards[countryCode.toLowerCase()]) ||
                 awards[`${teamNum}`] ||
                 awards[teamNum] ||
                 awards[String(teamNum)] ||
@@ -722,9 +730,11 @@ export function useTeamData(deps, opts = {}) {
                 team.awards[yearKey].awards = team.awards[yearKey].awards.map(
                   (award) => {
                     award.highlight = awardsHilight(award.name);
-                    award.eventName = eventnames[`${year}`]
-                      ? eventnames[`${year}`][award.eventCode]
-                      : award.eventCode;
+                    award.eventName = isFirstGlobalMode(ftcMode)
+                      ? "FIRST Global Challenge"
+                      : eventnames[`${year}`]
+                        ? eventnames[`${year}`][award.eventCode]
+                        : award.eventCode;
                     award.year = year;
                     return award;
                   }
@@ -735,7 +745,10 @@ export function useTeamData(deps, opts = {}) {
             }
           });
           team.hallOfFame = [];
-          _.filter(halloffame, { Chairmans: team.teamNumber }).forEach(
+          const hallOfFameIdentifier = isFirstGlobalMode(ftcMode)
+            ? team?.countryCode?.toUpperCase()
+            : team?.teamNumber;
+          _.filter(halloffame, { Chairmans: hallOfFameIdentifier }).forEach(
             (award) => {
               team.hallOfFame.push({
                 // @ts-ignore
@@ -746,7 +759,7 @@ export function useTeamData(deps, opts = {}) {
               });
             }
           );
-          _.filter(halloffame, { Impact: team.teamNumber }).forEach(
+          _.filter(halloffame, { Impact: hallOfFameIdentifier }).forEach(
             (award) => {
               team.hallOfFame.push({
                 // @ts-ignore
@@ -757,7 +770,7 @@ export function useTeamData(deps, opts = {}) {
               });
             }
           );
-          _.filter(halloffame, { Inspire: team.teamNumber }).forEach(
+          _.filter(halloffame, { Inspire: hallOfFameIdentifier }).forEach(
             (award) => {
               team.hallOfFame.push({
                 // @ts-ignore
@@ -768,7 +781,7 @@ export function useTeamData(deps, opts = {}) {
               });
             }
           );
-          _.filter(halloffame, { Winner1: team.teamNumber }).forEach(
+          _.filter(halloffame, { Winner1: hallOfFameIdentifier }).forEach(
             (award) => {
               team.hallOfFame.push({
                 // @ts-ignore
@@ -779,7 +792,7 @@ export function useTeamData(deps, opts = {}) {
               });
             }
           );
-          _.filter(halloffame, { Winner2: team.teamNumber }).forEach(
+          _.filter(halloffame, { Winner2: hallOfFameIdentifier }).forEach(
             (award) => {
               team.hallOfFame.push({
                 // @ts-ignore
@@ -790,7 +803,7 @@ export function useTeamData(deps, opts = {}) {
               });
             }
           );
-          _.filter(halloffame, { Winner3: team.teamNumber }).forEach(
+          _.filter(halloffame, { Winner3: hallOfFameIdentifier }).forEach(
             (award) => {
               team.hallOfFame.push({
                 // @ts-ignore
@@ -801,7 +814,7 @@ export function useTeamData(deps, opts = {}) {
               });
             }
           );
-          _.filter(halloffame, { Winner4: team.teamNumber }).forEach(
+          _.filter(halloffame, { Winner4: hallOfFameIdentifier }).forEach(
             (award) => {
               team.hallOfFame.push({
                 // @ts-ignore
@@ -812,7 +825,7 @@ export function useTeamData(deps, opts = {}) {
               });
             }
           );
-          _.filter(halloffame, { Winner5: team.teamNumber }).forEach(
+          _.filter(halloffame, { Winner5: hallOfFameIdentifier }).forEach(
             (award) => {
               team.hallOfFame.push({
                 // @ts-ignore
