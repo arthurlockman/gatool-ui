@@ -770,7 +770,7 @@ function SetupPage({
                                             <Switch checked={showQualsStats === null ? false : showQualsStats} onChange={setShowQualsStats} />
                                         </td>
                                         <td>
-                                            <b>Show Quals Statistics on Play-By-Play during Playoffs</b>
+                                            <b>Show Quals Statistics in Playoffs</b>
                                         </td>
                                     </tr>
                                     <tr className={"statsSettings"}>

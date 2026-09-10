@@ -14,7 +14,7 @@ function Announce({
   eventNamesCY,
   playoffOnly,
   remapNumberToString,
-  /** Fourth column: rank (quals) | matchup summary with rowspan (playoffs) | omit when rowspan continues */
+  /** Fourth column: rank, or omit when hidden (e.g. FIRST Global playoffs) */
   column4,
 }) {
     const { awardsMenu, showNotesAnnounce, showAwards, showMinorAwards, showSponsors, autoHideSponsors, showMottoes, showChampsStats, showDistrictChampsStats, showChampsStatsAtDistrictRegional, showBlueBanners } = useSettings();
@@ -151,20 +151,7 @@ function Announce({
                 </p>}
                 {(showNotesAnnounce || _.isNull(showNotesAnnounce)) && <p className="teamNotes" dangerouslySetInnerHTML={{ __html: team?.updates?.teamNotesLocal }} />}
             </td>
-            {column4?.type === "omit" ? null : column4?.type === "matchup" ? (
-                <td
-                    className={"col1 announce-alliance-matchup-cell"}
-                    rowSpan={column4.rowSpan}
-                    style={{
-                        backgroundColor:
-                            _.toLower(allianceColor) === "red"
-                                ? announceBackground.red
-                                : announceBackground.blue,
-                    }}
-                >
-                    {column4.content}
-                </td>
-            ) : (
+            {column4?.type === "omit" ? null : (
                 <td
                     className={`col1 ranking ${team?.rankStyle?.backgroundColor === "" ? "announce-rank-plain" : "announce-rank-highlight"}`}
                     style={

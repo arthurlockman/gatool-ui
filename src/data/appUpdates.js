@@ -1,5 +1,28 @@
 export const appUpdates = [
   {
+    date: "September 9, 2026",
+    message: (
+      <>
+      <ul>
+        <li>FIRST Global:</li>
+        <ul>
+          <li>Added Awards</li>
+          <li>Added Foul buttons</li>
+          <li>Ensured 2026 event isproperly displayed</li>
+          <li>Introduced role controls to limit edit access</li>
+        </ul>
+        <li>FRC:</li>
+        <ul>
+          <li>Removed Caster's Tool stats</li>
+        </ul>
+        <li>All programs</li>
+        <ul>
+          <li><i>Show Quals Statistics in Playoffs</i> now toggles Ranking on Announce</li>
+        </ul>
+      </ul>
+      </>
+    ),
+  },{
     date: "June 22, 2026",
     message: (
       <>

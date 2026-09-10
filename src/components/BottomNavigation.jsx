@@ -95,20 +95,6 @@ function BottomNavigation({ ftcMode }) {
                 <i>
                   <b>Nexus</b>
                 </i>
-              </span>{", by "}
-              <span
-                className="app-footer-link"
-            style={{ cursor: "pointer" }}
-                onClick={() => {
-                  setURL({
-                    title: "Caster's Tool",
-                    url: "https://casterstool.com",
-                  });
-                }}
-              >
-                <i>
-                  <b>Caster's Tool</b>
-                </i>
               </span>{", and by "}
               <span
                 className="app-footer-link"
