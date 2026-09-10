@@ -347,117 +347,6 @@ td {
   padding: 0;
 }
 
-/* Announce: prior playoff partnerships (replaces rank column, row-spanned) */
-.announce-alliance-matchup-cell {
-  vertical-align: middle;
-  text-align: left;
-  font-size: 1.05rem;
-  line-height: 1.35;
-  min-width: 22rem;
-  max-width: 30rem;
-  padding: 0.75rem 0.65rem !important;
-  border-left: 1px solid #ccc;
-}
-
-.announce-alliance-matchup-summary {
-  max-height: 70vh;
-  overflow-y: auto;
-  font-size: 1.05rem;
-}
-
-.announce-alliance-matchup-summary--status {
-  font-size: 1.05rem;
-  line-height: 1.4;
-}
-
-.announce-alliance-matchup-pair {
-  margin-top: 0.5rem;
-  font-size: 1.08rem;
-}
-
-.announce-alliance-matchup-pair:first-child {
-  margin-top: 0;
-}
-
-.announce-alliance-matchup-line {
-  padding-left: 0.4rem;
-  margin-top: 0.2rem;
-  font-size: 1.02rem;
-  line-height: 1.4;
-  color: #222;
-}
-
-.announce-alliance-matchup-line-result strong {
-  font-weight: 700;
-}
-
-/* Winning outcomes (see isPartnershipWinnerResult in component) */
-.announce-alliance-matchup-line--winner {
-  font-weight: 700;
-}
-
-.announce-alliance-matchup-line--winner .announce-alliance-matchup-line-main {
-  font-weight: 700;
-}
-
-.announce-alliance-matchup-line--winner .announce-alliance-matchup-line-result strong {
-  font-weight: 700;
-}
-
-.announce-alliance-matchup-line--finalist {
-  font-weight: 700;
-}
-
-.announce-alliance-matchup-line--finalist .announce-alliance-matchup-line-main,
-.announce-alliance-matchup-line--finalist .announce-alliance-matchup-line-result strong {
-  font-weight: 700;
-}
-
-/* Announce: Red vs Blue opponents row (between Red and Blue alliance rows) */
-.match-opponents-row {
-  background: #f5f5f5;
-}
-
-.match-opponents-row-spacer {
-  background: #f5f5f5;
-  border: none;
-  padding: 0.4rem 0.5rem !important;
-}
-
-/* "When these alliances met" block inside Red column 4 (combined cell) */
-.match-opponents-in-column {
-  margin-top: 0.75rem;
-  padding-top: 0.5rem;
-  border-top: 1px solid #ccc;
-}
-
-.match-opponents-cell {
-  padding: 0.6rem 0.75rem !important;
-  border-left: 1px solid #ccc;
-  vertical-align: middle;
-  font-size: 1.02rem;
-}
-
-.match-opponents-summary-title {
-  margin-bottom: 0.35rem;
-  font-size: 1.05rem;
-}
-
-.match-opponents-summary-line {
-  padding-left: 0.4rem;
-  margin-top: 0.2rem;
-  line-height: 1.4;
-  color: #222;
-}
-
-.match-opponents-summary-line-result strong {
-  font-weight: 700;
-}
-
-.match-opponents-summary--status {
-  font-size: 1.02rem;
-}
-
 .rank1 {
   text-align: center;
   color: white;
@@ -2171,16 +2060,14 @@ body {
    Rank column is also td.col1 but uses class "ranking" + inline rankHighlight(); exclude it so green/yellow/orange highlights are not overridden by !important. */
 [data-bs-theme="dark"] .gatool-announce.redAlliance td.col1:not(.ranking),
 [data-bs-theme="dark"] .gatool-announce.redAlliance td.col2,
-[data-bs-theme="dark"] .gatool-announce.redAlliance td.col7,
-[data-bs-theme="dark"] .gatool-announce.redAlliance td.announce-alliance-matchup-cell {
+[data-bs-theme="dark"] .gatool-announce.redAlliance td.col7 {
   background-color: rgba(95, 26, 32, 0.92) !important;
   color: #f1f5f9 !important;
 }
 
 [data-bs-theme="dark"] .gatool-announce.blueAlliance td.col1:not(.ranking),
 [data-bs-theme="dark"] .gatool-announce.blueAlliance td.col2,
-[data-bs-theme="dark"] .gatool-announce.blueAlliance td.col7,
-[data-bs-theme="dark"] .gatool-announce.blueAlliance td.announce-alliance-matchup-cell {
+[data-bs-theme="dark"] .gatool-announce.blueAlliance td.col7 {
   background-color: rgba(28, 52, 108, 0.92) !important;
   color: #f1f5f9 !important;
 }
@@ -2194,16 +2081,6 @@ body {
 [data-bs-theme="dark"] .gatool-announce.blueAlliance td.col1.ranking.announce-rank-plain {
   background-color: rgba(28, 52, 108, 0.92) !important;
   color: #f8fafc !important;
-}
-
-/* Prior partnerships: base rule sets .announce-alliance-matchup-line { color: #222 }, which wins over inherited cell text */
-[data-bs-theme="dark"] .gatool-announce .announce-alliance-matchup-line {
-  color: #e2e8f0 !important;
-}
-
-[data-bs-theme="dark"] .gatool-announce .announce-alliance-matchup-summary--status .text-muted {
-  color: #cbd5e1 !important;
-  opacity: 1;
 }
 
 [data-bs-theme="dark"] .gatool-announce .announceTeamNumber,

@@ -33,7 +33,6 @@ vi.mock("../components/TopButtons", () => ({ default: () => <div data-testid="to
 vi.mock("../components/BottomButtons", () => ({ default: () => <div data-testid="bottom-buttons" /> }));
 vi.mock("components/NotificationBanner", () => ({ default: () => null }));
 vi.mock("components/EventNotificationBanner", () => ({ default: () => null }));
-vi.mock("components/AnnounceAllianceMatchupSummary", () => ({ default: () => null }));
 
 import { useEventData } from "contexts/EventDataContext";
 
