@@ -13,11 +13,6 @@ import NotificationBanner from "components/NotificationBanner";
 import EventNotificationBanner from "components/EventNotificationBanner";
 import useScrollPosition from "../hooks/useScrollPosition";
 import { useScrollToTop } from "../contextProviders/ScrollContainerContext";
-import AnnounceAllianceMatchupSummary from "../components/AnnounceAllianceMatchupSummary";
-import {
-  getConnectionsEventKey,
-  allianceRosterToConnectionKey,
-} from "../utils/allianceConnectionsApi";
 import { getAllianceLookupEntry } from "../utils/allianceLookup";
 import { matchHasPostedResult } from "../utils/playoffReserveEdits";
 import { applyPlayoffStationOrderToMatch } from "../utils/playoffStationOrderEdits";
@@ -55,12 +50,11 @@ function AnnouncePage({
   eventMessage,
   eventBell,
   setEventBell,
-  alliancePartnerConnectionsCache,
   allianceSelectionArrays,
 }) {
   const { selectedEvent, selectedYear, eventLabel, ftcMode, firstGlobalMode, teamList, qualSchedule, qualScheduleAllFields, playoffSchedule, practiceSchedule, offlinePlayoffSchedule, rankings, districtRankings, alliances, allianceCount, communityUpdates, currentMatch, remapNumberToString, remapStringToNumber, regionalEventDetail } = useEventData();
   const { nextMatch, previousMatch, setMatchFromMenu, getSchedule, getRegionalEventDetail } = useEventActions();
-  const { hidePracticeSchedule, teamReduction, showInspection, usePullDownToUpdate, useSwipe, useScrollMemory } = useSettings();
+  const { hidePracticeSchedule, teamReduction, showInspection, usePullDownToUpdate, useSwipe, useScrollMemory, showQualsStats } = useSettings();
   // Remember scroll position for Announce page
   useScrollPosition('announce', true, false, useScrollMemory);
   const scrollToTop = useScrollToTop();
@@ -445,68 +439,6 @@ function AnnouncePage({
       selectedEvent, selectedYear, regionalEventDetail, ftcMode,
       remapNumberToString, remapStringToNumber, teamList]);
 
-  const connectionsEventKey =
-    !ftcMode && inPlayoffs
-      ? getConnectionsEventKey(selectedEvent, selectedYear)
-      : null;
-
-  const playoffAllianceTeamNums = (prefix) => {
-    if (!matchDetails?.teams) return [];
-    const nums = [];
-    for (let i = 1; i <= 4; i++) {
-      const t = _.find(matchDetails.teams, { station: `${prefix}${i}` });
-      const raw = t?.teamNumber;
-      if (raw != null && Number(raw) > 0) {
-        const n = remapStringToNumber
-          ? Number(remapStringToNumber(raw))
-          : Number(raw);
-        if (!Number.isNaN(n)) nums.push(n);
-      }
-    }
-    return nums;
-  };
-  const onFieldRedKey = playoffAllianceTeamNums("Red")
-    .slice()
-    .sort((a, b) => a - b)
-    .join(",");
-  const onFieldBlueKey = playoffAllianceTeamNums("Blue")
-    .slice()
-    .sort((a, b) => a - b)
-    .join(",");
-
-  const firstRedWithTeamGlobal = ["Red1", "Red2", "Red3", "Red4"].find(
-    (s) => teamDetails[s]?.teamNumber > 0
-  );
-  const firstBlueWithTeamGlobal = ["Blue1", "Blue2", "Blue3", "Blue4"].find(
-    (s) => teamDetails[s]?.teamNumber > 0
-  );
-
-  const cacheEntryForSide = (firstStationWithTeam, onFieldKey) => {
-    const allianceName = firstStationWithTeam
-      ? teamDetails[firstStationWithTeam]?.alliance
-      : null;
-    const rosterAlliance = alliances?.alliances?.find(
-      (x) => x.name === allianceName
-    );
-    const rosterKey = rosterAlliance
-      ? allianceRosterToConnectionKey(rosterAlliance)
-      : null;
-    const keysToTry = [rosterKey, onFieldKey].filter(Boolean);
-    const cache = alliancePartnerConnectionsCache || {};
-    for (const k of keysToTry) {
-      if (cache[k] !== undefined) return cache[k];
-    }
-    if (keysToTry.length === 0) {
-      return { loading: false, data: null, error: null };
-    }
-    return { loading: true, data: null, error: null };
-  };
-
-  const redCache = cacheEntryForSide(firstRedWithTeamGlobal, onFieldRedKey);
-  const blueCache = cacheEntryForSide(firstBlueWithTeamGlobal, onFieldBlueKey);
-
-  const showPlayoffMatchupColumn = Boolean(connectionsEventKey);
-
   if (
     practiceSchedule?.schedule?.schedule?.length > 0 ||
     practiceSchedule?.schedule?.length > 0
@@ -621,78 +553,16 @@ function AnnouncePage({
                     <td>{firstGlobalMode ? "Country" : "Team #"}</td>
                     <td>Team Name</td>
                     <td>Organization, Sponsors & Awards</td>
-                    {!(firstGlobalMode && inPlayoffs) && <td>
-                      {showPlayoffMatchupColumn
-                        ? "Prior Partnerships"
-                        : "Rank"}
-                    </td>}
+                    {!(inPlayoffs && (firstGlobalMode || !showQualsStats)) && <td>Rank</td>}
                   </tr>
                 </thead>
                 <tbody>
                   {displayOrder.map((station, index) => {
-                    const redRowsWithTeam = ["Red1", "Red2", "Red3", "Red4"].filter(
-                      (s) => teamDetails[s]?.teamNumber > 0
-                    ).length;
-                    const blueRowsWithTeam = [
-                      "Blue1",
-                      "Blue2",
-                      "Blue3",
-                      "Blue4",
-                    ].filter((s) => teamDetails[s]?.teamNumber > 0).length;
-
-                    let column4 = undefined;
-                    if (
-                      showPlayoffMatchupColumn &&
-                      !_.isEmpty(teamDetails[station]) &&
-                      teamDetails[station].teamNumber > 0
-                    ) {
-                      if (
-                        station.startsWith("Red") &&
-                        firstRedWithTeamGlobal &&
-                        redRowsWithTeam > 0
-                      ) {
-                        if (station === firstRedWithTeamGlobal) {
-                          column4 = {
-                            type: "matchup",
-                            rowSpan: redRowsWithTeam,
-                            content: (
-                              <AnnounceAllianceMatchupSummary
-                                connections={redCache.data}
-                                loading={redCache.loading}
-                                error={redCache.error}
-                              />
-                            ),
-                          };
-                        } else {
-                          column4 = { type: "omit" };
-                        }
-                      } else if (
-                        station.startsWith("Blue") &&
-                        firstBlueWithTeamGlobal &&
-                        blueRowsWithTeam > 0
-                      ) {
-                        if (station === firstBlueWithTeamGlobal) {
-                          column4 = {
-                            type: "matchup",
-                            rowSpan: blueRowsWithTeam,
-                            content: (
-                              <AnnounceAllianceMatchupSummary
-                                connections={blueCache.data}
-                                loading={blueCache.loading}
-                                error={blueCache.error}
-                              />
-                            ),
-                          };
-                        } else {
-                          column4 = { type: "omit" };
-                        }
-                      }
-                    }
-
-                    // FIRST Global playoffs/finals: hide the rank column entirely
-                    if (!column4 && firstGlobalMode && inPlayoffs) {
-                      column4 = { type: "omit" };
-                    }
+                    // Hide the rank column during playoffs unless the user has opted in via
+                    // "Show Quals Statistics in Playoffs" (FIRST Global always hides it).
+                    const column4 = inPlayoffs && (firstGlobalMode || !showQualsStats)
+                      ? { type: "omit" }
+                      : undefined;
 
                     if (
                       !_.isEmpty(teamDetails[station]) &&

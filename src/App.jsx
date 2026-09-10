@@ -38,11 +38,6 @@ import { appUpdates } from "./data/appUpdates";
 import { useOnlineStatus } from "./contextProviders/OnlineContext";
 import { toast } from "react-toastify";
 import { trainingData } from "components/TrainingMatches";
-import {
-  getConnectionsEventKey,
-  fetchAllianceConnections,
-  allianceRosterToConnectionKey,
-} from "./utils/allianceConnectionsApi";
 import { useInterval } from "react-interval-hook";
 import { clearAvatarCache } from "./components/TeamAvatar";
 
@@ -326,9 +321,6 @@ function App() {
     backgroundDataRefreshFrequency,
   } = useSettings();
   const [allianceSelection, setAllianceSelection] = useState(null);
-  /** Preloaded prior-partnership data per alliance roster (key = sorted team ids). */
-  const [alliancePartnerConnectionsCache, setAlliancePartnerConnectionsCache] =
-    useState({});
   const [lastVisit, setLastVisit] = usePersistentState("cache:lastVisit", {});
   const [localUpdates, setLocalUpdates, saveLocalUpdates] = usePersistentState(
     "cache:localUpdates",
@@ -735,75 +727,6 @@ function App() {
     }
     return available;
   };
-
-  const allianceConnectionsPrefetchSignature = useMemo(() => {
-    if (!alliances?.alliances?.length) return "";
-    const roster = alliances.alliances
-      .map((a) => allianceRosterToConnectionKey(a) || "")
-      .filter(Boolean)
-      .sort()
-      .join("|");
-    return `${selectedEvent?.value?.code || ""}@${selectedYear?.value || ""}@${roster}`;
-  }, [alliances?.alliances, selectedEvent?.value?.code, selectedYear?.value]);
-
-  useEffect(() => {
-    if (ftcMode !== false) {
-      setAlliancePartnerConnectionsCache({});
-      return;
-    }
-    const eventKey = getConnectionsEventKey(selectedEvent, selectedYear);
-    if (!eventKey || !alliances?.alliances?.length || !allianceConnectionsPrefetchSignature) {
-      setAlliancePartnerConnectionsCache({});
-      return;
-    }
-
-    const unique = [];
-    const seen = new Set();
-    for (const a of alliances.alliances) {
-      const key = allianceRosterToConnectionKey(a);
-      if (!key || seen.has(key)) continue;
-      seen.add(key);
-      unique.push({
-        key,
-        nums: key.split(",").map((n) => Number(n)),
-      });
-    }
-
-    const initial = {};
-    for (const { key } of unique) {
-      initial[key] = { loading: true, data: null, error: null };
-    }
-    setAlliancePartnerConnectionsCache(initial);
-
-    const ac = new AbortController();
-    Promise.all(
-      unique.map(async ({ key, nums }) => {
-        try {
-          const data = await fetchAllianceConnections(
-            eventKey,
-            nums,
-            ac.signal
-          );
-          return { key, loading: false, data, error: null };
-        } catch (e) {
-          if (e?.name === "AbortError") return null;
-          return { key, loading: false, data: null, error: e };
-        }
-      })
-    ).then((results) => {
-      if (ac.signal.aborted) return;
-      setAlliancePartnerConnectionsCache((prev) => {
-        const next = { ...prev };
-        for (const r of results) {
-          if (r) next[r.key] = r;
-        }
-        return next;
-      });
-    });
-
-    return () => ac.abort();
-    // allianceConnectionsPrefetchSignature encodes alliances.alliances rosters
-  }, [allianceConnectionsPrefetchSignature, ftcMode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   //functions to retrieve API data
 
@@ -2627,9 +2550,6 @@ function App() {
                     eventMessage={eventMessage}
                     eventBell={eventBell}
                     setEventBell={setEventBell}
-                    alliancePartnerConnectionsCache={
-                      alliancePartnerConnectionsCache
-                    }
                     upsertPlayoffReserveOverlay={upsertPlayoffReserveOverlay}
                     removePlayoffReserveOverlay={removePlayoffReserveOverlay}
                     playoffReserveEdits={playoffReserveEdits}
