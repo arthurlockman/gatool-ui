@@ -1,5 +1,18 @@
 export const appUpdates = [
   {
+    date: "September 27, 2026",
+    message: (
+      <>
+      <ul>
+        <li>FTC:</li>
+        <ul>
+          <li>Updated foul buttons for BIOBUZZ™</li>
+          <li>Added BIOBUZZ™ logo graphics</li>
+          <li>Added BIOBUZZ™ Cheat Sheet</li>
+        </ul>
+      </ul></> 
+    ),
+  },{
     date: "September 9, 2026",
     message: (
       <>
