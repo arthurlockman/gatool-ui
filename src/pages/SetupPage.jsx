@@ -592,7 +592,7 @@ function SetupPage({
                                             ? "/images/FIRST-Global-2026-Logo.png"
                                             : "/images/FIRST-Global-2026-Logo.png"
                                     }
-                                    alt="DECODE℠ presented by RTX Logo"
+                                    alt="FIRST Global Logo"
                                 />
                             )}
                             {ftcMode && ftcMode?.value !== "FIRSTGlobal" && (
@@ -600,10 +600,10 @@ function SetupPage({
                                     style={{ width: "100%" }}
                                     src={
                                         appearanceDark
-                                            ? "/images/first_age_ftc_decode_logo_vertical_rgb_fullcolorreverse.png"
-                                            : "/images/first_age_ftc_decode_logo_vertical_rgb_fullcolor.png"
+                                            ? "/images/first_canopy_ftc_biobuzz_logo_vertical_rgb_onecolorreverse.png"
+                                            : "/images/first_canopy_ftc_biobuzz_logo_vertical_rgb_fullcolor.png"
                                     }
-                                    alt="DECODE℠ presented by RTX Logo"
+                                    alt="BIOBUZZ™ presented by RTX Logo"
                                 />
                             )}
                         </div>
