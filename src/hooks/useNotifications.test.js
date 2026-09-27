@@ -9,6 +9,22 @@ import { server } from "../test/server";
 import { loadFixture } from "../test/fixtures";
 import { EventSelectionProvider } from "../contexts/EventSelectionContext";
 
+const { enqueueSnackbarMock, closeSnackbarMock } = vi.hoisted(() => ({
+  enqueueSnackbarMock: vi.fn(),
+  closeSnackbarMock: vi.fn(),
+}));
+
+vi.mock("notistack", async (importOriginal) => {
+  const real = await importOriginal();
+  return {
+    ...real,
+    useSnackbar: () => ({
+      enqueueSnackbar: enqueueSnackbarMock,
+      closeSnackbar: closeSnackbarMock,
+    }),
+  };
+});
+
 const BASE = "https://api.gatool.org/v3";
 
 function Wrapper({ children }) {
@@ -44,21 +60,11 @@ const MAWOR_EVENT = { value: { code: "MAWOR" }, label: "MAWOR" };
 describe("useNotifications – SW update snackbar dedup", () => {
   beforeEach(() => {
     vi.spyOn(console, "log").mockImplementation(() => {});
+    enqueueSnackbarMock.mockClear();
+    closeSnackbarMock.mockClear();
   });
 
   it("enqueues a snackbar with a stable key when showReload + waitingWorker are truthy", async () => {
-    const enqueueSnackbar = vi.fn();
-    const closeSnackbar   = vi.fn();
-
-    // Mock useSnackbar to capture calls without a real SnackbarProvider DOM
-    vi.mock("notistack", async (importOriginal) => {
-      const real = await importOriginal();
-      return {
-        ...real,
-        useSnackbar: () => ({ enqueueSnackbar, closeSnackbar }),
-      };
-    });
-
     const { rerender } = renderHookWithProviders(
       () =>
         useNotifications({
@@ -72,8 +78,6 @@ describe("useNotifications – SW update snackbar dedup", () => {
 
     // Trigger re-render; the mock useSnackbar is already in place
     await act(async () => { rerender(); });
-
-    vi.unmock("notistack");
   });
 
   it("uses preventDuplicate:true so repeated triggers don't stack snackbars", async () => {

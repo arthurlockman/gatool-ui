@@ -66,7 +66,7 @@ describe("CheatsheetPage", () => {
     render(<CheatsheetPage />);
     expect(screen.getByAltText("Cheatsheet")).toHaveAttribute(
       "src",
-      "/cheatsheet/decode_cheat_sheet_04222026.png"
+      "/cheatsheet/biobuzz_cheat_sheet_09272026.png"
     );
   });
 
