@@ -68,9 +68,13 @@ function AwardsPage() {
         return { sortedTeams: enriched, columns: cols };
     }, [teamList?.teams, communityUpdates, communityUpdatesLookup, selectedYear?.value, colCount]);
 
-    const filteredByExact = teamFilter ? sortedTeams.filter(t => t.teamNumber === Number(teamFilter)) : [];
-    const filteredByPrefix = teamFilter ? sortedTeams.filter(t => String(t.teamNumber).startsWith(teamFilter)) : [];
-    const singleFilterMatch = filteredByExact.length === 1 || filteredByPrefix.length === 1;
+    const matchingTeams = teamFilter
+        ? sortedTeams.filter((team) => firstGlobalMode
+            ? [team?.nameFull, team?.country, team?.countryCode]
+                .some(value => String(value || "").toLowerCase().includes(teamFilter.toLowerCase()))
+            : String(team?.teamNumber).startsWith(teamFilter))
+        : [];
+    const singleFilterMatch = matchingTeams.length === 1;
 
     const handleClose = () => {
         setAwardTeam(null);
@@ -101,12 +105,8 @@ function AwardsPage() {
 
     const handleFilterSelect = (e) => {
         e.preventDefault();
-        var team = {};
-        if (e.currentTarget[0].value) {
-            team = _.filter(sortedTeams, { 'teamNumber': Number(e.currentTarget[0].value) })[0];
-            if (_.isEmpty(team)) {
-                team = _.filter(sortedTeams, (team) => { return String(team?.teamNumber).startsWith(teamFilter) })[0]
-            }
+        if (teamFilter && matchingTeams.length > 0) {
+            const team = matchingTeams[0];
             // @ts-ignore
             document.getElementById("filterControl").value = "";
             setTeamFilter("");
@@ -139,8 +139,8 @@ function AwardsPage() {
                     <div>
                         <Form onSubmit={handleFilterSelect}>
                             <InputGroup className="mb-3" >
-                                <InputGroup.Text>Filter the teams</InputGroup.Text>
-                                <Form.Control id={"filterControl"} type="number" placeholder="Enter a number" aria-label="Team Number" onChange={filterTeams} />
+                                <InputGroup.Text>{firstGlobalMode ? "Filter countries" : "Filter the teams"}</InputGroup.Text>
+                                <Form.Control id={"filterControl"} type={firstGlobalMode ? "search" : "number"} placeholder={firstGlobalMode ? "Enter a country name or code" : "Enter a number"} aria-label={firstGlobalMode ? "Country name or code" : "Team Number"} value={teamFilter} onChange={filterTeams} />
                                 {singleFilterMatch && <Button variant="primary" type="submit">Select this team</Button>}
                             </InputGroup>
                         </Form>
@@ -149,7 +149,8 @@ function AwardsPage() {
                         return (index<colCount? <Col  key={index}>
                             {column.map((team) => {
                                 const displayTeamNumber = remapNumberToString ? remapNumberToString(team?.teamNumber) : team?.teamNumber;
-                                return ((String(team?.teamNumber).startsWith(teamFilter) || teamFilter === "") && <Row className={"awardsButton"} key={team.teamNumber} ><Button value={JSON.stringify(team)} onClick={handleShow} size="sm" variant={(team?.teamNumber === Number(teamFilter) || singleFilterMatch) ? "success" : "outline-success"}>{displayTeamNumber}</Button></Row>)
+                                const isVisible = teamFilter === "" || matchingTeams.includes(team);
+                                return (isVisible && <Row className={"awardsButton"} key={team.teamNumber} ><Button value={JSON.stringify(team)} onClick={handleShow} size="sm" variant={(team?.teamNumber === Number(teamFilter) || singleFilterMatch) ? "success" : "outline-success"}>{displayTeamNumber}</Button></Row>)
                             })}
                         </Col> : null)
                     })}
