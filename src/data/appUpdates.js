@@ -1,5 +1,16 @@
 export const appUpdates = [
   {
+    date: "October 2, 2026",
+    message: (
+      <>
+      <ul>
+        <li><i><b>FIRST</b></i> Global:</li>
+        <ul>
+          <li>Made it so that Awards screencan be filtered by three-character country code or by country name</li>
+        </ul>
+      </ul></> 
+    ),
+  },{
     date: "September 27, 2026",
     message: (
       <>

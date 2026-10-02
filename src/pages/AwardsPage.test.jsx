@@ -130,4 +130,34 @@ describe("AwardsPage", () => {
     });
     expect(screen.getByText("Select this team")).toBeInTheDocument();
   });
+
+  it.each(["Puerto", "PUR"])("filters FIRST Global countries by %s", (query) => {
+    setupMocks({
+      firstGlobalMode: true,
+      teamList: {
+        teams: [
+          {
+            teamNumber: 1,
+            country: "PUR",
+            countryCode: "pr",
+            nameFull: "Puerto Rico",
+          },
+          {
+            teamNumber: 2,
+            country: "PRY",
+            countryCode: "py",
+            nameFull: "Paraguay",
+          },
+        ],
+      },
+    });
+
+    render(<AwardsPage />);
+    fireEvent.change(screen.getByPlaceholderText("Enter a country name or code"), {
+      target: { value: query },
+    });
+
+    expect(screen.getByRole("button", { name: "1" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "2" })).not.toBeInTheDocument();
+  });
 });
