@@ -75,7 +75,7 @@ describe("CheatsheetPage", () => {
     render(<CheatsheetPage />);
     expect(screen.getByAltText("Cheatsheet")).toHaveAttribute(
       "src",
-      "/cheatsheet/IGNITING_INNOVATION_Cheat_Sheet_06222026.png"
+      "/cheatsheet/IGNITING_INNOVATION_Cheat_Sheet_10062026.png"
     );
   });
 
