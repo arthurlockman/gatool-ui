@@ -1,5 +1,16 @@
 export const appUpdates = [
   {
+    date: "October 6, 2026",
+    message: (
+      <>
+      <ul>
+        <li><i><b>FIRST</b></i> Global:</li>
+        <ul>
+          <li>Updated Cheat Sheet</li>
+        </ul>
+      </ul></> 
+    ),
+  },{
     date: "October 2, 2026",
     message: (
       <>
