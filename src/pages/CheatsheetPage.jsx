@@ -127,7 +127,7 @@ function CheatsheetPage() {
       {ftcMode && ftcMode.value === "FIRSTGlobal" && (
         <>
           <img
-            src="/cheatsheet/IGNITING_INNOVATION_Cheat_Sheet_06222026.png"
+            src="/cheatsheet/IGNITING_INNOVATION_Cheat_Sheet_10062026.png"
             width="100%"
             alt="Cheatsheet"
           ></img>
@@ -138,7 +138,7 @@ function CheatsheetPage() {
                 className="gatool-tap-link"
                 onClick={() => {
                   downloadPDF(
-                    "/cheatsheet/IGNITING_INNOVATION_Cheat_Sheet_06222026.pdf",
+                    "/cheatsheet/IGNITING_INNOVATION_Cheat_Sheet_10062026.pdf",
                   );
                 }}
               >
