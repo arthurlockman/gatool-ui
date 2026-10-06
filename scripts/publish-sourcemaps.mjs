@@ -13,10 +13,13 @@
  * would pass for every nonexistent asset.
  *
  * Usage:
- *   node scripts/publish-sourcemaps.mjs \
+ *   NR_API_KEY="$NR_API_KEY" node scripts/publish-sourcemaps.mjs \
  *     --base-url=https://gatool.org \
- *     --application-id=1431858641 \
- *     --api-key="$NR_API_KEY" [--dry-run]
+ *     --application-id=1431858641 [--dry-run]
+ *
+ * The API key must be supplied via the NR_API_KEY environment variable, never as a
+ * command-line argument — CLI args are visible in process listings, shell history, and
+ * CI/CD logs, which would leak the credential in shared build environments.
  */
 import { appendFileSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
@@ -28,7 +31,6 @@ const { values } = parseArgs({
     "build-dir": { type: "string", default: "build" },
     "base-url": { type: "string" },
     "application-id": { type: "string" },
-    "api-key": { type: "string" },
     "repo-url": { type: "string" },
     "build-commit": { type: "string" },
     "verify-timeout": { type: "string", default: "300" }, // seconds
@@ -37,7 +39,7 @@ const { values } = parseArgs({
 });
 
 const buildDir = values["build-dir"];
-const apiKey = values["api-key"] || process.env.NR_API_KEY;
+const apiKey = process.env.NR_API_KEY;
 const applicationId = values["application-id"] || process.env.APPLICATION_ID;
 const baseUrl = (values["base-url"] || "").replace(/\/+$/, "");
 const verifyTimeout = Number(values["verify-timeout"]);
@@ -47,7 +49,7 @@ for (const [name, value] of Object.entries({
   "--base-url": baseUrl,
   "--application-id": applicationId,
   // A dry run only verifies deployed filenames; it never talks to New Relic.
-  ...(dryRun ? {} : { "--api-key": apiKey }),
+  ...(dryRun ? {} : { NR_API_KEY: apiKey }),
 })) {
   if (!value) {
     console.error(`Missing required option ${name}`);
