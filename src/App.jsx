@@ -1210,7 +1210,12 @@ function App() {
     if (isFirstGlobalMode(ftcMode) && teamList?.teams?.length > 0) {
       const numbers = {};
       const strings = {};
-      teamList.teams.forEach((team) => {
+      // Cached lists may predate duplicate filtering in useTeamData.
+      const teams = _.uniqBy(teamList.teams, "teamNumber");
+      if (teams.length !== teamList.teams.length) {
+        console.warn("FIRST Global cached team list contains duplicate team numbers; keeping the first record for each team.");
+      }
+      teams.forEach((team) => {
         const code = team.country || team.countryCode || `${team.teamNumber}`;
         numbers[team.teamNumber] = code;
         strings[code] = team.teamNumber;
@@ -1219,8 +1224,7 @@ function App() {
     } else if (isFirstGlobalMode(ftcMode) && !teamList?.teams?.length) {
       setTeamRemappings(null);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ftcMode, teamList?.teams?.length]);
+  }, [ftcMode, teamList?.teams, setTeamRemappings]);
 
   // Refresh team list when showBlueBanners is enabled to fetch blue banner data
   useEffect(() => {

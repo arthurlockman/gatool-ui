@@ -393,7 +393,16 @@ export function useTeamData(deps, opts = {}) {
 
       // --- FIRST Global: set displayTeamNumber to country code, fill in nameShort from nameFull ---
       if (isFirstGlobalMode(ftcMode) && teams?.teams?.length > 0) {
-        teams.teams = teams.teams.map((team) => ({
+        // Match first-record lookups elsewhere; a later duplicate must not change a team's identity.
+        const uniqueTeams = _.uniqBy(teams.teams, "teamNumber");
+        if (uniqueTeams.length !== teams.teams.length) {
+          console.warn("FIRST Global team list contains duplicate team numbers; keeping the first record for each team.");
+          teams.teamCountPage = uniqueTeams.length;
+          if (teams.pageTotal === 1) {
+            teams.teamCountTotal = uniqueTeams.length;
+          }
+        }
+        teams.teams = uniqueTeams.map((team) => ({
           ...team,
           displayTeamNumber: team.country || team.countryCode || `${team.teamNumber}`,
           nameShort: team.nameShort || team.nameFull || `Team ${team.teamNumber}`,
