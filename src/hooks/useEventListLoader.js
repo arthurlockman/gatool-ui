@@ -196,18 +196,20 @@ export function useEventListLoader(deps) {
           );
           if (val.status === 200) {
             const fieldsets = await val.json();
-            // fieldsets is a 2D array of field indices, e.g. [[1,2],[3,4],[5]]
             const events = [];
             if (Array.isArray(fieldsets)) {
-              fieldsets.forEach((fields, idx) => {
-                const fieldLabel = fields.length === 1
-                  ? `Field ${fields[0]}`
-                  : `Fields ${fields[0]} & ${fields[fields.length - 1]}`;
-                events.push({
-                  eventId: `fg-fieldset-${idx}`,
-                  code: `FG${selectedYear?.value}-${idx}`,
+              const normalizedFieldsets = fieldsets.map((fields) =>
+                Array.isArray(fields) ? fields : [fields]
+              );
+              const allFields = [...new Set(normalizedFieldsets.flat())];
+              const createFieldEvent = (fields, eventId, code, fieldsetIndex, name) => {
+                return {
+                  eventId,
+                  code,
                   divisionCode: null,
-                  name: fieldLabel,
+                  name: name ?? (fields.length === 1
+                    ? `Field ${fields[0]}`
+                    : `Fields ${fields[0]} & ${fields[fields.length - 1]}`),
                   remote: false,
                   hybrid: false,
                   fieldCount: fields.length,
@@ -230,40 +232,38 @@ export function useEventListLoader(deps) {
                   dateStart: null,
                   dateEnd: null,
                   fieldset: fields,
-                  fieldsetIndex: idx,
-                });
+                  fieldsetIndex,
+                };
+              };
+
+              // Offer each field individually as well as the event's defined multi-field sets.
+              allFields.forEach((field) => {
+                events.push(createFieldEvent(
+                  [field],
+                  `fg-field-${field}`,
+                  `FG${selectedYear?.value}-field-${field}`,
+                  events.length
+                ));
               });
-              // Add "All Fields" option
-              const allFields = fieldsets.flat();
-              events.push({
-                eventId: `fg-fieldset-all`,
-                code: `FG${selectedYear?.value}-all`,
-                divisionCode: null,
-                name: "All Fields",
-                remote: false,
-                hybrid: false,
-                fieldCount: allFields.length,
-                published: true,
-                type: "FIRSTGlobal",
-                typeName: "FIRST Global",
-                regionCode: null,
-                leagueCode: null,
-                districtCode: null,
-                venue: null,
-                address: null,
-                city: null,
-                stateprov: null,
-                country: null,
-                website: null,
-                liveStreamUrl: null,
-                coordinates: null,
-                webcasts: null,
-                timezone: null,
-                dateStart: null,
-                dateEnd: null,
-                fieldset: allFields,
-                fieldsetIndex: -1,
+
+              normalizedFieldsets.forEach((fields, idx) => {
+                if (fields.length > 1) {
+                  events.push(createFieldEvent(
+                    fields,
+                    `fg-fieldset-${idx}`,
+                    `FG${selectedYear?.value}-${idx}`,
+                    events.length
+                  ));
+                }
               });
+
+              events.unshift(createFieldEvent(
+                allFields,
+                "fg-fieldset-all",
+                `FG${selectedYear?.value}-all`,
+                -1,
+                "All Fields"
+              ));
             }
             result = { events };
           } else {

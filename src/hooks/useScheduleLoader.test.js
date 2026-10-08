@@ -27,6 +27,7 @@ vi.mock("../contexts/SettingsContext", () => ({
 const { useScheduleLoader } = await import("./useScheduleLoader");
 
 const BASE = "https://api.gatool.org/v3";
+const FIRST_GLOBAL_BASE = `${BASE}/firstglobal`;
 
 function makeDeps(overrides = {}) {
   return {
@@ -48,6 +49,7 @@ function makeDeps(overrides = {}) {
     training: { schedule: { qual: {}, playoff: {} }, scores: { qual: {}, playoff: {} } },
     // Setters
     setQualSchedule: vi.fn(),
+    setQualScheduleAllFields: vi.fn(),
     setPlayoffSchedule: vi.fn(),
     setPracticeSchedule: vi.fn(),
     setQualsLength: vi.fn(),
@@ -330,6 +332,77 @@ describe("useScheduleLoader (FRC)", () => {
     expect(seenSignals.length).toBeGreaterThan(0);
     // The signal observed by MSW should be a real AbortSignal.
     expect(seenSignals[0]).toBeInstanceOf(AbortSignal);
+  });
+});
+
+describe("useScheduleLoader (FIRST Global field filters)", () => {
+  it("keeps the complete scored qual schedule when a field filter is selected", async () => {
+    eventSelectionState.selectedEvent = {
+      value: {
+        code: "FG26",
+        name: "FIRST Global Challenge",
+        type: "Championship",
+        fieldset: [1],
+        fieldsetIndex: 0,
+      },
+    };
+    eventSelectionState.selectedYear = { value: "2026" };
+    eventSelectionState.ftcMode = { value: "FIRSTGlobal" };
+
+    server.use(
+      http.get(`${FIRST_GLOBAL_BASE}/2026/matches/t2`, () =>
+        HttpResponse.json({
+          matches: [
+            {
+              matchNumber: 1,
+              description: "Qualification 1",
+              tournamentLevel: "Qualification",
+              fieldNumber: 1,
+              teams: [{ teamNumber: 101, station: "Red1" }],
+            },
+            {
+              matchNumber: 2,
+              description: "Qualification 2",
+              tournamentLevel: "Qualification",
+              fieldNumber: 2,
+              teams: [{ teamNumber: 202, station: "Blue1" }],
+            },
+          ],
+        })
+      ),
+      http.get(`${FIRST_GLOBAL_BASE}/2026/scores/t2`, () =>
+        HttpResponse.json({
+          matchScores: [
+            {
+              matchNumber: 1,
+              alliances: [
+                { alliance: "Red", totalPoints: 100 },
+                { alliance: "Blue", totalPoints: 80 },
+              ],
+            },
+            {
+              matchNumber: 2,
+              alliances: [
+                { alliance: "Red", totalPoints: 120 },
+                { alliance: "Blue", totalPoints: 90 },
+              ],
+            },
+          ],
+        })
+      )
+    );
+
+    const deps = makeDeps();
+    const { result } = renderHook(() => useScheduleLoader(deps));
+    await result.current.getSchedule(true);
+
+    await waitFor(() => expect(deps.setQualSchedule).toHaveBeenCalled());
+    const schedule = deps.setQualSchedule.mock.calls.at(-1)[0];
+    expect(schedule.schedule.map((match) => match.fieldNumber)).toEqual([1, 2]);
+    expect(schedule.schedule[0].scoreRedFinal).toBe(100);
+    expect(schedule.schedule[1].scoreBlueFinal).toBe(90);
+    const allFieldsSchedule = deps.setQualScheduleAllFields.mock.calls.at(-1)[0];
+    expect(allFieldsSchedule.schedule.schedule).toEqual(schedule.schedule);
   });
 });
 

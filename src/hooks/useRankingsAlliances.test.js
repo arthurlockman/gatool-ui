@@ -30,6 +30,7 @@ import { SettingsProvider, useSettings } from "../contexts/SettingsContext";
 import { useRankingsAlliances } from "./useRankingsAlliances";
 
 const BASE = "https://api.gatool.org/v3";
+const FIRST_GLOBAL_BASE = `${BASE}/firstglobal`;
 
 // Test event/year — matches the 2026-MAWOR-* fixtures.
 const MAWOR_EVENT = {
@@ -202,6 +203,64 @@ describe("useRankingsAlliances (FRC)", () => {
     const committed = deps.setRankings.mock.calls[0][0];
     expect(committed.ranks).toEqual([]);
     expect(deps.getEPA).not.toHaveBeenCalled();
+  });
+
+  it("getRanks: calculates FIRST Global averages from all scored qualification fields", async () => {
+    const event = {
+      value: {
+        code: "FG26",
+        name: "FIRST Global Challenge",
+        type: "Championship",
+        fieldset: [1],
+        fieldsetIndex: 0,
+      },
+      label: "FIRST Global Challenge",
+    };
+    server.use(
+      http.get(`${FIRST_GLOBAL_BASE}/2026/rankings/t2`, () =>
+        HttpResponse.json({
+          rankings: {
+            rankings: [
+              { rank: 1, teamNumber: 101, qualAverage: 0 },
+              { rank: 2, teamNumber: 202, qualAverage: 0 },
+            ],
+          },
+        })
+      )
+    );
+    const schedule = {
+      schedule: [
+        {
+          scoreRedFinal: 100,
+          scoreBlueFinal: 80,
+          teams: [
+            { teamNumber: 101, station: "Red1", surrogate: false },
+            { teamNumber: 202, station: "Blue1", surrogate: false },
+          ],
+        },
+        {
+          scoreRedFinal: 120,
+          scoreBlueFinal: 90,
+          teams: [
+            { teamNumber: 202, station: "Red1", surrogate: false },
+            { teamNumber: 101, station: "Blue1", surrogate: false },
+          ],
+        },
+      ],
+    };
+    const { result, deps } = await renderRA(
+      { qualSchedule: { schedule: [] } },
+      { selectedEvent: event, ftcMode: { value: "FIRSTGlobal" } }
+    );
+
+    await result.current.getRanks(schedule);
+
+    await waitFor(() => expect(deps.setRankings).toHaveBeenCalledTimes(1));
+    const committed = deps.setRankings.mock.calls[0][0];
+    expect(committed.ranks).toEqual([
+      expect.objectContaining({ teamNumber: 101, qualAverage: 95 }),
+      expect.objectContaining({ teamNumber: 202, qualAverage: 100 }),
+    ]);
   });
 
   it("getAlliances: happy path normalizes payload, builds Lookup, sets playoffs", async () => {
