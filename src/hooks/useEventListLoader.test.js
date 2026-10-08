@@ -395,12 +395,13 @@ describe("useEventListLoader — FIRST Global fieldsets", () => {
     await localforage.clear();
   });
 
-  it("getEvents builds field-set pseudo-events from the fieldsets API", async () => {
+  it("getEvents builds all-field, individual-field, and field-set options", async () => {
     server.use(
       http.get(`${fgBaseURL}2025/fieldsets`, () =>
         HttpResponse.json([
-          [1],
+          1,
           [2, 3],
+          [4, 5],
         ])
       )
     );
@@ -416,19 +417,30 @@ describe("useEventListLoader — FIRST Global fieldsets", () => {
     await waitFor(() => expect(setters.setEvents).toHaveBeenCalled());
 
     const events = setters.setEvents.mock.calls.at(-1)[0];
-    expect(events).toHaveLength(3);
-
-    expect(events[0].label).toBe("Field 1");
-    expect(events[0].value.code).toBe("FG2025-0");
-    expect(events[0].value.fieldset).toEqual([1]);
+    expect(events.map((event) => event.label)).toEqual([
+      "All Fields",
+      "Field 1",
+      "Field 2",
+      "Field 3",
+      "Field 4",
+      "Field 5",
+      "Fields 2 & 3",
+      "Fields 4 & 5",
+    ]);
+    expect(events[0].value.code).toBe("FG2025-all");
+    expect(events[0].value.fieldset).toEqual([1, 2, 3, 4, 5]);
+    expect(events[0].value.fieldsetIndex).toBe(-1);
     expect(events[0].value.type).toBe("FIRSTGlobal");
 
-    expect(events[1].label).toBe("Fields 2 & 3");
-    expect(events[1].value.fieldset).toEqual([2, 3]);
-
-    expect(events[2].label).toBe("All Fields");
-    expect(events[2].value.code).toBe("FG2025-all");
-    expect(events[2].value.fieldsetIndex).toBe(-1);
+    expect(events.slice(1, 6).map((event) => event.value.fieldset)).toEqual([
+      [1],
+      [2],
+      [3],
+      [4],
+      [5],
+    ]);
+    expect(events[6].value.fieldset).toEqual([2, 3]);
+    expect(events[7].value.fieldset).toEqual([4, 5]);
   });
 
   it("getEvents returns an empty list when fieldsets API fails", async () => {

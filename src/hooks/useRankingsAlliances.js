@@ -204,7 +204,7 @@ export function useRankingsAlliances(deps) {
 
   // --- getRanks ---
 
-  async function getRanks() {
+  async function getRanks(scheduleOverride) {
     console.log(`Fetching Ranks for ${selectedEvent?.value?.name}...`);
     getRanksEpochRef.current += 1;
     const getRanksEpoch = getRanksEpochRef.current;
@@ -386,42 +386,81 @@ export function useRankingsAlliances(deps) {
       };
     });
     if (ftcMode && ranks?.ranks?.length > 0) {
-      if (qualSchedule?.schedule?.length > 0) {
-        qualSchedule.schedule.forEach((match) => {
-          const matchReference = _.cloneDeep(match);
-          match.teams.forEach((matchTeam) => {
-            const teamIndex = _.findIndex(teamResults, {
-              teamNumber: matchTeam.teamNumber,
-            });
-            if (teamIndex >= 0 && !matchTeam.surrogate) {
-              const teamScore = matchTeam.station.toLowerCase().includes("red")
-                ? matchReference.scoreRedFinal
-                : matchReference.scoreBlueFinal;
-              teamResults[teamIndex].qualTotal += teamScore;
-              if (matchTeam.dq) {
-                teamResults[teamIndex].dqTotal += 1;
-              }
-              teamResults[teamIndex].matchesPlayed += 1;
-            }
+      const rankingSchedule = scheduleOverride || qualSchedule;
+      const rankingMatches = Array.isArray(rankingSchedule?.schedule)
+        ? rankingSchedule.schedule
+        : rankingSchedule?.schedule?.schedule || [];
+      if (isFirstGlobalMode(ftcMode)) {
+        const teamResultsByNumber = new Map();
+        rankingMatches.forEach((match) => {
+          if (match.scoreRedFinal == null || match.scoreBlueFinal == null) return;
+          const redScore = Number(match.scoreRedFinal);
+          const blueScore = Number(match.scoreBlueFinal);
+          if (!Number.isFinite(redScore) || !Number.isFinite(blueScore)) return;
+          match.teams?.forEach((matchTeam) => {
+            if (matchTeam.surrogate || matchTeam.teamNumber == null) return;
+            const station = matchTeam.station?.toLowerCase();
+            if (!station?.includes("red") && !station?.includes("blue")) return;
+            const teamNumber = String(matchTeam.teamNumber);
+            const teamResult = teamResultsByNumber.get(teamNumber) || {
+              total: 0,
+              matchesPlayed: 0,
+            };
+            const isRed = station.includes("red");
+            teamResult.total += isRed ? redScore : blueScore;
+            teamResult.matchesPlayed += 1;
+            teamResultsByNumber.set(teamNumber, teamResult);
           });
         });
-      }
-      // merge the teamResults into the ranks
-      ranks.ranks = ranks.ranks.map((rank) => {
-        const teamIndex = _.findIndex(teamResults, {
-          teamNumber: rank.teamNumber,
+        ranks.ranks = ranks.ranks.map((rank) => {
+          const teamResult = teamResultsByNumber.get(String(rank.teamNumber));
+          if (teamResult?.matchesPlayed > 0) {
+            return {
+              ...rank,
+              qualAverage:
+                Math.round((teamResult.total * 100) / teamResult.matchesPlayed) / 100,
+            };
+          }
+          return rank;
         });
-        if (teamIndex >= 0) {
-          rank.qualAverage = teamResults[teamIndex].matchesPlayed
-            ? Math.round(
-              (teamResults[teamIndex].qualTotal * 100) /
-              teamResults[teamIndex].matchesPlayed
-            ) / 100
-            : 0;
-          rank.dq = teamResults[teamIndex].dqTotal;
+      } else {
+        if (rankingMatches.length > 0) {
+          rankingMatches.forEach((match) => {
+            const matchReference = _.cloneDeep(match);
+            match.teams.forEach((matchTeam) => {
+              const teamIndex = _.findIndex(teamResults, {
+                teamNumber: matchTeam.teamNumber,
+              });
+              if (teamIndex >= 0 && !matchTeam.surrogate) {
+                const teamScore = matchTeam.station.toLowerCase().includes("red")
+                  ? matchReference.scoreRedFinal
+                  : matchReference.scoreBlueFinal;
+                teamResults[teamIndex].qualTotal += teamScore;
+                if (matchTeam.dq) {
+                  teamResults[teamIndex].dqTotal += 1;
+                }
+                teamResults[teamIndex].matchesPlayed += 1;
+              }
+            });
+          });
         }
-        return rank;
-      });
+        // merge the teamResults into the ranks
+        ranks.ranks = ranks.ranks.map((rank) => {
+          const teamIndex = _.findIndex(teamResults, {
+            teamNumber: rank.teamNumber,
+          });
+          if (teamIndex >= 0) {
+            rank.qualAverage = teamResults[teamIndex].matchesPlayed
+              ? Math.round(
+                (teamResults[teamIndex].qualTotal * 100) /
+                teamResults[teamIndex].matchesPlayed
+              ) / 100
+              : 0;
+            rank.dq = teamResults[teamIndex].dqTotal;
+          }
+          return rank;
+        });
+      }
     }
 
     ranks.dataSource = ranksDataSource;

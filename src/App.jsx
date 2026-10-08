@@ -225,8 +225,8 @@ function App() {
     "cache:qualSchedule",
     null
   );
-  // FIRST Global only: the full unfiltered qual schedule (all fields), used for high score computation.
-  // qualSchedule is filtered to the selected fieldset; this holds every match.
+  // FIRST Global only: the full scored qual schedule (all fields), used for
+  // calculations and for match positioning in Announce and Play-by-Play.
   const [qualScheduleAllFields, setQualScheduleAllFields] = usePersistentState(
     "cache:qualScheduleAllFields",
     null

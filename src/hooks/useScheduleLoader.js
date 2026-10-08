@@ -519,11 +519,9 @@ export function useScheduleLoader(deps, opts = {}) {
           // @ts-ignore
           qualschedule = await qualsResult.json();
           // FIRST Global: normalize { matches: [...] } → { schedule: { schedule: [...] } },
-          // populate actualStartTime/startTime from autoStartTime for played matches,
-          // and filter by selected fieldset using the fieldNumber property
+          // populate actualStartTime/startTime from autoStartTime for played matches.
           if (isFirstGlobalMode(ftcMode)) {
             const allMatches = qualschedule?.matches || qualschedule?.schedule?.schedule || [];
-            const fieldset = selectedEvent?.value?.fieldset;
             const normalized = allMatches.map((match) => {
               const hasResult = match.scoreRedFinal != null || match.scoreBlueFinal != null;
               return {
@@ -532,16 +530,12 @@ export function useScheduleLoader(deps, opts = {}) {
                 actualStartTime: match.actualStartTime || (hasResult ? match.autoStartTime : null),
               };
             });
-            const hasFieldsetFilter = fieldset && selectedEvent?.value?.fieldsetIndex !== -1;
-            // Store the complete unfiltered schedule for high score computation across all fields
-            setQualScheduleAllFields(hasFieldsetFilter ? { schedule: { schedule: normalized } } : null);
             // Always track total qual count so qualsLength reflects all fields (not just filtered fieldset)
             firstGlobalTotalQuals = normalized.length;
             firstGlobalAllQuals = normalized;
-            const filtered = hasFieldsetFilter
-              ? normalized.filter((match) => fieldset.includes(match.fieldNumber))
-              : normalized;
-            qualschedule = { schedule: { schedule: filtered } };
+            // Keep the complete schedule for rankings and calculations. Field selection
+            // is a presentation filter used only by Announce and Play-by-Play.
+            qualschedule = { schedule: { schedule: normalized } };
           }
         }
       }
@@ -686,6 +680,13 @@ export function useScheduleLoader(deps, opts = {}) {
         ? moment(qualschedule.schedule?.headers.matches["last-modified"])
         : moment();
       qualschedule.schedule = qualMatches;
+    }
+
+    if (isFirstGlobalMode(ftcMode)) {
+      // Keep a scored all-fields copy for views that need total-match positioning.
+      setQualScheduleAllFields({ schedule: { schedule: qualschedule?.schedule || [] } });
+    } else {
+      setQualScheduleAllFields(null);
     }
 
     var completedMatchCount = 0;
@@ -1410,7 +1411,7 @@ export function useScheduleLoader(deps, opts = {}) {
     if (playoffschedule?.schedule?.length > 0 || (isOfflineEvent && playoffSchedule?.schedule?.length > 0)) {
       getAlliances();
     }
-    getRanks();
+    getRanks(qualschedule);
     // System messages are fetched by callers (loadEvent, useInterval, nextMatch, etc.) to avoid double-fetch
 
     // Calculate event high scores after schedule is loaded

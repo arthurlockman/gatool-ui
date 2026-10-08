@@ -1,5 +1,29 @@
 export const appUpdates = [
   {
+    date: "October 8, 2026",
+    message: (
+      <>
+      <ul>
+        <li><i><b>FIRST</b></i> Global:</li>
+        <ul>
+          <li>Users can now filter the event by Field, Field Set or by the entire schedule</li>
+          <li>Qual Average now calculates properly when filtering by Field or Field Set</li>
+        </ul>
+      </ul></> 
+    ),
+  },{
+    date: "October 7, 2026",
+    message: (
+      <>
+      <ul>
+        <li><i><b>FIRST</b></i> Global:</li>
+        <ul>
+          <li>Fixed issue with team list due to late substitution</li>
+          <li>Updated CSS to better support Chrome</li>
+        </ul>
+      </ul></> 
+    ),
+  },{
     date: "October 6, 2026",
     message: (
       <>
