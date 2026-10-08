@@ -493,7 +493,7 @@ td {
   width: 100%;
 }
 
-.announceTable td {
+.announceTable td:nth-child(3) {
   overflow-wrap: break-word;
 }
 
@@ -519,6 +519,40 @@ td {
 
 .announceTeamNumber {
   white-space: nowrap;
+}
+
+.announceTable .ranking {
+  white-space: nowrap;
+}
+
+@media screen and (max-width: 600px) {
+  .announceTable thead td:nth-child(1) {
+    width: 21%;
+  }
+
+  .announceTable thead td:nth-child(2) {
+    width: 24%;
+  }
+
+  .announceTable thead td:nth-child(3) {
+    width: 43%;
+  }
+
+  .announceTable thead td:nth-child(3):last-child {
+    width: 55%;
+  }
+
+  .announceTable thead td:nth-child(4) {
+    width: 12%;
+  }
+
+  .table.announceTable > :not(caption) > * > * {
+    padding: 0.25rem;
+  }
+
+  .announceTable .ranking {
+    font-size: x-large;
+  }
 }
 
 .vertical-center {
