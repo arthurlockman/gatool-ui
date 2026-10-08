@@ -247,6 +247,64 @@ describe("useTeamData (FRC) — getTeamList", () => {
 });
 
 describe("useTeamData (FIRST Global) — getTeamList", () => {
+  it("keeps the first team record when duplicate team numbers disagree", async () => {
+    setSelection({
+      year: "2025",
+      ftcMode: { value: "FIRSTGlobal", label: "FIRST Global" },
+      event: {
+        code: "FG2025-all",
+        name: "FIRST Global 2025",
+        type: "FIRSTGlobal",
+        champLevel: null,
+      },
+    });
+    const warn = vi.spyOn(console, "warn");
+    const awardsRequests = [];
+    server.use(
+      http.get(`${FG_BASE}/:year/teams`, () =>
+        HttpResponse.json({
+          teamCountTotal: 4,
+          teamCountPage: 4,
+          pageCurrent: 1,
+          pageTotal: 1,
+          teams: [
+            { teamNumber: 12, nameFull: "Team Kosovo", country: "KOS", countryCode: "xk" },
+            { teamNumber: 13, nameFull: "Team Bangladesh", country: "BAN", countryCode: "bd" },
+            { teamNumber: 12, nameFull: "Team Bahamas", country: "BAH", countryCode: "bs" },
+            { teamNumber: 13, nameFull: "Team Bangladesh", country: "BAN", countryCode: "bd" },
+          ],
+        })
+      ),
+      http.post(`${FG_BASE}/:year/queryAwards`, async ({ request }) => {
+        const body = await request.json();
+        awardsRequests.push(body.teams);
+        return HttpResponse.json({});
+      })
+    );
+
+    const deps = makeDeps();
+    const { result } = renderHookWithProviders(() => useTeamData(deps));
+    await result.current.getTeamList();
+
+    const teams = deps.setTeamList.mock.calls[0][0];
+    expect(teams.teams).toHaveLength(2);
+    expect(teams.teamCountTotal).toBe(2);
+    expect(teams.teamCountPage).toBe(2);
+    expect(teams.teams[0]).toMatchObject({
+      teamNumber: 12,
+      nameFull: "Team Kosovo",
+      nameShort: "Team Kosovo",
+      country: "KOS",
+      countryCode: "xk",
+      displayTeamNumber: "KOS",
+    });
+    expect(warn).toHaveBeenCalledWith(
+      "FIRST Global team list contains duplicate team numbers; keeping the first record for each team."
+    );
+    expect(awardsRequests).toEqual([["XK", "BD"]]);
+    warn.mockRestore();
+  });
+
   it("requests and merges three seasons of awards by country code", async () => {
     setSelection({
       year: "2025",
