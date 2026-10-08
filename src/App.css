@@ -861,25 +861,38 @@ td {
 }
 
 @media screen and (max-width: 768px) {
-  .matchClock {
-    padding: 0.5rem;
-    font-size: 0.9rem;
+  div.matchClock {
+    padding: 0.4rem 0.35rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.75rem;
   }
 
-  .matchClock h5 {
-    margin: 0.25rem 0;
-    font-size: 0.95rem;
+  div.matchClock .matchClock-current,
+  div.matchClock .matchClock-actual,
+  div.matchClock h5 {
+    font-size: 0.75rem;
+  }
+
+  .matchClock-label,
+  .matchClock-label-break {
+    display: none;
   }
 }
 
 @media screen and (max-width: 480px) {
-  .matchClock {
-    padding: 0.35rem 0.2rem;
-    font-size: 0.75rem;
+  div.matchClock {
+    padding: 0.25rem 0.2rem;
+    font-size: 0.65rem;
   }
 
-  .matchClock h5 {
-    font-size: 0.8rem;
+  div.matchClock .matchClock-current,
+  div.matchClock .matchClock-actual,
+  div.matchClock h5 {
+    font-size: 0.65rem;
+  }
+
+  div.matchClock h5 {
+    margin: 0.2rem 0;
   }
 }
 
