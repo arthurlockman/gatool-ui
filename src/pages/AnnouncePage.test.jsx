@@ -125,6 +125,7 @@ describe("AnnouncePage", () => {
         rankings: { ranks: [{ teamNumber: 254, rank: 3 }] },
       });
       render(<AnnouncePage adHocMode={false} setAdHocMode={vi.fn()} qualsLength={10} />);
+      expect(screen.getByRole("table")).toHaveClass("announceTable");
       expect(screen.getByText("Rank")).toBeInTheDocument();
       expect(screen.getByText("3")).toBeInTheDocument();
     });

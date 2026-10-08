@@ -208,6 +208,11 @@ td {
 .playByPlayTable {
   display: table;
   width: 100%;
+  table-layout: fixed;
+}
+
+.playByPlayTable td {
+  overflow-wrap: break-word;
 }
 
 .playByPlayTableRow {
@@ -483,6 +488,73 @@ td {
   width: 58.333%;
 }
 
+.announceTable {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.announceTable td:nth-child(3) {
+  overflow-wrap: break-word;
+}
+
+.announceTable thead td:nth-child(1) {
+  width: 14%;
+}
+
+.announceTable thead td:nth-child(2) {
+  width: 22%;
+}
+
+.announceTable thead td:nth-child(3) {
+  width: 54%;
+}
+
+.announceTable thead td:nth-child(3):last-child {
+  width: 64%;
+}
+
+.announceTable thead td:nth-child(4) {
+  width: 10%;
+}
+
+.announceTeamNumber {
+  white-space: nowrap;
+}
+
+.announceTable .ranking {
+  white-space: nowrap;
+}
+
+@media screen and (max-width: 600px) {
+  .announceTable thead td:nth-child(1) {
+    width: 21%;
+  }
+
+  .announceTable thead td:nth-child(2) {
+    width: 24%;
+  }
+
+  .announceTable thead td:nth-child(3) {
+    width: 43%;
+  }
+
+  .announceTable thead td:nth-child(3):last-child {
+    width: 55%;
+  }
+
+  .announceTable thead td:nth-child(4) {
+    width: 12%;
+  }
+
+  .table.announceTable > :not(caption) > * > * {
+    padding: 0.25rem;
+  }
+
+  .announceTable .ranking {
+    font-size: x-large;
+  }
+}
+
 .vertical-center {
   min-height: 100%;
   /* Fallback for browsers do NOT support vh unit */
@@ -494,6 +566,8 @@ td {
 }
 
 .wltTable {
+  width: 100%;
+  table-layout: fixed;
   border-width: thin;
   background-color: rgba(255, 255, 255, 0.2);
   text-align: center;
@@ -501,9 +575,11 @@ td {
   margin: auto;
 }
 
-.wltCol {
-  font-size: medium;
-  white-space: nowrap;
+.playByPlayTable .wltCol {
+  font-size: small;
+  padding: 2px;
+  white-space: normal;
+  overflow-wrap: break-word;
 }
 
 .scheduleTablered {
@@ -778,6 +854,46 @@ td {
 
 .buttonNoWrap {
   white-space: nowrap;
+}
+
+.matchClock {
+  line-height: 1.2;
+}
+
+@media screen and (max-width: 768px) {
+  div.matchClock {
+    padding: 0.4rem 0.35rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  div.matchClock .matchClock-current,
+  div.matchClock .matchClock-actual,
+  div.matchClock h5 {
+    font-size: 0.75rem;
+  }
+
+  .matchClock-label,
+  .matchClock-label-break {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  div.matchClock {
+    padding: 0.25rem 0.2rem;
+    font-size: 0.65rem;
+  }
+
+  div.matchClock .matchClock-current,
+  div.matchClock .matchClock-actual,
+  div.matchClock h5 {
+    font-size: 0.65rem;
+  }
+
+  div.matchClock h5 {
+    margin: 0.2rem 0;
+  }
 }
 
 .awardsButton {
