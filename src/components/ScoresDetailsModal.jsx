@@ -91,7 +91,7 @@ function ScoresDetailsModal({ show, onHide, scoresMatch }) {
       ? scoreData.details
       : {};
   const nestedDetailKeys = new Set(Object.keys(nestedDetails));
-  const matchDetails = [
+  const scoreDetailEntries = [
     ...Object.entries(scoreData || {}).filter(
       ([key, value]) =>
         !["alliances", "details", "matchLevel", "matchNumber", "winningAlliance"].includes(key) &&
@@ -102,6 +102,34 @@ function ScoresDetailsModal({ show, onHide, scoresMatch }) {
       ([key]) => !["eventKey", "tournamentKey", "id"].includes(key)
     ),
   ];
+  const matchDetails = [];
+  const allianceDetailMap = new Map();
+  scoreDetailEntries.forEach(([key, value]) => {
+    const words = key.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/[_-]/g, " ");
+    const allianceMatch = words.match(/\b(red|blue)\b/i);
+    if (!allianceMatch) {
+      matchDetails.push([key, value]);
+      return;
+    }
+
+    const alliance = allianceMatch[0].toLowerCase();
+    const detailKey = words.replace(/\b(red|blue)\b/gi, "").trim();
+    const detail = allianceDetailMap.get(detailKey) || {};
+    detail[alliance] = value;
+    allianceDetailMap.set(detailKey, detail);
+  });
+  const allianceDetails = Array.from(allianceDetailMap, ([key, values]) => ({
+    key: _.startCase(key),
+    red: values.red,
+    blue: values.blue,
+  }));
+
+  const displayDetailValue = (value) =>
+    typeof value === "boolean"
+      ? scoreAchieved(value)
+      : Array.isArray(value)
+        ? value.join(", ")
+        : value;
 
   const scoresRow = (key, rowKey) => {
     const redAlliance = scoresMatch?.scores?.alliances?.[redIdx];
@@ -372,13 +400,7 @@ function ScoresDetailsModal({ show, onHide, scoresMatch }) {
                       <td>
                         <b>{_.startCase(key)}</b>
                       </td>
-                      <td colSpan={2}>
-                        {typeof value === "boolean"
-                          ? scoreAchieved(value)
-                          : Array.isArray(value)
-                            ? value.join(", ")
-                            : value}
-                      </td>
+                      <td colSpan={2}>{displayDetailValue(value)}</td>
                     </tr>
                   ))}
                 </>
@@ -417,6 +439,15 @@ function ScoresDetailsModal({ show, onHide, scoresMatch }) {
               ) : (
                 <></>
               )}
+              {allianceDetails.map(({ key, red, blue }) => (
+                <tr key={`alliance-detail-${key}`}>
+                  <td>
+                    <b>{key}</b>
+                  </td>
+                  <td className="scheduleTablered">{displayDetailValue(red)}</td>
+                  <td className="scheduleTableblue">{displayDetailValue(blue)}</td>
+                </tr>
+              ))}
             </tbody>
           </Table>
         </Container>

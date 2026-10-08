@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import ScoresDetailsModal from "./ScoresDetailsModal";
 
 describe("ScoresDetailsModal", () => {
-  it("displays FIRST Global match-level and nested score details", () => {
+  it("displays alliance-designated FIRST Global scores in the Alliance Results table", () => {
     render(
       <ScoresDetailsModal
         show
@@ -26,9 +26,10 @@ describe("ScoresDetailsModal", () => {
               eventKey: "FGC_2026-FGC-CMP",
               tournamentKey: "t2",
               id: 1,
-              wildfireInRedSuppressionUnit: 48,
-              redRobotOneBraceState: 0.1,
-              blueRobotOneBraceState: 0.05,
+              wildfireInRedSuppressionUnit: 118,
+              wildfireInBlueSuppressionUnit: 208,
+              redRobotOneBraceState: 0.3,
+              blueRobotOneBraceState: 0.3,
             },
           },
         }}
@@ -38,11 +39,22 @@ describe("ScoresDetailsModal", () => {
     expect(screen.getByText("Match Details")).toBeInTheDocument();
     expect(screen.getByText("Coopertition Achieved")).toBeInTheDocument();
     expect(screen.getByText("All Barriers Cleared")).toBeInTheDocument();
-    expect(
-      screen.getByText("Wildfire In Red Suppression Unit")
-    ).toBeInTheDocument();
-    expect(screen.getByText("Red Robot One Brace State")).toBeInTheDocument();
-    expect(screen.getByText("Blue Robot One Brace State")).toBeInTheDocument();
+    const criterion = screen.getByText("Criterion");
+    const wildfireRow = screen.getByText("Wildfire In Suppression Unit").closest("tr");
+    const robotStateRow = screen.getByText("Robot One Brace State").closest("tr");
+    expect(criterion.compareDocumentPosition(wildfireRow)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING
+    );
+    expect(criterion.compareDocumentPosition(robotStateRow)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING
+    );
+    expect(wildfireRow.children[1]).toHaveTextContent("118");
+    expect(wildfireRow.children[2]).toHaveTextContent("208");
+    expect(robotStateRow.children[1]).toHaveTextContent("0.3");
+    expect(robotStateRow.children[2]).toHaveTextContent("0.3");
+    expect(screen.queryByText("Wildfire In Red Suppression Unit")).not.toBeInTheDocument();
+    expect(screen.queryByText("Red Robot One Brace State")).not.toBeInTheDocument();
+    expect(screen.queryByText("Blue Robot One Brace State")).not.toBeInTheDocument();
     expect(screen.queryByText("Event Key")).not.toBeInTheDocument();
     expect(screen.queryByText("Tournament Key")).not.toBeInTheDocument();
   });
