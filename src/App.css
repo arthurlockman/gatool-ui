@@ -856,6 +856,33 @@ td {
   white-space: nowrap;
 }
 
+.matchClock {
+  line-height: 1.2;
+}
+
+@media screen and (max-width: 768px) {
+  .matchClock {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .matchClock h5 {
+    margin: 0.25rem 0;
+    font-size: 0.95rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .matchClock {
+    padding: 0.35rem 0.2rem;
+    font-size: 0.75rem;
+  }
+
+  .matchClock h5 {
+    font-size: 0.8rem;
+  }
+}
+
 .awardsButton {
   padding: 5px;
 }
