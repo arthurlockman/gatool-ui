@@ -547,7 +547,7 @@ function AnnouncePage({
               setEventBell={setEventBell}
             />
             {!matchDetails?.description.includes("Bye Match") && (
-              <table className={"table table-responsive"}>
+              <table className={"table table-responsive announceTable"}>
                 <thead>
                   <tr key={"header"}>
                     <td>{firstGlobalMode ? "Country" : "Team #"}</td>

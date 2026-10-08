@@ -27,6 +27,7 @@ function PlayByPlay({ station, team, inPlayoffs, selectedEvent, adHocMode, playo
 
     // Display remapped team number if available
     const displayTeamNumber = remapNumberToString ? remapNumberToString(team?.teamNumber) : team?.teamNumber;
+    const statsColumnCount = firstGlobalMode ? 3 : 5;
 
     return (
         <>
@@ -58,7 +59,7 @@ function PlayByPlay({ station, team, inPlayoffs, selectedEvent, adHocMode, playo
                                         <tr>
                                             <td className={"wltCol"} style={team?.rankStyle}>Rank {team?.rank}<br />AV RP {team?.sortOrder1}</td><td className={"wltCol"}>Qual Avg<br />{Math.floor(team?.qualAverage*100)/100}</td><td className={"wltCol"}>W-L-T<br />{team?.wins}-{team?.losses}-{team?.ties}</td>{!firstGlobalMode && <td className={"wltCol"}>{ftcMode?'OPA':'EPA'}<br />{team?.epa?.epa?.total_points?.mean>=0 ? team?.epa?.epa?.total_points?.mean : "TBD"}</td>}{!firstGlobalMode && <td className={"wltCol"}>Season<br />{team?.epa?.record?.wins>=0 ? `${team?.epa?.record?.wins}-${team?.epa?.record?.losses}-${team?.epa?.record?.ties}` : `TBD`}</td>}
                                         </tr>
-                                        <tr><td colSpan={6}>Team high score: {team?.highScore?.score} in {team?.highScore?.description.replace(" ", " ")}</td>
+                                        <tr><td colSpan={statsColumnCount}>Team high score: {team?.highScore?.score} in {team?.highScore?.description.replace(" ", " ")}</td>
                                         </tr>
                                     </tbody>
                                 </table>

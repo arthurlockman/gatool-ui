@@ -208,6 +208,11 @@ td {
 .playByPlayTable {
   display: table;
   width: 100%;
+  table-layout: fixed;
+}
+
+.playByPlayTable td {
+  overflow-wrap: break-word;
 }
 
 .playByPlayTableRow {
@@ -483,6 +488,39 @@ td {
   width: 58.333%;
 }
 
+.announceTable {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.announceTable td {
+  overflow-wrap: break-word;
+}
+
+.announceTable thead td:nth-child(1) {
+  width: 14%;
+}
+
+.announceTable thead td:nth-child(2) {
+  width: 22%;
+}
+
+.announceTable thead td:nth-child(3) {
+  width: 54%;
+}
+
+.announceTable thead td:nth-child(3):last-child {
+  width: 64%;
+}
+
+.announceTable thead td:nth-child(4) {
+  width: 10%;
+}
+
+.announceTeamNumber {
+  white-space: nowrap;
+}
+
 .vertical-center {
   min-height: 100%;
   /* Fallback for browsers do NOT support vh unit */
@@ -494,6 +532,8 @@ td {
 }
 
 .wltTable {
+  width: 100%;
+  table-layout: fixed;
   border-width: thin;
   background-color: rgba(255, 255, 255, 0.2);
   text-align: center;
@@ -501,9 +541,11 @@ td {
   margin: auto;
 }
 
-.wltCol {
-  font-size: medium;
-  white-space: nowrap;
+.playByPlayTable .wltCol {
+  font-size: small;
+  padding: 2px;
+  white-space: normal;
+  overflow-wrap: break-word;
 }
 
 .scheduleTablered {
