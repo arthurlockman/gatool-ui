@@ -8,6 +8,7 @@ export const appUpdates = [
         <ul>
           <li>Users can now filter the event by Field, Field Set or by the entire schedule</li>
           <li>Qual Average now calculates properly when filtering by Field or Field Set</li>
+          <li>Updated Score Display when you tap on a result in the Schedule screen</li>
         </ul>
       </ul></> 
     ),

@@ -31,6 +31,12 @@ import { useSettings } from "../contexts/SettingsContext";
 import { useEventData } from "contexts/EventDataContext";
 import { useEventActions } from "contexts/EventActionsContext";
 
+const hasMatchScores = (match) =>
+  Boolean(
+    match?.scores &&
+      (match.scoreRedFinal != null || match.scoreBlueFinal != null)
+  );
+
 function SchedulePage({
   setPracticeSchedule,
   setOfflinePlayoffSchedule,
@@ -1052,6 +1058,7 @@ function SchedulePage({
                     let blueStyle = "blue";
                     let winnerStyle = "tie";
                     let scoreStyle = "";
+                    const hasResult = Boolean(match?.actualStartTime) || hasMatchScores(match);
                     if (
                       Number(match.scoreRedFinal) > Number(match.scoreBlueFinal)
                     ) {
@@ -1066,7 +1073,8 @@ function SchedulePage({
 
                     if (
                       match?.scores?.coopertitionBonusAchieved ||
-                      match?.scores?.coopertitionCriteriaMet
+                      match?.scores?.coopertitionCriteriaMet ||
+                      match?.scores?.coopertitionAchieved
                     ) {
                       scoreStyle = " coopertition";
                     }
@@ -1089,12 +1097,12 @@ function SchedulePage({
                         <td>{match?.matchNumber}</td>
                         <td
                           className={
-                            match?.actualStartTime
+                            hasResult
                               ? `centerTable scheduleTable${winnerStyle}`
                               : "centerTable"
                           }
                           onClick={() => {
-                            if (match?.actualStartTime && match?.scores) {
+                            if (hasMatchScores(match)) {
                               handleOpenScores(match);
                             }
                           }}
@@ -1110,12 +1118,12 @@ function SchedulePage({
 
                         <td
                           className={
-                            match?.actualStartTime
+                            hasResult
                               ? `centerTable scheduleTable${winnerStyle} ${scoreStyle}`
                               : "centerTable"
                           }
                           onClick={() => {
-                            if (match?.actualStartTime && match?.scores) {
+                            if (hasMatchScores(match)) {
                               handleOpenScores(match);
                             }
                           }}
@@ -1124,7 +1132,7 @@ function SchedulePage({
                             className={redStyle}
                             style={{ whiteSpace: "nowrap" }}
                           >
-                            {match?.redRP && match?.actualStartTime
+                            {match?.redRP && hasResult
                               ? rankPointDisplay(match?.redRP)
                               : " "}
                           </span>
@@ -1133,7 +1141,7 @@ function SchedulePage({
                             className={blueStyle}
                             style={{ whiteSpace: "nowrap" }}
                           >
-                            {match?.blueRP && match?.actualStartTime
+                            {match?.blueRP && hasResult
                               ? rankPointDisplay(match?.blueRP)
                               : " "}
                           </span>
@@ -1234,7 +1242,7 @@ function SchedulePage({
                               : "centerTable"
                           }
                           onClick={() => {
-                            if (match?.actualStartTime && match?.scores) {
+                            if (hasMatchScores(match)) {
                               handleOpenScores(match);
                             }
                           }}
