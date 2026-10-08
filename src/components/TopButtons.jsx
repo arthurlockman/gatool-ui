@@ -757,8 +757,10 @@ function TopButtons({ previousMatch, nextMatch, currentMatch, matchMenu, setMatc
     const promoteCount =
         (showTopBarTeamOpsCol ? 1 : 0) +
         (showTopBarChangeTeamsCol ? 1 : 0);
-    const topBarCenterColXs =
-        promoteCount === 0 ? "5" : promoteCount === 1 ? "4" : "3";
+    const topBarCenterColXs = String(
+        (promoteCount === 0 ? 5 : promoteCount === 1 ? 4 : 3) +
+        (!adHocMode ? 1 : 0)
+    );
 
     let eventTeams = teamList?.teams.map((team) => ({
         label: team.teamNumber,
