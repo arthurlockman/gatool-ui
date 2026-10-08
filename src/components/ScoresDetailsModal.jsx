@@ -83,6 +83,25 @@ function ScoresDetailsModal({ show, onHide, scoresMatch }) {
   // Detect alliance order: FG has alliances[0]=Red, FRC/FTC has alliances[0]=Blue
   const redIdx = scoresMatch?.scores?.alliances?.[0]?.alliance === "Red" ? 0 : 1;
   const blueIdx = redIdx === 0 ? 1 : 0;
+  const scoreData = scoresMatch?.scores;
+  const nestedDetails =
+    scoreData?.details != null &&
+    typeof scoreData.details === "object" &&
+    !Array.isArray(scoreData.details)
+      ? scoreData.details
+      : {};
+  const nestedDetailKeys = new Set(Object.keys(nestedDetails));
+  const matchDetails = [
+    ...Object.entries(scoreData || {}).filter(
+      ([key, value]) =>
+        !["alliances", "details", "matchLevel", "matchNumber", "winningAlliance"].includes(key) &&
+        !nestedDetailKeys.has(key) &&
+        (value == null || typeof value !== "object")
+    ),
+    ...Object.entries(nestedDetails).filter(
+      ([key]) => !["eventKey", "tournamentKey", "id"].includes(key)
+    ),
+  ];
 
   const scoresRow = (key, rowKey) => {
     const redAlliance = scoresMatch?.scores?.alliances?.[redIdx];
@@ -280,13 +299,19 @@ function ScoresDetailsModal({ show, onHide, scoresMatch }) {
               <tr>
                 <td>Start Time:</td>
                 <td colSpan={2}>
-                  {moment(scoresMatch?.actualStartTime).format("dd hh:mm A")}
+                  {scoresMatch?.actualStartTime || scoresMatch?.startTime
+                    ? moment(
+                        scoresMatch.actualStartTime || scoresMatch.startTime
+                      ).format("dd hh:mm A")
+                    : "Not available"}
                 </td>
               </tr>
               <tr>
                 <td>Post Time:</td>
                 <td colSpan={2}>
-                  {moment(scoresMatch?.postResultTime).format("dd hh:mm A")}
+                  {scoresMatch?.postResultTime
+                    ? moment(scoresMatch.postResultTime).format("dd hh:mm A")
+                    : "Not available"}
                 </td>
               </tr>
               <tr>
@@ -326,11 +351,38 @@ function ScoresDetailsModal({ show, onHide, scoresMatch }) {
                     result={
                       scoresMatch?.scores?.coopertitionBonusAchieved ||
                       scoresMatch?.scores?.alliances?.[0]
-                        ?.coopertitionCriteriaMet
+                        ?.coopertitionCriteriaMet ||
+                      scoresMatch?.scores?.coopertitionAchieved
                     }
                   />
                 </td>
               </tr>
+              {matchDetails.length > 0 && (
+                <>
+                  <tr>
+                    <td>
+                      <b>Match Details</b>
+                    </td>
+                    <td colSpan={2}>
+                      <b>Result</b>
+                    </td>
+                  </tr>
+                  {matchDetails.map(([key, value]) => (
+                    <tr key={`match-detail-${key}`}>
+                      <td>
+                        <b>{_.startCase(key)}</b>
+                      </td>
+                      <td colSpan={2}>
+                        {typeof value === "boolean"
+                          ? scoreAchieved(value)
+                          : Array.isArray(value)
+                            ? value.join(", ")
+                            : value}
+                      </td>
+                    </tr>
+                  ))}
+                </>
+              )}
               <tr>
                 <td>
                   <b>Criterion</b>
