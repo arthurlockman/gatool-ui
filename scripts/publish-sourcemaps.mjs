@@ -13,10 +13,9 @@
  * would pass for every nonexistent asset.
  *
  * Usage:
- *   node scripts/publish-sourcemaps.mjs \
+ *   NR_API_KEY="$NR_API_KEY" node scripts/publish-sourcemaps.mjs \
  *     --base-url=https://gatool.org \
- *     --application-id=1431858641 \
- *     --api-key="$NR_API_KEY" [--dry-run]
+ *     --application-id=1431858641 [--dry-run]
  */
 import { appendFileSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
@@ -28,7 +27,6 @@ const { values } = parseArgs({
     "build-dir": { type: "string", default: "build" },
     "base-url": { type: "string" },
     "application-id": { type: "string" },
-    "api-key": { type: "string" },
     "repo-url": { type: "string" },
     "build-commit": { type: "string" },
     "verify-timeout": { type: "string", default: "300" }, // seconds
@@ -37,7 +35,9 @@ const { values } = parseArgs({
 });
 
 const buildDir = values["build-dir"];
-const apiKey = values["api-key"] || process.env.NR_API_KEY;
+// Accepted only via env var, never as a CLI flag: CLI args are visible to any
+// other process on the host (e.g. `ps`) and can land in shell history/CI logs.
+const apiKey = process.env.NR_API_KEY;
 const applicationId = values["application-id"] || process.env.APPLICATION_ID;
 const baseUrl = (values["base-url"] || "").replace(/\/+$/, "");
 const verifyTimeout = Number(values["verify-timeout"]);
