@@ -155,7 +155,7 @@ function CheatsheetPage() {
       {ftcMode && ftcMode.value !== "FIRSTGlobal" && (
         <>
           <img
-            src="/cheatsheet/biobuzz_cheat_sheet_09272026.png"
+            src="/cheatsheet/biobuzz_cheat_sheet_10132026.png"
             width="100%"
             alt="Cheatsheet"
           ></img>
@@ -165,7 +165,7 @@ function CheatsheetPage() {
               <span
                 className="gatool-tap-link"
                 onClick={() => {
-                  downloadPDF("/cheatsheet/biobuzz_cheat_sheet_09272026.pdf");
+                  downloadPDF("/cheatsheet/biobuzz_cheat_sheet_10132026.pdf");
                 }}
               >
                 Download the Cheat Sheet

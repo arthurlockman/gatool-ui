@@ -608,7 +608,6 @@ export function useScheduleLoader(deps, opts = {}) {
       if (ftcMode) {
         match = normalizeFtcHybridMatch(match);
       }
-      match.winner = winner(match, ftcMode);
       if (
         qualScores?.MatchScores &&
         selectedEvent?.value?.type !== "OffSeason" && !qualScheduleFromTBA
@@ -670,6 +669,10 @@ export function useScheduleLoader(deps, opts = {}) {
           });
         }
       }
+      match.winner = winner(
+        match,
+        isFirstGlobalMode(ftcMode) ? false : ftcMode
+      );
       return match;
     });
     if (qualMatches?.length > 0) {
@@ -683,6 +686,7 @@ export function useScheduleLoader(deps, opts = {}) {
     }
 
     if (isFirstGlobalMode(ftcMode)) {
+      firstGlobalAllQuals = qualschedule?.schedule || [];
       // Keep a scored all-fields copy for views that need total-match positioning.
       setQualScheduleAllFields({ schedule: { schedule: qualschedule?.schedule || [] } });
     } else {
@@ -695,9 +699,11 @@ export function useScheduleLoader(deps, opts = {}) {
       // For FIRST Global, count completed matches across ALL fields so that lastMatchPlayed
       // places playoff positions correctly (totalQuals + playoffPlayed), not filtered count.
       const countSource = firstGlobalAllQuals ?? qualschedule.schedule;
-      completedMatchCount =
-        countSource.length -
-        _.filter(countSource, { actualStartTime: null }).length;
+      completedMatchCount = countSource.filter(
+        (match) =>
+          match.actualStartTime != null ||
+          (match.scoreRedFinal != null && match.scoreBlueFinal != null)
+      ).length;
       // clear the Practice schedule if there is one loaded and there are matches in the schedule
       if (moment().isAfter(qualschedule?.schedule[0].startTime)) {
         console.log("It's after matches start. Resetting Practice Schedule");
@@ -1295,7 +1301,10 @@ export function useScheduleLoader(deps, opts = {}) {
               delete match.matchScores;
             }
           }
-          match.winner = winner(match, ftcMode);
+          match.winner = winner(
+            match,
+            isFirstGlobalMode(ftcMode) ? false : ftcMode
+          );
           return match;
         }
       );

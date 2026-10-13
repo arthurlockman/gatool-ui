@@ -1,5 +1,16 @@
 export const appUpdates = [
   {
+    date: "October 13, 2026",
+    message: (
+      <>
+      <ul>
+        <li>FTC:</li>
+        <ul>
+          <li>Updated Cheat Sheet</li>
+        </ul>
+      </ul></> 
+    ),
+  },{
     date: "October 8, 2026",
     message: (
       <>
@@ -8,6 +19,7 @@ export const appUpdates = [
         <ul>
           <li>Users can now filter the event by Field, Field Set or by the entire schedule</li>
           <li>Qual Average now calculates properly when filtering by Field or Field Set</li>
+          <li>Updated Score Display when you tap on a result in the Schedule screen</li>
         </ul>
       </ul></> 
     ),
@@ -19,9 +31,15 @@ export const appUpdates = [
         <li><i><b>FIRST</b></i> Global:</li>
         <ul>
           <li>Fixed issue with team list due to late substitution</li>
+        </ul>
+      </ul>
+      <ul>
+        <li>All Programs:</li>
+        <ul>
           <li>Updated CSS to better support Chrome</li>
         </ul>
-      </ul></> 
+      </ul>
+      </> 
     ),
   },{
     date: "October 6, 2026",

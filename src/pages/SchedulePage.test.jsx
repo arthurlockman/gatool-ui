@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import SchedulePage from "./SchedulePage";
 
 vi.mock("contexts/EventDataContext", () => ({ useEventData: vi.fn() }));
@@ -21,7 +21,12 @@ vi.mock("../contexts/SettingsContext", () => ({
 }));
 vi.mock("../hooks/useScrollPosition", () => ({ default: vi.fn() }));
 vi.mock("components/ScoresDetailsModal", () => ({
-  default: () => null,
+  default: ({ show, scoresMatch }) =>
+    show ? (
+      <div role="dialog">
+        <span>{scoresMatch?.description}</span>
+      </div>
+    ) : null,
   rankPointDisplay: () => null,
 }));
 vi.mock("components/AdjustAlliancesModal", () => ({ default: () => null }));
@@ -101,5 +106,37 @@ describe("SchedulePage", () => {
     expect(screen.getByText("Match Number")).toBeInTheDocument();
     expect(screen.getByText("Qualification 1")).toBeInTheDocument();
     expect(screen.getByText("1")).toBeInTheDocument();
+  });
+
+  it("opens score details for FIRST Global results without an actual start time", () => {
+    const match = {
+      matchNumber: 1,
+      description: "Qualification 1",
+      startTime: "2026-03-01T12:00:00Z",
+      actualStartTime: null,
+      scoreRedFinal: 72,
+      scoreBlueFinal: 42,
+      scores: {
+        alliances: [
+          { alliance: "Red", totalPoints: 72 },
+          { alliance: "Blue", totalPoints: 42 },
+        ],
+        details: { redRobotOneBraceState: 0.1 },
+      },
+      teams: [
+        { teamNumber: 254, station: "Red1" },
+        { teamNumber: 1678, station: "Blue1" },
+      ],
+    };
+    setupMocks({
+      ftcMode: { value: "FIRSTGlobal" },
+      firstGlobalMode: true,
+      qualSchedule: { schedule: [match] },
+    });
+
+    render(<SchedulePage {...schedulePageProps()} />);
+    fireEvent.click(screen.getByText("72"));
+
+    expect(screen.getByRole("dialog")).toHaveTextContent("Qualification 1");
   });
 });

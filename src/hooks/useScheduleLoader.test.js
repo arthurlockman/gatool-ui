@@ -401,6 +401,8 @@ describe("useScheduleLoader (FIRST Global field filters)", () => {
     expect(schedule.schedule.map((match) => match.fieldNumber)).toEqual([1, 2]);
     expect(schedule.schedule[0].scoreRedFinal).toBe(100);
     expect(schedule.schedule[1].scoreBlueFinal).toBe(90);
+    expect(schedule.schedule[0].winner.winner).toBe("red");
+    expect(schedule.completedMatchCount).toBe(2);
     const allFieldsSchedule = deps.setQualScheduleAllFields.mock.calls.at(-1)[0];
     expect(allFieldsSchedule.schedule.schedule).toEqual(schedule.schedule);
   });
