@@ -12,6 +12,7 @@ import { getTeamByStation, getMatchLabel as getMatchLabelHelper, isCurrentMatchH
 import { useBracketState } from "../hooks/useBracketState";
 import WinnerSelectionModal from "./WinnerSelectionModal";
 import { useSettings } from "../contexts/SettingsContext";
+import { matchHasPostedResult } from "../utils/playoffReserveEdits";
 
 function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMatch, qualsLength, nextMatch, previousMatch, getSchedule, usePullDownToUpdate, useSwipe, eventLabel, ftcMode, matches, allianceNumbers, allianceName, matchScore, matchWinner, alliances, remapNumberToString }) {
 	const { playoffCountOverride } = useSettings();
@@ -92,7 +93,7 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 		// Map bracket position to match index: match 10 = index 0, match 11 = index 1, etc.
 		const positionIndex = bracketMatchNumber - 10;
 		const match = finalSeriesMatchesForDisplay[positionIndex];
-		if (!match) return null;
+		if (!match || !matchHasPostedResult(match)) return null;
 		
 		if (alliance === "red") {
 			return match.scoreRedFinal;
@@ -111,6 +112,7 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 		const positionIndex = bracketMatchNumber - 10;
 		const match = finalSeriesMatchesForDisplay[positionIndex];
 		if (!match) return null;
+		if (match.winner?.winner === "tie" && !matchHasPostedResult(match)) return null;
 		return match.winner;
 	};
 	

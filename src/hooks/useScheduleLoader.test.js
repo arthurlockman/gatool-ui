@@ -336,6 +336,51 @@ describe("useScheduleLoader (FRC)", () => {
 });
 
 describe("useScheduleLoader (FIRST Global field filters)", () => {
+  it("does not count unplayed FIRST Global 0-0 placeholders as completed", async () => {
+    eventSelectionState.selectedEvent = {
+      value: {
+        code: "FG26",
+        name: "FIRST Global Challenge",
+        type: "Championship",
+      },
+    };
+    eventSelectionState.selectedYear = { value: "2026" };
+    eventSelectionState.ftcMode = { value: "FIRSTGlobal" };
+
+    server.use(
+      http.get(`${FIRST_GLOBAL_BASE}/2026/matches/t2`, () =>
+        HttpResponse.json({
+          matches: [
+            {
+              matchNumber: 1,
+              description: "Qualification 1",
+              tournamentLevel: "Qualification",
+              autoStartTime: "2026-10-20T12:00:00Z",
+              actualStartTime: null,
+              postResultTime: null,
+              scoreRedFinal: 0,
+              scoreBlueFinal: 0,
+              teams: [],
+            },
+          ],
+        })
+      ),
+      http.get(`${FIRST_GLOBAL_BASE}/2026/scores/t2`, () =>
+        HttpResponse.json({ matchScores: [] })
+      )
+    );
+
+    const deps = makeDeps();
+    const { result } = renderHook(() => useScheduleLoader(deps));
+    await result.current.getSchedule(true);
+
+    await waitFor(() => expect(deps.setQualSchedule).toHaveBeenCalled());
+    const qual = deps.setQualSchedule.mock.calls.at(-1)[0];
+    expect(qual.schedule[0].actualStartTime).toBeNull();
+    expect(qual.schedule[0].winner.winner).toBe("TBD");
+    expect(qual.completedMatchCount).toBe(0);
+  });
+
   it("keeps the complete scored qual schedule when a field filter is selected", async () => {
     eventSelectionState.selectedEvent = {
       value: {

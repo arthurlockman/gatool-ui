@@ -14,7 +14,10 @@ import {
   normalizePlayoffScheduleApiResponse,
 } from "../utils/ftcHybridMatchTeams";
 import { extendFTCPlayoffScheduleWithPartialMatches } from "../utils/ftcPlayoffSchedule";
-import { prunePlayoffReserveSetsAfterPostedMatches } from "../utils/playoffReserveEdits";
+import {
+  matchHasPostedResult,
+  prunePlayoffReserveSetsAfterPostedMatches,
+} from "../utils/playoffReserveEdits";
 import { useEventSelection } from "../contexts/EventSelectionContext";
 import { useSettings } from "../contexts/SettingsContext";
 import { getApiBaseUrl, isFirstGlobalMode, fgBaseURL } from "../utils/programConstants";
@@ -523,7 +526,7 @@ export function useScheduleLoader(deps, opts = {}) {
           if (isFirstGlobalMode(ftcMode)) {
             const allMatches = qualschedule?.matches || qualschedule?.schedule?.schedule || [];
             const normalized = allMatches.map((match) => {
-              const hasResult = match.scoreRedFinal != null || match.scoreBlueFinal != null;
+              const hasResult = matchHasPostedResult(match);
               return {
                 ...match,
                 startTime: match.startTime || match.autoStartTime,
@@ -701,8 +704,7 @@ export function useScheduleLoader(deps, opts = {}) {
       const countSource = firstGlobalAllQuals ?? qualschedule.schedule;
       completedMatchCount = countSource.filter(
         (match) =>
-          match.actualStartTime != null ||
-          (match.scoreRedFinal != null && match.scoreBlueFinal != null)
+          match.actualStartTime != null || matchHasPostedResult(match)
       ).length;
       // clear the Practice schedule if there is one loaded and there are matches in the schedule
       if (moment().isAfter(qualschedule?.schedule[0].startTime)) {
@@ -1082,7 +1084,7 @@ export function useScheduleLoader(deps, opts = {}) {
           ]);
           let combinedMatches = [];
           const normalizeFGMatch = (m, matchNumberOverride) => {
-            const hasResult = m.scoreRedFinal != null || m.scoreBlueFinal != null;
+            const hasResult = matchHasPostedResult(m);
             return {
               ...m,
               matchNumber: matchNumberOverride ?? m.matchNumber,

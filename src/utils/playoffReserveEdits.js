@@ -90,6 +90,19 @@ export function matchHasPostedResult(m) {
   return r !== 0 || b !== 0;
 }
 
+export function matchHasUnpostedZeroZeroScore(m) {
+  if (!m || typeof m !== "object") return false;
+  const red = Number(m.scoreRedFinal);
+  const blue = Number(m.scoreBlueFinal);
+  return (
+    m.scoreRedFinal != null &&
+    m.scoreBlueFinal != null &&
+    red === 0 &&
+    blue === 0 &&
+    !matchHasPostedResult(m)
+  );
+}
+
 /**
  * @param {object} m Schedule match row
  * @param {object} pending From reserve edit `pendingSourceMatch`
