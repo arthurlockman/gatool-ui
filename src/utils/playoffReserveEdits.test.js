@@ -3,6 +3,7 @@ import {
   compactReserveEditsForEvent,
   applyPlayoffReserveEdits,
   matchHasPostedResult,
+  matchHasUnpostedZeroZeroScore,
   prunePlayoffReserveSetsAfterPostedMatches,
 } from "./playoffReserveEdits";
 
@@ -177,6 +178,33 @@ describe("matchHasPostedResult", () => {
 
   it("is false when scores are non-numeric strings", () => {
     expect(matchHasPostedResult({ scoreRedFinal: "n/a", scoreBlueFinal: "n/a" })).toBe(false);
+  });
+});
+
+describe("matchHasUnpostedZeroZeroScore", () => {
+  it("identifies a 0-0 placeholder without a posted result time", () => {
+    expect(
+      matchHasUnpostedZeroZeroScore({
+        scoreRedFinal: 0,
+        scoreBlueFinal: 0,
+        postResultTime: null,
+      })
+    ).toBe(true);
+  });
+
+  it("does not treat a posted 0-0 result as a placeholder", () => {
+    expect(
+      matchHasUnpostedZeroZeroScore({
+        scoreRedFinal: 0,
+        scoreBlueFinal: 0,
+        postResultTime: "2026-01-01T00:00:00",
+      })
+    ).toBe(false);
+  });
+
+  it("does not identify non-zero or missing scores as 0-0 placeholders", () => {
+    expect(matchHasUnpostedZeroZeroScore({ scoreRedFinal: 0, scoreBlueFinal: 1 })).toBe(false);
+    expect(matchHasUnpostedZeroZeroScore({ scoreRedFinal: null, scoreBlueFinal: null })).toBe(false);
   });
 });
 

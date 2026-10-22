@@ -1,6 +1,7 @@
 import _ from "lodash";
 import { getAllianceLookupEntry } from "../utils/allianceLookup";
 import { isFtcLayout } from "./programConstants";
+import { matchHasPostedResult } from "./playoffReserveEdits";
 
 /**
  * Finds a team by their station assignment
@@ -280,6 +281,7 @@ export const getMatchScoreForDisplay = (bracketMatchNumber, alliance, ftcMode, o
 	if (!lastMatch) {
 		return originalMatchScore(bracketMatchNumber, alliance);
 	}
+	if (!matchHasPostedResult(lastMatch)) return null;
 
 	if (alliance === "red") {
 		return lastMatch.scoreRedFinal;
@@ -311,8 +313,9 @@ export const getMatchWinnerForDisplay = (bracketMatchNumber, ftcMode, offlinePla
 	if (!lastMatch) {
 		return originalMatchWinner(bracketMatchNumber);
 	}
-
-	return lastMatch.winner || originalMatchWinner(bracketMatchNumber);
+	const winner = lastMatch.winner || originalMatchWinner(bracketMatchNumber);
+	if (winner?.winner === "tie" && !matchHasPostedResult(lastMatch)) return null;
+	return winner;
 };
 
 /**

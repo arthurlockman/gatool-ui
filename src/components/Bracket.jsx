@@ -13,6 +13,7 @@ import { useBracketState } from "../hooks/useBracketState";
 import WinnerSelectionModal from "./WinnerSelectionModal";
 import { useSettings } from "../contexts/SettingsContext";
 import { isFtcLayout } from "../utils/programConstants";
+import { matchHasPostedResult } from "../utils/playoffReserveEdits";
 
 function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMatch, qualsLength, nextMatch, previousMatch, getSchedule, usePullDownToUpdate, useSwipe, eventLabel, ftcMode, matches, allianceNumbers, allianceName, matchScore, matchWinner, alliances, remapNumberToString }) {
 	const { playoffCountOverride } = useSettings();
@@ -122,7 +123,7 @@ function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMat
 		// Map bracket position to match index: match 14 = index 0, match 15 = index 1, etc.
 		const positionIndex = bracketMatchNumber - 14;
 		const match = finalSeriesMatchesForDisplay[positionIndex];
-		if (!match) return null;
+		if (!match || !matchHasPostedResult(match)) return null;
 		
 		if (alliance === "red") {
 			return match.scoreRedFinal;
@@ -141,6 +142,7 @@ function Bracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule, currentMat
 		const positionIndex = bracketMatchNumber - 14;
 		const match = finalSeriesMatchesForDisplay[positionIndex];
 		if (!match) return null;
+		if (match.winner?.winner === "tie" && !matchHasPostedResult(match)) return null;
 		return match.winner;
 	};
 	

@@ -27,15 +27,12 @@ import {
   getPlayoffScheduleRowStyles,
   playoffMatchHasDisplayableResult,
 } from "../utils/frcPlayoffSchedule";
+import {
+  matchHasPostedResult,
+} from "../utils/playoffReserveEdits";
 import { useSettings } from "../contexts/SettingsContext";
 import { useEventData } from "contexts/EventDataContext";
 import { useEventActions } from "contexts/EventActionsContext";
-
-const hasMatchScores = (match) =>
-  Boolean(
-    match?.scores &&
-      (match.scoreRedFinal != null || match.scoreBlueFinal != null)
-  );
 
 function SchedulePage({
   setPracticeSchedule,
@@ -1058,7 +1055,7 @@ function SchedulePage({
                     let blueStyle = "blue";
                     let winnerStyle = "tie";
                     let scoreStyle = "";
-                    const hasResult = Boolean(match?.actualStartTime) || hasMatchScores(match);
+                    const hasResult = matchHasPostedResult(match);
                     if (
                       Number(match.scoreRedFinal) > Number(match.scoreBlueFinal)
                     ) {
@@ -1102,17 +1099,17 @@ function SchedulePage({
                               : "centerTable"
                           }
                           onClick={() => {
-                            if (hasMatchScores(match)) {
+                            if (hasResult) {
                               handleOpenScores(match);
                             }
                           }}
                         >
                           <span className={redStyle}>
-                            {match?.scoreRedFinal}
+                            {hasResult ? match?.scoreRedFinal : null}
                           </span>
                           <br />
                           <span className={blueStyle}>
-                            {match?.scoreBlueFinal}
+                            {hasResult ? match?.scoreBlueFinal : null}
                           </span>
                         </td>
 
@@ -1123,7 +1120,7 @@ function SchedulePage({
                               : "centerTable"
                           }
                           onClick={() => {
-                            if (hasMatchScores(match)) {
+                            if (hasResult) {
                               handleOpenScores(match);
                             }
                           }}
@@ -1216,7 +1213,6 @@ function SchedulePage({
                     const { redStyle, blueStyle, winnerStyle } =
                       getPlayoffScheduleRowStyles(match, ftcMode);
                     const showPlayoffResultHighlight =
-                      Boolean(match?.actualStartTime) ||
                       playoffMatchHasDisplayableResult(match);
 
                     return (
@@ -1242,18 +1238,18 @@ function SchedulePage({
                               : "centerTable"
                           }
                           onClick={() => {
-                            if (hasMatchScores(match)) {
+                            if (matchHasPostedResult(match)) {
                               handleOpenScores(match);
                             }
                           }}
                           colSpan={2}
                         >
                           <span className={redStyle}>
-                            {match?.scoreRedFinal}
+                            {matchHasPostedResult(match) ? match?.scoreRedFinal : null}
                           </span>
                           <br />
                           <span className={blueStyle}>
-                            {match?.scoreBlueFinal}
+                            {matchHasPostedResult(match) ? match?.scoreBlueFinal : null}
                           </span>
                         </td>
                         {(!ftcMode || firstGlobalMode) && (

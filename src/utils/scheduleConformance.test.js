@@ -279,8 +279,19 @@ describe("winner", () => {
     expect(winner({ redWins: false, blueWins: true }, true).winner).toBe("blue");
   });
 
-  it("FTC mode: both wins false → tie", () => {
-    expect(winner({ redWins: false, blueWins: false }, true).winner).toBe("tie");
+  it("FTC mode: both wins false without a posted result → TBD", () => {
+    expect(winner({ redWins: false, blueWins: false }, true).winner).toBe("TBD");
+  });
+
+  it("FTC mode: both wins false with a posted tied score → tie", () => {
+    expect(
+      winner({
+        redWins: false,
+        blueWins: false,
+        scoreRedFinal: 40,
+        scoreBlueFinal: 40,
+      }, true).winner
+    ).toBe("tie");
   });
 
   it("FRC mode: redWins=true → red regardless of scores", () => {
@@ -291,8 +302,8 @@ describe("winner", () => {
     expect(winner({ blueWins: true, scoreRedFinal: 100, scoreBlueFinal: 1 }, false).winner).toBe("blue");
   });
 
-  it("FRC mode: both wins false → tie", () => {
-    expect(winner({ redWins: false, blueWins: false }, false).winner).toBe("tie");
+  it("FRC mode: both wins false without a posted result → TBD", () => {
+    expect(winner({ redWins: false, blueWins: false }, false).winner).toBe("TBD");
   });
 
   it("FRC: red score > blue score → red", () => {
@@ -305,6 +316,43 @@ describe("winner", () => {
 
   it("FRC: equal scores with no winningAlliance → tie", () => {
     expect(winner({ scoreRedFinal: 40, scoreBlueFinal: 40 }, false).winner).toBe("tie");
+  });
+
+  it("does not report unposted FIRST Global 0-0 score placeholders as ties", () => {
+    expect(
+      winner({ scoreRedFinal: 0, scoreBlueFinal: 0, postResultTime: null }, false).winner
+    ).toBe("TBD");
+  });
+
+  it("does not use winningAlliance to resolve an unposted 0-0 placeholder", () => {
+    expect(
+      winner({
+        scoreRedFinal: 0,
+        scoreBlueFinal: 0,
+        scores: { winningAlliance: 1 },
+      }, false).winner
+    ).toBe("TBD");
+  });
+
+  it("preserves a posted 0-0 match as a tie", () => {
+    expect(
+      winner({
+        scoreRedFinal: 0,
+        scoreBlueFinal: 0,
+        postResultTime: "2026-01-01T00:00:00",
+      }, false).winner
+    ).toBe("tie");
+  });
+
+  it("does not report FTC false/false flags with placeholder 0-0 scores as a tie", () => {
+    expect(
+      winner({
+        redWins: false,
+        blueWins: false,
+        scoreRedFinal: 0,
+        scoreBlueFinal: 0,
+      }, true).winner
+    ).toBe("TBD");
   });
 
   it("FRC: tie on points with winningAlliance=1 (tiebreaker) → red", () => {

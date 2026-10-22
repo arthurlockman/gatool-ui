@@ -139,4 +139,34 @@ describe("SchedulePage", () => {
 
     expect(screen.getByRole("dialog")).toHaveTextContent("Qualification 1");
   });
+
+  it("does not tint or display an unplayed FIRST Global 0-0 placeholder as a tie", () => {
+    setupMocks({
+      ftcMode: { value: "FIRSTGlobal" },
+      firstGlobalMode: true,
+      qualSchedule: {
+        schedule: [
+          {
+            matchNumber: 2,
+            description: "Qualification 2",
+            startTime: "2026-03-01T12:00:00Z",
+            actualStartTime: null,
+            postResultTime: null,
+            scoreRedFinal: 0,
+            scoreBlueFinal: 0,
+            scores: { alliances: [] },
+            teams: [],
+          },
+        ],
+      },
+    });
+
+    const { container } = render(<SchedulePage {...schedulePageProps()} />);
+    const row = screen.getByText("Qualification 2").closest("tr");
+    const resultCell = row?.querySelector("td:nth-child(4)");
+
+    expect(resultCell).not.toHaveClass("scheduleTabletie");
+    expect(resultCell).toHaveTextContent("");
+    expect(container.querySelectorAll(".scheduleTabletie")).toHaveLength(0);
+  });
 });
