@@ -1,5 +1,16 @@
 export const appUpdates = [
   {
+    date: "October 19, 2026",
+    message: (
+      <>
+      <ul>
+        <li>All Programs:</li>
+        <ul>
+          <li>Updated how match results are reported on Playoff Brackets and Schedule screens to remove incorrectly characterized ties for unplayed matches.</li>
+        </ul>
+      </ul></> 
+    ),
+  },{
     date: "October 13, 2026",
     message: (
       <>
@@ -81,7 +92,7 @@ export const appUpdates = [
     message: (
       <>
       <ul>
-        <li>FIRST Global:</li>
+        <li><i><b>FIRST</b></i> Global:</li>
         <ul>
           <li>Added Awards</li>
           <li>Added Foul buttons</li>
@@ -105,7 +116,7 @@ export const appUpdates = [
       <>
       <b>OFFSEASON UPDATES</b><br />
       <ul>
-        <li>FIRST Global:</li>
+        <li><i><b>FIRST</b></i> Global:</li>
         <ul>
           <li>Adding support for FIRST Global</li>
           <li>Users can now select FIRST Global and filter matches by Field Set</li>

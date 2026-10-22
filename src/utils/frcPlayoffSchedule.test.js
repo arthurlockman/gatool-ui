@@ -145,9 +145,19 @@ describe("playoffMatchHasDisplayableResult", () => {
     expect(playoffMatchHasDisplayableResult("nope")).toBe(false);
   });
 
-  it("returns true when actualStartTime or postResultTime is present", () => {
-    expect(playoffMatchHasDisplayableResult({ actualStartTime: "2025-01-01" })).toBe(true);
+  it("requires a result, not merely an actual start time", () => {
+    expect(playoffMatchHasDisplayableResult({ actualStartTime: "2025-01-01" })).toBe(false);
     expect(playoffMatchHasDisplayableResult({ postResultTime: "2025-01-01" })).toBe(true);
+    expect(
+      playoffMatchHasDisplayableResult({
+        scoreRedFinal: 0,
+        scoreBlueFinal: 0,
+        winner: { winner: "tie" },
+      })
+    ).toBe(false);
+    expect(
+      playoffMatchHasDisplayableResult({ redWins: false, blueWins: false })
+    ).toBe(false);
   });
 
   it("returns true for a winner.winner or winner.tieWinner of red/blue", () => {

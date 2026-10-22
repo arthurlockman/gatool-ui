@@ -1,5 +1,9 @@
 import _ from "lodash";
 import { matchClassesBase } from "../data/matchClasses";
+import {
+  matchHasPostedResult,
+  matchHasUnpostedZeroZeroScore,
+} from "./playoffReserveEdits";
 
 /**
  * @param {object} match
@@ -209,12 +213,15 @@ export function extendFRCPlayoffScheduleWithPartialMatches(schedule, allianceCou
  */
 export function playoffMatchHasDisplayableResult(m) {
   if (!m || typeof m !== "object") return false;
-  if (m.actualStartTime != null && m.actualStartTime !== "") return true;
-  if (m.postResultTime != null && m.postResultTime !== "") return true;
+  if (matchHasUnpostedZeroZeroScore(m)) return false;
+  if (matchHasPostedResult(m)) return true;
   const w = m.winner;
   if (w?.winner === "red" || w?.winner === "blue") return true;
   if (w?.tieWinner === "red" || w?.tieWinner === "blue") return true;
-  if (m.redWins === true || m.blueWins === true) return true;
+  if (
+    m.redWins === true ||
+    m.blueWins === true
+  ) return true;
   return false;
 }
 

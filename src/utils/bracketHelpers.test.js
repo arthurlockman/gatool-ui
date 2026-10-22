@@ -478,6 +478,39 @@ describe("getMatchWinnerForDisplay", () => {
 		expect(getMatchWinnerForDisplay(2, true, { schedule: sched }, [], originalMatchWinner)).toBe(winner);
 	});
 
+	it("does not show a tie winner for an unposted 0-0 placeholder", () => {
+		const sched = [
+			seriesMatch(2, 1, {
+				scoreRedFinal: 0,
+				scoreBlueFinal: 0,
+				winner: { winner: "tie" },
+			}),
+		];
+		expect(getMatchWinnerForDisplay(2, true, { schedule: sched }, [], originalMatchWinner)).toBeNull();
+	});
+
+	it("does not show a tie winner without any posted result data", () => {
+		const sched = [
+			seriesMatch(2, 1, {
+				winner: { winner: "tie" },
+			}),
+		];
+		expect(getMatchWinnerForDisplay(2, true, { schedule: sched }, [], originalMatchWinner)).toBeNull();
+	});
+
+	it("preserves a posted 0-0 tie winner", () => {
+		const winner = { winner: "tie" };
+		const sched = [
+			seriesMatch(2, 1, {
+				scoreRedFinal: 0,
+				scoreBlueFinal: 0,
+				postResultTime: "2026-01-01T00:00:00",
+				winner,
+			}),
+		];
+		expect(getMatchWinnerForDisplay(2, true, { schedule: sched }, [], originalMatchWinner)).toBe(winner);
+	});
+
 	it("falls back to original when last match has no winner", () => {
 		const sched = [seriesMatch(3, 1)];
 		expect(getMatchWinnerForDisplay(3, true, { schedule: sched }, [], originalMatchWinner)).toEqual({

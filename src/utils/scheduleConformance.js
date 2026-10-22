@@ -1,4 +1,8 @@
 import moment from "moment";
+import {
+  matchHasPostedResult,
+  matchHasUnpostedZeroZeroScore,
+} from "./playoffReserveEdits";
 
 /**
  * Conforms a Cheesy Arena match to the internal match representation.
@@ -222,7 +226,7 @@ export function winner(match, ftcMode) {
     if (match?.redWins === true) result.winner = "red";
     else if (match?.blueWins === true) result.winner = "blue";
     else if (match?.redWins === false && match?.blueWins === false) {
-      result.winner = "tie";
+      result.winner = matchHasPostedResult(match) ? "tie" : "TBD";
     } else result.winner = "TBD";
     return result;
   }
@@ -235,7 +239,7 @@ export function winner(match, ftcMode) {
     return result;
   }
   if (match?.redWins === false && match?.blueWins === false) {
-    result.winner = "tie";
+    result.winner = matchHasPostedResult(match) ? "tie" : "TBD";
     return result;
   }
   if (!ftcMode) {
@@ -246,10 +250,15 @@ export function winner(match, ftcMode) {
     const r = match?.scoreRedFinal;
     const b = match?.scoreBlueFinal;
     const hasScores = r != null && b != null;
-    const tieOnPoints = hasScores && Number(r) === Number(b);
+    const tieOnPoints =
+      hasScores &&
+      Number(r) === Number(b) &&
+      matchHasPostedResult(match);
     const committed =
-      (match?.actualStartTime != null && match?.actualStartTime !== "") ||
-      (match?.postResultTime != null && match?.postResultTime !== "");
+      matchHasPostedResult(match) ||
+      (!matchHasUnpostedZeroZeroScore(match) &&
+        match?.actualStartTime != null &&
+        match?.actualStartTime !== "");
     if (wa === 1 || wa === 2) {
       if (
         tieOnPoints ||
@@ -266,7 +275,7 @@ export function winner(match, ftcMode) {
     } else if (match?.scoreRedFinal > match?.scoreBlueFinal) {
       result.winner = "red";
     } else if (match?.scoreRedFinal === match?.scoreBlueFinal) {
-      result.winner = "tie";
+      result.winner = matchHasPostedResult(match) ? "tie" : "TBD";
     }
   } else {
     result.winner = "TBD";

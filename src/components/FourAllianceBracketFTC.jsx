@@ -11,6 +11,7 @@ import { GOLD, RED, BLUE, GREEN, BLACK, WHITE, black, bold, PLAYOFF_MATCH_GRAY_B
 import { getTeamByStation, getMatchLabel as getMatchLabelHelper, isCurrentMatchHelper, computeIsInFinalsView, getAllianceNumbersForDisplay as getAllianceNumbersForDisplayHelper, getAllianceNameForDisplay as getAllianceNameForDisplayHelper, getMatchScoreForDisplay as getMatchScoreForDisplayHelper, getMatchWinnerForDisplay as getMatchWinnerForDisplayHelper } from "../utils/bracketHelpers";
 import { useBracketState } from "../hooks/useBracketState";
 import WinnerSelectionModal from "./WinnerSelectionModal";
+import { matchHasPostedResult } from "../utils/playoffReserveEdits";
 
 function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previousMatch, getSchedule, useSwipe, usePullDownToUpdate, offlinePlayoffSchedule, setOfflinePlayoffSchedule, eventLabel, ftcMode,matches,allianceNumbers, allianceName, matchScore,matchWinner, alliances, remapNumberToString }) {
 	const { showSelectWinner, setShowSelectWinner, showConfirmWinner, winningAlliance, winnerMatch, setWinnerMatch, handleChooseWinner, handleClose, resetWinnerState } = useBracketState();
@@ -71,7 +72,7 @@ function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previous
 	// Helper function to get score for a finals match: bracket N → series N, use last match in that series
 	const getFinalsMatchScoreForDisplay = (bracketMatchNumber, alliance) => {
 		const match = getLastMatchInSeries(bracketMatchNumber);
-		if (!match) return null;
+		if (!match || !matchHasPostedResult(match)) return null;
 		if (alliance === "red") return match.scoreRedFinal;
 		if (alliance === "blue") return match.scoreBlueFinal;
 		return null;
@@ -81,10 +82,13 @@ function FourAllianceBracketFTC({ currentMatch, qualsLength, nextMatch, previous
 	const getFinalsMatchWinnerForDisplay = (bracketMatchNumber) => {
 		const match = getLastMatchInSeries(bracketMatchNumber);
 		if (!match) return null;
+		if (match.winner?.winner === "tie" && !matchHasPostedResult(match)) return null;
 		if (match.winner?.winner) return match.winner;
 		if (match.redWins === true && match.blueWins === false) return { winner: "red" };
 		if (match.blueWins === true && match.redWins === false) return { winner: "blue" };
-		if (match.redWins === false && match.blueWins === false) return { winner: "tie" };
+		if (match.redWins === false && match.blueWins === false) {
+			return matchHasPostedResult(match) ? { winner: "tie" } : null;
+		}
 		return null;
 	};
 	
