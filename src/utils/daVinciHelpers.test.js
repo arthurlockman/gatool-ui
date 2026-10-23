@@ -5,6 +5,7 @@ import {
 	getFinalsSlotWinner,
 	DA_VINCI_SCHEDULE,
 	FG_ROUND_ROBIN_SCHEDULE,
+	FG_FINALS_SCHEDULE,
 	getFGFinalsMatches,
 	computeFGTournamentWinner,
 } from "./daVinciHelpers";
@@ -272,29 +273,105 @@ describe("getFGFinalsMatches", () => {
 });
 
 describe("computeFGTournamentWinner", () => {
-	it("returns no winner until a side reaches 2 victories", () => {
-		const finals = [makeMatch(1, 17, { winner: winner("red") })];
-		expect(computeFGTournamentWinner(finals).winner).toBe("");
+	function finals() {
+		const teams = (red, blue) => [
+			{ station: "Red1", teamNumber: red },
+			{ station: "Blue1", teamNumber: blue },
+		];
+		return [
+			makeMatch(1, 17, { teams: teams(1, 6), scoreRedFinal: 532, scoreBlueFinal: 473 }),
+			makeMatch(1, 18, { teams: teams(6, 2), scoreRedFinal: 456, scoreBlueFinal: 422 }),
+			makeMatch(1, 19, { teams: teams(1, 2), scoreRedFinal: 478, scoreBlueFinal: 468 }),
+		];
+	}
+
+	it("ranks alliances by total score across their two matches", () => {
+		expect(computeFGTournamentWinner(finals())).toEqual({
+			matchNumber: 17, color: "red", totalScore: 1010,
+		});
 	});
 
-	it("red wins best-of-3 with 2 victories", () => {
-		const finals = [
-			makeMatch(1, 17, { winner: winner("red") }),
-			makeMatch(1, 18, { winner: winner("red") }),
-		];
-		const result = computeFGTournamentWinner(finals);
-		expect(result.winner).toBe("red");
-		expect(result.red).toBe(2);
+	it("tracks an alliance that changes color instead of counting red/blue wins", () => {
+		const matches = finals();
+		matches[0].scoreBlueFinal = 600;
+		expect(computeFGTournamentWinner(matches)).toEqual({
+			matchNumber: 17, color: "blue", totalScore: 1056,
+		});
 	});
 
-	it("blue wins best-of-3 with 2 victories", () => {
-		const finals = [
-			makeMatch(1, 17, { winner: winner("blue") }),
-			makeMatch(1, 18, { winner: winner("red") }),
-			makeMatch(1, 19, { winner: winner("blue") }),
-		];
-		const result = computeFGTournamentWinner(finals);
-		expect(result.winner).toBe("blue");
-		expect(result.blue).toBe(2);
+	it("can award the champion to an alliance with no match victories", () => {
+		const matches = finals();
+		Object.assign(matches[0], { scoreRedFinal: 500, scoreBlueFinal: 501, winner: winner("blue") });
+		Object.assign(matches[1], { scoreRedFinal: 1, scoreBlueFinal: 2, winner: winner("blue") });
+		Object.assign(matches[2], { scoreRedFinal: 500, scoreBlueFinal: 501, winner: winner("blue") });
+		expect(computeFGTournamentWinner(matches)).toEqual({
+			matchNumber: 17, color: "red", totalScore: 1000,
+		});
+	});
+
+	it("uses alliance lookup identities when the participating teams change", () => {
+		const matches = finals();
+		matches[2].teams[0].teamNumber = 10;
+		const alliances = { Lookup: { 1: { alliance: "Alliance 1" }, 10: { alliance: "Alliance 1" } } };
+		expect(computeFGTournamentWinner(matches, alliances)?.totalScore).toBe(1010);
+	});
+
+	it("matches rosters regardless of station order", () => {
+		const matches = finals();
+		matches[0].teams.push({ station: "Red2", teamNumber: 10 });
+		matches[2].teams.unshift({ station: "Red2", teamNumber: 10 });
+		expect(computeFGTournamentWinner(matches)?.totalScore).toBe(1010);
+	});
+
+	it("does not declare a champion until all three finals have scores", () => {
+		expect(computeFGTournamentWinner([])).toBeNull();
+		expect(computeFGTournamentWinner(finals().slice(0, 2))).toBeNull();
+		const matches = finals();
+		matches[2].scoreBlueFinal = null;
+		expect(computeFGTournamentWinner(matches)).toBeNull();
+	});
+
+	it("does not declare a champion from unposted zero-zero placeholders", () => {
+		const matches = finals();
+		matches[2].scoreRedFinal = 0;
+		matches[2].scoreBlueFinal = 0;
+		expect(computeFGTournamentWinner(matches)).toBeNull();
+		matches[2].postResultTime = "2026-10-23T12:00:00Z";
+		expect(computeFGTournamentWinner(matches)?.totalScore).toBe(929);
+	});
+
+	it("does not break a tie for highest total arbitrarily", () => {
+		const matches = finals();
+		matches[0].scoreBlueFinal = 554;
+		expect(computeFGTournamentWinner(matches)).toBeNull();
+	});
+
+	it.each([NaN, Infinity, -1, "invalid"])("does not rank invalid scores (%s)", (score) => {
+		const matches = finals();
+		matches[2].scoreRedFinal = score;
+		expect(computeFGTournamentWinner(matches)).toBeNull();
+	});
+
+	it("requires three identifiable alliances with two appearances each", () => {
+		const matches = finals();
+		matches[2].teams[0].teamNumber = 99;
+		expect(computeFGTournamentWinner(matches)).toBeNull();
+		matches[2].teams = [];
+		expect(computeFGTournamentWinner(matches)).toBeNull();
+	});
+});
+
+describe("FG_FINALS_SCHEDULE", () => {
+	it("contains three finals in which each finalist plays both others", () => {
+		expect(FG_FINALS_SCHEDULE.map((match) => match.matchNumber)).toEqual([17, 18, 19]);
+		const pairings = FG_FINALS_SCHEDULE.map(({ redPlaceHolder, bluePlaceHolder }) =>
+			[redPlaceHolder, bluePlaceHolder].sort().join("|")
+		);
+		expect(new Set(pairings).size).toBe(3);
+		for (const name of ["RR1", "RR2", "RR3"]) {
+			expect(FG_FINALS_SCHEDULE.filter((match) =>
+				match.redPlaceHolder === name || match.bluePlaceHolder === name
+			)).toHaveLength(2);
+		}
 	});
 });

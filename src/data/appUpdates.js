@@ -1,5 +1,17 @@
 export const appUpdates = [
   {
+    date: "October 23, 2026",
+    message: (
+      <>
+      <ul>
+        <li><i><b>FIRST</b></i> Global:</li>
+        <ul>
+          <li>Corrected the playoff bracket to show three round-robin finals matches and the winning alliance, ranked by the sum of its two finals scores.</li>
+        </ul>
+      </ul></>
+    ),
+  },
+  {
     date: "October 19, 2026",
     message: (
       <>
