@@ -203,6 +203,25 @@ describe("normalizeAndValidateSchedule", () => {
     expect(errorMatches).toEqual([]);
   });
 
+  it("retains unassigned playoff matches but excludes breaks and footnotes", () => {
+    const rows = [
+      { Description: "Match 3 (R2) (#3)" },
+      { Description: "Final 1 (#6)" },
+      { Description: "Final Tiebreaker (#8)" },
+      { Description: "Field Break" },
+      { Description: "Awards Break *" },
+      { Description: "\n* break if required\n" },
+    ];
+    const { normalized, errorMatches } = normalizeAndValidateSchedule(rows, { forPlayoffs: true });
+    expect(normalized.map((match) => match.Description)).toEqual([
+      "Match 3 (R2) (#3)",
+      "Final 1 (#6)",
+      "Final Tiebreaker (#8)",
+    ]);
+    expect(errorMatches).toEqual([]);
+    expect(normalizeAndValidateSchedule(rows).normalized).toEqual([]);
+  });
+
   it("flags exactly once per match even if multiple stations are missing", () => {
     const incomplete = fullMatch({ "Red 1": "", "Blue 2": "" });
     const { errorMatches } = normalizeAndValidateSchedule([incomplete]);

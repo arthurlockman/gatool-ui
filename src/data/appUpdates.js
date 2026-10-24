@@ -1,5 +1,17 @@
 export const appUpdates = [
   {
+    date: "October 24, 2026",
+    message: (
+      <>
+      <ul>
+        <li>FRC:</li>
+        <ul>
+          <li>Fixed offline playoff schedule imports to display matches, retain future matches with unassigned teams, and preserve Excel match dates and times.</li>
+        </ul>
+      </ul></>
+    ),
+  },
+  {
     date: "October 23, 2026",
     message: (
       <>
