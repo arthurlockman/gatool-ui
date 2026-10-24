@@ -1,3 +1,5 @@
+import { matchHasPostedResult } from "./playoffReserveEdits";
+
 /**
  * Helper utilities for the Da Vinci Tournament round-robin bracket (FTCCMP1).
  *
@@ -114,7 +116,7 @@ export const DA_VINCI_SCHEDULE = [
 
 /**
  * FIRST Global round-robin schedule: 8 alliances, 16 matches across 4 rounds,
- * then top 2 compete in a best-of-3 finals (t4).
+ * then the top 3 play a 3-match round-robin finals (t4).
  */
 export const FG_ROUND_ROBIN_SCHEDULE = [
 	// Round 1
@@ -139,6 +141,12 @@ export const FG_ROUND_ROBIN_SCHEDULE = [
 	{ matchNumber: 16, round: 4, redPlaceHolder: "Alliance 6", bluePlaceHolder: "Alliance 7" },
 ];
 
+export const FG_FINALS_SCHEDULE = [
+	{ matchNumber: 17, redPlaceHolder: "RR1", bluePlaceHolder: "RR2" },
+	{ matchNumber: 18, redPlaceHolder: "RR2", bluePlaceHolder: "RR3" },
+	{ matchNumber: 19, redPlaceHolder: "RR1", bluePlaceHolder: "RR3" },
+];
+
 /**
  * Returns the finals matches for FIRST Global (t4 matches, no series).
  * These are the last matches in the combined schedule after the round-robin.
@@ -154,18 +162,42 @@ export function getFGFinalsMatches(matches, roundRobinMatchCount) {
 }
 
 /**
- * Computes the FIRST Global tournament winner from finals matches.
- * Best of 3: first to 2 wins.
+ * Ranks the three FIRST Global finalists by the sum of their two match scores.
+ * Returns a match/color reference for displaying the champion using the same
+ * alliance names and country-code/team-number formatting as the match cards.
+ * Incomplete finals or tied totals do not establish a champion.
  * @param {Array} finalsMatches
- * @returns {{ red: number, blue: number, winner: string, level: number }}
+ * @param {object} alliances
+ * @returns {{ matchNumber: number, color: string, totalScore: number }|null}
  */
-export function computeFGTournamentWinner(finalsMatches) {
-	const result = { red: 0, blue: 0, winner: "", level: 0 };
-	for (const fm of finalsMatches) {
-		if (fm?.winner?.winner === "red") result.red += 1;
-		if (fm?.winner?.winner === "blue") result.blue += 1;
+export function computeFGTournamentWinner(finalsMatches, alliances) {
+	if (finalsMatches.length !== 3) return null;
+	const standings = new Map();
+	for (const match of finalsMatches) {
+		if (!matchHasPostedResult(match)) return null;
+		for (const color of ["red", "blue"]) {
+			const score = color === "red" ? match.scoreRedFinal : match.scoreBlueFinal;
+			if (score == null || !Number.isFinite(Number(score)) || Number(score) < 0) return null;
+			const prefix = color === "red" ? "Red" : "Blue";
+			const teams = match.teams?.filter((team) => team.station?.startsWith(prefix)) ?? [];
+			if (!teams.length) return null;
+			const alliance = teams
+				.map((team) => alliances?.Lookup?.[team.teamNumber]?.alliance)
+				.find((name) => name != null);
+			const key = alliance != null
+				? `alliance:${alliance}`
+				: `teams:${teams.map((team) => team.teamNumber).sort().join(",")}`;
+			const entry = standings.get(key) ?? {
+				matchNumber: match.matchNumber, color, totalScore: 0, appearances: 0,
+			};
+			entry.totalScore += Number(score);
+			entry.appearances += 1;
+			standings.set(key, entry);
+		}
 	}
-	if (result.red >= 2) result.winner = "red";
-	else if (result.blue >= 2) result.winner = "blue";
-	return result;
+	const ranked = [...standings.values()].sort((a, b) => b.totalScore - a.totalScore);
+	if (ranked.length !== 3 || ranked.some((entry) => entry.appearances !== 2)) return null;
+	if (ranked[0].totalScore === ranked[1].totalScore) return null;
+	const { matchNumber, color, totalScore } = ranked[0];
+	return { matchNumber, color, totalScore };
 }

@@ -1,3 +1,5 @@
+import Trophy from "./Trophy";
+
 /**
  * PlayoffMatch component for displaying finals matches
  * Uses relative positioning within a transform group
@@ -130,30 +132,7 @@ function PlayoffMatch({
 					{getAllianceNumbersForDisplay(matchNumber, "blue")}
 				</tspan>
 			</text>
-				{/* Trophy icon - positioned relative to background origin */}
-				{/* Original absolute coords: x=1204.36, y=414.19. Background origin: x=1024, y=343.4 */}
-				{/* Relative: x=180.36, y=70.79 */}
-				<g id="trophy" transform="translate(180.36, 70.79)">
-					{/* Base rects - relative to trophy origin (1204.36, 414.19) */}
-					<rect x="0" y="0" fill="#474E5D" width="26.51" height="1.66" />
-					<rect x="3.32" y="0" fill="#606776" width="1.66" height="1.66" />
-					<rect x="21.55" y="0" fill="#2E3544" width="4.97" height="1.66" />
-					<rect x="1.66" y="-9.94" fill="#474E5D" width="23.2" height="9.94" />
-					<rect x="4.98" y="-9.94" fill="#606776" width="1.66" height="9.94" />
-					<rect x="19.89" y="-9.94" fill="#2E3544" width="4.97" height="9.94" />
-					{/* Trophy paths - converted from absolute to relative coordinates */}
-					{/* Original: M1219.28,390.16 -> Relative: (1219.28-1204.36, 390.16-414.19) = (14.92, -24.03) */}
-					<path fill="#FFCA10" d="M14.92,-24.03c0,6.11,3.9,11.31,9.35,13.26l0.6,0.83h-23.2l0.59-0.83c5.45-1.94,9.35-7.14,9.35-13.26H14.92z"/>
-					<path fill="#FEE79B" d="M12.43,-24.03h-0.41c0,6.12-2.93,11.31-7.01,13.26l-0.44,0.83h2.9l0.3-0.83C10.48,-12.72,12.43,-17.91,12.43,-24.03z"/>
-					<path fill="#FFA200" d="M24.26,-10.77c-5.45-1.95-9.35-7.14-9.35-13.26h-0.83c0,6.11,1.95,11.31,4.67,13.26l0.3,0.83h5.8L24.26,-10.77z"/>
-					{/* Original uses two subpaths: outer cup with handles, then inner decoration */}
-					{/* Using corrected coordinates matching fourAllianceBracket.svg style */}
-					<path fill="#FFCA10" d="M-9.94,-48.06c0,11.89,10.39,21.54,23.2,21.54s23.2-9.65,23.2-21.54h-46.4Zm23.2,19.06c-10.51,0-19.21-7.23-20.54-16.57h41.08c-1.32,9.34-10.03,16.57-20.53,16.57Z"/>
-					{/* Original: M1232.54,362.82 -> Relative: (1232.54-1204.36, 362.82-414.19) = (28.18, -51.37) */}
-					<path fill="#FFCA10" d="M28.18,-51.37h-29.83c0,15.56,6.68,28.17,14.91,28.17S28.18,-35.81,28.18,-51.37z" />
-					<path fill="#FFA200" d="M20.72,-51.37c0,15.56-3.34,28.17-7.46,28.17c8.24,0,14.91-12.61,14.91-28.17H20.72z" />
-					<path fill="#FEE79B" d="M4.25,-51.37h-2.18c0,15.56,5.01,28.17,11.19,28.17C9.28,-23.2,4.25,-35.81,4.25,-51.37z" />
-				</g>
+				<Trophy transform="translate(180.36, 70.79)" />
 			</g>
 		</g>
 	);
