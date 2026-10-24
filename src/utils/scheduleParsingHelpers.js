@@ -120,9 +120,11 @@ export function parseCSVToSchedule(csvText) {
  * Normalize schedule rows by merging with the basic template, converting all
  * values to strings, filtering blank rows, and detecting rows with missing teams.
  * @param {Array} schedule raw schedule rows
+ * @param {object} [options] import options
+ * @param {boolean} [options.forPlayoffs=false] retain unassigned playoff matches
  * @returns {{ normalized: Array, errorMatches: Array }}
  */
-export function normalizeAndValidateSchedule(schedule) {
+export function normalizeAndValidateSchedule(schedule, { forPlayoffs = false } = {}) {
   const errorMatches = [];
 
   let normalized = schedule.map((match) => {
@@ -147,7 +149,9 @@ export function normalizeAndValidateSchedule(schedule) {
   normalized = normalized.filter((match) => {
     const hasTeamData = match["Blue 1"] || match["Blue 2"] || match["Blue 3"] ||
                        match["Red 1"] || match["Red 2"] || match["Red 3"];
-    return hasTeamData;
+    const isUnassignedPlayoff = forPlayoffs &&
+      /^(?:Match\s+\d+|Finals?\b|Playoff\s+\d+)/i.test(match.Description.trim());
+    return hasTeamData || isUnassignedPlayoff;
   });
 
   return { normalized, errorMatches };

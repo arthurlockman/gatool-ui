@@ -1,23 +1,25 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { utils, write } from "xlsx";
+import moment from "moment";
 import SchedulePage from "./SchedulePage";
 
 vi.mock("contexts/EventDataContext", () => ({ useEventData: vi.fn() }));
 vi.mock("contexts/EventActionsContext", () => ({
-  useEventActions: () => ({
+  useEventActions: vi.fn(() => ({
     setSelectedEvent: vi.fn(),
     getTeamList: vi.fn(),
     loadEvent: vi.fn(),
     getAlliances: vi.fn(),
-  }),
+  })),
 }));
 vi.mock("../contexts/SettingsContext", () => ({
-  useSettings: () => ({
+  useSettings: vi.fn(() => ({
     hidePracticeSchedule: false,
     useScrollMemory: false,
     playoffCountOverride: null,
     setPlayoffCountOverride: vi.fn(),
-  }),
+  })),
 }));
 vi.mock("../hooks/useScrollPosition", () => ({ default: vi.fn() }));
 vi.mock("components/ScoresDetailsModal", () => ({
@@ -32,6 +34,8 @@ vi.mock("components/ScoresDetailsModal", () => ({
 vi.mock("components/AdjustAlliancesModal", () => ({ default: () => null }));
 
 import { useEventData } from "contexts/EventDataContext";
+import { useEventActions } from "contexts/EventActionsContext";
+import { useSettings } from "../contexts/SettingsContext";
 
 function schedulePageProps(overrides = {}) {
   return {
@@ -71,6 +75,12 @@ function setupMocks(overrides = {}) {
 describe("SchedulePage", () => {
   beforeEach(() => {
     setupMocks();
+    useSettings.mockReturnValue({
+      hidePracticeSchedule: false,
+      useScrollMemory: false,
+      playoffCountOverride: null,
+      setPlayoffCountOverride: vi.fn(),
+    });
   });
 
   it("shows the no-event alert when nothing is selected", () => {
@@ -102,10 +112,106 @@ describe("SchedulePage", () => {
         ],
       },
     });
+
     render(<SchedulePage {...schedulePageProps()} />);
     expect(screen.getByText("Match Number")).toBeInTheDocument();
     expect(screen.getByText("Qualification 1")).toBeInTheDocument();
     expect(screen.getByText("1")).toBeInTheDocument();
+  });
+
+  it("imports and displays a four-alliance Excel playoff schedule including future matches", async () => {
+    setupMocks({
+      selectedEvent: { value: { code: "OFFLINE" }, label: "Offline Event" },
+    });
+    const getAlliances = vi.fn();
+    const getTeamList = vi.fn();
+    useEventActions.mockReturnValue({
+      setSelectedEvent: vi.fn(), getTeamList, loadEvent: vi.fn(), getAlliances,
+    });
+    useSettings.mockReturnValue({
+      hidePracticeSchedule: false,
+      useScrollMemory: false,
+      playoffCountOverride: { value: 4 },
+      setPlayoffCountOverride: vi.fn(),
+    });
+    const props = schedulePageProps({ playoffOnly: true });
+    const { container, rerender } = render(<SchedulePage {...props} />);
+    const descriptions = [
+      "Match 1 (R1) (#1)", "Match 2 (R1) (#2)", "Match 3 (R2) (#3)",
+      "Match 4 (R2) (#4)", "Match 5 (R3) (#5)", "Final 1 (#6)",
+      "Final 2 (#7)", "Final Tiebreaker (#8)",
+    ];
+    const sheet = utils.aoa_to_sheet([
+      ["Playoff Match Schedule"], [],
+      [null, "Mainely SPIRIT"], ["Matches Per Team"],
+      ["Time", "Description", "Blue 1", "Blue 2", "Blue 3", "Red 1", "Red 2", "Red 3"],
+      [46319.572916666664, descriptions[0], "9998", "4473", "172", "133", "5687", "9997"],
+      [46319.57986111111, descriptions[1], "58", "9055", "6153", "2648", "4564", "9999"],
+      [null, "Field Break"],
+      ...descriptions.slice(2).map((description, i) => [46319.59444444445 + i / 144, description]),
+      [null, "Awards Break *"],
+      ["\n* break if required\n"],
+    ]);
+    for (let row = 6; row <= 15; row++) {
+      if (sheet[`A${row}`]?.t === "n") sheet[`A${row}`].z = "m/d/yyyy h:mm AM/PM";
+    }
+    const workbook = utils.book_new();
+    utils.book_append_sheet(workbook, sheet, "Sheet1");
+    const file = new File([write(workbook, { type: "array", bookType: "xlsx" })], "playoffs.xlsx");
+    fireEvent.change(container.querySelector("#LoadOfflinePlayoffs"), { target: { files: [file] } });
+
+    await waitFor(() => expect(props.setOfflinePlayoffSchedule).toHaveBeenCalledOnce());
+    const saved = props.setOfflinePlayoffSchedule.mock.calls[0][0];
+    expect(Array.isArray(saved.schedule)).toBe(true);
+    expect(saved.schedule.map((match) => match.description)).toEqual(descriptions);
+    expect(saved.schedule.map((match) => match.matchNumber)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
+    expect(moment(saved.schedule[0].startTime).format("YYYY-MM-DD HH:mm")).toBe("2026-10-24 13:45");
+    expect(saved.schedule[2].teams).toHaveLength(6);
+    expect(saved.schedule[2].teams.every((team) => team.teamNumber === null)).toBe(true);
+    expect(getAlliances.mock.calls[0][0].Alliances.map((alliance) => alliance.captain)).toEqual(["133", "2648", "58", "9998"]);
+    expect(getTeamList).toHaveBeenCalledWith(expect.arrayContaining([133, 5687, 9997, 9998, 4473, 172]));
+    expect(getTeamList.mock.calls[0][0]).toHaveLength(12);
+    expect(getTeamList.mock.calls[0][0]).not.toContain(null);
+
+    setupMocks({
+      selectedEvent: { value: { code: "OFFLINE" }, label: "Offline Event" },
+      offlinePlayoffSchedule: saved,
+    });
+    rerender(<SchedulePage {...props} />);
+    for (const description of descriptions) {
+      expect(screen.getByText(description)).toBeInTheDocument();
+    }
+  });
+
+  it("preserves the nested practice schedule, text times, and surrogate markers", async () => {
+    const props = schedulePageProps();
+    const { container } = render(<SchedulePage {...props} />);
+    const sheet = utils.aoa_to_sheet([
+      ["Practice Match Schedule"], [],
+      [null, "Test Event"], [],
+      ["Time", "Description", "Blue 1", "Blue 2", "Blue 3", "Red 1", "Red 2", "Red 3"],
+      ["Sat 1:45 PM", "Practice 1", "1", "2", "3", "4*", "5", "6"],
+      [null, "Field Break"],
+    ]);
+    const workbook = utils.book_new();
+    utils.book_append_sheet(workbook, sheet, "Sheet1");
+    const file = new File([write(workbook, { type: "array", bookType: "xlsx" })], "practice.xlsx");
+    fireEvent.change(container.querySelector("#BackupFiles"), { target: { files: [file] } });
+
+    await waitFor(() => expect(props.setPracticeSchedule).toHaveBeenCalledOnce());
+    const saved = props.setPracticeSchedule.mock.calls[0][0];
+    expect(saved.schedule.schedule).toHaveLength(1);
+    expect(saved.schedule.schedule[0]).toMatchObject({
+      description: "Practice 1",
+      tournamentLevel: "Practice",
+      matchNumber: 1,
+      teams: expect.arrayContaining([
+        expect.objectContaining({ teamNumber: 4, station: "Red1", surrogate: true }),
+      ]),
+    });
+    expect(moment(saved.schedule.schedule[0].startTime).format("HH:mm")).toBe("13:45");
+    expect(props.setQualsLength).toHaveBeenCalledWith(1);
+    expect(props.setOfflinePlayoffSchedule).not.toHaveBeenCalled();
   });
 
   it("opens score details for FIRST Global results without an actual start time", () => {
