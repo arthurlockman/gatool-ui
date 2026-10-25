@@ -4,7 +4,7 @@ import StatsPage from "./StatsPage";
 
 vi.mock("contexts/EventDataContext", () => ({ useEventData: vi.fn() }));
 vi.mock("../components/StatsMatch", () => ({
-  default: ({ matchName }) => <td data-testid="stats-match">{matchName}</td>,
+  default: ({ matchName, highScores, matchType }) => <td data-testid="stats-match">{matchName} {highScores?.[matchType]?.score}</td>,
 }));
 
 import { useEventData } from "contexts/EventDataContext";
@@ -30,6 +30,35 @@ function setupEventData(overrides = {}) {
 describe("StatsPage", () => {
   beforeEach(() => {
     setupEventData();
+  });
+
+  it("shows only the selected FIRST Global season across all field sets", () => {
+    setupEventData({
+      ftcMode: { value: "FIRSTGlobal" },
+      eventLabel: "Field Set 2",
+      selectedEvent: { value: { code: "FG2026", regionCode: "R1", leagueCode: "L9", districtCode: "NE" } },
+    });
+    const props = {
+      worldStats,
+      eventHighScores: { year: 2026, highscores: { overallqual: { score: 987 } } },
+      ftcRegionHighScores: { year: 2026, highscores: {} },
+      ftcLeagueHighScores: { year: 2026, highscores: {} },
+      frcDistrictHighScores: { year: 2026, highscores: {} },
+      districts: [],
+      eventNamesCY: {},
+    };
+    const { container, rerender } = render(<StatsPage {...props} />);
+    expect(screen.getByText("FIRST Global 2026 High Scores - All Field Sets")).toBeInTheDocument();
+    expect(container.querySelectorAll("table")).toHaveLength(1);
+    expect(screen.getByText(/987/)).toBeInTheDocument();
+    expect(screen.queryByText(/World High Scores|Region R1 High Scores|Event High Scores:/)).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "League" })).not.toBeInTheDocument();
+
+    setupEventData({ ftcMode: { value: "FIRSTGlobal" }, selectedYear: { value: "2027" } });
+    rerender(<StatsPage {...props} />);
+    expect(screen.getByText(/awaiting stats data/i)).toBeInTheDocument();
+    expect(screen.queryByText(/987/)).not.toBeInTheDocument();
+    expect(container.querySelector("table")).not.toBeInTheDocument();
   });
 
   it("shows the no-event alert when nothing is selected", () => {

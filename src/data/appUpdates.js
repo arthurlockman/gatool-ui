@@ -1,12 +1,26 @@
 export const appUpdates = [
   {
-    date: "October 24, 2026",
+    date: "October 25, 2026",
     message: (
       <>
       <ul>
         <li>FRC:</li>
         <ul>
           <li>Fixed offline playoff schedule imports to display matches, retain future matches with unassigned teams, and preserve Excel match dates and times.</li>
+          <li>Fixed issue with finals match synthetic schedule when using Playoff Bracket tap-to-advance matches</li>
+          <li>Fixed offline finals advancement to keep alliances in their assigned colors and show the correct series advantage on Announce and Play-by-Play screens.</li>
+          <li>Restored finals series advantage below the alliance numbers on the Emcee numbers screen for FRC and FTC.</li>
+        </ul>
+        <li>FTC:</li>
+        <ul>
+          <li>Improved League filtering to account for similarly named Leagues across Regions</li>
+          <li>Event choices now respect both the selected Region/Event Type and League filters.</li>
+        </ul>
+        <li><i><b>FIRST</b></i> Global:</li>
+        <ul>
+          <li>Updated background tint on Settings screen to differentiate between FGC and FTC</li>
+          <li>Removed erroneous Region scores on the Stats page</li>
+          <li></li>
         </ul>
       </ul></>
     ),

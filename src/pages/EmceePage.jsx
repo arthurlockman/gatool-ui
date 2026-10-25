@@ -10,6 +10,7 @@ import { matchClassesBase } from "data/matchClasses";
 import { useSettings } from "../contexts/SettingsContext";
 import { useEventData } from "contexts/EventDataContext";
 import { useEventActions } from "contexts/EventActionsContext";
+import { isFirstGlobalMode } from "../utils/programConstants";
 
 function EmceePage() {
   const {
@@ -1012,8 +1013,7 @@ function EmceePage() {
               </Row>
             )}
 
-            {!nonStandardPlayoffs && ((!isDaVinci && playoffMatchNumber <= 13) ||
-              (isDaVinci && playoffMatchNumber >= 16 && (
+            {!nonStandardPlayoffs && !isFirstGlobalMode(ftcMode) && (!isDaVinci || matchDetails?.series >= 16) && (
                 <Row>
                   <Col
                     xs={12}
@@ -1028,7 +1028,7 @@ function EmceePage() {
                     />
                   </Col>
                 </Row>
-              )))}
+              )}
           </Container>
         </>
       )}

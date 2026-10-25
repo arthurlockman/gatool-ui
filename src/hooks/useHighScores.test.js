@@ -1,4 +1,4 @@
-// Tests for useHighScores. FRC mode only — the FTC region/league code paths
+// Tests for useHighScores. FRC and FIRST Global — the FTC region/league code paths
 // are out of scope. We mock useEventSelection so each test can drive
 // selectedYear / selectedEvent / ftcMode without touching localforage.
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -62,6 +62,42 @@ describe("useHighScores (FRC)", () => {
     expect(result.current.ftcRegionHighScores).toBeNull();
     expect(result.current.ftcLeagueHighScores).toBeNull();
     expect(result.current.frcDistrictHighScores).toBeNull();
+  });
+
+  it("calculates FIRST Global scores from all fields and refreshes when they update", async () => {
+    setEventSelection({
+      year: "2026",
+      event: { code: "FG2026" },
+      ftcMode: { value: "FIRSTGlobal" },
+    });
+    const makeMatch = (score, field) => ({
+      description: `Field ${field} Qualification 1`,
+      matchNumber: field,
+      tournamentLevel: "Qualification",
+      scoreRedFinal: score,
+      scoreBlueFinal: 10,
+      scoreRedFoul: 0,
+      scoreBlueFoul: 0,
+      teams: [{ teamNumber: 1, station: "Red1" }, { teamNumber: 2, station: "Blue1" }],
+    });
+    const filtered = { lastUpdate: "same", schedule: [makeMatch(100, 1)] };
+    let allFields = { schedule: { schedule: [makeMatch(100, 1), makeMatch(300, 2)] } };
+    const httpClient = createTestHttpClient();
+    const { result, rerender } = renderHookWithProviders(() => useHighScores({
+      httpClient,
+      qualSchedule: filtered,
+      qualScheduleAllFields: allFields,
+      playoffSchedule: null,
+      useFTCOffline: false,
+      isOnline: true,
+      manualOfflineMode: false,
+    }));
+    await waitFor(() => expect(result.current.eventHighScores?.highscores.overallqual.score).toBe(300));
+    expect(result.current.eventHighScores.year).toBe("2026");
+    allFields = { schedule: { schedule: [makeMatch(100, 1), makeMatch(500, 2)] } };
+    rerender();
+    await waitFor(() => expect(result.current.eventHighScores?.highscores.overallqual.score).toBe(500));
+    expect(result.current.eventHighScores.highscores.overallqual.matchName).toBe("Field 2 Qualification 1");
   });
 
   it("getWorldStats populates worldStats from the FRC global high-scores fixture", async () => {
