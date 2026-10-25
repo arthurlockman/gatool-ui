@@ -220,7 +220,7 @@ function SchedulePage({
     _.forEach(scheduleArray, function (row) {
       //do something
       _.forEach(row.teams, function (team) {
-        if (_.findIndex(tempTeamList, team.teamNumber) < 0) {
+        if (team.teamNumber != null && !tempTeamList.includes(team.teamNumber)) {
           tempTeamList.push(team.teamNumber);
         }
       });
@@ -268,9 +268,12 @@ function SchedulePage({
         }
       } else {
         // Parse Excel file (existing logic)
-        workbook = read(data, { type: "array" });
+        workbook = read(data, { type: "array", cellDates: true });
         var worksheet = workbook.Sheets[workbook.SheetNames[0]];
         schedule = utils.sheet_to_json(worksheet, { range: 4 });
+        schedule = schedule.map((match) => match.Time instanceof Date
+          ? { ...match, Time: moment(match.Time).format() }
+          : match);
         eventnameTemp = worksheet.B3?.v || selectedEvent?.label;
       }
       
@@ -278,7 +281,7 @@ function SchedulePage({
       var matchNumber = 0;
       var errorMessage = "";
       var innerSchedule = [];
-      const { normalized, errorMatches } = normalizeAndValidateSchedule(schedule);
+      const { normalized, errorMatches } = normalizeAndValidateSchedule(schedule, { forPlayoffs });
       schedule = normalized;
 
       if (errorMatches?.length > 0) {
@@ -294,10 +297,10 @@ function SchedulePage({
       } else {
         innerSchedule = schedule.map((match) => {
           var matchTime =
-            moment(match?.Time, "ddd h:mm A").format() === "Invalid date"
+            moment(match?.Time, [moment.ISO_8601, "ddd h:mm A"]).format() === "Invalid date"
               ? moment()
-              : moment(match?.Time, "ddd h:mm A").format();
-          if (match["Red 1"]) {
+              : moment(match?.Time, [moment.ISO_8601, "ddd h:mm A"]).format();
+          if (match["Red 1"] || forPlayoffs) {
             matchNumber++;
             var tempRow = {
               description: match?.Description,
@@ -424,9 +427,9 @@ function SchedulePage({
         }
 
         const scheduleArray = _.filter(innerSchedule, "description");
-        // Normalize to match API structure: schedule.schedule (nested)
-        // This ensures consistency with how getSchedule formats data from FIRST API
-        formattedSchedule.schedule = { schedule: scheduleArray };
+        formattedSchedule.schedule = forPlayoffs
+          ? scheduleArray
+          : { schedule: scheduleArray };
         
         if (!forPlayoffs) {
           await setPracticeSchedule(formattedSchedule);
@@ -862,9 +865,7 @@ function SchedulePage({
             playoffSchedule?.schedule?.length > 0) ||
           (qualSchedule?.schedule?.schedule?.length === 0 &&
             playoffSchedule?.schedule?.length > 0) ||
-          (qualSchedule?.schedule?.schedule?.length === 0 &&
-            playoffSchedule?.schedule?.length === 0 &&
-            offlinePlayoffSchedule)) && (
+          offlinePlayoffSchedule?.schedule?.length > 0) && (
           <div>
             <h4>{eventLabel}</h4>
             <Table

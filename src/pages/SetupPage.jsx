@@ -181,7 +181,23 @@ function SetupPage({
         { value: "offseason", label: "Offseason Events" }
     ];
 
-    const ftcFiltersMenu = _.orderBy(ftcLeagues, "label", "asc")
+    function getFTCLeagueOptions(filters) {
+        if (!filters?.length) return _.orderBy(ftcLeagues, "label", "asc");
+        const matchingLeagueCodes = new Set((eventList || [])
+            .filter((event) => filters.some((filter) =>
+                event.value?.regionCode === filter.value || event.value?.type === filter.value))
+            .map((event) => event.value?.leagueCode)
+            .filter(Boolean));
+        return _.orderBy(ftcLeagues.filter((league) => matchingLeagueCodes.has(league.value)), "label", "asc");
+    }
+
+    const ftcFiltersMenu = getFTCLeagueOptions(regionFilters);
+
+    function handleRegionFilters(filters) {
+        setRegionFilters(filters);
+        const availableLeagues = new Set(getFTCLeagueOptions(filters).map((league) => league.value));
+        setEventFilters((eventFilters || []).filter((league) => availableLeagues.has(league.value)));
+    }
 
     const regionFiltersMenu = [..._.filter(ftcTypes, (/** @type {{ type: string }} */ type) => String(type?.type ?? "").trim().toUpperCase() !== "KICKOFF").map((/** @type {{ type: string; description: string; }} */ type) => {
         return { value: type.type, label: type.description }
@@ -208,7 +224,13 @@ function SetupPage({
             filteredEvents = _.filter(filteredEvents, function (o) { return (_.indexOf(o?.filters, timeFilter.value) >= 0) });
         }
         var filterTemp = [];
-        if (filters.length > 0) {
+        if (ftcMode && !firstGlobalMode) {
+            filterTemp = filteredEvents.filter((event) =>
+                (!regionFilters?.length || regionFilters.some((filter) =>
+                    event.value?.regionCode === filter.value || event.value?.type === filter.value)) &&
+                (!eventFilters?.length || eventFilters.some((filter) =>
+                    event.value?.leagueCode === filter.value)));
+        } else if (filters.length > 0) {
             filters.forEach((filter) => {
                 filterTemp = filterTemp.concat(_.filter(filteredEvents, function (o) { return (_.indexOf(o.filters, filter) >= 0) }));
             })
@@ -387,7 +409,7 @@ function SetupPage({
             {(ftcMode === null || !selectedYear) && <Row>
                 <Alert variant="danger" className="gatool-awaiting-message"><b>Awaiting event list - {ftcMode === null ? "please select a program" : "please select a season"}</b></Alert>
             </Row>}
-            <Row className={ftcMode ? "ftcSetupPageMenus" : "setupPageMenus"}>
+            <Row className={firstGlobalMode ? "fgSetupPageMenus" : ftcMode ? "ftcSetupPageMenus" : "setupPageMenus"}>
                 <Col sm={2}>
                     <b>Choose a program...</b><br /><Select classNamePrefix="gatool-rs" options={ftcModeOptions} value={ftcMode === false ? { label: "FRC", value: "FRC" } : ftcMode} onChange={handleFTCMode} placeholder="Select a program" isDisabled={false} />
                 </Col>
@@ -471,7 +493,7 @@ function SetupPage({
                     <Select classNamePrefix="gatool-rs" options={ftcMode ? filterTimeFTC : filterTime} value={timeFilter ? timeFilter : ftcMode ? filterTimeFTC[0] : filterTime[0]} onChange={setTimeFilter} isDisabled={!isOnline || ftcMode === null || !selectedYear} />
                 </Col>
                 {ftcMode && <Col sm={4}><b>Filter by Event Type or Region here...</b><br />
-                    <Select classNamePrefix="gatool-rs" isMulti options={regionFiltersMenu} value={regionFilters} onChange={setRegionFilters} isDisabled={!isOnline || ftcMode === null || !selectedYear} />
+                    <Select classNamePrefix="gatool-rs" isMulti options={regionFiltersMenu} value={regionFilters} onChange={handleRegionFilters} isDisabled={!isOnline || ftcMode === null || !selectedYear} />
                 </Col>}
                 <Col sm={ftcMode ? 4 : 8}><b>Filter by  {ftcMode ? "League" : "event type or District"} here...</b><br />
                     <Select classNamePrefix="gatool-rs" isMulti options={ftcMode ? ftcFiltersMenu : filtersMenu} value={eventFilters} onChange={setEventFilters} isDisabled={!isOnline || ftcMode === null || !selectedYear} />

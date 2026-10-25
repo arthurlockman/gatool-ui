@@ -185,9 +185,9 @@ function SixAllianceBracket({ offlinePlayoffSchedule, setOfflinePlayoffSchedule,
 			console.log(matches[matchNumber - 1] || "no teams yet");
 			console.log(!matches[matchNumber - 1]?.teams[5]?.teamNumber ? "no blue team yet" : "select team");
 			if (matches[matchNumber - 1]?.teams[5]?.teamNumber) {
-				if (matchNumber >= 14) {
-					var finalsMatches = _.filter(matches, (value) => { return value.matchNumber > 13 });
-					matchNumber = 14 + _.findIndex(finalsMatches, (value) => { return value.scoreRedFinal < 10 });
+				if (matchNumber >= finalsStartMatch) {
+					var finalsMatches = _.filter(matches, (value) => { return value.matchNumber >= finalsStartMatch });
+					matchNumber = finalsStartMatch + _.findIndex(finalsMatches, (value) => { return value.scoreRedFinal < 10 });
 				}
 				setWinnerMatch(matchNumber);
 				setShowSelectWinner(true);
