@@ -3,10 +3,11 @@ import StatsMatch from "../components/StatsMatch";
 import _ from "lodash";
 import { useState } from "react";
 import { useEventData } from "contexts/EventDataContext";
+import { isFirstGlobalMode } from "../utils/programConstants";
 
 function StatsPage({
   worldStats,
-  eventHighScores,
+  eventHighScores: suppliedEventHighScores,
   eventNamesCY,
   districts,
   ftcRegionHighScores,
@@ -15,16 +16,21 @@ function StatsPage({
   frcDistrictHighScores,
 }) {
   const { selectedEvent, eventLabel, selectedYear, ftcMode } = useEventData();
+  const firstGlobalMode = isFirstGlobalMode(ftcMode);
+  const eventHighScores = !firstGlobalMode ||
+    String(suppliedEventHighScores?.year) === String(selectedYear?.value)
+    ? suppliedEventHighScores
+    : null;
   const eventDistrict = _.filter(districts, {
     value: selectedEvent?.value?.districtCode,
   })[0];
-  const hasAnyStats =
+  const hasAnyStats = firstGlobalMode ? eventHighScores :
     worldStats ||
     eventHighScores ||
     ftcRegionHighScores ||
     ftcLeagueHighScores ||
     frcDistrictHighScores;
-  const isFTC = !!ftcMode;
+  const isFTC = !!ftcMode && !firstGlobalMode;
   const hasLeague = !!(isFTC && selectedEvent?.value?.leagueCode);
   const [useLeagueHighScores, setUseLeagueHighScores] = useState(false);
   const ftcRegionLabel = selectedEvent?.value?.regionCode
@@ -59,7 +65,7 @@ function StatsPage({
         <Container fluid>
           <Row>
             {/* World High Scores (FRC and FTC use same endpoint: {{apiBase}}/{{season}}/highscores) */}
-            {worldStats && <Col xs={"12"} sm={((selectedEvent?.value?.districtCode && !isFTC) || (isFTC && (ftcRegionHighScores || ftcLeagueHighScores))) ? "4" : "6"}>
+            {!firstGlobalMode && worldStats && <Col xs={"12"} sm={((selectedEvent?.value?.districtCode && !isFTC) || (isFTC && (ftcRegionHighScores || ftcLeagueHighScores))) ? "4" : "6"}>
               <table className="table table-condensed gatool-highScores-Table gatool-worldHighScores">
                 <thead>
                   <tr>
@@ -157,7 +163,7 @@ function StatsPage({
               </table>
             </Col>}
             {/* FRC District High Scores */}
-            {selectedEvent?.value?.districtCode && !isFTC && (
+            {!firstGlobalMode && selectedEvent?.value?.districtCode && !isFTC && (
               <Col xs={"12"} sm={"4"}>
                 <table className="table table-condensed gatool-highScores-Table gatool-districtHighScores">
                   <thead>
@@ -319,6 +325,7 @@ function StatsPage({
             <Col
               xs={"12"}
               sm={
+                firstGlobalMode ? "12" :
                 (isFTC && (worldStats || ftcRegionHighScores || ftcLeagueHighScores)) || (!isFTC && selectedEvent?.value?.districtCode && worldStats)
                   ? "4"
                   : worldStats
@@ -330,7 +337,9 @@ function StatsPage({
                 <thead>
                   <tr>
                     <td className={"statsMatchHeader"} colSpan={2} style={{ backgroundColor: "#d9edf7" }}>
-                      Event High Scores: {eventLabel}
+                      {firstGlobalMode
+                        ? `FIRST Global ${selectedYear?.value} High Scores - All Field Sets`
+                        : `Event High Scores: ${eventLabel}`}
                     </td>
                   </tr>
                 </thead>

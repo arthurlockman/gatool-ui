@@ -16,6 +16,7 @@ export function useHighScores({
   manualOfflineMode,
 }) {
   const { selectedEvent, selectedYear, ftcMode } = useEventSelection();
+  const firstGlobalAllFields = isFirstGlobalMode(ftcMode) ? qualScheduleAllFields : null;
   const eventnames = ftcMode
     ? _.cloneDeep(FTCEventNames)
     : _.cloneDeep(eventNames);
@@ -485,16 +486,16 @@ export function useHighScores({
    * @returns sets the event high scores
    */
   async function getEventStats(year, code) {
+    // FIRST Global: use the complete unfiltered schedule so high scores span all fields.
+    const scheduleForHighScores = isFirstGlobalMode(ftcMode) && qualScheduleAllFields
+      ? qualScheduleAllFields
+      : qualSchedule;
     // Use locally calculated high scores instead of API call
-    if (!qualSchedule && !playoffSchedule) {
+    if (!scheduleForHighScores && !playoffSchedule) {
       setEventHighScores(null);
       return;
     }
 
-    // FIRST Global: use the complete unfiltered schedule so high scores span all fields
-    const scheduleForHighScores = isFirstGlobalMode(ftcMode) && qualScheduleAllFields
-      ? qualScheduleAllFields
-      : qualSchedule;
     const highscores = calculateEventHighScores(
       scheduleForHighScores,
       playoffSchedule,
@@ -564,12 +565,13 @@ export function useHighScores({
 
   // Recalculate event high scores whenever schedules update (when event loads or matches are played)
   useEffect(() => {
-    if (selectedEvent?.value?.code && selectedYear?.value && (qualSchedule || playoffSchedule)) {
+    if (selectedEvent?.value?.code && selectedYear?.value && (qualSchedule || playoffSchedule || (isFirstGlobalMode(ftcMode) && qualScheduleAllFields))) {
       console.log('Schedules updated, recalculating event high scores...');
       getEventStats(selectedYear?.value, selectedEvent?.value?.code);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [qualSchedule?.lastUpdate, playoffSchedule?.lastUpdate, selectedEvent?.value?.code, selectedYear?.value]);
+  }, [qualSchedule?.lastUpdate, playoffSchedule?.lastUpdate, selectedEvent?.value?.code, selectedYear?.value,
+    firstGlobalAllFields]);
 
   return {
     worldStats,

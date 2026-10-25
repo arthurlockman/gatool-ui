@@ -16,7 +16,7 @@ vi.mock("contexts/EventActionsContext", () => ({
   }),
 }));
 vi.mock("../contexts/SettingsContext", () => ({
-  useSettings: () => ({
+  useSettings: vi.fn(() => ({
     timeFormat: { value: "h:mm:ss a", label: "12hr" },
     setTimeFormat: vi.fn(),
     showSponsors: true,
@@ -93,7 +93,7 @@ vi.mock("../contexts/SettingsContext", () => ({
     setBackgroundDataRefreshFrequency: vi.fn(),
     nonStandardPlayoffs: false,
     setNonStandardPlayoffs: vi.fn(),
-  }),
+  })),
 }));
 vi.mock("../contextProviders/OnlineContext", () => ({
   useOnlineStatus: vi.fn(() => true),
@@ -116,6 +116,8 @@ vi.mock("components/ContentEditable", () => ({ default: () => null }));
 
 import { useEventData } from "contexts/EventDataContext";
 import { useOnlineStatus } from "../contextProviders/OnlineContext";
+import { useSettings } from "../contexts/SettingsContext";
+const baseSettings = useSettings.getMockImplementation()();
 
 function setupProps(overrides = {}) {
   return {
@@ -205,6 +207,93 @@ describe("SetupPage", () => {
   beforeEach(() => {
     setupMocks();
     vi.mocked(useOnlineStatus).mockReturnValue(true);
+    useSettings.mockImplementation(() => ({ ...baseSettings }));
+  });
+
+  it.each([
+    [[{ value: "R1" }], ["League One"], ["League Two", "League Three"]],
+    [[{ value: "0" }], ["League One", "League Three"], ["League Two"]],
+    [[], ["League One", "League Two", "League Three"], []],
+  ])("narrows league choices using region/type filters %j", (regionFilters, included, excluded) => {
+    setupMocks({ ftcMode: { value: "FTCOnline", label: "FTC Online" } });
+    useSettings.mockReturnValue({ ...baseSettings, regionFilters });
+    const props = setupProps({
+      ftcRegions: [{ regionCode: "R1", description: "Region One" }, { regionCode: "R2", description: "Region Two" }],
+      ftcTypes: [{ type: "0", description: "League Meet" }, { type: "1", description: "Qualifier" }],
+      ftcLeagues: [
+        { value: "L1", label: "League One" },
+        { value: "L2", label: "League Two" },
+        { value: "L3", label: "League Three" },
+      ],
+      eventList: [
+        { value: { code: "E1", name: "Event One", regionCode: "R1", type: "0", leagueCode: "L1" }, filters: ["R1", "0", "L1"] },
+        { value: { code: "E2", name: "Event Two", regionCode: "R2", type: "1", leagueCode: "L2" }, filters: ["R2", "1", "L2"] },
+        { value: { code: "E3", name: "Event Three", regionCode: "R2", type: "0", leagueCode: "L3" }, filters: ["R2", "0", "L3"] },
+      ],
+    });
+    const { rerender } = render(<SetupPage {...props} />);
+    const leagueColumn = screen.getByText(/Filter by\s+League/i).closest(".col-sm-4");
+    fireEvent.keyDown(leagueColumn.querySelector("input"), { key: "ArrowDown" });
+    for (const label of included) expect(screen.getByText(label)).toBeInTheDocument();
+    for (const label of excluded) expect(screen.queryByText(label)).not.toBeInTheDocument();
+    if (regionFilters.length === 0) {
+      fireEvent.keyDown(leagueColumn.querySelector("input"), { key: "Escape" });
+      useSettings.mockReturnValue({
+        ...baseSettings,
+        eventFilters: [{ value: "L1", label: "League One" }],
+      });
+      rerender(<SetupPage {...props} />);
+      const regionColumn = screen.getByText(/Filter by Event Type or Region/i).closest(".col-sm-4");
+      fireEvent.keyDown(regionColumn.querySelector("input"), { key: "ArrowDown" });
+      fireEvent.click(screen.getByText("Region Two"));
+      expect(baseSettings.setRegionFilters).toHaveBeenCalledWith([
+        { value: "R2", label: "Region Two" },
+      ]);
+      expect(baseSettings.setEventFilters).toHaveBeenCalledWith([]);
+    }
+  });
+
+  it.each([
+    [["R1"], ["L1"], "all", ["Event One"], ["Event Two", "Event Three", "Event Four"]],
+    [["R1"], [], "all", ["Event One", "Event Two"], ["Event Three", "Event Four"]],
+    [[], ["L1"], "all", ["Event One", "Event Three"], ["Event Two", "Event Four"]],
+    [["R1", "R2"], ["L1", "L2"], "all", ["Event One", "Event Two", "Event Three"], ["Event Four"]],
+    [["0"], ["L1"], "all", ["Event One"], ["Event Two", "Event Three", "Event Four"]],
+    [["R1"], ["L1"], "future", [], ["Event One", "Event Two", "Event Three", "Event Four"]],
+    [[], [], "all", ["Event One", "Event Two", "Event Three", "Event Four"], []],
+  ])("intersects FTC region/type %j with league %j and timeframe %s", (regions, leagues, timeframe, included, excluded) => {
+    setupMocks({ ftcMode: { value: "FTCOnline", label: "FTC Online" } });
+    useSettings.mockReturnValue({
+      ...baseSettings,
+      regionFilters: regions.map((value) => ({ value })),
+      eventFilters: leagues.map((value) => ({ value })),
+      timeFilter: { value: timeframe },
+    });
+    const events = [
+      ["E1", "Event One", "R1", "L1", "0", "past"],
+      ["E2", "Event Two", "R1", "L2", "0", "future"],
+      ["E3", "Event Three", "R2", "L1", "1", "future"],
+      ["E4", "Event Four", "R2", "L3", "0", "future"],
+    ].map(([code, name, regionCode, leagueCode, type, time]) => ({
+      label: name,
+      value: { code, name, regionCode, leagueCode, type },
+      filters: [regionCode, leagueCode, type, time],
+    }));
+    render(<SetupPage {...setupProps({ eventList: events })} />);
+    const eventColumn = screen.getByText(/then choose an event/i).closest(".col-sm-7");
+    fireEvent.keyDown(eventColumn.querySelector("input"), { key: "ArrowDown" });
+    for (const label of included) expect(screen.getByText(label)).toBeInTheDocument();
+    for (const label of excluded) expect(screen.queryByText(label)).not.toBeInTheDocument();
+  });
+
+  it.each([
+    [false, "setupPageMenus"],
+    [{ value: "FTC", label: "FTC" }, "ftcSetupPageMenus"],
+    [{ value: "FIRSTGlobal", label: "FIRST Global" }, "fgSetupPageMenus"],
+  ])("uses the program-specific menu style for %j", (ftcMode, className) => {
+    setupMocks({ ftcMode });
+    render(<SetupPage {...setupProps()} />);
+    expect(screen.getByText(/choose a program/i).closest(".row")).toHaveClass(className);
   });
 
   it("prompts the user to select a program when ftcMode is null", () => {

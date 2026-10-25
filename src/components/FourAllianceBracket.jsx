@@ -206,7 +206,7 @@ function FourAllianceBracket({ currentMatch, qualsLength, nextMatch, previousMat
 			if (t) t.teamNumber = num;
 		};
 
-		if (winnerTo <= 14) {
+		if (winnerMatch < finalsStartMatch) {
 			if (winnerTo) {
 				setTeamNum(tempMatches.schedule[winnerTo - 1], `${winnerStation}1`, tempTeams[winningAlliance][0]);
 				setTeamNum(tempMatches.schedule[winnerTo - 1], `${winnerStation}2`, tempTeams[winningAlliance][1]);

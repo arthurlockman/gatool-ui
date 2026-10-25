@@ -28,12 +28,12 @@ function BottomButtons({
   ftcLeagues,
 }) {
   const { showWorldAndStatsOnAnnouncePlayByPlay, highScoreMode, nonStandardPlayoffs } = useSettings();
-  const { firstGlobalMode, remapNumberToString } = useEventData();
+  const { firstGlobalMode, remapNumberToString, offlinePlayoffSchedule } = useEventData();
   function formatAllianceMembers(raw) {
     if (!firstGlobalMode || !raw) return raw;
     return String(raw).replace(/\d+/g, (num) => remapNumberToString(Number(num)));
   }
-    var matches = playoffSchedule?.schedule;
+    var matches = offlinePlayoffSchedule?.schedule || playoffSchedule?.schedule;
     var eventHighScore = eventHighScores?.highscores?.overallqual;
     if (!highScoreMode) {
         if (matchDetails?.tournamentLevel?.toLowerCase() === "playoff" || matchDetails?.tournamentLevel?.toLowerCase() === "finals") {
