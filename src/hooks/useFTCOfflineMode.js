@@ -77,7 +77,7 @@ export function useFTCOfflineMode({ httpClient, isOnline }) {
           delete json.Leagues;
         }
         const leagues = json.leagues.map((league) => {
-          return { label: league.name, value: league.code };
+          return { label: league.name, value: league.region + '/' + league.code };
         });
 
         setFTCLeagues(leagues);
