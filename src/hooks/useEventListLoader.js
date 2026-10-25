@@ -433,6 +433,9 @@ export function useEventListLoader(deps) {
             filters.push("district");
             filters.push(e.districtCode);
           } else if (ftcMode) {
+            if (e.leagueCode) {
+                e.leagueCode = e.regionCode + '/' + e.leagueCode;
+            }
             filters.push(e.type);
             filters.push(e.leagueCode);
             filters.push(e.regionCode);
