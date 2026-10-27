@@ -5,6 +5,7 @@ import _ from "lodash";
 import { useHotkeysContext, useHotkeys } from "react-hotkeys-hook";
 import useWindowDimensions from "hooks/UseWindowDimensions";
 import { useEventData } from "contexts/EventDataContext";
+import { orderByTeamNumber } from "../utils/teamNumberSort";
 
 
 
@@ -30,7 +31,8 @@ function AwardsPage() {
                 width > 480 ? 3 : 2;
 
     const { sortedTeams, columns } = useMemo(() => {
-        const sorted = _.orderBy(teamList?.teams, "teamNumber", "asc");
+        // FIRST Global remaps to country codes, so keep its numeric order.
+        const sorted = orderByTeamNumber(teamList?.teams, (team) => firstGlobalMode || !remapNumberToString ? team?.teamNumber : remapNumberToString(team?.teamNumber));
         const enriched = communityUpdates
             ? sorted.map((team) => {
                 team.updates = team?.updates ? _.merge(team.updates, communityUpdatesLookup[team?.teamNumber]?.updates) : communityUpdatesLookup[team?.teamNumber]?.updates;
@@ -66,14 +68,21 @@ function AwardsPage() {
             });
         }
         return { sortedTeams: enriched, columns: cols };
-    }, [teamList?.teams, communityUpdates, communityUpdatesLookup, selectedYear?.value, colCount]);
+    }, [teamList?.teams, communityUpdates, communityUpdatesLookup, selectedYear?.value, colCount, firstGlobalMode, remapNumberToString]);
+
+    const teamIdentifiers = (team) => {
+        const rawNumber = String(team?.teamNumber ?? "").toUpperCase();
+        const displayNumber = remapNumberToString ? String(remapNumberToString(team?.teamNumber) ?? "").toUpperCase() : rawNumber;
+        return displayNumber === rawNumber ? [rawNumber] : [displayNumber, rawNumber];
+    };
 
     const matchingTeams = teamFilter
         ? sortedTeams.filter((team) => firstGlobalMode
             ? [team?.nameFull, team?.country, team?.countryCode]
                 .some(value => String(value || "").toLowerCase().includes(teamFilter.toLowerCase()))
-            : String(team?.teamNumber).startsWith(teamFilter))
+            : teamIdentifiers(team).some((identifier) => identifier.startsWith(teamFilter.trim().toUpperCase())))
         : [];
+    const isExactFilterMatch = (team) => teamIdentifiers(team).includes(teamFilter.trim().toUpperCase());
     const singleFilterMatch = matchingTeams.length === 1;
 
     const handleClose = () => {
@@ -96,11 +105,7 @@ function AwardsPage() {
 
     const filterTeams = (e) => {
         e.preventDefault();
-        if (e.currentTarget.valueAsNumber === "") {
-            setTeamFilter("");
-        } else {
-            setTeamFilter(e.currentTarget.value);
-        }
+        setTeamFilter(e.currentTarget.value);
     }
 
     const handleFilterSelect = (e) => {
@@ -140,7 +145,7 @@ function AwardsPage() {
                         <Form onSubmit={handleFilterSelect}>
                             <InputGroup className="mb-3" >
                                 <InputGroup.Text>{firstGlobalMode ? "Filter countries" : "Filter the teams"}</InputGroup.Text>
-                                <Form.Control id={"filterControl"} type={firstGlobalMode ? "search" : "number"} placeholder={firstGlobalMode ? "Enter a country name or code" : "Enter a number"} aria-label={firstGlobalMode ? "Country name or code" : "Team Number"} value={teamFilter} onChange={filterTeams} />
+                                <Form.Control id={"filterControl"} type={firstGlobalMode ? "search" : "text"} placeholder={firstGlobalMode ? "Enter a country name or code" : "Enter a number"} aria-label={firstGlobalMode ? "Country name or code" : "Team Number"} value={teamFilter} onChange={filterTeams} />
                                 {singleFilterMatch && <Button variant="primary" type="submit">Select this team</Button>}
                             </InputGroup>
                         </Form>
@@ -150,7 +155,7 @@ function AwardsPage() {
                             {column.map((team) => {
                                 const displayTeamNumber = remapNumberToString ? remapNumberToString(team?.teamNumber) : team?.teamNumber;
                                 const isVisible = teamFilter === "" || matchingTeams.includes(team);
-                                return (isVisible && <Row className={"awardsButton"} key={team.teamNumber} ><Button value={JSON.stringify(team)} onClick={handleShow} size="sm" variant={(team?.teamNumber === Number(teamFilter) || singleFilterMatch) ? "success" : "outline-success"}>{displayTeamNumber}</Button></Row>)
+                                return (isVisible && <Row className={"awardsButton"} key={team.teamNumber} ><Button value={JSON.stringify(team)} onClick={handleShow} size="sm" variant={(isExactFilterMatch(team) || singleFilterMatch) ? "success" : "outline-success"}>{displayTeamNumber}</Button></Row>)
                             })}
                         </Col> : null)
                     })}

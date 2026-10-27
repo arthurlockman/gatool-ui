@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import { originalAndSustaining, allianceSelectionBaseRounds } from "../data/appConfig";
 import useWindowDimensions from "hooks/UseWindowDimensions";
 import { useSettings } from "../contexts/SettingsContext";
+import { orderByTeamNumber } from "../utils/teamNumberSort";
 
 const ALLIANCE_DECLINED_TITLE =
     "Not eligible to be selected (previously declined an alliance offer).";
@@ -92,10 +93,35 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         allianceSelectionOrder = _.concat(allianceSelectionOrder, allianceSelectionOrderRounds[round]);
     })
 
-    var sortedTeams = _.orderBy(rankings?.ranks, "teamNumber", "asc");
-    // remove non-competing teams from sortedTeams
-    sortedTeams = _.filter(sortedTeams, (team) => {
-        return _.findIndex(teamList?.teams, { "teamNumber": team?.teamNumber }) >= 0;
+    const teamIdentifiers = (team) => [
+        String(team?.teamNumber).toUpperCase(),
+        String(remapNumberToString ? remapNumberToString(team?.teamNumber) : team?.teamNumber).toUpperCase(),
+    ];
+
+    // FIRST Global remaps to country codes, so keep its numeric order.
+    const sortIdentifier = (team) => firstGlobalMode || !remapNumberToString ? team?.teamNumber : remapNumberToString(team?.teamNumber);
+    const sortByTeamNumber = (teams) => orderByTeamNumber(teams, sortIdentifier);
+
+    // TBA rankings use display identifiers; selection state must keep numeric team IDs.
+    var sortedTeams = _.orderBy((rankings?.ranks || []).flatMap((rank) => {
+        const team = teamList?.teams?.find((entry) =>
+            String(entry.teamNumber) === String(rank.teamNumber) ||
+            (!firstGlobalMode && teamIdentifiers(entry).includes(String(rank.teamNumber).toUpperCase()))
+        );
+        return team ? [{ ...rank, ...team, teamNumber: team.teamNumber }] : [];
+    }), "teamNumber", "asc");
+    sortedTeams = sortedTeams.map((team) => {
+        team.updates = communityUpdates?.find((update) => update.teamNumber === team.teamNumber)?.updates || team.updates || {};
+        var years = 1 + Number(selectedYear?.value) - Number(team?.rookieYear);
+        if (typeof team?.updates?.teamYearsNoCompeteLocal !== "undefined") { years -= team?.updates?.teamYearsNoCompeteLocal }
+        var yearsDisplay = "th";
+        if (years.toString().endsWith("1")) { yearsDisplay = "st" }
+        if (years.toString().endsWith("2")) { yearsDisplay = "nd" }
+        if (years.toString().endsWith("3")) { yearsDisplay = "rd" }
+        if (years.toString() === "11" || years.toString() === "12" || years.toString() === "13") { yearsDisplay = "th" }
+        if (years.toString() === "1") { yearsDisplay = "Rookie" }
+        if (years === 1) { team.yearsDisplay = yearsDisplay } else { team.yearsDisplay = `${years}${yearsDisplay}`; }
+        return team;
     });
 
     {
@@ -309,7 +335,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
             const availableIndex = _.findIndex(asArrays.availableTeams, { "teamNumber": team.teamNumber });
             if (availableIndex < 0) {
                 asArrays.availableTeams.push(team);
-                asArrays.availableTeams = _.orderBy(asArrays.availableTeams, ["teamNumber"], ["asc"]);
+                asArrays.availableTeams = sortByTeamNumber(asArrays.availableTeams);
             }
 
             // If the team is an alliance captain, promote the next team (skipping other removed teams)
@@ -344,7 +370,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                             const newCaptainIndex = _.findIndex(asArrays.availableTeams, { "teamNumber": newCaptain.teamNumber });
                             if (newCaptainIndex < 0) {
                                 asArrays.availableTeams.push(newCaptain);
-                                asArrays.availableTeams = _.orderBy(asArrays.availableTeams, ["teamNumber"], ["asc"]);
+                                asArrays.availableTeams = sortByTeamNumber(asArrays.availableTeams);
                             }
                         }
                     }
@@ -373,16 +399,12 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
 
     const filterTeams = (e) => {
         e.preventDefault();
-        if (e.currentTarget.valueAsNumber === "") {
-            setTeamFilter("");
-        } else {
-            setTeamFilter(e.currentTarget.value);
-        }
+        setTeamFilter(e.currentTarget.value);
     }
 
     const handleFilterSelect = (e) => {
         e.preventDefault();
-        var team = _.filter(asArrays.availableTeams, { 'teamNumber': Number(e.currentTarget[0].value) })[0];
+        var team = asArrays.availableTeams.find((entry) => teamIdentifiers(entry).includes(e.currentTarget[0].value.toUpperCase()));
         // @ts-ignore
         document.getElementById("filterControl").value = "";
         setTeamFilter("");
@@ -449,7 +471,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                     })),
                     allianceCount: allianceCount?.count,
                     rankedTeams: _.orderBy(sortedAndRankedTeams, ["rank", "asc"]),
-                    availableTeams: _.orderBy(sortedAndRankedTeams, ["teamNumber", "asc"]),
+                    availableTeams: sortByTeamNumber(sortedAndRankedTeams),
                     nextChoice: 0,
                     undo: [],
                     declined: [],
@@ -469,7 +491,7 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectedEvent, rankings, teamList, allianceCount, communityUpdates, allianceSelectionArrays, allianceSelectionRoundOrder])
+    }, [selectedEvent, rankings, teamList, allianceCount, communityUpdates, allianceSelectionArrays, allianceSelectionRoundOrder, remapNumberToString])
 
     useHotkeys('return', () => document.getElementById("acceptButton")?.click(), { scopes: 'allianceAccept' });
     useHotkeys('d', () => document.getElementById("declineButton")?.click(), { scopes: 'allianceDecline' });
@@ -494,21 +516,6 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
 
 
     if (selectedEvent && rankings && teamList && allianceCount?.count > 0 && communityUpdates) {
-        sortedTeams = sortedTeams.map((team) => {
-            team = _.merge(team, teamList?.teams[_.findIndex(teamList?.teams, { "teamNumber": team?.teamNumber })]);
-            team.updates = communityUpdates[_.findIndex(communityUpdates, { "teamNumber": team?.teamNumber })]?.updates || team?.updates || {}
-            var years = 1 + Number(selectedYear?.value) - Number(team?.rookieYear);
-            if (typeof team?.updates?.teamYearsNoCompeteLocal !== "undefined") { years -= team?.updates?.teamYearsNoCompeteLocal }
-            var yearsDisplay = "th";
-            if (years.toString().endsWith("1")) { yearsDisplay = "st" }
-            if (years.toString().endsWith("2")) { yearsDisplay = "nd" }
-            if (years.toString().endsWith("3")) { yearsDisplay = "rd" }
-            if (years.toString() === "11" || years.toString() === "12" || years.toString() === "13") { yearsDisplay = "th" }
-            if (years.toString() === "1") { yearsDisplay = "Rookie" }
-            if (years === 1) { team.yearsDisplay = yearsDisplay } else { team.yearsDisplay = `${years}${yearsDisplay}`; }
-            return team;
-        })
-
         // Use existing alliance selection arrays or wait for initialization
         if (allianceSelectionArrays && !_.isEmpty(allianceSelectionArrays)) {
             asArrays = _.cloneDeep(allianceSelectionArrays);
@@ -542,9 +549,9 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
             _.findIndex(asArrays.alliances, { "number": asArrays?.allianceSelectionOrder?.[asArrays.nextChoice]?.number })
         ]?.captain?.teamNumber;
         
-        const displayAvailableTeams = asArrays.availableTeams?.filter(team => 
+        const displayAvailableTeams = sortByTeamNumber(asArrays.availableTeams?.filter(team =>
             team.teamNumber !== currentCaptainTeamNumber
-        ) || [];
+        ) || []);
         
         var rows = displayAvailableTeams.length;
         if (rows > 0) {
@@ -596,10 +603,10 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
         return (
             <>
                 {(asArrays?.nextChoice < asArrays.allianceSelectionOrder?.length && !isUnavailableCaptain && !skipped && !removed) &&
-                    (String(team?.teamNumber).startsWith(teamFilter) || teamFilter === "") && <div key={"availableButton" + team?.teamNumber} className={declined ? "availableTeam allianceDecline" : skipped ? "availableTeam allianceTeam allianceSkip" : "availableTeam allianceTeam"} title={declined ? ALLIANCE_DECLINED_TITLE : undefined} onClick={() => handleShow(team, declined ? "declined" : "show")}><b>{displayTeamNumber}</b></div>}
+                    teamIdentifiers(team).some((identifier) => identifier.startsWith(teamFilter.toUpperCase())) && <div key={"availableButton" + team?.teamNumber} className={declined ? "availableTeam allianceDecline" : skipped ? "availableTeam allianceTeam allianceSkip" : "availableTeam allianceTeam"} title={declined ? ALLIANCE_DECLINED_TITLE : undefined} onClick={() => handleShow(team, declined ? "declined" : "show")}><b>{displayTeamNumber}</b></div>}
 
                 {(asArrays?.nextChoice >= asArrays.allianceSelectionOrder?.length || isUnavailableCaptain || skipped || removed) &&
-                    (String(team?.teamNumber).startsWith(teamFilter) || teamFilter === "") && <div key={"availableButtonDisabled" + team?.teamNumber} className={declined ? "availableTeam allianceDecline" : removed ? "availableTeam allianceTeam allianceRemovedTeam" : skipped ? "availableTeam allianceTeam allianceSkip" : "availableTeam allianceTeam"} title={removed ? ALLIANCE_REMOVED_TITLE : declined ? ALLIANCE_DECLINED_TITLE : undefined}><b>{displayTeamNumber}</b></div>}
+                    teamIdentifiers(team).some((identifier) => identifier.startsWith(teamFilter.toUpperCase())) && <div key={"availableButtonDisabled" + team?.teamNumber} className={declined ? "availableTeam allianceDecline" : removed ? "availableTeam allianceTeam allianceRemovedTeam" : skipped ? "availableTeam allianceTeam allianceSkip" : "availableTeam allianceTeam"} title={removed ? ALLIANCE_REMOVED_TITLE : declined ? ALLIANCE_DECLINED_TITLE : undefined}><b>{displayTeamNumber}</b></div>}
             </>
         )
     }
@@ -616,9 +623,9 @@ function AllianceSelection({ selectedYear, selectedEvent, rankings, teamList, al
                             <Form onSubmit={handleFilterSelect}>
                                 <InputGroup className="mb-3" >
                                     <InputGroup.Text>Filter the teams</InputGroup.Text>
-                                    <Form.Control id={"filterControl"} type="number" placeholder="Enter a number" aria-label="Team Number" onChange={filterTeams} style={{ minWidth: "100px" }} />
+                                    <Form.Control id={"filterControl"} type="text" placeholder="Enter a team number" aria-label="Team Number" onChange={filterTeams} style={{ minWidth: "100px" }} />
                                     <InputGroup.Text id="resetFilter" onClick={resetFilter}><XSquare /></InputGroup.Text>
-                                    {(_.filter(asArrays?.availableTeams, { 'teamNumber': Number(teamFilter) }).length === 1) && <Button variant="primary" type="submit">Select this team</Button>}
+                                    {(asArrays?.availableTeams?.filter((team) => teamIdentifiers(team).includes(teamFilter.toUpperCase())).length === 1) && <Button variant="primary" type="submit">Select this team</Button>}
                                     <span>    </span>
                                     {(asArrays?.undo?.length > 0) && <Button id="undoButton" size="sm" onClick={handleUndo} active >Undo Previous Choice</Button>}
                                     {(asArrays?.undo?.length === 0) && <Button size="sm" onClick={handleUndo} disabled >Undo Previous Choice</Button>}

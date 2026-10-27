@@ -493,7 +493,7 @@ export function useRankingsAlliances(deps) {
       }
     }
     // FRC Regional event: fetch championship advancement per team
-    if (!ftcMode && !selectedEvent?.value?.districtCode && selectedEvent?.value?.code && !selectedEvent?.value?.code.includes("OFFLINE")) {
+    if (!ftcMode && selectedEvent?.value?.type === "Regional" && !selectedEvent?.value?.districtCode && selectedEvent?.value?.code && !selectedEvent?.value?.code.includes("OFFLINE")) {
       getRegionalEventDetail(ranks?.ranks);
     }
   }

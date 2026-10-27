@@ -24,6 +24,7 @@ import useScrollPosition from "../hooks/useScrollPosition";
 import { useSettings } from "../contexts/SettingsContext";
 import { useEventData } from "contexts/EventDataContext";
 import { useEventActions } from "contexts/EventActionsContext";
+import { orderByTeamNumber } from "../utils/teamNumberSort";
 
 function RanksPage({
   rankSort,
@@ -232,10 +233,17 @@ function RanksPage({
     return teamRow.teamName !== undefined;
   });
 
-  if (rankSort.charAt(0) === "-") {
-    rankingsList = _.orderBy(rankingsList, rankSort.slice(1), "desc");
+  const rankSortDirection = rankSort.charAt(0) === "-" ? "desc" : "asc";
+  const rankSortKey = rankSortDirection === "desc" ? rankSort.slice(1) : rankSort;
+  if (rankSortKey === "teamNumber") {
+    // FIRST Global remaps to country names, so keep its numeric order.
+    rankingsList = orderByTeamNumber(
+      rankingsList,
+      (teamRow) => firstGlobalMode || !remapNumberToString ? teamRow.teamNumber : remapNumberToString(teamRow.teamNumber),
+      rankSortDirection
+    );
   } else {
-    rankingsList = _.orderBy(rankingsList, rankSort, "asc");
+    rankingsList = _.orderBy(rankingsList, rankSortKey, rankSortDirection);
   }
 
   return (
