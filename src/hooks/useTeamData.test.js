@@ -29,7 +29,7 @@ vi.mock("../contexts/EventSelectionContext", () => ({
 }));
 
 // Imported AFTER the mock so the hook picks up the mocked useEventSelection.
-import { useTeamData } from "./useTeamData";
+import { batchQueryTeamNumbers, useTeamData } from "./useTeamData";
 
 const BASE = "https://api.gatool.org/v3";
 const FG_BASE = `${BASE}/firstglobal`;
@@ -159,6 +159,36 @@ describe("useTeamData (FRC) — getTeamList", () => {
       nameShort: "Gompei and the HERD",
       city: "Worcester",
     });
+  });
+
+  it("ignores empty ad-hoc slots and sends only integer team numbers to queryHistory", async () => {
+    setSelection({
+      event: {
+        code: "OFFLINE",
+        name: "Offline Practice",
+        type: "Regional",
+        champLevel: "",
+      },
+    });
+    let historyBody;
+    server.use(
+      http.post(`${BASE}/:year/queryAwards`, () => HttpResponse.json({})),
+      http.post(`${BASE}/:year/queryHistory`, async ({ request }) => {
+        historyBody = await request.json();
+        return historyBody.teams.every(Number.isInteger)
+          ? HttpResponse.json({})
+          : new HttpResponse(null, { status: 400 });
+      })
+    );
+
+    const deps = makeDeps({ showBlueBanners: true });
+    const { result } = renderHookWithProviders(() => useTeamData(deps));
+
+    await result.current.getTeamList([190, null, undefined, 0, ""]);
+
+    await waitFor(() => expect(deps.setTeamList).toHaveBeenCalled());
+    expect(historyBody).toEqual({ teams: [190] });
+    expect(deps.setTeamList.mock.calls[0][0].teams.map((t) => t.teamNumber)).toEqual([190]);
   });
 
   it("merges queryAwards results onto the team list", async () => {
@@ -520,5 +550,13 @@ describe("useTeamData — resetTeamDataState", () => {
     expect(deps.setHaveChampsTeams).toHaveBeenCalledWith(false);
     expect(deps.setEITeams).toHaveBeenCalledWith([]);
     expect(deps.setRegionalEventDetail).toHaveBeenCalledWith(null);
+  });
+});
+
+describe("batchQueryTeamNumbers", () => {
+  it("keeps unique positive integers and drops values the batch endpoints reject", () => {
+    expect(batchQueryTeamNumbers([841, "841B", null, undefined, "", 0, " 254 ", 841, "9984"]))
+      .toEqual([841, 254, 9984]);
+    expect(batchQueryTeamNumbers(undefined)).toEqual([]);
   });
 });

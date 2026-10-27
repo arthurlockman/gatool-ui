@@ -1,5 +1,21 @@
 export const appUpdates = [
   {
+    date: "October 26, 2026",
+    message: (
+      <ul>
+        <li>FRC:</li>
+        <ul>
+          <li>Adding <i>2027 BIOCORE℠ presented by Haas</i> to Season menu</li>
+          <li>Fixed missing letter-suffixed teams in TBA offseason Alliance Selection, including team filtering and selection on Alliance Selection and Awards.</li>
+          <li>The Team List now displays remapped team numbers for extra robots, matching Schedule, Announce, and Play-by-Play.</li>
+          <li>Regional championship advancement is now requested only for regional events, avoiding invalid requests for TBA offseason teams.</li>
+          <li>Fixed intermittent "400 error from backend" messages when loading team history, robot images, and EPA for events with letter-suffixed teams, empty schedule slots, or 3-team alliances.</li>
+          <li>Sorting by team number on the Teams, Ranks, Awards, and Alliance Selection pages now orders letter-suffixed teams by number, then letter (e.g. 841, 841B, 842).</li>
+        </ul>
+      </ul>
+    ),
+  },
+  {
     date: "October 25, 2026",
     message: (
       <>

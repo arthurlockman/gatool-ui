@@ -325,7 +325,7 @@ describe("useRankingsAlliances (FRC)", () => {
       rankings: {
         rankings: [
           { teamNumber: 1277, rank: 1, wins: 8, losses: 2, ties: 0 },
-          { teamNumber: 126, rank: 2, wins: 7, losses: 3, ties: 0 },
+          { teamNumber: "841B", rank: 2, wins: 7, losses: 3, ties: 0 },
         ],
       },
     };
@@ -350,6 +350,8 @@ describe("useRankingsAlliances (FRC)", () => {
     const committed = deps.setRankings.mock.calls.at(-1)[0];
     expect(committed.ranks).toHaveLength(2);
     expect(committed.ranks[0].teamNumber).toBe(1277);
+    expect(committed.ranks[1].teamNumber).toBe("841B");
+    expect(deps.getRegionalEventDetail).not.toHaveBeenCalled();
   });
 
   it("getRanks: uses TBA endpoint for OffSeasonWithAzureSync events", async () => {
@@ -379,6 +381,7 @@ describe("useRankingsAlliances (FRC)", () => {
     const committed = deps.setRankings.mock.calls.at(-1)[0];
     expect(committed.ranks).toHaveLength(1);
     expect(committed.ranks[0].teamNumber).toBe(190);
+    expect(deps.getRegionalEventDetail).not.toHaveBeenCalled();
   });
 
   it("getAlliances: uses TBA endpoint for OffSeason events", async () => {

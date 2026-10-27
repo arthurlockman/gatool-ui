@@ -20,6 +20,23 @@ function trimArray(arr) {
 }
 
 /**
+ * Returns the unique integer team numbers accepted by the batch query endpoints.
+ * Those endpoints reject the whole request (HTTP 400) if any entry is null or a
+ * letter-suffixed identifier such as "841B".
+ * @param {Array<number|string|null|undefined>} teamNumbers
+ * @returns {number[]}
+ */
+export function batchQueryTeamNumbers(teamNumbers) {
+  return _.uniq(
+    (teamNumbers || [])
+      .map((teamNumber) =>
+        /^\d+$/.test(String(teamNumber ?? "").trim()) ? Number(String(teamNumber).trim()) : null
+      )
+      .filter((teamNumber) => teamNumber > 0)
+  );
+}
+
+/**
  * Determines whether an award name deserves special highlighting.
  * @param {string} awardName
  * @returns {boolean}
@@ -253,7 +270,11 @@ export function useTeamData(deps, opts = {}) {
         (cheesyArenaAvailable && useCheesyArena)
       ) {
         if (adHocTeamList) {
-          var adHocTeams = adHocTeamList.map(async (team) => {
+          // Empty schedule slots and 3-team alliances leave null/0 entries; don't turn them into placeholder teams.
+          const adHocTeamNumbers = adHocTeamList.filter(
+            (team) => team !== null && team !== undefined && !["", "0"].includes(String(team).trim())
+          );
+          var adHocTeams = adHocTeamNumbers.map(async (team) => {
             var request = await httpClient.getNoAuth(
               `${selectedYear?.value}/teams?teamNumber=${team}`,
               getApiBaseUrl(ftcMode),
@@ -877,23 +898,25 @@ export function useTeamData(deps, opts = {}) {
             champsStyle));
 
       if (shouldFetchChampsData) {
-        const teamNumbers = teams.teams.map((t) => t?.teamNumber);
+        const teamNumbers = batchQueryTeamNumbers(teams.teams.map((t) => t?.teamNumber));
         let historyMap = {};
-        try {
-          const baseURL = getApiBaseUrl(ftcMode);
-          const historyResult = await httpClient.postNoAuth(
-            `${selectedYear?.value}/queryHistory`,
-            { teams: teamNumbers },
-            baseURL
-          );
-          if (
-            historyResult.status === 200 &&
-            historyResult instanceof Response
-          ) {
-            historyMap = await historyResult.json();
+        if (teamNumbers.length > 0) {
+          try {
+            const baseURL = getApiBaseUrl(ftcMode);
+            const historyResult = await httpClient.postNoAuth(
+              `${selectedYear?.value}/queryHistory`,
+              { teams: teamNumbers },
+              baseURL
+            );
+            if (
+              historyResult.status === 200 &&
+              historyResult instanceof Response
+            ) {
+              historyMap = await historyResult.json();
+            }
+          } catch (e) {
+            console.error("Error fetching batch history:", e);
           }
-        } catch (e) {
-          console.error("Error fetching batch history:", e);
         }
 
         champsTeams = teams.teams.map((team) => {
@@ -1095,10 +1118,11 @@ export function useTeamData(deps, opts = {}) {
    */
   async function getRegionalEventDetail(ranksOverride) {
     if (!selectedYear?.value) return;
-    const teamNumbers =
+    const teamNumbers = batchQueryTeamNumbers(
       ranksOverride?.map((r) => r.teamNumber) ??
       teamList?.teams?.map((t) => t.teamNumber) ??
-      [];
+      []
+    );
     if (teamNumbers.length === 0) {
       setRegionalEventDetail(null);
       return;
@@ -1137,7 +1161,8 @@ export function useTeamData(deps, opts = {}) {
     const teams = teamList?.teams;
     if (!teams?.length || !selectedYear?.value) return;
     try {
-      const teamNumbers = teams.map((t) => t?.teamNumber);
+      const teamNumbers = batchQueryTeamNumbers(teams.map((t) => t?.teamNumber));
+      if (teamNumbers.length === 0) return;
       const result = await httpClient.postNoAuth(
         `${selectedYear.value}/queryMedia`,
         { teams: teamNumbers }
@@ -1166,7 +1191,8 @@ export function useTeamData(deps, opts = {}) {
     const teams = teamList?.teams;
     if (!teams?.length || !selectedYear?.value) return;
     try {
-      const teamNumbers = teams.map((t) => t?.teamNumber);
+      const teamNumbers = batchQueryTeamNumbers(teams.map((t) => t?.teamNumber));
+      if (teamNumbers.length === 0) return;
       const result = await httpClient.postNoAuth(
         `${selectedYear.value}/queryStatbotics`,
         { teams: teamNumbers }

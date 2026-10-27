@@ -133,7 +133,7 @@ function Announce({
                     </p>}
                 {awards && (showAwards || _.isNull(showAwards)) && <p className={"awards"}>
                     {awards.map((award, index) => {
-                        let formattedAward = <></>;
+                        let formattedAward = null;
                         if (award.year > selectedYear.value - (awardsMenu?.value || 3)) {
                             if (!award.highlight && (showMinorAwards || _.isNull(showMinorAwards))) {
                                 formattedAward = <span key={award?.year + award?.eventCode + award?.name + award?.person + team?.teamNumber + index} >{award.year} {_.findIndex(eventNamesCY[award.eventCode]) >= 0 ? eventNamesCY[award.eventCode] : award?.eventName ? award?.eventName : award.code} : {award.name}{award.person ? ` : ${award.person}` : ""}<br /></span>

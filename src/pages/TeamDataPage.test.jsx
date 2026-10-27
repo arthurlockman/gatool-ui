@@ -33,15 +33,11 @@ vi.mock("react-interval-hook", () => ({
   useInterval: () => ({ start: vi.fn(), stop: vi.fn() }),
 }));
 vi.mock("../components/TeamAvatar", () => ({ default: () => null }));
-vi.mock("components/TeamTimer", () => ({
-  default: ({ team, handleShow, editable }) => (
-    <td onClick={editable ? () => handleShow(team) : undefined}>{team?.teamNumber}</td>
-  ),
-}));
 vi.mock("components/TeamEditModal", () => ({
   default: ({ show, updateTeam, onHistory }) => show ? (
     <div>
       Team edit open
+      <span>Editing team {updateTeam?.teamNumber}</span>
       <button onClick={() => onHistory(updateTeam)}>Show team history</button>
     </div>
   ) : null,
@@ -154,6 +150,54 @@ describe("TeamDataPage", () => {
     expect(screen.getByText("254")).toBeInTheDocument();
     expect(screen.getByText("Poofs")).toBeInTheDocument();
     expect(screen.getByText(/tap to download this table as excel/i)).toBeInTheDocument();
+  });
+
+  it("displays TBA extra-robot numbers without changing the numeric team used for editing", () => {
+    const teams = [
+      { ...testTeam, teamNumber: 841, displayTeamNumber: "841" },
+      { ...testTeam, teamNumber: 9984, displayTeamNumber: "9984" },
+    ];
+    const eventData = {
+      selectedEvent: { value: { code: "CAELK", type: "OffSeason", tbaEventKey: "cacc" } },
+      teamList: { teams },
+      rankings: { ranks: [{ teamNumber: "841B", rank: 2 }] },
+    };
+    const props = teamDataProps({ isAuthenticated: true, user: { "https://gatool.org/roles": ["user"] } });
+    setupMocks(eventData);
+    const { rerender } = render(<TeamDataPage {...props} />);
+    expect(screen.getByText("9984")).toBeInTheDocument();
+
+    setupMocks({
+      ...eventData,
+      remapNumberToString: (n) => n === 9984 ? "841B" : n,
+    });
+    rerender(<TeamDataPage {...props} />);
+
+    expect(screen.getByText("841")).toBeInTheDocument();
+    const number = screen.getByText("841B");
+    expect(number.closest("tr").cells[1]).toHaveTextContent("2");
+    expect(screen.queryByText("9984")).not.toBeInTheDocument();
+    expect(teams[1].teamNumber).toBe(9984);
+    expect(teams[1].displayTeamNumber).toBe("9984");
+    fireEvent.click(number);
+    expect(screen.getByText("Team edit open")).toBeInTheDocument();
+    expect(screen.getByText("Editing team 9984")).toBeInTheDocument();
+  });
+
+  it("sorts letter-suffixed offseason teams by number then letter", () => {
+    const remap = { 9984: "841B", 9997: "8B" };
+    setupMocks({
+      selectedEvent: { value: { code: "CAELK", type: "OffSeason" } },
+      teamList: { teams: [9984, 1678, 841, 9997, 8].map((teamNumber) => ({ ...testTeam, teamNumber })) },
+      remapNumberToString: (n) => remap[n] || n,
+    });
+    const props = teamDataProps({ teamSort: "teamNumber" });
+    const { container, rerender } = render(<TeamDataPage {...props} />);
+    const order = () => [...container.querySelectorAll(".teamTable tbody tr")].map((row) => row.cells[0].textContent.replace("No recent visit.", ""));
+    expect(order()).toEqual(["8", "8B", "841", "841B", "1678"]);
+
+    rerender(<TeamDataPage {...teamDataProps({ teamSort: "-teamNumber" })} />);
+    expect(order()).toEqual(["1678", "841B", "841", "8B", "8"]);
   });
 
   it("keeps FIRST Global data read-only for a user without write access", () => {
