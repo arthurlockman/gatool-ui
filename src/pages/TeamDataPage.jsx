@@ -25,6 +25,7 @@ import { useEventData } from "contexts/EventDataContext";
 import { useEventActions } from "contexts/EventActionsContext";
 import { getFirstGlobalFlagUrl } from "../utils/countryFlag";
 import { canEditTeamData } from "../utils/roleAccess";
+import { orderByTeamNumber } from "../utils/teamNumberSort";
 
 /**
  * Message for an update that couldn't reach gatool Cloud. Only promise the user
@@ -908,6 +909,10 @@ function TeamDataPage({
 
         let extended = teamList.teams.map((teamRow) => {
             const teamRowCopy = { ...teamRow };
+            const displayNumber = remapNumberToString(teamRowCopy.teamNumber);
+            if (String(displayNumber) !== String(teamRowCopy.teamNumber)) {
+                teamRowCopy.displayTeamNumber = String(displayNumber);
+            }
             // Calculate rank inline to avoid dependency on getTeamRank function
             // For FG, rankings use numeric teamNumber directly; for TBA offseason, use remapped string
             const rankLookupNumber = firstGlobalMode
@@ -923,10 +928,12 @@ function TeamDataPage({
             return teamRowCopy;
         });
 
-        if (teamSort.charAt(0) === "-") {
-            extended = orderBy(extended, teamSort.slice(1), 'desc');
+        const sortDirection = teamSort.charAt(0) === "-" ? "desc" : "asc";
+        const sortKey = sortDirection === "desc" ? teamSort.slice(1) : teamSort;
+        if (sortKey === "teamNumber") {
+            extended = orderByTeamNumber(extended, (team) => team.displayTeamNumber || team.teamNumber, sortDirection);
         } else {
-            extended = orderBy(extended, teamSort, 'asc');
+            extended = orderBy(extended, sortKey, sortDirection);
         }
 
         return extended;

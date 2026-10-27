@@ -100,4 +100,21 @@ describe("RanksPage", () => {
     expect(screen.queryByText("Season Record")).not.toBeInTheDocument();
     expect(screen.queryByText("EPA")).not.toBeInTheDocument();
   });
+
+  it("sorts letter-suffixed offseason teams by number then letter", () => {
+    const remap = { 9984: "841B", 9997: "8B" };
+    setupMocks({
+      selectedEvent: { value: { code: "CAELK", type: "OffSeason" }, label: "Test Event" },
+      teamList: { teams: [8, 841, 1678, 9984, 9997].map((teamNumber) => ({ teamNumber, nameShort: `Team ${teamNumber}` })) },
+      rankings: { ranks: [1678, "841B", 841, "8B", 8].map((teamNumber, i) => ({ teamNumber, rank: i + 1 })) },
+      remapNumberToString: (n) => remap[n] || n,
+      remapStringToNumber: (s) => Number(Object.keys(remap).find((key) => remap[key] === s)) || Number(s),
+    });
+    const { container, rerender } = render(<RanksPage {...baseProps({ rankSort: "teamNumber" })} />);
+    const order = () => [...container.querySelectorAll("tbody tr")].map((row) => row.cells[0].textContent.trim().split(/\s/)[0]);
+    expect(order()).toEqual(["8", "8B", "841", "841B", "1678"]);
+
+    rerender(<RanksPage {...baseProps({ rankSort: "-teamNumber" })} />);
+    expect(order()).toEqual(["1678", "841B", "841", "8B", "8"]);
+  });
 });

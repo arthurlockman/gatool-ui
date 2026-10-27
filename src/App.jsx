@@ -74,9 +74,9 @@ const navPages = [
 ];
 
 const supportedYears = [
+  { label: "2027 BIOCORE℠ presented by Haas", value: "2027", program: "FRC" },
   { label: "2026 REBUILT℠ presented by Haas", value: "2026", program: "FRC" },
   { label: "2025 REEFSCAPE℠ presented by Haas", value: "2025", program: "FRC" },
-  { label: "2024 CRESCENDO℠", value: "2024", program: "FRC" },
 ];
 
 const FTCSupportedYears = [
