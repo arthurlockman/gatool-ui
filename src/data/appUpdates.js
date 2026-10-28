@@ -1,5 +1,13 @@
 export const appUpdates = [
   {
+    date: "October 28, 2026",
+    message: (
+      <ul>
+        <li>Fixed an issue with OFFLINE match where switching to Play by Play could cause corruption in the schedule, which could also leave matches blank on Schedule and Announce.</li>
+      </ul>
+    ),
+  },
+  {
     date: "October 26, 2026",
     message: (
       <ul>
