@@ -3,6 +3,8 @@ import useWindowDimensions from "hooks/UseWindowDimensions";
 import { useSettings } from "../contexts/SettingsContext";
 import { getFirstGlobalFlagUrl } from "../utils/countryFlag";
 
+import TeamNumber from "./TeamNumber";
+
 function PlayByPlay({ station, team, inPlayoffs, selectedEvent, adHocMode, playoffOnly, ftcMode, firstGlobalMode, remapNumberToString}) {
     const { showNotes, showMottoes, showQualsStats, showQualsStatsQuals } = useSettings();
     const { height, width } = useWindowDimensions();
@@ -26,7 +28,7 @@ function PlayByPlay({ station, team, inPlayoffs, selectedEvent, adHocMode, playo
     }
 
     // Display remapped team number if available
-    const displayTeamNumber = remapNumberToString ? remapNumberToString(team?.teamNumber) : team?.teamNumber;
+    const displayTeamNumber = <TeamNumber teamNumber={team?.teamNumber} remapNumberToString={remapNumberToString} />;
     const statsColumnCount = firstGlobalMode ? 3 : 5;
 
     return (
@@ -39,7 +41,7 @@ function PlayByPlay({ station, team, inPlayoffs, selectedEvent, adHocMode, playo
                         <p className={team?.updates?.organizationLocal ? (team?.updates?.organizationLocal?.length > 60 ? "playByPlayOrganization narrowFont" : "playByPlayOrganization") : (team?.organization?.length > 60 ? "playByPlayOrganization narrowFont" : "playByPlayOrganization")}>{team?.updates?.organizationLocal ? team?.updates?.organizationLocal : team?.organization}</p>
                         {(team?.updates?.cityStateLocal || team?.city || !firstGlobalMode) && <p className={"playByPlayCity"}>{team?.updates?.cityStateLocal ? team?.updates?.cityStateLocal : `${team?.city}, ${team?.stateProv}${team?.country !== "USA" && !team?.updates?.cityStateLocal ? `, ${team?.country}` : ""}`}</p>}
                         {(showMottoes || _.isNull(showMottoes)) && <p className={"playByPlayCity mottoes"}>{team?.updates?.teamMottoLocal}</p>}
-                        {(inPlayoffs || team?.alliance) && width < height && <p className={"playByPlayAlliance"}>{team?.alliance}{(selectedEvent?.value?.name.includes("OFFLINE") && !playoffOnly) ? <></> : <><br />{team.allianceRole}</>}</p>}
+                        {inPlayoffs && width < height && <p className={"playByPlayAlliance"}>{team?.alliance}{(selectedEvent?.value?.name.includes("OFFLINE") && !playoffOnly) ? <></> : <><br />{team.allianceRole}</>}</p>}
                     </>
                 }
                 {!team?.teamNumber && <>
@@ -73,7 +75,7 @@ function PlayByPlay({ station, team, inPlayoffs, selectedEvent, adHocMode, playo
                                 {team?.qualifiedFirstCmp && (selectedEvent?.value?.champLevel !== "CMPDIV" && selectedEvent?.value?.champLevel !== "CMPSUB" && selectedEvent?.value?.champLevel !== "CMPSUB") && <>Qualified for World Champs</>}
                             </p>}
                         {(showNotes || _.isNull(showNotes)) && <p className={`notes playByPlayWinLossTie teamNotes${team?.updates?.teamNotesLocal?.length > 60 ? " narrowFont" : ""}`} dangerouslySetInnerHTML={{ __html: team?.updates?.teamNotesLocal }}></p>}
-                        {(inPlayoffs || team?.alliance) && width >= height && <p className={"playByPlayAlliance"}>{team?.alliance}{selectedEvent?.value?.name.includes("OFFLINE") ? <></> : <><br />{team.allianceRole}</>}</p>}
+                        {inPlayoffs && width >= height && <p className={"playByPlayAlliance"}>{team?.alliance}{selectedEvent?.value?.name.includes("OFFLINE") ? <></> : <><br />{team.allianceRole}</>}</p>}
                     </>
                 }
                 {!team?.teamNumber && <>

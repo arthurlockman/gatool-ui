@@ -139,10 +139,10 @@ describe("AwardsPage", () => {
     });
     const { container } = render(<AwardsPage />);
     const order = [...container.querySelectorAll(".awardsButton button")].map((button) => button.textContent);
-    expect(order).toEqual(["8", "8B", "841", "841B", "1678"]);
+    expect(order).toEqual(["8", "9997/8B", "841", "9984/841B", "1678"]);
   });
 
-  it("filters and selects letter-suffixed offseason teams", () => {
+  it.each(["841b", "9984"])("filters and selects extra robots using %s", (query) => {
     const remap = { 9984: "841B" };
     setupMocks({
       teamList: { teams: [841, 9984, 1678].map((teamNumber) => ({ teamNumber, nameShort: `Team ${teamNumber}`, rookieYear: 2020 })) },
@@ -153,13 +153,13 @@ describe("AwardsPage", () => {
 
     fireEvent.change(filter, { target: { value: "841" } });
     expect(screen.getByRole("button", { name: "841" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "841B" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "9984/841B" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "1678" })).not.toBeInTheDocument();
 
-    fireEvent.change(filter, { target: { value: "841b" } });
+    fireEvent.change(filter, { target: { value: query } });
     expect(screen.queryByRole("button", { name: "841" })).not.toBeInTheDocument();
     fireEvent.click(screen.getByText("Select this team"));
-    expect(screen.getByText(/Team 841B/)).toBeInTheDocument();
+    expect(screen.getByText(/Team 9984\/841B/)).toBeInTheDocument();
   });
 
   it.each(["Puerto", "PUR"])("filters FIRST Global countries by %s", (query) => {

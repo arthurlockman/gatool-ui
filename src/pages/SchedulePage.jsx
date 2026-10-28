@@ -11,6 +11,7 @@ import moment from "moment";
 import { utils, read } from "xlsx";
 import { toast } from "react-toastify";
 import _ from "lodash";
+import { formatTeamNumber } from "../utils/teamNumberDisplay";
 import Switch from "react-switch";
 import { useState } from "react";
 import { playoffOverrideMenu, playoffOverrideMenuFTC } from "data/appConfig";
@@ -405,9 +406,9 @@ function SchedulePage({
                 var matchTeams = innerSchedule[allianceMember.match - 1].teams;
                 var tempAlliance = {
                   number: 1 + index,
-                  captain: getTeamByStation(matchTeams, `${stationPrefix}1`),
-                  round1: getTeamByStation(matchTeams, `${stationPrefix}2`),
-                  round2: getTeamByStation(matchTeams, `${stationPrefix}3`),
+                  captain: getTeamByStation(matchTeams, `${stationPrefix}1`, false),
+                  round1: getTeamByStation(matchTeams, `${stationPrefix}2`, false),
+                  round2: getTeamByStation(matchTeams, `${stationPrefix}3`, false),
                   round3: null,
                   backup: null,
                   backupReplaced: null,
@@ -472,11 +473,11 @@ function SchedulePage({
    * @param station the station to find (e.g., "Red1", "Red2", "Red3", "Blue1", "Blue2", "Blue3")
    * @returns the team object or null if not found
    */
-  function getTeamByStation(teams, station) {
+  function getTeamByStation(teams, station, forDisplay = true) {
     if (!teams || !Array.isArray(teams)) return null;
     const team = teams.find((t) => t?.station?.toLowerCase() === station?.toLowerCase());
     const teamNumber = team?.teamNumber || null;
-    // Use remapNumberToString to display the original team identifier (e.g., "841B" instead of 9991)
+    if (forDisplay) return formatTeamNumber(teamNumber, remapNumberToString);
     return remapNumberToString ? remapNumberToString(teamNumber) : teamNumber;
   }
 

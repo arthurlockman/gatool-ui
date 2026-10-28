@@ -8,7 +8,10 @@ vi.mock("../contextProviders/AuthClientContext", () => ({
 }));
 vi.mock("react-quizlet-flashcard", () => ({
   FlashcardArray: ({ deck }) => (
-    <div data-testid="flashcard-array">{deck?.length ?? 0} cards</div>
+    <div data-testid="flashcard-array">
+      {deck?.length ?? 0} cards
+      {deck?.map((card, index) => <div key={index}>{card.front.html}</div>)}
+    </div>
   ),
 }));
 
@@ -93,5 +96,15 @@ describe("CheatsheetPage", () => {
     expect(fetch).toHaveBeenCalledWith(
       "/cheatsheet/rebuilt-cheat-sheet-04222026.pdf"
     );
+  });
+
+  it("shows both identifiers on extra-robot flashcards", () => {
+    setupMocks({
+      teamList: { teams: [{ teamNumber: 9984, nameShort: "Extra robot" }] },
+      communityUpdates: [],
+      remapNumberToString: (n) => n === 9984 ? "841B" : n,
+    });
+    render(<CheatsheetPage />);
+    expect(screen.getByText("9984/841B")).toBeInTheDocument();
   });
 });

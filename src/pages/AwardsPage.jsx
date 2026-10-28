@@ -6,6 +6,7 @@ import { useHotkeysContext, useHotkeys } from "react-hotkeys-hook";
 import useWindowDimensions from "hooks/UseWindowDimensions";
 import { useEventData } from "contexts/EventDataContext";
 import { orderByTeamNumber } from "../utils/teamNumberSort";
+import { formatTeamNumber } from "../utils/teamNumberDisplay";
 
 
 
@@ -153,7 +154,7 @@ function AwardsPage() {
                     <Row key={eventLabel}>{columns.map((column, index) => {
                         return (index<colCount? <Col  key={index}>
                             {column.map((team) => {
-                                const displayTeamNumber = remapNumberToString ? remapNumberToString(team?.teamNumber) : team?.teamNumber;
+                                const displayTeamNumber = formatTeamNumber(team?.teamNumber, remapNumberToString);
                                 const isVisible = teamFilter === "" || matchingTeams.includes(team);
                                 return (isVisible && <Row className={"awardsButton"} key={team.teamNumber} ><Button value={JSON.stringify(team)} onClick={handleShow} size="sm" variant={(isExactFilterMatch(team) || singleFilterMatch) ? "success" : "outline-success"}>{displayTeamNumber}</Button></Row>)
                             })}
@@ -165,7 +166,7 @@ function AwardsPage() {
                             <Modal.Title className={"success"}>Awards Announcement</Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
-                            <span className={"allianceAnnounceDialog"}>Team {remapNumberToString ? remapNumberToString(awardTeam?.teamNumber) : awardTeam?.teamNumber} {awardTeam?.updates?.nameShortLocal ? awardTeam.updates.nameShortLocal : awardTeam?.nameShort}<br />
+                            <span className={"allianceAnnounceDialog"}>Team {formatTeamNumber(awardTeam?.teamNumber, remapNumberToString)} {awardTeam?.updates?.nameShortLocal ? awardTeam.updates.nameShortLocal : awardTeam?.nameShort}<br />
                                 is {awardTeam?.updates?.awardsTextLocal ? awardTeam?.updates?.awardsTextLocal : <>{(!firstGlobalMode && originalAndSustaining.includes(String(awardTeam?.teamNumber))) ? "an Original and Sustaining Team " : ""}from<br />
                                     {awardTeam?.updates?.organizationLocal ? awardTeam?.updates?.organizationLocal : awardTeam?.organization}<br />
                                     in</>} {awardTeam?.updates?.cityStateLocal ? awardTeam?.updates?.cityStateLocal : (firstGlobalMode ? "" : `${awardTeam?.city}, ${awardTeam?.stateProv}${awardTeam?.country !== "USA" ? `, ${awardTeam?.country}` : ""}`)}<br />

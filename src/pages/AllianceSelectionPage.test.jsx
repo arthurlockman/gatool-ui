@@ -31,7 +31,9 @@ vi.mock("../components/AllianceSelection", () => ({
 }));
 
 // Bracket components are complex; stub them all out
-vi.mock("../components/Bracket", () => ({ default: () => <div data-testid="bracket-stub" /> }));
+vi.mock("../components/Bracket", () => ({
+    default: ({ allianceNumbers, matches }) => <div data-testid="bracket-stub">{matches?.length ? allianceNumbers(1, "red") : ""}</div>,
+}));
 vi.mock("../components/SixAllianceBracket", () => ({ default: () => <div data-testid="six-alliance-bracket-stub" /> }));
 vi.mock("../components/FourAllianceBracket", () => ({ default: () => <div data-testid="four-alliance-bracket-stub" /> }));
 vi.mock("../components/FourAllianceBracketFTC", () => ({ default: () => <div data-testid="four-alliance-bracket-ftc-stub" /> }));
@@ -127,6 +129,25 @@ function baseProps(overrides = {}) {
         ...overrides,
     };
 }
+
+describe("TBA bracket team identifiers", () => {
+    it("shows numeric IDs rather than suffixes or combined labels", () => {
+        setupMocks({
+            eventOverrides: {
+                alliances: {
+                    alliances: Array.from({ length: 8 }, (_, i) => ({ number: i + 1 })),
+                    Lookup: { "841B": { captain: "841B", round1: 254, round2: 1678 } },
+                },
+                playoffSchedule: { schedule: [{ matchNumber: 1, teams: [{ station: "Red1", teamNumber: 9984 }] }] },
+                remapNumberToString: (n) => n === 9984 ? "841B" : n,
+                remapStringToNumber: (n) => n === "841B" ? 9984 : n,
+            },
+        });
+        render(<AllianceSelectionPage {...baseProps({ playoffs: true })} />);
+        expect(screen.getByTestId("bracket-stub")).toHaveTextContent("9984 254 1678");
+        expect(screen.getByTestId("bracket-stub")).not.toHaveTextContent("841B");
+    });
+});
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
 

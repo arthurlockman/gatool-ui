@@ -5,6 +5,7 @@ import _ from "lodash";
 import { apiBaseUrl } from "../contextProviders/AuthClientContext";
 import { useEventData } from "contexts/EventDataContext";
 import { getFirstGlobalFlagUrl } from "../utils/countryFlag";
+import { formatTeamNumber } from "../utils/teamNumberDisplay";
 
 function CheatsheetPage() {
   const {
@@ -15,6 +16,7 @@ function CheatsheetPage() {
     eventLabel,
     ftcMode,
     robotImages,
+    remapNumberToString,
   } = useEventData();
   const sortedTeams = _.orderBy(teamList?.teams, "teamNumber", "asc");
   const cardStyle = {
@@ -51,7 +53,7 @@ function CheatsheetPage() {
         ],
       );
     }
-    const frontHTML = `<h1>${robotImage}<b>${ftcMode && ftcMode.value === "FIRSTGlobal" ? team?.displayTeamNumber : team.teamNumber}</b></h1>`;
+    const frontHTML = `<h1>${robotImage}<b>${ftcMode && ftcMode.value === "FIRSTGlobal" ? team?.displayTeamNumber : formatTeamNumber(team.teamNumber, remapNumberToString)}</b></h1>`;
     const backHTML = `<h1>${avatar}<b>${
       team?.updates?.nameShortLocal
         ? team?.updates?.nameShortLocal

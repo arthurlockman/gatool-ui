@@ -174,7 +174,7 @@ describe("TeamDataPage", () => {
     rerender(<TeamDataPage {...props} />);
 
     expect(screen.getByText("841")).toBeInTheDocument();
-    const number = screen.getByText("841B");
+    const number = screen.getByText("9984/841B");
     expect(number.closest("tr").cells[1]).toHaveTextContent("2");
     expect(screen.queryByText("9984")).not.toBeInTheDocument();
     expect(teams[1].teamNumber).toBe(9984);
@@ -194,10 +194,10 @@ describe("TeamDataPage", () => {
     const props = teamDataProps({ teamSort: "teamNumber" });
     const { container, rerender } = render(<TeamDataPage {...props} />);
     const order = () => [...container.querySelectorAll(".teamTable tbody tr")].map((row) => row.cells[0].textContent.replace("No recent visit.", ""));
-    expect(order()).toEqual(["8", "8B", "841", "841B", "1678"]);
+    expect(order()).toEqual(["8", "9997/8B", "841", "9984/841B", "1678"]);
 
     rerender(<TeamDataPage {...teamDataProps({ teamSort: "-teamNumber" })} />);
-    expect(order()).toEqual(["1678", "841B", "841", "8B", "8"]);
+    expect(order()).toEqual(["1678", "9984/841B", "841", "9997/8B", "8"]);
   });
 
   it("keeps FIRST Global data read-only for a user without write access", () => {
