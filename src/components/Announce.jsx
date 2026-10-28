@@ -1,5 +1,6 @@
 
 import _ from "lodash";
+import TeamNumber from "./TeamNumber";
 import { useSettings } from "../contexts/SettingsContext";
 import { getFirstGlobalFlagUrl } from "../utils/countryFlag";
 
@@ -38,7 +39,7 @@ function Announce({
     if (years.toString() === "1") { yearsDisplay = "Rookie" }
     
     // Display remapped team number if available
-    const displayTeamNumber = remapNumberToString ? remapNumberToString(team.teamNumber) : team.teamNumber;
+    const displayTeamNumber = <TeamNumber teamNumber={team.teamNumber} remapNumberToString={remapNumberToString} />;
 
     return (
         <><tr key={station} className={`gatool-announce ${_.toLower(allianceColor)}Alliance`} >
@@ -46,7 +47,7 @@ function Announce({
                 <span className={"announceTeamNumber"} >{team?.countryCode && <img src={getFirstGlobalFlagUrl(team.countryCode)} alt={team.countryCode} style={{ height: "1.2em", verticalAlign: "middle", marginRight: "0.2em" }} />}<b>{displayTeamNumber}</b></span><br />
                 {team?.updates?.sayNumber && <span className={"playByPlaysayNumber"}>{team.updates?.sayNumber}<br /></span>}
                 {selectedEvent?.value?.type !== "FIRSTGlobal" && <span >{team?.rookieYear}<br />({years === 1 ? "" : years}{yearsDisplay} season)</span>}
-                {(inPlayoffs || team.alliance) && <p className={"announceAlliance"}>{team.alliance}{(selectedEvent?.value?.name.includes("OFFLINE") && !playoffOnly) ? <></> : <><br />{team.allianceRole}</>}</p>}
+                {inPlayoffs && <p className={"announceAlliance"}>{team.alliance}{(selectedEvent?.value?.name.includes("OFFLINE") && !playoffOnly) ? <></> : <><br />{team.allianceRole}</>}</p>}
             </td>
             <td className={'col2'} style={{ backgroundColor: _.toLower(allianceColor) === "red" ? announceBackground.red : announceBackground.blue }}>
                 <span className={"teamName"}>{team?.updates?.nameShortLocal ? team?.updates?.nameShortLocal : team?.nameShort}</span><br />

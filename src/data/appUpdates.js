@@ -3,7 +3,15 @@ export const appUpdates = [
     date: "October 28, 2026",
     message: (
       <ul>
-        <li>Fixed an issue with OFFLINE match where switching to Play by Play could cause corruption in the schedule, which could also leave matches blank on Schedule and Announce.</li>
+        <li>All Programs:</li>
+        <ul>
+          <li>Alliance affiliations on Announce and Play-by-Play now appear only for playoff matches, not qualification matches, across all programs.</li>
+        </ul>
+        <li>FRC</li>
+        <ul>
+          <li>Fixed an issue with OFFLINE match where switching to Play by Play could cause corruption in the schedule, which could also leave matches blank on Schedule and Announce.</li>
+          <li>When using TBA for offseason events, extra robots now show both identifiers (e.g. 9984/841B) on Teams, Ranks, Schedule, Alliance Selection, Awards, and Flash Cards. Playoff brackets and Stats retain 99XX IDs</li>
+        </ul>
       </ul>
     ),
   },
@@ -27,259 +35,259 @@ export const appUpdates = [
     date: "October 25, 2026",
     message: (
       <>
-      <ul>
-        <li>FRC:</li>
         <ul>
-          <li>Fixed offline playoff schedule imports to display matches, retain future matches with unassigned teams, and preserve Excel match dates and times.</li>
-          <li>Fixed issue with finals match synthetic schedule when using Playoff Bracket tap-to-advance matches</li>
-          <li>Fixed offline finals advancement to keep alliances in their assigned colors and show the correct series advantage on Announce and Play-by-Play screens.</li>
-          <li>Restored finals series advantage below the alliance numbers on the Emcee numbers screen for FRC and FTC.</li>
-        </ul>
-        <li>FTC:</li>
-        <ul>
-          <li>Improved League filtering to account for similarly named Leagues across Regions</li>
-          <li>Event choices now respect both the selected Region/Event Type and League filters.</li>
-        </ul>
-        <li><i><b>FIRST</b></i> Global:</li>
-        <ul>
-          <li>Updated background tint on Settings screen to differentiate between FGC and FTC</li>
-          <li>Removed erroneous Region scores on the Stats page</li>
-          <li></li>
-        </ul>
-      </ul></>
+          <li>FRC:</li>
+          <ul>
+            <li>Fixed offline playoff schedule imports to display matches, retain future matches with unassigned teams, and preserve Excel match dates and times.</li>
+            <li>Fixed issue with finals match synthetic schedule when using Playoff Bracket tap-to-advance matches</li>
+            <li>Fixed offline finals advancement to keep alliances in their assigned colors and show the correct series advantage on Announce and Play-by-Play screens.</li>
+            <li>Restored finals series advantage below the alliance numbers on the Emcee numbers screen for FRC and FTC.</li>
+          </ul>
+          <li>FTC:</li>
+          <ul>
+            <li>Improved League filtering to account for similarly named Leagues across Regions</li>
+            <li>Event choices now respect both the selected Region/Event Type and League filters.</li>
+          </ul>
+          <li><i><b>FIRST</b></i> Global:</li>
+          <ul>
+            <li>Updated background tint on Settings screen to differentiate between FGC and FTC</li>
+            <li>Removed erroneous Region scores on the Stats page</li>
+            <li></li>
+          </ul>
+        </ul></>
     ),
   },
   {
     date: "October 23, 2026",
     message: (
       <>
-      <ul>
-        <li><i><b>FIRST</b></i> Global:</li>
         <ul>
-          <li>Corrected the playoff bracket to show three round-robin finals matches and the winning alliance, ranked by the sum of its two finals scores.</li>
-        </ul>
-      </ul></>
+          <li><i><b>FIRST</b></i> Global:</li>
+          <ul>
+            <li>Corrected the playoff bracket to show three round-robin finals matches and the winning alliance, ranked by the sum of its two finals scores.</li>
+          </ul>
+        </ul></>
     ),
   },
   {
     date: "October 19, 2026",
     message: (
       <>
-      <ul>
-        <li>All Programs:</li>
         <ul>
-          <li>Updated how match results are reported on Playoff Brackets and Schedule screens to remove incorrectly characterized ties for unplayed matches.</li>
-        </ul>
-      </ul></> 
+          <li>All Programs:</li>
+          <ul>
+            <li>Updated how match results are reported on Playoff Brackets and Schedule screens to remove incorrectly characterized ties for unplayed matches.</li>
+          </ul>
+        </ul></>
     ),
-  },{
+  }, {
     date: "October 13, 2026",
     message: (
       <>
-      <ul>
-        <li>FTC:</li>
         <ul>
-          <li>Updated Cheat Sheet</li>
-        </ul>
-      </ul></> 
+          <li>FTC:</li>
+          <ul>
+            <li>Updated Cheat Sheet</li>
+          </ul>
+        </ul></>
     ),
-  },{
+  }, {
     date: "October 8, 2026",
     message: (
       <>
-      <ul>
-        <li><i><b>FIRST</b></i> Global:</li>
         <ul>
-          <li>Users can now filter the event by Field, Field Set or by the entire schedule</li>
-          <li>Qual Average now calculates properly when filtering by Field or Field Set</li>
-          <li>Updated Score Display when you tap on a result in the Schedule screen</li>
-        </ul>
-      </ul></> 
+          <li><i><b>FIRST</b></i> Global:</li>
+          <ul>
+            <li>Users can now filter the event by Field, Field Set or by the entire schedule</li>
+            <li>Qual Average now calculates properly when filtering by Field or Field Set</li>
+            <li>Updated Score Display when you tap on a result in the Schedule screen</li>
+          </ul>
+        </ul></>
     ),
-  },{
+  }, {
     date: "October 7, 2026",
     message: (
       <>
-      <ul>
-        <li><i><b>FIRST</b></i> Global:</li>
         <ul>
-          <li>Fixed issue with team list due to late substitution</li>
+          <li><i><b>FIRST</b></i> Global:</li>
+          <ul>
+            <li>Fixed issue with team list due to late substitution</li>
+          </ul>
         </ul>
-      </ul>
-      <ul>
-        <li>All Programs:</li>
         <ul>
-          <li>Updated CSS to better support Chrome</li>
+          <li>All Programs:</li>
+          <ul>
+            <li>Updated CSS to better support Chrome</li>
+          </ul>
         </ul>
-      </ul>
-      </> 
+      </>
     ),
-  },{
+  }, {
     date: "October 6, 2026",
     message: (
       <>
-      <ul>
-        <li><i><b>FIRST</b></i> Global:</li>
         <ul>
-          <li>Updated Cheat Sheet</li>
-        </ul>
-      </ul></> 
+          <li><i><b>FIRST</b></i> Global:</li>
+          <ul>
+            <li>Updated Cheat Sheet</li>
+          </ul>
+        </ul></>
     ),
-  },{
+  }, {
     date: "October 2, 2026",
     message: (
       <>
-      <ul>
-        <li><i><b>FIRST</b></i> Global:</li>
         <ul>
-          <li>Made it so that Awards screencan be filtered by three-character country code or by country name</li>
-        </ul>
-      </ul></> 
+          <li><i><b>FIRST</b></i> Global:</li>
+          <ul>
+            <li>Made it so that Awards screencan be filtered by three-character country code or by country name</li>
+          </ul>
+        </ul></>
     ),
-  },{
+  }, {
     date: "September 27, 2026",
     message: (
       <>
-      <ul>
-        <li>FTC:</li>
         <ul>
-          <li>Updated foul buttons for BIOBUZZ™</li>
-          <li>Added BIOBUZZ™ logo graphics</li>
-          <li>Added BIOBUZZ™ Cheat Sheet</li>
-        </ul>
-      </ul></> 
+          <li>FTC:</li>
+          <ul>
+            <li>Updated foul buttons for BIOBUZZ™</li>
+            <li>Added BIOBUZZ™ logo graphics</li>
+            <li>Added BIOBUZZ™ Cheat Sheet</li>
+          </ul>
+        </ul></>
     ),
-  },{
+  }, {
     date: "September 9, 2026",
     message: (
       <>
-      <ul>
-        <li><i><b>FIRST</b></i> Global:</li>
         <ul>
-          <li>Added Awards</li>
-          <li>Added Foul buttons</li>
-          <li>Ensured 2026 event isproperly displayed</li>
-          <li>Introduced role controls to limit edit access</li>
+          <li><i><b>FIRST</b></i> Global:</li>
+          <ul>
+            <li>Added Awards</li>
+            <li>Added Foul buttons</li>
+            <li>Ensured 2026 event isproperly displayed</li>
+            <li>Introduced role controls to limit edit access</li>
+          </ul>
+          <li>FRC:</li>
+          <ul>
+            <li>Removed Caster's Tool stats</li>
+          </ul>
+          <li>All programs</li>
+          <ul>
+            <li><i>Show Quals Statistics in Playoffs</i> now toggles Ranking on Announce</li>
+          </ul>
         </ul>
-        <li>FRC:</li>
-        <ul>
-          <li>Removed Caster's Tool stats</li>
-        </ul>
-        <li>All programs</li>
-        <ul>
-          <li><i>Show Quals Statistics in Playoffs</i> now toggles Ranking on Announce</li>
-        </ul>
-      </ul>
       </>
     ),
-  },{
+  }, {
     date: "June 22, 2026",
     message: (
       <>
-      <b>OFFSEASON UPDATES</b><br />
-      <ul>
-        <li><i><b>FIRST</b></i> Global:</li>
+        <b>OFFSEASON UPDATES</b><br />
         <ul>
-          <li>Adding support for FIRST Global</li>
-          <li>Users can now select FIRST Global and filter matches by Field Set</li>
-          <li>Team data can be updated per country</li>
-          <li>Includes Cheat Sheet and flash cards for FIRST Global</li>
+          <li><i><b>FIRST</b></i> Global:</li>
+          <ul>
+            <li>Adding support for FIRST Global</li>
+            <li>Users can now select FIRST Global and filter matches by Field Set</li>
+            <li>Team data can be updated per country</li>
+            <li>Includes Cheat Sheet and flash cards for FIRST Global</li>
+          </ul>
         </ul>
-      </ul>
       </>
     ),
-  },{
+  }, {
     date: "June 7, 2026",
     message: (
       <>
-      <b>OFFSEASON UPDATES</b><br />
-      <ul>
-        <li>FTC:</li>
+        <b>OFFSEASON UPDATES</b><br />
         <ul>
-          <li>3-Team Alliances are now supported for FTC events</li>
-          <li>Proper support for offseason demo teams in FTC events</li>
+          <li>FTC:</li>
+          <ul>
+            <li>3-Team Alliances are now supported for FTC events</li>
+            <li>Proper support for offseason demo teams in FTC events</li>
+          </ul>
         </ul>
-      </ul>
       </>
     ),
-  },{
+  }, {
     date: "June 5, 2026",
     message: (
       <>
-      <b>OFFSEASON UPDATES</b><br />
-      <ul>
-        <li>FRC:</li>
+        <b>OFFSEASON UPDATES</b><br />
         <ul>
-          <li>When using a registered FRC event, if gatool cannot get event data from FIRST API, we will now attempt to load event data from TBA API. If that fails, we will fall back to Nexus API for schedule.</li>
+          <li>FRC:</li>
+          <ul>
+            <li>When using a registered FRC event, if gatool cannot get event data from FIRST API, we will now attempt to load event data from TBA API. If that fails, we will fall back to Nexus API for schedule.</li>
+          </ul>
         </ul>
-      </ul>
       </>
     ),
-  },{
+  }, {
     date: "June 3, 2026",
     message: (
       <>
-      <b>OFFSEASON UPDATES</b><br />
-      <ul>
-        <li>FRC:</li>
+        <b>OFFSEASON UPDATES</b><br />
         <ul>
-          <li>Test Match mode:</li>
+          <li>FRC:</li>
           <ul>
-            <li>Users can now add a 4th team to an Alliance in Test Match mode</li>
-            <li>Users can now add choose Alliances in Test Match mode</li>
-          </ul>
-        <li>Alliance Selection:</li>
-          <ul>
-            <li>Alliance Selection now supports more than 8 Alliances</li>
-            <li>Alliance Selection now supports changing the order of the Alliance Selection rounds</li>
+            <li>Test Match mode:</li>
+            <ul>
+              <li>Users can now add a 4th team to an Alliance in Test Match mode</li>
+              <li>Users can now add choose Alliances in Test Match mode</li>
+            </ul>
+            <li>Alliance Selection:</li>
+            <ul>
+              <li>Alliance Selection now supports more than 8 Alliances</li>
+              <li>Alliance Selection now supports changing the order of the Alliance Selection rounds</li>
+            </ul>
           </ul>
         </ul>
-      </ul>
       </>
     ),
-  },{
+  }, {
     date: "May 8, 2026",
     message: (
       <>
-      <b>MAJOR REFACTORING OF THE APP CODEBASE</b><br />
-      <ul>
-        <li>ALL PROGRAMS:</li>
+        <b>MAJOR REFACTORING OF THE APP CODEBASE</b><br />
         <ul>
-        <li>You can now use Passkeys or email OTP when authenticating</li>
-        <li>Choosing FIRST Championship in the Timeframe selector on Setup Page now works for both FRC and FTC</li>
-        <li>Internatinal teams' countries repeated in many placeswhen users entered updated city/state details. This no longer happens.</li>
-        <li>You can now see the date when Notes fields were last updated.</li>
+          <li>ALL PROGRAMS:</li>
+          <ul>
+            <li>You can now use Passkeys or email OTP when authenticating</li>
+            <li>Choosing FIRST Championship in the Timeframe selector on Setup Page now works for both FRC and FTC</li>
+            <li>Internatinal teams' countries repeated in many placeswhen users entered updated city/state details. This no longer happens.</li>
+            <li>You can now see the date when Notes fields were last updated.</li>
+          </ul>
+          <li>FRC:</li>
+          <ul>
+            <li>Users can now reorder teams for unplayed matches during FRC Championship Division and Einstein playoffs</li>
+            <li>Removed Reserve Team list on Alliance Selection screen for FRC Championship Divisions</li>
+            <li>Added Impact and Einstein winners</li>
+          </ul>
+          <li>FTC:</li>
+          <ul>
+            <li>Restored the third Alliance member during Champs Divisional playoffs and Finals tournaments for FTC</li>
+            <li>Removed Reserve Team list on Alliance Selection screen</li>
+            <li>Added Inspire and da Vinci winners</li>
+            <li>Adding da Vinci Tournament Bracket for FTC</li>
+          </ul>
         </ul>
-        <li>FRC:</li>
-        <ul>
-        <li>Users can now reorder teams for unplayed matches during FRC Championship Division and Einstein playoffs</li>
-        <li>Removed Reserve Team list on Alliance Selection screen for FRC Championship Divisions</li>
-        <li>Added Impact and Einstein winners</li>
-        </ul>
-        <li>FTC:</li>
-        <ul>
-        <li>Restored the third Alliance member during Champs Divisional playoffs and Finals tournaments for FTC</li>
-        <li>Removed Reserve Team list on Alliance Selection screen</li>
-        <li>Added Inspire and da Vinci winners</li>
-        <li>Adding da Vinci Tournament Bracket for FTC</li>
-        </ul>
-      </ul>
       </>
     ),
-  },{
+  }, {
     date: "April 29, 2026",
     message: (
       <ul>
         <li>ALL PROGRAMS:</li>
         <ul>
-        <li>Added FIRST Championship to the Timeframe selector on Setup Page</li>
-        <li>On Awards, internatinal teams' countries repeated when users entered updated city/state details. This no longer happens.</li>
+          <li>Added FIRST Championship to the Timeframe selector on Setup Page</li>
+          <li>On Awards, internatinal teams' countries repeated when users entered updated city/state details. This no longer happens.</li>
           <li>Performance improvements when rendering some screens</li>
           <li>Made prior years' awards' event names dynamic to reduce maintenance</li>
         </ul>
       </ul>
     ),
-  },{
+  }, {
     date: "April 22, 2026",
     message: (
       <ul>
@@ -294,7 +302,7 @@ export const appUpdates = [
         </ul>
       </ul>
     ),
-  },{
+  }, {
     date: "April 20, 2026",
     message: (
       <ul>
@@ -305,7 +313,7 @@ export const appUpdates = [
         </ul>
       </ul>
     ),
-  },{
+  }, {
     date: "April 16, 2026",
     message: (
       <ul>
@@ -315,7 +323,7 @@ export const appUpdates = [
         </ul>
       </ul>
     ),
-  },{
+  }, {
     date: "April 13, 2026",
     message: (
       <ul>
@@ -332,7 +340,7 @@ export const appUpdates = [
         </ul>
       </ul>
     ),
-  },{
+  }, {
     date: "April 7, 2026",
     message: (
       <ul>
@@ -346,7 +354,7 @@ export const appUpdates = [
         </ul>
       </ul>
     ),
-  },{
+  }, {
     date: "April 5, 2026",
     message: (
       <ul>
@@ -357,7 +365,7 @@ export const appUpdates = [
         </ul>
       </ul>
     ),
-  },{
+  }, {
     date: "April 3, 2026",
     message: (
       <ul>
@@ -367,7 +375,7 @@ export const appUpdates = [
         </ul>
       </ul>
     ),
-  },{
+  }, {
     date: "April 1, 2026",
     message: (
       <ul>
@@ -392,7 +400,7 @@ export const appUpdates = [
         </ul>
       </ul>
     ),
-  },{
+  }, {
     date: "March 23, 2026",
     message: (
       <ul>
@@ -403,7 +411,7 @@ export const appUpdates = [
         </ul>
       </ul>
     ),
-  },{
+  }, {
     date: "March 19, 2026",
     message: (
       <ul>
@@ -415,7 +423,7 @@ export const appUpdates = [
         </ul>
       </ul>
     ),
-  },{
+  }, {
     date: "March 10, 2026",
     message: (
       <ul>
@@ -425,7 +433,7 @@ export const appUpdates = [
         </ul>
       </ul>
     ),
-  },{
+  }, {
     date: "March 8, 2026",
     message: (
       <ul>
@@ -442,7 +450,7 @@ export const appUpdates = [
         </ul>
       </ul>
     ),
-  },{
+  }, {
     date: "February 28, 2026",
     message: (
       <ul>
@@ -457,7 +465,7 @@ export const appUpdates = [
         </ul>
       </ul>
     ),
-  },{
+  }, {
     date: "February 26, 2026",
     message: (
       <ul>
@@ -474,7 +482,7 @@ export const appUpdates = [
         </ul>
       </ul>
     ),
-  },{
+  }, {
     date: "February 22, 2026",
     message: (
       <ul>
@@ -490,7 +498,7 @@ export const appUpdates = [
         </ul>
       </ul>
     ),
-  },{
+  }, {
     date: "February 18, 2026",
     message: (
       <ul>
@@ -502,7 +510,7 @@ export const appUpdates = [
         </ul>
       </ul>
     ),
-  },{
+  }, {
     date: "February 13, 2026",
     message: (
       <ul>
@@ -512,7 +520,7 @@ export const appUpdates = [
         </ul>
       </ul>
     ),
-  },{
+  }, {
     date: "February 2, 2026",
     message: (
       <ul>
@@ -532,7 +540,7 @@ export const appUpdates = [
         </ul>
       </ul>
     ),
-  },{
+  }, {
     date: "January 25, 2026",
     message: (
       <ul>
@@ -544,7 +552,7 @@ export const appUpdates = [
         </ul>
       </ul>
     ),
-  },{
+  }, {
     date: "January 18, 2026",
     message: (
       <ul>
@@ -555,7 +563,7 @@ export const appUpdates = [
         </ul>
       </ul>
     ),
-  },{
+  }, {
     date: "January 16, 2026",
     message: (
       <ul>
@@ -566,7 +574,7 @@ export const appUpdates = [
         </ul>
       </ul>
     ),
-  },{
+  }, {
     date: "January 12, 2026",
     message: (
       <ul>
@@ -574,15 +582,15 @@ export const appUpdates = [
         <ul>
           <li>Fixed an issue where updates to team data were not being saved correctly and causing the app to crash</li>
         </ul>
-        
+
         <li>FRC:</li>
         <ul>
-        <li>Updated fouls to match REBUILT™ game rules</li>
-        <li>Updated cheat sheet to match REBUILT™ game</li>
+          <li>Updated fouls to match REBUILT™ game rules</li>
+          <li>Updated cheat sheet to match REBUILT™ game</li>
         </ul>
       </ul>
     ),
-  },{
+  }, {
     date: "December 16, 2025",
     message: (
       <ul>
@@ -594,16 +602,16 @@ export const appUpdates = [
           <li>Fixed 🤞 rendering issue which caused the footer to move when scrolling on the Alliance Selection screen</li>
           <li>Added scrolling memory for screens. Enabled by default, can be disabled on the Setup page</li>
         </ul>
-        
+
         <li>FRC:</li>
         <ul>
-        <li>Updated game brand on Setting page to animated REBUILT™ logo</li>
+          <li>Updated game brand on Setting page to animated REBUILT™ logo</li>
         </ul>
       </ul>
     ),
-  },{
+  }, {
     date: "December 9, 2025",
-        message: (
+    message: (
       <ul>
         <li>ALL PROGRAMS: Updated logic for Alliance Selection to only show teams that are competing in the event</li>
         <li>FRC: Updated game brand on Setting page to REBUILT™</li>
@@ -612,7 +620,7 @@ export const appUpdates = [
         <li>FTC: Fixed a bug that prevented OPA and season stats from displaying correctly on the Ranks and Play-By-Play pages</li>
       </ul>
     ),
-  },{
+  }, {
     date: "November 17, 2025",
     message: (
       <ul>
@@ -623,7 +631,7 @@ export const appUpdates = [
         <li>FTC: Fixed cache timing issues in our APIs that prevented some team data from loading in a timely manner</li>
       </ul>
     ),
-  },{
+  }, {
     date: "November 8, 2025",
     message: (
       <ul>
@@ -633,7 +641,7 @@ export const appUpdates = [
         <li>Fixed a bug where Blue Banner statistics were not displayed correctly on Announce for TBA-soueces events</li>
       </ul>
     ),
-  },{
+  }, {
     date: "November 3, 2025",
     message: (
       <ul>
@@ -645,7 +653,7 @@ export const appUpdates = [
         <li>Fixed a bug that ignored certain event properties when loading from TBA</li>
       </ul>
     ),
-  },{
+  }, {
     date: "October 25, 2025",
     message: (
       <ul>
@@ -655,7 +663,7 @@ export const appUpdates = [
         <li>Fixed crashes when loading TBA events without score data</li>
       </ul>
     ),
-  },{
+  }, {
     date: "October 23, 2025",
     message: (
       <ul>
