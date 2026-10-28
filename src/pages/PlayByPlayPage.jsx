@@ -400,19 +400,6 @@ function PlayByPlayPage({
       },
     };
 
-  if (
-    (practiceSchedule?.schedule?.schedule?.length > 0 ||
-      practiceSchedule?.schedule?.length > 0) &&
-    adHocMatch &&
-    (!qualSchedule ||
-      qualSchedule?.schedule?.length === 0 ||
-      qualSchedule?.schedule?.schedule?.length === 0)
-  ) {
-    if (matchDetails?.teams) {
-      matchDetails.teams = adHocMatch;
-    }
-  }
-
   var inPlayoffs = matchDetails?.tournamentLevel
     ? (matchDetails?.tournamentLevel.toLowerCase() === "playoff" || matchDetails?.tournamentLevel.toLowerCase() === "finals")
     : false;
