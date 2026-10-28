@@ -25,6 +25,7 @@ import { useSettings } from "../contexts/SettingsContext";
 import { useEventData } from "contexts/EventDataContext";
 import { useEventActions } from "contexts/EventActionsContext";
 import { orderByTeamNumber } from "../utils/teamNumberSort";
+import { formatTeamNumber } from "../utils/teamNumberDisplay";
 
 function RanksPage({
   rankSort,
@@ -741,9 +742,7 @@ function RanksPage({
                         : `TBD`;
 
                     // Display remapped team number if available
-                    const displayTeamNumber = remapNumberToString
-                      ? remapNumberToString(rankRow.teamNumber)
-                      : rankRow.teamNumber;
+                    const displayTeamNumber = formatTeamNumber(rankRow.teamNumber, remapNumberToString, remapStringToNumber);
 
                     return (
                       <tr key={"rankings" + rankRow.teamNumber}>

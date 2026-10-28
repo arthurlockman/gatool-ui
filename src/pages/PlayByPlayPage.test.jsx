@@ -20,7 +20,7 @@ vi.mock("contexts/EventActionsContext", () => ({ useEventActions: vi.fn() }));
 // PlayByPlay is stubbed to render a detectable element keyed by station so
 // tests can assert which rows are rendered without parsing CSS class names.
 vi.mock("../components/PlayByPlay", () => ({
-    default: ({ station }) => <td data-testid={`pbp-${station}`} />,
+    default: ({ station, team }) => <td data-testid={`pbp-${station}`}>{team?.teamNumber}</td>,
 }));
 vi.mock("../components/TopButtons", () => ({ default: () => <div data-testid="top-buttons" /> }));
 vi.mock("../components/BottomButtons", () => ({ default: () => <div data-testid="bottom-buttons" /> }));
@@ -172,6 +172,65 @@ function baseProps(overrides = {}) {
 }
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
+
+describe("PlayByPlayPage offline scheduled matches", () => {
+    it.each(["nested", "flat"])("preserves %s schedules when navigating and toggling ad-hoc mode", (shape) => {
+        setupMocks();
+        const stations = ["Red1", "Red2", "Red3", "Blue1", "Blue2", "Blue3"];
+        const matchTeams = [
+            [6153, 2648, 4564, 58, 9996, 133],
+            [9999, 4473, 9997, 9055, 9998, 172],
+            [9999, 4564, 5687, 2648, 9055, 6153],
+            [5687, 4473, 58, 172, 9997, 9996],
+        ];
+        const matches = matchTeams.map((numbers, index) => ({
+            ...makePlayoffMatch(),
+            tournamentLevel: "Practice",
+            description: `Qualification ${index + 1}`,
+            matchNumber: index + 1,
+            teams: numbers.map((teamNumber, i) => ({
+                teamNumber, station: stations[i], surrogate: false, dq: false,
+            })),
+        }));
+        const original = structuredClone(matches);
+        const eventData = {
+            ...useEventData(),
+            selectedEvent: { value: { code: "OFFLINE", name: "Mainely SPIRIT", type: "OffSeason", champLevel: "" } },
+            ftcMode: false,
+            teamList: { teams: [...new Set(matchTeams.flat())].map((teamNumber) => ({ teamNumber, nameShort: `Team ${teamNumber}` })) },
+            playoffSchedule: { schedule: [] },
+            practiceSchedule: { schedule: shape === "nested" ? { schedule: matches } : matches },
+        };
+        useEventData.mockReturnValue(eventData);
+        const emptyAdHoc = stations.map((station) => ({ station, teamNumber: null }));
+        const props = baseProps({ adHocMatch: emptyAdHoc, qualsLength: matches.length });
+        const { rerender } = render(<PlayByPlayPage {...props} />);
+        const expectMatch = (numbers) => {
+            stations.forEach((station, i) => {
+                expect(screen.getByTestId(`pbp-${station}`)).toHaveTextContent(String(numbers[i]));
+            });
+        };
+
+        expectMatch(matchTeams[0]);
+        expect(matches).toMatchObject(original);
+        eventData.currentMatch = 4;
+        rerender(<PlayByPlayPage {...props} />);
+        expectMatch(matchTeams[3]);
+        expect(matches).toMatchObject(original);
+
+        const adHocMatch = stations.map((station) => ({ station, teamNumber: 9055 }));
+        rerender(<PlayByPlayPage {...props} adHocMatch={adHocMatch} adHocMode />);
+        expectMatch(stations.map(() => 9055));
+        expect(matches).toMatchObject(original);
+
+        rerender(<PlayByPlayPage {...props} adHocMatch={adHocMatch} />);
+        expectMatch(matchTeams[3]);
+        eventData.currentMatch = 1;
+        rerender(<PlayByPlayPage {...props} adHocMatch={adHocMatch} />);
+        expectMatch(matchTeams[0]);
+        expect(matches).toMatchObject(original);
+    });
+});
 
 describe("PlayByPlayPage – FTC row-5 (Blue3/Red3) visibility", () => {
     beforeEach(() => {

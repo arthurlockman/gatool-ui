@@ -70,7 +70,7 @@ describe("AllianceSelection team identifiers", () => {
         expect(getSelection().alliances.map((alliance) => alliance.captain.teamNumber)).toEqual([1678, 9984]);
         for (const [number, display] of Object.entries(remappings)) {
             expect(getSelection().availableTeams.some((team) => team.teamNumber === Number(number))).toBe(true);
-            expect(screen.getAllByText(display).length).toBeGreaterThan(0);
+            expect(screen.getAllByText(`${number}/${display}`).length).toBeGreaterThan(0);
         }
         expect(getSelection().rankedTeams.some((team) => team.teamNumber === 12345)).toBe(false);
         expect(ranks[1].teamNumber).toBe("841B");
@@ -83,11 +83,11 @@ describe("AllianceSelection team identifiers", () => {
         fireEvent.change(screen.getByLabelText("Team Number"), { target: { value: "8b" } });
         const available = document.querySelectorAll(".availableTeam");
         expect(available).toHaveLength(1);
-        expect(available[0]).toHaveTextContent("8B");
+        expect(available[0]).toHaveTextContent("9997/8B");
 
         fireEvent.click(screen.getByRole("button", { name: "Select this team" }));
         const dialog = await screen.findByRole("dialog");
-        expect(dialog).toHaveTextContent("8B");
+        expect(dialog).toHaveTextContent("9997/8B");
         expect(dialog).toHaveTextContent("Extra robot");
         fireEvent.click(screen.getByRole("button", { name: /accept/i }));
         fireEvent.click(screen.getByRole("button", { name: /accept/i }));
@@ -97,8 +97,8 @@ describe("AllianceSelection team identifiers", () => {
     it("orders Teams for Alliance Selection by number then suffix", async () => {
         const { getSelection } = renderSelection();
         await waitFor(() => expect(getSelection().rankedTeams).toHaveLength(8));
-        const order = [...document.querySelectorAll(".availableTeam")].map((cell) => cell.textContent.match(/^\d+[A-Z]*/)?.[0]);
-        expect(order).toEqual(["8B", "841", "841B", "2035B", "2135B", "4698B", "7419B"]);
+        const order = [...document.querySelectorAll(".availableTeam")].map((cell) => cell.textContent.match(/^\d+(?:\/\d+[A-Z]+)?/)?.[0]);
+        expect(order).toEqual(["9997/8B", "841", "9984/841B", "9995/2035B", "9996/2135B", "9998/4698B", "9974/7419B"]);
         expect(getSelection().availableTeams.map((team) => team.teamNumber)).toEqual([9997, 841, 9984, 9995, 9996, 9998, 9974]);
     });
 

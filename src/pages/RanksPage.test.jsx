@@ -112,9 +112,9 @@ describe("RanksPage", () => {
     });
     const { container, rerender } = render(<RanksPage {...baseProps({ rankSort: "teamNumber" })} />);
     const order = () => [...container.querySelectorAll("tbody tr")].map((row) => row.cells[0].textContent.trim().split(/\s/)[0]);
-    expect(order()).toEqual(["8", "8B", "841", "841B", "1678"]);
+    expect(order()).toEqual(["8", "9997/8B", "841", "9984/841B", "1678"]);
 
     rerender(<RanksPage {...baseProps({ rankSort: "-teamNumber" })} />);
-    expect(order()).toEqual(["1678", "841B", "841", "8B", "8"]);
+    expect(order()).toEqual(["1678", "9984/841B", "841", "9997/8B", "8"]);
   });
 });

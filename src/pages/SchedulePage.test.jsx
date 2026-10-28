@@ -119,9 +119,23 @@ describe("SchedulePage", () => {
     expect(screen.getByText("1")).toBeInTheDocument();
   });
 
+  it("shows both TBA identifiers in the schedule", () => {
+    setupMocks({
+      remapNumberToString: (n) => n === 9984 ? "841B" : n,
+      qualSchedule: { schedule: [{
+        matchNumber: 1,
+        description: "Qualification 1",
+        teams: [{ teamNumber: 9984, station: "Red1" }],
+      }] },
+    });
+    render(<SchedulePage {...schedulePageProps()} />);
+    expect(screen.getByText("9984/841B")).toBeInTheDocument();
+  });
+
   it("imports and displays a four-alliance Excel playoff schedule including future matches", async () => {
     setupMocks({
       selectedEvent: { value: { code: "OFFLINE" }, label: "Offline Event" },
+      remapNumberToString: (n) => n === 9998 ? "4698B" : String(n),
     });
     const getAlliances = vi.fn();
     const getTeamList = vi.fn();
@@ -168,7 +182,7 @@ describe("SchedulePage", () => {
     expect(moment(saved.schedule[0].startTime).format("YYYY-MM-DD HH:mm")).toBe("2026-10-24 13:45");
     expect(saved.schedule[2].teams).toHaveLength(6);
     expect(saved.schedule[2].teams.every((team) => team.teamNumber === null)).toBe(true);
-    expect(getAlliances.mock.calls[0][0].Alliances.map((alliance) => alliance.captain)).toEqual(["133", "2648", "58", "9998"]);
+    expect(getAlliances.mock.calls[0][0].Alliances.map((alliance) => alliance.captain)).toEqual(["133", "2648", "58", "4698B"]);
     expect(getTeamList).toHaveBeenCalledWith(expect.arrayContaining([133, 5687, 9997, 9998, 4473, 172]));
     expect(getTeamList.mock.calls[0][0]).toHaveLength(12);
     expect(getTeamList.mock.calls[0][0]).not.toContain(null);

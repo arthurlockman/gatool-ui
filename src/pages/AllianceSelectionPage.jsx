@@ -30,7 +30,7 @@ function AllianceSelectionPage({
   setOfflinePlayoffSchedule,
   qualsLength,
 }) {
-  const { selectedEvent, selectedYear, qualSchedule, playoffSchedule, offlinePlayoffSchedule, alliances, rankings, teamList, allianceCount, communityUpdates, practiceSchedule, currentMatch, eventLabel, ftcMode, firstGlobalMode, remapNumberToString } = useEventData();
+  const { selectedEvent, selectedYear, qualSchedule, playoffSchedule, offlinePlayoffSchedule, alliances, rankings, teamList, allianceCount, communityUpdates, practiceSchedule, currentMatch, eventLabel, ftcMode, firstGlobalMode, remapNumberToString, remapStringToNumber } = useEventData();
   const { getRanks, loadEvent, nextMatch, previousMatch, getSchedule } = useEventActions();
     const { timeFormat, useSwipe, usePullDownToUpdate, useFourTeamAlliances, setUseFourTeamAlliances, useScrollMemory, rankingsOverride,
         playoffCountOverride, setPlayoffCountOverride, allianceSelectionRoundOrder, setAllianceSelectionRoundOrder, nonStandardPlayoffs } = useSettings();
@@ -156,6 +156,9 @@ function AllianceSelectionPage({
             const lookupTeam = getTeamByStation(match?.teams, allianceColor === "red" ? "Red1" : "Blue1");
             targetAlliance = alliances?.Lookup[`${remapNumberToString(lookupTeam)}`];
             allianceMembers = _.compact([targetAlliance?.captain, targetAlliance?.round1, targetAlliance?.round2, targetAlliance?.round3, targetAlliance?.backup]);
+            if (!ftcMode && remapStringToNumber) {
+                allianceMembers = allianceMembers.map(remapStringToNumber);
+            }
             alliance = allianceMembers.join("  ");
         }
         //todo: layer in fourth member for new playoff modes
